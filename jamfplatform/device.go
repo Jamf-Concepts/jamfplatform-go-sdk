@@ -243,3 +243,28 @@ func (c *Client) ListDevicesForUser(ctx context.Context, userID string, sort []s
 		return result.Results, result.HasNext, nil
 	})
 }
+
+// GetDeviceBySerialNumber looks up a single device by its serial number.
+// It returns an error if no device is found or if multiple devices match.
+func (c *Client) GetDeviceBySerialNumber(ctx context.Context, serialNumber string) (*DeviceReadRepresentationV1, error) {
+	if serialNumber == "" {
+		return nil, fmt.Errorf("serial number cannot be empty")
+	}
+
+	filter := BuildRSQLExpression([]RSQLClause{
+		{Selector: "serialNumber", Operator: "==", Argument: serialNumber},
+	})
+	devices, err := c.ListDevices(ctx, nil, filter)
+	if err != nil {
+		return nil, fmt.Errorf("GetDeviceBySerialNumber(%s): %w", serialNumber, err)
+	}
+
+	switch len(devices) {
+	case 0:
+		return nil, fmt.Errorf("GetDeviceBySerialNumber(%s): no device found", serialNumber)
+	case 1:
+		return c.GetDevice(ctx, devices[0].ID)
+	default:
+		return nil, fmt.Errorf("GetDeviceBySerialNumber(%s): multiple devices (%d) found", serialNumber, len(devices))
+	}
+}

@@ -177,3 +177,72 @@ func TestListDevicesForUser(t *testing.T) {
 		t.Errorf("got %+v", devices)
 	}
 }
+
+func TestGetDeviceBySerialNumber(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("filter") == "" {
+			t.Error("expected filter parameter")
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "dev-abc", "name": "Mac1", "serialNumber": "ABC123"},
+			},
+			"hasNext": false,
+		})
+	})
+	mux.HandleFunc("/management/devices/v1/devices/dev-abc", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"id": "dev-abc", "name": "Mac1",
+		})
+	})
+
+	device, err := c.GetDeviceBySerialNumber(context.Background(), "ABC123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if device.ID != "dev-abc" {
+		t.Errorf("ID = %q, want dev-abc", device.ID)
+	}
+}
+
+func TestGetDeviceBySerialNumber_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []any{},
+			"hasNext": false,
+		})
+	})
+
+	_, err := c.GetDeviceBySerialNumber(context.Background(), "NOSUCH")
+	if err == nil {
+		t.Fatal("expected error for missing device")
+	}
+}
+
+func TestGetDeviceBySerialNumber_MultipleMatches(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "d1", "serialNumber": "DUP"},
+				{"id": "d2", "serialNumber": "DUP"},
+			},
+			"hasNext": false,
+		})
+	})
+
+	_, err := c.GetDeviceBySerialNumber(context.Background(), "DUP")
+	if err == nil {
+		t.Fatal("expected error for multiple devices")
+	}
+}
+
+func TestGetDeviceBySerialNumber_EmptySerial(t *testing.T) {
+	c, _ := testServer(t)
+	_, err := c.GetDeviceBySerialNumber(context.Background(), "")
+	if err == nil {
+		t.Fatal("expected error for empty serial")
+	}
+}

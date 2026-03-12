@@ -1,0 +1,18 @@
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package jamfplatform
+
+import (
+	"context"
+	"time"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
+)
+
+// PollUntil repeatedly invokes checker until it reports completion or returns an error.
+// Between attempts the function waits for the provided interval while respecting context cancellation.
+// Use context.WithTimeout to bound the total polling duration.
+func PollUntil(ctx context.Context, interval time.Duration, checker func(context.Context) (bool, error)) error {
+	return client.PollUntil(ctx, interval, checker)
+}
