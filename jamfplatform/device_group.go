@@ -173,13 +173,8 @@ func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]strin
 		endpoint := fmt.Sprintf("%s/device-groups/%s/members?%s", deviceGroupsV1Prefix, url.PathEscape(id), params.Encode())
 
 		var result struct {
-			Results     []string `json:"results"`
-			TotalCount  int      `json:"totalCount"`
-			Page        int      `json:"page"`
-			PageSize    int      `json:"pageSize"`
-			TotalPages  int      `json:"totalPages"`
-			HasNext     bool     `json:"hasNext"`
-			HasPrevious bool     `json:"hasPrevious"`
+			client.PaginatedResponseRepresentation
+			Results []string `json:"results"`
 		}
 		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 			return nil, false, err
@@ -207,13 +202,8 @@ func (c *Client) ListDeviceGroupsForDevice(ctx context.Context, deviceID string)
 		endpoint := fmt.Sprintf("%s/devices/%s/device-groups?%s", deviceGroupsV1Prefix, url.PathEscape(deviceID), params.Encode())
 
 		var result struct {
-			Results     []DeviceGroupMemberOfRepresentationV1 `json:"results"`
-			TotalCount  int                                   `json:"totalCount"`
-			Page        int                                   `json:"page"`
-			PageSize    int                                   `json:"pageSize"`
-			TotalPages  int                                   `json:"totalPages"`
-			HasNext     bool                                  `json:"hasNext"`
-			HasPrevious bool                                  `json:"hasPrevious"`
+			client.PaginatedResponseRepresentation
+			Results []DeviceGroupMemberOfRepresentationV1 `json:"results"`
 		}
 		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 			return nil, false, err
