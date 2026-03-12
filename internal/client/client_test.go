@@ -18,7 +18,7 @@ func newTestServer(t *testing.T) (*httptest.Server, *http.ServeMux) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/auth/token", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{
+		_ = json.NewEncoder(w).Encode(map[string]any{
 			"access_token": "test-token",
 			"token_type":   "bearer",
 			"expires_in":   3600,
@@ -44,7 +44,7 @@ func TestDo_Success(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		json.NewEncoder(w).Encode(map[string]string{"name": "hello"})
+		_ = json.NewEncoder(w).Encode(map[string]string{"name": "hello"})
 	})
 
 	var result struct{ Name string }
@@ -68,8 +68,8 @@ func TestDo_PostWithBody(t *testing.T) {
 			t.Errorf("Content-Type = %q, want application/json", ct)
 		}
 		var body map[string]string
-		json.NewDecoder(r.Body).Decode(&body)
-		json.NewEncoder(w).Encode(map[string]string{"id": "123", "name": body["name"]})
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		_ = json.NewEncoder(w).Encode(map[string]string{"id": "123", "name": body["name"]})
 	})
 
 	var result struct {
@@ -89,7 +89,7 @@ func TestDoExpect_CorrectStatus(t *testing.T) {
 	c, _, mux := newTestClient(t)
 	mux.HandleFunc("/api/create", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]string{"id": "new"})
+		_ = json.NewEncoder(w).Encode(map[string]string{"id": "new"})
 	})
 
 	var result struct{ ID string }
@@ -106,7 +106,7 @@ func TestDoExpect_WrongStatus(t *testing.T) {
 	c, _, mux := newTestClient(t)
 	mux.HandleFunc("/api/missing", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(ApiError{
+		_ = json.NewEncoder(w).Encode(ApiError{
 			HTTPStatus: 404,
 			TraceID:    "trace-abc",
 			Errors:     []Error{{Code: "NOT_FOUND", Field: "id", Description: "resource not found"}},
