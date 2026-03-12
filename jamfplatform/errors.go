@@ -1,0 +1,18 @@
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package jamfplatform
+
+import (
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
+)
+
+// Sentinel errors re-exported from the transport layer.
+var (
+	ErrAuthentication = client.ErrAuthentication
+	ErrNotFound       = client.ErrNotFound
+)
+
+// APIResponseError is a type alias for the transport layer's structured API error.
+// Users can use errors.As(err, &apiErr) to inspect API response details.
+type APIResponseError = client.APIResponseError
