@@ -91,13 +91,30 @@ devices, err := client.ListDevices(ctx, nil, filter)
 
 | Domain | Methods |
 |--------|---------|
-| Devices | ListDevices, GetDevice, UpdateDevice, DeleteDevice, ListDeviceApplications, ListDevicesForUser |
+| Devices | ListDevices, GetDevice, GetDeviceBySerialNumber, UpdateDevice, DeleteDevice, ListDeviceApplications, ListDevicesForUser |
 | Device Groups | ListDeviceGroups, GetDeviceGroup, CreateDeviceGroup, UpdateDeviceGroup, DeleteDeviceGroup, ListDeviceGroupMembers, UpdateDeviceGroupMembers, ListDeviceGroupsForDevice |
 | Device Actions | EraseDevice, RestartDevice, ShutdownDevice, UnmanageDevice |
 | Blueprints | ListBlueprints, GetBlueprint, GetBlueprintByName, CreateBlueprint, UpdateBlueprint, DeleteBlueprint, DeployBlueprint, UndeployBlueprint, ListBlueprintComponents, GetBlueprintComponent |
 | Compliance Benchmarks | ListBaselines, GetBaselineRules, ListBenchmarks, GetBenchmark, GetBenchmarkByTitle, CreateBenchmark, DeleteBenchmark |
 
 All list methods handle pagination automatically.
+
+### Async polling
+
+For async operations (e.g. benchmark sync), use the `PollUntil` helper:
+
+```go
+ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+defer cancel()
+
+err := jamfplatform.PollUntil(ctx, 5*time.Second, func(ctx context.Context) (bool, error) {
+	bm, err := client.GetBenchmark(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	return bm.SyncState == "SYNCED", nil
+})
+```
 
 ## License
 
