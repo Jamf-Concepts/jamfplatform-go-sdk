@@ -1,0 +1,25 @@
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+// Package jamfplatform provides a Go client for the Jamf Platform API.
+//
+// Create a client with [NewClient] and use the typed methods to manage
+// Jamf Platform resources such as blueprints, device groups, benchmarks, and devices.
+//
+//	c := jamfplatform.NewClient(
+//		"https://your-tenant.apigw.jamf.com",
+//		os.Getenv("JAMFPLATFORM_CLIENT_ID"),
+//		os.Getenv("JAMFPLATFORM_CLIENT_SECRET"),
+//	)
+//
+//	devices, err := c.ListDevices(ctx, nil, "")
+//
+// The client handles OAuth2 authentication and token refresh automatically.
+//
+// Error handling uses [*APIResponseError] for structured API errors:
+//
+//	device, err := c.GetDevice(ctx, id)
+//	if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
+//		// handle not found
+//	}
+package jamfplatform
