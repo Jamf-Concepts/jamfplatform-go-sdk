@@ -5,6 +5,7 @@ package jamfplatform
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"testing"
 )
@@ -244,5 +245,77 @@ func TestGetDeviceBySerialNumber_EmptySerial(t *testing.T) {
 	_, err := c.GetDeviceBySerialNumber(context.Background(), "")
 	if err == nil {
 		t.Fatal("expected error for empty serial")
+	}
+}
+
+func TestListDevices_APIError(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusInternalServerError, map[string]any{
+			"httpStatus": 500,
+			"traceId":    "trace-err",
+			"errors":     []map[string]string{{"code": "SERVER_ERROR", "field": "", "description": "internal error"}},
+		})
+	})
+
+	_, err := c.ListDevices(context.Background(), nil, "")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("expected *APIResponseError, got %T", err)
+	}
+	if !apiErr.HasStatus(500) {
+		t.Errorf("expected status 500, got %d", apiErr.StatusCode)
+	}
+}
+
+func TestUpdateDevice_APIError(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/devices/v1/devices/dev-1", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusBadRequest, map[string]any{
+			"httpStatus": 400,
+			"traceId":    "trace-bad",
+			"errors":     []map[string]string{{"code": "INVALID_INPUT", "field": "name", "description": "invalid"}},
+		})
+	})
+
+	name := "x"
+	err := c.UpdateDevice(context.Background(), "dev-1", &DeviceUpdateRepresentationV1{Name: &name})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestDeleteDevice_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/devices/v1/devices/missing", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	err := c.DeleteDevice(context.Background(), "missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestListDeviceApplications_APIError(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/devices/v1/devices/dev-1/applications", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusForbidden, map[string]any{
+			"httpStatus": 403,
+			"traceId":    "trace-403",
+			"errors":     []map[string]string{{"code": "FORBIDDEN", "field": "", "description": "access denied"}},
+		})
+	})
+
+	_, err := c.ListDeviceApplications(context.Background(), "dev-1", nil, "")
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }

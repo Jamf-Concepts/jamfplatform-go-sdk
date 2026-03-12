@@ -242,6 +242,86 @@ func TestGetBlueprintComponent(t *testing.T) {
 	}
 }
 
+func TestGetBlueprint_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/blueprints/v1/blueprints/missing", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetBlueprint(context.Background(), "missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestCreateBlueprint_APIError(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/blueprints/v1/blueprints", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusBadRequest, map[string]any{
+			"httpStatus": 400,
+			"traceId":    "trace-bad",
+			"errors":     []map[string]string{{"code": "INVALID_INPUT", "field": "name", "description": "required"}},
+		})
+	})
+
+	_, err := c.CreateBlueprint(context.Background(), &BlueprintCreateRequestV1{})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestDeployBlueprint_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/blueprints/v1/blueprints/missing/deploy", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	err := c.DeployBlueprint(context.Background(), "missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUndeployBlueprint_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/blueprints/v1/blueprints/missing/undeploy", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	err := c.UndeployBlueprint(context.Background(), "missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestGetBlueprintComponent_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/blueprints/v1/blueprint-components/nonexistent", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "identifier", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetBlueprintComponent(context.Background(), "nonexistent")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestBlueprintComponentV1_Configuration(t *testing.T) {
 	raw := json.RawMessage(`{"key":"value"}`)
 	comp := BlueprintComponentV1{

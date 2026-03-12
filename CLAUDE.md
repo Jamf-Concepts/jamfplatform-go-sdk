@@ -10,7 +10,7 @@ Go SDK for the Jamf Platform REST API (`github.com/Jamf-Concepts/jamfplatform-go
 
 ```bash
 make test        # Run unit tests: go test -v -cover -count=1 -timeout=120s ./...
-make testacc     # Run acceptance tests (requires JAMFPLATFORM_ACC=1): real API calls, -timeout 120m -p=1
+make testacc     # Run acceptance tests (requires JAMFPLATFORM_ACC=1, -tags acceptance): real API calls, -timeout 120m -p=1
 make lint        # golangci-lint run ./...
 go test -v -run TestFunctionName ./jamfplatform/  # Run a single test
 ```

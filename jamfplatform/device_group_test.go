@@ -155,6 +155,73 @@ func TestUpdateDeviceGroupMembers(t *testing.T) {
 	}
 }
 
+func TestGetDeviceGroup_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/device-groups/v1/device-groups/missing", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetDeviceGroup(context.Background(), "missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestCreateDeviceGroup_APIError(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/device-groups/v1/device-groups", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusBadRequest, map[string]any{
+			"httpStatus": 400,
+			"traceId":    "trace-bad",
+			"errors":     []map[string]string{{"code": "INVALID_INPUT", "field": "name", "description": "required"}},
+		})
+	})
+
+	_, err := c.CreateDeviceGroup(context.Background(), &DeviceGroupCreateRepresentationV1{
+		DeviceType: "COMPUTER",
+		GroupType:  "STATIC",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateDeviceGroup_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/device-groups/v1/device-groups/missing", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	err := c.UpdateDeviceGroup(context.Background(), "missing", &DeviceGroupUpdateRepresentationV1{Name: "x"})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestDeleteDeviceGroup_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/device-groups/v1/device-groups/missing", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	err := c.DeleteDeviceGroup(context.Background(), "missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestListDeviceGroupsForDevice(t *testing.T) {
 	c, mux := testServer(t)
 	mux.HandleFunc("/management/device-groups/v1/devices/dev-1/device-groups", func(w http.ResponseWriter, _ *http.Request) {

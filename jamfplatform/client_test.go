@@ -4,6 +4,9 @@
 package jamfplatform
 
 import (
+	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -73,5 +76,47 @@ func TestNewNullableStringNull(t *testing.T) {
 	ns := NewNullableStringNull()
 	if !ns.IsNull {
 		t.Error("NewNullableStringNull().IsNull = false, want true")
+	}
+}
+
+func TestNewClient_WithLogger(t *testing.T) {
+	c := NewClient("https://example.com", "id", "secret", WithLogger(nil))
+	if c == nil {
+		t.Fatal("NewClient returned nil")
+	}
+}
+
+func TestValidateCredentials_Success(t *testing.T) {
+	c, _ := testServer(t)
+	if err := c.ValidateCredentials(context.Background()); err != nil {
+		t.Fatalf("ValidateCredentials failed: %v", err)
+	}
+}
+
+func TestValidateCredentials_Failure(t *testing.T) {
+	// Point at a server that returns an error for the token endpoint
+	mux := http.NewServeMux()
+	mux.HandleFunc("/auth/token", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte(`{"error":"invalid_client"}`))
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+
+	c := NewClient(srv.URL, "bad-id", "bad-secret")
+	err := c.ValidateCredentials(context.Background())
+	if err == nil {
+		t.Fatal("expected error for invalid credentials")
+	}
+}
+
+func TestAccessToken_Success(t *testing.T) {
+	c, _ := testServer(t)
+	token, err := c.AccessToken(context.Background())
+	if err != nil {
+		t.Fatalf("AccessToken failed: %v", err)
+	}
+	if token.AccessToken != "test-token" {
+		t.Errorf("AccessToken = %q, want test-token", token.AccessToken)
 	}
 }
