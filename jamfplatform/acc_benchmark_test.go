@@ -93,17 +93,21 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 		t.Skip("No rules available for baseline")
 	}
 
-	// Build rule requests — enable first 5 rules (or fewer)
+	// Build rule requests — enable first 5 rules (or fewer), including ODV values
 	var ruleRequests []CBEngineRuleRequestV2
 	limit := 5
 	if len(rules.Rules) < limit {
 		limit = len(rules.Rules)
 	}
 	for _, r := range rules.Rules[:limit] {
-		ruleRequests = append(ruleRequests, CBEngineRuleRequestV2{
+		rr := CBEngineRuleRequestV2{
 			ID:      r.ID,
 			Enabled: true,
-		})
+		}
+		if r.ODV != nil {
+			rr.ODV = &CBEngineODVRequestV2{Value: r.ODV.Value}
+		}
+		ruleRequests = append(ruleRequests, rr)
 	}
 
 	title := "sdk-acc-benchmark-" + runSuffix()
@@ -120,7 +124,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 		Sources:          rules.Sources,
 		Rules:            ruleRequests,
 		Target:           CBEngineTargetV2{DeviceGroups: []string{groupID}},
-		EnforcementMode:  "AUDIT_ONLY",
+		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
 		t.Fatalf("CreateBenchmark failed: %v", err)
@@ -141,8 +145,8 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 	if bm.Title != title {
 		t.Errorf("expected title %q, got %q", title, bm.Title)
 	}
-	if bm.EnforcementMode != "AUDIT_ONLY" {
-		t.Errorf("expected AUDIT_ONLY, got %q", bm.EnforcementMode)
+	if bm.EnforcementMode != "MONITOR" {
+		t.Errorf("expected MONITOR, got %q", bm.EnforcementMode)
 	}
 	t.Logf("Benchmark synced: %s, rules: %d", resp.BenchmarkID, len(bm.Rules))
 }

@@ -128,40 +128,48 @@ func ensureBenchmarkDeletedByID(t *testing.T, c *Client, ctx context.Context, be
 	}
 	t.Logf("Delete issued for benchmark %s", benchmarkID)
 
+	deleteCtx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
+
 	lastDelete := time.Now()
-	deadline := time.Now().Add(2 * time.Minute)
-	for time.Now().Before(deadline) {
-		time.Sleep(2 * time.Second)
+	err := PollUntil(deleteCtx, 2*time.Second, func(_ context.Context) (bool, error) {
 		if _, found := benchmarkSyncState(c, ctx, benchmarkID); !found {
 			t.Logf("Benchmark %s fully deleted", benchmarkID)
-			return
+			return true, nil
 		}
 		if time.Since(lastDelete) > 20*time.Second {
 			lastDelete = time.Now()
 			t.Logf("Retrying delete for stuck benchmark %s", benchmarkID)
 			_ = c.DeleteBenchmark(ctx, benchmarkID)
 		}
+		return false, nil
+	})
+	if err != nil {
+		t.Logf("Warning: benchmark %s still present after 2m", benchmarkID)
 	}
-	t.Logf("Warning: benchmark %s still present after 2m", benchmarkID)
 }
 
 func waitForBenchmarkSyncState(t *testing.T, c *Client, ctx context.Context, benchmarkID string) {
 	t.Helper()
-	deadline := time.Now().Add(2 * time.Minute)
-	for time.Now().Before(deadline) {
+	syncCtx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
+
+	err := PollUntil(syncCtx, 3*time.Second, func(_ context.Context) (bool, error) {
 		state, found := benchmarkSyncState(c, ctx, benchmarkID)
 		if !found {
 			t.Logf("Benchmark %s not found, may already be deleted", benchmarkID)
-			return
+			return true, nil
 		}
 		if state == "SYNCED" || state == "FAILED" {
 			t.Logf("Benchmark %s reached state %s", benchmarkID, state)
-			return
+			return true, nil
 		}
 		t.Logf("Benchmark %s in state %q, waiting for SYNCED", benchmarkID, state)
-		time.Sleep(3 * time.Second)
+		return false, nil
+	})
+	if err != nil {
+		t.Logf("Warning: benchmark %s did not reach SYNCED after 2m", benchmarkID)
 	}
-	t.Logf("Warning: benchmark %s did not reach SYNCED after 2m", benchmarkID)
 }
 
 func benchmarkSyncState(c *Client, ctx context.Context, benchmarkID string) (string, bool) {

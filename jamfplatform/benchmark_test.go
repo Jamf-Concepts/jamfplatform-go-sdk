@@ -160,6 +160,86 @@ func TestGetBenchmarkByTitle_NotFound(t *testing.T) {
 	}
 }
 
+func TestListBaselines_APIError(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/baselines", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusInternalServerError, map[string]any{
+			"httpStatus": 500,
+			"traceId":    "trace-err",
+			"errors":     []map[string]string{{"code": "SERVER_ERROR", "field": "", "description": "internal error"}},
+		})
+	})
+
+	_, err := c.ListBaselines(context.Background())
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestCreateBenchmark_APIError(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusBadRequest, map[string]any{
+			"httpStatus": 400,
+			"traceId":    "trace-bad",
+			"errors":     []map[string]string{{"code": "INVALID_INPUT", "field": "title", "description": "required"}},
+		})
+	})
+
+	_, err := c.CreateBenchmark(context.Background(), &CBEngineBenchmarkRequestV2{})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestDeleteBenchmark_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/benchmarks/missing", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	err := c.DeleteBenchmark(context.Background(), "missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestGetBenchmark_NotFound(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks/missing", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetBenchmark(context.Background(), "missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestGetBaselineRules_APIError(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/rules", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusForbidden, map[string]any{
+			"httpStatus": 403,
+			"traceId":    "trace-403",
+			"errors":     []map[string]string{{"code": "FORBIDDEN", "field": "", "description": "access denied"}},
+		})
+	})
+
+	_, err := c.GetBaselineRules(context.Background(), "bl-1")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestGetBaselineRules(t *testing.T) {
 	c, mux := testServer(t)
 	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/rules", func(w http.ResponseWriter, r *http.Request) {

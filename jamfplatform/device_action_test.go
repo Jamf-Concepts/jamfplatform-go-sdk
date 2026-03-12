@@ -102,3 +102,19 @@ func TestDeviceAction_EmptyID(t *testing.T) {
 		t.Fatal("expected error for empty device ID")
 	}
 }
+
+func TestDeviceAction_APIError(t *testing.T) {
+	c, mux := testServer(t)
+	mux.HandleFunc("/management/actions/v1/devices/dev-1/restart", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "device not found"}},
+		})
+	})
+
+	_, err := c.RestartDevice(context.Background(), "dev-1")
+	if err == nil {
+		t.Fatal("expected error for missing device")
+	}
+}

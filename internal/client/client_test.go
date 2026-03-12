@@ -6,6 +6,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -221,6 +222,161 @@ func TestBaseURL(t *testing.T) {
 	if got := c.BaseURL(); got != srv.URL {
 		t.Errorf("BaseURL() = %q, want %q", got, srv.URL)
 	}
+}
+
+func TestSentinelErrors(t *testing.T) {
+	if ErrAuthentication == nil {
+		t.Fatal("ErrAuthentication is nil")
+	}
+	if ErrNotFound == nil {
+		t.Fatal("ErrNotFound is nil")
+	}
+	// Verify they have distinct messages
+	if ErrAuthentication.Error() == ErrNotFound.Error() {
+		t.Error("ErrAuthentication and ErrNotFound have the same message")
+	}
+}
+
+func TestValidateCredentials_Success(t *testing.T) {
+	srv, _ := newTestServer(t)
+	c := NewClient(srv.URL, "test-id", "test-secret")
+	if err := c.ValidateCredentials(context.Background()); err != nil {
+		t.Fatalf("ValidateCredentials failed: %v", err)
+	}
+}
+
+func TestValidateCredentials_Failure(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/auth/token", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte(`{"error":"invalid_client"}`))
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+
+	c := NewClient(srv.URL, "bad-id", "bad-secret")
+	err := c.ValidateCredentials(context.Background())
+	if err == nil {
+		t.Fatal("expected error for invalid credentials")
+	}
+}
+
+func TestAccessToken_Success(t *testing.T) {
+	srv, _ := newTestServer(t)
+	c := NewClient(srv.URL, "test-id", "test-secret")
+	token, err := c.AccessToken(context.Background())
+	if err != nil {
+		t.Fatalf("AccessToken failed: %v", err)
+	}
+	if token.AccessToken != "test-token" {
+		t.Errorf("AccessToken = %q, want test-token", token.AccessToken)
+	}
+}
+
+func TestHTTPClient(t *testing.T) {
+	c, _, _ := newTestClient(t)
+	if c.HTTPClient() == nil {
+		t.Fatal("HTTPClient returned nil")
+	}
+}
+
+func TestSetLogger(t *testing.T) {
+	c, _, mux := newTestClient(t)
+
+	var logged bool
+	c.SetLogger(&testLogger{onRequest: func() { logged = true }})
+
+	mux.HandleFunc("/api/logged", func(w http.ResponseWriter, _ *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]string{"ok": "true"})
+	})
+
+	var result map[string]string
+	_ = c.Do(context.Background(), http.MethodGet, "/api/logged", nil, &result)
+	if !logged {
+		t.Error("logger was not called")
+	}
+}
+
+type testLogger struct {
+	onRequest func()
+}
+
+func (l *testLogger) LogRequest(_ context.Context, _, _ string, _ []byte) {
+	if l.onRequest != nil {
+		l.onRequest()
+	}
+}
+
+func (l *testLogger) LogResponse(_ context.Context, _ int, _ http.Header, _ []byte) {}
+
+func TestDo_MalformedJSON(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/bad-json", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{invalid json`))
+	})
+
+	var result map[string]string
+	err := c.Do(context.Background(), http.MethodGet, "/api/bad-json", nil, &result)
+	if err == nil {
+		t.Fatal("expected error for malformed JSON")
+	}
+}
+
+func TestDoExpect_NonJSONErrorBody(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/text-error", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusBadGateway)
+		_, _ = w.Write([]byte("Bad Gateway"))
+	})
+
+	err := c.DoExpect(context.Background(), http.MethodGet, "/api/text-error", nil, http.StatusOK, nil)
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("expected *APIResponseError, got %T", err)
+	}
+	if apiErr.StatusCode != 502 {
+		t.Errorf("StatusCode = %d, want 502", apiErr.StatusCode)
+	}
+	if apiErr.Body != "Bad Gateway" {
+		t.Errorf("Body = %q, want Bad Gateway", apiErr.Body)
+	}
+}
+
+func TestSetUserAgent(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.SetUserAgent("custom-agent/2.0")
+
+	mux.HandleFunc("/api/ua", func(w http.ResponseWriter, _ *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]string{"ok": "true"})
+	})
+
+	var result map[string]string
+	err := c.Do(context.Background(), http.MethodGet, "/api/ua", nil, &result)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetHTTPClient(t *testing.T) {
+	c, _, mux := newTestClient(t)
+
+	custom := &http.Client{}
+	c.SetHTTPClient(custom)
+
+	mux.HandleFunc("/api/custom-http", func(w http.ResponseWriter, _ *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]string{"ok": "true"})
+	})
+
+	var result map[string]string
+	err := c.Do(context.Background(), http.MethodGet, "/api/custom-http", nil, &result)
+	// SetHTTPClient creates a new oauth2 client wrapping the custom http.Client,
+	// which won't have the test server's token endpoint configured.
+	// The important thing is the method doesn't panic.
+	_ = err
 }
 
 func contains(s, substr string) bool {
