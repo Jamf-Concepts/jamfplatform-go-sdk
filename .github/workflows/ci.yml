@@ -65,6 +65,24 @@ jobs:
       - run: cd tools && go install github.com/hashicorp/copywrite
       - run: copywrite headers --plan --config .copywrite.hcl
 
+  testacc:
+    name: Acceptance Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: [test, vet, lint]
+    environment: acceptance
+    env:
+      JAMFPLATFORM_ACC: "1"
+      JAMFPLATFORM_BASE_URL: ${{ secrets.JAMFPLATFORM_BASE_URL }}
+      JAMFPLATFORM_CLIENT_ID: ${{ secrets.JAMFPLATFORM_CLIENT_ID }}
+      JAMFPLATFORM_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - run: go test -v -cover -count=1 -tags acceptance -timeout 120m -p=1 ./...
+
   govulncheck:
     name: Vulnerability Check
     runs-on: ubuntu-latest
