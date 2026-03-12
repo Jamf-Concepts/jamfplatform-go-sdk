@@ -17,7 +17,7 @@ func testServer(t *testing.T) (*Client, *http.ServeMux) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/auth/token", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{
+		_ = json.NewEncoder(w).Encode(map[string]any{
 			"access_token": "test-token",
 			"token_type":   "bearer",
 			"expires_in":   3600,
