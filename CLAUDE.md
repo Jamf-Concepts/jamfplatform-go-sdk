@@ -20,7 +20,7 @@ go test -v -run TestFunctionName ./jamfplatform/  # Run a single test
 Two-layer design, intentionally thin:
 
 - **`jamfplatform/`** — Exported package. All resource types, API methods, and the public `Client`. Methods call `c.transport.Do`/`DoExpect`/`DoWithContentType` directly. One file per API domain (`blueprint.go`, `device.go`, `device_group.go`, `device_action.go`, `benchmark.go`).
-- **`internal/client/`** — HTTP transport only. Handles OAuth2 auth, request/response marshaling, error handling, logging, and the generic `ListAllPages[T]` paginator. No resource-specific types belong here.
+- **`internal/client/`** — HTTP transport only. Handles OAuth2 auth, request/response marshaling, error handling, logging, the generic `ListAllPages[T]` paginator, `PollUntil` async poller, and RSQL filter building. No resource-specific types belong here.
 
 ### Key transport methods
 
@@ -35,6 +35,14 @@ Two-layer design, intentionally thin:
 ### RSQL filters
 
 `RSQLClause`, `BuildRSQLExpression`, `FormatArgument` live in `internal/client/rsql.go` and are re-exported from `jamfplatform/rsql.go`.
+
+### Async polling
+
+`PollUntil` in `internal/client/poll.go` (re-exported from `jamfplatform/poll.go`) repeatedly invokes a checker function at a given interval until done or context cancellation. Used for async operations like benchmark sync.
+
+### Convenience lookups
+
+`GetDeviceBySerialNumber` in `jamfplatform/device.go` uses RSQL filter + `ListDevices` to resolve a serial number to a full device record. Errors if zero or multiple matches.
 
 ### Error handling
 
