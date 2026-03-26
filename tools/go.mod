@@ -2,7 +2,7 @@ module github.com/Jamf-Concepts/jamfplatform-go-sdk/tools
 
 go 1.26.1
 
-require github.com/hashicorp/copywrite v0.25.1
+require github.com/hashicorp/copywrite v0.25.2
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7 // indirect
