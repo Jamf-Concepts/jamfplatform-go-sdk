@@ -25,3 +25,6 @@ coverage.html
 
 # macOS
 .DS_Store
+
+# Testing
+testing/

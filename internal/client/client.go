@@ -199,6 +199,21 @@ func (c *Client) DoWithContentType(ctx context.Context, method, path string, bod
 	return c.handleResponse(ctx, resp, expectedStatus, result)
 }
 
+// DoWithHeaders performs an authenticated API request with extra headers and decodes the response.
+// It expects HTTP 200 OK as the success status.
+func (c *Client) DoWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, result any) error {
+	return c.DoExpectWithHeaders(ctx, method, path, body, headers, http.StatusOK, result)
+}
+
+// DoExpectWithHeaders performs an authenticated API request with extra headers expecting the given HTTP status.
+func (c *Client) DoExpectWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, expectedStatus int, result any) error {
+	resp, err := c.doRequestFull(ctx, method, path, body, "", headers)
+	if err != nil {
+		return err
+	}
+	return c.handleResponse(ctx, resp, expectedStatus, result)
+}
+
 // buildURL constructs the full API URL from a relative endpoint.
 func (c *Client) buildURL(endpoint string) string {
 	if len(endpoint) > 0 && endpoint[0] == '/' {
@@ -209,11 +224,16 @@ func (c *Client) buildURL(endpoint string) string {
 
 // doRequest performs an authenticated API request.
 func (c *Client) doRequest(ctx context.Context, method, endpoint string, body any) (*http.Response, error) {
-	return c.doRequestWithContentType(ctx, method, endpoint, body, "")
+	return c.doRequestFull(ctx, method, endpoint, body, "", nil)
 }
 
 // doRequestWithContentType performs an authenticated API request with an optional content type override.
 func (c *Client) doRequestWithContentType(ctx context.Context, method, endpoint string, body any, contentType string) (*http.Response, error) {
+	return c.doRequestFull(ctx, method, endpoint, body, contentType, nil)
+}
+
+// doRequestFull performs an authenticated API request with optional content type and extra headers.
+func (c *Client) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header) (*http.Response, error) {
 	var requestBodyBytes []byte
 
 	fullURL := c.buildURL(endpoint)
@@ -238,6 +258,12 @@ func (c *Client) doRequestWithContentType(ctx context.Context, method, endpoint 
 	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	for key, values := range extraHeaders {
+		for _, v := range values {
+			req.Header.Set(key, v)
+		}
 	}
 
 	if requestBodyBytes != nil {

@@ -14,7 +14,7 @@ import (
 
 // Device Management Action API path constants.
 const (
-	deviceManagementActionsV1Prefix = "/management/actions/v1"
+	deviceActionsLegacyV1Prefix = "/management/actions/v1"
 )
 
 // DeviceCommandResponseV1 captures the command metadata returned by device actions.
@@ -58,7 +58,8 @@ func (c *Client) invokeDeviceManagementAction(ctx context.Context, deviceID, act
 		return nil, fmt.Errorf("deviceID cannot be empty")
 	}
 
-	endpoint := fmt.Sprintf("%s/devices/%s/%s", deviceManagementActionsV1Prefix, url.PathEscape(deviceID), action)
+	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceActionsLegacyV1Prefix)
+	endpoint := fmt.Sprintf("%s/devices/%s/%s", prefix, url.PathEscape(deviceID), action)
 	var result []DeviceCommandResponseV1
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, payload, http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("%s device %s: %w", action, deviceID, err)

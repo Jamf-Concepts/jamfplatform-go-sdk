@@ -17,10 +17,7 @@ import (
 )
 
 // CBEngine API path constants.
-const (
-	cbEngineV1Prefix = "/api/compliance-benchmarks/preview/v1"
-	cbEngineV2Prefix = "/api/compliance-benchmarks/preview/v2"
-)
+const cbEngineV1Prefix = "/api/compliance-benchmarks/v1"
 
 // CBEngine Baseline Types
 
@@ -170,12 +167,22 @@ type CBEngineSourcedRulesV1 struct {
 	Rules   []CBEngineRuleInfoV1 `json:"rules"`
 }
 
+// benchmarkPath returns the endpoint path and optional tenant headers for
+// a benchmark API resource. When tenantID is configured, adds X-Tenant-Id header.
+func (c *Client) benchmarkPath(resource string) (string, http.Header) {
+	if c.tenantID != "" {
+		return cbEngineV1Prefix + resource, http.Header{"X-Tenant-Id": {c.tenantID}}
+	}
+	return cbEngineV1Prefix + resource, nil
+}
+
 // CBEngine Baseline operations
 
 // ListBaselines returns list of available mSCP baselines.
 func (c *Client) ListBaselines(ctx context.Context) (*CBEngineBaselinesResponseV1, error) {
+	endpoint, headers := c.benchmarkPath("/baselines")
 	var result CBEngineBaselinesResponseV1
-	if err := c.transport.Do(ctx, http.MethodGet, cbEngineV1Prefix+"/baselines", nil, &result); err != nil {
+	if err := c.transport.DoWithHeaders(ctx, http.MethodGet, endpoint, nil, headers, &result); err != nil {
 		return nil, fmt.Errorf("ListBaselines: %w", err)
 	}
 	return &result, nil
@@ -185,8 +192,9 @@ func (c *Client) ListBaselines(ctx context.Context) (*CBEngineBaselinesResponseV
 
 // CreateBenchmark creates a new benchmark.
 func (c *Client) CreateBenchmark(ctx context.Context, request *CBEngineBenchmarkRequestV2) (*CBEngineBenchmarkResponseV2, error) {
+	endpoint, headers := c.benchmarkPath("/benchmarks")
 	var result CBEngineBenchmarkResponseV2
-	if err := c.transport.DoExpect(ctx, http.MethodPost, cbEngineV2Prefix+"/benchmarks", request, http.StatusAccepted, &result); err != nil {
+	if err := c.transport.DoExpectWithHeaders(ctx, http.MethodPost, endpoint, request, headers, http.StatusAccepted, &result); err != nil {
 		return nil, fmt.Errorf("CreateBenchmark: %w", err)
 	}
 	return &result, nil
@@ -194,8 +202,9 @@ func (c *Client) CreateBenchmark(ctx context.Context, request *CBEngineBenchmark
 
 // ListBenchmarks retrieves all benchmarks for the tenant.
 func (c *Client) ListBenchmarks(ctx context.Context) (*CBEngineBenchmarksResponseV2, error) {
+	endpoint, headers := c.benchmarkPath("/benchmarks")
 	var result CBEngineBenchmarksResponseV2
-	if err := c.transport.Do(ctx, http.MethodGet, cbEngineV2Prefix+"/benchmarks", nil, &result); err != nil {
+	if err := c.transport.DoWithHeaders(ctx, http.MethodGet, endpoint, nil, headers, &result); err != nil {
 		return nil, fmt.Errorf("ListBenchmarks: %w", err)
 	}
 	return &result, nil
@@ -203,9 +212,9 @@ func (c *Client) ListBenchmarks(ctx context.Context) (*CBEngineBenchmarksRespons
 
 // GetBenchmark retrieves a specific benchmark by ID.
 func (c *Client) GetBenchmark(ctx context.Context, id string) (*CBEngineBenchmarkResponseV2, error) {
+	endpoint, headers := c.benchmarkPath(fmt.Sprintf("/benchmarks/%s", url.PathEscape(id)))
 	var result CBEngineBenchmarkResponseV2
-	endpoint := fmt.Sprintf("%s/benchmarks/%s", cbEngineV2Prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+	if err := c.transport.DoWithHeaders(ctx, http.MethodGet, endpoint, nil, headers, &result); err != nil {
 		return nil, fmt.Errorf("GetBenchmark(%s): %w", id, err)
 	}
 	return &result, nil
@@ -213,8 +222,8 @@ func (c *Client) GetBenchmark(ctx context.Context, id string) (*CBEngineBenchmar
 
 // DeleteBenchmark removes a benchmark by ID.
 func (c *Client) DeleteBenchmark(ctx context.Context, id string) error {
-	endpoint := fmt.Sprintf("%s/benchmarks/%s", cbEngineV1Prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+	endpoint, headers := c.benchmarkPath(fmt.Sprintf("/benchmarks/%s", url.PathEscape(id)))
+	if err := c.transport.DoExpectWithHeaders(ctx, http.MethodDelete, endpoint, nil, headers, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteBenchmark(%s): %w", id, err)
 	}
 	return nil
@@ -240,9 +249,9 @@ func (c *Client) GetBenchmarkByTitle(ctx context.Context, title string) (*CBEngi
 
 // GetBaselineRules returns list of rules for given baseline.
 func (c *Client) GetBaselineRules(ctx context.Context, baselineID string) (*CBEngineSourcedRulesV1, error) {
+	endpoint, headers := c.benchmarkPath(fmt.Sprintf("/rules?baselineId=%s", url.QueryEscape(baselineID)))
 	var result CBEngineSourcedRulesV1
-	endpoint := fmt.Sprintf("%s/rules?baselineId=%s", cbEngineV1Prefix, url.QueryEscape(baselineID))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+	if err := c.transport.DoWithHeaders(ctx, http.MethodGet, endpoint, nil, headers, &result); err != nil {
 		return nil, fmt.Errorf("GetBaselineRules(%s): %w", baselineID, err)
 	}
 	return &result, nil

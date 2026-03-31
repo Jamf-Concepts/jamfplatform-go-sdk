@@ -14,6 +14,13 @@ import (
 // a Client pointed at it. Tests register additional handlers on the returned mux.
 func testServer(t *testing.T) (*Client, *http.ServeMux) {
 	t.Helper()
+	return testServerWithOpts(t)
+}
+
+// testServerWithOpts creates an httptest.Server like testServer but accepts
+// additional client options (e.g. WithEnvironmentID, WithTenantID).
+func testServerWithOpts(t *testing.T, opts ...Option) (*Client, *http.ServeMux) {
+	t.Helper()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/auth/token", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -26,7 +33,7 @@ func testServer(t *testing.T) (*Client, *http.ServeMux) {
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
 
-	c := NewClient(srv.URL, "test-id", "test-secret")
+	c := NewClient(srv.URL, "test-id", "test-secret", opts...)
 	return c, mux
 }
 

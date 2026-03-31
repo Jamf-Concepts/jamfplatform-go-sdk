@@ -118,3 +118,23 @@ func TestDeviceAction_APIError(t *testing.T) {
 		t.Fatal("expected error for missing device")
 	}
 }
+
+func TestEraseDevice_BetaPath(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithEnvironmentID("env-uuid-123"))
+	mux.HandleFunc("/api/devices/v1/environment/env-uuid-123/devices/dev-1/erase", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, []DeviceCommandResponseV1{
+			{DeviceID: "dev-1", CommandID: "cmd-beta"},
+		})
+	})
+
+	cmds, err := c.EraseDevice(context.Background(), "dev-1", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(cmds) != 1 || cmds[0].CommandID != "cmd-beta" {
+		t.Errorf("got %+v", cmds)
+	}
+}

@@ -20,7 +20,8 @@ import (
 
 // Device Inventory API path constants.
 const (
-	deviceInventoryV1Prefix = "/management/devices/v1"
+	deviceInventoryLegacyV1Prefix = "/management/devices/v1"
+	deviceNamespace               = "devices"
 )
 
 // DeviceListReadRepresentationV1 represents a device in a list response.
@@ -131,6 +132,7 @@ func NewNullableStringNull() *NullableString {
 
 // ListDevices returns all devices, automatically handling pagination.
 func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
+	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -142,7 +144,7 @@ func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) 
 			params.Set("filter", filter)
 		}
 
-		endpoint := deviceInventoryV1Prefix + "/devices"
+		endpoint := prefix + "/devices"
 		if encoded := params.Encode(); encoded != "" {
 			endpoint += "?" + encoded
 		}
@@ -160,8 +162,9 @@ func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) 
 
 // GetDevice retrieves a device by ID.
 func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresentationV1, error) {
+	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
 	var result DeviceReadRepresentationV1
-	endpoint := fmt.Sprintf("%s/devices/%s", deviceInventoryV1Prefix, url.PathEscape(id))
+	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetDevice(%s): %w", id, err)
 	}
@@ -170,7 +173,8 @@ func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresent
 
 // UpdateDevice updates an existing device.
 func (c *Client) UpdateDevice(ctx context.Context, id string, payload *DeviceUpdateRepresentationV1) error {
-	endpoint := fmt.Sprintf("%s/devices/%s", deviceInventoryV1Prefix, url.PathEscape(id))
+	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
+	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPatch, endpoint, payload, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDevice(%s): %w", id, err)
 	}
@@ -179,7 +183,8 @@ func (c *Client) UpdateDevice(ctx context.Context, id string, payload *DeviceUpd
 
 // DeleteDevice deletes a device by ID.
 func (c *Client) DeleteDevice(ctx context.Context, id string) error {
-	endpoint := fmt.Sprintf("%s/devices/%s", deviceInventoryV1Prefix, url.PathEscape(id))
+	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
+	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDevice(%s): %w", id, err)
 	}
@@ -188,6 +193,7 @@ func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 
 // ListDeviceApplications returns all installed applications for a device, handling pagination internally.
 func (c *Client) ListDeviceApplications(ctx context.Context, deviceID string, sort []string, filter string) ([]DeviceInstalledApplicationReadRepresentationV1, error) {
+	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceInstalledApplicationReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -199,7 +205,7 @@ func (c *Client) ListDeviceApplications(ctx context.Context, deviceID string, so
 			params.Set("filter", filter)
 		}
 
-		endpoint := fmt.Sprintf("%s/devices/%s/applications", deviceInventoryV1Prefix, url.PathEscape(deviceID))
+		endpoint := fmt.Sprintf("%s/devices/%s/applications", prefix, url.PathEscape(deviceID))
 		if encoded := params.Encode(); encoded != "" {
 			endpoint += "?" + encoded
 		}
@@ -217,6 +223,7 @@ func (c *Client) ListDeviceApplications(ctx context.Context, deviceID string, so
 
 // ListDevicesForUser returns all devices assigned to the specified user, handling pagination internally.
 func (c *Client) ListDevicesForUser(ctx context.Context, userID string, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
+	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -228,7 +235,7 @@ func (c *Client) ListDevicesForUser(ctx context.Context, userID string, sort []s
 			params.Set("filter", filter)
 		}
 
-		endpoint := fmt.Sprintf("%s/users/%s/devices", deviceInventoryV1Prefix, url.PathEscape(userID))
+		endpoint := fmt.Sprintf("%s/users/%s/devices", prefix, url.PathEscape(userID))
 		if encoded := params.Encode(); encoded != "" {
 			endpoint += "?" + encoded
 		}

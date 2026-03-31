@@ -19,7 +19,8 @@ import (
 
 // Device Groups API path constants.
 const (
-	deviceGroupsV1Prefix = "/management/device-groups/v1"
+	deviceGroupsLegacyV1Prefix = "/management/device-groups/v1"
+	deviceGroupsNamespace      = "device-groups"
 )
 
 // DeviceGroupListReadRepresentationV1 represents a device group in a list response.
@@ -98,6 +99,7 @@ type DeviceGroupMemberOfRepresentationV1 struct {
 
 // ListDeviceGroups returns all device groups, automatically handling pagination.
 func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter string) ([]DeviceGroupListReadRepresentationV1, error) {
+	prefix := c.environmentPrefix(deviceGroupsNamespace, "v1", deviceGroupsLegacyV1Prefix)
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceGroupListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		if len(sort) > 0 {
@@ -109,7 +111,7 @@ func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter str
 			params.Set("filter", filter)
 		}
 
-		endpoint := deviceGroupsV1Prefix + "/device-groups"
+		endpoint := prefix + "/device-groups"
 		if len(params) > 0 {
 			endpoint += "?" + params.Encode()
 		}
@@ -127,8 +129,9 @@ func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter str
 
 // GetDeviceGroup retrieves a device group by ID.
 func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupReadRepresentationV1, error) {
+	prefix := c.environmentPrefix(deviceGroupsNamespace, "v1", deviceGroupsLegacyV1Prefix)
 	var result DeviceGroupReadRepresentationV1
-	endpoint := fmt.Sprintf("%s/device-groups/%s", deviceGroupsV1Prefix, url.PathEscape(id))
+	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetDeviceGroup(%s): %w", id, err)
 	}
@@ -137,8 +140,9 @@ func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupRea
 
 // CreateDeviceGroup creates a new device group.
 func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCreateRepresentationV1) (*DeviceGroupCreateResponseV1, error) {
+	prefix := c.environmentPrefix(deviceGroupsNamespace, "v1", deviceGroupsLegacyV1Prefix)
 	var result DeviceGroupCreateResponseV1
-	endpoint := deviceGroupsV1Prefix + "/device-groups"
+	endpoint := prefix + "/device-groups"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateDeviceGroup: %w", err)
 	}
@@ -147,7 +151,8 @@ func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCrea
 
 // UpdateDeviceGroup updates a device group.
 func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *DeviceGroupUpdateRepresentationV1) error {
-	endpoint := fmt.Sprintf("%s/device-groups/%s", deviceGroupsV1Prefix, url.PathEscape(id))
+	prefix := c.environmentPrefix(deviceGroupsNamespace, "v1", deviceGroupsLegacyV1Prefix)
+	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDeviceGroup(%s): %w", id, err)
 	}
@@ -156,7 +161,8 @@ func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *Devi
 
 // DeleteDeviceGroup deletes a device group by ID.
 func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
-	endpoint := fmt.Sprintf("%s/device-groups/%s", deviceGroupsV1Prefix, url.PathEscape(id))
+	prefix := c.environmentPrefix(deviceGroupsNamespace, "v1", deviceGroupsLegacyV1Prefix)
+	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDeviceGroup(%s): %w", id, err)
 	}
@@ -165,12 +171,13 @@ func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
 
 // ListDeviceGroupMembers returns all member IDs for a device group, handling pagination internally.
 func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]string, error) {
+	prefix := c.environmentPrefix(deviceGroupsNamespace, "v1", deviceGroupsLegacyV1Prefix)
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]string, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
 
-		endpoint := fmt.Sprintf("%s/device-groups/%s/members?%s", deviceGroupsV1Prefix, url.PathEscape(id), params.Encode())
+		endpoint := fmt.Sprintf("%s/device-groups/%s/members?%s", prefix, url.PathEscape(id), params.Encode())
 
 		var result struct {
 			client.PaginatedResponseRepresentation
@@ -185,7 +192,8 @@ func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]strin
 
 // UpdateDeviceGroupMembers patches the members of a static device group.
 func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, patch *DeviceGroupMemberPatchRepresentationV1) error {
-	endpoint := fmt.Sprintf("%s/device-groups/%s/members", deviceGroupsV1Prefix, url.PathEscape(id))
+	prefix := c.environmentPrefix(deviceGroupsNamespace, "v1", deviceGroupsLegacyV1Prefix)
+	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, patch, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDeviceGroupMembers(%s): %w", id, err)
 	}
@@ -194,12 +202,13 @@ func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, patch 
 
 // ListDeviceGroupsForDevice returns all device groups a device belongs to, handling pagination internally.
 func (c *Client) ListDeviceGroupsForDevice(ctx context.Context, deviceID string) ([]DeviceGroupMemberOfRepresentationV1, error) {
+	prefix := c.environmentPrefix(deviceGroupsNamespace, "v1", deviceGroupsLegacyV1Prefix)
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceGroupMemberOfRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
 
-		endpoint := fmt.Sprintf("%s/devices/%s/device-groups?%s", deviceGroupsV1Prefix, url.PathEscape(deviceID), params.Encode())
+		endpoint := fmt.Sprintf("%s/devices/%s/device-groups?%s", prefix, url.PathEscape(deviceID), params.Encode())
 
 		var result struct {
 			client.PaginatedResponseRepresentation
