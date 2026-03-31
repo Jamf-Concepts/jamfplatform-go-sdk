@@ -10,8 +10,11 @@ import (
 )
 
 func TestListBaselines(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/baselines", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/baselines", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("X-Tenant-Id"); got != "t-abc-123" {
+			t.Errorf("X-Tenant-Id = %q, want t-abc-123", got)
+		}
 		writeJSON(t, w, http.StatusOK, CBEngineBaselinesResponseV1{
 			Baselines: []CBEngineBaselineInfoV1{
 				{ID: "bl-1", Name: "CIS macOS 15", Title: "CIS Benchmark for macOS 15"},
@@ -29,10 +32,13 @@ func TestListBaselines(t *testing.T) {
 }
 
 func TestListBenchmarks(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.Header.Get("X-Tenant-Id"); got != "t-abc-123" {
+			t.Errorf("X-Tenant-Id = %q, want t-abc-123", got)
 		}
 		writeJSON(t, w, http.StatusOK, CBEngineBenchmarksResponseV2{
 			Benchmarks: []CBEngineBenchmarkV2{
@@ -51,8 +57,11 @@ func TestListBenchmarks(t *testing.T) {
 }
 
 func TestGetBenchmark(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks/bm-1", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks/bm-1", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("X-Tenant-Id"); got != "t-abc-123" {
+			t.Errorf("X-Tenant-Id = %q, want t-abc-123", got)
+		}
 		writeJSON(t, w, http.StatusOK, CBEngineBenchmarkResponseV2{
 			BenchmarkID:     "bm-1",
 			Title:           "Test Benchmark",
@@ -73,10 +82,13 @@ func TestGetBenchmark(t *testing.T) {
 }
 
 func TestCreateBenchmark(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.Header.Get("X-Tenant-Id"); got != "t-abc-123" {
+			t.Errorf("X-Tenant-Id = %q, want t-abc-123", got)
 		}
 		var body CBEngineBenchmarkRequestV2
 		readJSON(t, r, &body)
@@ -104,10 +116,13 @@ func TestCreateBenchmark(t *testing.T) {
 }
 
 func TestDeleteBenchmark(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/benchmarks/bm-1", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks/bm-1", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		if got := r.Header.Get("X-Tenant-Id"); got != "t-abc-123" {
+			t.Errorf("X-Tenant-Id = %q, want t-abc-123", got)
 		}
 		w.WriteHeader(http.StatusNoContent)
 	})
@@ -119,9 +134,9 @@ func TestDeleteBenchmark(t *testing.T) {
 }
 
 func TestGetBenchmarkByTitle(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet && r.URL.Path == "/api/compliance-benchmarks/preview/v2/benchmarks" {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
 			writeJSON(t, w, http.StatusOK, CBEngineBenchmarksResponseV2{
 				Benchmarks: []CBEngineBenchmarkV2{
 					{ID: "bm-1", Title: "Target"},
@@ -130,7 +145,7 @@ func TestGetBenchmarkByTitle(t *testing.T) {
 			})
 		}
 	})
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks/bm-1", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks/bm-1", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, CBEngineBenchmarkResponseV2{
 			BenchmarkID: "bm-1",
 			Title:       "Target",
@@ -147,8 +162,8 @@ func TestGetBenchmarkByTitle(t *testing.T) {
 }
 
 func TestGetBenchmarkByTitle_NotFound(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, CBEngineBenchmarksResponseV2{
 			Benchmarks: []CBEngineBenchmarkV2{},
 		})
@@ -161,8 +176,8 @@ func TestGetBenchmarkByTitle_NotFound(t *testing.T) {
 }
 
 func TestListBaselines_APIError(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/baselines", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/baselines", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusInternalServerError, map[string]any{
 			"httpStatus": 500,
 			"traceId":    "trace-err",
@@ -177,8 +192,8 @@ func TestListBaselines_APIError(t *testing.T) {
 }
 
 func TestCreateBenchmark_APIError(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusBadRequest, map[string]any{
 			"httpStatus": 400,
 			"traceId":    "trace-bad",
@@ -193,8 +208,8 @@ func TestCreateBenchmark_APIError(t *testing.T) {
 }
 
 func TestDeleteBenchmark_NotFound(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/benchmarks/missing", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks/missing", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -209,8 +224,8 @@ func TestDeleteBenchmark_NotFound(t *testing.T) {
 }
 
 func TestGetBenchmark_NotFound(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v2/benchmarks/missing", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks/missing", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -225,8 +240,8 @@ func TestGetBenchmark_NotFound(t *testing.T) {
 }
 
 func TestGetBaselineRules_APIError(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/rules", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/rules", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusForbidden, map[string]any{
 			"httpStatus": 403,
 			"traceId":    "trace-403",
@@ -241,8 +256,11 @@ func TestGetBaselineRules_APIError(t *testing.T) {
 }
 
 func TestGetBaselineRules(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/api/compliance-benchmarks/preview/v1/rules", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/rules", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("X-Tenant-Id"); got != "t-abc-123" {
+			t.Errorf("X-Tenant-Id = %q, want t-abc-123", got)
+		}
 		if got := r.URL.Query().Get("baselineId"); got != "bl-1" {
 			t.Errorf("baselineId = %q, want bl-1", got)
 		}

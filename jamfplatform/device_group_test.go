@@ -241,3 +241,26 @@ func TestListDeviceGroupsForDevice(t *testing.T) {
 		t.Errorf("got %+v", groups)
 	}
 }
+
+func TestListDeviceGroups_BetaPath(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithEnvironmentID("env-uuid-123"))
+	mux.HandleFunc("/api/device-groups/v1/environment/env-uuid-123/device-groups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":  []map[string]any{{"id": "g1", "name": "Beta Group", "deviceType": "MAC", "groupType": "SMART"}},
+			"hasNext":  false,
+			"page":     0,
+			"pageSize": 100,
+		})
+	})
+
+	groups, err := c.ListDeviceGroups(context.Background(), nil, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(groups) != 1 || groups[0].Name != "Beta Group" {
+		t.Errorf("got %+v", groups)
+	}
+}

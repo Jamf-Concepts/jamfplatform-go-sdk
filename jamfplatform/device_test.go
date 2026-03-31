@@ -319,3 +319,41 @@ func TestListDeviceApplications_APIError(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestListDevices_BetaPath(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithEnvironmentID("env-uuid-123"))
+	mux.HandleFunc("/api/devices/v1/environment/env-uuid-123/devices", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":  []map[string]any{{"id": "d1", "name": "BetaMac"}},
+			"hasNext":  false,
+			"page":     0,
+			"pageSize": 100,
+		})
+	})
+
+	devices, err := c.ListDevices(context.Background(), nil, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(devices) != 1 || devices[0].Name != "BetaMac" {
+		t.Errorf("got %+v", devices)
+	}
+}
+
+func TestGetDevice_BetaPath(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithEnvironmentID("env-uuid-123"))
+	mux.HandleFunc("/api/devices/v1/environment/env-uuid-123/devices/d1", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusOK, DeviceReadRepresentationV1{ID: "d1", Name: "BetaMac"})
+	})
+
+	dev, err := c.GetDevice(context.Background(), "d1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if dev.Name != "BetaMac" {
+		t.Errorf("Name = %q, want BetaMac", dev.Name)
+	}
+}

@@ -30,7 +30,15 @@ var initAcceptanceClient = sync.OnceValues(func() (*Client, error) {
 		return nil, fmt.Errorf("missing required environment variables (JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET)")
 	}
 
-	c := NewClient(baseURL, clientID, clientSecret)
+	var opts []Option
+	if id := os.Getenv("JAMFPLATFORM_TENANT_ID"); id != "" {
+		opts = append(opts, WithTenantID(id))
+	}
+	if id := os.Getenv("JAMFPLATFORM_ENVIRONMENT_ID"); id != "" {
+		opts = append(opts, WithEnvironmentID(id))
+	}
+
+	c := NewClient(baseURL, clientID, clientSecret, opts...)
 	if err := c.ValidateCredentials(context.Background()); err != nil {
 		return nil, fmt.Errorf("failed to validate credentials: %w", err)
 	}
@@ -60,9 +68,17 @@ func smartGroupFixtureName() string {
 
 func requireSmartGroupFixture(t *testing.T) string {
 	t.Helper()
-	c := accClient(t)
 
 	smartGroupFixtureOnce.Do(func() {
+		// If a device group ID is provided via env var, use it directly.
+		// This is useful when the device groups API is not available with the
+		// current credentials (e.g. tenant-scoped credentials for blueprints/benchmarks).
+		if id := os.Getenv("JAMFPLATFORM_DEVICE_GROUP_ID"); id != "" {
+			smartGroupID = id
+			return
+		}
+
+		c := accClient(t)
 		ctx := context.Background()
 
 		groups, err := c.ListDeviceGroups(ctx, nil, fmt.Sprintf("name==%q", smartGroupFixtureName()))
@@ -107,8 +123,10 @@ func requireSmartGroupFixture(t *testing.T) string {
 }
 
 // cleanupSmartGroupFixture deletes the shared fixture. Call from TestMain.
+// Skips cleanup when the group was provided via JAMFPLATFORM_DEVICE_GROUP_ID
+// since we don't own that resource.
 func cleanupSmartGroupFixture() {
-	if smartGroupID == "" {
+	if smartGroupID == "" || os.Getenv("JAMFPLATFORM_DEVICE_GROUP_ID") != "" {
 		return
 	}
 	if c, err := initAcceptanceClient(); err == nil {
