@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
+	"time"
 )
 
 func createTestBlueprint(t *testing.T, c *Client, name string, groupID string, steps []BlueprintStepV1) *BlueprintDetailV1 {
@@ -155,10 +156,11 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 	bp := createTestBlueprint(t, c, "sdk-acc-update-test-"+suffix, groupID, steps)
 
 	renamedName := "sdk-acc-update-renamed-" + suffix
+	updatedDesc := "Updated description"
 	err := c.UpdateBlueprint(ctx, bp.ID, &BlueprintUpdateRequestV1{
-		Name:        renamedName,
-		Description: "Updated description",
-		Scope:       BlueprintUpdateScopeV1{DeviceGroups: []string{groupID}},
+		Name:        &renamedName,
+		Description: &updatedDesc,
+		Scope:       &BlueprintUpdateScopeV1{DeviceGroups: []string{groupID}},
 		Steps:       steps,
 	})
 	if err != nil {
@@ -176,6 +178,42 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 		t.Errorf("expected updated description, got %q", updated.Description)
 	}
 	t.Logf("Updated blueprint ID: %s", bp.ID)
+}
+
+func TestAcceptance_Blueprint_Report(t *testing.T) {
+	groupID := requireSmartGroupFixture(t)
+	c := accClient(t)
+	ctx := context.Background()
+
+	steps := makeStep("com.jamf.ddm.passcode-settings", map[string]any{
+		"RequirePasscode": true,
+		"MinimumLength":   6,
+	})
+	bp := createTestBlueprint(t, c, "sdk-acc-report-"+runSuffix(), groupID, steps)
+
+	if err := c.DeployBlueprint(ctx, bp.ID); err != nil {
+		t.Fatalf("DeployBlueprint failed: %v", err)
+	}
+	t.Cleanup(func() { _ = c.UndeployBlueprint(ctx, bp.ID) })
+
+	pollCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+	err := PollUntil(pollCtx, 2*time.Second, func(ctx context.Context) (bool, error) {
+		got, err := c.GetBlueprint(ctx, bp.ID)
+		if err != nil {
+			return false, err
+		}
+		return got.DeploymentState.State != "NOT_DEPLOYED", nil
+	})
+	if err != nil {
+		t.Fatalf("Timed out waiting for deployment: %v", err)
+	}
+
+	report, err := c.GetBlueprintReport(ctx, bp.ID)
+	if err != nil {
+		t.Fatalf("GetBlueprintReport failed: %v", err)
+	}
+	t.Logf("Report for %s: succeeded=%d failed=%d pending=%d", bp.ID, report.Succeeded, report.Failed, report.Pending)
 }
 
 func TestAcceptance_Blueprint_GetByName(t *testing.T) {

@@ -167,3 +167,86 @@ func TestAcceptance_DeviceGroup_ListMembers(t *testing.T) {
 	}
 	t.Logf("Fixture group has %d members", len(members))
 }
+
+func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	devices, err := c.ListDevices(ctx, nil, "")
+	if err != nil {
+		t.Fatalf("ListDevices failed: %v", err)
+	}
+	if len(devices) == 0 {
+		t.Skip("No devices available — cannot test member updates")
+	}
+	deviceID := devices[0].ID
+
+	suffix := runSuffix()
+	desc := "SDK acceptance test — safe to delete"
+	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
+		Name:        "sdk-acc-members-" + suffix,
+		Description: &desc,
+		DeviceType:  "COMPUTER",
+		GroupType:   "STATIC",
+		Members:     []string{},
+	})
+	if err != nil {
+		t.Fatalf("CreateDeviceGroup failed: %v", err)
+	}
+	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
+
+	// Add a device
+	err = c.UpdateDeviceGroupMembers(ctx, resp.ID, &DeviceGroupMemberPatchRepresentationV1{
+		Added: []string{deviceID},
+	})
+	if err != nil {
+		t.Fatalf("UpdateDeviceGroupMembers (add) failed: %v", err)
+	}
+
+	members, err := c.ListDeviceGroupMembers(ctx, resp.ID)
+	if err != nil {
+		t.Fatalf("ListDeviceGroupMembers failed: %v", err)
+	}
+	if len(members) != 1 || members[0] != deviceID {
+		t.Errorf("expected [%s], got %v", deviceID, members)
+	}
+
+	// Remove the device
+	err = c.UpdateDeviceGroupMembers(ctx, resp.ID, &DeviceGroupMemberPatchRepresentationV1{
+		Removed: []string{deviceID},
+	})
+	if err != nil {
+		t.Fatalf("UpdateDeviceGroupMembers (remove) failed: %v", err)
+	}
+
+	members, err = c.ListDeviceGroupMembers(ctx, resp.ID)
+	if err != nil {
+		t.Fatalf("ListDeviceGroupMembers after remove failed: %v", err)
+	}
+	if len(members) != 0 {
+		t.Errorf("expected empty members, got %v", members)
+	}
+	t.Logf("Added and removed device %s from group %s", deviceID, resp.ID)
+}
+
+func TestAcceptance_DeviceGroup_ListGroupsForDevice(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	devices, err := c.ListDevices(ctx, nil, "")
+	if err != nil {
+		t.Fatalf("ListDevices failed: %v", err)
+	}
+	if len(devices) == 0 {
+		t.Skip("No devices available")
+	}
+
+	groups, err := c.ListDeviceGroupsForDevice(ctx, devices[0].ID)
+	if err != nil {
+		t.Fatalf("ListDeviceGroupsForDevice failed: %v", err)
+	}
+	t.Logf("Device %s belongs to %d groups", devices[0].ID, len(groups))
+	for _, g := range groups {
+		t.Logf("  %s (%s)", g.GroupName, g.GroupID)
+	}
+}

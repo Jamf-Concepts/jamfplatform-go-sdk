@@ -151,6 +151,102 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 	t.Logf("Benchmark synced: %s, rules: %d", resp.BenchmarkID, len(bm.Rules))
 }
 
+func TestAcceptance_Benchmark_Reporting(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	baselines, err := c.ListBaselines(ctx)
+	if err != nil {
+		t.Fatalf("ListBaselines failed: %v", err)
+	}
+	if len(baselines.Baselines) == 0 {
+		t.Skip("No baselines available — CB Engine may not be enabled")
+	}
+
+	groupID := requireSmartGroupFixture(t)
+	baseline := baselines.Baselines[0]
+
+	rules, err := c.GetBaselineRules(ctx, baseline.BaselineID)
+	if err != nil {
+		t.Fatalf("GetBaselineRules failed: %v", err)
+	}
+	if len(rules.Rules) == 0 {
+		t.Skip("No rules available for baseline")
+	}
+
+	var ruleRequests []CBEngineRuleRequestV2
+	limit := 3
+	if len(rules.Rules) < limit {
+		limit = len(rules.Rules)
+	}
+	for _, r := range rules.Rules[:limit] {
+		rr := CBEngineRuleRequestV2{
+			ID:      r.ID,
+			Enabled: true,
+		}
+		if r.ODV != nil {
+			rr.ODV = &CBEngineODVRequestV2{Value: r.ODV.Value}
+		}
+		ruleRequests = append(ruleRequests, rr)
+	}
+
+	title := "sdk-acc-reporting-" + runSuffix()
+	if existing, err := c.GetBenchmarkByTitle(ctx, title); err == nil {
+		ensureBenchmarkDeletedByID(t, c, ctx, existing.BenchmarkID)
+	}
+
+	resp, err := c.CreateBenchmark(ctx, &CBEngineBenchmarkRequestV2{
+		Title:            title,
+		Description:      "SDK acceptance test — reporting endpoints",
+		SourceBaselineID: baseline.BaselineID,
+		Sources:          rules.Sources,
+		Rules:            ruleRequests,
+		Target:           CBEngineTargetV2{DeviceGroups: []string{groupID}},
+		EnforcementMode:  "MONITOR",
+	})
+	if err != nil {
+		t.Fatalf("CreateBenchmark failed: %v", err)
+	}
+	t.Cleanup(func() { ensureBenchmarkDeletedByID(t, c, ctx, resp.BenchmarkID) })
+
+	waitForBenchmarkSyncState(t, c, ctx, resp.BenchmarkID)
+	benchmarkID := resp.BenchmarkID
+
+	t.Run("RulesStats", func(t *testing.T) {
+		stats, err := c.ListBenchmarkRulesStats(ctx, benchmarkID, "", "")
+		if err != nil {
+			t.Fatalf("ListBenchmarkRulesStats failed: %v", err)
+		}
+		t.Logf("Found %d rule stats", len(stats))
+		for _, s := range stats {
+			t.Logf("  %s: passed=%d failed=%d unknown=%d (%.1f%%)", s.RuleTitle, s.Passed, s.Failed, s.Unknown, s.PassPercentage)
+		}
+	})
+
+	t.Run("RuleDevices", func(t *testing.T) {
+		stats, err := c.ListBenchmarkRulesStats(ctx, benchmarkID, "", "")
+		if err != nil {
+			t.Fatalf("ListBenchmarkRulesStats failed: %v", err)
+		}
+		if len(stats) == 0 {
+			t.Skip("No rule stats — cannot query devices")
+		}
+		devices, err := c.ListBenchmarkRuleDevices(ctx, benchmarkID, stats[0].RuleID, "", "", "")
+		if err != nil {
+			t.Fatalf("ListBenchmarkRuleDevices failed: %v", err)
+		}
+		t.Logf("Found %d devices for rule %s", len(devices), stats[0].RuleTitle)
+	})
+
+	t.Run("CompliancePercentage", func(t *testing.T) {
+		pct, err := c.GetBenchmarkCompliancePercentage(ctx, benchmarkID)
+		if err != nil {
+			t.Fatalf("GetBenchmarkCompliancePercentage failed: %v", err)
+		}
+		t.Logf("Compliance percentage: %.1f%%", pct.CompliancePercentage)
+	})
+}
+
 func TestAcceptance_Benchmark_GetByTitle(t *testing.T) {
 	c := accClient(t)
 
