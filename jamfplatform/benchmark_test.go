@@ -14,7 +14,7 @@ func TestListBaselines(t *testing.T) {
 	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/baselines", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, CBEngineBaselinesResponseV1{
 			Baselines: []CBEngineBaselineInfoV1{
-				{ID: "bl-1", Name: "CIS macOS 15", Title: "CIS Benchmark for macOS 15"},
+				{ID: "bl-1", Title: "CIS Benchmark for macOS 15", RuleCount: 42},
 			},
 		})
 	})
@@ -28,6 +28,22 @@ func TestListBaselines(t *testing.T) {
 	}
 }
 
+func TestListBaselines_APIError(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/baselines", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusInternalServerError, map[string]any{
+			"httpStatus": 500,
+			"traceId":    "trace-err",
+			"errors":     []map[string]string{{"code": "SERVER_ERROR", "field": "", "description": "internal error"}},
+		})
+	})
+
+	_, err := c.ListBaselines(context.Background())
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestListBenchmarks(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
 	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/benchmarks", func(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +52,7 @@ func TestListBenchmarks(t *testing.T) {
 		}
 		writeJSON(t, w, http.StatusOK, CBEngineBenchmarksResponseV2{
 			Benchmarks: []CBEngineBenchmarkV2{
-				{ID: "bm-1", Title: "My Benchmark", SyncState: "SYNCED"},
+				{ID: "bm-1", Title: "My Benchmark", SyncState: "SYNCED", Modified: false},
 			},
 		})
 	})
@@ -54,9 +70,11 @@ func TestGetBenchmark(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
 	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/benchmarks/bm-1", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, CBEngineBenchmarkResponseV2{
-			BenchmarkID:     "bm-1",
-			Title:           "Test Benchmark",
-			EnforcementMode: "AUDIT_ONLY",
+			BenchmarkID:        "bm-1",
+			Title:              "Test Benchmark",
+			BaselineID:         "bl-1",
+			EnforcementMode:    "MONITOR",
+			CanSwitchToEnforce: true,
 		})
 	})
 
@@ -67,8 +85,11 @@ func TestGetBenchmark(t *testing.T) {
 	if bm.BenchmarkID != "bm-1" {
 		t.Errorf("BenchmarkID = %q, want bm-1", bm.BenchmarkID)
 	}
-	if bm.EnforcementMode != "AUDIT_ONLY" {
-		t.Errorf("EnforcementMode = %q, want AUDIT_ONLY", bm.EnforcementMode)
+	if bm.BaselineID != "bl-1" {
+		t.Errorf("BaselineID = %q, want bl-1", bm.BaselineID)
+	}
+	if !bm.CanSwitchToEnforce {
+		t.Error("CanSwitchToEnforce = false, want true")
 	}
 }
 
@@ -93,7 +114,7 @@ func TestCreateBenchmark(t *testing.T) {
 		Title:            "New Benchmark",
 		SourceBaselineID: "bl-1",
 		Target:           CBEngineTargetV2{DeviceGroups: []string{"g1"}},
-		EnforcementMode:  "AUDIT_ONLY",
+		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -160,17 +181,17 @@ func TestGetBenchmarkByTitle_NotFound(t *testing.T) {
 	}
 }
 
-func TestListBaselines_APIError(t *testing.T) {
+func TestGetBenchmark_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
-	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/baselines", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusInternalServerError, map[string]any{
-			"httpStatus": 500,
-			"traceId":    "trace-err",
-			"errors":     []map[string]string{{"code": "SERVER_ERROR", "field": "", "description": "internal error"}},
+	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/benchmarks/missing", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
 		})
 	})
 
-	_, err := c.ListBaselines(context.Background())
+	_, err := c.GetBenchmark(context.Background(), "missing")
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -208,38 +229,6 @@ func TestDeleteBenchmark_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetBenchmark_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
-	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/benchmarks/missing", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.GetBenchmark(context.Background(), "missing")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
-func TestGetBaselineRules_APIError(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
-	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/rules", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusForbidden, map[string]any{
-			"httpStatus": 403,
-			"traceId":    "trace-403",
-			"errors":     []map[string]string{{"code": "FORBIDDEN", "field": "", "description": "access denied"}},
-		})
-	})
-
-	_, err := c.GetBaselineRules(context.Background(), "bl-1")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestGetBaselineRules(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
 	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/rules", func(w http.ResponseWriter, r *http.Request) {
@@ -260,5 +249,21 @@ func TestGetBaselineRules(t *testing.T) {
 	}
 	if len(rules.Rules) != 1 || rules.Rules[0].ID != "rule-1" {
 		t.Errorf("got %+v", rules)
+	}
+}
+
+func TestGetBaselineRules_APIError(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/rules", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusForbidden, map[string]any{
+			"httpStatus": 403,
+			"traceId":    "trace-403",
+			"errors":     []map[string]string{{"code": "FORBIDDEN", "field": "", "description": "access denied"}},
+		})
+	})
+
+	_, err := c.GetBaselineRules(context.Background(), "bl-1")
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }
