@@ -13,9 +13,7 @@ import (
 )
 
 // Device Management Action API path constants.
-const (
-	deviceActionsLegacyV1Prefix = "/management/actions/v1"
-)
+const deviceActionsNamespace = "device-actions"
 
 // DeviceCommandResponseV1 captures the command metadata returned by device actions.
 type DeviceCommandResponseV1 struct {
@@ -58,7 +56,7 @@ func (c *Client) invokeDeviceManagementAction(ctx context.Context, deviceID, act
 		return nil, fmt.Errorf("deviceID cannot be empty")
 	}
 
-	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceActionsLegacyV1Prefix)
+	prefix := c.tenantPrefix(deviceActionsNamespace, "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s/%s", prefix, url.PathEscape(deviceID), action)
 	var result []DeviceCommandResponseV1
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, payload, http.StatusCreated, &result); err != nil {

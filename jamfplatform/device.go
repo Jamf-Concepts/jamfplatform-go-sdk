@@ -19,10 +19,7 @@ import (
 )
 
 // Device Inventory API path constants.
-const (
-	deviceInventoryLegacyV1Prefix = "/management/devices/v1"
-	deviceNamespace               = "devices"
-)
+const deviceNamespace = "devices"
 
 // DeviceListReadRepresentationV1 represents a device in a list response.
 type DeviceListReadRepresentationV1 struct {
@@ -132,7 +129,7 @@ func NewNullableStringNull() *NullableString {
 
 // ListDevices returns all devices, automatically handling pagination.
 func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
-	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
+	prefix := c.tenantPrefix(deviceNamespace, "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -162,7 +159,7 @@ func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) 
 
 // GetDevice retrieves a device by ID.
 func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresentationV1, error) {
-	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
+	prefix := c.tenantPrefix(deviceNamespace, "v1")
 	var result DeviceReadRepresentationV1
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -173,7 +170,7 @@ func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresent
 
 // UpdateDevice updates an existing device.
 func (c *Client) UpdateDevice(ctx context.Context, id string, payload *DeviceUpdateRepresentationV1) error {
-	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
+	prefix := c.tenantPrefix(deviceNamespace, "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPatch, endpoint, payload, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDevice(%s): %w", id, err)
@@ -183,7 +180,7 @@ func (c *Client) UpdateDevice(ctx context.Context, id string, payload *DeviceUpd
 
 // DeleteDevice deletes a device by ID.
 func (c *Client) DeleteDevice(ctx context.Context, id string) error {
-	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
+	prefix := c.tenantPrefix(deviceNamespace, "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDevice(%s): %w", id, err)
@@ -193,7 +190,7 @@ func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 
 // ListDeviceApplications returns all installed applications for a device, handling pagination internally.
 func (c *Client) ListDeviceApplications(ctx context.Context, deviceID string, sort []string, filter string) ([]DeviceInstalledApplicationReadRepresentationV1, error) {
-	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
+	prefix := c.tenantPrefix(deviceNamespace, "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceInstalledApplicationReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -223,7 +220,7 @@ func (c *Client) ListDeviceApplications(ctx context.Context, deviceID string, so
 
 // ListDevicesForUser returns all devices assigned to the specified user, handling pagination internally.
 func (c *Client) ListDevicesForUser(ctx context.Context, userID string, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
-	prefix := c.environmentPrefix(deviceNamespace, "v1", deviceInventoryLegacyV1Prefix)
+	prefix := c.tenantPrefix(deviceNamespace, "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))

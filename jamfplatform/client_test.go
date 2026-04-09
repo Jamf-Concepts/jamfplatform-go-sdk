@@ -121,13 +121,6 @@ func TestAccessToken_Success(t *testing.T) {
 	}
 }
 
-func TestWithEnvironmentID(t *testing.T) {
-	c := NewClient("https://example.com", "id", "secret", WithEnvironmentID("env-uuid"))
-	if c.environmentID != "env-uuid" {
-		t.Errorf("environmentID = %q, want env-uuid", c.environmentID)
-	}
-}
-
 func TestWithTenantID(t *testing.T) {
 	c := NewClient("https://example.com", "id", "secret", WithTenantID("tenant-uuid"))
 	if c.tenantID != "tenant-uuid" {
@@ -135,42 +128,51 @@ func TestWithTenantID(t *testing.T) {
 	}
 }
 
-func TestEnvironmentPrefix(t *testing.T) {
+func TestTenantPrefix(t *testing.T) {
 	tests := []struct {
 		name      string
-		envID     string
+		tenantID  string
 		namespace string
 		version   string
-		legacy    string
 		want      string
 	}{
 		{
-			name:      "legacy when no environment ID",
+			name:     "devices",
+			tenantID: "e77c1408-10c8-4007-b177-abc9157fbcaa",
 			namespace: "devices", version: "v1",
-			legacy: "/management/devices/v1",
-			want:   "/management/devices/v1",
+			want: "/api/devices/v1/tenant/e77c1408-10c8-4007-b177-abc9157fbcaa",
 		},
 		{
-			name: "beta path with environment ID",
-			envID: "e77c1408-10c8-4007-b177-abc9157fbcaa",
-			namespace: "devices", version: "v1",
-			legacy: "/management/devices/v1",
-			want:   "/api/devices/v1/environment/e77c1408-10c8-4007-b177-abc9157fbcaa",
-		},
-		{
-			name: "device groups beta path",
-			envID: "env-123",
+			name:     "device groups",
+			tenantID: "t-123",
 			namespace: "device-groups", version: "v1",
-			legacy: "/management/device-groups/v1",
-			want:   "/api/device-groups/v1/environment/env-123",
+			want: "/api/device-groups/v1/tenant/t-123",
+		},
+		{
+			name:     "device actions",
+			tenantID: "t-123",
+			namespace: "device-actions", version: "v1",
+			want: "/api/device-actions/v1/tenant/t-123",
+		},
+		{
+			name:     "blueprints",
+			tenantID: "t-abc",
+			namespace: "blueprints", version: "v1",
+			want: "/api/blueprints/v1/tenant/t-abc",
+		},
+		{
+			name:     "compliance benchmarks",
+			tenantID: "t-abc",
+			namespace: "compliance-benchmarks", version: "v1",
+			want: "/api/compliance-benchmarks/v1/tenant/t-abc",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{environmentID: tt.envID}
-			got := c.environmentPrefix(tt.namespace, tt.version, tt.legacy)
+			c := &Client{tenantID: tt.tenantID}
+			got := c.tenantPrefix(tt.namespace, tt.version)
 			if got != tt.want {
-				t.Errorf("environmentPrefix() = %q, want %q", got, tt.want)
+				t.Errorf("tenantPrefix() = %q, want %q", got, tt.want)
 			}
 		})
 	}

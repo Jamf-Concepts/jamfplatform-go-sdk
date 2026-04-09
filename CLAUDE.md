@@ -22,6 +22,10 @@ Two-layer design, intentionally thin:
 - **`jamfplatform/`** — Exported package. All resource types, API methods, and the public `Client`. Methods call `c.transport.Do`/`DoExpect`/`DoWithContentType` directly. One file per API domain (`blueprint.go`, `device.go`, `device_group.go`, `device_action.go`, `benchmark.go`).
 - **`internal/client/`** — HTTP transport only. Handles OAuth2 auth, request/response marshaling, error handling, logging, the generic `ListAllPages[T]` paginator, `PollUntil` async poller, and RSQL filter building. No resource-specific types belong here.
 
+### URL path construction
+
+All API paths use the pattern `/api/{namespace}/{version}/tenant/{tenantId}/{resource}`. The `tenantPrefix(namespace, version)` method on `Client` builds this prefix. Each resource file defines its own namespace constant (e.g. `deviceNamespace = "devices"`, `deviceActionsNamespace = "device-actions"`, `blueprintNamespace = "blueprints"`).
+
 ### Key transport methods
 
 - `Do(ctx, method, path, body, result)` — expects 200 OK
@@ -55,7 +59,7 @@ Types and endpoints use explicit version suffixes (`V1`, `V2`). Benchmark CRUD u
 ## Conventions
 
 - MIT license. Copyright headers managed by HashiCorp `copywrite` (uses `--plan` flag, not `--check`).
-- Options pattern for client configuration: `WithUserAgent`, `WithHTTPClient`, `WithLogger`.
+- Options pattern for client configuration: `WithTenantID`, `WithUserAgent`, `WithHTTPClient`, `WithLogger`.
 - Pointer fields (`*string`, `*bool`) for optional/nullable JSON. `NullableString` type for fields that need explicit `null` vs omitted.
 - `url.PathEscape` for path parameters, `url.QueryEscape` for query parameters.
 - Error wrapping: `fmt.Errorf("MethodName(%s): %w", id, err)`.
