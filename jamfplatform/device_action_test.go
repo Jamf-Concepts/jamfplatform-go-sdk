@@ -10,8 +10,8 @@ import (
 )
 
 func TestEraseDevice(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/actions/v1/devices/dev-1/erase", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/dev-1/erase", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -36,8 +36,8 @@ func TestEraseDevice(t *testing.T) {
 }
 
 func TestRestartDevice(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/actions/v1/devices/dev-1/restart", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/dev-1/restart", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -56,8 +56,8 @@ func TestRestartDevice(t *testing.T) {
 }
 
 func TestShutdownDevice(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/actions/v1/devices/dev-1/shutdown", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/dev-1/shutdown", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -76,8 +76,8 @@ func TestShutdownDevice(t *testing.T) {
 }
 
 func TestUnmanageDevice(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/actions/v1/devices/dev-1/unmanage", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/dev-1/unmanage", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -96,7 +96,7 @@ func TestUnmanageDevice(t *testing.T) {
 }
 
 func TestDeviceAction_EmptyID(t *testing.T) {
-	c, _ := testServer(t)
+	c, _ := testServerWithOpts(t, WithTenantID("t-test"))
 	_, err := c.EraseDevice(context.Background(), "", nil)
 	if err == nil {
 		t.Fatal("expected error for empty device ID")
@@ -104,8 +104,8 @@ func TestDeviceAction_EmptyID(t *testing.T) {
 }
 
 func TestDeviceAction_APIError(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/actions/v1/devices/dev-1/restart", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/dev-1/restart", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -116,25 +116,5 @@ func TestDeviceAction_APIError(t *testing.T) {
 	_, err := c.RestartDevice(context.Background(), "dev-1")
 	if err == nil {
 		t.Fatal("expected error for missing device")
-	}
-}
-
-func TestEraseDevice_BetaPath(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithEnvironmentID("env-uuid-123"))
-	mux.HandleFunc("/api/devices/v1/environment/env-uuid-123/devices/dev-1/erase", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		writeJSON(t, w, http.StatusCreated, []DeviceCommandResponseV1{
-			{DeviceID: "dev-1", CommandID: "cmd-beta"},
-		})
-	})
-
-	cmds, err := c.EraseDevice(context.Background(), "dev-1", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(cmds) != 1 || cmds[0].CommandID != "cmd-beta" {
-		t.Errorf("got %+v", cmds)
 	}
 }

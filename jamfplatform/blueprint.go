@@ -18,8 +18,8 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
-// Blueprint API path constants
-const blueprintV1Prefix = "/api/blueprints/v1"
+// Blueprint API path constants.
+const blueprintNamespace = "blueprints"
 
 // Blueprint API Types
 
@@ -119,17 +119,10 @@ type BlueprintCreateResponseV1 struct {
 	Href string `json:"href"`
 }
 
-// blueprintPath returns the endpoint path and optional tenant headers for
-// a blueprint API resource. When tenantID is configured, adds X-Tenant-Id header.
-func (c *Client) blueprintPath(resource string) (string, http.Header) {
-	if c.tenantID != "" {
-		return blueprintV1Prefix + resource, http.Header{"X-Tenant-Id": {c.tenantID}}
-	}
-	return blueprintV1Prefix + resource, nil
-}
 
 // ListBlueprints returns all blueprints, automatically handling pagination.
 func (c *Client) ListBlueprints(ctx context.Context, sort []string, search string) ([]BlueprintOverviewV1, error) {
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]BlueprintOverviewV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -140,13 +133,13 @@ func (c *Client) ListBlueprints(ctx context.Context, sort []string, search strin
 		if search != "" {
 			params.Set("search", search)
 		}
-		endpoint, headers := c.blueprintPath("/blueprints?" + params.Encode())
+		endpoint := prefix + "/blueprints?" + params.Encode()
 
 		var result struct {
 			Results    []BlueprintOverviewV1 `json:"results"`
 			TotalCount int64                 `json:"totalCount"`
 		}
-		if err := c.transport.DoWithHeaders(ctx, http.MethodGet, endpoint, nil, headers, &result); err != nil {
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 			return nil, false, err
 		}
 		return result.Results, len(result.Results) >= pageSize && len(result.Results) > 0, nil
@@ -155,9 +148,10 @@ func (c *Client) ListBlueprints(ctx context.Context, sort []string, search strin
 
 // GetBlueprint retrieves a blueprint by ID.
 func (c *Client) GetBlueprint(ctx context.Context, id string) (*BlueprintDetailV1, error) {
-	endpoint, headers := c.blueprintPath(fmt.Sprintf("/blueprints/%s", url.PathEscape(id)))
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
 	var result BlueprintDetailV1
-	if err := c.transport.DoWithHeaders(ctx, http.MethodGet, endpoint, nil, headers, &result); err != nil {
+	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetBlueprint(%s): %w", id, err)
 	}
 	return &result, nil
@@ -182,9 +176,10 @@ func (c *Client) GetBlueprintByName(ctx context.Context, name string) (*Blueprin
 
 // CreateBlueprint creates a new blueprint.
 func (c *Client) CreateBlueprint(ctx context.Context, request *BlueprintCreateRequestV1) (*BlueprintCreateResponseV1, error) {
-	endpoint, headers := c.blueprintPath("/blueprints")
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
 	var result BlueprintCreateResponseV1
-	if err := c.transport.DoExpectWithHeaders(ctx, http.MethodPost, endpoint, request, headers, http.StatusCreated, &result); err != nil {
+	endpoint := prefix + "/blueprints"
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateBlueprint: %w", err)
 	}
 	return &result, nil
@@ -192,8 +187,9 @@ func (c *Client) CreateBlueprint(ctx context.Context, request *BlueprintCreateRe
 
 // UpdateBlueprint updates a blueprint configuration.
 func (c *Client) UpdateBlueprint(ctx context.Context, id string, request *BlueprintUpdateRequestV1) error {
-	endpoint, headers := c.blueprintPath(fmt.Sprintf("/blueprints/%s", url.PathEscape(id)))
-	if err := c.transport.DoExpectWithHeaders(ctx, http.MethodPatch, endpoint, request, headers, http.StatusNoContent, nil); err != nil {
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
+	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPatch, endpoint, request, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateBlueprint(%s): %w", id, err)
 	}
 	return nil
@@ -201,8 +197,9 @@ func (c *Client) UpdateBlueprint(ctx context.Context, id string, request *Bluepr
 
 // DeleteBlueprint deletes a blueprint by ID.
 func (c *Client) DeleteBlueprint(ctx context.Context, id string) error {
-	endpoint, headers := c.blueprintPath(fmt.Sprintf("/blueprints/%s", url.PathEscape(id)))
-	if err := c.transport.DoExpectWithHeaders(ctx, http.MethodDelete, endpoint, nil, headers, http.StatusNoContent, nil); err != nil {
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
+	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteBlueprint(%s): %w", id, err)
 	}
 	return nil
@@ -210,8 +207,9 @@ func (c *Client) DeleteBlueprint(ctx context.Context, id string) error {
 
 // DeployBlueprint starts deployment of a blueprint.
 func (c *Client) DeployBlueprint(ctx context.Context, id string) error {
-	endpoint, headers := c.blueprintPath(fmt.Sprintf("/blueprints/%s/deploy", url.PathEscape(id)))
-	if err := c.transport.DoExpectWithHeaders(ctx, http.MethodPost, endpoint, nil, headers, http.StatusAccepted, nil); err != nil {
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
+	endpoint := fmt.Sprintf("%s/blueprints/%s/deploy", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("DeployBlueprint(%s): %w", id, err)
 	}
 	return nil
@@ -219,8 +217,9 @@ func (c *Client) DeployBlueprint(ctx context.Context, id string) error {
 
 // UndeployBlueprint starts undeployment of a blueprint.
 func (c *Client) UndeployBlueprint(ctx context.Context, id string) error {
-	endpoint, headers := c.blueprintPath(fmt.Sprintf("/blueprints/%s/undeploy", url.PathEscape(id)))
-	if err := c.transport.DoExpectWithHeaders(ctx, http.MethodPost, endpoint, nil, headers, http.StatusAccepted, nil); err != nil {
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
+	endpoint := fmt.Sprintf("%s/blueprints/%s/undeploy", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("UndeployBlueprint(%s): %w", id, err)
 	}
 	return nil
@@ -228,17 +227,18 @@ func (c *Client) UndeployBlueprint(ctx context.Context, id string) error {
 
 // ListBlueprintComponents returns all blueprint components, automatically handling pagination.
 func (c *Client) ListBlueprintComponents(ctx context.Context) ([]BlueprintComponentDescriptionV1, error) {
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]BlueprintComponentDescriptionV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
-		endpoint, headers := c.blueprintPath("/blueprint-components?" + params.Encode())
+		endpoint := prefix + "/blueprint-components?" + params.Encode()
 
 		var result struct {
 			Results    []BlueprintComponentDescriptionV1 `json:"results"`
 			TotalCount int64                             `json:"totalCount"`
 		}
-		if err := c.transport.DoWithHeaders(ctx, http.MethodGet, endpoint, nil, headers, &result); err != nil {
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 			return nil, false, err
 		}
 		return result.Results, len(result.Results) >= pageSize && len(result.Results) > 0, nil
@@ -247,9 +247,10 @@ func (c *Client) ListBlueprintComponents(ctx context.Context) ([]BlueprintCompon
 
 // GetBlueprintComponent gets a blueprint component by identifier.
 func (c *Client) GetBlueprintComponent(ctx context.Context, id string) (*BlueprintComponentDescriptionV1, error) {
-	endpoint, headers := c.blueprintPath(fmt.Sprintf("/blueprint-components/%s", url.PathEscape(id)))
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
 	var result BlueprintComponentDescriptionV1
-	if err := c.transport.DoWithHeaders(ctx, http.MethodGet, endpoint, nil, headers, &result); err != nil {
+	endpoint := fmt.Sprintf("%s/blueprint-components/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetBlueprintComponent(%s): %w", id, err)
 	}
 	return &result, nil

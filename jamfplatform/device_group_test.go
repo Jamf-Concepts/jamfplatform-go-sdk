@@ -10,8 +10,8 @@ import (
 )
 
 func TestListDeviceGroups(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -36,8 +36,8 @@ func TestListDeviceGroups(t *testing.T) {
 }
 
 func TestGetDeviceGroup(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups/g1", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups/g1", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"id": "g1", "name": "Test Group", "deviceType": "COMPUTER", "groupType": "STATIC", "memberCount": 3,
 		})
@@ -53,8 +53,8 @@ func TestGetDeviceGroup(t *testing.T) {
 }
 
 func TestCreateDeviceGroup(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -80,8 +80,8 @@ func TestCreateDeviceGroup(t *testing.T) {
 }
 
 func TestUpdateDeviceGroup(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups/g1", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups/g1", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -99,8 +99,8 @@ func TestUpdateDeviceGroup(t *testing.T) {
 }
 
 func TestDeleteDeviceGroup(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups/g1", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups/g1", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -114,8 +114,8 @@ func TestDeleteDeviceGroup(t *testing.T) {
 }
 
 func TestListDeviceGroupMembers(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups/g1/members", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups/g1/members", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results":  []string{"dev-1", "dev-2"},
 			"hasNext":  false,
@@ -134,8 +134,8 @@ func TestListDeviceGroupMembers(t *testing.T) {
 }
 
 func TestUpdateDeviceGroupMembers(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups/g1/members", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups/g1/members", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -156,8 +156,8 @@ func TestUpdateDeviceGroupMembers(t *testing.T) {
 }
 
 func TestGetDeviceGroup_NotFound(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups/missing", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups/missing", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -172,8 +172,8 @@ func TestGetDeviceGroup_NotFound(t *testing.T) {
 }
 
 func TestCreateDeviceGroup_APIError(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusBadRequest, map[string]any{
 			"httpStatus": 400,
 			"traceId":    "trace-bad",
@@ -191,8 +191,8 @@ func TestCreateDeviceGroup_APIError(t *testing.T) {
 }
 
 func TestUpdateDeviceGroup_NotFound(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups/missing", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups/missing", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -207,8 +207,8 @@ func TestUpdateDeviceGroup_NotFound(t *testing.T) {
 }
 
 func TestDeleteDeviceGroup_NotFound(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/device-groups/missing", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups/missing", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -223,8 +223,8 @@ func TestDeleteDeviceGroup_NotFound(t *testing.T) {
 }
 
 func TestListDeviceGroupsForDevice(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/device-groups/v1/devices/dev-1/device-groups", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/devices/dev-1/device-groups", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results": []map[string]string{
 				{"groupId": "g1", "groupName": "Group 1"},
@@ -238,29 +238,6 @@ func TestListDeviceGroupsForDevice(t *testing.T) {
 		t.Fatal(err)
 	}
 	if len(groups) != 1 || groups[0].GroupID != "g1" {
-		t.Errorf("got %+v", groups)
-	}
-}
-
-func TestListDeviceGroups_BetaPath(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithEnvironmentID("env-uuid-123"))
-	mux.HandleFunc("/api/device-groups/v1/environment/env-uuid-123/device-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":  []map[string]any{{"id": "g1", "name": "Beta Group", "deviceType": "MAC", "groupType": "SMART"}},
-			"hasNext":  false,
-			"page":     0,
-			"pageSize": 100,
-		})
-	})
-
-	groups, err := c.ListDeviceGroups(context.Background(), nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(groups) != 1 || groups[0].Name != "Beta Group" {
 		t.Errorf("got %+v", groups)
 	}
 }

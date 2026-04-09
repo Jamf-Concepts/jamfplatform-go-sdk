@@ -34,9 +34,6 @@ var initAcceptanceClient = sync.OnceValues(func() (*Client, error) {
 	if id := os.Getenv("JAMFPLATFORM_TENANT_ID"); id != "" {
 		opts = append(opts, WithTenantID(id))
 	}
-	if id := os.Getenv("JAMFPLATFORM_ENVIRONMENT_ID"); id != "" {
-		opts = append(opts, WithEnvironmentID(id))
-	}
 
 	c := NewClient(baseURL, clientID, clientSecret, opts...)
 	if err := c.ValidateCredentials(context.Background()); err != nil {

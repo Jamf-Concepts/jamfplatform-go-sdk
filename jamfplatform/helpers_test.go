@@ -18,7 +18,7 @@ func testServer(t *testing.T) (*Client, *http.ServeMux) {
 }
 
 // testServerWithOpts creates an httptest.Server like testServer but accepts
-// additional client options (e.g. WithEnvironmentID, WithTenantID).
+// additional client options (e.g. WithTenantID).
 func testServerWithOpts(t *testing.T, opts ...Option) (*Client, *http.ServeMux) {
 	t.Helper()
 	mux := http.NewServeMux()

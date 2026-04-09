@@ -11,8 +11,8 @@ import (
 )
 
 func TestListDevices(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -46,8 +46,8 @@ func TestListDevices(t *testing.T) {
 }
 
 func TestListDevices_WithSort(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
 		if got := r.URL.Query().Get("sort"); got != "name:asc,model:desc" {
 			t.Errorf("sort = %q, want name:asc,model:desc", got)
 		}
@@ -64,8 +64,8 @@ func TestListDevices_WithSort(t *testing.T) {
 }
 
 func TestGetDevice(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices/dev-123", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/dev-123", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -88,8 +88,8 @@ func TestGetDevice(t *testing.T) {
 }
 
 func TestGetDevice_NotFound(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices/missing", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/missing", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-1",
@@ -104,8 +104,8 @@ func TestGetDevice_NotFound(t *testing.T) {
 }
 
 func TestUpdateDevice(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices/dev-1", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/dev-1", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -125,8 +125,8 @@ func TestUpdateDevice(t *testing.T) {
 }
 
 func TestDeleteDevice(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices/dev-1", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/dev-1", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -140,8 +140,8 @@ func TestDeleteDevice(t *testing.T) {
 }
 
 func TestListDeviceApplications(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices/dev-1/applications", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/dev-1/applications", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results": []map[string]string{
 				{"name": "Safari", "version": "17.0"},
@@ -160,8 +160,8 @@ func TestListDeviceApplications(t *testing.T) {
 }
 
 func TestListDevicesForUser(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/users/user-1/devices", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/users/user-1/devices", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results": []map[string]any{
 				{"id": "d1", "name": "UserMac"},
@@ -180,8 +180,8 @@ func TestListDevicesForUser(t *testing.T) {
 }
 
 func TestGetDeviceBySerialNumber(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("filter") == "" {
 			t.Error("expected filter parameter")
 		}
@@ -192,7 +192,7 @@ func TestGetDeviceBySerialNumber(t *testing.T) {
 			"hasNext": false,
 		})
 	})
-	mux.HandleFunc("/management/devices/v1/devices/dev-abc", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/dev-abc", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"id": "dev-abc", "name": "Mac1",
 		})
@@ -208,8 +208,8 @@ func TestGetDeviceBySerialNumber(t *testing.T) {
 }
 
 func TestGetDeviceBySerialNumber_NotFound(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results": []any{},
 			"hasNext": false,
@@ -223,8 +223,8 @@ func TestGetDeviceBySerialNumber_NotFound(t *testing.T) {
 }
 
 func TestGetDeviceBySerialNumber_MultipleMatches(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results": []map[string]any{
 				{"id": "d1", "serialNumber": "DUP"},
@@ -241,7 +241,7 @@ func TestGetDeviceBySerialNumber_MultipleMatches(t *testing.T) {
 }
 
 func TestGetDeviceBySerialNumber_EmptySerial(t *testing.T) {
-	c, _ := testServer(t)
+	c, _ := testServerWithOpts(t, WithTenantID("t-test"))
 	_, err := c.GetDeviceBySerialNumber(context.Background(), "")
 	if err == nil {
 		t.Fatal("expected error for empty serial")
@@ -249,8 +249,8 @@ func TestGetDeviceBySerialNumber_EmptySerial(t *testing.T) {
 }
 
 func TestListDevices_APIError(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusInternalServerError, map[string]any{
 			"httpStatus": 500,
 			"traceId":    "trace-err",
@@ -272,8 +272,8 @@ func TestListDevices_APIError(t *testing.T) {
 }
 
 func TestUpdateDevice_APIError(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices/dev-1", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/dev-1", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusBadRequest, map[string]any{
 			"httpStatus": 400,
 			"traceId":    "trace-bad",
@@ -289,8 +289,8 @@ func TestUpdateDevice_APIError(t *testing.T) {
 }
 
 func TestDeleteDevice_NotFound(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices/missing", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/missing", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -305,8 +305,8 @@ func TestDeleteDevice_NotFound(t *testing.T) {
 }
 
 func TestListDeviceApplications_APIError(t *testing.T) {
-	c, mux := testServer(t)
-	mux.HandleFunc("/management/devices/v1/devices/dev-1/applications", func(w http.ResponseWriter, _ *http.Request) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/dev-1/applications", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusForbidden, map[string]any{
 			"httpStatus": 403,
 			"traceId":    "trace-403",
@@ -317,43 +317,5 @@ func TestListDeviceApplications_APIError(t *testing.T) {
 	_, err := c.ListDeviceApplications(context.Background(), "dev-1", nil, "")
 	if err == nil {
 		t.Fatal("expected error")
-	}
-}
-
-func TestListDevices_BetaPath(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithEnvironmentID("env-uuid-123"))
-	mux.HandleFunc("/api/devices/v1/environment/env-uuid-123/devices", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":  []map[string]any{{"id": "d1", "name": "BetaMac"}},
-			"hasNext":  false,
-			"page":     0,
-			"pageSize": 100,
-		})
-	})
-
-	devices, err := c.ListDevices(context.Background(), nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(devices) != 1 || devices[0].Name != "BetaMac" {
-		t.Errorf("got %+v", devices)
-	}
-}
-
-func TestGetDevice_BetaPath(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithEnvironmentID("env-uuid-123"))
-	mux.HandleFunc("/api/devices/v1/environment/env-uuid-123/devices/d1", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusOK, DeviceReadRepresentationV1{ID: "d1", Name: "BetaMac"})
-	})
-
-	dev, err := c.GetDevice(context.Background(), "d1")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if dev.Name != "BetaMac" {
-		t.Errorf("Name = %q, want BetaMac", dev.Name)
 	}
 }
