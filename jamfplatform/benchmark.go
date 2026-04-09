@@ -13,7 +13,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // CBEngine API path constants.
@@ -246,6 +249,106 @@ func (c *Client) GetBenchmarkByTitle(ctx context.Context, title string) (*CBEngi
 	}
 
 	return nil, fmt.Errorf("benchmark with title '%s' not found", title)
+}
+
+// ---------- Reporting Types ----------
+
+// CBEngineRuleResultV1 represents compliance stats for a single rule within a benchmark.
+type CBEngineRuleResultV1 struct {
+	RuleID          string  `json:"ruleId"`
+	RuleTitle       string  `json:"ruleTitle"`
+	RuleNumber      string  `json:"ruleNumber,omitempty"`
+	Discussion      string  `json:"discussion,omitempty"`
+	Passed          int     `json:"passed"`
+	Failed          int     `json:"failed"`
+	Unknown         int     `json:"unknown"`
+	PassPercentage  float32 `json:"passPercentage"`
+	NumberOfDevices int     `json:"numberOfDevices"`
+}
+
+// CBEngineDeviceRuleResultV1 represents a device's compliance state for a rule.
+type CBEngineDeviceRuleResultV1 struct {
+	DeviceID   string  `json:"deviceId"`
+	State      string  `json:"state"`
+	DeviceName *string `json:"deviceName,omitempty"`
+}
+
+// CBEngineCompliancePercentageV1 represents overall compliance for a benchmark.
+type CBEngineCompliancePercentageV1 struct {
+	CompliancePercentage float32 `json:"compliancePercentage"`
+}
+
+// ========== Reporting Operations ==========
+
+// ListBenchmarkRulesStats returns paginated compliance stats per rule for a benchmark.
+// sort accepts chained fields like "ruleTitle:asc", "passed:desc".
+func (c *Client) ListBenchmarkRulesStats(ctx context.Context, benchmarkID string, sort string, ruleSearch string) ([]CBEngineRuleResultV1, error) {
+	prefix := c.tenantPrefix(cbEngineNamespace, "v1")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]CBEngineRuleResultV1, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if sort != "" {
+			params.Set("sort", sort)
+		}
+		if ruleSearch != "" {
+			params.Set("rule-search", ruleSearch)
+		}
+
+		endpoint := fmt.Sprintf("%s/benchmarks/%s/rules?%s", prefix, url.PathEscape(benchmarkID), params.Encode())
+
+		var result struct {
+			Results    []CBEngineRuleResultV1 `json:"results"`
+			TotalCount int                    `json:"totalCount"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		return result.Results, len(result.Results) >= pageSize && len(result.Results) > 0, nil
+	})
+}
+
+// ListBenchmarkRuleDevices returns paginated devices and their compliance state for a specific rule.
+// ruleID is required. ruleResult filters by state (PASSED, FAILED, UNKNOWN).
+func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, benchmarkID string, ruleID string, sort string, deviceSearch string, ruleResult string) ([]CBEngineDeviceRuleResultV1, error) {
+	prefix := c.tenantPrefix(cbEngineNamespace, "v1")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]CBEngineDeviceRuleResultV1, bool, error) {
+		params := url.Values{}
+		params.Set("rule-id", ruleID)
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if sort != "" {
+			params.Set("sort", sort)
+		}
+		if deviceSearch != "" {
+			params.Set("device-search", deviceSearch)
+		}
+		if ruleResult != "" {
+			params.Set("rule-result", ruleResult)
+		}
+
+		endpoint := fmt.Sprintf("%s/benchmarks/%s/devices?%s", prefix, url.PathEscape(benchmarkID), params.Encode())
+
+		var result struct {
+			Results    []CBEngineDeviceRuleResultV1 `json:"results"`
+			TotalCount int                          `json:"totalCount"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		return result.Results, len(result.Results) >= pageSize && len(result.Results) > 0, nil
+	})
+}
+
+// GetBenchmarkCompliancePercentage returns the overall compliance percentage for a benchmark.
+func (c *Client) GetBenchmarkCompliancePercentage(ctx context.Context, benchmarkID string) (*CBEngineCompliancePercentageV1, error) {
+	prefix := c.tenantPrefix(cbEngineNamespace, "v1")
+	endpoint := fmt.Sprintf("%s/benchmarks/%s/compliance-percentage", prefix, url.PathEscape(benchmarkID))
+	var result CBEngineCompliancePercentageV1
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetBenchmarkCompliancePercentage(%s): %w", benchmarkID, err)
+	}
+	return &result, nil
 }
 
 // ========== Rule Operations ==========
