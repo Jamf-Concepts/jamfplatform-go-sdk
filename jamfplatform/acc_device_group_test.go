@@ -100,7 +100,7 @@ func TestAcceptance_DeviceGroup_UpdateGroup(t *testing.T) {
 	renamedName := "sdk-acc-update-renamed-" + suffix
 	updatedDesc := "Updated description"
 	err = c.UpdateDeviceGroup(ctx, resp.ID, &DeviceGroupUpdateRepresentationV1{
-		Name:        renamedName,
+		Name:        &renamedName,
 		Description: &updatedDesc,
 	})
 	if err != nil {

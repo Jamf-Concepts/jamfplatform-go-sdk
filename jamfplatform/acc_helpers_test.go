@@ -25,15 +25,13 @@ var initAcceptanceClient = sync.OnceValues(func() (*Client, error) {
 	baseURL := os.Getenv("JAMFPLATFORM_BASE_URL")
 	clientID := os.Getenv("JAMFPLATFORM_CLIENT_ID")
 	clientSecret := os.Getenv("JAMFPLATFORM_CLIENT_SECRET")
+	tenantID := os.Getenv("JAMFPLATFORM_TENANT_ID")
 
-	if baseURL == "" || clientID == "" || clientSecret == "" {
-		return nil, fmt.Errorf("missing required environment variables (JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET)")
+	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
+		return nil, fmt.Errorf("missing required environment variables (JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID)")
 	}
 
-	var opts []Option
-	if id := os.Getenv("JAMFPLATFORM_TENANT_ID"); id != "" {
-		opts = append(opts, WithTenantID(id))
-	}
+	opts := []Option{WithTenantID(tenantID)}
 
 	c := NewClient(baseURL, clientID, clientSecret, opts...)
 	if err := c.ValidateCredentials(context.Background()); err != nil {
