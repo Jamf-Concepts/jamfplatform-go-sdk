@@ -30,6 +30,20 @@ type EraseDeviceRequestV1 struct {
 	Pin                    *string `json:"pin,omitempty"`
 }
 
+// CheckInDevice requests that the specified device check for pending commands.
+func (c *Client) CheckInDevice(ctx context.Context, id string) error {
+	if id == "" {
+		return fmt.Errorf("deviceID cannot be empty")
+	}
+
+	prefix := c.tenantPrefix(deviceActionsNamespace, "v1")
+	endpoint := fmt.Sprintf("%s/devices/%s/check-in", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("check-in device %s: %w", id, err)
+	}
+	return nil
+}
+
 // EraseDevice requests that the specified device erase its content and settings.
 func (c *Client) EraseDevice(ctx context.Context, id string, request *EraseDeviceRequestV1) ([]DeviceCommandResponseV1, error) {
 	return c.invokeDeviceManagementAction(ctx, id, "erase", request)

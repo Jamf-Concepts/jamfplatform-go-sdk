@@ -9,6 +9,20 @@ import (
 	"testing"
 )
 
+func TestCheckInDevice(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/dev-1/check-in", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	if err := c.CheckInDevice(context.Background(), "dev-1"); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestEraseDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/dev-1/erase", func(w http.ResponseWriter, r *http.Request) {
@@ -99,6 +113,13 @@ func TestDeviceAction_EmptyID(t *testing.T) {
 	c, _ := testServerWithOpts(t, WithTenantID("t-test"))
 	_, err := c.EraseDevice(context.Background(), "", nil)
 	if err == nil {
+		t.Fatal("expected error for empty device ID")
+	}
+}
+
+func TestCheckInDevice_EmptyID(t *testing.T) {
+	c, _ := testServerWithOpts(t, WithTenantID("t-test"))
+	if err := c.CheckInDevice(context.Background(), ""); err == nil {
 		t.Fatal("expected error for empty device ID")
 	}
 }
