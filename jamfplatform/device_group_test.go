@@ -92,7 +92,8 @@ func TestUpdateDeviceGroup(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	err := c.UpdateDeviceGroup(context.Background(), "g1", &DeviceGroupUpdateRepresentationV1{Name: "Updated"})
+	name := "Updated"
+	err := c.UpdateDeviceGroup(context.Background(), "g1", &DeviceGroupUpdateRepresentationV1{Name: &name})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,10 +118,8 @@ func TestListDeviceGroupMembers(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/device-groups/g1/members", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":  []string{"dev-1", "dev-2"},
-			"hasNext":  false,
-			"page":     0,
-			"pageSize": 100,
+			"totalCount": 2,
+			"results":    []string{"dev-1", "dev-2"},
 		})
 	})
 
@@ -200,7 +199,8 @@ func TestUpdateDeviceGroup_NotFound(t *testing.T) {
 		})
 	})
 
-	err := c.UpdateDeviceGroup(context.Background(), "missing", &DeviceGroupUpdateRepresentationV1{Name: "x"})
+	name := "x"
+	err := c.UpdateDeviceGroup(context.Background(), "missing", &DeviceGroupUpdateRepresentationV1{Name: &name})
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -226,10 +226,10 @@ func TestListDeviceGroupsForDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/devices/dev-1/device-groups", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
+			"totalCount": 1,
 			"results": []map[string]string{
 				{"groupId": "g1", "groupName": "Group 1"},
 			},
-			"hasNext": false,
 		})
 	})
 

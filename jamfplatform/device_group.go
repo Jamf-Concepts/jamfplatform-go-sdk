@@ -22,13 +22,12 @@ const deviceGroupsNamespace = "device-groups"
 
 // DeviceGroupListReadRepresentationV1 represents a device group in a list response.
 type DeviceGroupListReadRepresentationV1 struct {
-	ID          string                                `json:"id"`
-	Name        string                                `json:"name"`
-	Description string                                `json:"description,omitempty"`
-	DeviceType  string                                `json:"deviceType"`
-	GroupType   string                                `json:"groupType"`
-	MemberCount int                                   `json:"memberCount"`
-	Criteria    []DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	DeviceType  string `json:"deviceType"`
+	GroupType   string `json:"groupType"`
+	MemberCount int    `json:"memberCount"`
 }
 
 // DeviceGroupCriteriaRepresentationV1 represents a criterion for device groups.
@@ -71,21 +70,15 @@ type DeviceGroupCreateResponseV1 struct {
 
 // DeviceGroupUpdateRepresentationV1 represents the payload to update a device group.
 type DeviceGroupUpdateRepresentationV1 struct {
-	Name        string                                `json:"name"`
+	Name        *string                               `json:"name,omitempty"`
 	Description *string                               `json:"description,omitempty"`
 	Criteria    []DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
-	DeviceIds   []string                              `json:"deviceIds,omitempty"`
 }
 
 // DeviceGroupMemberPatchRepresentationV1 represents the payload to patch device group members.
 type DeviceGroupMemberPatchRepresentationV1 struct {
 	Added   []string `json:"added,omitempty"`
 	Removed []string `json:"removed,omitempty"`
-}
-
-// DeviceGroupMemberV1 represents a device group member.
-type DeviceGroupMemberV1 struct {
-	DeviceID string `json:"deviceId"`
 }
 
 // DeviceGroupMemberOfRepresentationV1 represents a device group that a device belongs to.
@@ -166,25 +159,19 @@ func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
 	return nil
 }
 
-// ListDeviceGroupMembers returns all member IDs for a device group, handling pagination internally.
+// ListDeviceGroupMembers returns all member device IDs for a device group.
 func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]string, error) {
 	prefix := c.tenantPrefix(deviceGroupsNamespace, "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]string, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
+	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))
 
-		endpoint := fmt.Sprintf("%s/device-groups/%s/members?%s", prefix, url.PathEscape(id), params.Encode())
-
-		var result struct {
-			client.PaginatedResponseRepresentation
-			Results []string `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		return result.Results, result.HasNext, nil
-	})
+	var result struct {
+		TotalCount int      `json:"totalCount"`
+		Results    []string `json:"results"`
+	}
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListDeviceGroupMembers(%s): %w", id, err)
+	}
+	return result.Results, nil
 }
 
 // UpdateDeviceGroupMembers patches the members of a static device group.
@@ -197,23 +184,17 @@ func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, patch 
 	return nil
 }
 
-// ListDeviceGroupsForDevice returns all device groups a device belongs to, handling pagination internally.
+// ListDeviceGroupsForDevice returns all device groups a device belongs to.
 func (c *Client) ListDeviceGroupsForDevice(ctx context.Context, deviceID string) ([]DeviceGroupMemberOfRepresentationV1, error) {
 	prefix := c.tenantPrefix(deviceGroupsNamespace, "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceGroupMemberOfRepresentationV1, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
+	endpoint := fmt.Sprintf("%s/devices/%s/device-groups", prefix, url.PathEscape(deviceID))
 
-		endpoint := fmt.Sprintf("%s/devices/%s/device-groups?%s", prefix, url.PathEscape(deviceID), params.Encode())
-
-		var result struct {
-			client.PaginatedResponseRepresentation
-			Results []DeviceGroupMemberOfRepresentationV1 `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		return result.Results, result.HasNext, nil
-	})
+	var result struct {
+		TotalCount int                                    `json:"totalCount"`
+		Results    []DeviceGroupMemberOfRepresentationV1 `json:"results"`
+	}
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListDeviceGroupsForDevice(%s): %w", deviceID, err)
+	}
+	return result.Results, nil
 }
