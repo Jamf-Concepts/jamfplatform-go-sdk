@@ -70,8 +70,11 @@ func TestGetDevice(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id":   "dev-123",
-			"name": "TestMac",
+			"id":         "dev-123",
+			"name":       "TestMac",
+			"managed":    true,
+			"mdmCapable": true,
+			"supervised": false,
 		})
 	})
 
@@ -84,6 +87,12 @@ func TestGetDevice(t *testing.T) {
 	}
 	if device.Name != "TestMac" {
 		t.Errorf("Name = %q, want TestMac", device.Name)
+	}
+	if !device.Managed {
+		t.Error("Managed = false, want true")
+	}
+	if !device.MDMCapable {
+		t.Error("MDMCapable = false, want true")
 	}
 }
 
