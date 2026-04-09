@@ -229,6 +229,85 @@ func TestDeleteBenchmark_NotFound(t *testing.T) {
 	}
 }
 
+func TestListBenchmarkRulesStats(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/benchmarks/bm-1/rules", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("rule-search"); got != "firewall" {
+			t.Errorf("rule-search = %q, want firewall", got)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"ruleId": "r1", "ruleTitle": "Enable Firewall", "ruleNumber": "2.5.1", "passed": 10, "failed": 2, "unknown": 1, "passPercentage": 76.9, "numberOfDevices": 13},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	rules, err := c.ListBenchmarkRulesStats(context.Background(), "bm-1", "", "firewall")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rules) != 1 || rules[0].RuleID != "r1" {
+		t.Errorf("got %+v", rules)
+	}
+	if rules[0].Passed != 10 || rules[0].Failed != 2 {
+		t.Errorf("Passed=%d Failed=%d, want 10/2", rules[0].Passed, rules[0].Failed)
+	}
+}
+
+func TestListBenchmarkRuleDevices(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/benchmarks/bm-1/devices", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("rule-id"); got != "r1" {
+			t.Errorf("rule-id = %q, want r1", got)
+		}
+		if got := r.URL.Query().Get("rule-result"); got != "FAILED" {
+			t.Errorf("rule-result = %q, want FAILED", got)
+		}
+		name := "John's Mac"
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []CBEngineDeviceRuleResultV1{
+				{DeviceID: "dev-1", State: "FAILED", DeviceName: &name},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	devices, err := c.ListBenchmarkRuleDevices(context.Background(), "bm-1", "r1", "", "", "FAILED")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(devices) != 1 || devices[0].DeviceID != "dev-1" {
+		t.Errorf("got %+v", devices)
+	}
+	if devices[0].State != "FAILED" {
+		t.Errorf("State = %q, want FAILED", devices[0].State)
+	}
+}
+
+func TestGetBenchmarkCompliancePercentage(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/benchmarks/bm-1/compliance-percentage", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusOK, CBEngineCompliancePercentageV1{
+			CompliancePercentage: 82.7,
+		})
+	})
+
+	resp, err := c.GetBenchmarkCompliancePercentage(context.Background(), "bm-1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.CompliancePercentage < 82.6 || resp.CompliancePercentage > 82.8 {
+		t.Errorf("CompliancePercentage = %f, want ~82.7", resp.CompliancePercentage)
+	}
+}
+
 func TestGetBaselineRules(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
 	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-abc-123/rules", func(w http.ResponseWriter, r *http.Request) {
