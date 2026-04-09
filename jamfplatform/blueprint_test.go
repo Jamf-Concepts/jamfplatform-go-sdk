@@ -150,7 +150,8 @@ func TestUpdateBlueprint(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	err := c.UpdateBlueprint(context.Background(), "bp-1", &BlueprintUpdateRequestV1{Name: "Updated"})
+	updatedName := "Updated"
+	err := c.UpdateBlueprint(context.Background(), "bp-1", &BlueprintUpdateRequestV1{Name: &updatedName})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -198,6 +199,44 @@ func TestUndeployBlueprint(t *testing.T) {
 	err := c.UndeployBlueprint(context.Background(), "bp-1")
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestGetBlueprintReport(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/blueprints/v1/tenant/t-abc-123/blueprints/bp-1/report", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, BlueprintStatusDetailV1{
+			Succeeded: 150,
+			Failed:    10,
+			Pending:   5,
+		})
+	})
+
+	report, err := c.GetBlueprintReport(context.Background(), "bp-1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if report.Succeeded != 150 || report.Failed != 10 || report.Pending != 5 {
+		t.Errorf("got %+v", report)
+	}
+}
+
+func TestGetBlueprintReport_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-abc-123"))
+	mux.HandleFunc("/api/blueprints/v1/tenant/t-abc-123/blueprints/missing/report", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetBlueprintReport(context.Background(), "missing")
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }
 

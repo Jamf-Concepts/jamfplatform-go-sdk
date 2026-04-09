@@ -49,8 +49,9 @@ type BlueprintComponentV1 struct {
 
 // BlueprintStepV1 describes a step within a blueprint.
 type BlueprintStepV1 struct {
-	Name       string                 `json:"name"`
-	Components []BlueprintComponentV1 `json:"components,omitempty"`
+	Name                string                 `json:"name"`
+	Components          []BlueprintComponentV1 `json:"components,omitempty"`
+	ActivationPredicate *string                `json:"activationPredicate,omitempty"`
 }
 
 // BlueprintCreateScopeV1 defines the scope for creating a blueprint.
@@ -67,11 +68,12 @@ type BlueprintCreateRequestV1 struct {
 }
 
 // BlueprintUpdateRequestV1 represents a request to update an existing blueprint.
+// All fields are optional for merge-patch semantics; nil fields are omitted from the JSON payload.
 type BlueprintUpdateRequestV1 struct {
-	Name        string                 `json:"name"`
-	Description string                 `json:"description,omitempty"`
-	Scope       BlueprintUpdateScopeV1 `json:"scope"`
-	Steps       []BlueprintStepV1      `json:"steps"`
+	Name        *string                 `json:"name,omitempty"`
+	Description *string                 `json:"description,omitempty"`
+	Scope       *BlueprintUpdateScopeV1 `json:"scope,omitempty"`
+	Steps       []BlueprintStepV1       `json:"steps,omitempty"`
 }
 
 // BlueprintDeploymentV1 describes the deployment status of a blueprint.
@@ -117,6 +119,13 @@ type BlueprintUpdateScopeV1 struct {
 type BlueprintCreateResponseV1 struct {
 	ID   string `json:"id"`
 	Href string `json:"href"`
+}
+
+// BlueprintStatusDetailV1 describes the deployment status report for a blueprint.
+type BlueprintStatusDetailV1 struct {
+	Succeeded int `json:"succeeded"`
+	Failed    int `json:"failed"`
+	Pending   int `json:"pending"`
 }
 
 
@@ -223,6 +232,17 @@ func (c *Client) UndeployBlueprint(ctx context.Context, id string) error {
 		return fmt.Errorf("UndeployBlueprint(%s): %w", id, err)
 	}
 	return nil
+}
+
+// GetBlueprintReport retrieves the deployment status report for a blueprint.
+func (c *Client) GetBlueprintReport(ctx context.Context, id string) (*BlueprintStatusDetailV1, error) {
+	prefix := c.tenantPrefix(blueprintNamespace, "v1")
+	var result BlueprintStatusDetailV1
+	endpoint := fmt.Sprintf("%s/blueprints/%s/report", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetBlueprintReport(%s): %w", id, err)
+	}
+	return &result, nil
 }
 
 // ListBlueprintComponents returns all blueprint components, automatically handling pagination.
