@@ -46,6 +46,7 @@ type DeviceReadRepresentationV1 struct {
 	EnrollmentType          string                                     `json:"enrollmentType"`
 	LastEnrollmentTime      string                                     `json:"lastEnrollmentTime"`
 	Managed                 bool                                       `json:"managed"`
+	MDMCapable              bool                                       `json:"mdmCapable"`
 	Supervised              bool                                       `json:"supervised"`
 	Hardware                *DeviceHardwareReadRepresentationV1        `json:"hardware,omitempty"`
 	Network                 *DeviceNetworkReadRepresentationV1         `json:"network,omitempty"`

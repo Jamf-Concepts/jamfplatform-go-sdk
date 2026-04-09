@@ -50,7 +50,7 @@ func TestAcceptance_GetDevice(t *testing.T) {
 		t.Errorf("expected ID %q, got %q", devices[0].ID, device.ID)
 	}
 
-	t.Logf("Read device: %s (%s), managed: %v", device.Name, device.ID, device.Managed)
+	t.Logf("Read device: %s (%s), managed: %v, mdmCapable: %v", device.Name, device.ID, device.Managed, device.MDMCapable)
 	if device.Hardware != nil {
 		t.Logf("  Hardware: %s %s, serial: %s", device.Hardware.Make, device.Hardware.Model, device.Hardware.SerialNumber)
 	}
