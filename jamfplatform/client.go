@@ -31,6 +31,16 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 		transportOpts = append(transportOpts, client.WithHTTPClient(cfg.httpClient))
 	}
 
+	var cache client.TokenCache
+	if cfg.tokenCache != nil {
+		cache = cfg.tokenCache
+	} else if cfg.cacheDir != "" {
+		cache = client.NewFileTokenCache(cfg.cacheDir)
+	}
+	if cache != nil {
+		transportOpts = append(transportOpts, client.WithTokenCache(cache, client.CacheKey(baseURL, clientID)))
+	}
+
 	transport := client.NewClientWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
 	if cfg.logger != nil {
 		transport.SetLogger(cfg.logger)
@@ -63,6 +73,8 @@ type clientConfig struct {
 	httpClient *http.Client
 	logger     Logger
 	tenantID   string
+	tokenCache TokenCache
+	cacheDir   string
 }
 
 // Option configures a Client.
@@ -88,6 +100,20 @@ func WithHTTPClient(httpClient *http.Client) Option {
 func WithLogger(logger Logger) Option {
 	return func(cfg *clientConfig) {
 		cfg.logger = logger
+	}
+}
+
+// WithTokenCache sets a custom token cache for persisting tokens across process restarts.
+func WithTokenCache(cache TokenCache) Option {
+	return func(cfg *clientConfig) {
+		cfg.tokenCache = cache
+	}
+}
+
+// WithFileTokenCache enables file-based token caching in the given directory.
+func WithFileTokenCache(dir string) Option {
+	return func(cfg *clientConfig) {
+		cfg.cacheDir = dir
 	}
 }
 
