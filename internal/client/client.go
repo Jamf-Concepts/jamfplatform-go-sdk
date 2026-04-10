@@ -38,6 +38,8 @@ type Client struct {
 	oauthConfig *clientcredentials.Config
 	logger      Logger
 	userAgent   string
+	tokenCache  TokenCache
+	cacheKey    string
 }
 
 // PaginatedResponseRepresentation captures pagination metadata shared by multiple endpoints.
@@ -114,6 +116,16 @@ func WithHTTPClient(httpClient *http.Client) Option {
 	}
 }
 
+// WithTokenCache sets a persistent token cache and its lookup key.
+func WithTokenCache(cache TokenCache, cacheKey string) Option {
+	return func(c *Client) {
+		if cache != nil && cacheKey != "" {
+			c.tokenCache = cache
+			c.cacheKey = cacheKey
+		}
+	}
+}
+
 // NewClient creates a new Jamf Platform API client.
 func NewClient(baseURL, clientID, clientSecret string) *Client {
 	return NewClientWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")
@@ -138,6 +150,9 @@ func NewClientWithUserAgent(baseURL, clientID, clientSecret, userAgent string, o
 	}
 	for _, opt := range opts {
 		opt(c)
+	}
+	if c.tokenCache != nil {
+		c.httpClient = newCachingOAuth2Client(c.oauthConfig, c.baseClient, c.tokenCache, c.cacheKey)
 	}
 	return c
 }

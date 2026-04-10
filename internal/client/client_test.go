@@ -7,9 +7,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 // newTestServer creates an httptest.Server with a mux that handles the OAuth2
@@ -377,6 +379,120 @@ func TestSetHTTPClient(t *testing.T) {
 	// which won't have the test server's token endpoint configured.
 	// The important thing is the method doesn't panic.
 	_ = err
+}
+
+type mockTokenCache struct {
+	loadFn  func(key string) (string, time.Time, bool)
+	storeFn func(key string, token string, expiresAt time.Time) error
+}
+
+func (m *mockTokenCache) Load(key string) (string, time.Time, bool) {
+	return m.loadFn(key)
+}
+
+func (m *mockTokenCache) Store(key string, token string, expiresAt time.Time) error {
+	return m.storeFn(key, token, expiresAt)
+}
+
+func TestTokenCache_LoadHit(t *testing.T) {
+	srv, _ := newTestServer(t)
+
+	cache := &mockTokenCache{
+		loadFn: func(_ string) (string, time.Time, bool) {
+			return "cached-token", time.Now().Add(time.Hour), true
+		},
+		storeFn: func(_ string, _ string, _ time.Time) error {
+			return nil
+		},
+	}
+
+	c := NewClientWithUserAgent(srv.URL, "cid", "csecret", "test",
+		WithTokenCache(cache, "test-key"))
+
+	token, err := c.AccessToken(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if token.AccessToken != "cached-token" {
+		t.Errorf("expected cached-token, got %q", token.AccessToken)
+	}
+}
+
+func TestTokenCache_LoadMiss(t *testing.T) {
+	srv, _ := newTestServer(t)
+
+	var stored bool
+	cache := &mockTokenCache{
+		loadFn: func(_ string) (string, time.Time, bool) {
+			return "", time.Time{}, false
+		},
+		storeFn: func(_ string, token string, _ time.Time) error {
+			if token != "test-token" {
+				t.Errorf("expected Store to receive %q, got %q", "test-token", token)
+			}
+			stored = true
+			return nil
+		},
+	}
+
+	c := NewClientWithUserAgent(srv.URL, "cid", "csecret", "test",
+		WithTokenCache(cache, "test-key"))
+
+	token, err := c.AccessToken(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if token.AccessToken != "test-token" {
+		t.Errorf("expected test-token, got %q", token.AccessToken)
+	}
+	if !stored {
+		t.Error("expected Store to be called after fetch")
+	}
+}
+
+func TestTokenCache_StoreErrorIgnored(t *testing.T) {
+	srv, _ := newTestServer(t)
+
+	cache := &mockTokenCache{
+		loadFn: func(_ string) (string, time.Time, bool) {
+			return "", time.Time{}, false
+		},
+		storeFn: func(_ string, _ string, _ time.Time) error {
+			return fmt.Errorf("disk full")
+		},
+	}
+
+	c := NewClientWithUserAgent(srv.URL, "cid", "csecret", "test",
+		WithTokenCache(cache, "test-key"))
+
+	_, err := c.AccessToken(context.Background())
+	if err != nil {
+		t.Fatalf("expected success despite Store error, got: %v", err)
+	}
+}
+
+func TestTokenCache_ExpiredCacheEntry(t *testing.T) {
+	srv, _ := newTestServer(t)
+
+	cache := &mockTokenCache{
+		loadFn: func(_ string) (string, time.Time, bool) {
+			return "expired-token", time.Now().Add(-time.Hour), true
+		},
+		storeFn: func(_ string, _ string, _ time.Time) error {
+			return nil
+		},
+	}
+
+	c := NewClientWithUserAgent(srv.URL, "cid", "csecret", "test",
+		WithTokenCache(cache, "test-key"))
+
+	token, err := c.AccessToken(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if token.AccessToken != "test-token" {
+		t.Errorf("expected test-token from fresh fetch, got %q", token.AccessToken)
+	}
 }
 
 func contains(s, substr string) bool {

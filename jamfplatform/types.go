@@ -6,7 +6,14 @@ package jamfplatform
 import (
 	"context"
 	"net/http"
+	"time"
 )
+
+// TokenCache persists OAuth2 tokens across process restarts.
+type TokenCache interface {
+	Load(key string) (token string, expiresAt time.Time, ok bool)
+	Store(key string, token string, expiresAt time.Time) error
+}
 
 // Logger is an interface for logging HTTP requests and responses.
 type Logger interface {
