@@ -42,43 +42,6 @@ func TestNewClient_WithHTTPClient(t *testing.T) {
 	}
 }
 
-func TestNullableString_Marshal(t *testing.T) {
-	tests := []struct {
-		name     string
-		ns       NullableString
-		expected string
-	}{
-		{"value", NullableString{Value: "hello"}, `"hello"`},
-		{"null", NullableString{IsNull: true}, `null`},
-		{"empty value", NullableString{Value: ""}, `""`},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.ns.MarshalJSON()
-			if err != nil {
-				t.Fatal(err)
-			}
-			if string(got) != tt.expected {
-				t.Errorf("MarshalJSON() = %s, want %s", got, tt.expected)
-			}
-		})
-	}
-}
-
-func TestNewNullableString(t *testing.T) {
-	ns := NewNullableString("test")
-	if ns.Value != "test" || ns.IsNull {
-		t.Errorf("NewNullableString = %+v, want Value=test IsNull=false", ns)
-	}
-}
-
-func TestNewNullableStringNull(t *testing.T) {
-	ns := NewNullableStringNull()
-	if !ns.IsNull {
-		t.Error("NewNullableStringNull().IsNull = false, want true")
-	}
-}
-
 func TestNewClient_WithLogger(t *testing.T) {
 	c := NewClient("https://example.com", "id", "secret", WithLogger(nil))
 	if c == nil {

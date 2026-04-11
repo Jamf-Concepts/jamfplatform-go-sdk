@@ -1,0 +1,379 @@
+{
+  "package": "jamfplatform",
+  "module": "github.com/Jamf-Concepts/jamfplatform-go-sdk",
+  "specs": [
+    {
+      "file": "testing/device-inventory.yaml",
+      "namespace": "devices",
+      "version": "v1",
+      "outputFile": "jamfplatform/zz_generated_device.go",
+      "testFile": "jamfplatform/zz_generated_device_test.go",
+      "skipSchemas": [
+        "PaginatedResponseRepresentation",
+        "PaginatedDeviceResponseRepresentation",
+        "PaginatedDeviceInstalledApplicationReadRepresentationV1",
+        "ApiErrorRepresentation"
+      ],
+      "operations": [
+        {
+          "path": "/v1/devices",
+          "method": "GET",
+          "goName": "ListDevices",
+          "pagination": "hasNext",
+          "extraParams": [
+            {"spec": "sort", "go": "sort", "type": "[]string"},
+            {"spec": "filter", "go": "filter", "type": "string"}
+          ]
+        },
+        {
+          "path": "/v1/devices/{id}",
+          "method": "GET",
+          "goName": "GetDevice"
+        },
+        {
+          "path": "/v1/devices/{id}",
+          "method": "PATCH",
+          "goName": "UpdateDevice"
+        },
+        {
+          "path": "/v1/devices/{id}",
+          "method": "DELETE",
+          "goName": "DeleteDevice"
+        },
+        {
+          "path": "/v1/devices/{id}/applications",
+          "method": "GET",
+          "goName": "ListDeviceApplications",
+          "pagination": "hasNext",
+          "extraParams": [
+            {"spec": "sort", "go": "sort", "type": "[]string"},
+            {"spec": "filter", "go": "filter", "type": "string"}
+          ]
+        },
+        {
+          "path": "/v1/users/{id}/devices",
+          "method": "GET",
+          "goName": "ListDevicesForUser",
+          "pathParamNames": {"id": "userID"},
+          "pagination": "hasNext",
+          "extraParams": [
+            {"spec": "sort", "go": "sort", "type": "[]string"},
+            {"spec": "filter", "go": "filter", "type": "string"}
+          ]
+        }
+      ]
+    },
+    {
+      "file": "testing/blueprints.json",
+      "namespace": "blueprints",
+      "version": "v1",
+      "outputFile": "jamfplatform/zz_generated_blueprint.go",
+      "testFile": "jamfplatform/zz_generated_blueprint_test.go",
+      "skipSchemas": [
+        "PagedResponseBlueprintOverview",
+        "PagedResponseComponentDescription",
+        "ApiError",
+        "Error"
+      ],
+      "operations": [
+        {
+          "path": "/v1/blueprints",
+          "method": "GET",
+          "goName": "ListBlueprints",
+          "pagination": "sizeCheck",
+          "extraParams": [
+            {"spec": "sort", "go": "sort", "type": "[]string"},
+            {"spec": "search", "go": "search", "type": "string"}
+          ]
+        },
+        {
+          "path": "/v1/blueprints",
+          "method": "POST",
+          "goName": "CreateBlueprint"
+        },
+        {
+          "path": "/v1/blueprints/{blueprintId}",
+          "method": "GET",
+          "goName": "GetBlueprint"
+        },
+        {
+          "path": "/v1/blueprints/{blueprintId}",
+          "method": "PATCH",
+          "goName": "UpdateBlueprint"
+        },
+        {
+          "path": "/v1/blueprints/{blueprintId}",
+          "method": "DELETE",
+          "goName": "DeleteBlueprint"
+        },
+        {
+          "path": "/v1/blueprints/{blueprintId}/deploy",
+          "method": "POST",
+          "goName": "DeployBlueprint"
+        },
+        {
+          "path": "/v1/blueprints/{blueprintId}/undeploy",
+          "method": "POST",
+          "goName": "UndeployBlueprint"
+        },
+        {
+          "path": "/v1/blueprints/{blueprintId}/report",
+          "method": "GET",
+          "goName": "GetBlueprintReport"
+        },
+        {
+          "path": "/v1/blueprint-components",
+          "method": "GET",
+          "goName": "ListBlueprintComponents",
+          "pagination": "sizeCheck"
+        },
+        {
+          "path": "/v1/blueprint-components/{identifier}",
+          "method": "GET",
+          "goName": "GetBlueprintComponent"
+        }
+      ]
+    },
+    {
+      "file": "testing/devicegroups.yaml",
+      "namespace": "device-groups",
+      "version": "v1",
+      "outputFile": "jamfplatform/zz_generated_device_group.go",
+      "testFile": "jamfplatform/zz_generated_device_group_test.go",
+      "skipSchemas": [
+        "PaginatedDeviceGroupResponseRepresentation",
+        "ApiErrorRepresentation",
+        "ApiErrorCauseRepresentation"
+      ],
+      "operations": [
+        {
+          "path": "/v1/device-groups",
+          "method": "GET",
+          "goName": "ListDeviceGroups",
+          "pagination": "hasNext",
+          "extraParams": [
+            {"spec": "sort", "go": "sort", "type": "[]string"},
+            {"spec": "filter", "go": "filter", "type": "string"}
+          ]
+        },
+        {
+          "path": "/v1/device-groups",
+          "method": "POST",
+          "goName": "CreateDeviceGroup"
+        },
+        {
+          "path": "/v1/device-groups/{id}",
+          "method": "GET",
+          "goName": "GetDeviceGroup"
+        },
+        {
+          "path": "/v1/device-groups/{id}",
+          "method": "PATCH",
+          "goName": "UpdateDeviceGroup",
+          "contentType": "application/json"
+        },
+        {
+          "path": "/v1/device-groups/{id}",
+          "method": "DELETE",
+          "goName": "DeleteDeviceGroup"
+        },
+        {
+          "path": "/v1/device-groups/{id}/members",
+          "method": "GET",
+          "goName": "ListDeviceGroupMembers",
+          "unwrapResults": "[]string"
+        },
+        {
+          "path": "/v1/device-groups/{id}/members",
+          "method": "PATCH",
+          "goName": "UpdateDeviceGroupMembers",
+          "contentType": "application/json"
+        },
+        {
+          "path": "/v1/devices/{id}/device-groups",
+          "method": "GET",
+          "goName": "ListDeviceGroupsForDevice",
+          "pathParamNames": {"id": "deviceID"},
+          "unwrapResults": "[]DeviceGroupMemberOfRepresentationV1"
+        }
+      ]
+    },
+    {
+      "file": "testing/deviceaction.yaml",
+      "namespace": "device-actions",
+      "version": "v1",
+      "outputFile": "jamfplatform/zz_generated_device_action.go",
+      "testFile": "jamfplatform/zz_generated_device_action_test.go",
+      "skipSchemas": [
+        "ApiError"
+      ],
+      "operations": [
+        {
+          "path": "/v1/devices/{id}/check-in",
+          "method": "POST",
+          "goName": "CheckInDevice"
+        },
+        {
+          "path": "/v1/devices/{id}/erase",
+          "method": "POST",
+          "goName": "EraseDevice"
+        },
+        {
+          "path": "/v1/devices/{id}/restart",
+          "method": "POST",
+          "goName": "RestartDevice"
+        },
+        {
+          "path": "/v1/devices/{id}/shutdown",
+          "method": "POST",
+          "goName": "ShutdownDevice"
+        },
+        {
+          "path": "/v1/devices/{id}/unmanage",
+          "method": "POST",
+          "goName": "UnmanageDevice"
+        }
+      ]
+    },
+    {
+      "file": "testing/declarations.json",
+      "namespace": "ddm/report",
+      "version": "v1",
+      "outputFile": "jamfplatform/zz_generated_declaration_report.go",
+      "testFile": "jamfplatform/zz_generated_declaration_report_test.go",
+      "skipSchemas": [
+        "ApiErrorDto",
+        "ErrorDto"
+      ],
+      "operations": [
+        {
+          "path": "/v1/devices/{deviceId}",
+          "method": "GET",
+          "goName": "GetDeviceDeclarationReport"
+        },
+        {
+          "path": "/v1/declarations/{declarationIdentifier}",
+          "method": "GET",
+          "goName": "ListDeclarationReportClients",
+          "pagination": "totalCount",
+          "pageSizeParam": "size",
+          "extraParams": [
+            {"spec": "sort", "go": "sort", "type": "[]string"}
+          ]
+        }
+      ]
+    },
+    {
+      "file": "testing/benchmarks.json",
+      "namespace": "compliance-benchmarks",
+      "version": "v1",
+      "outputFile": "jamfplatform/zz_generated_benchmark.go",
+      "testFile": "jamfplatform/zz_generated_benchmark_test.go",
+      "skipSchemas": [
+        "DeployableObject",
+        "DeployableObjectInfoResponse",
+        "DeployableObjectSyncDetail",
+        "DeployableObjectsRequest",
+        "DeployableObjectsResponse",
+        "DeployableObjectsSyncDetailResponse",
+        "DeployableObjectsSyncStatusResponse",
+        "DeploymentInfo",
+        "SyncStats",
+        "AuditingDocument",
+        "AuditingDocumentRequest",
+        "AuditingDocumentsRequest",
+        "AuditingDocumentsResponse",
+        "AuditingFile",
+        "AuditingPreferencesRequest",
+        "AuditingPreferencesResponse",
+        "Author",
+        "TenantJamfProSupportInfoResponse",
+        "Payload",
+        "PreviewRuleRequest",
+        "RuleInfoWithUpdate",
+        "UpdatedSourcedRules",
+        "RuleReport",
+        "RulesReportResponse"
+      ],
+      "operations": [
+        {
+          "path": "/v2/benchmarks",
+          "method": "GET",
+          "goName": "ListBenchmarks",
+          "versionOverride": "v1"
+        },
+        {
+          "path": "/v2/benchmarks",
+          "method": "POST",
+          "goName": "CreateBenchmark",
+          "versionOverride": "v1"
+        },
+        {
+          "path": "/v2/benchmarks/{id}",
+          "method": "GET",
+          "goName": "GetBenchmark",
+          "versionOverride": "v1"
+        },
+        {
+          "path": "/v1/benchmarks/{benchmarkId}",
+          "method": "DELETE",
+          "goName": "DeleteBenchmark"
+        },
+        {
+          "path": "/v1/baselines",
+          "method": "GET",
+          "goName": "ListBaselines"
+        },
+        {
+          "path": "/v1/rules",
+          "method": "GET",
+          "goName": "GetBaselineRules",
+          "extraParams": [
+            {"spec": "baselineId", "go": "baselineID", "type": "string"}
+          ]
+        }
+      ]
+    },
+    {
+      "file": "testing/benchmarks-report.yaml",
+      "namespace": "compliance-benchmarks",
+      "version": "v1",
+      "outputFile": "jamfplatform/zz_generated_benchmark_report.go",
+      "testFile": "jamfplatform/zz_generated_benchmark_report_test.go",
+      "skipSchemas": [
+        "ApiError",
+        "BenchmarkRulesRequest",
+        "Synchronization"
+      ],
+      "operations": [
+        {
+          "path": "/v1/benchmarks/{id}/rules",
+          "method": "GET",
+          "goName": "ListBenchmarkRulesStats",
+          "pagination": "sizeCheck",
+          "extraParams": [
+            {"spec": "sort", "go": "sort", "type": "string"},
+            {"spec": "rule-search", "go": "ruleSearch", "type": "string"}
+          ]
+        },
+        {
+          "path": "/v1/benchmarks/{id}/devices",
+          "method": "GET",
+          "goName": "ListBenchmarkRuleDevices",
+          "pagination": "sizeCheck",
+          "extraParams": [
+            {"spec": "rule-id", "go": "ruleID", "type": "string"},
+            {"spec": "sort", "go": "sort", "type": "string"},
+            {"spec": "device-search", "go": "deviceSearch", "type": "string"},
+            {"spec": "rule-result", "go": "ruleResult", "type": "string"}
+          ]
+        },
+        {
+          "path": "/v1/benchmarks/{benchmarkId}/compliance-percentage",
+          "method": "GET",
+          "goName": "GetBenchmarkCompliancePercentage"
+        }
+      ]
+    }
+  ]
+}

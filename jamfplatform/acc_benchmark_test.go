@@ -94,36 +94,31 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 	}
 
 	// Build rule requests — enable first 5 rules (or fewer), including ODV values
-	var ruleRequests []CBEngineRuleRequestV2
+	var ruleRequests []RuleRequest
 	limit := 5
 	if len(rules.Rules) < limit {
 		limit = len(rules.Rules)
 	}
 	for _, r := range rules.Rules[:limit] {
-		rr := CBEngineRuleRequestV2{
+		rr := RuleRequest{
 			ID:      r.ID,
 			Enabled: true,
 		}
 		if r.ODV != nil {
-			rr.ODV = &CBEngineODVRequestV2{Value: r.ODV.Value}
+			rr.ODV = &OdvRequest{Value: r.ODV.Value}
 		}
 		ruleRequests = append(ruleRequests, rr)
 	}
 
 	title := "sdk-acc-benchmark-" + runSuffix()
 
-	// Clean up any leftover from a previous run
-	if existing, err := c.GetBenchmarkByTitle(ctx, title); err == nil {
-		ensureBenchmarkDeletedByID(t, c, ctx, existing.BenchmarkID)
-	}
-
-	resp, err := c.CreateBenchmark(ctx, &CBEngineBenchmarkRequestV2{
+	resp, err := c.CreateBenchmark(ctx, &BenchmarkRequestV2{
 		Title:            title,
 		Description:      "SDK acceptance test — safe to delete",
 		SourceBaselineID: baseline.BaselineID,
 		Sources:          rules.Sources,
 		Rules:            ruleRequests,
-		Target:           CBEngineTargetV2{DeviceGroups: []string{groupID}},
+		Target:           &TargetV2{DeviceGroups: []string{groupID}},
 		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
@@ -174,34 +169,31 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 		t.Skip("No rules available for baseline")
 	}
 
-	var ruleRequests []CBEngineRuleRequestV2
+	var ruleRequests []RuleRequest
 	limit := 3
 	if len(rules.Rules) < limit {
 		limit = len(rules.Rules)
 	}
 	for _, r := range rules.Rules[:limit] {
-		rr := CBEngineRuleRequestV2{
+		rr := RuleRequest{
 			ID:      r.ID,
 			Enabled: true,
 		}
 		if r.ODV != nil {
-			rr.ODV = &CBEngineODVRequestV2{Value: r.ODV.Value}
+			rr.ODV = &OdvRequest{Value: r.ODV.Value}
 		}
 		ruleRequests = append(ruleRequests, rr)
 	}
 
 	title := "sdk-acc-reporting-" + runSuffix()
-	if existing, err := c.GetBenchmarkByTitle(ctx, title); err == nil {
-		ensureBenchmarkDeletedByID(t, c, ctx, existing.BenchmarkID)
-	}
 
-	resp, err := c.CreateBenchmark(ctx, &CBEngineBenchmarkRequestV2{
+	resp, err := c.CreateBenchmark(ctx, &BenchmarkRequestV2{
 		Title:            title,
 		Description:      "SDK acceptance test — reporting endpoints",
 		SourceBaselineID: baseline.BaselineID,
 		Sources:          rules.Sources,
 		Rules:            ruleRequests,
-		Target:           CBEngineTargetV2{DeviceGroups: []string{groupID}},
+		Target:           &TargetV2{DeviceGroups: []string{groupID}},
 		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
@@ -245,26 +237,4 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 		}
 		t.Logf("Compliance percentage: %.1f%%", pct.CompliancePercentage)
 	})
-}
-
-func TestAcceptance_Benchmark_GetByTitle(t *testing.T) {
-	c := accClient(t)
-
-	benchmarks, err := c.ListBenchmarks(context.Background())
-	if err != nil {
-		t.Fatalf("ListBenchmarks failed: %v", err)
-	}
-	if len(benchmarks.Benchmarks) == 0 {
-		t.Skip("No benchmarks available")
-	}
-
-	title := benchmarks.Benchmarks[0].Title
-	bm, err := c.GetBenchmarkByTitle(context.Background(), title)
-	if err != nil {
-		t.Fatalf("GetBenchmarkByTitle(%q) failed: %v", title, err)
-	}
-	if bm.Title != title {
-		t.Errorf("expected title %q, got %q", title, bm.Title)
-	}
-	t.Logf("Found benchmark by title: %s (ID: %s)", bm.Title, bm.BenchmarkID)
 }

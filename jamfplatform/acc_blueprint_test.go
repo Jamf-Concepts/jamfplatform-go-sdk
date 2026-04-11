@@ -12,14 +12,16 @@ import (
 	"time"
 )
 
-func createTestBlueprint(t *testing.T, c *Client, name string, groupID string, steps []BlueprintStepV1) *BlueprintDetailV1 {
+func createTestBlueprint(t *testing.T, c *Client, name string, groupID string, steps []BlueprintStep) *BlueprintDetail {
 	t.Helper()
 	ctx := context.Background()
 
-	resp, err := c.CreateBlueprint(ctx, &BlueprintCreateRequestV1{
+	desc := "SDK acceptance test — safe to delete"
+	scope := CreateScope{DeviceGroups: []string{groupID}}
+	resp, err := c.CreateBlueprint(ctx, &CreateBlueprintRequest{
 		Name:        name,
-		Description: "SDK acceptance test — safe to delete",
-		Scope:       BlueprintCreateScopeV1{DeviceGroups: []string{groupID}},
+		Description: &desc,
+		Scope:       &scope,
 		Steps:       steps,
 	})
 	if err != nil {
@@ -34,15 +36,17 @@ func createTestBlueprint(t *testing.T, c *Client, name string, groupID string, s
 	return bp
 }
 
-func makeStep(identifier string, config any) []BlueprintStepV1 {
+func makeStep(identifier string, config any) []BlueprintStep {
 	configJSON, _ := json.Marshal(config)
-	return []BlueprintStepV1{
+	configStr := string(configJSON)
+	stepName := "Step 1"
+	return []BlueprintStep{
 		{
-			Name: "Step 1",
-			Components: []BlueprintComponentV1{
+			Name: &stepName,
+			Components: []Component{
 				{
 					Identifier:    identifier,
-					Configuration: json.RawMessage(configJSON),
+					Configuration: &configStr,
 				},
 			},
 		},
@@ -113,7 +117,7 @@ func TestAcceptance_Blueprint_EmptyBlueprint(t *testing.T) {
 	c := accClient(t)
 
 	name := "sdk-acc-empty-bp-" + runSuffix()
-	bp := createTestBlueprint(t, c, name, groupID, []BlueprintStepV1{})
+	bp := createTestBlueprint(t, c, name, groupID, []BlueprintStep{})
 
 	if bp.Name != name {
 		t.Errorf("expected name %q, got %q", name, bp.Name)
@@ -157,10 +161,10 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 
 	renamedName := "sdk-acc-update-renamed-" + suffix
 	updatedDesc := "Updated description"
-	err := c.UpdateBlueprint(ctx, bp.ID, &BlueprintUpdateRequestV1{
-		Name:        &renamedName,
+	err := c.UpdateBlueprint(ctx, bp.ID, &UpdateBlueprintRequest{
+		Name:        renamedName,
 		Description: &updatedDesc,
-		Scope:       &BlueprintUpdateScopeV1{DeviceGroups: []string{groupID}},
+		Scope:       &BlueprintScope{DeviceGroups: []string{groupID}},
 		Steps:       steps,
 	})
 	if err != nil {
@@ -174,8 +178,8 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 	if updated.Name != renamedName {
 		t.Errorf("expected name %q, got %q", renamedName, updated.Name)
 	}
-	if updated.Description != "Updated description" {
-		t.Errorf("expected updated description, got %q", updated.Description)
+	if updated.Description == nil || *updated.Description != "Updated description" {
+		t.Errorf("expected updated description, got %v", updated.Description)
 	}
 	t.Logf("Updated blueprint ID: %s", bp.ID)
 }
@@ -214,21 +218,4 @@ func TestAcceptance_Blueprint_Report(t *testing.T) {
 		t.Fatalf("GetBlueprintReport failed: %v", err)
 	}
 	t.Logf("Report for %s: succeeded=%d failed=%d pending=%d", bp.ID, report.Succeeded, report.Failed, report.Pending)
-}
-
-func TestAcceptance_Blueprint_GetByName(t *testing.T) {
-	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
-
-	name := "sdk-acc-find-by-name-" + runSuffix()
-	_ = createTestBlueprint(t, c, name, groupID, []BlueprintStepV1{})
-
-	found, err := c.GetBlueprintByName(context.Background(), name)
-	if err != nil {
-		t.Fatalf("GetBlueprintByName failed: %v", err)
-	}
-	if found.Name != name {
-		t.Errorf("expected name %q, got %q", name, found.Name)
-	}
-	t.Logf("Found blueprint by name: ID %s", found.ID)
 }
