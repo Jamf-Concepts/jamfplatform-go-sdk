@@ -2,6 +2,8 @@
 
 Go client library for the [Jamf Platform API](https://developer.jamf.com/platform-api).
 
+All types, methods, and unit tests are generated from OpenAPI spec files. Published API specs are available in the [`api/`](api/) directory.
+
 ## Installation
 
 ```bash
@@ -27,6 +29,7 @@ func main() {
 		"https://your-tenant.apigw.jamf.com",
 		os.Getenv("JAMFPLATFORM_CLIENT_ID"),
 		os.Getenv("JAMFPLATFORM_CLIENT_SECRET"),
+		jamfplatform.WithTenantID(os.Getenv("JAMFPLATFORM_TENANT_ID")),
 	)
 
 	ctx := context.Background()
@@ -52,9 +55,11 @@ Token refresh is handled automatically.
 
 ```go
 client := jamfplatform.NewClient(baseURL, clientID, clientSecret,
+	jamfplatform.WithTenantID(tenantID),
 	jamfplatform.WithUserAgent("my-app/1.0"),
 	jamfplatform.WithHTTPClient(customHTTPClient),
 	jamfplatform.WithLogger(myLogger),
+	jamfplatform.WithFileTokenCache("/tmp/tokens"),
 )
 ```
 
@@ -87,18 +92,6 @@ filter := jamfplatform.BuildRSQLExpression([]jamfplatform.RSQLClause{
 devices, err := client.ListDevices(ctx, nil, filter)
 ```
 
-## API coverage
-
-| Domain | Methods |
-|--------|---------|
-| Devices | ListDevices, GetDevice, GetDeviceBySerialNumber, UpdateDevice, DeleteDevice, ListDeviceApplications, ListDevicesForUser |
-| Device Groups | ListDeviceGroups, GetDeviceGroup, CreateDeviceGroup, UpdateDeviceGroup, DeleteDeviceGroup, ListDeviceGroupMembers, UpdateDeviceGroupMembers, ListDeviceGroupsForDevice |
-| Device Actions | EraseDevice, RestartDevice, ShutdownDevice, UnmanageDevice |
-| Blueprints | ListBlueprints, GetBlueprint, GetBlueprintByName, CreateBlueprint, UpdateBlueprint, DeleteBlueprint, DeployBlueprint, UndeployBlueprint, ListBlueprintComponents, GetBlueprintComponent |
-| Compliance Benchmarks | ListBaselines, GetBaselineRules, ListBenchmarks, GetBenchmark, GetBenchmarkByTitle, CreateBenchmark, DeleteBenchmark |
-
-All list methods handle pagination automatically.
-
 ### Async polling
 
 For async operations (e.g. benchmark sync), use the `PollUntil` helper:
@@ -115,6 +108,41 @@ err := jamfplatform.PollUntil(ctx, 5*time.Second, func(ctx context.Context) (boo
 	return bm.SyncState == "SYNCED", nil
 })
 ```
+
+## API coverage
+
+| Domain | Methods |
+|--------|---------|
+| Devices | ListDevices, GetDevice, UpdateDevice, DeleteDevice, ListDeviceApplications, ListDevicesForUser |
+| Device Groups | ListDeviceGroups, GetDeviceGroup, CreateDeviceGroup, UpdateDeviceGroup, DeleteDeviceGroup, ListDeviceGroupMembers, UpdateDeviceGroupMembers, ListDeviceGroupsForDevice |
+| Device Actions | CheckInDevice, EraseDevice, RestartDevice, ShutdownDevice, UnmanageDevice |
+| Blueprints | ListBlueprints, GetBlueprint, CreateBlueprint, UpdateBlueprint, DeleteBlueprint, DeployBlueprint, UndeployBlueprint, GetBlueprintReport, ListBlueprintComponents, GetBlueprintComponent |
+| Compliance Benchmarks | ListBaselines, GetBaselineRules, ListBenchmarks, GetBenchmark, CreateBenchmark, DeleteBenchmark |
+| Benchmark Reporting | ListBenchmarkRulesStats, ListBenchmarkRuleDevices, GetBenchmarkCompliancePercentage |
+| DDM Declarations | GetDeviceDeclarationReport, ListDeclarationReportClients |
+
+All list methods handle pagination automatically.
+
+## Code generation
+
+All SDK types, methods, and unit tests are generated from OpenAPI spec files using a custom generator built on [kin-openapi](https://github.com/getkin/kin-openapi). The generator also publishes filtered API specs to `api/` containing only the public SDK surface.
+
+```bash
+make generate    # regenerate Go code, tests, and published API specs
+make test        # run unit tests
+make testacc     # run acceptance tests (requires API credentials)
+make lint        # run golangci-lint
+```
+
+The only handwritten source file is `jamfplatform/client.go`. Everything else is generated from the specs in `testing/` via the config in `tools/generate/config.json`.
+
+To add a new API endpoint:
+
+1. Ensure the endpoint is defined in the OpenAPI spec file under `testing/`
+2. Add an operation entry to `tools/generate/config.json`
+3. Run `make generate`
+
+CI enforces that generated output is current on every pull request.
 
 ## License
 
