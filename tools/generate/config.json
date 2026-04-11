@@ -6,8 +6,8 @@
       "file": "testing/device-inventory.yaml",
       "namespace": "devices",
       "version": "v1",
-      "outputFile": "jamfplatform/zz_generated_device.go",
-      "testFile": "jamfplatform/zz_generated_device_test.go",
+      "outputFile": "jamfplatform/device.go",
+      "testFile": "jamfplatform/device_test.go",
       "skipSchemas": [
         "PaginatedResponseRepresentation",
         "PaginatedDeviceResponseRepresentation",
@@ -67,8 +67,8 @@
       "file": "testing/blueprints.json",
       "namespace": "blueprints",
       "version": "v1",
-      "outputFile": "jamfplatform/zz_generated_blueprint.go",
-      "testFile": "jamfplatform/zz_generated_blueprint_test.go",
+      "outputFile": "jamfplatform/blueprint.go",
+      "testFile": "jamfplatform/blueprint_test.go",
       "skipSchemas": [
         "PagedResponseBlueprintOverview",
         "PagedResponseComponentDescription",
@@ -138,8 +138,8 @@
       "file": "testing/devicegroups.yaml",
       "namespace": "device-groups",
       "version": "v1",
-      "outputFile": "jamfplatform/zz_generated_device_group.go",
-      "testFile": "jamfplatform/zz_generated_device_group_test.go",
+      "outputFile": "jamfplatform/device_group.go",
+      "testFile": "jamfplatform/device_group_test.go",
       "skipSchemas": [
         "PaginatedDeviceGroupResponseRepresentation",
         "ApiErrorRepresentation",
@@ -202,8 +202,8 @@
       "file": "testing/deviceaction.yaml",
       "namespace": "device-actions",
       "version": "v1",
-      "outputFile": "jamfplatform/zz_generated_device_action.go",
-      "testFile": "jamfplatform/zz_generated_device_action_test.go",
+      "outputFile": "jamfplatform/device_action.go",
+      "testFile": "jamfplatform/device_action_test.go",
       "skipSchemas": [
         "ApiError"
       ],
@@ -239,8 +239,8 @@
       "file": "testing/declarations.json",
       "namespace": "ddm/report",
       "version": "v1",
-      "outputFile": "jamfplatform/zz_generated_declaration_report.go",
-      "testFile": "jamfplatform/zz_generated_declaration_report_test.go",
+      "outputFile": "jamfplatform/declaration_report.go",
+      "testFile": "jamfplatform/declaration_report_test.go",
       "skipSchemas": [
         "ApiErrorDto",
         "ErrorDto"
@@ -267,8 +267,8 @@
       "file": "testing/benchmarks.json",
       "namespace": "compliance-benchmarks",
       "version": "v1",
-      "outputFile": "jamfplatform/zz_generated_benchmark.go",
-      "testFile": "jamfplatform/zz_generated_benchmark_test.go",
+      "outputFile": "jamfplatform/benchmark.go",
+      "testFile": "jamfplatform/benchmark_test.go",
       "skipSchemas": [
         "DeployableObject",
         "DeployableObjectInfoResponse",
@@ -338,8 +338,8 @@
       "file": "testing/benchmarks-report.yaml",
       "namespace": "compliance-benchmarks",
       "version": "v1",
-      "outputFile": "jamfplatform/zz_generated_benchmark_report.go",
-      "testFile": "jamfplatform/zz_generated_benchmark_report_test.go",
+      "outputFile": "jamfplatform/benchmark_report.go",
+      "testFile": "jamfplatform/benchmark_report_test.go",
       "skipSchemas": [
         "ApiError",
         "BenchmarkRulesRequest",
