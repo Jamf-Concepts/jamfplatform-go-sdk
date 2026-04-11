@@ -188,15 +188,26 @@ func main() {
 	}
 
 	emittedTypes := make(map[string]bool) // dedup types across specs
+	hasSourceSpecs := true
 	for _, spec := range cfg.Specs {
-		if err := processSpec(*rootDir, cfg, spec, emittedTypes); err != nil {
+		specPath, usedFallback, err := resolveSpecPath(*rootDir, cfg, spec)
+		if err != nil {
+			log.Fatalf("spec %s: %v", spec.File, err)
+		}
+		if usedFallback {
+			hasSourceSpecs = false
+		}
+		if err := processSpec(*rootDir, cfg, spec, specPath, emittedTypes); err != nil {
 			log.Fatalf("spec %s: %v", spec.File, err)
 		}
 	}
 	if err := writeStaticFiles(*rootDir, cfg); err != nil {
 		log.Fatalf("static files: %v", err)
 	}
-	if cfg.SpecDir != "" {
+	// Only publish filtered specs when source specs are available.
+	// In CI the source specs are private; the generator reads from the
+	// already-published api/ specs and only regenerates Go code.
+	if cfg.SpecDir != "" && hasSourceSpecs {
 		if err := publishSpecs(*rootDir, cfg); err != nil {
 			log.Fatalf("publishing specs: %v", err)
 		}
@@ -208,8 +219,28 @@ func main() {
 // Per-spec processing
 // ---------------------------------------------------------------------------
 
-func processSpec(root string, cfg Config, spec SpecDef, emittedTypes map[string]bool) error {
-	doc, err := openapi3.NewLoader().LoadFromFile(filepath.Join(root, spec.File))
+// resolveSpecPath returns the path to load for a spec. It tries the source
+// spec first (testing/), then falls back to the published spec in api/.
+// This allows CI to regenerate Go code from the committed api/ specs when
+// the private source specs are not available.
+func resolveSpecPath(root string, cfg Config, spec SpecDef) (path string, usedFallback bool, err error) {
+	primary := filepath.Join(root, spec.File)
+	if _, err := os.Stat(primary); err == nil {
+		return primary, false, nil
+	}
+	if spec.SpecFile == "" {
+		return "", false, fmt.Errorf("source spec %s not found and no specFile configured for fallback", spec.File)
+	}
+	fallback := filepath.Join(root, cfg.SpecDir, spec.SpecFile)
+	if _, err := os.Stat(fallback); err != nil {
+		return "", false, fmt.Errorf("neither source spec %s nor published spec %s found", spec.File, fallback)
+	}
+	log.Printf("source spec %s not found, using published spec %s", spec.File, fallback)
+	return fallback, true, nil
+}
+
+func processSpec(root string, cfg Config, spec SpecDef, specPath string, emittedTypes map[string]bool) error {
+	doc, err := openapi3.NewLoader().LoadFromFile(specPath)
 	if err != nil {
 		return fmt.Errorf("loading spec: %w", err)
 	}
