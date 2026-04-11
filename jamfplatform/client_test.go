@@ -100,32 +100,32 @@ func TestTenantPrefix(t *testing.T) {
 		want      string
 	}{
 		{
-			name:     "devices",
-			tenantID: "e77c1408-10c8-4007-b177-abc9157fbcaa",
+			name:      "devices",
+			tenantID:  "e77c1408-10c8-4007-b177-abc9157fbcaa",
 			namespace: "devices", version: "v1",
 			want: "/api/devices/v1/tenant/e77c1408-10c8-4007-b177-abc9157fbcaa",
 		},
 		{
-			name:     "device groups",
-			tenantID: "t-123",
+			name:      "device groups",
+			tenantID:  "t-123",
 			namespace: "device-groups", version: "v1",
 			want: "/api/device-groups/v1/tenant/t-123",
 		},
 		{
-			name:     "device actions",
-			tenantID: "t-123",
+			name:      "device actions",
+			tenantID:  "t-123",
 			namespace: "device-actions", version: "v1",
 			want: "/api/device-actions/v1/tenant/t-123",
 		},
 		{
-			name:     "blueprints",
-			tenantID: "t-abc",
+			name:      "blueprints",
+			tenantID:  "t-abc",
 			namespace: "blueprints", version: "v1",
 			want: "/api/blueprints/v1/tenant/t-abc",
 		},
 		{
-			name:     "compliance benchmarks",
-			tenantID: "t-abc",
+			name:      "compliance benchmarks",
+			tenantID:  "t-abc",
 			namespace: "compliance-benchmarks", version: "v1",
 			want: "/api/compliance-benchmarks/v1/tenant/t-abc",
 		},
@@ -140,4 +140,3 @@ func TestTenantPrefix(t *testing.T) {
 		})
 	}
 }
-

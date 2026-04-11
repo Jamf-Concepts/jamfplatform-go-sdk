@@ -59,7 +59,6 @@ func TestAcceptance_GetDevice(t *testing.T) {
 	}
 }
 
-
 func TestAcceptance_ListDeviceApplications(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
