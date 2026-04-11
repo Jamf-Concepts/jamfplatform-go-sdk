@@ -822,7 +822,7 @@ func extractPathParams(path string, overrides map[string]string) []GoPathParam {
 	params := make([]GoPathParam, 0, len(matches))
 	for _, m := range matches {
 		specName := m[1]
-		goName := specName
+		var goName string
 		if override, ok := overrides[specName]; ok {
 			goName = override
 		} else {
