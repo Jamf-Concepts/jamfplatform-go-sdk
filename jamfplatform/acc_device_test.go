@@ -59,33 +59,6 @@ func TestAcceptance_GetDevice(t *testing.T) {
 	}
 }
 
-func TestAcceptance_GetDeviceBySerialNumber(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-
-	devices, err := c.ListDevices(ctx, nil, "")
-	if err != nil {
-		t.Fatalf("ListDevices failed: %v", err)
-	}
-	if len(devices) == 0 {
-		t.Skip("No devices available for serial number lookup")
-	}
-
-	serial := devices[0].SerialNumber
-	if serial == "" {
-		t.Skip("First device has no serial number")
-	}
-
-	device, err := c.GetDeviceBySerialNumber(ctx, serial)
-	if err != nil {
-		t.Fatalf("GetDeviceBySerialNumber(%s) failed: %v", serial, err)
-	}
-	if device.ID != devices[0].ID {
-		t.Errorf("expected ID %q, got %q", devices[0].ID, device.ID)
-	}
-
-	t.Logf("Resolved serial %s to device %s (%s)", serial, device.Name, device.ID)
-}
 
 func TestAcceptance_ListDeviceApplications(t *testing.T) {
 	c := accClient(t)

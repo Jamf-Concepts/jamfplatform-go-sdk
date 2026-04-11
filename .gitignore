@@ -28,3 +28,4 @@ coverage.html
 
 # Testing
 testing/
+tools/generate/generate
