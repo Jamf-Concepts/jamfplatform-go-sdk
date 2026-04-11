@@ -1,5 +1,8 @@
 default: test lint
 
+generate:
+	cd tools/generate && go run . -root $(CURDIR)
+
 test:
 	go test -v -cover -count=1 -timeout=120s ./...
 
@@ -9,4 +12,4 @@ testacc:
 lint:
 	golangci-lint run ./...
 
-.PHONY: default test testacc lint
+.PHONY: default generate test testacc lint
