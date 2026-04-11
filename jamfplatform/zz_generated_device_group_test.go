@@ -39,9 +39,7 @@ func TestCreateDeviceGroup(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusCreated, map[string]any{
-			"id": "new-id",
-		})
+		writeJSON(t, w, http.StatusCreated, map[string]any{"id": "new-id"})
 	})
 
 	result, err := c.CreateDeviceGroup(context.Background(), &DeviceGroupCreateRepresentationV1{})
@@ -59,9 +57,7 @@ func TestGetDeviceGroup(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id": "test-id",
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 	})
 
 	result, err := c.GetDeviceGroup(context.Background(), "test-id")
@@ -125,10 +121,7 @@ func TestListDeviceGroupMembers(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"totalCount": 1,
-			"results":    []string{"item-1"},
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []string{"item-1"}})
 	})
 
 	results, err := c.ListDeviceGroupMembers(context.Background(), "test-id")
@@ -161,10 +154,7 @@ func TestListDeviceGroupsForDevice(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"totalCount": 1,
-			"results":    []map[string]any{{"id": "item-1"}},
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{"id": "item-1"}}})
 	})
 
 	results, err := c.ListDeviceGroupsForDevice(context.Background(), "test-id")

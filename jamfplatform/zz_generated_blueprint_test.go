@@ -39,9 +39,7 @@ func TestCreateBlueprint(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusCreated, map[string]any{
-			"id": "new-id",
-		})
+		writeJSON(t, w, http.StatusCreated, map[string]any{"id": "new-id"})
 	})
 
 	result, err := c.CreateBlueprint(context.Background(), &CreateBlueprintRequest{})
@@ -59,9 +57,7 @@ func TestGetBlueprint(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id": "test-id",
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 	})
 
 	result, err := c.GetBlueprint(context.Background(), "test-id")
@@ -155,9 +151,7 @@ func TestGetBlueprintReport(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id": "test-id",
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 	})
 
 	result, err := c.GetBlueprintReport(context.Background(), "test-id")
@@ -213,9 +207,7 @@ func TestGetBlueprintComponent(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id": "test-id",
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 	})
 
 	result, err := c.GetBlueprintComponent(context.Background(), "test-id")

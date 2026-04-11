@@ -17,9 +17,7 @@ func TestGetDeviceDeclarationReport(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id": "test-id",
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 	})
 
 	result, err := c.GetDeviceDeclarationReport(context.Background(), "test-id")

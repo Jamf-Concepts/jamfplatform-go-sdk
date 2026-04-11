@@ -5,15 +5,9 @@
 
 package jamfplatform
 
-import (
-	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
-)
+import "github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 
-// RSQLClause represents a single RSQL filter clause.
 type RSQLClause = client.RSQLClause
 
-// BuildRSQLExpression concatenates filter clauses into an RSQL query string.
 var BuildRSQLExpression = client.BuildRSQLExpression
-
-// FormatArgument prepares an RSQL argument value, adding quotes/escapes when needed.
 var FormatArgument = client.FormatArgument

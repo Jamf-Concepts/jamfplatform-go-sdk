@@ -12,15 +12,11 @@ import (
 	"testing"
 )
 
-// testServer creates an httptest.Server with OAuth2 token endpoint and returns
-// a Client pointed at it. Tests register additional handlers on the returned mux.
 func testServer(t *testing.T) (*Client, *http.ServeMux) {
 	t.Helper()
 	return testServerWithOpts(t)
 }
 
-// testServerWithOpts creates an httptest.Server like testServer but accepts
-// additional client options (e.g. WithTenantID).
 func testServerWithOpts(t *testing.T, opts ...Option) (*Client, *http.ServeMux) {
 	t.Helper()
 	mux := http.NewServeMux()
@@ -34,12 +30,10 @@ func testServerWithOpts(t *testing.T, opts ...Option) (*Client, *http.ServeMux) 
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
-
 	c := NewClient(srv.URL, "test-id", "test-secret", opts...)
 	return c, mux
 }
 
-// writeJSON is a test helper that writes a JSON response with the given status code.
 func writeJSON(t *testing.T, w http.ResponseWriter, status int, v any) {
 	t.Helper()
 	w.Header().Set("Content-Type", "application/json")
@@ -51,7 +45,6 @@ func writeJSON(t *testing.T, w http.ResponseWriter, status int, v any) {
 	}
 }
 
-// readJSON is a test helper that decodes a JSON request body.
 func readJSON(t *testing.T, r *http.Request, v any) {
 	t.Helper()
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
