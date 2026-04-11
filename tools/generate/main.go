@@ -36,41 +36,74 @@ import (
 // ---------------------------------------------------------------------------
 
 type Config struct {
-	Package    string    `json:"package"`
-	Module     string    `json:"module"`
-	SpecDir    string    `json:"specDir"`    // output directory for published specs (e.g. "api")
-	Specs      []SpecDef `json:"specs"`
+	Package string    `json:"package"`
+	Module  string    `json:"module"`
+	SpecDir string    `json:"specDir"`
+	Specs   []SpecDef `json:"specs"`
 }
 
 type SpecDef struct {
-	File        string         `json:"file"`
-	Namespace   string         `json:"namespace"`
-	Version     string         `json:"version"`
-	OutputFile  string         `json:"outputFile"`
-	TestFile    string         `json:"testFile"`
-	SpecFile    string         `json:"specFile,omitempty"` // override published spec filename
-	SkipSchemas []string       `json:"skipSchemas"`
-	Operations  []OperationDef `json:"operations"`
+	File       string         `json:"file"`
+	Namespace  string         `json:"namespace"`
+	SpecFile   string         `json:"specFile,omitempty"` // override published spec filename
+	Operations []OperationDef `json:"operations"`
 }
 
+// baseName derives a Go file base name from the spec file path.
+// "testing/device-inventory.yaml" → "device_inventory"
+// "testing/benchmarks-report.yaml" → "benchmarks_report"
+func (s SpecDef) baseName() string {
+	name := filepath.Base(s.File)
+	name = strings.TrimSuffix(name, filepath.Ext(name))
+	return strings.ReplaceAll(name, "-", "_")
+}
+
+func (s SpecDef) outputFile() string  { return "jamfplatform/" + s.baseName() + ".go" }
+func (s SpecDef) testOutputFile() string { return "jamfplatform/" + s.baseName() + "_test.go" }
+
 type OperationDef struct {
-	Path            string            `json:"path"`
-	Method          string            `json:"method"`
-	GoName          string            `json:"goName"`
-	ContentType     string            `json:"contentType,omitempty"`
-	Pagination      string            `json:"pagination,omitempty"`
-	PageSizeParam   string            `json:"pageSizeParam,omitempty"`
-	VersionOverride string            `json:"versionOverride,omitempty"`
-	PathParamNames  map[string]string `json:"pathParamNames,omitempty"`
-	ExtraParams     []ExtraParam      `json:"extraParams,omitempty"`
-	UnwrapResults   string            `json:"unwrapResults,omitempty"`
-	Skip            bool              `json:"skip,omitempty"`
+	Op            string            `json:"op"`                      // "GET /v1/devices/{id}"
+	Name          string            `json:"name"`                    // Go method name
+	ContentType   string            `json:"contentType,omitempty"`
+	Pagination    string            `json:"pagination,omitempty"`    // hasNext, sizeCheck, totalCount
+	PageSizeParam string            `json:"pageSizeParam,omitempty"`
+	Version       string            `json:"version,omitempty"`       // override version for tenantPrefix
+	PathNames     map[string]string `json:"pathNames,omitempty"`     // spec param -> Go param name
+	Params        []string          `json:"params,omitempty"`        // "name", "name:type", "spec:type:goName"
+	UnwrapResults string            `json:"unwrapResults,omitempty"`
+}
+
+// parseOp splits "GET /v1/devices/{id}" into method and path.
+func (o OperationDef) parseOp() (method, path string) {
+	parts := strings.SplitN(o.Op, " ", 2)
+	return strings.ToUpper(parts[0]), parts[1]
+}
+
+// parseParams expands compact param notation into ExtraParam structs.
+//
+//	"sort"                → {Spec:"sort", Go:"sort", Type:"string"}
+//	"sort:[]string"       → {Spec:"sort", Go:"sort", Type:"[]string"}
+//	"rule-id:string:ruleID" → {Spec:"rule-id", Go:"ruleID", Type:"string"}
+func (o OperationDef) parseParams() []ExtraParam {
+	params := make([]ExtraParam, 0, len(o.Params))
+	for _, p := range o.Params {
+		parts := strings.Split(p, ":")
+		ep := ExtraParam{Spec: parts[0], Go: toLowerCamelCase(parts[0]), Type: "string"}
+		if len(parts) >= 2 {
+			ep.Type = parts[1]
+		}
+		if len(parts) >= 3 {
+			ep.Go = parts[2]
+		}
+		params = append(params, ep)
+	}
+	return params
 }
 
 type ExtraParam struct {
-	Spec string `json:"spec"`
-	Go   string `json:"go"`
-	Type string `json:"type"`
+	Spec string
+	Go   string
+	Type string
 }
 
 // ---------------------------------------------------------------------------
@@ -154,8 +187,9 @@ func main() {
 		log.Fatalf("parsing config: %v", err)
 	}
 
+	emittedTypes := make(map[string]bool) // dedup types across specs
 	for _, spec := range cfg.Specs {
-		if err := processSpec(*rootDir, cfg, spec); err != nil {
+		if err := processSpec(*rootDir, cfg, spec, emittedTypes); err != nil {
 			log.Fatalf("spec %s: %v", spec.File, err)
 		}
 	}
@@ -174,34 +208,43 @@ func main() {
 // Per-spec processing
 // ---------------------------------------------------------------------------
 
-func processSpec(root string, cfg Config, spec SpecDef) error {
+func processSpec(root string, cfg Config, spec SpecDef, emittedTypes map[string]bool) error {
 	doc, err := openapi3.NewLoader().LoadFromFile(filepath.Join(root, spec.File))
 	if err != nil {
 		return fmt.Errorf("loading spec: %w", err)
 	}
 
-	skipSet := make(map[string]bool, len(spec.SkipSchemas))
-	for _, s := range spec.SkipSchemas {
-		skipSet[s] = true
+	methods, err := extractMethods(doc, spec)
+	if err != nil {
+		return err
+	}
+
+	// Only generate schemas that are actually referenced by the whitelisted operations
+	// and haven't already been emitted by a previous spec.
+	referencedSchemas := collectReferencedSchemas(doc, spec)
+	for name := range referencedSchemas {
+		if emittedTypes[name] {
+			delete(referencedSchemas, name)
+		}
+	}
+	types := extractTypes(doc, referencedSchemas)
+	for _, t := range types {
+		emittedTypes[t.Name] = true
 	}
 
 	gf := GeneratedFile{
 		Package: cfg.Package,
 		Module:  cfg.Module,
-		Types:   extractTypes(doc, skipSet),
+		Types:   types,
+		Methods: methods,
 	}
-	methods, err := extractMethods(doc, spec)
-	if err != nil {
-		return err
-	}
-	gf.Methods = methods
 
 	for _, pair := range []struct {
 		tmpl *template.Template
 		out  string
 	}{
-		{sourceTmpl, spec.OutputFile},
-		{testTmpl, spec.TestFile},
+		{sourceTmpl, spec.outputFile()},
+		{testTmpl, spec.testOutputFile()},
 	} {
 		var buf bytes.Buffer
 		if err := pair.tmpl.Execute(&buf, gf); err != nil {
@@ -244,9 +287,8 @@ func publishSpecs(root string, cfg Config) error {
 		type pathMethod struct{ path, method string }
 		allowed := make(map[pathMethod]bool)
 		for _, op := range spec.Operations {
-			if !op.Skip {
-				allowed[pathMethod{op.Path, strings.ToUpper(op.Method)}] = true
-			}
+			method, path := op.parseOp()
+			allowed[pathMethod{path, method}] = true
 		}
 
 		// Filter paths: remove operations not in whitelist, remove empty path items.
@@ -407,15 +449,97 @@ func collectRefs(doc *openapi3.T, used map[string]bool) {
 }
 
 // ---------------------------------------------------------------------------
+// Schema reference collection — determines which schemas to generate
+// ---------------------------------------------------------------------------
+
+// collectReferencedSchemas walks all whitelisted operations in a spec and
+// transitively collects every schema name referenced by request bodies,
+// responses, and their nested properties.
+func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]bool {
+	used := make(map[string]bool)
+
+	var walkRef func(ref *openapi3.SchemaRef)
+	walkRef = func(ref *openapi3.SchemaRef) {
+		if ref == nil {
+			return
+		}
+		if ref.Ref != "" {
+			parts := strings.Split(ref.Ref, "/")
+			name := parts[len(parts)-1]
+			if used[name] {
+				return
+			}
+			used[name] = true
+			if schema, ok := doc.Components.Schemas[name]; ok {
+				walkRef(schema)
+			}
+		}
+		if ref.Value == nil {
+			return
+		}
+		for _, prop := range ref.Value.Properties {
+			walkRef(prop)
+		}
+		if ref.Value.Items != nil {
+			walkRef(ref.Value.Items)
+		}
+		if ref.Value.AdditionalProperties.Schema != nil {
+			walkRef(ref.Value.AdditionalProperties.Schema)
+		}
+		for _, s := range ref.Value.AllOf {
+			walkRef(s)
+		}
+		for _, s := range ref.Value.OneOf {
+			walkRef(s)
+		}
+		for _, s := range ref.Value.AnyOf {
+			walkRef(s)
+		}
+	}
+
+	for _, opDef := range spec.Operations {
+		method, path := opDef.parseOp()
+		pathItem := doc.Paths.Find(path)
+		if pathItem == nil {
+			continue
+		}
+		op := pathItem.GetOperation(method)
+		if op == nil {
+			continue
+		}
+		if op.RequestBody != nil && op.RequestBody.Value != nil {
+			for _, content := range op.RequestBody.Value.Content {
+				if content.Schema != nil {
+					walkRef(content.Schema)
+				}
+			}
+		}
+		if op.Responses != nil {
+			for _, respRef := range op.Responses.Map() {
+				if respRef.Value == nil {
+					continue
+				}
+				for _, content := range respRef.Value.Content {
+					if content.Schema != nil {
+						walkRef(content.Schema)
+					}
+				}
+			}
+		}
+	}
+	return used
+}
+
+// ---------------------------------------------------------------------------
 // Schema → Go types
 // ---------------------------------------------------------------------------
 
-func extractTypes(doc *openapi3.T, skip map[string]bool) []GoType {
+func extractTypes(doc *openapi3.T, allow map[string]bool) []GoType {
 	names := sortedKeys(doc.Components.Schemas)
 	var types []GoType
 
 	for _, name := range names {
-		if skip[name] {
+		if !allow[name] {
 			continue
 		}
 		schema := doc.Components.Schemas[name].Value
@@ -555,12 +679,9 @@ func refName(ref *openapi3.SchemaRef) string {
 func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
 	var methods []GoMethod
 	for _, opDef := range spec.Operations {
-		if opDef.Skip {
-			continue
-		}
 		m, err := buildMethod(doc, spec, opDef)
 		if err != nil {
-			return nil, fmt.Errorf("operation %s %s: %w", opDef.Method, opDef.Path, err)
+			return nil, fmt.Errorf("operation %s: %w", opDef.Op, err)
 		}
 		methods = append(methods, m)
 	}
@@ -568,40 +689,40 @@ func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
 }
 
 func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, error) {
-	pathItem := doc.Paths.Find(opDef.Path)
+	httpMethod, specPath := opDef.parseOp()
+
+	pathItem := doc.Paths.Find(specPath)
 	if pathItem == nil {
-		return GoMethod{}, fmt.Errorf("path %s not found in spec", opDef.Path)
+		return GoMethod{}, fmt.Errorf("path %s not found in spec", specPath)
 	}
-	op := pathItem.GetOperation(opDef.Method)
+	op := pathItem.GetOperation(httpMethod)
 	if op == nil {
-		return GoMethod{}, fmt.Errorf("%s %s: operation not found", opDef.Method, opDef.Path)
+		return GoMethod{}, fmt.Errorf("%s not found", opDef.Op)
 	}
 
-	version := spec.Version
-	if opDef.VersionOverride != "" {
-		version = opDef.VersionOverride
-	}
+	// Version: operation override > extract from path > "v1"
+	version := cmp(opDef.Version, extractVersion(specPath))
 
 	m := GoMethod{
-		Name:            opDef.GoName,
-		HTTPMethod:      opDef.Method,
+		Name:            opDef.Name,
+		HTTPMethod:      httpMethod,
 		Namespace:       spec.Namespace,
 		Version:         version,
-		ResourcePath:    stripVersionPrefix(opDef.Path),
-		QueryParams:     opDef.ExtraParams,
+		ResourcePath:    stripVersionPrefix(specPath),
+		QueryParams:     opDef.parseParams(),
 		ContentType:     opDef.ContentType,
 		PaginationStyle: opDef.Pagination,
 		PageSizeParam:   cmp(opDef.PageSizeParam, "page-size"),
 		ResultsField:    "results",
-		SpecPath:        opDef.Path,
+		SpecPath:        specPath,
 		UnwrapResults:   opDef.UnwrapResults,
 	}
 
 	if op.Summary != "" {
-		m.Comment = opDef.GoName + " " + lowerFirst(cleanComment(op.Summary))
+		m.Comment = opDef.Name + " " + lowerFirst(cleanComment(op.Summary))
 	}
 
-	m.PathParams = extractPathParams(opDef.Path, opDef.PathParamNames)
+	m.PathParams = extractPathParams(specPath, opDef.PathNames)
 	m.ExpectedStatus, m.ResponseType = detectResponse(op)
 
 	// Request body
@@ -678,6 +799,15 @@ func extractPathParams(path string, overrides map[string]string) []GoPathParam {
 
 func stripVersionPrefix(path string) string {
 	return versionPrefixRe.ReplaceAllString(path, "")
+}
+
+// extractVersion returns "v1" from "/v1/devices" or "v2" from "/v2/benchmarks".
+func extractVersion(path string) string {
+	match := versionPrefixRe.FindString(path)
+	if match == "" {
+		return "v1"
+	}
+	return match[1:] // strip leading "/"
 }
 
 func detectResponse(op *openapi3.Operation) (int, string) {

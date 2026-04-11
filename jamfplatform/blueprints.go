@@ -21,6 +21,13 @@ import (
 // Types
 // ---------------------------------------------------------------------------
 
+// ApiError represents a api error.
+type ApiError struct {
+	Errors     *Error `json:"errors,omitempty"`
+	HttpStatus int    `json:"httpStatus"`
+	TraceID    string `json:"traceId"`
+}
+
 // BlueprintDetail represents a blueprint detail.
 type BlueprintDetail struct {
 	Created         string           `json:"created"`
@@ -107,12 +114,32 @@ type DeploymentState struct {
 	State          string      `json:"state"`
 }
 
+// Error represents a error.
+type Error struct {
+	Code        string  `json:"code"`
+	Description string  `json:"description"`
+	Field       *string `json:"field,omitempty"`
+	ID          *string `json:"id,omitempty"`
+}
+
 // JsonNode configuration of the component. Exact schema is dependent on component type.
 type JsonNode = json.RawMessage
 
 // Meta Meta object containing additional information about component.
 type Meta struct {
 	SupportedOs map[string][]SupportedOs `json:"supportedOs"`
+}
+
+// PagedResponseBlueprintOverview represents a paged response blueprint overview.
+type PagedResponseBlueprintOverview struct {
+	Results    []BlueprintOverview `json:"results"`
+	TotalCount int64               `json:"totalCount"`
+}
+
+// PagedResponseComponentDescription represents a paged response component description.
+type PagedResponseComponentDescription struct {
+	Results    []ComponentDescription `json:"results"`
+	TotalCount int64                  `json:"totalCount"`
 }
 
 // SupportedOs Supported version of OS families.

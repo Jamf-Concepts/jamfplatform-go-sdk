@@ -20,6 +20,13 @@ import (
 // Types
 // ---------------------------------------------------------------------------
 
+// ApiErrorDto represents a api error dto.
+type ApiErrorDto struct {
+	Errors     []ErrorDto `json:"errors"`
+	HttpStatus int        `json:"httpStatus"`
+	TraceID    string     `json:"traceId"`
+}
+
 // DeclarationReportClientDto represents a declaration report client dto.
 type DeclarationReportClientDto struct {
 	Active        bool                               `json:"active"`
@@ -48,6 +55,14 @@ type DeviceReportChannelDto struct {
 // DeviceReportDto represents a device report dto.
 type DeviceReportDto struct {
 	Channels []DeviceReportChannelDto `json:"channels"`
+}
+
+// ErrorDto represents a error dto.
+type ErrorDto struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Field       string `json:"field"`
+	ID          string `json:"id"`
 }
 
 // StatusReportDeclarationDto represents a status report declaration dto.

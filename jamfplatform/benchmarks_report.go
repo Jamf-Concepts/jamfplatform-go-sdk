@@ -19,14 +19,6 @@ import (
 // Types
 // ---------------------------------------------------------------------------
 
-// BenchmarkDeviceStatsResponse Representation of devices for a benchmark rule. Used for drill-down view controller.
-type BenchmarkDeviceStatsResponse struct {
-	DeviceCount int `json:"deviceCount"`
-	Failed      int `json:"failed"`
-	Passed      int `json:"passed"`
-	Unknown     int `json:"unknown"`
-}
-
 // BenchmarkRuleDevicesResponse Representation of devices for a benchmark rule. Used for drill-down view controller.
 type BenchmarkRuleDevicesResponse struct {
 	Results    []DeviceRuleResult `json:"results"`

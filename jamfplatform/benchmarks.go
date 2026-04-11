@@ -16,12 +16,6 @@ import (
 // Types
 // ---------------------------------------------------------------------------
 
-// BaselineGroup represents a baseline group.
-type BaselineGroup struct {
-	Baselines []SimpleBaseline `json:"baselines"`
-	GroupName string           `json:"groupName"`
-}
-
 // BaselineInfo represents a baseline info.
 type BaselineInfo struct {
 	BaselineID  string `json:"baselineId"`
@@ -34,22 +28,6 @@ type BaselineInfo struct {
 // BaselinesResponse represents a baselines response.
 type BaselinesResponse struct {
 	Baselines []BaselineInfo `json:"baselines"`
-}
-
-// BaselinesResponseV2 represents a baselines response v2.
-type BaselinesResponseV2 struct {
-	BaselineGroups []BaselineGroup `json:"baselineGroups"`
-}
-
-// BenchmarkDraftResponseV2 represents a benchmark draft response v2.
-type BenchmarkDraftResponseV2 struct {
-	BenchmarkID        string                  `json:"benchmarkId"`
-	CanSwitchToEnforce bool                    `json:"canSwitchToEnforce"`
-	ChangedFields      []string                `json:"changedFields"`
-	Changes            *DraftChangesResponseV2 `json:"changes,omitempty"`
-	ID                 string                  `json:"id"`
-	LastUpdatedAt      string                  `json:"lastUpdatedAt"`
-	NumberOfChanges    int                     `json:"numberOfChanges"`
 }
 
 // BenchmarkRequestV2 represents a benchmark request v2.
@@ -96,32 +74,6 @@ type BenchmarksResponseV2 struct {
 	Benchmarks []BenchmarkV2 `json:"benchmarks"`
 }
 
-// DraftChangesResponseV2 represents a draft changes response v2.
-type DraftChangesResponseV2 struct {
-	Description     string     `json:"description"`
-	EnforcementMode string     `json:"enforcementMode"`
-	Rules           []RuleInfo `json:"rules"`
-	Sources         []Source   `json:"sources"`
-	Target          *TargetV2  `json:"target,omitempty"`
-	Title           string     `json:"title"`
-}
-
-// DraftChangesV2 represents a draft changes v2.
-type DraftChangesV2 struct {
-	Description     string       `json:"description"`
-	EnforcementMode string       `json:"enforcementMode"`
-	Rules           []RuleChange `json:"rules"`
-	Sources         []Source     `json:"sources"`
-	Target          *TargetV2    `json:"target,omitempty"`
-	Title           string       `json:"title"`
-}
-
-// DraftRequestV2 represents a draft request v2.
-type DraftRequestV2 struct {
-	ChangedFields []string        `json:"changedFields"`
-	Changes       *DraftChangesV2 `json:"changes,omitempty"`
-}
-
 // OdvRecommendation represents a odv recommendation.
 type OdvRecommendation struct {
 	Hint  string `json:"hint"`
@@ -130,11 +82,6 @@ type OdvRecommendation struct {
 
 // OdvRequest represents a odv request.
 type OdvRequest struct {
-	Value string `json:"value"`
-}
-
-// OdvValue represents a odv value.
-type OdvValue struct {
 	Value string `json:"value"`
 }
 
@@ -159,13 +106,6 @@ type OsSpecificRuleInfo struct {
 	Description string             `json:"description"`
 	ODV         *OdvRecommendation `json:"odv,omitempty"`
 	Title       string             `json:"title"`
-}
-
-// RuleChange represents a rule change.
-type RuleChange struct {
-	Enabled bool      `json:"enabled"`
-	ID      string    `json:"id"`
-	ODV     *OdvValue `json:"odv,omitempty"`
 }
 
 // RuleInfo represents a rule info.
@@ -196,13 +136,6 @@ type RuleRequest struct {
 	Enabled bool        `json:"enabled"`
 	ID      string      `json:"id"`
 	ODV     *OdvRequest `json:"odv,omitempty"`
-}
-
-// SimpleBaseline represents a simple baseline.
-type SimpleBaseline struct {
-	Description string `json:"description"`
-	ID          string `json:"id"`
-	Title       string `json:"title"`
 }
 
 // Source represents a source.
