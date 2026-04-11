@@ -130,4 +130,3 @@ func WithTenantID(id string) Option {
 func (c *Client) tenantPrefix(namespace, version string) string {
 	return "/api/" + namespace + "/" + version + "/tenant/" + c.tenantID
 }
-
