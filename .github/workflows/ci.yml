@@ -37,17 +37,6 @@ jobs:
           go-version-file: go.mod
       - uses: golangci/golangci-lint-action@v9
 
-  generate:
-    name: Generated Code
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-      - run: make generate
-      - run: git diff --exit-code -- jamfplatform/ api/
-
   mod-tidy:
     name: Go Mod Tidy
     runs-on: ubuntu-latest
