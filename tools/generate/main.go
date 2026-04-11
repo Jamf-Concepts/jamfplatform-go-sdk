@@ -82,9 +82,10 @@ type ExtraParam struct {
 
 // GoType represents a generated Go struct.
 type GoType struct {
-	Name    string
-	Comment string
-	Fields  []GoField
+	Name      string
+	Comment   string
+	Fields    []GoField
+	IsRawJSON bool // true = type alias for json.RawMessage (freeform object)
 }
 
 // GoField represents one field of a generated struct.
@@ -489,6 +490,23 @@ func extractTypes(doc *openapi3.T, skip map[string]bool) []GoType {
 			continue
 		}
 
+		// Freeform object with no properties → json.RawMessage alias.
+		if len(schema.Properties) == 0 && schema.AdditionalProperties.Schema == nil {
+			gt := GoType{
+				Name:    name,
+				Comment: cleanComment(schema.Description),
+				// Empty fields + IsRawJSON triggers json.RawMessage alias in template.
+				IsRawJSON: true,
+			}
+			if gt.Comment == "" {
+				gt.Comment = fmt.Sprintf("%s represents a freeform JSON object.", name)
+			} else {
+				gt.Comment = name + " " + lowerFirst(gt.Comment)
+			}
+			types = append(types, gt)
+			continue
+		}
+
 		gt := schemaToGoType(name, schema, doc)
 		types = append(types, gt)
 	}
@@ -526,11 +544,12 @@ func schemaToGoType(name string, schema *openapi3.Schema, doc *openapi3.T) GoTyp
 		// Nullable or optional object fields → pointer.
 		isNullable := prop != nil && prop.Nullable
 		isRequired := required[pname]
-		// Only treat $ref as object ref if it resolves to an object schema (not enum).
+		// Only treat $ref as object ref if it resolves to an object schema with properties
+		// (not enum types or freeform objects like json.RawMessage).
 		isObjectRef := false
 		if propRef.Ref != "" {
 			resolved := resolveSchema(propRef, doc)
-			if resolved != nil && resolved.Type != nil && resolved.Type.Is("object") {
+			if resolved != nil && resolved.Type != nil && resolved.Type.Is("object") && len(resolved.Properties) > 0 {
 				isObjectRef = true
 			}
 		}
@@ -899,6 +918,7 @@ var templateFuncs = template.FuncMap{
 	"needsStrings": needsStrings,
 	"needsURL":     needsURL,
 	"needsClient":  needsClient,
+	"needsJSON":    needsJSON,
 }
 
 func httpConst(method string) string {
@@ -971,6 +991,15 @@ func needsURL(gf GeneratedFile) bool {
 	return false
 }
 
+func needsJSON(gf GeneratedFile) bool {
+	for _, t := range gf.Types {
+		if t.IsRawJSON {
+			return true
+		}
+	}
+	return false
+}
+
 func needsClient(gf GeneratedFile) bool {
 	for _, m := range gf.Methods {
 		if m.Paginated {
@@ -993,6 +1022,9 @@ package {{ .Package }}
 
 import (
 	"context"
+{{- if needsJSON . }}
+	"encoding/json"
+{{- end }}
 {{- if needsFmt . }}
 	"fmt"
 {{- end }}
@@ -1018,7 +1050,10 @@ import (
 // Types
 // ---------------------------------------------------------------------------
 {{ range .Types }}
-{{- if .Fields }}
+{{- if .IsRawJSON }}
+// {{ .Comment }}
+type {{ .Name }} = json.RawMessage
+{{- else if .Fields }}
 // {{ .Comment }}
 type {{ .Name }} struct {
 {{- range .Fields }}

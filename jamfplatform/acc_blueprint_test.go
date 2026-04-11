@@ -38,7 +38,6 @@ func createTestBlueprint(t *testing.T, c *Client, name string, groupID string, s
 
 func makeStep(identifier string, config any) []BlueprintStep {
 	configJSON, _ := json.Marshal(config)
-	configStr := string(configJSON)
 	stepName := "Step 1"
 	return []BlueprintStep{
 		{
@@ -46,7 +45,7 @@ func makeStep(identifier string, config any) []BlueprintStep {
 			Components: []Component{
 				{
 					Identifier:    identifier,
-					Configuration: &configStr,
+					Configuration: json.RawMessage(configJSON),
 				},
 			},
 		},
