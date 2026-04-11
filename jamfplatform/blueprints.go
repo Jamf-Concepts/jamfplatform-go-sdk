@@ -150,7 +150,7 @@ type SupportedOs struct {
 // UpdateBlueprintRequest represents a update blueprint request.
 type UpdateBlueprintRequest struct {
 	Description *string         `json:"description,omitempty"`
-	Name        string          `json:"name"`
+	Name        *string         `json:"name,omitempty"`
 	Scope       *BlueprintScope `json:"scope,omitempty"`
 	Steps       []BlueprintStep `json:"steps"`
 }

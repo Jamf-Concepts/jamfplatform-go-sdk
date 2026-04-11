@@ -161,7 +161,7 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 	renamedName := "sdk-acc-update-renamed-" + suffix
 	updatedDesc := "Updated description"
 	err := c.UpdateBlueprint(ctx, bp.ID, &UpdateBlueprintRequest{
-		Name:        renamedName,
+		Name:        &renamedName,
 		Description: &updatedDesc,
 		Scope:       &BlueprintScope{DeviceGroups: []string{groupID}},
 		Steps:       steps,

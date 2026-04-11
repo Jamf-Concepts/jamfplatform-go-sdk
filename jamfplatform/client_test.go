@@ -5,6 +5,7 @@ package jamfplatform
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -138,5 +139,135 @@ func TestTenantPrefix(t *testing.T) {
 				t.Errorf("tenantPrefix() = %q, want %q", got, tt.want)
 			}
 		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Multi-page pagination tests — exercises each generated pagination style
+// ---------------------------------------------------------------------------
+
+func TestListDevices_MultiPage(t *testing.T) {
+	// hasNext style: server returns hasNext=true/false to signal more pages.
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	callCount := 0
+	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		page := r.URL.Query().Get("page")
+		switch page {
+		case "0":
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results": []map[string]any{{"id": "d-1"}, {"id": "d-2"}},
+				"hasNext": true,
+			})
+		case "1":
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results": []map[string]any{{"id": "d-3"}},
+				"hasNext": false,
+			})
+		default:
+			t.Errorf("unexpected page %s", page)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+	})
+
+	devices, err := c.ListDevices(context.Background(), nil, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(devices) != 3 {
+		t.Fatalf("got %d devices, want 3", len(devices))
+	}
+	if callCount != 2 {
+		t.Errorf("expected 2 API calls, got %d", callCount)
+	}
+}
+
+func TestListBlueprints_MultiPage(t *testing.T) {
+	// sizeCheck style: hasMore = len(results) >= pageSize && len(results) > 0.
+	// ListAllPages uses pageSize=100, so we return 100 items on page 0
+	// and fewer on page 1 to signal end.
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	callCount := 0
+	mux.HandleFunc("/api/blueprints/v1/tenant/t-test/blueprints", func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		page := r.URL.Query().Get("page")
+		switch page {
+		case "0":
+			items := make([]map[string]any, 100)
+			for i := range items {
+				items[i] = map[string]any{"id": fmt.Sprintf("bp-%d", i)}
+			}
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    items,
+				"totalCount": 150,
+			})
+		case "1":
+			items := make([]map[string]any, 50)
+			for i := range items {
+				items[i] = map[string]any{"id": fmt.Sprintf("bp-%d", 100+i)}
+			}
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    items,
+				"totalCount": 150,
+			})
+		default:
+			t.Errorf("unexpected page %s", page)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+	})
+
+	blueprints, err := c.ListBlueprints(context.Background(), nil, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(blueprints) != 150 {
+		t.Fatalf("got %d blueprints, want 150", len(blueprints))
+	}
+	if callCount != 2 {
+		t.Errorf("expected 2 API calls, got %d", callCount)
+	}
+}
+
+func TestListDeclarationReportClients_MultiPage(t *testing.T) {
+	// totalCount style: hasNext = (page+1)*pageSize < totalCount.
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	callCount := 0
+	mux.HandleFunc("/api/ddm/report/v1/tenant/t-test/declarations/decl-1", func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		page := r.URL.Query().Get("page")
+		switch page {
+		case "0":
+			items := make([]map[string]any, 100)
+			for i := range items {
+				items[i] = map[string]any{"deviceId": fmt.Sprintf("dev-%d", i)}
+			}
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    items,
+				"totalCount": 120,
+			})
+		case "1":
+			items := make([]map[string]any, 20)
+			for i := range items {
+				items[i] = map[string]any{"deviceId": fmt.Sprintf("dev-%d", 100+i)}
+			}
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    items,
+				"totalCount": 120,
+			})
+		default:
+			t.Errorf("unexpected page %s", page)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+	})
+
+	clients, err := c.ListDeclarationReportClients(context.Background(), "decl-1", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(clients) != 120 {
+		t.Fatalf("got %d clients, want 120", len(clients))
+	}
+	if callCount != 2 {
+		t.Errorf("expected 2 API calls, got %d", callCount)
 	}
 }

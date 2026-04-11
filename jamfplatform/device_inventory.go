@@ -106,7 +106,7 @@ type DeviceSecurityReadRepresentationV1 struct {
 
 // DeviceUpdateRepresentationV1 represents a device update representation v1.
 type DeviceUpdateRepresentationV1 struct {
-	Name   string  `json:"name"`
+	Name   *string `json:"name,omitempty"`
 	UserID *string `json:"userId,omitempty"`
 }
 

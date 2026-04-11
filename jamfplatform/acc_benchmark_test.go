@@ -111,10 +111,11 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 	}
 
 	title := "sdk-acc-benchmark-" + runSuffix()
+	benchmarkDesc := "SDK acceptance test — safe to delete"
 
 	resp, err := c.CreateBenchmark(ctx, &BenchmarkRequestV2{
 		Title:            title,
-		Description:      "SDK acceptance test — safe to delete",
+		Description:      &benchmarkDesc,
 		SourceBaselineID: baseline.BaselineID,
 		Sources:          rules.Sources,
 		Rules:            ruleRequests,
@@ -186,10 +187,11 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	}
 
 	title := "sdk-acc-reporting-" + runSuffix()
+	reportingDesc := "SDK acceptance test — reporting endpoints"
 
 	resp, err := c.CreateBenchmark(ctx, &BenchmarkRequestV2{
 		Title:            title,
-		Description:      "SDK acceptance test — reporting endpoints",
+		Description:      &reportingDesc,
 		SourceBaselineID: baseline.BaselineID,
 		Sources:          rules.Sources,
 		Rules:            ruleRequests,

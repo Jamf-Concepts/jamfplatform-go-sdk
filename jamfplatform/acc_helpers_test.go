@@ -88,9 +88,10 @@ func requireSmartGroupFixture(t *testing.T) string {
 			}
 		}
 
+		fixtureDesc := "SDK acceptance test fixture — safe to delete"
 		resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
 			Name:        smartGroupFixtureName(),
-			Description: "SDK acceptance test fixture — safe to delete",
+			Description: &fixtureDesc,
 			DeviceType:  "COMPUTER",
 			GroupType:   "SMART",
 			Criteria: []DeviceGroupCriteriaRepresentationV1{
