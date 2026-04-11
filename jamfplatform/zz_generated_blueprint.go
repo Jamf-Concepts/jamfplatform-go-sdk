@@ -7,6 +7,7 @@ package jamfplatform
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -63,8 +64,8 @@ type BlueprintStep struct {
 
 // Component Array of components included in the step.
 type Component struct {
-	Configuration *JsonNode `json:"configuration,omitempty"`
-	Identifier    string    `json:"identifier"`
+	Configuration JsonNode `json:"configuration"`
+	Identifier    string   `json:"identifier"`
 }
 
 // ComponentDescription Array of result items.
@@ -106,8 +107,8 @@ type DeploymentState struct {
 	State          string      `json:"state"`
 }
 
-// JsonNode Configuration of the component. Exact schema is dependent on component type.
-type JsonNode = string
+// JsonNode configuration of the component. Exact schema is dependent on component type.
+type JsonNode = json.RawMessage
 
 // Meta Meta object containing additional information about component.
 type Meta struct {
