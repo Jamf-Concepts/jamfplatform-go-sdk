@@ -20,6 +20,13 @@ import (
 // Types
 // ---------------------------------------------------------------------------
 
+// ApiErrorRepresentation represents a api error representation.
+type ApiErrorRepresentation struct {
+	Errors     []map[string]any `json:"errors"`
+	HttpStatus int              `json:"httpStatus"`
+	TraceID    string           `json:"traceId"`
+}
+
 // DeviceHardwareReadRepresentationV1 represents a device hardware read representation v1.
 type DeviceHardwareReadRepresentationV1 struct {
 	BatteryHealth   string `json:"batteryHealth"`
@@ -101,6 +108,16 @@ type DeviceSecurityReadRepresentationV1 struct {
 type DeviceUpdateRepresentationV1 struct {
 	Name   string  `json:"name"`
 	UserID *string `json:"userId,omitempty"`
+}
+
+// PaginatedResponseRepresentation represents a paginated response representation.
+type PaginatedResponseRepresentation struct {
+	HasNext     bool `json:"hasNext"`
+	HasPrevious bool `json:"hasPrevious"`
+	Page        int  `json:"page"`
+	PageSize    int  `json:"pageSize"`
+	TotalCount  int  `json:"totalCount"`
+	TotalPages  int  `json:"totalPages"`
 }
 
 // ---------------------------------------------------------------------------

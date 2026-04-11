@@ -20,6 +20,14 @@ import (
 // Types
 // ---------------------------------------------------------------------------
 
+// ApiErrorCauseRepresentation represents a api error cause representation.
+type ApiErrorCauseRepresentation struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Field       string `json:"field"`
+	ID          string `json:"id"`
+}
+
 // DeviceGroupCreateRepresentationV1 represents a device group create representation v1.
 type DeviceGroupCreateRepresentationV1 struct {
 	Criteria    []DeviceGroupCriteriaRepresentationV1 `json:"criteria"`
@@ -99,16 +107,6 @@ type JoinTypeV1 = string
 // ListResponseRepresentation represents a list response representation.
 type ListResponseRepresentation struct {
 	TotalCount int `json:"totalCount"`
-}
-
-// PaginatedResponseRepresentation represents a paginated response representation.
-type PaginatedResponseRepresentation struct {
-	HasNext     bool `json:"hasNext"`
-	HasPrevious bool `json:"hasPrevious"`
-	Page        int  `json:"page"`
-	PageSize    int  `json:"pageSize"`
-	TotalCount  int  `json:"totalCount"`
-	TotalPages  int  `json:"totalPages"`
 }
 
 // ---------------------------------------------------------------------------
