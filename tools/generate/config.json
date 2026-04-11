@@ -6,6 +6,7 @@
     {
       "file": "testing/device-inventory.yaml",
       "namespace": "devices",
+      "specFile": "device_inventory_api.json",
       "operations": [
         {"op": "GET /v1/devices", "name": "ListDevices", "pagination": "hasNext", "params": ["sort:[]string", "filter"]},
         {"op": "GET /v1/devices/{id}", "name": "GetDevice"},
@@ -35,6 +36,7 @@
     {
       "file": "testing/devicegroups.yaml",
       "namespace": "device-groups",
+      "specFile": "device_group_inventory_api.json",
       "operations": [
         {"op": "GET /v1/device-groups", "name": "ListDeviceGroups", "pagination": "hasNext", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v1/device-groups", "name": "CreateDeviceGroup"},
@@ -49,6 +51,7 @@
     {
       "file": "testing/deviceaction.yaml",
       "namespace": "device-actions",
+      "specFile": "device_management_action_api.json",
       "operations": [
         {"op": "POST /v1/devices/{id}/check-in", "name": "CheckInDevice"},
         {"op": "POST /v1/devices/{id}/erase", "name": "EraseDevice"},
@@ -60,6 +63,7 @@
     {
       "file": "testing/declarations.json",
       "namespace": "ddm/report",
+      "specFile": "declaration_reporting_service.json",
       "operations": [
         {"op": "GET /v1/devices/{deviceId}", "name": "GetDeviceDeclarationReport"},
         {"op": "GET /v1/declarations/{declarationIdentifier}", "name": "ListDeclarationReportClients", "pagination": "totalCount", "pageSizeParam": "size", "params": ["sort:[]string"]}
@@ -68,6 +72,7 @@
     {
       "file": "testing/benchmarks.json",
       "namespace": "compliance-benchmarks",
+      "specFile": "compliance_benchmark_engine.json",
       "operations": [
         {"op": "GET /v2/benchmarks", "name": "ListBenchmarks", "version": "v1"},
         {"op": "POST /v2/benchmarks", "name": "CreateBenchmark", "version": "v1"},
@@ -80,6 +85,7 @@
     {
       "file": "testing/benchmarks-report.yaml",
       "namespace": "compliance-benchmarks",
+      "specFile": "compliance_benchmarks_reporting_api.json",
       "operations": [
         {"op": "GET /v1/benchmarks/{id}/rules", "name": "ListBenchmarkRulesStats", "pagination": "sizeCheck", "params": ["sort:string", "rule-search:string:ruleSearch"]},
         {"op": "GET /v1/benchmarks/{id}/devices", "name": "ListBenchmarkRuleDevices", "pagination": "sizeCheck", "params": ["rule-id:string:ruleID", "sort:string", "device-search:string:deviceSearch", "rule-result:string:ruleResult"]},
