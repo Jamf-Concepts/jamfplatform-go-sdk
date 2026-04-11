@@ -32,7 +32,7 @@ type BaselinesResponse struct {
 
 // BenchmarkRequestV2 represents a benchmark request v2.
 type BenchmarkRequestV2 struct {
-	Description      string        `json:"description"`
+	Description      *string       `json:"description,omitempty"`
 	EnforcementMode  string        `json:"enforcementMode"`
 	Rules            []RuleRequest `json:"rules"`
 	SourceBaselineID string        `json:"sourceBaselineId"`

@@ -24,11 +24,11 @@ type DeviceCommandResponse struct {
 
 // EraseDeviceRequest represents a erase device request.
 type EraseDeviceRequest struct {
-	ClearActivationLock    bool    `json:"clearActivationLock"`
-	DisallowProximitySetup bool    `json:"disallowProximitySetup"`
+	ClearActivationLock    *bool   `json:"clearActivationLock,omitempty"`
+	DisallowProximitySetup *bool   `json:"disallowProximitySetup,omitempty"`
 	Pin                    *string `json:"pin,omitempty"`
-	PreserveDataPlan       bool    `json:"preserveDataPlan"`
-	ReturnToService        bool    `json:"returnToService"`
+	PreserveDataPlan       *bool   `json:"preserveDataPlan,omitempty"`
+	ReturnToService        *bool   `json:"returnToService,omitempty"`
 }
 
 // ---------------------------------------------------------------------------

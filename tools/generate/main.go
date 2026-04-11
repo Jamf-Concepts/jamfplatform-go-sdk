@@ -228,6 +228,7 @@ func processSpec(root string, cfg Config, spec SpecDef, emittedTypes map[string]
 		}
 	}
 	types := extractTypes(doc, referencedSchemas)
+
 	for _, t := range types {
 		emittedTypes[t.Name] = true
 	}
@@ -356,60 +357,74 @@ func publishSpecs(root string, cfg Config) error {
 	return nil
 }
 
-// collectRefs walks the remaining spec paths and collects all referenced schema names,
-// following nested $refs transitively.
-func collectRefs(doc *openapi3.T, used map[string]bool) {
-	var walkRef func(ref *openapi3.SchemaRef)
-	walkRef = func(ref *openapi3.SchemaRef) {
+// ---------------------------------------------------------------------------
+// Shared schema walker
+// ---------------------------------------------------------------------------
+
+// newSchemaWalker returns a function that transitively walks $ref'd schemas.
+// onRef is called for each unique $ref name encountered; it should return true
+// if the walker should recurse into the referenced schema (i.e. it hasn't been
+// visited yet in this walk's context).
+func newSchemaWalker(doc *openapi3.T, onRef func(name string) bool) func(ref *openapi3.SchemaRef) {
+	var walk func(ref *openapi3.SchemaRef)
+	walk = func(ref *openapi3.SchemaRef) {
 		if ref == nil {
 			return
 		}
 		if ref.Ref != "" {
 			parts := strings.Split(ref.Ref, "/")
 			name := parts[len(parts)-1]
-			if used[name] {
-				return // already visited
+			if !onRef(name) {
+				return
 			}
-			used[name] = true
-			// Follow into the schema's own references.
 			if schema, ok := doc.Components.Schemas[name]; ok {
-				walkRef(schema)
+				walk(schema)
 			}
 		}
 		if ref.Value == nil {
 			return
 		}
-		schema := ref.Value
-		for _, prop := range schema.Properties {
-			walkRef(prop)
+		for _, prop := range ref.Value.Properties {
+			walk(prop)
 		}
-		if schema.Items != nil {
-			walkRef(schema.Items)
+		if ref.Value.Items != nil {
+			walk(ref.Value.Items)
 		}
-		if schema.AdditionalProperties.Schema != nil {
-			walkRef(schema.AdditionalProperties.Schema)
+		if ref.Value.AdditionalProperties.Schema != nil {
+			walk(ref.Value.AdditionalProperties.Schema)
 		}
-		for _, allOf := range schema.AllOf {
-			walkRef(allOf)
+		for _, s := range ref.Value.AllOf {
+			walk(s)
 		}
-		for _, oneOf := range schema.OneOf {
-			walkRef(oneOf)
+		for _, s := range ref.Value.OneOf {
+			walk(s)
 		}
-		for _, anyOf := range schema.AnyOf {
-			walkRef(anyOf)
+		for _, s := range ref.Value.AnyOf {
+			walk(s)
 		}
 	}
+	return walk
+}
 
-	// Walk all remaining operations.
+// collectRefs walks the remaining spec paths and collects all referenced schema names,
+// following nested $refs transitively. Used for pruning published specs.
+func collectRefs(doc *openapi3.T, used map[string]bool) {
+	walk := newSchemaWalker(doc, func(name string) bool {
+		if used[name] {
+			return false
+		}
+		used[name] = true
+		return true
+	})
+
 	for _, path := range doc.Paths.InMatchingOrder() {
 		item := doc.Paths.Find(path)
 		if item == nil {
 			continue
 		}
-		// Path-level parameters.
 		for _, p := range item.Parameters {
 			if p.Value != nil && p.Value.Schema != nil {
-				walkRef(p.Value.Schema)
+				walk(p.Value.Schema)
 			}
 		}
 		for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE"} {
@@ -417,21 +432,18 @@ func collectRefs(doc *openapi3.T, used map[string]bool) {
 			if op == nil {
 				continue
 			}
-			// Parameters.
 			for _, p := range op.Parameters {
 				if p.Value != nil && p.Value.Schema != nil {
-					walkRef(p.Value.Schema)
+					walk(p.Value.Schema)
 				}
 			}
-			// Request body.
 			if op.RequestBody != nil && op.RequestBody.Value != nil {
 				for _, content := range op.RequestBody.Value.Content {
 					if content.Schema != nil {
-						walkRef(content.Schema)
+						walk(content.Schema)
 					}
 				}
 			}
-			// Responses.
 			if op.Responses != nil {
 				for _, respRef := range op.Responses.Map() {
 					if respRef.Value == nil {
@@ -439,7 +451,7 @@ func collectRefs(doc *openapi3.T, used map[string]bool) {
 					}
 					for _, content := range respRef.Value.Content {
 						if content.Schema != nil {
-							walkRef(content.Schema)
+							walk(content.Schema)
 						}
 					}
 				}
@@ -452,49 +464,36 @@ func collectRefs(doc *openapi3.T, used map[string]bool) {
 // Schema reference collection — determines which schemas to generate
 // ---------------------------------------------------------------------------
 
+// schemaUsage tracks whether a schema is used as a request body, response body, or both.
+// Request schemas get pointer fields for unrequired scalars (to distinguish omit vs zero value).
+type schemaUsage struct {
+	isRequest  bool
+	isResponse bool
+}
+
 // collectReferencedSchemas walks all whitelisted operations in a spec and
 // transitively collects every schema name referenced by request bodies,
-// responses, and their nested properties.
-func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]bool {
-	used := make(map[string]bool)
+// responses, and their nested properties, tracking request vs response usage.
+func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]*schemaUsage {
+	used := make(map[string]*schemaUsage)
 
-	var walkRef func(ref *openapi3.SchemaRef)
-	walkRef = func(ref *openapi3.SchemaRef) {
-		if ref == nil {
-			return
-		}
-		if ref.Ref != "" {
-			parts := strings.Split(ref.Ref, "/")
-			name := parts[len(parts)-1]
-			if used[name] {
-				return
+	makeWalker := func(isRequest bool) func(ref *openapi3.SchemaRef) {
+		visited := make(map[string]bool)
+		return newSchemaWalker(doc, func(name string) bool {
+			if visited[name] {
+				return false
 			}
-			used[name] = true
-			if schema, ok := doc.Components.Schemas[name]; ok {
-				walkRef(schema)
+			visited[name] = true
+			if used[name] == nil {
+				used[name] = &schemaUsage{}
 			}
-		}
-		if ref.Value == nil {
-			return
-		}
-		for _, prop := range ref.Value.Properties {
-			walkRef(prop)
-		}
-		if ref.Value.Items != nil {
-			walkRef(ref.Value.Items)
-		}
-		if ref.Value.AdditionalProperties.Schema != nil {
-			walkRef(ref.Value.AdditionalProperties.Schema)
-		}
-		for _, s := range ref.Value.AllOf {
-			walkRef(s)
-		}
-		for _, s := range ref.Value.OneOf {
-			walkRef(s)
-		}
-		for _, s := range ref.Value.AnyOf {
-			walkRef(s)
-		}
+			if isRequest {
+				used[name].isRequest = true
+			} else {
+				used[name].isResponse = true
+			}
+			return true
+		})
 	}
 
 	for _, opDef := range spec.Operations {
@@ -508,20 +507,22 @@ func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]bool {
 			continue
 		}
 		if op.RequestBody != nil && op.RequestBody.Value != nil {
+			walkReq := makeWalker(true)
 			for _, content := range op.RequestBody.Value.Content {
 				if content.Schema != nil {
-					walkRef(content.Schema)
+					walkReq(content.Schema)
 				}
 			}
 		}
 		if op.Responses != nil {
+			walkResp := makeWalker(false)
 			for _, respRef := range op.Responses.Map() {
 				if respRef.Value == nil {
 					continue
 				}
 				for _, content := range respRef.Value.Content {
 					if content.Schema != nil {
-						walkRef(content.Schema)
+						walkResp(content.Schema)
 					}
 				}
 			}
@@ -534,12 +535,13 @@ func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]bool {
 // Schema → Go types
 // ---------------------------------------------------------------------------
 
-func extractTypes(doc *openapi3.T, allow map[string]bool) []GoType {
+func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 	names := sortedKeys(doc.Components.Schemas)
 	var types []GoType
 
 	for _, name := range names {
-		if !allow[name] {
+		usage := allow[name]
+		if usage == nil {
 			continue
 		}
 		schema := doc.Components.Schemas[name].Value
@@ -573,12 +575,12 @@ func extractTypes(doc *openapi3.T, allow map[string]bool) []GoType {
 			continue
 		}
 
-		types = append(types, schemaToGoType(name, schema))
+		types = append(types, schemaToGoType(name, schema, usage.isRequest))
 	}
 	return types
 }
 
-func schemaToGoType(name string, schema *openapi3.Schema) GoType {
+func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool) GoType {
 	gt := GoType{
 		Name:    name,
 		Comment: fmt.Sprintf("%s represents a %s.", name, camelToWords(name)),
@@ -599,9 +601,12 @@ func schemaToGoType(name string, schema *openapi3.Schema) GoType {
 		isRequired := required[pname]
 
 		// Pointer for: nullable, unrequired non-scalars, or $ref to object with properties.
+		// For request types, unrequired scalars also get pointers so callers can
+		// distinguish "omit field" from "send zero value" (critical for PATCH).
 		isStructRef := propRef.Ref != "" && prop != nil && prop.Type != nil &&
 			prop.Type.Is("object") && len(prop.Properties) > 0
-		needsPtr := isNullable || isStructRef || (!isRequired && !isScalar(goType))
+		needsPtr := isNullable || isStructRef || (!isRequired && !isScalar(goType)) ||
+			(isRequest && !isRequired)
 
 		if needsPtr && !strings.HasPrefix(goType, "*") && !strings.HasPrefix(goType, "[]") && !strings.HasPrefix(goType, "map[") {
 			goType = "*" + goType
@@ -701,7 +706,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 	}
 
 	// Version: operation override > extract from path > "v1"
-	version := cmp(opDef.Version, extractVersion(specPath))
+	version := coalesce(opDef.Version, extractVersion(specPath))
 
 	m := GoMethod{
 		Name:            opDef.Name,
@@ -712,7 +717,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 		QueryParams:     opDef.parseParams(),
 		ContentType:     opDef.ContentType,
 		PaginationStyle: opDef.Pagination,
-		PageSizeParam:   cmp(opDef.PageSizeParam, "page-size"),
+		PageSizeParam:   coalesce(opDef.PageSizeParam, "page-size"),
 		ResultsField:    "results",
 		SpecPath:        specPath,
 		UnwrapResults:   opDef.UnwrapResults,
@@ -1690,7 +1695,8 @@ func isScalar(goType string) bool {
 	return false
 }
 
-func cmp(val, fallback string) string {
+// coalesce returns val if non-empty, otherwise fallback.
+func coalesce(val, fallback string) string {
 	if val != "" {
 		return val
 	}
@@ -1706,8 +1712,14 @@ func sortedKeys[V any](m map[string]V) []string {
 	return keys
 }
 
-// toSnakeCase converts "Device Inventory API" to "device_inventory_api".
+// toSnakeCase converts titles to snake_case filenames.
+// Handles spaces ("Device Inventory API" → "device_inventory_api"),
+// camelCase ("DDMReport" → "ddm_report"), and mixed input.
 func toSnakeCase(s string) string {
+	// Insert underscore before uppercase runs: "DDMReport" → "DDM_Report"
+	s = regexp.MustCompile(`([A-Z]+)([A-Z][a-z])`).ReplaceAllString(s, "${1}_${2}")
+	// Insert underscore at lower→upper boundary: "deviceAction" → "device_Action"
+	s = regexp.MustCompile(`([a-z0-9])([A-Z])`).ReplaceAllString(s, "${1}_${2}")
 	s = strings.ToLower(s)
 	s = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(s, "_")
 	return strings.Trim(s, "_")

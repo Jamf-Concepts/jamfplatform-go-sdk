@@ -56,7 +56,7 @@ func TestAcceptance_DeviceGroup_CreateAndDeleteStaticGroup(t *testing.T) {
 	desc := "SDK acceptance test — safe to delete"
 	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
 		Name:        name,
-		Description: desc,
+		Description: &desc,
 		DeviceType:  "COMPUTER",
 		GroupType:   "STATIC",
 		Members:     []string{},
@@ -87,7 +87,7 @@ func TestAcceptance_DeviceGroup_UpdateGroup(t *testing.T) {
 	desc := "SDK acceptance test — safe to delete"
 	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
 		Name:        "sdk-acc-update-original-" + suffix,
-		Description: desc,
+		Description: &desc,
 		DeviceType:  "COMPUTER",
 		GroupType:   "STATIC",
 		Members:     []string{},
@@ -100,8 +100,8 @@ func TestAcceptance_DeviceGroup_UpdateGroup(t *testing.T) {
 	renamedName := "sdk-acc-update-renamed-" + suffix
 	updatedDesc := "Updated description"
 	err = c.UpdateDeviceGroup(ctx, resp.ID, &DeviceGroupUpdateRepresentationV1{
-		Name:        renamedName,
-		Description: updatedDesc,
+		Name:        &renamedName,
+		Description: &updatedDesc,
 	})
 	if err != nil {
 		t.Fatalf("UpdateDeviceGroup failed: %v", err)
@@ -126,7 +126,7 @@ func TestAcceptance_DeviceGroup_SmartGroupWithCriteria(t *testing.T) {
 	desc := "SDK acceptance test smart group — safe to delete"
 	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
 		Name:        name,
-		Description: desc,
+		Description: &desc,
 		DeviceType:  "COMPUTER",
 		GroupType:   "SMART",
 		Criteria: []DeviceGroupCriteriaRepresentationV1{
@@ -185,7 +185,7 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 	desc := "SDK acceptance test — safe to delete"
 	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
 		Name:        "sdk-acc-members-" + suffix,
-		Description: desc,
+		Description: &desc,
 		DeviceType:  "COMPUTER",
 		GroupType:   "STATIC",
 		Members:     []string{},

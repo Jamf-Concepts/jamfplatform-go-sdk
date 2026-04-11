@@ -31,7 +31,7 @@ type ApiErrorCauseRepresentation struct {
 // DeviceGroupCreateRepresentationV1 represents a device group create representation v1.
 type DeviceGroupCreateRepresentationV1 struct {
 	Criteria    []DeviceGroupCriteriaRepresentationV1 `json:"criteria"`
-	Description string                                `json:"description"`
+	Description *string                               `json:"description,omitempty"`
 	DeviceType  DeviceTypeV1                          `json:"deviceType"`
 	GroupType   GroupTypeV1                           `json:"groupType"`
 	Members     []string                              `json:"members"`
@@ -42,8 +42,8 @@ type DeviceGroupCreateRepresentationV1 struct {
 type DeviceGroupCriteriaRepresentationV1 struct {
 	AttributeName         string     `json:"attributeName"`
 	AttributeValue        string     `json:"attributeValue"`
-	HasClosingParenthesis bool       `json:"hasClosingParenthesis"`
-	HasOpeningParenthesis bool       `json:"hasOpeningParenthesis"`
+	HasClosingParenthesis *bool      `json:"hasClosingParenthesis,omitempty"`
+	HasOpeningParenthesis *bool      `json:"hasOpeningParenthesis,omitempty"`
 	JoinType              JoinTypeV1 `json:"joinType"`
 	Operator              string     `json:"operator"`
 	Order                 int        `json:"order"`
@@ -85,8 +85,8 @@ type DeviceGroupReadRepresentationV1 struct {
 // DeviceGroupUpdateRepresentationV1 represents a device group update representation v1.
 type DeviceGroupUpdateRepresentationV1 struct {
 	Criteria    []DeviceGroupCriteriaRepresentationV1 `json:"criteria"`
-	Description string                                `json:"description"`
-	Name        string                                `json:"name"`
+	Description *string                               `json:"description,omitempty"`
+	Name        *string                               `json:"name,omitempty"`
 }
 
 // DeviceTypeV1 represents a device type v1 value.
