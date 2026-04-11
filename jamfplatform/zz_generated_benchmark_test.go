@@ -17,9 +17,7 @@ func TestListBenchmarks(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id": "test-id",
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 	})
 
 	result, err := c.ListBenchmarks(context.Background())
@@ -53,9 +51,7 @@ func TestCreateBenchmark(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusAccepted, map[string]any{
-			"id": "new-id",
-		})
+		writeJSON(t, w, http.StatusAccepted, map[string]any{"id": "new-id"})
 	})
 
 	result, err := c.CreateBenchmark(context.Background(), &BenchmarkRequestV2{})
@@ -73,9 +69,7 @@ func TestGetBenchmark(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id": "test-id",
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 	})
 
 	result, err := c.GetBenchmark(context.Background(), "test-id")
@@ -124,9 +118,7 @@ func TestListBaselines(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id": "test-id",
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 	})
 
 	result, err := c.ListBaselines(context.Background())
@@ -160,9 +152,7 @@ func TestGetBaselineRules(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"id": "test-id",
-		})
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 	})
 
 	result, err := c.GetBaselineRules(context.Background(), "")

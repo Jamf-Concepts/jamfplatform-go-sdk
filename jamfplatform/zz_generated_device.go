@@ -57,8 +57,8 @@ type DeviceListReadRepresentationV1 struct {
 // DeviceNetworkReadRepresentationV1 represents a device network read representation v1.
 type DeviceNetworkReadRepresentationV1 struct {
 	LastIPAddress           *string `json:"lastIpAddress,omitempty"`
-	LastReportedIPv4Address *string `json:"lastReportedIpV4Address,omitempty"`
-	LastReportedIPv6Address *string `json:"lastReportedIpV6Address,omitempty"`
+	LastReportedIPV4Address *string `json:"lastReportedIpV4Address,omitempty"`
+	LastReportedIPV6Address *string `json:"lastReportedIpV6Address,omitempty"`
 }
 
 // DeviceOperatingSystemReadRepresentationV1 represents a device operating system read representation v1.
