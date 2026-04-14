@@ -17,11 +17,10 @@ func createTestBlueprint(t *testing.T, c *Client, name string, groupID string, s
 	ctx := context.Background()
 
 	desc := "SDK acceptance test — safe to delete"
-	scope := CreateScope{DeviceGroups: []string{groupID}}
 	resp, err := c.CreateBlueprint(ctx, &CreateBlueprintRequest{
 		Name:        name,
 		Description: &desc,
-		Scope:       &scope,
+		Scope:       CreateScope{DeviceGroups: []string{groupID}},
 		Steps:       steps,
 	})
 	if err != nil {
@@ -164,7 +163,7 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 		Name:        &renamedName,
 		Description: &updatedDesc,
 		Scope:       &BlueprintScope{DeviceGroups: []string{groupID}},
-		Steps:       steps,
+		Steps:       &steps,
 	})
 	if err != nil {
 		t.Fatalf("UpdateBlueprint failed: %v", err)
@@ -181,6 +180,45 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 		t.Errorf("expected updated description, got %v", updated.Description)
 	}
 	t.Logf("Updated blueprint ID: %s", bp.ID)
+}
+
+func TestAcceptance_Blueprint_PartialUpdatePreservesSteps(t *testing.T) {
+	groupID := requireSmartGroupFixture(t)
+	c := accClient(t)
+	ctx := context.Background()
+	suffix := runSuffix()
+
+	steps := makeStep("com.jamf.ddm.passcode-settings", map[string]any{
+		"RequirePasscode": true,
+		"MinimumLength":   6,
+	})
+	bp := createTestBlueprint(t, c, "sdk-acc-partial-update-"+suffix, groupID, steps)
+
+	if len(bp.Steps) == 0 {
+		t.Fatal("expected blueprint to have steps after creation")
+	}
+
+	// Update only the name — omit Steps entirely.
+	// Before the fix, this would serialize "steps":[] and wipe them.
+	renamedName := "sdk-acc-partial-renamed-" + suffix
+	err := c.UpdateBlueprint(ctx, bp.ID, &UpdateBlueprintRequest{
+		Name: &renamedName,
+	})
+	if err != nil {
+		t.Fatalf("UpdateBlueprint (partial) failed: %v", err)
+	}
+
+	updated, err := c.GetBlueprint(ctx, bp.ID)
+	if err != nil {
+		t.Fatalf("GetBlueprint after partial update failed: %v", err)
+	}
+	if updated.Name != renamedName {
+		t.Errorf("expected name %q, got %q", renamedName, updated.Name)
+	}
+	if len(updated.Steps) != len(bp.Steps) {
+		t.Errorf("steps were lost: expected %d steps, got %d", len(bp.Steps), len(updated.Steps))
+	}
+	t.Logf("Partial update preserved %d steps on blueprint %s", len(updated.Steps), bp.ID)
 }
 
 func TestAcceptance_Blueprint_Report(t *testing.T) {

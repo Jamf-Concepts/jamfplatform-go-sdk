@@ -37,7 +37,7 @@ type BenchmarkRequestV2 struct {
 	Rules            []RuleRequest `json:"rules"`
 	SourceBaselineID string        `json:"sourceBaselineId"`
 	Sources          []Source      `json:"sources"`
-	Target           *TargetV2     `json:"target,omitempty"`
+	Target           TargetV2      `json:"target"`
 	Title            string        `json:"title"`
 }
 

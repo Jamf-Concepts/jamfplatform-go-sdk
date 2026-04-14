@@ -94,7 +94,7 @@ func requireSmartGroupFixture(t *testing.T) string {
 			Description: &fixtureDesc,
 			DeviceType:  "COMPUTER",
 			GroupType:   "SMART",
-			Criteria: []DeviceGroupCriteriaRepresentationV1{
+			Criteria: &[]DeviceGroupCriteriaRepresentationV1{
 				{
 					Order:          0,
 					AttributeName:  "Serial Number",

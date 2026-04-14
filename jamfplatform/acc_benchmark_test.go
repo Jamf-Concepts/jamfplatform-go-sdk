@@ -119,7 +119,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 		SourceBaselineID: baseline.BaselineID,
 		Sources:          rules.Sources,
 		Rules:            ruleRequests,
-		Target:           &TargetV2{DeviceGroups: []string{groupID}},
+		Target:           TargetV2{DeviceGroups: []string{groupID}},
 		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
@@ -195,7 +195,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 		SourceBaselineID: baseline.BaselineID,
 		Sources:          rules.Sources,
 		Rules:            ruleRequests,
-		Target:           &TargetV2{DeviceGroups: []string{groupID}},
+		Target:           TargetV2{DeviceGroups: []string{groupID}},
 		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
