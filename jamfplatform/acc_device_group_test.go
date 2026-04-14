@@ -231,17 +231,20 @@ func TestAcceptance_DeviceGroup_ListMembers(t *testing.T) {
 }
 
 func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
+	groupID := requireSmartGroupFixture(t)
 	c := accClient(t)
 	ctx := context.Background()
 
-	devices, err := c.ListDevices(ctx, nil, "")
+	// Use a member from the COMPUTER smart group fixture so the device type
+	// is guaranteed to match the COMPUTER static group we create below.
+	fixtureMembers, err := c.ListDeviceGroupMembers(ctx, groupID)
 	if err != nil {
-		t.Fatalf("ListDevices failed: %v", err)
+		t.Fatalf("ListDeviceGroupMembers (fixture) failed: %v", err)
 	}
-	if len(devices) == 0 {
-		t.Skip("No devices available — cannot test member updates")
+	if len(fixtureMembers) == 0 {
+		t.Skip("Smart group fixture has no members — cannot test member updates")
 	}
-	deviceID := devices[0].ID
+	deviceID := fixtureMembers[0]
 
 	suffix := runSuffix()
 	desc := "SDK acceptance test — safe to delete"
