@@ -30,12 +30,12 @@ type ApiErrorCauseRepresentation struct {
 
 // DeviceGroupCreateRepresentationV1 represents a device group create representation v1.
 type DeviceGroupCreateRepresentationV1 struct {
-	Criteria    []DeviceGroupCriteriaRepresentationV1 `json:"criteria"`
-	Description *string                               `json:"description,omitempty"`
-	DeviceType  DeviceTypeV1                          `json:"deviceType"`
-	GroupType   GroupTypeV1                           `json:"groupType"`
-	Members     []string                              `json:"members"`
-	Name        string                                `json:"name"`
+	Criteria    *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
+	Description *string                                `json:"description,omitempty"`
+	DeviceType  DeviceTypeV1                           `json:"deviceType"`
+	GroupType   GroupTypeV1                            `json:"groupType"`
+	Members     *[]string                              `json:"members,omitempty"`
+	Name        string                                 `json:"name"`
 }
 
 // DeviceGroupCriteriaRepresentationV1 represents a device group criteria representation v1.
@@ -67,8 +67,8 @@ type DeviceGroupMemberOfRepresentationV1 struct {
 
 // DeviceGroupMemberPatchRepresentationV1 represents a device group member patch representation v1.
 type DeviceGroupMemberPatchRepresentationV1 struct {
-	Added   []string `json:"added"`
-	Removed []string `json:"removed"`
+	Added   *[]string `json:"added,omitempty"`
+	Removed *[]string `json:"removed,omitempty"`
 }
 
 // DeviceGroupReadRepresentationV1 represents a device group read representation v1.
@@ -84,9 +84,9 @@ type DeviceGroupReadRepresentationV1 struct {
 
 // DeviceGroupUpdateRepresentationV1 represents a device group update representation v1.
 type DeviceGroupUpdateRepresentationV1 struct {
-	Criteria    []DeviceGroupCriteriaRepresentationV1 `json:"criteria"`
-	Description *string                               `json:"description,omitempty"`
-	Name        *string                               `json:"name,omitempty"`
+	Criteria    *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
+	Description *string                                `json:"description,omitempty"`
+	Name        *string                                `json:"name,omitempty"`
 }
 
 // DeviceTypeV1 represents a device type v1 value.

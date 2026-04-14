@@ -634,12 +634,19 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool) GoType
 		// Pointer for: nullable, unrequired non-scalars, or $ref to object with properties.
 		// For request types, unrequired scalars also get pointers so callers can
 		// distinguish "omit field" from "send zero value" (critical for PATCH).
+		// $ref struct pointers only apply to response types; for request types the
+		// (isRequest && !isRequired) term handles optional fields instead.
 		isStructRef := propRef.Ref != "" && prop != nil && prop.Type != nil &&
 			prop.Type.Is("object") && len(prop.Properties) > 0
-		needsPtr := isNullable || isStructRef || (!isRequired && !isScalar(goType)) ||
+		needsPtr := isNullable || (isStructRef && !isRequest) || (!isRequired && !isScalar(goType)) ||
 			(isRequest && !isRequired)
 
-		if needsPtr && !strings.HasPrefix(goType, "*") && !strings.HasPrefix(goType, "[]") && !strings.HasPrefix(goType, "map[") {
+		if isRequest && !isRequired && !strings.HasPrefix(goType, "*") && (strings.HasPrefix(goType, "[]") || strings.HasPrefix(goType, "map[")) {
+			// For request types, unrequired slices/maps get pointer-wrapped so
+			// callers can distinguish "omit field" (nil) from "send empty" (&[]T{}).
+			goType = "*" + goType
+			jsonTag += ",omitempty"
+		} else if needsPtr && !strings.HasPrefix(goType, "*") && !strings.HasPrefix(goType, "[]") && !strings.HasPrefix(goType, "map[") {
 			goType = "*" + goType
 			jsonTag += ",omitempty"
 		} else if isNullable && !strings.HasPrefix(goType, "*") {

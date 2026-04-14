@@ -87,7 +87,7 @@ type ComponentDescription struct {
 type CreateBlueprintRequest struct {
 	Description *string         `json:"description,omitempty"`
 	Name        string          `json:"name"`
-	Scope       *CreateScope    `json:"scope,omitempty"`
+	Scope       CreateScope     `json:"scope"`
 	Steps       []BlueprintStep `json:"steps"`
 }
 
@@ -149,10 +149,10 @@ type SupportedOs struct {
 
 // UpdateBlueprintRequest represents a update blueprint request.
 type UpdateBlueprintRequest struct {
-	Description *string         `json:"description,omitempty"`
-	Name        *string         `json:"name,omitempty"`
-	Scope       *BlueprintScope `json:"scope,omitempty"`
-	Steps       []BlueprintStep `json:"steps"`
+	Description *string          `json:"description,omitempty"`
+	Name        *string          `json:"name,omitempty"`
+	Scope       *BlueprintScope  `json:"scope,omitempty"`
+	Steps       *[]BlueprintStep `json:"steps,omitempty"`
 }
 
 // ---------------------------------------------------------------------------
