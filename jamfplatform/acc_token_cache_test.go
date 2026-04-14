@@ -31,6 +31,7 @@ func TestAcceptance_FileTokenCache(t *testing.T) {
 
 	tok1, err := client1.AccessToken(ctx)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("first AccessToken call: %v", err)
 	}
 	if tok1.AccessToken == "" {
@@ -39,6 +40,7 @@ func TestAcceptance_FileTokenCache(t *testing.T) {
 
 	entries, err := os.ReadDir(cacheDir)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("reading cache dir: %v", err)
 	}
 	if len(entries) != 1 {
@@ -53,6 +55,7 @@ func TestAcceptance_FileTokenCache(t *testing.T) {
 
 	tok2, err := client2.AccessToken(ctx)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("second AccessToken call: %v", err)
 	}
 	if tok2.AccessToken != tok1.AccessToken {
@@ -61,6 +64,7 @@ func TestAcceptance_FileTokenCache(t *testing.T) {
 
 	devices, err := client2.ListDevices(ctx, nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDevices with cached token: %v", err)
 	}
 	t.Logf("Listed %d devices using cached token", len(devices))

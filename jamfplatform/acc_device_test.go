@@ -15,6 +15,7 @@ func TestAcceptance_ListDevices(t *testing.T) {
 
 	devices, err := c.ListDevices(context.Background(), nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
 	t.Logf("Found %d devices", len(devices))
@@ -25,6 +26,7 @@ func TestAcceptance_ListDevicesWithSort(t *testing.T) {
 
 	devices, err := c.ListDevices(context.Background(), []string{"name:asc"}, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDevices with sort failed: %v", err)
 	}
 	t.Logf("Found %d devices (sorted by name asc)", len(devices))
@@ -36,6 +38,7 @@ func TestAcceptance_GetDevice(t *testing.T) {
 
 	devices, err := c.ListDevices(ctx, nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
 	if len(devices) == 0 {
@@ -44,6 +47,7 @@ func TestAcceptance_GetDevice(t *testing.T) {
 
 	device, err := c.GetDevice(ctx, devices[0].ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetDevice failed: %v", err)
 	}
 	if device.ID != devices[0].ID {
@@ -65,6 +69,7 @@ func TestAcceptance_ListDeviceApplications(t *testing.T) {
 
 	devices, err := c.ListDevices(ctx, nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
 	if len(devices) == 0 {
@@ -73,6 +78,7 @@ func TestAcceptance_ListDeviceApplications(t *testing.T) {
 
 	apps, err := c.ListDeviceApplications(ctx, devices[0].ID, nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceApplications failed: %v", err)
 	}
 	t.Logf("Device %s has %d applications", devices[0].ID, len(apps))
@@ -84,6 +90,7 @@ func TestAcceptance_ListDeviceGroupsForDevice(t *testing.T) {
 
 	devices, err := c.ListDevices(ctx, nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
 	if len(devices) == 0 {
@@ -92,6 +99,7 @@ func TestAcceptance_ListDeviceGroupsForDevice(t *testing.T) {
 
 	groups, err := c.ListDeviceGroupsForDevice(ctx, devices[0].ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupsForDevice failed: %v", err)
 	}
 	t.Logf("Device %s belongs to %d groups", devices[0].ID, len(groups))

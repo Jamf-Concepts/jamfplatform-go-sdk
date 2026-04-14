@@ -24,12 +24,14 @@ func createTestBlueprint(t *testing.T, c *Client, name string, groupID string, s
 		Steps:       steps,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("CreateBlueprint failed for %q: %v", name, err)
 	}
 	t.Cleanup(func() { _ = c.DeleteBlueprint(ctx, resp.ID) })
 
 	bp, err := c.GetBlueprint(ctx, resp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprint failed for %q: %v", name, err)
 	}
 	return bp
@@ -56,6 +58,7 @@ func TestAcceptance_ListBlueprints(t *testing.T) {
 
 	bps, err := c.ListBlueprints(context.Background(), nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListBlueprints failed: %v", err)
 	}
 	t.Logf("Found %d blueprints", len(bps))
@@ -66,6 +69,7 @@ func TestAcceptance_ListBlueprintsWithSearch(t *testing.T) {
 
 	bps, err := c.ListBlueprints(context.Background(), nil, "sdk-acc")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListBlueprints with search failed: %v", err)
 	}
 	t.Logf("Found %d blueprints matching 'sdk-acc'", len(bps))
@@ -76,6 +80,7 @@ func TestAcceptance_ListBlueprintComponents(t *testing.T) {
 
 	comps, err := c.ListBlueprintComponents(context.Background())
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListBlueprintComponents failed: %v", err)
 	}
 	if len(comps) == 0 {
@@ -94,6 +99,7 @@ func TestAcceptance_GetBlueprintComponent(t *testing.T) {
 
 	comps, err := c.ListBlueprintComponents(ctx)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListBlueprintComponents failed: %v", err)
 	}
 	if len(comps) == 0 {
@@ -102,6 +108,7 @@ func TestAcceptance_GetBlueprintComponent(t *testing.T) {
 
 	comp, err := c.GetBlueprintComponent(ctx, comps[0].Identifier)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprintComponent failed for %q: %v", comps[0].Identifier, err)
 	}
 	if comp.Identifier != comps[0].Identifier {
@@ -166,11 +173,13 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 		Steps:       &steps,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("UpdateBlueprint failed: %v", err)
 	}
 
 	updated, err := c.GetBlueprint(ctx, bp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprint after update failed: %v", err)
 	}
 	if updated.Name != renamedName {
@@ -205,11 +214,13 @@ func TestAcceptance_Blueprint_PartialUpdatePreservesSteps(t *testing.T) {
 		Name: &renamedName,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("UpdateBlueprint (partial) failed: %v", err)
 	}
 
 	updated, err := c.GetBlueprint(ctx, bp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprint after partial update failed: %v", err)
 	}
 	if updated.Name != renamedName {
@@ -233,6 +244,7 @@ func TestAcceptance_Blueprint_Report(t *testing.T) {
 	bp := createTestBlueprint(t, c, "sdk-acc-report-"+runSuffix(), groupID, steps)
 
 	if err := c.DeployBlueprint(ctx, bp.ID); err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("DeployBlueprint failed: %v", err)
 	}
 	t.Cleanup(func() { _ = c.UndeployBlueprint(ctx, bp.ID) })
@@ -247,11 +259,13 @@ func TestAcceptance_Blueprint_Report(t *testing.T) {
 		return got.DeploymentState.State != "NOT_DEPLOYED", nil
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("Timed out waiting for deployment: %v", err)
 	}
 
 	report, err := c.GetBlueprintReport(ctx, bp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprintReport failed: %v", err)
 	}
 	t.Logf("Report for %s: succeeded=%d failed=%d pending=%d", bp.ID, report.Succeeded, report.Failed, report.Pending)

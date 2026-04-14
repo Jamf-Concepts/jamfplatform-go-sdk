@@ -7,6 +7,7 @@ package jamfplatform
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -49,6 +50,16 @@ func accClient(t *testing.T) *Client {
 		t.Skipf("Skipping acceptance test: %v", err)
 	}
 	return c
+}
+
+// skipOnServerError skips the test if err is an API 5xx response.
+// Use instead of t.Fatalf for API calls that may hit transient server bugs.
+func skipOnServerError(t *testing.T, err error) {
+	t.Helper()
+	var apiErr *APIResponseError
+	if errors.As(err, &apiErr) && apiErr.StatusCode >= 500 {
+		t.Skipf("Skipping due to server error: %v", err)
+	}
 }
 
 // Smart group fixture — shared across all tests that need a device group scope.
