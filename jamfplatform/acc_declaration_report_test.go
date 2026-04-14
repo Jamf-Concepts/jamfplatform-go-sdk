@@ -16,6 +16,7 @@ func TestAcceptance_GetDeviceDeclarationReport(t *testing.T) {
 
 	devices, err := c.ListDevices(ctx, nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
 	if len(devices) == 0 {
@@ -24,6 +25,7 @@ func TestAcceptance_GetDeviceDeclarationReport(t *testing.T) {
 
 	report, err := c.GetDeviceDeclarationReport(ctx, devices[0].ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceDeclarationReport failed: %v", err)
 	}
 	t.Logf("Device %s has %d channels", devices[0].ID, len(report.Channels))
@@ -42,6 +44,7 @@ func TestAcceptance_ListDeclarationReportClients(t *testing.T) {
 	// Get a device report first to find a declaration identifier to query
 	devices, err := c.ListDevices(ctx, nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
 	if len(devices) == 0 {
@@ -50,6 +53,7 @@ func TestAcceptance_ListDeclarationReportClients(t *testing.T) {
 
 	report, err := c.GetDeviceDeclarationReport(ctx, devices[0].ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceDeclarationReport failed: %v", err)
 	}
 
@@ -66,6 +70,7 @@ func TestAcceptance_ListDeclarationReportClients(t *testing.T) {
 
 	clients, err := c.ListDeclarationReportClients(ctx, declID, nil)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeclarationReportClients(%s) failed: %v", declID, err)
 	}
 	t.Logf("Declaration %s reported by %d clients", declID, len(clients))

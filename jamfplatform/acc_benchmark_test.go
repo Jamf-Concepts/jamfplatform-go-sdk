@@ -15,6 +15,7 @@ func TestAcceptance_ListBaselines(t *testing.T) {
 
 	baselines, err := c.ListBaselines(context.Background())
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListBaselines failed: %v", err)
 	}
 	if len(baselines.Baselines) == 0 {
@@ -33,6 +34,7 @@ func TestAcceptance_GetBaselineRules(t *testing.T) {
 
 	baselines, err := c.ListBaselines(ctx)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListBaselines failed: %v", err)
 	}
 	if len(baselines.Baselines) == 0 {
@@ -42,6 +44,7 @@ func TestAcceptance_GetBaselineRules(t *testing.T) {
 	baseline := baselines.Baselines[0]
 	rules, err := c.GetBaselineRules(ctx, baseline.BaselineID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetBaselineRules failed for %q: %v", baseline.BaselineID, err)
 	}
 
@@ -62,6 +65,7 @@ func TestAcceptance_ListBenchmarks(t *testing.T) {
 
 	benchmarks, err := c.ListBenchmarks(context.Background())
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListBenchmarks failed: %v", err)
 	}
 	t.Logf("Found %d benchmarks", len(benchmarks.Benchmarks))
@@ -76,6 +80,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 
 	baselines, err := c.ListBaselines(ctx)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListBaselines failed: %v", err)
 	}
 	if len(baselines.Baselines) == 0 {
@@ -87,6 +92,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 
 	rules, err := c.GetBaselineRules(ctx, baseline.BaselineID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetBaselineRules failed: %v", err)
 	}
 	if len(rules.Rules) == 0 {
@@ -123,6 +129,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("CreateBenchmark failed: %v", err)
 	}
 	t.Logf("Created benchmark %q (ID: %s)", title, resp.BenchmarkID)
@@ -136,6 +143,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 
 	bm, err := c.GetBenchmark(ctx, resp.BenchmarkID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetBenchmark failed: %v", err)
 	}
 	if bm.Title != title {
@@ -153,6 +161,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 
 	baselines, err := c.ListBaselines(ctx)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListBaselines failed: %v", err)
 	}
 	if len(baselines.Baselines) == 0 {
@@ -164,6 +173,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 
 	rules, err := c.GetBaselineRules(ctx, baseline.BaselineID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetBaselineRules failed: %v", err)
 	}
 	if len(rules.Rules) == 0 {
@@ -199,6 +209,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("CreateBenchmark failed: %v", err)
 	}
 	t.Cleanup(func() { ensureBenchmarkDeletedByID(t, c, ctx, resp.BenchmarkID) })
@@ -209,6 +220,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	t.Run("RulesStats", func(t *testing.T) {
 		stats, err := c.ListBenchmarkRulesStats(ctx, benchmarkID, "", "")
 		if err != nil {
+			skipOnServerError(t, err)
 			t.Fatalf("ListBenchmarkRulesStats failed: %v", err)
 		}
 		t.Logf("Found %d rule stats", len(stats))
@@ -220,6 +232,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	t.Run("RuleDevices", func(t *testing.T) {
 		stats, err := c.ListBenchmarkRulesStats(ctx, benchmarkID, "", "")
 		if err != nil {
+			skipOnServerError(t, err)
 			t.Fatalf("ListBenchmarkRulesStats failed: %v", err)
 		}
 		if len(stats) == 0 {
@@ -227,6 +240,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 		}
 		devices, err := c.ListBenchmarkRuleDevices(ctx, benchmarkID, stats[0].RuleID, "", "", "")
 		if err != nil {
+			skipOnServerError(t, err)
 			t.Fatalf("ListBenchmarkRuleDevices failed: %v", err)
 		}
 		t.Logf("Found %d devices for rule %s", len(devices), stats[0].RuleTitle)
@@ -235,6 +249,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	t.Run("CompliancePercentage", func(t *testing.T) {
 		pct, err := c.GetBenchmarkCompliancePercentage(ctx, benchmarkID)
 		if err != nil {
+			skipOnServerError(t, err)
 			t.Fatalf("GetBenchmarkCompliancePercentage failed: %v", err)
 		}
 		t.Logf("Compliance percentage: %.1f%%", pct.CompliancePercentage)

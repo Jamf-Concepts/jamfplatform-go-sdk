@@ -15,6 +15,7 @@ func TestAcceptance_ListDeviceGroups(t *testing.T) {
 
 	groups, err := c.ListDeviceGroups(context.Background(), nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroups failed: %v", err)
 	}
 	t.Logf("Found %d device groups", len(groups))
@@ -25,6 +26,7 @@ func TestAcceptance_ListDeviceGroupsWithSort(t *testing.T) {
 
 	groups, err := c.ListDeviceGroups(context.Background(), []string{"name:asc"}, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroups with sort failed: %v", err)
 	}
 	t.Logf("Found %d device groups (sorted)", len(groups))
@@ -36,6 +38,7 @@ func TestAcceptance_DeviceGroup_SmartGroupFixture(t *testing.T) {
 
 	group, err := c.GetDeviceGroup(context.Background(), groupID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup failed: %v", err)
 	}
 	if group.GroupType != "SMART" {
@@ -63,12 +66,14 @@ func TestAcceptance_DeviceGroup_CreateAndDeleteStaticGroup(t *testing.T) {
 		Members:     &emptyMembers,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
 	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
 
 	group, err := c.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup failed: %v", err)
 	}
 	if group.Name != name {
@@ -95,6 +100,7 @@ func TestAcceptance_DeviceGroup_UpdateGroup(t *testing.T) {
 		Members:     &emptyMembers,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
 	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
@@ -106,11 +112,13 @@ func TestAcceptance_DeviceGroup_UpdateGroup(t *testing.T) {
 		Description: &updatedDesc,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("UpdateDeviceGroup failed: %v", err)
 	}
 
 	group, err := c.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup after update failed: %v", err)
 	}
 	if group.Name != renamedName {
@@ -143,12 +151,14 @@ func TestAcceptance_DeviceGroup_SmartGroupWithCriteria(t *testing.T) {
 		Criteria:    &criteria,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
 	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
 
 	group, err := c.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup failed: %v", err)
 	}
 	if group.GroupType != "SMART" {
@@ -184,12 +194,14 @@ func TestAcceptance_DeviceGroup_PartialUpdatePreservesCriteria(t *testing.T) {
 		Criteria:    &criteria,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
 	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
 
 	group, err := c.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup failed: %v", err)
 	}
 	if group.Criteria == nil || len(*group.Criteria) != 1 {
@@ -203,11 +215,13 @@ func TestAcceptance_DeviceGroup_PartialUpdatePreservesCriteria(t *testing.T) {
 		Name: &renamedName,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("UpdateDeviceGroup (partial) failed: %v", err)
 	}
 
 	updated, err := c.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup after partial update failed: %v", err)
 	}
 	if updated.Name != renamedName {
@@ -225,6 +239,7 @@ func TestAcceptance_DeviceGroup_ListMembers(t *testing.T) {
 
 	members, err := c.ListDeviceGroupMembers(context.Background(), groupID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupMembers failed: %v", err)
 	}
 	t.Logf("Fixture group has %d members", len(members))
@@ -239,6 +254,7 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 	// is guaranteed to match the COMPUTER static group we create below.
 	fixtureMembers, err := c.ListDeviceGroupMembers(ctx, groupID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupMembers (fixture) failed: %v", err)
 	}
 	if len(fixtureMembers) == 0 {
@@ -257,6 +273,7 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 		Members:     &emptyMembers,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
 	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
@@ -267,11 +284,13 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 		Added: &addIDs,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("UpdateDeviceGroupMembers (add) failed: %v", err)
 	}
 
 	members, err := c.ListDeviceGroupMembers(ctx, resp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupMembers failed: %v", err)
 	}
 	if len(members) != 1 || members[0] != deviceID {
@@ -284,11 +303,13 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 		Removed: &removeIDs,
 	})
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("UpdateDeviceGroupMembers (remove) failed: %v", err)
 	}
 
 	members, err = c.ListDeviceGroupMembers(ctx, resp.ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupMembers after remove failed: %v", err)
 	}
 	if len(members) != 0 {
@@ -303,6 +324,7 @@ func TestAcceptance_DeviceGroup_ListGroupsForDevice(t *testing.T) {
 
 	devices, err := c.ListDevices(ctx, nil, "")
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
 	if len(devices) == 0 {
@@ -311,6 +333,7 @@ func TestAcceptance_DeviceGroup_ListGroupsForDevice(t *testing.T) {
 
 	groups, err := c.ListDeviceGroupsForDevice(ctx, devices[0].ID)
 	if err != nil {
+		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupsForDevice failed: %v", err)
 	}
 	t.Logf("Device %s belongs to %d groups", devices[0].ID, len(groups))
