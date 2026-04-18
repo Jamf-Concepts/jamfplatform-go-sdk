@@ -47,6 +47,7 @@ type SpecDef struct {
 	Namespace      string         `json:"namespace"`
 	SpecFile       string         `json:"specFile,omitempty"`       // override published spec filename
 	Package        string         `json:"package,omitempty"`        // target Go sub-package under jamfplatform/; empty emits to root (legacy)
+	SplitByTag     bool           `json:"splitByTag,omitempty"`     // emit one methods file per OpenAPI tag instead of one per spec
 	Operations     []OperationDef `json:"operations"`
 	ExcludePaths   []string       `json:"excludePaths,omitempty"`   // "METHOD /path" entries the generator must refuse to include
 	SkipDeprecated bool           `json:"skipDeprecated,omitempty"` // omit operations marked deprecated in the spec
@@ -166,6 +167,7 @@ type GoMethod struct {
 	HTTPMethod   string
 	Namespace    string
 	Version      string
+	Tag          string // first OpenAPI tag of the operation, used when SplitByTag is enabled
 	ResourcePath string // path after version prefix, e.g. "/devices/{id}"
 	PathParams   []GoPathParam
 	QueryParams  []ExtraParam
@@ -426,6 +428,12 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	}
 
 	for _, sm := range allSpecs {
+		if sm.spec.SplitByTag {
+			if err := emitMethodsByTag(pkgDir, cfg, pkgName, sm.spec, sm.methods); err != nil {
+				return err
+			}
+			continue
+		}
 		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Methods: sm.methods}
 		if err := emitTemplated(sourceTmpl, mf, filepath.Join(pkgDir, sm.baseName+".go")); err != nil {
 			return err
@@ -439,6 +447,43 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		return err
 	}
 	return nil
+}
+
+// emitMethodsByTag buckets methods by their first OpenAPI tag and emits one
+// source + test file per tag. Operations without a tag error out — untagged
+// ops in splitByTag mode signal a spec bug the curator should see.
+func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, methods []GoMethod) error {
+	buckets := make(map[string][]GoMethod)
+	for _, m := range methods {
+		if m.Tag == "" {
+			return fmt.Errorf("spec %s: operation %s has no OpenAPI tag but splitByTag is enabled", spec.File, m.Name)
+		}
+		buckets[m.Tag] = append(buckets[m.Tag], m)
+	}
+
+	tags := make([]string, 0, len(buckets))
+	for t := range buckets {
+		tags = append(tags, t)
+	}
+	sort.Strings(tags)
+
+	for _, tag := range tags {
+		base := tagToFileBase(tag)
+		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Methods: buckets[tag]}
+		if err := emitTemplated(sourceTmpl, mf, filepath.Join(pkgDir, base+".go")); err != nil {
+			return err
+		}
+		if err := emitTemplated(testTmpl, mf, filepath.Join(pkgDir, base+"_test.go")); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// tagToFileBase converts an OpenAPI tag ("startup-status", "mobile-device-extension-attributes-preview")
+// into a Go-friendly filename base by kebab-to-snake-casing.
+func tagToFileBase(tag string) string {
+	return strings.ReplaceAll(tag, "-", "_")
 }
 
 // emitTemplated executes a template and writes the goimports-formatted result
@@ -1064,6 +1109,10 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 
 	if op.Summary != "" {
 		m.Comment = opDef.Name + " " + lowerFirst(cleanComment(op.Summary))
+	}
+
+	if len(op.Tags) > 0 {
+		m.Tag = op.Tags[0]
 	}
 
 	if op.Deprecated {

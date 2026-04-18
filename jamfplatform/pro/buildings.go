@@ -64,14 +64,3 @@ func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error
 	}
 	return &result, nil
 }
-
-// GetStartupStatus retrieve information about application startup.
-func (c *Client) GetStartupStatus(ctx context.Context) (*StartupStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "")
-	var result StartupStatus
-	endpoint := prefix + "/startup-status"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetStartupStatus: %w", err)
-	}
-	return &result, nil
-}
