@@ -66,7 +66,7 @@ type StartupStatus struct {
 
 // ListBuildingsV1 search for sorted and paged Buildings.
 func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter string) ([]Building, error) {
-	prefix := c.tenantPrefix("pro", "v1")
+	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Building, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -96,7 +96,7 @@ func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter stri
 
 // GetBuildingV1 get specified Building object.
 func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error) {
-	prefix := c.tenantPrefix("pro", "v1")
+	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Building
 	endpoint := fmt.Sprintf("%s/buildings/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -107,7 +107,7 @@ func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error
 
 // GetStartupStatus retrieve information about application startup.
 func (c *Client) GetStartupStatus(ctx context.Context) (*StartupStatus, error) {
-	prefix := c.tenantPrefix("pro", "")
+	prefix := c.transport.TenantPrefix("pro", "")
 	var result StartupStatus
 	endpoint := prefix + "/startup-status"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

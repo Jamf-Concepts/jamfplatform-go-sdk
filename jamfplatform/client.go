@@ -134,9 +134,3 @@ func WithTenantID(id string) Option {
 	}
 }
 
-// tenantPrefix delegates to the transport. Retained while generated code
-// still calls it; sub-packages built after the package-per-API rework
-// call c.transport.TenantPrefix directly.
-func (c *Client) tenantPrefix(namespace, version string) string {
-	return c.transport.TenantPrefix(namespace, version)
-}

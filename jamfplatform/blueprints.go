@@ -161,7 +161,7 @@ type UpdateBlueprintRequest struct {
 
 // ListBlueprints list blueprints.
 func (c *Client) ListBlueprints(ctx context.Context, sort []string, search string) ([]BlueprintOverview, error) {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]BlueprintOverview, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -190,7 +190,7 @@ func (c *Client) ListBlueprints(ctx context.Context, sort []string, search strin
 
 // CreateBlueprint create a new blueprint.
 func (c *Client) CreateBlueprint(ctx context.Context, request *CreateBlueprintRequest) (*CreateResponse, error) {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	var result CreateResponse
 	endpoint := prefix + "/blueprints"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -201,7 +201,7 @@ func (c *Client) CreateBlueprint(ctx context.Context, request *CreateBlueprintRe
 
 // GetBlueprint get a blueprint.
 func (c *Client) GetBlueprint(ctx context.Context, blueprintID string) (*BlueprintDetail, error) {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	var result BlueprintDetail
 	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -212,7 +212,7 @@ func (c *Client) GetBlueprint(ctx context.Context, blueprintID string) (*Bluepri
 
 // UpdateBlueprint updates a blueprint configuration.
 func (c *Client) UpdateBlueprint(ctx context.Context, blueprintID string, request *UpdateBlueprintRequest) error {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.DoExpect(ctx, http.MethodPatch, endpoint, request, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateBlueprint(%s): %w", blueprintID, err)
@@ -222,7 +222,7 @@ func (c *Client) UpdateBlueprint(ctx context.Context, blueprintID string, reques
 
 // DeleteBlueprint delete a blueprint.
 func (c *Client) DeleteBlueprint(ctx context.Context, blueprintID string) error {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteBlueprint(%s): %w", blueprintID, err)
@@ -232,7 +232,7 @@ func (c *Client) DeleteBlueprint(ctx context.Context, blueprintID string) error 
 
 // DeployBlueprint deploy blueprint.
 func (c *Client) DeployBlueprint(ctx context.Context, blueprintID string) error {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s/deploy", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("DeployBlueprint(%s): %w", blueprintID, err)
@@ -242,7 +242,7 @@ func (c *Client) DeployBlueprint(ctx context.Context, blueprintID string) error 
 
 // UndeployBlueprint undeploy blueprint.
 func (c *Client) UndeployBlueprint(ctx context.Context, blueprintID string) error {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s/undeploy", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("UndeployBlueprint(%s): %w", blueprintID, err)
@@ -252,7 +252,7 @@ func (c *Client) UndeployBlueprint(ctx context.Context, blueprintID string) erro
 
 // GetBlueprintReport get blueprint status report.
 func (c *Client) GetBlueprintReport(ctx context.Context, blueprintID string) (*BlueprintStatusDetail, error) {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	var result BlueprintStatusDetail
 	endpoint := fmt.Sprintf("%s/blueprints/%s/report", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -263,7 +263,7 @@ func (c *Client) GetBlueprintReport(ctx context.Context, blueprintID string) (*B
 
 // ListBlueprintComponents list available blueprint components.
 func (c *Client) ListBlueprintComponents(ctx context.Context) ([]ComponentDescription, error) {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComponentDescription, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -286,7 +286,7 @@ func (c *Client) ListBlueprintComponents(ctx context.Context) ([]ComponentDescri
 
 // GetBlueprintComponent get component.
 func (c *Client) GetBlueprintComponent(ctx context.Context, identifier string) (*ComponentDescription, error) {
-	prefix := c.tenantPrefix("blueprints", "v1")
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	var result ComponentDescription
 	endpoint := fmt.Sprintf("%s/blueprint-components/%s", prefix, url.PathEscape(identifier))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

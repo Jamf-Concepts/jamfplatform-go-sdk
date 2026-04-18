@@ -96,7 +96,7 @@ type StatusReportDeclarationReasonDto struct {
 
 // GetDeviceDeclarationReport get device report declarations.
 func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string) (*DeviceReportDto, error) {
-	prefix := c.tenantPrefix("ddm/report", "v1")
+	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	var result DeviceReportDto
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(deviceID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -107,7 +107,7 @@ func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string
 
 // ListDeclarationReportClients get declaration report devices.
 func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationIdentifier string, sort []string) ([]DeclarationReportClientDto, error) {
-	prefix := c.tenantPrefix("ddm/report", "v1")
+	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeclarationReportClientDto, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))

@@ -169,7 +169,7 @@ type ValidationConstraints struct {
 
 // ListBenchmarks returns list of tenant benchmarks.
 func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, error) {
-	prefix := c.tenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarksResponseV2
 	endpoint := prefix + "/benchmarks"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -180,7 +180,7 @@ func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, err
 
 // CreateBenchmark creates a new benchmark from provided benchmark request.
 func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV2) (*BenchmarkResponseV2, error) {
-	prefix := c.tenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
 	endpoint := prefix + "/benchmarks"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusAccepted, &result); err != nil {
@@ -191,7 +191,7 @@ func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV
 
 // GetBenchmark returns benchmark for given benchmark ID.
 func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkResponseV2, error) {
-	prefix := c.tenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
 	endpoint := fmt.Sprintf("%s/benchmarks/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -202,7 +202,7 @@ func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkRespons
 
 // DeleteBenchmark removes benchmark with given benchmark ID.
 func (c *Client) DeleteBenchmark(ctx context.Context, benchmarkID string) error {
-	prefix := c.tenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	endpoint := fmt.Sprintf("%s/benchmarks/%s", prefix, url.PathEscape(benchmarkID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteBenchmark(%s): %w", benchmarkID, err)
@@ -212,7 +212,7 @@ func (c *Client) DeleteBenchmark(ctx context.Context, benchmarkID string) error 
 
 // ListBaselines returns list of the mSCP baselines.
 func (c *Client) ListBaselines(ctx context.Context) (*BaselinesResponse, error) {
-	prefix := c.tenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BaselinesResponse
 	endpoint := prefix + "/baselines"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -223,7 +223,7 @@ func (c *Client) ListBaselines(ctx context.Context) (*BaselinesResponse, error) 
 
 // GetBaselineRules get list of rules for given baseline.
 func (c *Client) GetBaselineRules(ctx context.Context, baselineID string) (*SourcedRules, error) {
-	prefix := c.tenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result SourcedRules
 	endpoint := prefix + "/rules"
 	params := url.Values{}

@@ -115,7 +115,7 @@ type ListResponseRepresentation struct {
 
 // ListDeviceGroups get all device groups.
 func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter string) ([]DeviceGroupListReadRepresentationV1, error) {
-	prefix := c.tenantPrefix("device-groups", "v1")
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceGroupListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -144,7 +144,7 @@ func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter str
 
 // CreateDeviceGroup create a new device group.
 func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCreateRepresentationV1) (*HrefRepresentation, error) {
-	prefix := c.tenantPrefix("device-groups", "v1")
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	var result HrefRepresentation
 	endpoint := prefix + "/device-groups"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -155,7 +155,7 @@ func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCrea
 
 // GetDeviceGroup get a device group by ID.
 func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupReadRepresentationV1, error) {
-	prefix := c.tenantPrefix("device-groups", "v1")
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	var result DeviceGroupReadRepresentationV1
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -166,7 +166,7 @@ func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupRea
 
 // UpdateDeviceGroup update a device group.
 func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *DeviceGroupUpdateRepresentationV1) error {
-	prefix := c.tenantPrefix("device-groups", "v1")
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDeviceGroup(%s): %w", id, err)
@@ -176,7 +176,7 @@ func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *Devi
 
 // DeleteDeviceGroup delete a device group.
 func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
-	prefix := c.tenantPrefix("device-groups", "v1")
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDeviceGroup(%s): %w", id, err)
@@ -186,7 +186,7 @@ func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
 
 // ListDeviceGroupMembers get group members.
 func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]string, error) {
-	prefix := c.tenantPrefix("device-groups", "v1")
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))
 
 	var result struct {
@@ -201,7 +201,7 @@ func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]strin
 
 // UpdateDeviceGroupMembers update device group members.
 func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, request *DeviceGroupMemberPatchRepresentationV1) error {
-	prefix := c.tenantPrefix("device-groups", "v1")
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDeviceGroupMembers(%s): %w", id, err)
@@ -211,7 +211,7 @@ func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, reques
 
 // ListDeviceGroupsForDevice get device groups for a device.
 func (c *Client) ListDeviceGroupsForDevice(ctx context.Context, deviceID string) ([]DeviceGroupMemberOfRepresentationV1, error) {
-	prefix := c.tenantPrefix("device-groups", "v1")
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s/device-groups", prefix, url.PathEscape(deviceID))
 
 	var result struct {

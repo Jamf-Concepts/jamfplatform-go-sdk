@@ -1160,7 +1160,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- else }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
-	prefix := c.tenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
@@ -1182,7 +1182,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- else }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}) (*{{ .ResponseType }}, error) {
 {{- end }}
-	prefix := c.tenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- if .ContentType }}
@@ -1207,7 +1207,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- else }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
-	prefix := c.tenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, &result); err != nil {
@@ -1224,7 +1224,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "update" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}) error {
-	prefix := c.tenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 {{- if .ContentType }}
 	if err := c.transport.DoWithContentType(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, nil); err != nil {
@@ -1240,7 +1240,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "action" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}) error {
-	prefix := c.tenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, nil); err != nil {
 		return fmt.Errorf({{ errWrap . }})
@@ -1252,7 +1252,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "unwrap" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .UnwrapResults }}, error) {
-	prefix := c.tenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 
@@ -1270,7 +1270,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "paginated" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ([]{{ .ItemType }}, error) {
-	prefix := c.tenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]{{ .ItemType }}, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))

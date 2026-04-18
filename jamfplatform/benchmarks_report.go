@@ -65,7 +65,7 @@ type RuleResultState = string
 
 // ListBenchmarkRulesStats get benchmark rules for a tenant.
 func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort string, ruleSearch string) ([]RuleResult, error) {
-	prefix := c.tenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]RuleResult, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -94,7 +94,7 @@ func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort st
 
 // ListBenchmarkRuleDevices get devices for a benchmark report rule.
 func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID string, sort string, deviceSearch string, ruleResult string) ([]DeviceRuleResult, error) {
-	prefix := c.tenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceRuleResult, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -129,7 +129,7 @@ func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID
 
 // GetBenchmarkCompliancePercentage get compliance percentage for a benchmark report.
 func (c *Client) GetBenchmarkCompliancePercentage(ctx context.Context, benchmarkID string) (*CompliancePercentage, error) {
-	prefix := c.tenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result CompliancePercentage
 	endpoint := fmt.Sprintf("%s/benchmarks/%s/compliance-percentage", prefix, url.PathEscape(benchmarkID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

@@ -37,7 +37,7 @@ type EraseDeviceRequest struct {
 
 // CheckInDevice request a device check in.
 func (c *Client) CheckInDevice(ctx context.Context, id string) error {
-	prefix := c.tenantPrefix("device-actions", "v1")
+	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s/check-in", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("CheckInDevice(%s): %w", id, err)
@@ -47,7 +47,7 @@ func (c *Client) CheckInDevice(ctx context.Context, id string) error {
 
 // EraseDevice erase a device.
 func (c *Client) EraseDevice(ctx context.Context, id string, request *EraseDeviceRequest) ([]DeviceCommandResponse, error) {
-	prefix := c.tenantPrefix("device-actions", "v1")
+	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
 	endpoint := fmt.Sprintf("%s/devices/%s/erase", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -58,7 +58,7 @@ func (c *Client) EraseDevice(ctx context.Context, id string, request *EraseDevic
 
 // RestartDevice restart a device.
 func (c *Client) RestartDevice(ctx context.Context, id string) ([]DeviceCommandResponse, error) {
-	prefix := c.tenantPrefix("device-actions", "v1")
+	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
 	endpoint := fmt.Sprintf("%s/devices/%s/restart", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusCreated, &result); err != nil {
@@ -69,7 +69,7 @@ func (c *Client) RestartDevice(ctx context.Context, id string) ([]DeviceCommandR
 
 // ShutdownDevice shut down a device.
 func (c *Client) ShutdownDevice(ctx context.Context, id string) ([]DeviceCommandResponse, error) {
-	prefix := c.tenantPrefix("device-actions", "v1")
+	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
 	endpoint := fmt.Sprintf("%s/devices/%s/shutdown", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusCreated, &result); err != nil {
@@ -80,7 +80,7 @@ func (c *Client) ShutdownDevice(ctx context.Context, id string) ([]DeviceCommand
 
 // UnmanageDevice unmanage a device.
 func (c *Client) UnmanageDevice(ctx context.Context, id string) ([]DeviceCommandResponse, error) {
-	prefix := c.tenantPrefix("device-actions", "v1")
+	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
 	endpoint := fmt.Sprintf("%s/devices/%s/unmanage", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusCreated, &result); err != nil {
