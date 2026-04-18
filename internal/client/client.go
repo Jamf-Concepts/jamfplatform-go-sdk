@@ -112,6 +112,9 @@ type Option func(*Transport)
 func WithHTTPClient(httpClient *http.Client) Option {
 	return func(c *Transport) {
 		if httpClient != nil {
+			if httpClient.Jar == nil {
+				httpClient.Jar = newCookieJar()
+			}
 			c.baseClient = httpClient
 			c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient)
 		}
