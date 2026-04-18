@@ -66,6 +66,12 @@ type HrefResponse struct {
 	ID   string `json:"id"`
 }
 
+// IconResponse represents a icon response.
+type IconResponse struct {
+	ID  int    `json:"id"`
+	URL string `json:"url"`
+}
+
 // StartupStatus represents a startup status.
 type StartupStatus struct {
 	Error                   *string `json:"error,omitempty"`

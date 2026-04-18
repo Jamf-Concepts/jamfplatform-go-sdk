@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
+	"os"
 	"strings"
 	"testing"
 
@@ -156,6 +157,32 @@ func TestAcceptance_Pro_ExportBuildings(t *testing.T) {
 // alternative — actually rotating a credential — would lock out either the
 // OAuth API client (our test auth) or an admin user. The test still
 // exercises the transport path and payload encoding end-to-end.
+// TestAcceptance_Pro_UploadIcon uploads a PNG fixture via the multipart
+// endpoint and asserts the server returned a usable id + URL. Icons
+// persist on the tenant (no delete endpoint) — a handful of test icons
+// accumulating in the tenant is an acceptable cost for test coverage.
+func TestAcceptance_Pro_UploadIcon(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	const fixturePath = "../testing/fixtures/jamf-cli-icon-1024.png"
+	f, err := os.Open(fixturePath)
+	if err != nil {
+		t.Skipf("fixture %s unavailable: %v", fixturePath, err)
+	}
+	t.Cleanup(func() { _ = f.Close() })
+
+	resp, err := pro.New(c).UploadIconV1(ctx, "sdk-acc-icon-"+runSuffix()+".png", f)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UploadIconV1: %v", err)
+	}
+	if resp.ID == 0 {
+		t.Errorf("expected non-zero icon id, got %+v", resp)
+	}
+	t.Logf("Uploaded icon id=%d url=%s", resp.ID, resp.URL)
+}
+
 func TestAcceptance_Pro_ChangeUserPassword(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()

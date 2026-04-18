@@ -162,14 +162,15 @@ type GoField struct {
 }
 
 type GoMethod struct {
-	Name         string
-	Comment      string
-	Category     string // get, create, update, action, actionWithResponse, paginated, unwrap
-	HTTPMethod   string
-	Namespace    string
-	Version      string
-	Tag          string // first OpenAPI tag of the operation, used when SplitByTag is enabled
-	ResourcePath string // path after version prefix, e.g. "/devices/{id}"
+	Name            string
+	Comment         string
+	Category        string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart
+	HTTPMethod      string
+	Namespace       string
+	Version         string
+	Tag             string // first OpenAPI tag of the operation, used when SplitByTag is enabled
+	ResourcePath    string // path after version prefix, e.g. "/devices/{id}"
+	MultipartFields []GoMultipartField
 	PathParams   []GoPathParam
 	QueryParams  []ExtraParam
 	RequestType  string
@@ -188,6 +189,16 @@ type GoMethod struct {
 type GoPathParam struct {
 	SpecName string
 	GoName   string
+}
+
+// GoMultipartField describes one part of a multipart/form-data request body.
+// Binary fields (format: binary) emit two Go parameters: a filename string
+// and an io.Reader content. Non-binary fields emit one typed parameter.
+type GoMultipartField struct {
+	Name   string // spec field name ("file")
+	GoName string // Go param identifier (camelCase)
+	IsFile bool
+	Type   string // Go type for non-file fields
 }
 
 type GeneratedFile struct {
@@ -1079,6 +1090,31 @@ func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
 	return methods, nil
 }
 
+// extractMultipartFields walks a multipart/form-data request body schema's
+// properties and returns a list of multipart fields for generator use.
+// Binary fields (format: binary) become file uploads; other scalars become
+// string form fields.
+func extractMultipartFields(schema *openapi3.Schema) []GoMultipartField {
+	if schema == nil {
+		return nil
+	}
+	fields := make([]GoMultipartField, 0, len(schema.Properties))
+	for _, name := range sortedKeys(schema.Properties) {
+		prop := schema.Properties[name].Value
+		isFile := prop != nil && prop.Type != nil && prop.Type.Is("string") && prop.Format == "binary"
+		f := GoMultipartField{
+			Name:   name,
+			GoName: toLowerCamelCase(name),
+			IsFile: isFile,
+		}
+		if !isFile && prop != nil {
+			f.Type = schemaRefToGoType(schema.Properties[name])
+		}
+		fields = append(fields, f)
+	}
+	return fields
+}
+
 // isRateLimited reports whether the operation carries x-rate-limit: true.
 // kin-openapi stores vendor extensions as raw JSON bytes keyed by the
 // extension name.
@@ -1184,10 +1220,14 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 
 	// Request body
 	if op.RequestBody != nil && op.RequestBody.Value != nil {
-		for _, content := range op.RequestBody.Value.Content {
-			if content.Schema != nil {
-				m.RequestType = refName(content.Schema)
-				break
+		if mpContent, ok := op.RequestBody.Value.Content["multipart/form-data"]; ok && mpContent.Schema != nil && mpContent.Schema.Value != nil {
+			m.MultipartFields = extractMultipartFields(mpContent.Schema.Value)
+		} else {
+			for _, content := range op.RequestBody.Value.Content {
+				if content.Schema != nil {
+					m.RequestType = refName(content.Schema)
+					break
+				}
 			}
 		}
 	}
@@ -1207,6 +1247,9 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 }
 
 func categorize(m GoMethod) string {
+	if len(m.MultipartFields) > 0 {
+		return "multipart"
+	}
 	if m.UnwrapResults != "" {
 		return "unwrap"
 	}
@@ -1419,6 +1462,20 @@ var funcMap = template.FuncMap{
 		return ", " + strings.Join(args, ", ")
 	},
 	"isStringSlice": func(s string) bool { return s == "[]string" },
+	"testMultipartArgs": func(m GoMethod) string {
+		if len(m.MultipartFields) == 0 {
+			return ""
+		}
+		args := make([]string, 0, len(m.MultipartFields)*2)
+		for _, f := range m.MultipartFields {
+			if f.IsFile {
+				args = append(args, `"test.bin"`, `bytes.NewBufferString("stub")`)
+			} else {
+				args = append(args, `""`)
+			}
+		}
+		return ", " + strings.Join(args, ", ")
+	},
 }
 
 var sourceTmpl = template.Must(template.New("source").Funcs(funcMap).Parse(sourceTemplate))
@@ -1481,6 +1538,8 @@ type {{ .Name }} = string
 {{ template "actionWithResponse" . }}
 {{- else if eq .Category "update" }}
 {{ template "update" . }}
+{{- else if eq .Category "multipart" }}
+{{ template "multipart" . }}
 {{- else }}
 {{ template "action" . }}
 {{- end }}
@@ -1604,6 +1663,48 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 }
 {{ end }}
 
+{{- define "multipart" }}
+// {{ .Comment }}
+{{- if .ResponseType }}
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .MultipartFields }}{{ if .IsFile }}, {{ .GoName }}Filename string, {{ .GoName }} io.Reader{{ else }}, {{ .GoName }} {{ .Type }}{{ end }}{{ end }}) (*{{ .ResponseType }}, error) {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	var result {{ .ResponseType }}
+	endpoint := {{ fmtPath . }}
+	parts := []client.MultipartField{
+{{- range .MultipartFields }}
+{{- if .IsFile }}
+		{Name: "{{ .Name }}", Filename: {{ .GoName }}Filename, Content: {{ .GoName }}},
+{{- else }}
+		{Name: "{{ .Name }}", Value: {{ .GoName }}},
+{{- end }}
+{{- end }}
+	}
+	if err := c.transport.DoMultipart(ctx, {{ httpConst .HTTPMethod }}, endpoint, parts, {{ statusConst .ExpectedStatus }}, &result); err != nil {
+		return nil, fmt.Errorf({{ errWrap . }})
+	}
+	return &result, nil
+}
+{{- else }}
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .MultipartFields }}{{ if .IsFile }}, {{ .GoName }}Filename string, {{ .GoName }} io.Reader{{ else }}, {{ .GoName }} {{ .Type }}{{ end }}{{ end }}) error {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	endpoint := {{ fmtPath . }}
+	parts := []client.MultipartField{
+{{- range .MultipartFields }}
+{{- if .IsFile }}
+		{Name: "{{ .Name }}", Filename: {{ .GoName }}Filename, Content: {{ .GoName }}},
+{{- else }}
+		{Name: "{{ .Name }}", Value: {{ .GoName }}},
+{{- end }}
+{{- end }}
+	}
+	if err := c.transport.DoMultipart(ctx, {{ httpConst .HTTPMethod }}, endpoint, parts, {{ statusConst .ExpectedStatus }}, nil); err != nil {
+		return fmt.Errorf({{ errWrap . }})
+	}
+	return nil
+}
+{{- end }}
+{{ end }}
+
 {{- define "unwrap" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .UnwrapResults }}, error) {
@@ -1711,6 +1812,8 @@ import (
 <% template "testActionWithResponse" . %>
 <%- else if eq .Category "update" %>
 <% template "testUpdate" . %>
+<%- else if eq .Category "multipart" %>
+<% template "testMultipart" . %>
 <%- else %>
 <% template "testAction" . %>
 <%- end %>
@@ -1807,6 +1910,39 @@ func Test<% .Name %>(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+<% end %>
+
+<%- define "testMultipart" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != <% httpConst .HTTPMethod %> {
+			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
+		}
+		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
+			t.Errorf("Content-Type = %q, want multipart/form-data", ct)
+		}
+		<%- if .ResponseType %>
+		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})
+		<%- else %>
+		w.WriteHeader(<% statusConst .ExpectedStatus %>)
+		<%- end %>
+	})
+
+	<%- if .ResponseType %>
+	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testMultipartArgs . %>)
+	<%- else %>
+	err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testMultipartArgs . %>)
+	<%- end %>
+	if err != nil {
+		t.Fatal(err)
+	}
+	<%- if .ResponseType %>
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+	<%- end %>
 }
 <% end %>
 
