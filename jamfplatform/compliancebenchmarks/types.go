@@ -5,6 +5,8 @@
 
 package compliancebenchmarks
 
+import "time"
+
 // BaselineInfo represents a baseline info.
 type BaselineInfo struct {
 	BaselineID  string `json:"baselineId"`
@@ -38,7 +40,7 @@ type BenchmarkResponseV2 struct {
 	Deleted            bool       `json:"deleted"`
 	Description        string     `json:"description"`
 	EnforcementMode    string     `json:"enforcementMode"`
-	LastUpdatedAt      string     `json:"lastUpdatedAt"`
+	LastUpdatedAt      time.Time  `json:"lastUpdatedAt"`
 	Rules              []RuleInfo `json:"rules"`
 	Sources            []Source   `json:"sources"`
 	Target             *TargetV2  `json:"target,omitempty"`

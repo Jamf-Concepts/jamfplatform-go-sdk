@@ -60,6 +60,15 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 		if inlineObject {
 			nested := parentName + exportedGoName(propName)
 			nested = uniqueSchemaName(doc, nested)
+			// Preserve the original property name as the hoisted schema's
+			// XML wire name so its XMLName tag matches the containing
+			// field's xml tag (Go's encoding/xml enforces agreement).
+			if v.XML == nil {
+				v.XML = &openapi3.XML{}
+			}
+			if v.XML.Name == "" {
+				v.XML.Name = propName
+			}
 			doc.Components.Schemas[nested] = &openapi3.SchemaRef{Value: v}
 			hoisted = true
 			return &openapi3.SchemaRef{Ref: "#/components/schemas/" + nested, Value: v}
@@ -67,6 +76,15 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 		// inline array of object — hoist the element schema.
 		nested := parentName + exportedGoName(propName) + "Item"
 		nested = uniqueSchemaName(doc, nested)
+		if v.Items.Value.XML == nil {
+			v.Items.Value.XML = &openapi3.XML{}
+		}
+		if v.Items.Value.XML.Name == "" {
+			// Array element wire name defaults to the Jamf convention of
+			// singular of the plural property name. Best-effort — curator
+			// can fix via xml metadata if needed.
+			v.Items.Value.XML.Name = singularize(propName)
+		}
 		doc.Components.Schemas[nested] = &openapi3.SchemaRef{Value: v.Items.Value}
 		v.Items = &openapi3.SchemaRef{Ref: "#/components/schemas/" + nested, Value: v.Items.Value}
 		hoisted = true
@@ -76,6 +94,22 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 		schema.Properties[propName] = lift(propName, schema.Properties[propName])
 	}
 	return hoisted
+}
+
+// singularize returns a best-effort singular form of a plural noun — used
+// as the default XML element name for array items when the spec doesn't
+// provide one. Handles the common English plural suffixes Jamf uses
+// (-ies, -s). Curators can override via explicit xml metadata.
+func singularize(plural string) string {
+	switch {
+	case strings.HasSuffix(plural, "ies"):
+		return plural[:len(plural)-3] + "y"
+	case strings.HasSuffix(plural, "ses"):
+		return plural[:len(plural)-2]
+	case strings.HasSuffix(plural, "s") && !strings.HasSuffix(plural, "ss"):
+		return plural[:len(plural)-1]
+	}
+	return plural
 }
 
 // uniqueSchemaName disambiguates a proposed schema name if the name is
@@ -314,10 +348,13 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 			continue
 		}
 		name := goTypeName(specName)
+		xmlName := xmlWireName(specName, schema)
 		// allOf composition without an explicit type: merge properties from
 		// each composed schema into a single flat struct.
 		if len(schema.AllOf) > 0 && (schema.Type == nil || !schema.Type.Is("object")) {
-			types = append(types, schemaToGoType(name, schema, false))
+			t := schemaToGoType(name, schema, false)
+			t.XMLName = xmlName
+			types = append(types, t)
 			continue
 		}
 		if schema.Type == nil {
@@ -325,7 +362,9 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 			// clearly objects (Classic spec does this). If there are
 			// properties, treat it as an object anyway.
 			if len(schema.Properties) > 0 {
-				types = append(types, schemaToGoType(name, schema, usage.isRequest))
+				t := schemaToGoType(name, schema, usage.isRequest)
+				t.XMLName = xmlName
+				types = append(types, t)
 			}
 			continue
 		}
@@ -359,7 +398,9 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 			continue
 		}
 
-		types = append(types, schemaToGoType(name, schema, usage.isRequest))
+		t := schemaToGoType(name, schema, usage.isRequest)
+		t.XMLName = xmlName
+		types = append(types, t)
 	}
 	return types
 }
@@ -540,6 +581,14 @@ func schemaRefToGoType(ref *openapi3.SchemaRef) string {
 		if schema.Format == "byte" {
 			return "[]byte"
 		}
+		// OpenAPI format: date-time is ISO 8601 / RFC 3339 per the Jamf
+		// style guide. Emit as time.Time so callers get parsed timestamps
+		// rather than raw strings; encoding/json handles the RFC 3339
+		// round-trip natively for time.Time. Classic's XML codec also
+		// honors time.Time via xml.MarshalerAttr/Unmarshaler defaults.
+		if schema.Format == "date-time" {
+			return "time.Time"
+		}
 		return "string"
 	case schema.Type.Is("integer"):
 		if schema.Format == "int64" {
@@ -590,4 +639,15 @@ func goTypeName(specName string) string {
 		return specName
 	}
 	return exportedGoName(specName)
+}
+
+// xmlWireName returns the root XML element name a schema serializes to.
+// Spec-level xml.name overrides take priority (e.g. computer_post -> <computer>);
+// otherwise the schema's original name is used verbatim (which for Classic
+// is already the wire shape since the spec is snake_case).
+func xmlWireName(specName string, schema *openapi3.Schema) string {
+	if schema != nil && schema.XML != nil && schema.XML.Name != "" {
+		return schema.XML.Name
+	}
+	return specName
 }

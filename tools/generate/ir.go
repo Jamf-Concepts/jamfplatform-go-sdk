@@ -13,6 +13,7 @@ type GoType struct {
 	Fields        []GoField
 	IsRawJSON     bool
 	Discriminator *GoDiscriminator
+	XMLName       string // wire element name when format=xml and it differs from Go type name; emitted as XMLName xml.Name `xml:"..."` field
 }
 
 // GoDiscriminator describes a oneOf-with-discriminator polymorphic schema.
@@ -50,9 +51,10 @@ type GoMethod struct {
 	MultipartFields []GoMultipartField
 	PathParams      []GoPathParam
 	QueryParams     []ExtraParam
-	RequestType     string
-	ResponseType    string
-	ExpectedStatus  int
+	RequestType       string
+	ResponseType      string
+	ResponseWireName  string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies
+	ExpectedStatus    int
 	ContentType     string
 	PaginationStyle string
 	PageSizeParam   string

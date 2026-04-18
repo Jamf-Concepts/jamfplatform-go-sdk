@@ -5,6 +5,8 @@
 
 package devices
 
+import "time"
+
 // ApiErrorRepresentation represents a api error representation.
 type ApiErrorRepresentation struct {
 	Errors     []ApiErrorRepresentationErrorsItem `json:"errors"`
@@ -41,17 +43,17 @@ type DeviceInstalledApplicationReadRepresentationV1 struct {
 
 // DeviceListReadRepresentationV1 represents a device list read representation v1.
 type DeviceListReadRepresentationV1 struct {
-	EnrollmentType          string  `json:"enrollmentType"`
-	ID                      string  `json:"id"`
-	LastCheckInTime         *string `json:"lastCheckInTime,omitempty"`
-	LastEnrollmentTime      string  `json:"lastEnrollmentTime"`
-	LastInventoryUpdateTime string  `json:"lastInventoryUpdateTime"`
-	Model                   string  `json:"model"`
-	ModelIdentifier         string  `json:"modelIdentifier"`
-	Name                    string  `json:"name"`
-	OperatingSystemVersion  string  `json:"operatingSystemVersion"`
-	SerialNumber            string  `json:"serialNumber"`
-	UserID                  *string `json:"userId,omitempty"`
+	EnrollmentType          string     `json:"enrollmentType"`
+	ID                      string     `json:"id"`
+	LastCheckInTime         *time.Time `json:"lastCheckInTime,omitempty"`
+	LastEnrollmentTime      *time.Time `json:"lastEnrollmentTime,omitempty"`
+	LastInventoryUpdateTime *time.Time `json:"lastInventoryUpdateTime,omitempty"`
+	Model                   string     `json:"model"`
+	ModelIdentifier         string     `json:"modelIdentifier"`
+	Name                    string     `json:"name"`
+	OperatingSystemVersion  string     `json:"operatingSystemVersion"`
+	SerialNumber            string     `json:"serialNumber"`
+	UserID                  *string    `json:"userId,omitempty"`
 }
 
 // DeviceNetworkReadRepresentationV1 represents a device network read representation v1.
@@ -75,9 +77,9 @@ type DeviceReadRepresentationV1 struct {
 	EnrollmentType          string                                     `json:"enrollmentType"`
 	Hardware                *DeviceHardwareReadRepresentationV1        `json:"hardware,omitempty"`
 	ID                      string                                     `json:"id"`
-	LastCheckInTime         *string                                    `json:"lastCheckInTime,omitempty"`
-	LastEnrollmentTime      string                                     `json:"lastEnrollmentTime"`
-	LastInventoryUpdateTime string                                     `json:"lastInventoryUpdateTime"`
+	LastCheckInTime         *time.Time                                 `json:"lastCheckInTime,omitempty"`
+	LastEnrollmentTime      *time.Time                                 `json:"lastEnrollmentTime,omitempty"`
+	LastInventoryUpdateTime *time.Time                                 `json:"lastInventoryUpdateTime,omitempty"`
 	Managed                 bool                                       `json:"managed"`
 	MDMCapable              bool                                       `json:"mdmCapable"`
 	Name                    string                                     `json:"name"`

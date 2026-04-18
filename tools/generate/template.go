@@ -175,6 +175,9 @@ func (m {{ .Name }}) MarshalJSON() ([]byte, error) {
 {{- else if .Fields }}
 // {{ .Comment }}
 type {{ .Name }} struct {
+{{- if and (eq $.Format "xml") .XMLName }}
+	XMLName xml.Name ` + "`" + `xml:"{{ .XMLName }}"` + "`" + `
+{{- end }}
 {{- range .Fields }}
 {{- if .Comment }}
 	// {{ .Comment }}
@@ -541,7 +544,7 @@ func Test<% .Name %>(t *testing.T) {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
 		}
 		<%- if eq .Format "xml" %>
-		writeXML(t, w, http.StatusOK, "<<% .ResponseType %>></<% .ResponseType %>>")
+		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
 		<%- else %>
 		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 		<%- end %>

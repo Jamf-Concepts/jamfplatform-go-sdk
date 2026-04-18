@@ -181,6 +181,15 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 	}
 	if opDef.ResponseType != "" {
 		m.ResponseType = goTypeName(opDef.ResponseType)
+		// XML wire name is the raw spec name unless the schema overrides
+		// via xml.name — test stubs emit <wireName> bodies so the generated
+		// type's XMLName check passes.
+		m.ResponseWireName = opDef.ResponseType
+		if doc.Components != nil && doc.Components.Schemas != nil {
+			if ref, ok := doc.Components.Schemas[opDef.ResponseType]; ok && ref.Value != nil && ref.Value.XML != nil && ref.Value.XML.Name != "" {
+				m.ResponseWireName = ref.Value.XML.Name
+			}
+		}
 	}
 	if opDef.ExpectedStatus != 0 {
 		m.ExpectedStatus = opDef.ExpectedStatus

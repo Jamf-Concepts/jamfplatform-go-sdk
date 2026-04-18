@@ -7,6 +7,7 @@ package blueprints
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // ApiError represents a api error.
@@ -18,24 +19,24 @@ type ApiError struct {
 
 // BlueprintDetail represents a blueprint detail.
 type BlueprintDetail struct {
-	Created         string           `json:"created"`
+	Created         time.Time        `json:"created"`
 	DeploymentState *DeploymentState `json:"deploymentState,omitempty"`
 	Description     *string          `json:"description,omitempty"`
 	ID              string           `json:"id"`
 	Name            string           `json:"name"`
 	Scope           *BlueprintScope  `json:"scope,omitempty"`
 	Steps           []BlueprintStep  `json:"steps"`
-	Updated         string           `json:"updated"`
+	Updated         time.Time        `json:"updated"`
 }
 
 // BlueprintOverview Array of result items.
 type BlueprintOverview struct {
-	Created         string           `json:"created"`
+	Created         time.Time        `json:"created"`
 	DeploymentState *DeploymentState `json:"deploymentState,omitempty"`
 	Description     *string          `json:"description,omitempty"`
 	ID              string           `json:"id"`
 	Name            string           `json:"name"`
-	Updated         string           `json:"updated"`
+	Updated         time.Time        `json:"updated"`
 }
 
 // BlueprintScope Device groups.
@@ -92,8 +93,8 @@ type CreateScope struct {
 
 // Deployment Information about last deployment job.
 type Deployment struct {
-	Started string `json:"started"`
-	State   string `json:"state"`
+	Started time.Time `json:"started"`
+	State   string    `json:"state"`
 }
 
 // DeploymentState Blueprint deployment state.

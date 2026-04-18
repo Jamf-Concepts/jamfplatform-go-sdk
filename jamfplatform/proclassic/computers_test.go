@@ -17,7 +17,7 @@ func TestGetComputerByID(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeXML(t, w, http.StatusOK, "<Computer></Computer>")
+		writeXML(t, w, http.StatusOK, "<computer></computer>")
 	})
 
 	result, err := c.GetComputerByID(context.Background(), "test-id")

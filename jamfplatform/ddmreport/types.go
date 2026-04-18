@@ -5,6 +5,8 @@
 
 package ddmreport
 
+import "time"
+
 // ApiErrorDto represents a api error dto.
 type ApiErrorDto struct {
 	Errors     []ErrorDto `json:"errors"`
@@ -16,7 +18,7 @@ type ApiErrorDto struct {
 type DeclarationReportClientDto struct {
 	Active        bool                               `json:"active"`
 	Channel       string                             `json:"channel"`
-	DateUpdated   string                             `json:"dateUpdated"`
+	DateUpdated   *time.Time                         `json:"dateUpdated,omitempty"`
 	DeviceID      string                             `json:"deviceId"`
 	Reasons       []StatusReportDeclarationReasonDto `json:"reasons"`
 	ServerToken   string                             `json:"serverToken"`
@@ -34,7 +36,7 @@ type DeclarationReportDto struct {
 type DeviceReportChannelDto struct {
 	Channel        string                       `json:"channel"`
 	Declarations   []StatusReportDeclarationDto `json:"declarations"`
-	LastReportTime string                       `json:"lastReportTime"`
+	LastReportTime time.Time                    `json:"lastReportTime"`
 }
 
 // DeviceReportDto represents a device report dto.
@@ -53,7 +55,7 @@ type ErrorDto struct {
 // StatusReportDeclarationDto represents a status report declaration dto.
 type StatusReportDeclarationDto struct {
 	Active                bool                               `json:"active"`
-	DateUpdated           string                             `json:"dateUpdated"`
+	DateUpdated           *time.Time                         `json:"dateUpdated,omitempty"`
 	DeclarationIdentifier string                             `json:"declarationIdentifier"`
 	Reasons               []StatusReportDeclarationReasonDto `json:"reasons"`
 	ServerToken           string                             `json:"serverToken"`
