@@ -3,7 +3,7 @@
 // Copyright Jamf Software LLC 2026
 // SPDX-License-Identifier: MIT
 
-package jamfplatform
+package ddmreport
 
 import (
 	"context"

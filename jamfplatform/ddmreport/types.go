@@ -3,18 +3,7 @@
 // Copyright Jamf Software LLC 2026
 // SPDX-License-Identifier: MIT
 
-package jamfplatform
-
-import (
-	"context"
-	"fmt"
-	"net/http"
-	"net/url"
-	"strconv"
-	"strings"
-
-	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
-)
+package ddmreport
 
 // ---------------------------------------------------------------------------
 // Types
@@ -93,41 +82,3 @@ type StatusReportDeclarationReasonDto struct {
 // ---------------------------------------------------------------------------
 // Methods
 // ---------------------------------------------------------------------------
-
-// GetDeviceDeclarationReport get device report declarations.
-func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string) (*DeviceReportDto, error) {
-	prefix := c.transport.TenantPrefix("ddm/report", "v1")
-	var result DeviceReportDto
-	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(deviceID))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetDeviceDeclarationReport(%s): %w", deviceID, err)
-	}
-	return &result, nil
-}
-
-// ListDeclarationReportClients get declaration report devices.
-func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationIdentifier string, sort []string) ([]DeclarationReportClientDto, error) {
-	prefix := c.transport.TenantPrefix("ddm/report", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeclarationReportClientDto, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-
-		endpoint := fmt.Sprintf("%s/declarations/%s", prefix, url.PathEscape(declarationIdentifier))
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                          `json:"totalCount"`
-			Results    []DeclarationReportClientDto `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}

@@ -3,7 +3,7 @@
 // Copyright Jamf Software LLC 2026
 // SPDX-License-Identifier: MIT
 
-package jamfplatform
+package devicegroups
 
 import (
 	"context"
@@ -19,95 +19,6 @@ import (
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-
-// ApiErrorCauseRepresentation represents a api error cause representation.
-type ApiErrorCauseRepresentation struct {
-	Code        string `json:"code"`
-	Description string `json:"description"`
-	Field       string `json:"field"`
-	ID          string `json:"id"`
-}
-
-// DeviceGroupCreateRepresentationV1 represents a device group create representation v1.
-type DeviceGroupCreateRepresentationV1 struct {
-	Criteria    *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
-	Description *string                                `json:"description,omitempty"`
-	DeviceType  DeviceTypeV1                           `json:"deviceType"`
-	GroupType   GroupTypeV1                            `json:"groupType"`
-	Members     *[]string                              `json:"members,omitempty"`
-	Name        string                                 `json:"name"`
-}
-
-// DeviceGroupCriteriaRepresentationV1 represents a device group criteria representation v1.
-type DeviceGroupCriteriaRepresentationV1 struct {
-	AttributeName         string     `json:"attributeName"`
-	AttributeValue        string     `json:"attributeValue"`
-	HasClosingParenthesis *bool      `json:"hasClosingParenthesis,omitempty"`
-	HasOpeningParenthesis *bool      `json:"hasOpeningParenthesis,omitempty"`
-	JoinType              JoinTypeV1 `json:"joinType"`
-	Operator              string     `json:"operator"`
-	Order                 int        `json:"order"`
-}
-
-// DeviceGroupListReadRepresentationV1 represents a device group list read representation v1.
-type DeviceGroupListReadRepresentationV1 struct {
-	Description string       `json:"description"`
-	DeviceType  DeviceTypeV1 `json:"deviceType"`
-	GroupType   GroupTypeV1  `json:"groupType"`
-	ID          string       `json:"id"`
-	MemberCount int          `json:"memberCount"`
-	Name        string       `json:"name"`
-}
-
-// DeviceGroupMemberOfRepresentationV1 represents a device group member of representation v1.
-type DeviceGroupMemberOfRepresentationV1 struct {
-	GroupID   string `json:"groupId"`
-	GroupName string `json:"groupName"`
-}
-
-// DeviceGroupMemberPatchRepresentationV1 represents a device group member patch representation v1.
-type DeviceGroupMemberPatchRepresentationV1 struct {
-	Added   *[]string `json:"added,omitempty"`
-	Removed *[]string `json:"removed,omitempty"`
-}
-
-// DeviceGroupReadRepresentationV1 represents a device group read representation v1.
-type DeviceGroupReadRepresentationV1 struct {
-	Criteria    *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
-	Description string                                 `json:"description"`
-	DeviceType  DeviceTypeV1                           `json:"deviceType"`
-	GroupType   GroupTypeV1                            `json:"groupType"`
-	ID          string                                 `json:"id"`
-	MemberCount int                                    `json:"memberCount"`
-	Name        string                                 `json:"name"`
-}
-
-// DeviceGroupUpdateRepresentationV1 represents a device group update representation v1.
-type DeviceGroupUpdateRepresentationV1 struct {
-	Criteria    *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
-	Description *string                                `json:"description,omitempty"`
-	Name        *string                                `json:"name,omitempty"`
-}
-
-// DeviceTypeV1 represents a device type v1 value.
-type DeviceTypeV1 = string
-
-// GroupTypeV1 represents a group type v1 value.
-type GroupTypeV1 = string
-
-// HrefRepresentation represents a href representation.
-type HrefRepresentation struct {
-	Href string `json:"href"`
-	ID   string `json:"id"`
-}
-
-// JoinTypeV1 represents a join type v1 value.
-type JoinTypeV1 = string
-
-// ListResponseRepresentation represents a list response representation.
-type ListResponseRepresentation struct {
-	TotalCount int `json:"totalCount"`
-}
 
 // ---------------------------------------------------------------------------
 // Methods

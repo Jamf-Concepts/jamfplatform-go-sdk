@@ -3,7 +3,7 @@
 // Copyright Jamf Software LLC 2026
 // SPDX-License-Identifier: MIT
 
-package jamfplatform
+package deviceactions
 
 import (
 	"context"
@@ -15,21 +15,6 @@ import (
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-
-// DeviceCommandResponse represents a device command response.
-type DeviceCommandResponse struct {
-	CommandID string `json:"commandId"`
-	DeviceID  string `json:"deviceId"`
-}
-
-// EraseDeviceRequest represents a erase device request.
-type EraseDeviceRequest struct {
-	ClearActivationLock    *bool   `json:"clearActivationLock,omitempty"`
-	DisallowProximitySetup *bool   `json:"disallowProximitySetup,omitempty"`
-	Pin                    *string `json:"pin,omitempty"`
-	PreserveDataPlan       *bool   `json:"preserveDataPlan,omitempty"`
-	ReturnToService        *bool   `json:"returnToService,omitempty"`
-}
 
 // ---------------------------------------------------------------------------
 // Methods

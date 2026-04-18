@@ -3,14 +3,7 @@
 // Copyright Jamf Software LLC 2026
 // SPDX-License-Identifier: MIT
 
-package jamfplatform
-
-import (
-	"context"
-	"fmt"
-	"net/http"
-	"net/url"
-)
+package compliancebenchmarks
 
 // ---------------------------------------------------------------------------
 // Types
@@ -163,78 +156,53 @@ type ValidationConstraints struct {
 	Regex      string   `json:"regex"`
 }
 
+// ApiError represents a api error.
+type ApiError struct {
+	Errors     []map[string]any `json:"errors"`
+	HttpStatus int              `json:"httpStatus"`
+	TraceID    string           `json:"traceId"`
+}
+
+// BenchmarkRuleDevicesResponse Representation of devices for a benchmark rule. Used for drill-down view controller.
+type BenchmarkRuleDevicesResponse struct {
+	Results    []DeviceRuleResult `json:"results"`
+	TotalCount int                `json:"totalCount"`
+}
+
+// BenchmarkRulesStatsResponse Representation of rules results for whole benchmark. Used for top-level view controller.
+type BenchmarkRulesStatsResponse struct {
+	Results    []RuleResult `json:"results"`
+	TotalCount int          `json:"totalCount"`
+}
+
+// CompliancePercentage represents a compliance percentage.
+type CompliancePercentage struct {
+	CompliancePercentage float32 `json:"compliancePercentage"`
+}
+
+// DeviceRuleResult represents a device rule result.
+type DeviceRuleResult struct {
+	DeviceID   string          `json:"deviceId"`
+	DeviceName *string         `json:"deviceName,omitempty"`
+	State      RuleResultState `json:"state"`
+}
+
+// RuleResult represents a rule result.
+type RuleResult struct {
+	Discussion      string  `json:"discussion"`
+	Failed          int     `json:"failed"`
+	NumberOfDevices int     `json:"numberOfDevices"`
+	PassPercentage  float32 `json:"passPercentage"`
+	Passed          int     `json:"passed"`
+	RuleID          string  `json:"ruleId"`
+	RuleNumber      string  `json:"ruleNumber"`
+	RuleTitle       string  `json:"ruleTitle"`
+	Unknown         int     `json:"unknown"`
+}
+
+// RuleResultState represents a rule result state value.
+type RuleResultState = string
+
 // ---------------------------------------------------------------------------
 // Methods
 // ---------------------------------------------------------------------------
-
-// ListBenchmarks returns list of tenant benchmarks.
-func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
-	var result BenchmarksResponseV2
-	endpoint := prefix + "/benchmarks"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("ListBenchmarks: %w", err)
-	}
-	return &result, nil
-}
-
-// CreateBenchmark creates a new benchmark from provided benchmark request.
-func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV2) (*BenchmarkResponseV2, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
-	var result BenchmarkResponseV2
-	endpoint := prefix + "/benchmarks"
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusAccepted, &result); err != nil {
-		return nil, fmt.Errorf("CreateBenchmark: %w", err)
-	}
-	return &result, nil
-}
-
-// GetBenchmark returns benchmark for given benchmark ID.
-func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkResponseV2, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
-	var result BenchmarkResponseV2
-	endpoint := fmt.Sprintf("%s/benchmarks/%s", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetBenchmark(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// DeleteBenchmark removes benchmark with given benchmark ID.
-func (c *Client) DeleteBenchmark(ctx context.Context, benchmarkID string) error {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
-	endpoint := fmt.Sprintf("%s/benchmarks/%s", prefix, url.PathEscape(benchmarkID))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteBenchmark(%s): %w", benchmarkID, err)
-	}
-	return nil
-}
-
-// ListBaselines returns list of the mSCP baselines.
-func (c *Client) ListBaselines(ctx context.Context) (*BaselinesResponse, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
-	var result BaselinesResponse
-	endpoint := prefix + "/baselines"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("ListBaselines: %w", err)
-	}
-	return &result, nil
-}
-
-// GetBaselineRules get list of rules for given baseline.
-func (c *Client) GetBaselineRules(ctx context.Context, baselineID string) (*SourcedRules, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
-	var result SourcedRules
-	endpoint := prefix + "/rules"
-	params := url.Values{}
-	if baselineID != "" {
-		params.Set("baselineId", baselineID)
-	}
-	if encoded := params.Encode(); encoded != "" {
-		endpoint += "?" + encoded
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetBaselineRules: %w", err)
-	}
-	return &result, nil
-}
