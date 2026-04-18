@@ -68,6 +68,13 @@ func (c *Client) AccessToken(ctx context.Context) (*oauth2.Token, error) {
 	return c.transport.AccessToken(ctx)
 }
 
+// Transport returns the underlying transport used by sub-package clients in
+// jamfplatform/. Sub-package constructors (e.g. devices.New) call this to
+// share the authenticated HTTP layer.
+func (c *Client) Transport() *client.Transport {
+	return c.transport
+}
+
 // clientConfig holds configuration applied via Option functions.
 type clientConfig struct {
 	userAgent  string

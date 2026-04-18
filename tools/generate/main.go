@@ -46,6 +46,7 @@ type SpecDef struct {
 	File           string         `json:"file"`
 	Namespace      string         `json:"namespace"`
 	SpecFile       string         `json:"specFile,omitempty"`       // override published spec filename
+	Package        string         `json:"package,omitempty"`        // target Go sub-package under jamfplatform/; empty emits to root (legacy)
 	Operations     []OperationDef `json:"operations"`
 	ExcludePaths   []string       `json:"excludePaths,omitempty"`   // "METHOD /path" entries the generator must refuse to include
 	SkipDeprecated bool           `json:"skipDeprecated,omitempty"` // omit operations marked deprecated in the spec
