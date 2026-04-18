@@ -42,6 +42,7 @@ type Transport struct {
 	userAgent   string
 	tokenCache  TokenCache
 	cacheKey    string
+	cookieJar   http.CookieJar
 }
 
 // PaginatedResponseRepresentation captures pagination metadata shared by multiple endpoints.
@@ -138,6 +139,15 @@ func WithTenantID(id string) Option {
 	}
 }
 
+// WithCookieJar overrides the default in-memory cookie jar. Typically used to
+// install a persistent jar (e.g. FileCookieJar) so sticky-session cookies
+// survive across process invocations.
+func WithCookieJar(jar http.CookieJar) Option {
+	return func(c *Transport) {
+		c.cookieJar = jar
+	}
+}
+
 // NewTransport creates a new Jamf Platform API transport.
 func NewTransport(baseURL, clientID, clientSecret string) *Transport {
 	return NewTransportWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")
@@ -165,6 +175,10 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 	}
 	if c.tokenCache != nil {
 		c.httpClient = newCachingOAuth2Client(c.oauthConfig, c.baseClient, c.tokenCache, c.cacheKey)
+	}
+	if c.cookieJar != nil {
+		c.httpClient.Jar = c.cookieJar
+		c.baseClient.Jar = c.cookieJar
 	}
 	return c
 }
