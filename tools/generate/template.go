@@ -179,7 +179,7 @@ func (m {{ .Name }}) MarshalJSON() ([]byte, error) {
 // {{ .Comment }}
 type {{ .Name }} struct {
 {{- if and (eq $.Format "xml") .XMLName }}
-	XMLName xml.Name ` + "`" + `xml:"{{ .XMLName }}"` + "`" + `
+	XMLName xml.Name
 {{- end }}
 {{- range .Fields }}
 {{- if .Comment }}
@@ -192,6 +192,22 @@ type {{ .Name }} struct {
 {{- end }}
 {{- end }}
 }
+
+{{- if and (eq $.Format "xml") .XMLName }}
+
+// MarshalXML forces the {{ .Name }} root element name to the wire value
+// declared by the spec (<{{ .XMLName }}>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t {{ .Name }}) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "{{ .XMLName }}"}
+	type shadow {{ .Name }}
+	return e.EncodeElement(shadow(t), start)
+}
+{{- end }}
 {{- else }}
 // {{ .Comment }}
 type {{ .Name }} = string

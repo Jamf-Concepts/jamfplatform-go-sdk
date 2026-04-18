@@ -373,7 +373,35 @@
         {"op": "GET /webhooks/id/{id}", "name": "GetWebhookByID", "responseType": "webhook", "pathNames": {"id": "id"}},
         {"op": "POST /webhooks/id/{id}", "name": "CreateWebhookByID", "requestType": "webhook", "responseType": "webhook", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /webhooks/id/{id}", "name": "UpdateWebhookByID", "requestType": "webhook", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /webhooks/id/{id}", "name": "DeleteWebhookByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /webhooks/id/{id}", "name": "DeleteWebhookByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /accounts/userid/{id}", "name": "GetAccountByUserID", "responseType": "account", "pathNames": {"id": "id"}},
+        {"op": "POST /accounts/userid/{id}", "name": "CreateAccountByUserID", "requestType": "account", "responseType": "account", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /accounts/userid/{id}", "name": "UpdateAccountByUserID", "requestType": "account", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /accounts/userid/{id}", "name": "DeleteAccountByUserID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /accounts/groupid/{id}", "name": "GetAccountGroupByID", "responseType": "group", "pathNames": {"id": "id"}},
+        {"op": "POST /accounts/groupid/{id}", "name": "CreateAccountGroupByID", "requestType": "group", "responseType": "group", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /accounts/groupid/{id}", "name": "UpdateAccountGroupByID", "requestType": "group", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /accounts/groupid/{id}", "name": "DeleteAccountGroupByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /computerinvitations/id/{id}", "name": "GetComputerInvitationByID", "responseType": "computer_invitation", "pathNames": {"id": "id"}},
+        {"op": "POST /computerinvitations/id/{id}", "name": "CreateComputerInvitationByID", "requestType": "computer_invitation", "responseType": "computer_invitation", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /computerinvitations/id/{id}", "name": "DeleteComputerInvitationByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /mobiledeviceinvitations/id/{id}", "name": "GetMobileDeviceInvitationByID", "responseType": "mobile_device_invitation", "pathNames": {"id": "id"}},
+        {"op": "POST /mobiledeviceinvitations/id/{id}", "name": "CreateMobileDeviceInvitationByID", "requestType": "mobile_device_invitation_post", "responseType": "mobile_device_invitation", "pathNames": {"id": "id"}, "expectedStatus": 200},
+        {"op": "DELETE /mobiledeviceinvitations/id/{id}", "name": "DeleteMobileDeviceInvitationByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /mobiledeviceenrollmentprofiles/id/{id}", "name": "GetMobileDeviceEnrollmentProfileByID", "responseType": "mobile_device_enrollment_profile", "pathNames": {"id": "id"}},
+        {"op": "POST /mobiledeviceenrollmentprofiles/id/{id}", "name": "CreateMobileDeviceEnrollmentProfileByID", "requestType": "mobile_device_enrollment_profile_post", "responseType": "mobile_device_enrollment_profile", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledeviceenrollmentprofiles/id/{id}", "name": "UpdateMobileDeviceEnrollmentProfileByID", "requestType": "mobile_device_enrollment_profile_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /mobiledeviceenrollmentprofiles/id/{id}", "name": "DeleteMobileDeviceEnrollmentProfileByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /mobiledeviceprovisioningprofiles/id/{id}", "name": "GetMobileDeviceProvisioningProfileByID", "responseType": "mobile_device_provisioning_profile", "pathNames": {"id": "id"}},
+        {"op": "POST /mobiledeviceprovisioningprofiles/id/{id}", "name": "CreateMobileDeviceProvisioningProfileByID", "requestType": "mobile_device_provisioning_profile", "responseType": "mobile_device_provisioning_profile", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledeviceprovisioningprofiles/id/{id}", "name": "UpdateMobileDeviceProvisioningProfileByID", "requestType": "mobile_device_provisioning_profile", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /mobiledeviceprovisioningprofiles/id/{id}", "name": "DeleteMobileDeviceProvisioningProfileByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

@@ -1,6 +1,163 @@
 {
   "components": {
     "schemas": {
+      "account": {
+        "properties": {
+          "access_level": {
+            "enum": [
+              "Full Access",
+              "Site Access",
+              "Group Access"
+            ],
+            "type": "string"
+          },
+          "directory_user": {
+            "type": "boolean"
+          },
+          "email": {
+            "example": "john.smith@company.com",
+            "type": "string"
+          },
+          "email_address": {
+            "example": "john.smith@company.com",
+            "type": "string"
+          },
+          "enabled": {
+            "enum": [
+              "Enabled",
+              "Disabled"
+            ],
+            "type": "string"
+          },
+          "force_password_change": {
+            "type": "boolean"
+          },
+          "full_name": {
+            "example": "John Smith",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "ldap_server": {
+            "properties": {
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "name": {
+                "example": "Directory Server Name",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "description": "Name of the account",
+            "example": "John Smith",
+            "type": "string"
+          },
+          "privilege_set": {
+            "enum": [
+              "Administrator",
+              "Auditor",
+              "Enrollment Only",
+              "Custom"
+            ],
+            "type": "string"
+          },
+          "privileges": {
+            "properties": {
+              "casper_admin": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "casper_imaging": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "casper_remote": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_actions": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_objects": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_settings": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "recon": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "advanced_computer_search": {
         "properties": {
           "computers": {
@@ -1640,6 +1797,98 @@
         },
         "type": "object"
       },
+      "computer_invitation": {
+        "properties": {
+          "create_account_if_does_not_exist": {
+            "default": false,
+            "type": "boolean"
+          },
+          "enroll_into_site": {
+            "properties": {
+              "id": {
+                "default": -1,
+                "type": "integer"
+              },
+              "name": {
+                "default": "None",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "expiration_date": {
+            "description": "Use 'Unlimited' to specify no expiration date",
+            "example": "2012-05-07T11:13:35Z",
+            "type": "string"
+          },
+          "expiration_date_epoch": {
+            "example": 1336407215609,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "expiration_date_utc": {
+            "example": "2012-05-07T11:13:35.609-0500",
+            "readOnly": true,
+            "type": "string"
+          },
+          "hide_account": {
+            "default": false,
+            "type": "boolean"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "invitation": {
+            "example": 7.249663721735319e+37,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "invitation_status": {
+            "example": "INVITATION_EXPIRED",
+            "readOnly": true,
+            "type": "string"
+          },
+          "invitation_type": {
+            "example": "USER_INITATIED_EMAIL",
+            "type": "string"
+          },
+          "invited_user_uuid": {
+            "example": "B87E9AA8-C3DE-4034-821E-1B7D51FD4956",
+            "readOnly": true,
+            "type": "string"
+          },
+          "keep_existing_site_membership": {
+            "default": false,
+            "type": "boolean"
+          },
+          "lock_down_ssh": {
+            "default": false,
+            "type": "boolean"
+          },
+          "multiple_users_allowed": {
+            "default": false,
+            "type": "boolean"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "ssh_password": {
+            "example": "accountpassword",
+            "type": "string"
+          },
+          "ssh_username": {
+            "example": "jamfadmin",
+            "type": "string"
+          },
+          "times_used": {
+            "example": 0,
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "criterion": {
         "properties": {
           "and_or": {
@@ -2457,6 +2706,136 @@
             "type": "object"
           }
         },
+        "type": "object"
+      },
+      "group": {
+        "properties": {
+          "access_level": {
+            "enum": [
+              "Full Access",
+              "Site Access",
+              "Group Access"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "members": {
+            "items": {
+              "properties": {
+                "user": {
+                  "$ref": "#/components/schemas/id_name"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Group name",
+            "example": "Administrators",
+            "type": "string"
+          },
+          "privilege_set": {
+            "enum": [
+              "Administrator",
+              "Auditor",
+              "Enrollment Only",
+              "Custom"
+            ],
+            "type": "string"
+          },
+          "privileges": {
+            "properties": {
+              "casper_admin": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "casper_imaging": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "casper_remote": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_actions": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_objects": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_settings": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "recon": {
+                "items": {
+                  "properties": {
+                    "privilege": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site"
+          }
+        },
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "ibeacon": {
@@ -4861,6 +5240,55 @@
           "name": "configuration_profile"
         }
       },
+      "mobile_device_enrollment_profile": {
+        "properties": {
+          "attachments": {
+            "items": {
+              "properties": {
+                "attachment": {
+                  "$ref": "#/components/schemas/attachment"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "general": {
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "invitation": {
+                "example": 2.0938027893325487e+38,
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the enrollment profile",
+                "example": "Configurator Enrollment Profile",
+                "type": "string"
+              },
+              "udid": {
+                "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "location": {
+            "$ref": "#/components/schemas/location"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/purchasing"
+          }
+        },
+        "type": "object"
+      },
       "mobile_device_extension_attribute": {
         "properties": {
           "date_type": {
@@ -4985,6 +5413,145 @@
           "name",
           "is_smart"
         ],
+        "type": "object"
+      },
+      "mobile_device_invitation": {
+        "properties": {
+          "date_sent": {
+            "example": "2012-05-07T11:13:35Z",
+            "readOnly": true,
+            "type": "string"
+          },
+          "date_sent_epoch": {
+            "example": 1336407215609,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "date_sent_utc": {
+            "example": "2012-05-07T11:13:35.609-0500",
+            "readOnly": true,
+            "type": "string"
+          },
+          "enrolled_into_site": {
+            "properties": {
+              "id": {
+                "default": -1,
+                "type": "integer"
+              },
+              "name": {
+                "default": "None",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "expiration_date": {
+            "default": "Unlimited",
+            "description": "Use 'Unlimited' to specify no expiration",
+            "example": "2012-05-07T11:13:35Z",
+            "type": "string"
+          },
+          "expiration_date_epoch": {
+            "example": 1336407215609,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "expiration_date_utc": {
+            "example": "2012-05-07T11:13:35.609-0500",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "invitation": {
+            "example": 7.249663721735319e+37,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "invitation_type": {
+            "default": "USER_INITIATED_URL",
+            "example": "USER_INITATIED_EMAIL",
+            "type": "string"
+          },
+          "keep_existing_site_membership": {
+            "default": false,
+            "type": "boolean"
+          },
+          "last_action": {
+            "example": "NONE",
+            "readOnly": true,
+            "type": "string"
+          },
+          "login_required": {
+            "default": true,
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "multiple_uses_allowed": {
+            "default": false,
+            "type": "boolean"
+          },
+          "reply_to": {
+            "example": "it@company.com",
+            "readOnly": true,
+            "type": "string"
+          },
+          "sent_from": {
+            "example": "Jamf Pro",
+            "readOnly": true,
+            "type": "string"
+          },
+          "sent_to": {
+            "example": "user@company.com",
+            "readOnly": true,
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "subject": {
+            "example": "Enroll your device",
+            "readOnly": true,
+            "type": "string"
+          },
+          "target_ios": {
+            "example": "iOS 4",
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "mobile_device_provisioning_profile": {
+        "properties": {
+          "general": {
+            "properties": {
+              "display_name": {
+                "example": "in-house app profile",
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "name": {
+                "example": "in-house app profile",
+                "type": "string"
+              },
+              "uuid": {
+                "example": "116AF1E6-7EB5-4335-B598-276CDE5E015B",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
         "type": "object"
       },
       "network_segment": {
@@ -7408,6 +7975,230 @@
   },
   "openapi": "3.0.3",
   "paths": {
+    "/accounts/groupid/{id}": {
+      "delete": {
+        "operationId": "deleteGroupById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a group by ID",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "get": {
+        "operationId": "findGroupsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/group"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/group"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds groups by ID",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "post": {
+        "description": "Groups created via this endpoint are created only within Jamf Pro and will not affect the LDAP server.",
+        "operationId": "createGroupById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new group by ID",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "Groups updated via this endpoint are updated only within Jamf Pro and will not affect the LDAP server.",
+        "operationId": "updateGroupById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing group by ID",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/accounts/userid/{id}": {
+      "delete": {
+        "operationId": "deleteAccountById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes an account by ID",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "get": {
+        "operationId": "findAccountsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/account"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/account"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds accounts by ID",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "post": {
+        "operationId": "createAccountById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new account by ID",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateAccountById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing account by ID",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/advancedcomputersearches/id/{id}": {
       "delete": {
         "operationId": "deleteAdvancedComputerSearchById",
@@ -8474,6 +9265,97 @@
         "summary": "Updates an existing computer group by ID",
         "tags": [
           "computergroups"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/computerinvitations/id/{id}": {
+      "delete": {
+        "operationId": "deleteComputerInvitationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer invitation by id",
+        "tags": [
+          "computerinvitations"
+        ]
+      },
+      "get": {
+        "operationId": "findComputerInvitationsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_invitation"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_invitation"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer invitations by id",
+        "tags": [
+          "computerinvitations"
+        ]
+      },
+      "post": {
+        "operationId": "createComputerInvitationsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_invitation"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new computer invitation by id",
+        "tags": [
+          "computerinvitations"
         ],
         "x-explorer-enabled": false
       }
@@ -10178,6 +11060,115 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledeviceenrollmentprofiles/id/{id}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceEnrollmentProfileById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device enrollment profile by ID",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceEnrollmentProfilesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device enrollment profiles by ID",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ]
+      },
+      "post": {
+        "operationId": "createMobileDeviceEnrollmentProfilesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new mobile device enrollment profile by ID",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateMobileDeviceEnrollmentProfileById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device enrollment profile by ID",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/mobiledeviceextensionattributes/id/{id}": {
       "delete": {
         "operationId": "deleteMobiledeviceextensionattributeById",
@@ -10393,6 +11384,217 @@
         "summary": "Updates an existing mobile device group by ID",
         "tags": [
           "mobiledevicegroups"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceinvitations/id/{id}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceInvitationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device invitation by id",
+        "tags": [
+          "mobiledeviceinvitations"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceInvitationsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_invitation"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_invitation"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device invitations by id",
+        "tags": [
+          "mobiledeviceinvitations"
+        ]
+      },
+      "post": {
+        "operationId": "createMobileDeviceInvitationsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_invitation"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new mobile device invitation by id",
+        "tags": [
+          "mobiledeviceinvitations"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceprovisioningprofiles/id/{id}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceProvisioningProfilesById",
+        "parameters": [
+          {
+            "description": "Id value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device provisioning profiles by id",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceProvisioningProfilesById",
+        "parameters": [
+          {
+            "description": "Id value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a mobile device provisioning profiles by id",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ]
+      },
+      "post": {
+        "operationId": "createMobileDeviceProvisioningProfilesById",
+        "parameters": [
+          {
+            "description": "Id value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a mobile device provisioning profiles by id",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateMobileDeviceProvisioningProfilesById",
+        "parameters": [
+          {
+            "description": "Id value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Updates an existing mobile device provisioning profiles by id",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
         ],
         "x-explorer-enabled": false
       }

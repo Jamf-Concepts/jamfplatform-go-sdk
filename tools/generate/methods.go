@@ -175,6 +175,23 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 
 	m.PathParams = extractPathParams(specPath, opDef.PathNames)
 	m.ExpectedStatus, m.ResponseType = detectResponse(op)
+	// When detectResponse populates ResponseType from the spec, capture
+	// the matching schema's XML wire name so test stubs emit bodies the
+	// generated decoder accepts. The later config-level responseType
+	// override re-derives this, so only fill when both are unset.
+	if m.ResponseType != "" && opDef.ResponseType == "" && doc.Components != nil && doc.Components.Schemas != nil {
+		for specName, ref := range doc.Components.Schemas {
+			if goTypeName(specName) != m.ResponseType {
+				continue
+			}
+			if ref.Value != nil && ref.Value.XML != nil && ref.Value.XML.Name != "" {
+				m.ResponseWireName = ref.Value.XML.Name
+			} else {
+				m.ResponseWireName = specName
+			}
+			break
+		}
+	}
 
 	// Request body
 	if op.RequestBody != nil && op.RequestBody.Value != nil {

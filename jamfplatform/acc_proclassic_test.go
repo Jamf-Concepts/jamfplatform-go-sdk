@@ -884,9 +884,14 @@ func TestAcceptance_Classic_DistributionPointCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 
 	name := "sdk-acc-dp-" + runSuffix()
+	noAuth := true
 	created, err := pc.CreateDistributionPointByID(ctx, "0", &proclassic.DistributionPointPost{
-		Name:     classicStrPtr(name),
-		IPAddress: classicStrPtr("dp.example.test"),
+		Name:                     classicStrPtr(name),
+		IPAddress:                classicStrPtr("dp.example.test"),
+		ShareName:                classicStrPtr("CasperShare"),
+		ReadOnlyUsername:         classicStrPtr("ro-user"),
+		ReadWriteUsername:        classicStrPtr("rw-user"),
+		NoAuthenticationRequired: &noAuth,
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1240,6 +1245,95 @@ func TestAcceptance_Classic_WebhookCRUD(t *testing.T) {
 	_, err = pc.GetWebhookByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+// TestAcceptance_Classic_AccountUserCRUD is skipped: the Classic account
+// schema in v11.20.0 omits the `password` field the server requires on
+// create — the generated Account struct therefore can't send a valid
+// create payload. Endpoint shape is covered by unit tests; restoring
+// live CRUD needs a spec patch or a generator-level extra-field hook.
+func TestAcceptance_Classic_AccountUserCRUD(t *testing.T) {
+	t.Skip("spec omits required account password field; generated struct can't send a valid create payload")
+}
+
+func TestAcceptance_Classic_AccountGroupCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-grp-" + runSuffix()
+	created, err := pc.CreateAccountGroupByID(ctx, "0", &proclassic.Group{
+		Name:         classicStrPtr(name),
+		AccessLevel:  classicStrPtr("Full Access"),
+		PrivilegeSet: classicStrPtr("Administrator"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("forbidden on this tenant: %v", err)
+		}
+		t.Fatalf("CreateAccountGroupByID: %v", err)
+	}
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteAccountGroupByID(ctx, intToStr(id)) })
+	if err := pc.DeleteAccountGroupByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetAccountGroupByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_ComputerInvitationCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	createAccount := false
+	created, err := pc.CreateComputerInvitationByID(ctx, "0", &proclassic.ComputerInvitation{
+		CreateAccountIfDoesNotExist: &createAccount,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) { t.Skipf("forbidden: %v", err) }
+		t.Fatalf("CreateComputerInvitationByID: %v", err)
+	}
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteComputerInvitationByID(ctx, intToStr(id)) })
+	if err := pc.DeleteComputerInvitationByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetComputerInvitationByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+// TestAcceptance_Classic_MobileDeviceInvitationCRUD is skipped: the
+// Classic spec types `invitation` as integer, but the server returns a
+// 39-digit code that overflows int64. Fixing this needs a spec patch
+// (invitation → string) or generator-level type override. Endpoint
+// shape is covered by unit tests.
+func TestAcceptance_Classic_MobileDeviceInvitationCRUD(t *testing.T) {
+	t.Skip("spec types `invitation` as int; server returns a 39-digit code that overflows int64")
+}
+
+func TestAcceptance_Classic_MobileDeviceEnrollmentProfileCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-mdep-" + runSuffix()
+	created, err := pc.CreateMobileDeviceEnrollmentProfileByID(ctx, "0", &proclassic.MobileDeviceEnrollmentProfilePost{
+		General: &proclassic.MobileDeviceEnrollmentProfilePostGeneral{Name: classicStrPtr(name)},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) { t.Skipf("forbidden: %v", err) }
+		t.Fatalf("CreateMobileDeviceEnrollmentProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteMobileDeviceEnrollmentProfileByID(ctx, intToStr(id)) })
+	if err := pc.DeleteMobileDeviceEnrollmentProfileByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetMobileDeviceEnrollmentProfileByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_MobileDeviceProvisioningProfileCRUD(t *testing.T) {
+	t.Skip("mobile_device_provisioning_profile requires a real provisioning profile blob; test scaffolding only covers endpoint shape via unit tests")
 }
 
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
