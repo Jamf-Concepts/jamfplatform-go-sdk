@@ -3,47 +3,51 @@
 
 //go:build acceptance
 
-package jamfplatform
+package jamfplatform_test
 
 import (
 	"context"
 	"encoding/json"
 	"testing"
 	"time"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/blueprints"
 )
 
-func createTestBlueprint(t *testing.T, c *Client, name string, groupID string, steps []BlueprintStep) *BlueprintDetail {
+func createTestBlueprint(t *testing.T, c *jamfplatform.Client, name string, groupID string, steps []blueprints.BlueprintStep) *blueprints.BlueprintDetail {
 	t.Helper()
 	ctx := context.Background()
+	bp := blueprints.New(c)
 
 	desc := "SDK acceptance test — safe to delete"
-	resp, err := c.CreateBlueprint(ctx, &CreateBlueprintRequest{
+	resp, err := bp.CreateBlueprint(ctx, &blueprints.CreateBlueprintRequest{
 		Name:        name,
 		Description: &desc,
-		Scope:       CreateScope{DeviceGroups: []string{groupID}},
+		Scope:       blueprints.CreateScope{DeviceGroups: []string{groupID}},
 		Steps:       steps,
 	})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateBlueprint failed for %q: %v", name, err)
 	}
-	t.Cleanup(func() { _ = c.DeleteBlueprint(ctx, resp.ID) })
+	t.Cleanup(func() { _ = bp.DeleteBlueprint(ctx, resp.ID) })
 
-	bp, err := c.GetBlueprint(ctx, resp.ID)
+	got, err := bp.GetBlueprint(ctx, resp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprint failed for %q: %v", name, err)
 	}
-	return bp
+	return got
 }
 
-func makeStep(identifier string, config any) []BlueprintStep {
+func makeStep(identifier string, config any) []blueprints.BlueprintStep {
 	configJSON, _ := json.Marshal(config)
 	stepName := "Step 1"
-	return []BlueprintStep{
+	return []blueprints.BlueprintStep{
 		{
 			Name: &stepName,
-			Components: []Component{
+			Components: []blueprints.Component{
 				{
 					Identifier:    identifier,
 					Configuration: json.RawMessage(configJSON),
@@ -56,7 +60,7 @@ func makeStep(identifier string, config any) []BlueprintStep {
 func TestAcceptance_ListBlueprints(t *testing.T) {
 	c := accClient(t)
 
-	bps, err := c.ListBlueprints(context.Background(), nil, "")
+	bps, err := blueprints.New(c).ListBlueprints(context.Background(), nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListBlueprints failed: %v", err)
@@ -67,7 +71,7 @@ func TestAcceptance_ListBlueprints(t *testing.T) {
 func TestAcceptance_ListBlueprintsWithSearch(t *testing.T) {
 	c := accClient(t)
 
-	bps, err := c.ListBlueprints(context.Background(), nil, "sdk-acc")
+	bps, err := blueprints.New(c).ListBlueprints(context.Background(), nil, "sdk-acc")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListBlueprints with search failed: %v", err)
@@ -78,7 +82,7 @@ func TestAcceptance_ListBlueprintsWithSearch(t *testing.T) {
 func TestAcceptance_ListBlueprintComponents(t *testing.T) {
 	c := accClient(t)
 
-	comps, err := c.ListBlueprintComponents(context.Background())
+	comps, err := blueprints.New(c).ListBlueprintComponents(context.Background())
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListBlueprintComponents failed: %v", err)
@@ -96,8 +100,9 @@ func TestAcceptance_ListBlueprintComponents(t *testing.T) {
 func TestAcceptance_GetBlueprintComponent(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
+	bp := blueprints.New(c)
 
-	comps, err := c.ListBlueprintComponents(ctx)
+	comps, err := bp.ListBlueprintComponents(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListBlueprintComponents failed: %v", err)
@@ -106,7 +111,7 @@ func TestAcceptance_GetBlueprintComponent(t *testing.T) {
 		t.Skip("No blueprint components available")
 	}
 
-	comp, err := c.GetBlueprintComponent(ctx, comps[0].Identifier)
+	comp, err := bp.GetBlueprintComponent(ctx, comps[0].Identifier)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprintComponent failed for %q: %v", comps[0].Identifier, err)
@@ -122,7 +127,7 @@ func TestAcceptance_Blueprint_EmptyBlueprint(t *testing.T) {
 	c := accClient(t)
 
 	name := "sdk-acc-empty-bp-" + runSuffix()
-	bp := createTestBlueprint(t, c, name, groupID, []BlueprintStep{})
+	bp := createTestBlueprint(t, c, name, groupID, []blueprints.BlueprintStep{})
 
 	if bp.Name != name {
 		t.Errorf("expected name %q, got %q", name, bp.Name)
@@ -157,6 +162,7 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	suffix := runSuffix()
+	bpClient := blueprints.New(c)
 
 	steps := makeStep("com.jamf.ddm.passcode-settings", map[string]any{
 		"RequirePasscode": true,
@@ -166,10 +172,10 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 
 	renamedName := "sdk-acc-update-renamed-" + suffix
 	updatedDesc := "Updated description"
-	err := c.UpdateBlueprint(ctx, bp.ID, &UpdateBlueprintRequest{
+	err := bpClient.UpdateBlueprint(ctx, bp.ID, &blueprints.UpdateBlueprintRequest{
 		Name:        &renamedName,
 		Description: &updatedDesc,
-		Scope:       &BlueprintScope{DeviceGroups: []string{groupID}},
+		Scope:       &blueprints.BlueprintScope{DeviceGroups: []string{groupID}},
 		Steps:       &steps,
 	})
 	if err != nil {
@@ -177,7 +183,7 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 		t.Fatalf("UpdateBlueprint failed: %v", err)
 	}
 
-	updated, err := c.GetBlueprint(ctx, bp.ID)
+	updated, err := bpClient.GetBlueprint(ctx, bp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprint after update failed: %v", err)
@@ -196,6 +202,7 @@ func TestAcceptance_Blueprint_PartialUpdatePreservesSteps(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	suffix := runSuffix()
+	bpClient := blueprints.New(c)
 
 	steps := makeStep("com.jamf.ddm.passcode-settings", map[string]any{
 		"RequirePasscode": true,
@@ -210,7 +217,7 @@ func TestAcceptance_Blueprint_PartialUpdatePreservesSteps(t *testing.T) {
 	// Update only the name — omit Steps entirely.
 	// Before the fix, this would serialize "steps":[] and wipe them.
 	renamedName := "sdk-acc-partial-renamed-" + suffix
-	err := c.UpdateBlueprint(ctx, bp.ID, &UpdateBlueprintRequest{
+	err := bpClient.UpdateBlueprint(ctx, bp.ID, &blueprints.UpdateBlueprintRequest{
 		Name: &renamedName,
 	})
 	if err != nil {
@@ -218,7 +225,7 @@ func TestAcceptance_Blueprint_PartialUpdatePreservesSteps(t *testing.T) {
 		t.Fatalf("UpdateBlueprint (partial) failed: %v", err)
 	}
 
-	updated, err := c.GetBlueprint(ctx, bp.ID)
+	updated, err := bpClient.GetBlueprint(ctx, bp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprint after partial update failed: %v", err)
@@ -236,6 +243,7 @@ func TestAcceptance_Blueprint_Report(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
 	c := accClient(t)
 	ctx := context.Background()
+	bpClient := blueprints.New(c)
 
 	steps := makeStep("com.jamf.ddm.passcode-settings", map[string]any{
 		"RequirePasscode": true,
@@ -243,16 +251,16 @@ func TestAcceptance_Blueprint_Report(t *testing.T) {
 	})
 	bp := createTestBlueprint(t, c, "sdk-acc-report-"+runSuffix(), groupID, steps)
 
-	if err := c.DeployBlueprint(ctx, bp.ID); err != nil {
+	if err := bpClient.DeployBlueprint(ctx, bp.ID); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("DeployBlueprint failed: %v", err)
 	}
-	t.Cleanup(func() { _ = c.UndeployBlueprint(ctx, bp.ID) })
+	t.Cleanup(func() { _ = bpClient.UndeployBlueprint(ctx, bp.ID) })
 
 	pollCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
-	err := PollUntil(pollCtx, 2*time.Second, func(ctx context.Context) (bool, error) {
-		got, err := c.GetBlueprint(ctx, bp.ID)
+	err := jamfplatform.PollUntil(pollCtx, 2*time.Second, func(ctx context.Context) (bool, error) {
+		got, err := bpClient.GetBlueprint(ctx, bp.ID)
 		if err != nil {
 			return false, err
 		}
@@ -263,7 +271,7 @@ func TestAcceptance_Blueprint_Report(t *testing.T) {
 		t.Fatalf("Timed out waiting for deployment: %v", err)
 	}
 
-	report, err := c.GetBlueprintReport(ctx, bp.ID)
+	report, err := bpClient.GetBlueprintReport(ctx, bp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetBlueprintReport failed: %v", err)

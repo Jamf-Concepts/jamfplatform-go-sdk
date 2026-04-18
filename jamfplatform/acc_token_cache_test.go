@@ -3,12 +3,15 @@
 
 //go:build acceptance
 
-package jamfplatform
+package jamfplatform_test
 
 import (
 	"context"
 	"os"
 	"testing"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
 )
 
 func TestAcceptance_FileTokenCache(t *testing.T) {
@@ -24,9 +27,9 @@ func TestAcceptance_FileTokenCache(t *testing.T) {
 	cacheDir := t.TempDir()
 	ctx := context.Background()
 
-	client1 := NewClient(baseURL, clientID, clientSecret,
-		WithTenantID(tenantID),
-		WithFileTokenCache(cacheDir),
+	client1 := jamfplatform.NewClient(baseURL, clientID, clientSecret,
+		jamfplatform.WithTenantID(tenantID),
+		jamfplatform.WithFileTokenCache(cacheDir),
 	)
 
 	tok1, err := client1.AccessToken(ctx)
@@ -48,9 +51,9 @@ func TestAcceptance_FileTokenCache(t *testing.T) {
 	}
 	t.Logf("Cache file: %s", entries[0].Name())
 
-	client2 := NewClient(baseURL, clientID, clientSecret,
-		WithTenantID(tenantID),
-		WithFileTokenCache(cacheDir),
+	client2 := jamfplatform.NewClient(baseURL, clientID, clientSecret,
+		jamfplatform.WithTenantID(tenantID),
+		jamfplatform.WithFileTokenCache(cacheDir),
 	)
 
 	tok2, err := client2.AccessToken(ctx)
@@ -62,10 +65,10 @@ func TestAcceptance_FileTokenCache(t *testing.T) {
 		t.Error("expected second client to return the same cached token")
 	}
 
-	devices, err := client2.ListDevices(ctx, nil, "")
+	d, err := devices.New(client2).ListDevices(ctx, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDevices with cached token: %v", err)
 	}
-	t.Logf("Listed %d devices using cached token", len(devices))
+	t.Logf("Listed %d devices using cached token", len(d))
 }

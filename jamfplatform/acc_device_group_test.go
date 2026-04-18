@@ -3,17 +3,20 @@
 
 //go:build acceptance
 
-package jamfplatform
+package jamfplatform_test
 
 import (
 	"context"
 	"testing"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devicegroups"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
 )
 
 func TestAcceptance_ListDeviceGroups(t *testing.T) {
 	c := accClient(t)
 
-	groups, err := c.ListDeviceGroups(context.Background(), nil, "")
+	groups, err := devicegroups.New(c).ListDeviceGroups(context.Background(), nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroups failed: %v", err)
@@ -24,7 +27,7 @@ func TestAcceptance_ListDeviceGroups(t *testing.T) {
 func TestAcceptance_ListDeviceGroupsWithSort(t *testing.T) {
 	c := accClient(t)
 
-	groups, err := c.ListDeviceGroups(context.Background(), []string{"name:asc"}, "")
+	groups, err := devicegroups.New(c).ListDeviceGroups(context.Background(), []string{"name:asc"}, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroups with sort failed: %v", err)
@@ -36,7 +39,7 @@ func TestAcceptance_DeviceGroup_SmartGroupFixture(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
 	c := accClient(t)
 
-	group, err := c.GetDeviceGroup(context.Background(), groupID)
+	group, err := devicegroups.New(c).GetDeviceGroup(context.Background(), groupID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup failed: %v", err)
@@ -54,11 +57,12 @@ func TestAcceptance_DeviceGroup_CreateAndDeleteStaticGroup(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	suffix := runSuffix()
+	dg := devicegroups.New(c)
 
 	name := "sdk-acc-static-group-" + suffix
 	desc := "SDK acceptance test — safe to delete"
 	emptyMembers := []string{}
-	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
+	resp, err := dg.CreateDeviceGroup(ctx, &devicegroups.DeviceGroupCreateRepresentationV1{
 		Name:        name,
 		Description: &desc,
 		DeviceType:  "COMPUTER",
@@ -69,9 +73,9 @@ func TestAcceptance_DeviceGroup_CreateAndDeleteStaticGroup(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
+	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
 
-	group, err := c.GetDeviceGroup(ctx, resp.ID)
+	group, err := dg.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup failed: %v", err)
@@ -89,10 +93,11 @@ func TestAcceptance_DeviceGroup_UpdateGroup(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	suffix := runSuffix()
+	dg := devicegroups.New(c)
 
 	desc := "SDK acceptance test — safe to delete"
 	emptyMembers := []string{}
-	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
+	resp, err := dg.CreateDeviceGroup(ctx, &devicegroups.DeviceGroupCreateRepresentationV1{
 		Name:        "sdk-acc-update-original-" + suffix,
 		Description: &desc,
 		DeviceType:  "COMPUTER",
@@ -103,11 +108,11 @@ func TestAcceptance_DeviceGroup_UpdateGroup(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
+	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
 
 	renamedName := "sdk-acc-update-renamed-" + suffix
 	updatedDesc := "Updated description"
-	err = c.UpdateDeviceGroup(ctx, resp.ID, &DeviceGroupUpdateRepresentationV1{
+	err = dg.UpdateDeviceGroup(ctx, resp.ID, &devicegroups.DeviceGroupUpdateRepresentationV1{
 		Name:        &renamedName,
 		Description: &updatedDesc,
 	})
@@ -116,7 +121,7 @@ func TestAcceptance_DeviceGroup_UpdateGroup(t *testing.T) {
 		t.Fatalf("UpdateDeviceGroup failed: %v", err)
 	}
 
-	group, err := c.GetDeviceGroup(ctx, resp.ID)
+	group, err := dg.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup after update failed: %v", err)
@@ -131,10 +136,11 @@ func TestAcceptance_DeviceGroup_SmartGroupWithCriteria(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	suffix := runSuffix()
+	dg := devicegroups.New(c)
 
 	name := "sdk-acc-smart-criteria-" + suffix
 	desc := "SDK acceptance test smart group — safe to delete"
-	criteria := []DeviceGroupCriteriaRepresentationV1{
+	criteria := []devicegroups.DeviceGroupCriteriaRepresentationV1{
 		{
 			Order:          0,
 			AttributeName:  "Serial Number",
@@ -143,7 +149,7 @@ func TestAcceptance_DeviceGroup_SmartGroupWithCriteria(t *testing.T) {
 			JoinType:       "AND",
 		},
 	}
-	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
+	resp, err := dg.CreateDeviceGroup(ctx, &devicegroups.DeviceGroupCreateRepresentationV1{
 		Name:        name,
 		Description: &desc,
 		DeviceType:  "COMPUTER",
@@ -154,9 +160,9 @@ func TestAcceptance_DeviceGroup_SmartGroupWithCriteria(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
+	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
 
-	group, err := c.GetDeviceGroup(ctx, resp.ID)
+	group, err := dg.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup failed: %v", err)
@@ -174,10 +180,11 @@ func TestAcceptance_DeviceGroup_PartialUpdatePreservesCriteria(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	suffix := runSuffix()
+	dg := devicegroups.New(c)
 
 	name := "sdk-acc-partial-criteria-" + suffix
 	desc := "SDK acceptance test — safe to delete"
-	criteria := []DeviceGroupCriteriaRepresentationV1{
+	criteria := []devicegroups.DeviceGroupCriteriaRepresentationV1{
 		{
 			Order:          0,
 			AttributeName:  "Serial Number",
@@ -186,7 +193,7 @@ func TestAcceptance_DeviceGroup_PartialUpdatePreservesCriteria(t *testing.T) {
 			JoinType:       "AND",
 		},
 	}
-	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
+	resp, err := dg.CreateDeviceGroup(ctx, &devicegroups.DeviceGroupCreateRepresentationV1{
 		Name:        name,
 		Description: &desc,
 		DeviceType:  "COMPUTER",
@@ -197,9 +204,9 @@ func TestAcceptance_DeviceGroup_PartialUpdatePreservesCriteria(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
+	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
 
-	group, err := c.GetDeviceGroup(ctx, resp.ID)
+	group, err := dg.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup failed: %v", err)
@@ -211,7 +218,7 @@ func TestAcceptance_DeviceGroup_PartialUpdatePreservesCriteria(t *testing.T) {
 	// Update only the name — omit Criteria entirely.
 	// Before the fix, this would serialize "criteria":[] and wipe them.
 	renamedName := "sdk-acc-partial-criteria-renamed-" + suffix
-	err = c.UpdateDeviceGroup(ctx, resp.ID, &DeviceGroupUpdateRepresentationV1{
+	err = dg.UpdateDeviceGroup(ctx, resp.ID, &devicegroups.DeviceGroupUpdateRepresentationV1{
 		Name: &renamedName,
 	})
 	if err != nil {
@@ -219,7 +226,7 @@ func TestAcceptance_DeviceGroup_PartialUpdatePreservesCriteria(t *testing.T) {
 		t.Fatalf("UpdateDeviceGroup (partial) failed: %v", err)
 	}
 
-	updated, err := c.GetDeviceGroup(ctx, resp.ID)
+	updated, err := dg.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceGroup after partial update failed: %v", err)
@@ -237,7 +244,7 @@ func TestAcceptance_DeviceGroup_ListMembers(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
 	c := accClient(t)
 
-	members, err := c.ListDeviceGroupMembers(context.Background(), groupID)
+	members, err := devicegroups.New(c).ListDeviceGroupMembers(context.Background(), groupID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupMembers failed: %v", err)
@@ -249,10 +256,11 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
 	c := accClient(t)
 	ctx := context.Background()
+	dg := devicegroups.New(c)
 
 	// Use a member from the COMPUTER smart group fixture so the device type
 	// is guaranteed to match the COMPUTER static group we create below.
-	fixtureMembers, err := c.ListDeviceGroupMembers(ctx, groupID)
+	fixtureMembers, err := dg.ListDeviceGroupMembers(ctx, groupID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupMembers (fixture) failed: %v", err)
@@ -265,7 +273,7 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 	suffix := runSuffix()
 	desc := "SDK acceptance test — safe to delete"
 	emptyMembers := []string{}
-	resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
+	resp, err := dg.CreateDeviceGroup(ctx, &devicegroups.DeviceGroupCreateRepresentationV1{
 		Name:        "sdk-acc-members-" + suffix,
 		Description: &desc,
 		DeviceType:  "COMPUTER",
@@ -276,11 +284,11 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = c.DeleteDeviceGroup(ctx, resp.ID) })
+	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
 
 	// Add a device
 	addIDs := []string{deviceID}
-	err = c.UpdateDeviceGroupMembers(ctx, resp.ID, &DeviceGroupMemberPatchRepresentationV1{
+	err = dg.UpdateDeviceGroupMembers(ctx, resp.ID, &devicegroups.DeviceGroupMemberPatchRepresentationV1{
 		Added: &addIDs,
 	})
 	if err != nil {
@@ -288,7 +296,7 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 		t.Fatalf("UpdateDeviceGroupMembers (add) failed: %v", err)
 	}
 
-	members, err := c.ListDeviceGroupMembers(ctx, resp.ID)
+	members, err := dg.ListDeviceGroupMembers(ctx, resp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupMembers failed: %v", err)
@@ -299,7 +307,7 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 
 	// Remove the device
 	removeIDs := []string{deviceID}
-	err = c.UpdateDeviceGroupMembers(ctx, resp.ID, &DeviceGroupMemberPatchRepresentationV1{
+	err = dg.UpdateDeviceGroupMembers(ctx, resp.ID, &devicegroups.DeviceGroupMemberPatchRepresentationV1{
 		Removed: &removeIDs,
 	})
 	if err != nil {
@@ -307,7 +315,7 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 		t.Fatalf("UpdateDeviceGroupMembers (remove) failed: %v", err)
 	}
 
-	members, err = c.ListDeviceGroupMembers(ctx, resp.ID)
+	members, err = dg.ListDeviceGroupMembers(ctx, resp.ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupMembers after remove failed: %v", err)
@@ -322,21 +330,21 @@ func TestAcceptance_DeviceGroup_ListGroupsForDevice(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 
-	devices, err := c.ListDevices(ctx, nil, "")
+	d, err := devices.New(c).ListDevices(ctx, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
-	if len(devices) == 0 {
+	if len(d) == 0 {
 		t.Skip("No devices available")
 	}
 
-	groups, err := c.ListDeviceGroupsForDevice(ctx, devices[0].ID)
+	groups, err := devicegroups.New(c).ListDeviceGroupsForDevice(ctx, d[0].ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupsForDevice failed: %v", err)
 	}
-	t.Logf("Device %s belongs to %d groups", devices[0].ID, len(groups))
+	t.Logf("Device %s belongs to %d groups", d[0].ID, len(groups))
 	for _, g := range groups {
 		t.Logf("  %s (%s)", g.GroupName, g.GroupID)
 	}

@@ -3,55 +3,59 @@
 
 //go:build acceptance
 
-package jamfplatform
+package jamfplatform_test
 
 import (
 	"context"
 	"testing"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devicegroups"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
 )
 
 func TestAcceptance_ListDevices(t *testing.T) {
 	c := accClient(t)
 
-	devices, err := c.ListDevices(context.Background(), nil, "")
+	d, err := devices.New(c).ListDevices(context.Background(), nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
-	t.Logf("Found %d devices", len(devices))
+	t.Logf("Found %d devices", len(d))
 }
 
 func TestAcceptance_ListDevicesWithSort(t *testing.T) {
 	c := accClient(t)
 
-	devices, err := c.ListDevices(context.Background(), []string{"name:asc"}, "")
+	d, err := devices.New(c).ListDevices(context.Background(), []string{"name:asc"}, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDevices with sort failed: %v", err)
 	}
-	t.Logf("Found %d devices (sorted by name asc)", len(devices))
+	t.Logf("Found %d devices (sorted by name asc)", len(d))
 }
 
 func TestAcceptance_GetDevice(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
+	dev := devices.New(c)
 
-	devices, err := c.ListDevices(ctx, nil, "")
+	d, err := dev.ListDevices(ctx, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
-	if len(devices) == 0 {
+	if len(d) == 0 {
 		t.Skip("No devices available to read by ID")
 	}
 
-	device, err := c.GetDevice(ctx, devices[0].ID)
+	device, err := dev.GetDevice(ctx, d[0].ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDevice failed: %v", err)
 	}
-	if device.ID != devices[0].ID {
-		t.Errorf("expected ID %q, got %q", devices[0].ID, device.ID)
+	if device.ID != d[0].ID {
+		t.Errorf("expected ID %q, got %q", d[0].ID, device.ID)
 	}
 
 	t.Logf("Read device: %s (%s), managed: %v, mdmCapable: %v", device.Name, device.ID, device.Managed, device.MDMCapable)
@@ -66,43 +70,44 @@ func TestAcceptance_GetDevice(t *testing.T) {
 func TestAcceptance_ListDeviceApplications(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
+	dev := devices.New(c)
 
-	devices, err := c.ListDevices(ctx, nil, "")
+	d, err := dev.ListDevices(ctx, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
-	if len(devices) == 0 {
+	if len(d) == 0 {
 		t.Skip("No devices available")
 	}
 
-	apps, err := c.ListDeviceApplications(ctx, devices[0].ID, nil, "")
+	apps, err := dev.ListDeviceApplications(ctx, d[0].ID, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceApplications failed: %v", err)
 	}
-	t.Logf("Device %s has %d applications", devices[0].ID, len(apps))
+	t.Logf("Device %s has %d applications", d[0].ID, len(apps))
 }
 
 func TestAcceptance_ListDeviceGroupsForDevice(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 
-	devices, err := c.ListDevices(ctx, nil, "")
+	d, err := devices.New(c).ListDevices(ctx, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
-	if len(devices) == 0 {
+	if len(d) == 0 {
 		t.Skip("No devices available")
 	}
 
-	groups, err := c.ListDeviceGroupsForDevice(ctx, devices[0].ID)
+	groups, err := devicegroups.New(c).ListDeviceGroupsForDevice(ctx, d[0].ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupsForDevice failed: %v", err)
 	}
-	t.Logf("Device %s belongs to %d groups", devices[0].ID, len(groups))
+	t.Logf("Device %s belongs to %d groups", d[0].ID, len(groups))
 	for _, g := range groups {
 		t.Logf("  Group: %s (%s)", g.GroupName, g.GroupID)
 	}
