@@ -552,6 +552,52 @@ type MobileDeviceWatchOsInventory struct {
 	UserAndLocation      *MobileDeviceUserAndLocation             `json:"userAndLocation,omitempty"`
 }
 
+// Package represents a package.
+type Package struct {
+	BasePath             *string `json:"basePath,omitempty"`
+	CategoryID           string  `json:"categoryId"`
+	CloudTransferStatus  *string `json:"cloudTransferStatus,omitempty"`
+	FileName             string  `json:"fileName"`
+	FillExistingUsers    *bool   `json:"fillExistingUsers,omitempty"`
+	FillUserTemplate     bool    `json:"fillUserTemplate"`
+	Format               *string `json:"format,omitempty"`
+	HashType             *string `json:"hashType,omitempty"`
+	HashValue            *string `json:"hashValue,omitempty"`
+	ID                   *string `json:"id,omitempty"`
+	IgnoreConflicts      *bool   `json:"ignoreConflicts,omitempty"`
+	Indexed              *bool   `json:"indexed,omitempty"`
+	Info                 *string `json:"info,omitempty"`
+	InstallLanguage      *string `json:"installLanguage,omitempty"`
+	Manifest             *string `json:"manifest,omitempty"`
+	ManifestFileName     *string `json:"manifestFileName,omitempty"`
+	Md5                  *string `json:"md5,omitempty"`
+	Notes                *string `json:"notes,omitempty"`
+	OsInstall            bool    `json:"osInstall"`
+	OsInstallerVersion   *string `json:"osInstallerVersion,omitempty"`
+	OsRequirements       *string `json:"osRequirements,omitempty"`
+	PackageName          string  `json:"packageName"`
+	ParentPackageID      *string `json:"parentPackageId,omitempty"`
+	Priority             int     `json:"priority"`
+	RebootRequired       bool    `json:"rebootRequired"`
+	SelfHealNotify       *bool   `json:"selfHealNotify,omitempty"`
+	SelfHealingAction    *string `json:"selfHealingAction,omitempty"`
+	SerialNumber         *string `json:"serialNumber,omitempty"`
+	Sha256               *string `json:"sha256,omitempty"`
+	Sha3512              *string `json:"sha3512,omitempty"`
+	Size                 *string `json:"size,omitempty"`
+	SuppressEula         bool    `json:"suppressEula"`
+	SuppressFromDock     bool    `json:"suppressFromDock"`
+	SuppressRegistration bool    `json:"suppressRegistration"`
+	SuppressUpdates      bool    `json:"suppressUpdates"`
+	Swu                  *bool   `json:"swu,omitempty"`
+}
+
+// PackagesSearchResults represents a packages search results.
+type PackagesSearchResults struct {
+	Results    []Package `json:"results"`
+	TotalCount int       `json:"totalCount"`
+}
+
 // StartupStatus represents a startup status.
 type StartupStatus struct {
 	Error                   *string `json:"error,omitempty"`

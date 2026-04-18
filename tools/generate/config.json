@@ -129,7 +129,13 @@
         {"op": "POST /v1/user/change-password", "name": "ChangeUserPasswordV1"},
         {"op": "POST /v1/buildings/export", "name": "ExportBuildingsV1", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v1/icon", "name": "UploadIconV1"},
-        {"op": "GET /v2/mobile-devices/detail", "name": "ListMobileDevicesDetailV2", "pagination": "totalCount", "params": ["section:[]string", "sort:[]string", "filter"]}
+        {"op": "GET /v2/mobile-devices/detail", "name": "ListMobileDevicesDetailV2", "pagination": "totalCount", "params": ["section:[]string", "sort:[]string", "filter"]},
+        {"op": "GET /v1/packages", "name": "ListPackagesV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/packages", "name": "CreatePackageV1"},
+        {"op": "GET /v1/packages/{id}", "name": "GetPackageV1"},
+        {"op": "PUT /v1/packages/{id}", "name": "UpdatePackageV1"},
+        {"op": "DELETE /v1/packages/{id}", "name": "DeletePackageV1"},
+        {"op": "POST /v1/packages/{id}/upload", "name": "UploadPackageV1"}
       ]
     }
   ]

@@ -1534,6 +1534,205 @@
           }
         ]
       },
+      "Package": {
+        "properties": {
+          "basePath": {
+            "example": "my/path",
+            "nullable": true,
+            "type": "string"
+          },
+          "categoryId": {
+            "example": "-1",
+            "type": "string"
+          },
+          "cloudTransferStatus": {
+            "example": "READY",
+            "readOnly": true,
+            "type": "string"
+          },
+          "fileName": {
+            "example": "my-package.pkg",
+            "type": "string"
+          },
+          "fillExistingUsers": {
+            "example": false,
+            "type": "boolean"
+          },
+          "fillUserTemplate": {
+            "example": false,
+            "type": "boolean"
+          },
+          "format": {
+            "example": "format",
+            "nullable": true,
+            "type": "string"
+          },
+          "hashType": {
+            "example": "MD5",
+            "nullable": true,
+            "type": "string"
+          },
+          "hashValue": {
+            "example": "0cc175b9c0f1b6a831c399e269772661",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "ignoreConflicts": {
+            "example": false,
+            "type": "boolean"
+          },
+          "indexed": {
+            "example": false,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "info": {
+            "example": "A package that is important to my organization.",
+            "nullable": true,
+            "type": "string"
+          },
+          "installLanguage": {
+            "example": "en_US",
+            "nullable": true,
+            "type": "string"
+          },
+          "manifest": {
+            "example": "manifest",
+            "nullable": true,
+            "type": "string"
+          },
+          "manifestFileName": {
+            "example": "manifest.plist",
+            "nullable": true,
+            "type": "string"
+          },
+          "md5": {
+            "example": "0cc175b9c0f1b6a831c399e269772661",
+            "nullable": true,
+            "type": "string"
+          },
+          "notes": {
+            "example": "Some notes.",
+            "nullable": true,
+            "type": "string"
+          },
+          "osInstall": {
+            "example": false,
+            "type": "boolean"
+          },
+          "osInstallerVersion": {
+            "example": "10.3.x",
+            "nullable": true,
+            "type": "string"
+          },
+          "osRequirements": {
+            "example": "10.6.8, 10.7.x",
+            "nullable": true,
+            "type": "string"
+          },
+          "packageName": {
+            "example": "Google Chrome",
+            "type": "string"
+          },
+          "parentPackageId": {
+            "example": "3",
+            "nullable": true,
+            "type": "string"
+          },
+          "priority": {
+            "example": 3,
+            "type": "integer"
+          },
+          "rebootRequired": {
+            "example": false,
+            "type": "boolean"
+          },
+          "selfHealNotify": {
+            "example": false,
+            "type": "boolean"
+          },
+          "selfHealingAction": {
+            "example": "nothing",
+            "nullable": true,
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "1234",
+            "nullable": true,
+            "type": "string"
+          },
+          "sha256": {
+            "example": "61be55a8e2f6b4e172338bddf184d6dbee29c98853e0a0485ecee7f27b9af0b4",
+            "nullable": true,
+            "type": "string"
+          },
+          "sha3512": {
+            "example": "a51a01e63f76c4601a2989575280e2a1c1e83191382277906b0f92a251c53bbbd1d9804dd30edd304cffe75d1c6455440b0c39081ca94c68f149d1f719e15092",
+            "nullable": true,
+            "type": "string"
+          },
+          "size": {
+            "example": "234KB",
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "suppressEula": {
+            "example": false,
+            "type": "boolean"
+          },
+          "suppressFromDock": {
+            "example": false,
+            "type": "boolean"
+          },
+          "suppressRegistration": {
+            "example": false,
+            "type": "boolean"
+          },
+          "suppressUpdates": {
+            "example": false,
+            "type": "boolean"
+          },
+          "swu": {
+            "example": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "categoryId",
+          "fileName",
+          "fillUserTemplate",
+          "osInstall",
+          "packageName",
+          "priority",
+          "rebootRequired",
+          "suppressEula",
+          "suppressFromDock",
+          "suppressRegistration",
+          "suppressUpdates"
+        ],
+        "type": "object"
+      },
+      "PackagesSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/Package"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "StartupStatus": {
         "properties": {
           "error": {
@@ -2058,6 +2257,288 @@
           "icon"
         ],
         "x-authentication-required": true
+      }
+    },
+    "/v1/packages": {
+      "get": {
+        "description": "Retrieves packages",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorts results by one or more criteria, following the format property:asc/desc. Default sort is ID:asc. If using multiple criteria, separate with commas.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be combined with paging and sorting. Fields allowed in the query: id, fileName, packageName, categoryId, info, notes, manifestFileName, cloudTransferStatus. Default filter is an empty query and returns all results from the requested page.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackagesSearchResults"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Retrieve Packages",
+        "tags": [
+          "packages"
+        ],
+        "x-required-privileges": [
+          "Read Packages"
+        ]
+      },
+      "post": {
+        "description": "Create package",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Package"
+              }
+            }
+          },
+          "description": "Package to be created",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Package was created"
+          }
+        },
+        "summary": "Create package",
+        "tags": [
+          "packages"
+        ],
+        "x-required-privileges": [
+          "Create Packages"
+        ]
+      }
+    },
+    "/v1/packages/{id}": {
+      "delete": {
+        "description": "Removes specified package\n",
+        "parameters": [
+          {
+            "description": "Instance ID of package",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Package deleted successfully"
+          }
+        },
+        "summary": "Remove specified package\n",
+        "tags": [
+          "packages"
+        ],
+        "x-required-privileges": [
+          "Delete Packages"
+        ]
+      },
+      "get": {
+        "description": "Gets specified Package object\n",
+        "parameters": [
+          {
+            "description": "instance id of package",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            },
+            "description": "Package details found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified package object could not be found"
+          }
+        },
+        "summary": "Get specified Package object\n",
+        "tags": [
+          "packages"
+        ],
+        "x-required-privileges": [
+          "Read Packages"
+        ]
+      },
+      "put": {
+        "description": "Update specified package object\n",
+        "parameters": [
+          {
+            "description": "Instance ID of package",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Package"
+              }
+            }
+          },
+          "description": "Package object to update. IDs defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            },
+            "description": "Package update"
+          }
+        },
+        "summary": "Update specified package object\n",
+        "tags": [
+          "packages"
+        ],
+        "x-required-privileges": [
+          "Update Packages"
+        ]
+      }
+    },
+    "/v1/packages/{id}/upload": {
+      "post": {
+        "description": "Uploads a package",
+        "parameters": [
+          {
+            "description": "instance id of package",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successfully uploaded package"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified package object does not exist."
+          }
+        },
+        "summary": "Upload package",
+        "tags": [
+          "packages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Packages",
+          "Read Packages"
+        ]
       }
     },
     "/v1/user/change-password": {
