@@ -279,7 +279,37 @@
         {"op": "GET /directorybindings/id/{id}", "name": "GetDirectoryBindingByID", "responseType": "directory_binding", "pathNames": {"id": "id"}},
         {"op": "POST /directorybindings/id/{id}", "name": "CreateDirectoryBindingByID", "requestType": "directory_binding", "responseType": "directory_binding", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /directorybindings/id/{id}", "name": "UpdateDirectoryBindingByID", "requestType": "directory_binding", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /directorybindings/id/{id}", "name": "DeleteDirectoryBindingByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /directorybindings/id/{id}", "name": "DeleteDirectoryBindingByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /networksegments/id/{id}", "name": "GetNetworkSegmentByID", "responseType": "network_segment", "pathNames": {"id": "id"}},
+        {"op": "POST /networksegments/id/{id}", "name": "CreateNetworkSegmentByID", "requestType": "network_segment_post", "responseType": "network_segment", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /networksegments/id/{id}", "name": "UpdateNetworkSegmentByID", "requestType": "network_segment_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /networksegments/id/{id}", "name": "DeleteNetworkSegmentByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /ldapservers/id/{id}", "name": "GetLDAPServerByID", "responseType": "ldap_server", "pathNames": {"id": "id"}},
+        {"op": "POST /ldapservers/id/{id}", "name": "CreateLDAPServerByID", "requestType": "ldap_server_post", "responseType": "ldap_server", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /ldapservers/id/{id}", "name": "UpdateLDAPServerByID", "requestType": "ldap_server_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /ldapservers/id/{id}", "name": "DeleteLDAPServerByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /distributionpoints/id/{id}", "name": "GetDistributionPointByID", "responseType": "distribution_point", "pathNames": {"id": "id"}},
+        {"op": "POST /distributionpoints/id/{id}", "name": "CreateDistributionPointByID", "requestType": "distribution_point_post", "responseType": "distribution_point", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /distributionpoints/id/{id}", "name": "UpdateDistributionPointByID", "requestType": "distribution_point_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /distributionpoints/id/{id}", "name": "DeleteDistributionPointByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /macapplications/id/{id}", "name": "GetMacApplicationByID", "responseType": "mac_application", "pathNames": {"id": "id"}},
+        {"op": "POST /macapplications/id/{id}", "name": "CreateMacApplicationByID", "requestType": "mac_application", "responseType": "mac_application", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /macapplications/id/{id}", "name": "UpdateMacApplicationByID", "requestType": "mac_application", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /macapplications/id/{id}", "name": "DeleteMacApplicationByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /mobiledeviceapplications/id/{id}", "name": "GetMobileDeviceApplicationByID", "responseType": "mobile_device_application", "pathNames": {"id": "id"}},
+        {"op": "POST /mobiledeviceapplications/id/{id}", "name": "CreateMobileDeviceApplicationByID", "requestType": "mobile_device_application", "responseType": "mobile_device_application", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledeviceapplications/id/{id}", "name": "UpdateMobileDeviceApplicationByID", "requestType": "mobile_device_application", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /mobiledeviceapplications/id/{id}", "name": "DeleteMobileDeviceApplicationByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /ebooks/id/{id}", "name": "GetEbookByID", "responseType": "ebook", "pathNames": {"id": "id"}},
+        {"op": "POST /ebooks/id/{id}", "name": "CreateEbookByID", "requestType": "ebook_post", "responseType": "ebook", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /ebooks/id/{id}", "name": "UpdateEbookByID", "requestType": "ebook_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /ebooks/id/{id}", "name": "DeleteEbookByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

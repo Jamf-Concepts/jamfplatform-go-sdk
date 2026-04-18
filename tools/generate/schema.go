@@ -476,16 +476,23 @@ func addTopLevelIDsForClassic(types []GoType) {
 		if len(t.Fields) == 0 || t.AliasTarget != "" || t.IsRawJSON {
 			continue
 		}
-		var hasGeneral, hasTopID bool
+		var hasSubObject, hasTopID bool
 		for _, f := range t.Fields {
-			if f.Name == "General" {
-				hasGeneral = true
-			}
 			if f.Name == "ID" {
 				hasTopID = true
 			}
+			// Any pointer-to-struct field — i.e. a nested sub-object like
+			// General, Connection, Scope — is a signal the server probably
+			// returns id at the top level on create while the spec nests it
+			// inside one of these children. Scalar ptr fields (*string, *int,
+			// *bool) and slice/map types don't count.
+			if strings.HasPrefix(f.Type, "*") && !strings.HasPrefix(f.Type, "*[]") &&
+				!isScalar(strings.TrimPrefix(f.Type, "*")) &&
+				!strings.HasPrefix(f.Type, "*map[") {
+				hasSubObject = true
+			}
 		}
-		if !hasGeneral || hasTopID {
+		if !hasSubObject || hasTopID {
 			continue
 		}
 		t.Fields = append([]GoField{{
@@ -793,9 +800,19 @@ func goTypeName(specName string) string {
 // Spec-level xml.name overrides take priority (e.g. computer_post -> <computer>);
 // otherwise the schema's original name is used verbatim (which for Classic
 // is already the wire shape since the spec is snake_case).
+//
+// When the spec is missing an xml.name override on a `_post` write-schema
+// (Jamf Classic convention: computer_post / policy_post / user_post / etc.
+// all ship with `xml.name: <resource>` except a few where it's forgotten),
+// we default to the suffix-stripped name. Without this, marshal emits a
+// `<ldap_server_post>` root the server rejects. Spec-level overrides
+// always win when present.
 func xmlWireName(specName string, schema *openapi3.Schema) string {
 	if schema != nil && schema.XML != nil && schema.XML.Name != "" {
 		return schema.XML.Name
+	}
+	if strings.HasSuffix(specName, "_post") {
+		return strings.TrimSuffix(specName, "_post")
 	}
 	return specName
 }

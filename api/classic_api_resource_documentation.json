@@ -1496,6 +1496,659 @@
         ],
         "type": "object"
       },
+      "distribution_point": {
+        "properties": {
+          "connection_type": {
+            "enum": [
+              "SMB",
+              "AFP"
+            ],
+            "type": "string"
+          },
+          "context": {
+            "description": "Path to the share",
+            "example": "CasperShare",
+            "type": "string"
+          },
+          "enable_load_balancing": {
+            "default": false,
+            "type": "boolean"
+          },
+          "failover_point": {
+            "type": "string"
+          },
+          "failover_point_url": {
+            "type": "string"
+          },
+          "http_downloads_enabled": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "http_password": {
+            "description": "Password for basic authentication",
+            "type": "string"
+          },
+          "http_url": {
+            "description": "URL to download packages from",
+            "example": "http://ny.company.com/CasperShare",
+            "type": "string"
+          },
+          "http_username": {
+            "description": "Username to authenticate with for basic authentication",
+            "example": "casperinstall",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "ip_address": {
+            "description": "IP address or hostname of distribution point",
+            "example": "ny.company.com",
+            "type": "string"
+          },
+          "is_master": {
+            "default": false,
+            "description": "Only one share can be set as master",
+            "type": "boolean"
+          },
+          "local_path": {
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the distribution point",
+            "example": "New York Share",
+            "type": "string"
+          },
+          "no_authentication_required": {
+            "default": true,
+            "type": "boolean"
+          },
+          "password": {
+            "example": "password",
+            "type": "string"
+          },
+          "port": {
+            "example": 80,
+            "type": "integer"
+          },
+          "protocol": {
+            "enum": [
+              "http",
+              "https"
+            ],
+            "type": "string"
+          },
+          "read_only_password": {
+            "description": "Password for the read only account",
+            "example": "password",
+            "type": "string"
+          },
+          "read_only_username": {
+            "description": "Account with read only privileges to the share",
+            "example": "casperinstall",
+            "type": "string"
+          },
+          "read_write_password": {
+            "description": "Password for the read/write account",
+            "example": "password",
+            "type": "string"
+          },
+          "read_write_username": {
+            "description": "Account with read/write privileges to the share",
+            "example": "casperwrite",
+            "type": "string"
+          },
+          "share_name": {
+            "description": "Name of the share",
+            "example": "Caspershare",
+            "type": "string"
+          },
+          "share_port": {
+            "example": 139,
+            "type": "integer"
+          },
+          "ssh_username": {
+            "example": "username",
+            "type": "string"
+          },
+          "username_password_required": {
+            "default": false,
+            "type": "boolean"
+          },
+          "workgroup_or_domain": {
+            "description": "Workgroup or domain of the accounts that have access to the share (SMB only)",
+            "example": "COMPANY",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "share_name",
+          "read_only_username",
+          "read_write_username"
+        ],
+        "type": "object"
+      },
+      "ebook": {
+        "properties": {
+          "general": {
+            "properties": {
+              "author": {
+                "example": "Apple Inc.",
+                "type": "string"
+              },
+              "category": {
+                "$ref": "#/components/schemas/category_object"
+              },
+              "deploy_as_managed": {
+                "type": "boolean"
+              },
+              "deployment_type": {
+                "enum": [
+                  "Make Available in Self Service",
+                  "Install Automatically/Prompt Users to Install"
+                ],
+                "type": "string"
+              },
+              "file_type": {
+                "enum": [
+                  "PDF",
+                  "IBOOK",
+                  "EPUB"
+                ],
+                "type": "string"
+              },
+              "free": {
+                "type": "boolean"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "name": {
+                "description": "Name of the ebook",
+                "example": "iPhone User Guide for iOS 10.3",
+                "type": "string"
+              },
+              "self_service_icon": {
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "uri": {
+                    "example": "https://company.jamfcloud.com/iconservlet/?id=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
+              "url": {
+                "description": "Download URL for the ebook",
+                "example": "https://itunes.apple.com/us/book/iphone-user-guide-for-ios-10-3/id1134772174?mt=11\u0026amp;uo=4",
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "scope": {
+            "properties": {
+              "all_computers": {
+                "default": false,
+                "type": "boolean"
+              },
+              "all_jss_users": {
+                "default": false,
+                "type": "boolean"
+              },
+              "all_mobile_devices": {
+                "default": false,
+                "type": "boolean"
+              },
+              "buildings": {
+                "items": {
+                  "properties": {
+                    "building": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "classes": {
+                "items": {
+                  "properties": {
+                    "class": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computer_groups": {
+                "items": {
+                  "properties": {
+                    "computer_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computers": {
+                "items": {
+                  "properties": {
+                    "computer": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "description": "Name of the computer",
+                          "example": "Admins MacBook Pro",
+                          "type": "string"
+                        },
+                        "udid": {
+                          "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "departments": {
+                "items": {
+                  "properties": {
+                    "department": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "exclusions": {
+                "properties": {
+                  "buildings": {
+                    "items": {
+                      "properties": {
+                        "building": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computer_groups": {
+                    "items": {
+                      "properties": {
+                        "computer_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computers": {
+                    "items": {
+                      "properties": {
+                        "computer": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the computer",
+                              "example": "Johns iMac",
+                              "type": "string"
+                            },
+                            "udid": {
+                              "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "departments": {
+                    "items": {
+                      "properties": {
+                        "department": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "mobile_device_groups": {
+                    "items": {
+                      "properties": {
+                        "mobile_device_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "mobile_devices": {
+                    "items": {
+                      "properties": {
+                        "mobile_device": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the device",
+                              "example": "Johns iPad",
+                              "type": "string"
+                            },
+                            "udid": {
+                              "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                              "type": "string"
+                            },
+                            "wifi_mac_address": {
+                              "example": "E0:AC:CB:97:36:G4",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the network segment",
+                              "example": "New York",
+                              "type": "string"
+                            },
+                            "uid": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "properties": {
+                            "name": {
+                              "example": "Adam",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "jss_user_groups": {
+                "items": {
+                  "properties": {
+                    "user_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "limitations": {
+                "properties": {
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "mobile_device_groups": {
+                "items": {
+                  "properties": {
+                    "mobile_device_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "mobile_devices": {
+                "items": {
+                  "properties": {
+                    "mobile_device": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "description": "Name of the device",
+                          "example": "Admins iPad",
+                          "type": "string"
+                        },
+                        "udid": {
+                          "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                          "type": "string"
+                        },
+                        "wifi_mac_address": {
+                          "example": "E0:AC:CB:97:36:G4",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "self_service": {
+            "properties": {
+              "feature_on_main_page": {
+                "type": "boolean"
+              },
+              "force_users_to_view_description": {
+                "type": "boolean"
+              },
+              "install_button_text": {
+                "example": "Install",
+                "type": "string"
+              },
+              "notification": {
+                "type": "boolean"
+              },
+              "notification_message": {
+                "type": "string"
+              },
+              "notification_subject": {
+                "type": "string"
+              },
+              "self_service_categories": {
+                "properties": {
+                  "category": {
+                    "properties": {
+                      "display_in": {
+                        "description": "Self Service categories to be displayed ebook in",
+                        "type": "string"
+                      },
+                      "feature_in": {
+                        "type": "boolean"
+                      },
+                      "id": {
+                        "example": 1,
+                        "type": "integer"
+                      },
+                      "name": {
+                        "description": "Name of the category",
+                        "example": "eBooks",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "self_service_description": {
+                "type": "string"
+              },
+              "self_service_display_name": {
+                "example": "iPhone User Guide for iOS 10.3",
+                "type": "string"
+              },
+              "self_service_icon": {
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "uri": {
+                    "example": "https://company.jamfcloud.com/iconservlet/?id=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
       "id_name": {
         "properties": {
           "id": {
@@ -1504,6 +2157,272 @@
           },
           "name": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ldap_server": {
+        "properties": {
+          "connection": {
+            "properties": {
+              "account": {
+                "properties": {
+                  "distinguished_username": {
+                    "example": "CN=Administrator,CN=Users,DC=Company,DC=com",
+                    "type": "string"
+                  },
+                  "password": {
+                    "example": "password",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "authentication_type": {
+                "enum": [
+                  "simple",
+                  "CRAM-MD5",
+                  "DIGEST-MD5",
+                  "none"
+                ],
+                "type": "string"
+              },
+              "hostname": {
+                "description": "Hostname or IP address of the server",
+                "example": "company.ad.com",
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "name": {
+                "description": "Name of the LDAP server",
+                "example": "Company Active Directory",
+                "type": "string"
+              },
+              "open_close_timeout": {
+                "description": "Timeout in seconds",
+                "example": 15,
+                "type": "integer"
+              },
+              "port": {
+                "example": 389,
+                "type": "integer"
+              },
+              "referral_response": {
+                "enum": [
+                  "ignore",
+                  "follow"
+                ],
+                "type": "string"
+              },
+              "search_timeout": {
+                "description": "Timeout in seconds",
+                "example": 60,
+                "type": "integer"
+              },
+              "server_type": {
+                "enum": [
+                  "Active Directory",
+                  "Open Directory",
+                  "eDirectory",
+                  "Custom"
+                ],
+                "type": "string"
+              },
+              "use_ssl": {
+                "default": false,
+                "type": "boolean"
+              },
+              "use_wildcards": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "mappings_for_users": {
+            "properties": {
+              "user_group_mappings": {
+                "properties": {
+                  "map_group_id": {
+                    "example": "uSNCreated",
+                    "type": "string"
+                  },
+                  "map_group_name": {
+                    "example": "name",
+                    "type": "string"
+                  },
+                  "map_group_uuid": {
+                    "example": "objectGUID",
+                    "type": "string"
+                  },
+                  "map_object_class_to_any_or_all": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ],
+                    "type": "string"
+                  },
+                  "object_classes": {
+                    "example": "top, group",
+                    "type": "string"
+                  },
+                  "search_base": {
+                    "example": "DC=Company,DC=com",
+                    "type": "string"
+                  },
+                  "search_scope": {
+                    "enum": [
+                      "All Subtrees",
+                      "First Level Only"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "user_group_membership_mappings": {
+                "properties": {
+                  "append_to_username": {
+                    "example": "company.com",
+                    "type": "string"
+                  },
+                  "group_id": {
+                    "example": "uSNCreated",
+                    "type": "string"
+                  },
+                  "map_group_membership_to_user_field": {
+                    "example": "memberOf",
+                    "type": "string"
+                  },
+                  "map_object_class_to_any_or_all": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ],
+                    "type": "string"
+                  },
+                  "map_user_membership_to_group_field": {
+                    "type": "boolean"
+                  },
+                  "map_user_membership_use_dn": {
+                    "type": "boolean"
+                  },
+                  "object_classes": {
+                    "example": "group",
+                    "type": "string"
+                  },
+                  "recursive_lookups": {
+                    "type": "boolean"
+                  },
+                  "search_base": {
+                    "example": "DC=Company,DC=com",
+                    "type": "string"
+                  },
+                  "search_scope": {
+                    "enum": [
+                      "All Subtrees",
+                      "First Level Only"
+                    ],
+                    "type": "string"
+                  },
+                  "use_dn": {
+                    "type": "boolean"
+                  },
+                  "user_group_membership_stored_in": {
+                    "enum": [
+                      "user object",
+                      "group object"
+                    ],
+                    "type": "string"
+                  },
+                  "user_group_membership_use_ldap_compare": {
+                    "type": "boolean"
+                  },
+                  "username": {
+                    "example": "sAMAccountName",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "user_mappings": {
+                "properties": {
+                  "append_to_email_results": {
+                    "example": "company.com",
+                    "type": "string"
+                  },
+                  "map_building": {
+                    "example": "streetAddress",
+                    "type": "string"
+                  },
+                  "map_department": {
+                    "example": "department",
+                    "type": "string"
+                  },
+                  "map_email_address": {
+                    "example": "mail",
+                    "type": "string"
+                  },
+                  "map_object_class_to_any_or_all": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ],
+                    "type": "string"
+                  },
+                  "map_position": {
+                    "example": "title",
+                    "type": "string"
+                  },
+                  "map_realname": {
+                    "example": "displayName",
+                    "type": "string"
+                  },
+                  "map_room": {
+                    "example": "room",
+                    "type": "string"
+                  },
+                  "map_telephone": {
+                    "example": "telephoneNumber",
+                    "type": "string"
+                  },
+                  "map_user_id": {
+                    "example": "uSNCreated",
+                    "type": "string"
+                  },
+                  "map_user_uuid": {
+                    "example": "objectGUID",
+                    "type": "string"
+                  },
+                  "map_username": {
+                    "example": "sAMAccountName",
+                    "type": "string"
+                  },
+                  "object_classes": {
+                    "example": "organizationalPerson, user",
+                    "type": "string"
+                  },
+                  "search_base": {
+                    "example": "DC=Company,DC=com",
+                    "type": "string"
+                  },
+                  "search_scope": {
+                    "enum": [
+                      "All Subtrees",
+                      "First Level Only"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
           }
         },
         "type": "object"
@@ -1549,6 +2468,411 @@
           "username": {
             "example": "JBetty",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "mac_application": {
+        "properties": {
+          "general": {
+            "properties": {
+              "bundle_id": {
+                "example": "com.barebones.textwrangler",
+                "type": "string"
+              },
+              "category": {
+                "$ref": "#/components/schemas/category_object"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "is_free": {
+                "type": "boolean"
+              },
+              "name": {
+                "description": "Name of the application",
+                "example": "TextWrangler.app",
+                "type": "string"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
+              "url": {
+                "example": "https://itunes.apple.com/us/app/textwrangler/id404010395?mt=12\u0026amp;uo=4",
+                "type": "string"
+              },
+              "version": {
+                "example": "5.5.2",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "version",
+              "bundle_id",
+              "url"
+            ],
+            "type": "object"
+          },
+          "scope": {
+            "properties": {
+              "all_computers": {
+                "default": false,
+                "type": "boolean"
+              },
+              "all_jss_users": {
+                "default": false,
+                "type": "boolean"
+              },
+              "buildings": {
+                "items": {
+                  "properties": {
+                    "building": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computer_groups": {
+                "items": {
+                  "properties": {
+                    "computer_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computers": {
+                "items": {
+                  "properties": {
+                    "computer": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "description": "Name of the computer",
+                          "example": "Admins MacBook Pro",
+                          "type": "string"
+                        },
+                        "udid": {
+                          "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "departments": {
+                "items": {
+                  "properties": {
+                    "department": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "exclusions": {
+                "properties": {
+                  "buildings": {
+                    "items": {
+                      "properties": {
+                        "building": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computer_groups": {
+                    "items": {
+                      "properties": {
+                        "computer_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computers": {
+                    "items": {
+                      "properties": {
+                        "computer": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the computer",
+                              "example": "Johns iMac",
+                              "type": "string"
+                            },
+                            "udid": {
+                              "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "departments": {
+                    "items": {
+                      "properties": {
+                        "department": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the network segment",
+                              "example": "New York",
+                              "type": "string"
+                            },
+                            "uid": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "properties": {
+                            "name": {
+                              "example": "Adam",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "jss_user_groups": {
+                "items": {
+                  "properties": {
+                    "user_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "limitations": {
+                "properties": {
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "self_service": {
+            "properties": {
+              "feature_on_main_page": {
+                "type": "boolean"
+              },
+              "force_users_to_view_description": {
+                "type": "boolean"
+              },
+              "install_button_text": {
+                "example": "Install",
+                "type": "string"
+              },
+              "notification": {
+                "type": "string"
+              },
+              "notification_message": {
+                "example": "You can install TextWrangler by clicking this link or going to Self Service",
+                "type": "string"
+              },
+              "notification_subject": {
+                "example": "TextWrangler is Available to Install",
+                "type": "string"
+              },
+              "self_service_categories": {
+                "items": {
+                  "properties": {
+                    "category": {
+                      "properties": {
+                        "display_in": {
+                          "example": true,
+                          "type": "boolean"
+                        },
+                        "feature_in": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "example": "Applications",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "self_service_description": {
+                "example": "Installs the TextWrangler application",
+                "type": "string"
+              },
+              "self_service_icon": {
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "uri": {
+                    "example": "https://company.jamfcloud.com/iconservlet/?id=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "vpp": {
+                "properties": {
+                  "assign_vpp_device_based_licenses": {
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "vpp_admin_account_id": {
+                    "default": -1,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
           }
         },
         "type": "object"
@@ -2059,6 +3383,505 @@
             "xml": {
               "name": "security"
             }
+          }
+        },
+        "type": "object"
+      },
+      "mobile_device_application": {
+        "properties": {
+          "app_configuration": {
+            "properties": {
+              "preferences": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "general": {
+            "properties": {
+              "bundle_id": {
+                "example": "com.jamfsoftware.selfservice",
+                "type": "string"
+              },
+              "category": {
+                "$ref": "#/components/schemas/category_object"
+              },
+              "deploy_as_managed_app": {
+                "type": "boolean"
+              },
+              "deploy_automatically": {
+                "type": "boolean"
+              },
+              "deployment_type": {
+                "enum": [
+                  "Make Available in Self Service",
+                  "Install Automatically/Prompt Users to Install"
+                ],
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "display_name": {
+                "example": "Self Service Mobile",
+                "type": "string"
+              },
+              "external_url": {
+                "example": "https://itunes.apple.com/us/app/self-service-mobile/id718509958?mt=8\u0026amp;uo=4",
+                "type": "string"
+              },
+              "free": {
+                "type": "boolean"
+              },
+              "host_externally": {
+                "type": "boolean"
+              },
+              "icon": {
+                "properties": {
+                  "data": {
+                    "description": "base64 encoded",
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "name": {
+                    "example": "1024x1024bb.png",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "example": "https://company.jamfcloud.com/iconservlet/?id=1018\u0026amp;scale=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "internal_app": {
+                "type": "boolean"
+              },
+              "ipa": {
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "example": "Self Service Mobile.ipa",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "itunes_country_region": {
+                "type": "string"
+              },
+              "itunes_store_url": {
+                "type": "string"
+              },
+              "itunes_sync_time": {
+                "type": "integer"
+              },
+              "keep_description_and_icon_up_to_date": {
+                "type": "boolean"
+              },
+              "make_available_after_install": {
+                "type": "boolean"
+              },
+              "mobile_device_provisioning_profile": {
+                "type": "integer"
+              },
+              "name": {
+                "example": "Self Service Mobile",
+                "type": "string"
+              },
+              "prevent_backup_of_app_data": {
+                "type": "boolean"
+              },
+              "remove_app_when_mdm_profile_is_removed": {
+                "type": "boolean"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
+              "take_over_management": {
+                "type": "boolean"
+              },
+              "version": {
+                "example": 9.98,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "bundle_id",
+              "version"
+            ],
+            "type": "object"
+          },
+          "scope": {
+            "properties": {
+              "all_jss_users": {
+                "type": "boolean"
+              },
+              "all_mobile_devices": {
+                "type": "boolean"
+              },
+              "buildings": {
+                "items": {
+                  "properties": {
+                    "building": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "departments": {
+                "items": {
+                  "properties": {
+                    "department": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "exclusions": {
+                "properties": {
+                  "buildings": {
+                    "items": {
+                      "properties": {
+                        "building": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "departments": {
+                    "items": {
+                      "properties": {
+                        "department": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "mobile_device_groups": {
+                    "items": {
+                      "properties": {
+                        "mobile_device_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "mobile_devices": {
+                    "items": {
+                      "properties": {
+                        "mobile_device": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the device",
+                              "example": "Johns iPad",
+                              "type": "string"
+                            },
+                            "udid": {
+                              "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                              "type": "string"
+                            },
+                            "wifi_mac_address": {
+                              "example": "E0:AC:CB:97:36:G4",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the network segment",
+                              "example": "New York",
+                              "type": "string"
+                            },
+                            "uid": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "properties": {
+                            "name": {
+                              "example": "Adam",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "jss_user_groups": {
+                "items": {
+                  "properties": {
+                    "user_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "limitations": {
+                "properties": {
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "mobile_device_groups": {
+                "items": {
+                  "properties": {
+                    "mobile_device_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "mobile_devices": {
+                "items": {
+                  "properties": {
+                    "mobile_device": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "description": "Name of the device",
+                          "example": "Admins iPad",
+                          "type": "string"
+                        },
+                        "udid": {
+                          "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                          "type": "string"
+                        },
+                        "wifi_mac_address": {
+                          "example": "E0:AC:CB:97:36:G4",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "self_service": {
+            "properties": {
+              "feature_on_main_page": {
+                "type": "boolean"
+              },
+              "notification": {
+                "type": "boolean"
+              },
+              "notification_message": {
+                "example": "Click here to open Self Service and install this new application!",
+                "type": "string"
+              },
+              "notification_subject": {
+                "example": "New App Avaialble",
+                "type": "string"
+              },
+              "self_service_categories": {
+                "items": {
+                  "properties": {
+                    "category": {
+                      "properties": {
+                        "display_in": {
+                          "default": true,
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "example": "Education Tools",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "self_service_description": {
+                "type": "string"
+              },
+              "self_service_icon": {
+                "properties": {
+                  "data": {
+                    "description": "base64 encoded",
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "name": {
+                    "example": "1024x1024bb.png",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "example": "https://company.jamfcloud.com/iconservlet/?id=1018\u0026amp;scale=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "vpp": {
+            "properties": {
+              "assign_vpp_device_based_licenses": {
+                "default": false,
+                "type": "boolean"
+              },
+              "vpp_admin_account_id": {
+                "example": -1,
+                "type": "integer"
+              }
+            },
+            "type": "object"
           }
         },
         "type": "object"
@@ -2599,6 +4422,59 @@
         "required": [
           "name",
           "is_smart"
+        ],
+        "type": "object"
+      },
+      "network_segment": {
+        "properties": {
+          "building": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          },
+          "distribution_point": {
+            "type": "string"
+          },
+          "distribution_server": {
+            "type": "string"
+          },
+          "ending_address": {
+            "example": "10.10.1.1",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the network segment",
+            "example": "Amsterdam Office",
+            "type": "string"
+          },
+          "override_buildings": {
+            "default": false,
+            "type": "boolean"
+          },
+          "override_departments": {
+            "default": false,
+            "type": "boolean"
+          },
+          "starting_address": {
+            "example": "10.1.1.1",
+            "type": "string"
+          },
+          "swu_server": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "starting_address",
+          "ending_address"
         ],
         "type": "object"
       },
@@ -5837,6 +7713,555 @@
         "x-explorer-enabled": false
       }
     },
+    "/distributionpoints/id/{id}": {
+      "delete": {
+        "operationId": "deleteDistributionPointById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a distribution point by ID",
+        "tags": [
+          "distributionpoints"
+        ]
+      },
+      "get": {
+        "operationId": "findDistributionPointsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/distribution_point"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/distribution_point"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds distribution points by ID",
+        "tags": [
+          "distributionpoints"
+        ]
+      },
+      "post": {
+        "operationId": "createDistributionPointById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new distribution point by ID",
+        "tags": [
+          "distributionpoints"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateDistributionPointById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing distribution point by ID",
+        "tags": [
+          "distributionpoints"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/ebooks/id/{id}": {
+      "delete": {
+        "operationId": "deleteEBookById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes an ebook by ID",
+        "tags": [
+          "ebooks"
+        ]
+      },
+      "get": {
+        "operationId": "findEBooksById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ebook"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ebook"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds ebooks by ID",
+        "tags": [
+          "ebooks"
+        ]
+      },
+      "post": {
+        "operationId": "createEBookById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new ebook by ID",
+        "tags": [
+          "ebooks"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateEBookById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing ebook by ID",
+        "tags": [
+          "ebooks"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/ldapservers/id/{id}": {
+      "delete": {
+        "operationId": "deleteLDAPServerById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes an LDAP server by ID",
+        "tags": [
+          "ldapservers"
+        ]
+      },
+      "get": {
+        "operationId": "findLDAPServersById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ldap_server"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ldap_server"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds LDAP servers by ID",
+        "tags": [
+          "ldapservers"
+        ]
+      },
+      "post": {
+        "operationId": "createLDAPServerById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new LDAP server by ID",
+        "tags": [
+          "ldapservers"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateLDAPServerById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing LDAP server by ID",
+        "tags": [
+          "ldapservers"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/macapplications/id/{id}": {
+      "delete": {
+        "operationId": "deleteMacappById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mac application by ID",
+        "tags": [
+          "macapplications"
+        ]
+      },
+      "get": {
+        "operationId": "findMacappsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mac_application"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mac_application"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mac applications by ID",
+        "tags": [
+          "macapplications"
+        ]
+      },
+      "post": {
+        "description": "Does not support vpp codes.",
+        "operationId": "createMacappById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new mac application by ID",
+        "tags": [
+          "macapplications"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "Does not support vpp codes.",
+        "operationId": "updateMacappById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mac application by ID",
+        "tags": [
+          "macapplications"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceapplications/id/{id}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceApplicationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device application by ID",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceApplicationsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device applications by ID",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      },
+      "post": {
+        "description": "App configuration preferences should be listed using character entities, e.g. \u003cpreferences\u003e\u003cdict\u003e\u003ckey\u003eabc\u003c/key\u003e\u003cstring\u003exyz\u003c/string\u003e\u003c/dict\u003e\u003c/preferences\u003e",
+        "operationId": "createMobileDeviceApplicationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new mobile device application by ID",
+        "tags": [
+          "mobiledeviceapplications"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "App configuration preferences should be listed using character entities, e.g. \u003cpreferences\u003e\u003cdict\u003e\u003ckey\u003eabc\u003c/key\u003e\u003cstring\u003exyz\u003c/string\u003e\u003c/dict\u003e\u003c/preferences\u003e",
+        "operationId": "updateMobileDeviceApplicationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device application by ID",
+        "tags": [
+          "mobiledeviceapplications"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/mobiledeviceconfigurationprofiles/id/{id}": {
       "delete": {
         "operationId": "deleteMobileDeviceConfigurationProfileById",
@@ -6612,6 +9037,115 @@
         "summary": "Updates an existing mobile device by UDID",
         "tags": [
           "mobiledevices"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/networksegments/id/{id}": {
+      "delete": {
+        "operationId": "deleteNetworkSegmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a network segment by ID",
+        "tags": [
+          "networksegments"
+        ]
+      },
+      "get": {
+        "operationId": "findNetworkSegmentsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/network_segment"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/network_segment"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds network segments by ID",
+        "tags": [
+          "networksegments"
+        ]
+      },
+      "post": {
+        "operationId": "createNetworkSegmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new network segment by ID",
+        "tags": [
+          "networksegments"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateNetworkSegmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing network segment by ID",
+        "tags": [
+          "networksegments"
         ],
         "x-explorer-enabled": false
       }

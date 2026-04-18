@@ -24,6 +24,7 @@ type AdvancedComputerSearch struct {
 
 // AdvancedComputerSearchComputersItem represents a advanced computer search computers item.
 type AdvancedComputerSearchComputersItem struct {
+	ID       *int                                         `xml:"id,omitempty"`
 	Computer *AdvancedComputerSearchComputersItemComputer `xml:"computer,omitempty"`
 	Size     *Size                                        `xml:"size,omitempty"`
 }
@@ -40,12 +41,14 @@ type AdvancedComputerSearchComputersItemComputer struct {
 // AdvancedComputerSearchCriteriaItem represents a advanced computer search criteria item.
 type AdvancedComputerSearchCriteriaItem struct {
 	XMLName   xml.Name   `xml:"criteria"`
+	ID        *int       `xml:"id,omitempty"`
 	Criterion *Criterion `xml:"criterion,omitempty"`
 	Size      *Size      `xml:"size,omitempty"`
 }
 
 // AdvancedComputerSearchDisplayFieldsItem represents a advanced computer search display fields item.
 type AdvancedComputerSearchDisplayFieldsItem struct {
+	ID           *int                                                 `xml:"id,omitempty"`
 	DisplayField *AdvancedComputerSearchDisplayFieldsItemDisplayField `xml:"display_field,omitempty"`
 	Size         *Size                                                `xml:"size,omitempty"`
 }
@@ -74,12 +77,14 @@ type AdvancedMobileDeviceSearch struct {
 // AdvancedMobileDeviceSearchCriteriaItem represents a advanced mobile device search criteria item.
 type AdvancedMobileDeviceSearchCriteriaItem struct {
 	XMLName   xml.Name   `xml:"criteria"`
+	ID        *int       `xml:"id,omitempty"`
 	Criterion *Criterion `xml:"criterion,omitempty"`
 	Size      *Size      `xml:"size,omitempty"`
 }
 
 // AdvancedMobileDeviceSearchDisplayFieldsItem represents a advanced mobile device search display fields item.
 type AdvancedMobileDeviceSearchDisplayFieldsItem struct {
+	ID           *int                                                     `xml:"id,omitempty"`
 	DisplayField *AdvancedMobileDeviceSearchDisplayFieldsItemDisplayField `xml:"display_field,omitempty"`
 	Size         *Size                                                    `xml:"size,omitempty"`
 }
@@ -92,6 +97,7 @@ type AdvancedMobileDeviceSearchDisplayFieldsItemDisplayField struct {
 
 // AdvancedMobileDeviceSearchMobileDevicesItem represents a advanced mobile device search mobile devices item.
 type AdvancedMobileDeviceSearchMobileDevicesItem struct {
+	ID           *int                                                     `xml:"id,omitempty"`
 	MobileDevice *AdvancedMobileDeviceSearchMobileDevicesItemMobileDevice `xml:"mobile_device,omitempty"`
 	Size         *Size                                                    `xml:"size,omitempty"`
 }
@@ -119,6 +125,7 @@ type AdvancedUserSearch struct {
 // AdvancedUserSearchCriteriaItem represents a advanced user search criteria item.
 type AdvancedUserSearchCriteriaItem struct {
 	XMLName   xml.Name                                 `xml:"criteria"`
+	ID        *int                                     `xml:"id,omitempty"`
 	Criterion *AdvancedUserSearchCriteriaItemCriterion `xml:"criterion,omitempty"`
 	Size      *Size                                    `xml:"size,omitempty"`
 }
@@ -137,6 +144,7 @@ type AdvancedUserSearchCriteriaItemCriterion struct {
 
 // AdvancedUserSearchDisplayFieldsItem represents a advanced user search display fields item.
 type AdvancedUserSearchDisplayFieldsItem struct {
+	ID           *int                                             `xml:"id,omitempty"`
 	DisplayField *AdvancedUserSearchDisplayFieldsItemDisplayField `xml:"display_field,omitempty"`
 	Size         *Size                                            `xml:"size,omitempty"`
 }
@@ -149,6 +157,7 @@ type AdvancedUserSearchDisplayFieldsItemDisplayField struct {
 
 // AdvancedUserSearchUsersItem represents a advanced user search users item.
 type AdvancedUserSearchUsersItem struct {
+	ID   *int                             `xml:"id,omitempty"`
 	Size *Size                            `xml:"size,omitempty"`
 	User *AdvancedUserSearchUsersItemUser `xml:"user,omitempty"`
 }
@@ -374,6 +383,7 @@ type ComputerGroup struct {
 
 // ComputerGroupComputersItem represents a computer group computers item.
 type ComputerGroupComputersItem struct {
+	ID       *int                                `xml:"id,omitempty"`
 	Computer *ComputerGroupComputersItemComputer `xml:"computer,omitempty"`
 	Size     *Size                               `xml:"size,omitempty"`
 }
@@ -391,6 +401,7 @@ type ComputerGroupComputersItemComputer struct {
 // ComputerGroupCriteriaItem represents a computer group criteria item.
 type ComputerGroupCriteriaItem struct {
 	XMLName   xml.Name   `xml:"criteria"`
+	ID        *int       `xml:"id,omitempty"`
 	Criterion *Criterion `xml:"criterion,omitempty"`
 	Size      *Size      `xml:"size,omitempty"`
 }
@@ -408,6 +419,7 @@ type ComputerGroupPost struct {
 // ComputerGroupPostCriteriaItem represents a computer group post criteria item.
 type ComputerGroupPostCriteriaItem struct {
 	XMLName   xml.Name   `xml:"criteria"`
+	ID        *int       `xml:"id,omitempty"`
 	Criterion *Criterion `xml:"criterion,omitempty"`
 }
 
@@ -467,10 +479,595 @@ type DirectoryBinding struct {
 	Username   *string  `xml:"username,omitempty"`
 }
 
+// DistributionPoint represents a distribution point.
+type DistributionPoint struct {
+	XMLName                  xml.Name `xml:"distribution_point"`
+	ConnectionType           *string  `xml:"connection_type,omitempty"`
+	Context                  *string  `xml:"context,omitempty"`
+	EnableLoadBalancing      *bool    `xml:"enable_load_balancing,omitempty"`
+	FailoverPoint            *string  `xml:"failover_point,omitempty"`
+	FailoverPointURL         *string  `xml:"failover_point_url,omitempty"`
+	HttpDownloadsEnabled     *bool    `xml:"http_downloads_enabled,omitempty"`
+	HttpPassword             *string  `xml:"http_password,omitempty"`
+	HttpURL                  *string  `xml:"http_url,omitempty"`
+	HttpUsername             *string  `xml:"http_username,omitempty"`
+	ID                       *int     `xml:"id,omitempty"`
+	IPAddress                *string  `xml:"ip_address,omitempty"`
+	IsMaster                 *bool    `xml:"is_master,omitempty"`
+	LocalPath                *string  `xml:"local_path,omitempty"`
+	Name                     *string  `xml:"name,omitempty"`
+	NoAuthenticationRequired *bool    `xml:"no_authentication_required,omitempty"`
+	Password                 *string  `xml:"password,omitempty"`
+	Port                     *int     `xml:"port,omitempty"`
+	Protocol                 *string  `xml:"protocol,omitempty"`
+	ReadOnlyPassword         *string  `xml:"read_only_password,omitempty"`
+	ReadOnlyUsername         *string  `xml:"read_only_username,omitempty"`
+	ReadWritePassword        *string  `xml:"read_write_password,omitempty"`
+	ReadWriteUsername        *string  `xml:"read_write_username,omitempty"`
+	ShareName                *string  `xml:"share_name,omitempty"`
+	SharePort                *int     `xml:"share_port,omitempty"`
+	SshUsername              *string  `xml:"ssh_username,omitempty"`
+	UsernamePasswordRequired *bool    `xml:"username_password_required,omitempty"`
+	WorkgroupOrDomain        *string  `xml:"workgroup_or_domain,omitempty"`
+}
+
+// DistributionPointPost represents a distribution point post.
+type DistributionPointPost struct {
+	XMLName                  xml.Name `xml:"distribution_point"`
+	ConnectionType           *string  `xml:"connection_type,omitempty"`
+	Context                  *string  `xml:"context,omitempty"`
+	EnableLoadBalancing      *bool    `xml:"enable_load_balancing,omitempty"`
+	FailoverPoint            *string  `xml:"failover_point,omitempty"`
+	HttpDownloadsEnabled     *bool    `xml:"http_downloads_enabled,omitempty"`
+	HttpPassword             *string  `xml:"http_password,omitempty"`
+	HttpURL                  *string  `xml:"http_url,omitempty"`
+	HttpUsername             *string  `xml:"http_username,omitempty"`
+	ID                       *int     `xml:"id,omitempty"`
+	IPAddress                *string  `xml:"ip_address,omitempty"`
+	IsMaster                 *bool    `xml:"is_master,omitempty"`
+	Name                     *string  `xml:"name,omitempty"`
+	NoAuthenticationRequired *bool    `xml:"no_authentication_required,omitempty"`
+	Password                 *string  `xml:"password,omitempty"`
+	Port                     *int     `xml:"port,omitempty"`
+	Protocol                 *string  `xml:"protocol,omitempty"`
+	ReadOnlyPassword         *string  `xml:"read_only_password,omitempty"`
+	ReadOnlyUsername         *string  `xml:"read_only_username,omitempty"`
+	ReadWritePassword        *string  `xml:"read_write_password,omitempty"`
+	ReadWriteUsername        *string  `xml:"read_write_username,omitempty"`
+	ShareName                *string  `xml:"share_name,omitempty"`
+	SharePort                *int     `xml:"share_port,omitempty"`
+	SshUsername              *string  `xml:"ssh_username,omitempty"`
+	UsernamePasswordRequired *bool    `xml:"username_password_required,omitempty"`
+	WorkgroupOrDomain        *string  `xml:"workgroup_or_domain,omitempty"`
+}
+
+// Ebook represents a ebook.
+type Ebook struct {
+	XMLName     xml.Name          `xml:"ebook"`
+	ID          *int              `xml:"id,omitempty"`
+	General     *EbookGeneral     `xml:"general,omitempty"`
+	Scope       *EbookScope       `xml:"scope,omitempty"`
+	SelfService *EbookSelfService `xml:"self_service,omitempty"`
+}
+
+// EbookGeneral represents a ebook general.
+type EbookGeneral struct {
+	XMLName         xml.Name                     `xml:"general"`
+	Author          *string                      `xml:"author,omitempty"`
+	Category        *CategoryObject              `xml:"category,omitempty"`
+	DeployAsManaged *bool                        `xml:"deploy_as_managed,omitempty"`
+	DeploymentType  *string                      `xml:"deployment_type,omitempty"`
+	FileType        *string                      `xml:"file_type,omitempty"`
+	Free            *bool                        `xml:"free,omitempty"`
+	ID              *int                         `xml:"id,omitempty"`
+	Name            *string                      `xml:"name,omitempty"`
+	SelfServiceIcon *EbookGeneralSelfServiceIcon `xml:"self_service_icon,omitempty"`
+	Site            *SiteObject                  `xml:"site,omitempty"`
+	URL             *string                      `xml:"url,omitempty"`
+	Version         *string                      `xml:"version,omitempty"`
+}
+
+// EbookGeneralSelfServiceIcon represents a ebook general self service icon.
+type EbookGeneralSelfServiceIcon struct {
+	XMLName xml.Name `xml:"self_service_icon"`
+	Data    *string  `xml:"data,omitempty"`
+	ID      *int     `xml:"id,omitempty"`
+	URI     *string  `xml:"uri,omitempty"`
+}
+
+// EbookScope represents a ebook scope.
+type EbookScope struct {
+	XMLName            xml.Name                           `xml:"scope"`
+	ID                 *int                               `xml:"id,omitempty"`
+	AllComputers       *bool                              `xml:"all_computers,omitempty"`
+	AllJssUsers        *bool                              `xml:"all_jss_users,omitempty"`
+	AllMobileDevices   *bool                              `xml:"all_mobile_devices,omitempty"`
+	Buildings          []EbookScopeBuildingsItem          `xml:"buildings"`
+	Classes            []EbookScopeClassesItem            `xml:"classes"`
+	ComputerGroups     []EbookScopeComputerGroupsItem     `xml:"computer_groups"`
+	Computers          []EbookScopeComputersItem          `xml:"computers"`
+	Departments        []EbookScopeDepartmentsItem        `xml:"departments"`
+	Exclusions         *EbookScopeExclusions              `xml:"exclusions,omitempty"`
+	JssUserGroups      []EbookScopeJssUserGroupsItem      `xml:"jss_user_groups"`
+	JssUsers           []EbookScopeJssUsersItem           `xml:"jss_users"`
+	Limitations        *EbookScopeLimitations             `xml:"limitations,omitempty"`
+	MobileDeviceGroups []EbookScopeMobileDeviceGroupsItem `xml:"mobile_device_groups"`
+	MobileDevices      []EbookScopeMobileDevicesItem      `xml:"mobile_devices"`
+}
+
+// EbookScopeBuildingsItem represents a ebook scope buildings item.
+type EbookScopeBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
+	Building *IDName `xml:"building,omitempty"`
+}
+
+// EbookScopeClassesItem represents a ebook scope classes item.
+type EbookScopeClassesItem struct {
+	ID    *int    `xml:"id,omitempty"`
+	Class *IDName `xml:"class,omitempty"`
+}
+
+// EbookScopeComputerGroupsItem represents a ebook scope computer groups item.
+type EbookScopeComputerGroupsItem struct {
+	ID            *int    `xml:"id,omitempty"`
+	ComputerGroup *IDName `xml:"computer_group,omitempty"`
+}
+
+// EbookScopeComputersItem represents a ebook scope computers item.
+type EbookScopeComputersItem struct {
+	ID       *int                             `xml:"id,omitempty"`
+	Computer *EbookScopeComputersItemComputer `xml:"computer,omitempty"`
+}
+
+// EbookScopeComputersItemComputer represents a ebook scope computers item computer.
+type EbookScopeComputersItemComputer struct {
+	XMLName xml.Name `xml:"computer"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	UDID    *string  `xml:"udid,omitempty"`
+}
+
+// EbookScopeDepartmentsItem represents a ebook scope departments item.
+type EbookScopeDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
+	Department *IDName `xml:"department,omitempty"`
+}
+
+// EbookScopeExclusions represents a ebook scope exclusions.
+type EbookScopeExclusions struct {
+	XMLName            xml.Name                                     `xml:"exclusions"`
+	Buildings          []EbookScopeExclusionsBuildingsItem          `xml:"buildings"`
+	ComputerGroups     []EbookScopeExclusionsComputerGroupsItem     `xml:"computer_groups"`
+	Computers          []EbookScopeExclusionsComputersItem          `xml:"computers"`
+	Departments        []EbookScopeExclusionsDepartmentsItem        `xml:"departments"`
+	JssUserGroups      []EbookScopeExclusionsJssUserGroupsItem      `xml:"jss_user_groups"`
+	JssUsers           []EbookScopeExclusionsJssUsersItem           `xml:"jss_users"`
+	MobileDeviceGroups []EbookScopeExclusionsMobileDeviceGroupsItem `xml:"mobile_device_groups"`
+	MobileDevices      []EbookScopeExclusionsMobileDevicesItem      `xml:"mobile_devices"`
+	NetworkSegments    []EbookScopeExclusionsNetworkSegmentsItem    `xml:"network_segments"`
+	UserGroups         []EbookScopeExclusionsUserGroupsItem         `xml:"user_groups"`
+	Users              []EbookScopeExclusionsUsersItem              `xml:"users"`
+}
+
+// EbookScopeExclusionsBuildingsItem represents a ebook scope exclusions buildings item.
+type EbookScopeExclusionsBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
+	Building *IDName `xml:"building,omitempty"`
+}
+
+// EbookScopeExclusionsComputerGroupsItem represents a ebook scope exclusions computer groups item.
+type EbookScopeExclusionsComputerGroupsItem struct {
+	ID            *int    `xml:"id,omitempty"`
+	ComputerGroup *IDName `xml:"computer_group,omitempty"`
+}
+
+// EbookScopeExclusionsComputersItem represents a ebook scope exclusions computers item.
+type EbookScopeExclusionsComputersItem struct {
+	ID       *int                                       `xml:"id,omitempty"`
+	Computer *EbookScopeExclusionsComputersItemComputer `xml:"computer,omitempty"`
+}
+
+// EbookScopeExclusionsComputersItemComputer represents a ebook scope exclusions computers item computer.
+type EbookScopeExclusionsComputersItemComputer struct {
+	XMLName xml.Name `xml:"computer"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	UDID    *string  `xml:"udid,omitempty"`
+}
+
+// EbookScopeExclusionsDepartmentsItem represents a ebook scope exclusions departments item.
+type EbookScopeExclusionsDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
+	Department *IDName `xml:"department,omitempty"`
+}
+
+// EbookScopeExclusionsJssUserGroupsItem represents a ebook scope exclusions jss user groups item.
+type EbookScopeExclusionsJssUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// EbookScopeExclusionsJssUsersItem represents a ebook scope exclusions jss users item.
+type EbookScopeExclusionsJssUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
+	User *IDName `xml:"user,omitempty"`
+}
+
+// EbookScopeExclusionsMobileDeviceGroupsItem represents a ebook scope exclusions mobile device groups item.
+type EbookScopeExclusionsMobileDeviceGroupsItem struct {
+	ID                *int    `xml:"id,omitempty"`
+	MobileDeviceGroup *IDName `xml:"mobile_device_group,omitempty"`
+}
+
+// EbookScopeExclusionsMobileDevicesItem represents a ebook scope exclusions mobile devices item.
+type EbookScopeExclusionsMobileDevicesItem struct {
+	ID           *int                                               `xml:"id,omitempty"`
+	MobileDevice *EbookScopeExclusionsMobileDevicesItemMobileDevice `xml:"mobile_device,omitempty"`
+}
+
+// EbookScopeExclusionsMobileDevicesItemMobileDevice represents a ebook scope exclusions mobile devices item mobile device.
+type EbookScopeExclusionsMobileDevicesItemMobileDevice struct {
+	XMLName        xml.Name `xml:"mobile_device"`
+	ID             *int     `xml:"id,omitempty"`
+	Name           *string  `xml:"name,omitempty"`
+	UDID           *string  `xml:"udid,omitempty"`
+	WifiMacAddress *string  `xml:"wifi_mac_address,omitempty"`
+}
+
+// EbookScopeExclusionsNetworkSegmentsItem represents a ebook scope exclusions network segments item.
+type EbookScopeExclusionsNetworkSegmentsItem struct {
+	ID             *int                                                   `xml:"id,omitempty"`
+	NetworkSegment *EbookScopeExclusionsNetworkSegmentsItemNetworkSegment `xml:"network_segment,omitempty"`
+}
+
+// EbookScopeExclusionsNetworkSegmentsItemNetworkSegment represents a ebook scope exclusions network segments item network segment.
+type EbookScopeExclusionsNetworkSegmentsItemNetworkSegment struct {
+	XMLName xml.Name `xml:"network_segment"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	Uid     *string  `xml:"uid,omitempty"`
+}
+
+// EbookScopeExclusionsUserGroupsItem represents a ebook scope exclusions user groups item.
+type EbookScopeExclusionsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// EbookScopeExclusionsUsersItem represents a ebook scope exclusions users item.
+type EbookScopeExclusionsUsersItem struct {
+	ID   *int                               `xml:"id,omitempty"`
+	User *EbookScopeExclusionsUsersItemUser `xml:"user,omitempty"`
+}
+
+// EbookScopeExclusionsUsersItemUser represents a ebook scope exclusions users item user.
+type EbookScopeExclusionsUsersItemUser struct {
+	XMLName xml.Name `xml:"user"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// EbookScopeJssUserGroupsItem represents a ebook scope jss user groups item.
+type EbookScopeJssUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// EbookScopeJssUsersItem represents a ebook scope jss users item.
+type EbookScopeJssUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
+	User *IDName `xml:"user,omitempty"`
+}
+
+// EbookScopeLimitations represents a ebook scope limitations.
+type EbookScopeLimitations struct {
+	XMLName         xml.Name                                   `xml:"limitations"`
+	NetworkSegments []EbookScopeLimitationsNetworkSegmentsItem `xml:"network_segments"`
+	UserGroups      []EbookScopeLimitationsUserGroupsItem      `xml:"user_groups"`
+	Users           []EbookScopeLimitationsUsersItem           `xml:"users"`
+}
+
+// EbookScopeLimitationsNetworkSegmentsItem represents a ebook scope limitations network segments item.
+type EbookScopeLimitationsNetworkSegmentsItem struct {
+	ID             *int    `xml:"id,omitempty"`
+	NetworkSegment *IDName `xml:"network_segment,omitempty"`
+}
+
+// EbookScopeLimitationsUserGroupsItem represents a ebook scope limitations user groups item.
+type EbookScopeLimitationsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// EbookScopeLimitationsUsersItem represents a ebook scope limitations users item.
+type EbookScopeLimitationsUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
+	User *IDName `xml:"user,omitempty"`
+}
+
+// EbookScopeMobileDeviceGroupsItem represents a ebook scope mobile device groups item.
+type EbookScopeMobileDeviceGroupsItem struct {
+	ID                *int    `xml:"id,omitempty"`
+	MobileDeviceGroup *IDName `xml:"mobile_device_group,omitempty"`
+}
+
+// EbookScopeMobileDevicesItem represents a ebook scope mobile devices item.
+type EbookScopeMobileDevicesItem struct {
+	ID           *int                                     `xml:"id,omitempty"`
+	MobileDevice *EbookScopeMobileDevicesItemMobileDevice `xml:"mobile_device,omitempty"`
+}
+
+// EbookScopeMobileDevicesItemMobileDevice represents a ebook scope mobile devices item mobile device.
+type EbookScopeMobileDevicesItemMobileDevice struct {
+	XMLName        xml.Name `xml:"mobile_device"`
+	ID             *int     `xml:"id,omitempty"`
+	Name           *string  `xml:"name,omitempty"`
+	UDID           *string  `xml:"udid,omitempty"`
+	WifiMacAddress *string  `xml:"wifi_mac_address,omitempty"`
+}
+
+// EbookSelfService represents a ebook self service.
+type EbookSelfService struct {
+	XMLName                     xml.Name                               `xml:"self_service"`
+	ID                          *int                                   `xml:"id,omitempty"`
+	FeatureOnMainPage           *bool                                  `xml:"feature_on_main_page,omitempty"`
+	ForceUsersToViewDescription *bool                                  `xml:"force_users_to_view_description,omitempty"`
+	InstallButtonText           *string                                `xml:"install_button_text,omitempty"`
+	Notification                *bool                                  `xml:"notification,omitempty"`
+	NotificationMessage         *string                                `xml:"notification_message,omitempty"`
+	NotificationSubject         *string                                `xml:"notification_subject,omitempty"`
+	SelfServiceCategories       *EbookSelfServiceSelfServiceCategories `xml:"self_service_categories,omitempty"`
+	SelfServiceDescription      *string                                `xml:"self_service_description,omitempty"`
+	SelfServiceDisplayName      *string                                `xml:"self_service_display_name,omitempty"`
+	SelfServiceIcon             *EbookSelfServiceSelfServiceIcon       `xml:"self_service_icon,omitempty"`
+}
+
+// EbookSelfServiceSelfServiceCategories represents a ebook self service self service categories.
+type EbookSelfServiceSelfServiceCategories struct {
+	XMLName  xml.Name                                       `xml:"self_service_categories"`
+	ID       *int                                           `xml:"id,omitempty"`
+	Category *EbookSelfServiceSelfServiceCategoriesCategory `xml:"category,omitempty"`
+}
+
+// EbookSelfServiceSelfServiceCategoriesCategory represents a ebook self service self service categories category.
+type EbookSelfServiceSelfServiceCategoriesCategory struct {
+	XMLName   xml.Name `xml:"category"`
+	DisplayIn *string  `xml:"display_in,omitempty"`
+	FeatureIn *bool    `xml:"feature_in,omitempty"`
+	ID        *int     `xml:"id,omitempty"`
+	Name      *string  `xml:"name,omitempty"`
+}
+
+// EbookSelfServiceSelfServiceIcon represents a ebook self service self service icon.
+type EbookSelfServiceSelfServiceIcon struct {
+	XMLName xml.Name `xml:"self_service_icon"`
+	Data    *string  `xml:"data,omitempty"`
+	ID      *int     `xml:"id,omitempty"`
+	URI     *string  `xml:"uri,omitempty"`
+}
+
+// EbookPost represents a ebook post.
+type EbookPost struct {
+	XMLName xml.Name          `xml:"ebook"`
+	ID      *int              `xml:"id,omitempty"`
+	General *EbookPostGeneral `xml:"general,omitempty"`
+	Scope   *EbookPostScope   `xml:"scope,omitempty"`
+}
+
+// EbookPostGeneral represents a ebook post general.
+type EbookPostGeneral struct {
+	XMLName         xml.Name        `xml:"general"`
+	Author          *string         `xml:"author,omitempty"`
+	Category        *CategoryObject `xml:"category,omitempty"`
+	DeployAsManaged *bool           `xml:"deploy_as_managed,omitempty"`
+	DeploymentType  *string         `xml:"deployment_type,omitempty"`
+	FileType        *string         `xml:"file_type,omitempty"`
+	Free            *bool           `xml:"free,omitempty"`
+	ID              *int            `xml:"id,omitempty"`
+	Name            *string         `xml:"name,omitempty"`
+	SelfServiceIcon *string         `xml:"self_service_icon,omitempty"`
+	Site            *SiteObject     `xml:"site,omitempty"`
+	URL             *string         `xml:"url,omitempty"`
+	Version         *string         `xml:"version,omitempty"`
+}
+
+// EbookPostScope represents a ebook post scope.
+type EbookPostScope struct {
+	XMLName          xml.Name `xml:"scope"`
+	AllComputers     *bool    `xml:"all_computers,omitempty"`
+	AllJssUsers      *bool    `xml:"all_jss_users,omitempty"`
+	AllMobileDevices *bool    `xml:"all_mobile_devices,omitempty"`
+}
+
 // IDName represents a i d name.
 type IDName struct {
 	ID   *int    `xml:"id,omitempty"`
 	Name *string `xml:"name,omitempty"`
+}
+
+// LdapServer represents a ldap server.
+type LdapServer struct {
+	XMLName          xml.Name                    `xml:"ldap_server"`
+	ID               *int                        `xml:"id,omitempty"`
+	Connection       *LdapServerConnection       `xml:"connection,omitempty"`
+	MappingsForUsers *LdapServerMappingsForUsers `xml:"mappings_for_users,omitempty"`
+}
+
+// LdapServerConnection represents a ldap server connection.
+type LdapServerConnection struct {
+	XMLName            xml.Name                     `xml:"connection"`
+	Account            *LdapServerConnectionAccount `xml:"account,omitempty"`
+	AuthenticationType *string                      `xml:"authentication_type,omitempty"`
+	Hostname           *string                      `xml:"hostname,omitempty"`
+	ID                 *int                         `xml:"id,omitempty"`
+	Name               *string                      `xml:"name,omitempty"`
+	OpenCloseTimeout   *int                         `xml:"open_close_timeout,omitempty"`
+	Port               *int                         `xml:"port,omitempty"`
+	ReferralResponse   *string                      `xml:"referral_response,omitempty"`
+	SearchTimeout      *int                         `xml:"search_timeout,omitempty"`
+	ServerType         *string                      `xml:"server_type,omitempty"`
+	UseSsl             *bool                        `xml:"use_ssl,omitempty"`
+	UseWildcards       *bool                        `xml:"use_wildcards,omitempty"`
+}
+
+// LdapServerConnectionAccount represents a ldap server connection account.
+type LdapServerConnectionAccount struct {
+	XMLName               xml.Name `xml:"account"`
+	DistinguishedUsername *string  `xml:"distinguished_username,omitempty"`
+	Password              *string  `xml:"password,omitempty"`
+}
+
+// LdapServerMappingsForUsers represents a ldap server mappings for users.
+type LdapServerMappingsForUsers struct {
+	XMLName                     xml.Name                                               `xml:"mappings_for_users"`
+	ID                          *int                                                   `xml:"id,omitempty"`
+	UserGroupMappings           *LdapServerMappingsForUsersUserGroupMappings           `xml:"user_group_mappings,omitempty"`
+	UserGroupMembershipMappings *LdapServerMappingsForUsersUserGroupMembershipMappings `xml:"user_group_membership_mappings,omitempty"`
+	UserMappings                *LdapServerMappingsForUsersUserMappings                `xml:"user_mappings,omitempty"`
+}
+
+// LdapServerMappingsForUsersUserGroupMappings represents a ldap server mappings for users user group mappings.
+type LdapServerMappingsForUsersUserGroupMappings struct {
+	XMLName                  xml.Name `xml:"user_group_mappings"`
+	MapGroupID               *string  `xml:"map_group_id,omitempty"`
+	MapGroupName             *string  `xml:"map_group_name,omitempty"`
+	MapGroupUUID             *string  `xml:"map_group_uuid,omitempty"`
+	MapObjectClassToAnyOrAll *string  `xml:"map_object_class_to_any_or_all,omitempty"`
+	ObjectClasses            *string  `xml:"object_classes,omitempty"`
+	SearchBase               *string  `xml:"search_base,omitempty"`
+	SearchScope              *string  `xml:"search_scope,omitempty"`
+}
+
+// LdapServerMappingsForUsersUserGroupMembershipMappings represents a ldap server mappings for users user group membership mappings.
+type LdapServerMappingsForUsersUserGroupMembershipMappings struct {
+	XMLName                           xml.Name `xml:"user_group_membership_mappings"`
+	AppendToUsername                  *string  `xml:"append_to_username,omitempty"`
+	GroupID                           *string  `xml:"group_id,omitempty"`
+	MapGroupMembershipToUserField     *string  `xml:"map_group_membership_to_user_field,omitempty"`
+	MapObjectClassToAnyOrAll          *string  `xml:"map_object_class_to_any_or_all,omitempty"`
+	MapUserMembershipToGroupField     *bool    `xml:"map_user_membership_to_group_field,omitempty"`
+	MapUserMembershipUseDn            *bool    `xml:"map_user_membership_use_dn,omitempty"`
+	ObjectClasses                     *string  `xml:"object_classes,omitempty"`
+	RecursiveLookups                  *bool    `xml:"recursive_lookups,omitempty"`
+	SearchBase                        *string  `xml:"search_base,omitempty"`
+	SearchScope                       *string  `xml:"search_scope,omitempty"`
+	UseDn                             *bool    `xml:"use_dn,omitempty"`
+	UserGroupMembershipStoredIn       *string  `xml:"user_group_membership_stored_in,omitempty"`
+	UserGroupMembershipUseLdapCompare *bool    `xml:"user_group_membership_use_ldap_compare,omitempty"`
+	Username                          *string  `xml:"username,omitempty"`
+}
+
+// LdapServerMappingsForUsersUserMappings represents a ldap server mappings for users user mappings.
+type LdapServerMappingsForUsersUserMappings struct {
+	XMLName                  xml.Name `xml:"user_mappings"`
+	AppendToEmailResults     *string  `xml:"append_to_email_results,omitempty"`
+	MapBuilding              *string  `xml:"map_building,omitempty"`
+	MapDepartment            *string  `xml:"map_department,omitempty"`
+	MapEmailAddress          *string  `xml:"map_email_address,omitempty"`
+	MapObjectClassToAnyOrAll *string  `xml:"map_object_class_to_any_or_all,omitempty"`
+	MapPosition              *string  `xml:"map_position,omitempty"`
+	MapRealname              *string  `xml:"map_realname,omitempty"`
+	MapRoom                  *string  `xml:"map_room,omitempty"`
+	MapTelephone             *string  `xml:"map_telephone,omitempty"`
+	MapUserID                *string  `xml:"map_user_id,omitempty"`
+	MapUserUUID              *string  `xml:"map_user_uuid,omitempty"`
+	MapUsername              *string  `xml:"map_username,omitempty"`
+	ObjectClasses            *string  `xml:"object_classes,omitempty"`
+	SearchBase               *string  `xml:"search_base,omitempty"`
+	SearchScope              *string  `xml:"search_scope,omitempty"`
+}
+
+// LdapServerPost represents a ldap server post.
+type LdapServerPost struct {
+	XMLName          xml.Name                        `xml:"ldap_server"`
+	ID               *int                            `xml:"id,omitempty"`
+	Connection       *LdapServerPostConnection       `xml:"connection,omitempty"`
+	MappingsForUsers *LdapServerPostMappingsForUsers `xml:"mappings_for_users,omitempty"`
+}
+
+// LdapServerPostConnection represents a ldap server post connection.
+type LdapServerPostConnection struct {
+	XMLName             xml.Name                         `xml:"connection"`
+	Account             *LdapServerPostConnectionAccount `xml:"account,omitempty"`
+	AuthenticationType  *string                          `xml:"authentication_type,omitempty"`
+	CertificateUsed     *string                          `xml:"certificate_used,omitempty"`
+	ConnectionIsUsedFor *string                          `xml:"connection_is_used_for,omitempty"`
+	Hostname            *string                          `xml:"hostname,omitempty"`
+	ID                  *int                             `xml:"id,omitempty"`
+	Name                *string                          `xml:"name,omitempty"`
+	OpenCloseTimeout    *int                             `xml:"open_close_timeout,omitempty"`
+	Port                *int                             `xml:"port,omitempty"`
+	ReferralResponse    *string                          `xml:"referral_response,omitempty"`
+	SearchTimeout       *int                             `xml:"search_timeout,omitempty"`
+	ServerType          *string                          `xml:"server_type,omitempty"`
+	UseSsl              *bool                            `xml:"use_ssl,omitempty"`
+	UseWildcards        *bool                            `xml:"use_wildcards,omitempty"`
+}
+
+// LdapServerPostConnectionAccount represents a ldap server post connection account.
+type LdapServerPostConnectionAccount struct {
+	XMLName               xml.Name `xml:"account"`
+	DistinguishedUsername *string  `xml:"distinguished_username,omitempty"`
+	Password              *string  `xml:"password,omitempty"`
+}
+
+// LdapServerPostMappingsForUsers represents a ldap server post mappings for users.
+type LdapServerPostMappingsForUsers struct {
+	XMLName                     xml.Name                                                   `xml:"mappings_for_users"`
+	ID                          *int                                                       `xml:"id,omitempty"`
+	UserGroupMappings           *LdapServerPostMappingsForUsersUserGroupMappings           `xml:"user_group_mappings,omitempty"`
+	UserGroupMembershipMappings *LdapServerPostMappingsForUsersUserGroupMembershipMappings `xml:"user_group_membership_mappings,omitempty"`
+	UserMappings                *LdapServerPostMappingsForUsersUserMappings                `xml:"user_mappings,omitempty"`
+}
+
+// LdapServerPostMappingsForUsersUserGroupMappings represents a ldap server post mappings for users user group mappings.
+type LdapServerPostMappingsForUsersUserGroupMappings struct {
+	XMLName                  xml.Name `xml:"user_group_mappings"`
+	MapGroupID               *string  `xml:"map_group_id,omitempty"`
+	MapGroupName             *string  `xml:"map_group_name,omitempty"`
+	MapGroupUUID             *string  `xml:"map_group_uuid,omitempty"`
+	MapObjectClassToAnyOrAll *string  `xml:"map_object_class_to_any_or_all,omitempty"`
+	ObjectClasses            *string  `xml:"object_classes,omitempty"`
+	SearchBase               *string  `xml:"search_base,omitempty"`
+	SearchScope              *string  `xml:"search_scope,omitempty"`
+}
+
+// LdapServerPostMappingsForUsersUserGroupMembershipMappings represents a ldap server post mappings for users user group membership mappings.
+type LdapServerPostMappingsForUsersUserGroupMembershipMappings struct {
+	XMLName                           xml.Name `xml:"user_group_membership_mappings"`
+	AppendToUsername                  *string  `xml:"append_to_username,omitempty"`
+	GroupID                           *string  `xml:"group_id,omitempty"`
+	MapGroupMembershipToUserField     *string  `xml:"map_group_membership_to_user_field,omitempty"`
+	MapObjectClassToAnyOrAll          *string  `xml:"map_object_class_to_any_or_all,omitempty"`
+	MapUserMembershipToGroupField     *bool    `xml:"map_user_membership_to_group_field,omitempty"`
+	MapUserMembershipUseDn            *bool    `xml:"map_user_membership_use_dn,omitempty"`
+	ObjectClasses                     *string  `xml:"object_classes,omitempty"`
+	RecursiveLookups                  *bool    `xml:"recursive_lookups,omitempty"`
+	SearchBase                        *string  `xml:"search_base,omitempty"`
+	SearchScope                       *string  `xml:"search_scope,omitempty"`
+	UseDn                             *bool    `xml:"use_dn,omitempty"`
+	UserGroupMembershipStoredIn       *string  `xml:"user_group_membership_stored_in,omitempty"`
+	UserGroupMembershipUseLdapCompare *bool    `xml:"user_group_membership_use_ldap_compare,omitempty"`
+	Username                          *string  `xml:"username,omitempty"`
+}
+
+// LdapServerPostMappingsForUsersUserMappings represents a ldap server post mappings for users user mappings.
+type LdapServerPostMappingsForUsersUserMappings struct {
+	XMLName                  xml.Name `xml:"user_mappings"`
+	AppendToEmailResults     *string  `xml:"append_to_email_results,omitempty"`
+	MapBuilding              *string  `xml:"map_building,omitempty"`
+	MapDepartment            *string  `xml:"map_department,omitempty"`
+	MapEmailAddress          *string  `xml:"map_email_address,omitempty"`
+	MapObjectClassToAnyOrAll *string  `xml:"map_object_class_to_any_or_all,omitempty"`
+	MapPosition              *string  `xml:"map_position,omitempty"`
+	MapRealname              *string  `xml:"map_realname,omitempty"`
+	MapRoom                  *string  `xml:"map_room,omitempty"`
+	MapTelephone             *string  `xml:"map_telephone,omitempty"`
+	MapUserID                *string  `xml:"map_user_id,omitempty"`
+	MapUserUUID              *string  `xml:"map_user_uuid,omitempty"`
+	MapUsername              *string  `xml:"map_username,omitempty"`
+	ObjectClasses            *string  `xml:"object_classes,omitempty"`
+	SearchBase               *string  `xml:"search_base,omitempty"`
+	SearchScope              *string  `xml:"search_scope,omitempty"`
 }
 
 // Location represents a location.
@@ -486,6 +1083,250 @@ type Location struct {
 	Realname     *string  `xml:"realname,omitempty"`
 	Room         *string  `xml:"room,omitempty"`
 	Username     *string  `xml:"username,omitempty"`
+}
+
+// MacApplication represents a mac application.
+type MacApplication struct {
+	XMLName     xml.Name                   `xml:"mac_application"`
+	ID          *int                       `xml:"id,omitempty"`
+	General     *MacApplicationGeneral     `xml:"general,omitempty"`
+	Scope       *MacApplicationScope       `xml:"scope,omitempty"`
+	SelfService *MacApplicationSelfService `xml:"self_service,omitempty"`
+}
+
+// MacApplicationGeneral represents a mac application general.
+type MacApplicationGeneral struct {
+	XMLName  xml.Name        `xml:"general"`
+	BundleID *string         `xml:"bundle_id,omitempty"`
+	Category *CategoryObject `xml:"category,omitempty"`
+	ID       *int            `xml:"id,omitempty"`
+	IsFree   *bool           `xml:"is_free,omitempty"`
+	Name     *string         `xml:"name,omitempty"`
+	Site     *SiteObject     `xml:"site,omitempty"`
+	URL      *string         `xml:"url,omitempty"`
+	Version  *string         `xml:"version,omitempty"`
+}
+
+// MacApplicationScope represents a mac application scope.
+type MacApplicationScope struct {
+	XMLName        xml.Name                                 `xml:"scope"`
+	ID             *int                                     `xml:"id,omitempty"`
+	AllComputers   *bool                                    `xml:"all_computers,omitempty"`
+	AllJssUsers    *bool                                    `xml:"all_jss_users,omitempty"`
+	Buildings      *[]MacApplicationScopeBuildingsItem      `xml:"buildings,omitempty"`
+	ComputerGroups *[]MacApplicationScopeComputerGroupsItem `xml:"computer_groups,omitempty"`
+	Computers      *[]MacApplicationScopeComputersItem      `xml:"computers,omitempty"`
+	Departments    *[]MacApplicationScopeDepartmentsItem    `xml:"departments,omitempty"`
+	Exclusions     *MacApplicationScopeExclusions           `xml:"exclusions,omitempty"`
+	JssUserGroups  *[]MacApplicationScopeJssUserGroupsItem  `xml:"jss_user_groups,omitempty"`
+	JssUsers       *[]MacApplicationScopeJssUsersItem       `xml:"jss_users,omitempty"`
+	Limitations    *MacApplicationScopeLimitations          `xml:"limitations,omitempty"`
+}
+
+// MacApplicationScopeBuildingsItem represents a mac application scope buildings item.
+type MacApplicationScopeBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
+	Building *IDName `xml:"building,omitempty"`
+}
+
+// MacApplicationScopeComputerGroupsItem represents a mac application scope computer groups item.
+type MacApplicationScopeComputerGroupsItem struct {
+	ID            *int    `xml:"id,omitempty"`
+	ComputerGroup *IDName `xml:"computer_group,omitempty"`
+}
+
+// MacApplicationScopeComputersItem represents a mac application scope computers item.
+type MacApplicationScopeComputersItem struct {
+	ID       *int                                      `xml:"id,omitempty"`
+	Computer *MacApplicationScopeComputersItemComputer `xml:"computer,omitempty"`
+}
+
+// MacApplicationScopeComputersItemComputer represents a mac application scope computers item computer.
+type MacApplicationScopeComputersItemComputer struct {
+	XMLName xml.Name `xml:"computer"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	UDID    *string  `xml:"udid,omitempty"`
+}
+
+// MacApplicationScopeDepartmentsItem represents a mac application scope departments item.
+type MacApplicationScopeDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
+	Department *IDName `xml:"department,omitempty"`
+}
+
+// MacApplicationScopeExclusions represents a mac application scope exclusions.
+type MacApplicationScopeExclusions struct {
+	XMLName         xml.Name                                            `xml:"exclusions"`
+	Buildings       *[]MacApplicationScopeExclusionsBuildingsItem       `xml:"buildings,omitempty"`
+	ComputerGroups  *[]MacApplicationScopeExclusionsComputerGroupsItem  `xml:"computer_groups,omitempty"`
+	Computers       *[]MacApplicationScopeExclusionsComputersItem       `xml:"computers,omitempty"`
+	Departments     *[]MacApplicationScopeExclusionsDepartmentsItem     `xml:"departments,omitempty"`
+	JssUserGroups   *[]MacApplicationScopeExclusionsJssUserGroupsItem   `xml:"jss_user_groups,omitempty"`
+	JssUsers        *[]MacApplicationScopeExclusionsJssUsersItem        `xml:"jss_users,omitempty"`
+	NetworkSegments *[]MacApplicationScopeExclusionsNetworkSegmentsItem `xml:"network_segments,omitempty"`
+	UserGroups      *[]MacApplicationScopeExclusionsUserGroupsItem      `xml:"user_groups,omitempty"`
+	Users           *[]MacApplicationScopeExclusionsUsersItem           `xml:"users,omitempty"`
+}
+
+// MacApplicationScopeExclusionsBuildingsItem represents a mac application scope exclusions buildings item.
+type MacApplicationScopeExclusionsBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
+	Building *IDName `xml:"building,omitempty"`
+}
+
+// MacApplicationScopeExclusionsComputerGroupsItem represents a mac application scope exclusions computer groups item.
+type MacApplicationScopeExclusionsComputerGroupsItem struct {
+	ID            *int    `xml:"id,omitempty"`
+	ComputerGroup *IDName `xml:"computer_group,omitempty"`
+}
+
+// MacApplicationScopeExclusionsComputersItem represents a mac application scope exclusions computers item.
+type MacApplicationScopeExclusionsComputersItem struct {
+	ID       *int                                                `xml:"id,omitempty"`
+	Computer *MacApplicationScopeExclusionsComputersItemComputer `xml:"computer,omitempty"`
+}
+
+// MacApplicationScopeExclusionsComputersItemComputer represents a mac application scope exclusions computers item computer.
+type MacApplicationScopeExclusionsComputersItemComputer struct {
+	XMLName xml.Name `xml:"computer"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	UDID    *string  `xml:"udid,omitempty"`
+}
+
+// MacApplicationScopeExclusionsDepartmentsItem represents a mac application scope exclusions departments item.
+type MacApplicationScopeExclusionsDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
+	Department *IDName `xml:"department,omitempty"`
+}
+
+// MacApplicationScopeExclusionsJssUserGroupsItem represents a mac application scope exclusions jss user groups item.
+type MacApplicationScopeExclusionsJssUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// MacApplicationScopeExclusionsJssUsersItem represents a mac application scope exclusions jss users item.
+type MacApplicationScopeExclusionsJssUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
+	User *IDName `xml:"user,omitempty"`
+}
+
+// MacApplicationScopeExclusionsNetworkSegmentsItem represents a mac application scope exclusions network segments item.
+type MacApplicationScopeExclusionsNetworkSegmentsItem struct {
+	ID             *int                                                            `xml:"id,omitempty"`
+	NetworkSegment *MacApplicationScopeExclusionsNetworkSegmentsItemNetworkSegment `xml:"network_segment,omitempty"`
+}
+
+// MacApplicationScopeExclusionsNetworkSegmentsItemNetworkSegment represents a mac application scope exclusions network segments item network segment.
+type MacApplicationScopeExclusionsNetworkSegmentsItemNetworkSegment struct {
+	XMLName xml.Name `xml:"network_segment"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	Uid     *string  `xml:"uid,omitempty"`
+}
+
+// MacApplicationScopeExclusionsUserGroupsItem represents a mac application scope exclusions user groups item.
+type MacApplicationScopeExclusionsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// MacApplicationScopeExclusionsUsersItem represents a mac application scope exclusions users item.
+type MacApplicationScopeExclusionsUsersItem struct {
+	ID   *int                                        `xml:"id,omitempty"`
+	User *MacApplicationScopeExclusionsUsersItemUser `xml:"user,omitempty"`
+}
+
+// MacApplicationScopeExclusionsUsersItemUser represents a mac application scope exclusions users item user.
+type MacApplicationScopeExclusionsUsersItemUser struct {
+	XMLName xml.Name `xml:"user"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// MacApplicationScopeJssUserGroupsItem represents a mac application scope jss user groups item.
+type MacApplicationScopeJssUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// MacApplicationScopeJssUsersItem represents a mac application scope jss users item.
+type MacApplicationScopeJssUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
+	User *IDName `xml:"user,omitempty"`
+}
+
+// MacApplicationScopeLimitations represents a mac application scope limitations.
+type MacApplicationScopeLimitations struct {
+	XMLName         xml.Name                                             `xml:"limitations"`
+	NetworkSegments *[]MacApplicationScopeLimitationsNetworkSegmentsItem `xml:"network_segments,omitempty"`
+	UserGroups      *[]MacApplicationScopeLimitationsUserGroupsItem      `xml:"user_groups,omitempty"`
+	Users           *[]MacApplicationScopeLimitationsUsersItem           `xml:"users,omitempty"`
+}
+
+// MacApplicationScopeLimitationsNetworkSegmentsItem represents a mac application scope limitations network segments item.
+type MacApplicationScopeLimitationsNetworkSegmentsItem struct {
+	ID             *int    `xml:"id,omitempty"`
+	NetworkSegment *IDName `xml:"network_segment,omitempty"`
+}
+
+// MacApplicationScopeLimitationsUserGroupsItem represents a mac application scope limitations user groups item.
+type MacApplicationScopeLimitationsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// MacApplicationScopeLimitationsUsersItem represents a mac application scope limitations users item.
+type MacApplicationScopeLimitationsUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
+	User *IDName `xml:"user,omitempty"`
+}
+
+// MacApplicationSelfService represents a mac application self service.
+type MacApplicationSelfService struct {
+	XMLName                     xml.Name                                              `xml:"self_service"`
+	ID                          *int                                                  `xml:"id,omitempty"`
+	FeatureOnMainPage           *bool                                                 `xml:"feature_on_main_page,omitempty"`
+	ForceUsersToViewDescription *bool                                                 `xml:"force_users_to_view_description,omitempty"`
+	InstallButtonText           *string                                               `xml:"install_button_text,omitempty"`
+	Notification                *string                                               `xml:"notification,omitempty"`
+	NotificationMessage         *string                                               `xml:"notification_message,omitempty"`
+	NotificationSubject         *string                                               `xml:"notification_subject,omitempty"`
+	SelfServiceCategories       *[]MacApplicationSelfServiceSelfServiceCategoriesItem `xml:"self_service_categories,omitempty"`
+	SelfServiceDescription      *string                                               `xml:"self_service_description,omitempty"`
+	SelfServiceIcon             *MacApplicationSelfServiceSelfServiceIcon             `xml:"self_service_icon,omitempty"`
+	Vpp                         *MacApplicationSelfServiceVpp                         `xml:"vpp,omitempty"`
+}
+
+// MacApplicationSelfServiceSelfServiceCategoriesItem represents a mac application self service self service categories item.
+type MacApplicationSelfServiceSelfServiceCategoriesItem struct {
+	ID       *int                                                        `xml:"id,omitempty"`
+	Category *MacApplicationSelfServiceSelfServiceCategoriesItemCategory `xml:"category,omitempty"`
+}
+
+// MacApplicationSelfServiceSelfServiceCategoriesItemCategory represents a mac application self service self service categories item category.
+type MacApplicationSelfServiceSelfServiceCategoriesItemCategory struct {
+	XMLName   xml.Name `xml:"category"`
+	DisplayIn *bool    `xml:"display_in,omitempty"`
+	FeatureIn *bool    `xml:"feature_in,omitempty"`
+	ID        *int     `xml:"id,omitempty"`
+	Name      *string  `xml:"name,omitempty"`
+}
+
+// MacApplicationSelfServiceSelfServiceIcon represents a mac application self service self service icon.
+type MacApplicationSelfServiceSelfServiceIcon struct {
+	XMLName xml.Name `xml:"self_service_icon"`
+	Data    *string  `xml:"data,omitempty"`
+	ID      *int     `xml:"id,omitempty"`
+	URI     *string  `xml:"uri,omitempty"`
+}
+
+// MacApplicationSelfServiceVpp represents a mac application self service vpp.
+type MacApplicationSelfServiceVpp struct {
+	XMLName                      xml.Name `xml:"vpp"`
+	AssignVppDeviceBasedLicenses *bool    `xml:"assign_vpp_device_based_licenses,omitempty"`
+	VppAdminAccountID            *int     `xml:"vpp_admin_account_id,omitempty"`
 }
 
 // MobileDevice represents a mobile device.
@@ -606,6 +1447,292 @@ type MobileDeviceSecurityObject struct {
 	PasscodePresent                 *bool   `xml:"passcode_present,omitempty"`
 }
 
+// MobileDeviceApplication represents a mobile device application.
+type MobileDeviceApplication struct {
+	XMLName          xml.Name                                 `xml:"mobile_device_application"`
+	ID               *int                                     `xml:"id,omitempty"`
+	AppConfiguration *MobileDeviceApplicationAppConfiguration `xml:"app_configuration,omitempty"`
+	General          *MobileDeviceApplicationGeneral          `xml:"general,omitempty"`
+	Scope            *MobileDeviceApplicationScope            `xml:"scope,omitempty"`
+	SelfService      *MobileDeviceApplicationSelfService      `xml:"self_service,omitempty"`
+	Vpp              *MobileDeviceApplicationVpp              `xml:"vpp,omitempty"`
+}
+
+// MobileDeviceApplicationAppConfiguration represents a mobile device application app configuration.
+type MobileDeviceApplicationAppConfiguration struct {
+	XMLName     xml.Name `xml:"app_configuration"`
+	Preferences *string  `xml:"preferences,omitempty"`
+}
+
+// MobileDeviceApplicationGeneral represents a mobile device application general.
+type MobileDeviceApplicationGeneral struct {
+	XMLName                          xml.Name                            `xml:"general"`
+	BundleID                         *string                             `xml:"bundle_id,omitempty"`
+	Category                         *CategoryObject                     `xml:"category,omitempty"`
+	DeployAsManagedApp               *bool                               `xml:"deploy_as_managed_app,omitempty"`
+	DeployAutomatically              *bool                               `xml:"deploy_automatically,omitempty"`
+	DeploymentType                   *string                             `xml:"deployment_type,omitempty"`
+	Description                      *string                             `xml:"description,omitempty"`
+	DisplayName                      *string                             `xml:"display_name,omitempty"`
+	ExternalURL                      *string                             `xml:"external_url,omitempty"`
+	Free                             *bool                               `xml:"free,omitempty"`
+	HostExternally                   *bool                               `xml:"host_externally,omitempty"`
+	Icon                             *MobileDeviceApplicationGeneralIcon `xml:"icon,omitempty"`
+	ID                               *int                                `xml:"id,omitempty"`
+	InternalApp                      *bool                               `xml:"internal_app,omitempty"`
+	Ipa                              *MobileDeviceApplicationGeneralIpa  `xml:"ipa,omitempty"`
+	ItunesCountryRegion              *string                             `xml:"itunes_country_region,omitempty"`
+	ItunesStoreURL                   *string                             `xml:"itunes_store_url,omitempty"`
+	ItunesSyncTime                   *int                                `xml:"itunes_sync_time,omitempty"`
+	KeepDescriptionAndIconUpToDate   *bool                               `xml:"keep_description_and_icon_up_to_date,omitempty"`
+	MakeAvailableAfterInstall        *bool                               `xml:"make_available_after_install,omitempty"`
+	MobileDeviceProvisioningProfile  *int                                `xml:"mobile_device_provisioning_profile,omitempty"`
+	Name                             *string                             `xml:"name,omitempty"`
+	PreventBackupOfAppData           *bool                               `xml:"prevent_backup_of_app_data,omitempty"`
+	RemoveAppWhenMDMProfileIsRemoved *bool                               `xml:"remove_app_when_mdm_profile_is_removed,omitempty"`
+	Site                             *SiteObject                         `xml:"site,omitempty"`
+	TakeOverManagement               *bool                               `xml:"take_over_management,omitempty"`
+	Version                          *string                             `xml:"version,omitempty"`
+}
+
+// MobileDeviceApplicationGeneralIcon represents a mobile device application general icon.
+type MobileDeviceApplicationGeneralIcon struct {
+	XMLName xml.Name `xml:"icon"`
+	Data    *string  `xml:"data,omitempty"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	URI     *string  `xml:"uri,omitempty"`
+}
+
+// MobileDeviceApplicationGeneralIpa represents a mobile device application general ipa.
+type MobileDeviceApplicationGeneralIpa struct {
+	XMLName xml.Name `xml:"ipa"`
+	Data    *string  `xml:"data,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	URI     *string  `xml:"uri,omitempty"`
+}
+
+// MobileDeviceApplicationScope represents a mobile device application scope.
+type MobileDeviceApplicationScope struct {
+	XMLName            xml.Name                                              `xml:"scope"`
+	ID                 *int                                                  `xml:"id,omitempty"`
+	AllJssUsers        *bool                                                 `xml:"all_jss_users,omitempty"`
+	AllMobileDevices   *bool                                                 `xml:"all_mobile_devices,omitempty"`
+	Buildings          *[]MobileDeviceApplicationScopeBuildingsItem          `xml:"buildings,omitempty"`
+	Departments        *[]MobileDeviceApplicationScopeDepartmentsItem        `xml:"departments,omitempty"`
+	Exclusions         *MobileDeviceApplicationScopeExclusions               `xml:"exclusions,omitempty"`
+	JssUserGroups      *[]MobileDeviceApplicationScopeJssUserGroupsItem      `xml:"jss_user_groups,omitempty"`
+	JssUsers           *[]MobileDeviceApplicationScopeJssUsersItem           `xml:"jss_users,omitempty"`
+	Limitations        *MobileDeviceApplicationScopeLimitations              `xml:"limitations,omitempty"`
+	MobileDeviceGroups *[]MobileDeviceApplicationScopeMobileDeviceGroupsItem `xml:"mobile_device_groups,omitempty"`
+	MobileDevices      *[]MobileDeviceApplicationScopeMobileDevicesItem      `xml:"mobile_devices,omitempty"`
+}
+
+// MobileDeviceApplicationScopeBuildingsItem represents a mobile device application scope buildings item.
+type MobileDeviceApplicationScopeBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
+	Building *IDName `xml:"building,omitempty"`
+}
+
+// MobileDeviceApplicationScopeDepartmentsItem represents a mobile device application scope departments item.
+type MobileDeviceApplicationScopeDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
+	Department *IDName `xml:"department,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusions represents a mobile device application scope exclusions.
+type MobileDeviceApplicationScopeExclusions struct {
+	XMLName            xml.Name                                                        `xml:"exclusions"`
+	Buildings          *[]MobileDeviceApplicationScopeExclusionsBuildingsItem          `xml:"buildings,omitempty"`
+	Departments        *[]MobileDeviceApplicationScopeExclusionsDepartmentsItem        `xml:"departments,omitempty"`
+	JssUserGroups      *[]MobileDeviceApplicationScopeExclusionsJssUserGroupsItem      `xml:"jss_user_groups,omitempty"`
+	JssUsers           *[]MobileDeviceApplicationScopeExclusionsJssUsersItem           `xml:"jss_users,omitempty"`
+	MobileDeviceGroups *[]MobileDeviceApplicationScopeExclusionsMobileDeviceGroupsItem `xml:"mobile_device_groups,omitempty"`
+	MobileDevices      *[]MobileDeviceApplicationScopeExclusionsMobileDevicesItem      `xml:"mobile_devices,omitempty"`
+	NetworkSegments    *[]MobileDeviceApplicationScopeExclusionsNetworkSegmentsItem    `xml:"network_segments,omitempty"`
+	UserGroups         *[]MobileDeviceApplicationScopeExclusionsUserGroupsItem         `xml:"user_groups,omitempty"`
+	Users              *[]MobileDeviceApplicationScopeExclusionsUsersItem              `xml:"users,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsBuildingsItem represents a mobile device application scope exclusions buildings item.
+type MobileDeviceApplicationScopeExclusionsBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
+	Building *IDName `xml:"building,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsDepartmentsItem represents a mobile device application scope exclusions departments item.
+type MobileDeviceApplicationScopeExclusionsDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
+	Department *IDName `xml:"department,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsJssUserGroupsItem represents a mobile device application scope exclusions jss user groups item.
+type MobileDeviceApplicationScopeExclusionsJssUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsJssUsersItem represents a mobile device application scope exclusions jss users item.
+type MobileDeviceApplicationScopeExclusionsJssUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
+	User *IDName `xml:"user,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsMobileDeviceGroupsItem represents a mobile device application scope exclusions mobile device groups item.
+type MobileDeviceApplicationScopeExclusionsMobileDeviceGroupsItem struct {
+	ID                *int    `xml:"id,omitempty"`
+	MobileDeviceGroup *IDName `xml:"mobile_device_group,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsMobileDevicesItem represents a mobile device application scope exclusions mobile devices item.
+type MobileDeviceApplicationScopeExclusionsMobileDevicesItem struct {
+	ID           *int                                                                 `xml:"id,omitempty"`
+	MobileDevice *MobileDeviceApplicationScopeExclusionsMobileDevicesItemMobileDevice `xml:"mobile_device,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsMobileDevicesItemMobileDevice represents a mobile device application scope exclusions mobile devices item mobile device.
+type MobileDeviceApplicationScopeExclusionsMobileDevicesItemMobileDevice struct {
+	XMLName        xml.Name `xml:"mobile_device"`
+	ID             *int     `xml:"id,omitempty"`
+	Name           *string  `xml:"name,omitempty"`
+	UDID           *string  `xml:"udid,omitempty"`
+	WifiMacAddress *string  `xml:"wifi_mac_address,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsNetworkSegmentsItem represents a mobile device application scope exclusions network segments item.
+type MobileDeviceApplicationScopeExclusionsNetworkSegmentsItem struct {
+	ID             *int                                                                     `xml:"id,omitempty"`
+	NetworkSegment *MobileDeviceApplicationScopeExclusionsNetworkSegmentsItemNetworkSegment `xml:"network_segment,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsNetworkSegmentsItemNetworkSegment represents a mobile device application scope exclusions network segments item network segment.
+type MobileDeviceApplicationScopeExclusionsNetworkSegmentsItemNetworkSegment struct {
+	XMLName xml.Name `xml:"network_segment"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	Uid     *string  `xml:"uid,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsUserGroupsItem represents a mobile device application scope exclusions user groups item.
+type MobileDeviceApplicationScopeExclusionsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsUsersItem represents a mobile device application scope exclusions users item.
+type MobileDeviceApplicationScopeExclusionsUsersItem struct {
+	ID   *int                                                 `xml:"id,omitempty"`
+	User *MobileDeviceApplicationScopeExclusionsUsersItemUser `xml:"user,omitempty"`
+}
+
+// MobileDeviceApplicationScopeExclusionsUsersItemUser represents a mobile device application scope exclusions users item user.
+type MobileDeviceApplicationScopeExclusionsUsersItemUser struct {
+	XMLName xml.Name `xml:"user"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// MobileDeviceApplicationScopeJssUserGroupsItem represents a mobile device application scope jss user groups item.
+type MobileDeviceApplicationScopeJssUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// MobileDeviceApplicationScopeJssUsersItem represents a mobile device application scope jss users item.
+type MobileDeviceApplicationScopeJssUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
+	User *IDName `xml:"user,omitempty"`
+}
+
+// MobileDeviceApplicationScopeLimitations represents a mobile device application scope limitations.
+type MobileDeviceApplicationScopeLimitations struct {
+	XMLName         xml.Name                                                      `xml:"limitations"`
+	NetworkSegments *[]MobileDeviceApplicationScopeLimitationsNetworkSegmentsItem `xml:"network_segments,omitempty"`
+	UserGroups      *[]MobileDeviceApplicationScopeLimitationsUserGroupsItem      `xml:"user_groups,omitempty"`
+	Users           *[]MobileDeviceApplicationScopeLimitationsUsersItem           `xml:"users,omitempty"`
+}
+
+// MobileDeviceApplicationScopeLimitationsNetworkSegmentsItem represents a mobile device application scope limitations network segments item.
+type MobileDeviceApplicationScopeLimitationsNetworkSegmentsItem struct {
+	ID             *int    `xml:"id,omitempty"`
+	NetworkSegment *IDName `xml:"network_segment,omitempty"`
+}
+
+// MobileDeviceApplicationScopeLimitationsUserGroupsItem represents a mobile device application scope limitations user groups item.
+type MobileDeviceApplicationScopeLimitationsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// MobileDeviceApplicationScopeLimitationsUsersItem represents a mobile device application scope limitations users item.
+type MobileDeviceApplicationScopeLimitationsUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
+	User *IDName `xml:"user,omitempty"`
+}
+
+// MobileDeviceApplicationScopeMobileDeviceGroupsItem represents a mobile device application scope mobile device groups item.
+type MobileDeviceApplicationScopeMobileDeviceGroupsItem struct {
+	ID                *int    `xml:"id,omitempty"`
+	MobileDeviceGroup *IDName `xml:"mobile_device_group,omitempty"`
+}
+
+// MobileDeviceApplicationScopeMobileDevicesItem represents a mobile device application scope mobile devices item.
+type MobileDeviceApplicationScopeMobileDevicesItem struct {
+	ID           *int                                                       `xml:"id,omitempty"`
+	MobileDevice *MobileDeviceApplicationScopeMobileDevicesItemMobileDevice `xml:"mobile_device,omitempty"`
+}
+
+// MobileDeviceApplicationScopeMobileDevicesItemMobileDevice represents a mobile device application scope mobile devices item mobile device.
+type MobileDeviceApplicationScopeMobileDevicesItemMobileDevice struct {
+	XMLName        xml.Name `xml:"mobile_device"`
+	ID             *int     `xml:"id,omitempty"`
+	Name           *string  `xml:"name,omitempty"`
+	UDID           *string  `xml:"udid,omitempty"`
+	WifiMacAddress *string  `xml:"wifi_mac_address,omitempty"`
+}
+
+// MobileDeviceApplicationSelfService represents a mobile device application self service.
+type MobileDeviceApplicationSelfService struct {
+	XMLName                xml.Name                                                       `xml:"self_service"`
+	ID                     *int                                                           `xml:"id,omitempty"`
+	FeatureOnMainPage      *bool                                                          `xml:"feature_on_main_page,omitempty"`
+	Notification           *bool                                                          `xml:"notification,omitempty"`
+	NotificationMessage    *string                                                        `xml:"notification_message,omitempty"`
+	NotificationSubject    *string                                                        `xml:"notification_subject,omitempty"`
+	SelfServiceCategories  *[]MobileDeviceApplicationSelfServiceSelfServiceCategoriesItem `xml:"self_service_categories,omitempty"`
+	SelfServiceDescription *string                                                        `xml:"self_service_description,omitempty"`
+	SelfServiceIcon        *MobileDeviceApplicationSelfServiceSelfServiceIcon             `xml:"self_service_icon,omitempty"`
+}
+
+// MobileDeviceApplicationSelfServiceSelfServiceCategoriesItem represents a mobile device application self service self service categories item.
+type MobileDeviceApplicationSelfServiceSelfServiceCategoriesItem struct {
+	ID       *int                                                                 `xml:"id,omitempty"`
+	Category *MobileDeviceApplicationSelfServiceSelfServiceCategoriesItemCategory `xml:"category,omitempty"`
+}
+
+// MobileDeviceApplicationSelfServiceSelfServiceCategoriesItemCategory represents a mobile device application self service self service categories item category.
+type MobileDeviceApplicationSelfServiceSelfServiceCategoriesItemCategory struct {
+	XMLName   xml.Name `xml:"category"`
+	DisplayIn *bool    `xml:"display_in,omitempty"`
+	ID        *int     `xml:"id,omitempty"`
+	Name      *string  `xml:"name,omitempty"`
+}
+
+// MobileDeviceApplicationSelfServiceSelfServiceIcon represents a mobile device application self service self service icon.
+type MobileDeviceApplicationSelfServiceSelfServiceIcon struct {
+	XMLName xml.Name `xml:"self_service_icon"`
+	Data    *string  `xml:"data,omitempty"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	URI     *string  `xml:"uri,omitempty"`
+}
+
+// MobileDeviceApplicationVpp represents a mobile device application vpp.
+type MobileDeviceApplicationVpp struct {
+	XMLName                      xml.Name `xml:"vpp"`
+	AssignVppDeviceBasedLicenses *bool    `xml:"assign_vpp_device_based_licenses,omitempty"`
+	VppAdminAccountID            *int     `xml:"vpp_admin_account_id,omitempty"`
+}
+
 // MobileDeviceConfigurationProfile represents a mobile device configuration profile.
 type MobileDeviceConfigurationProfile struct {
 	XMLName     xml.Name                                     `xml:"configuration_profile"`
@@ -634,6 +1761,7 @@ type MobileDeviceConfigurationProfileGeneral struct {
 // MobileDeviceConfigurationProfileScope represents a mobile device configuration profile scope.
 type MobileDeviceConfigurationProfileScope struct {
 	XMLName            xml.Name                                                       `xml:"scope"`
+	ID                 *int                                                           `xml:"id,omitempty"`
 	AllJssUsers        *bool                                                          `xml:"all_jss_users,omitempty"`
 	AllMobileDevices   *bool                                                          `xml:"all_mobile_devices,omitempty"`
 	Buildings          *[]MobileDeviceConfigurationProfileScopeBuildingsItem          `xml:"buildings,omitempty"`
@@ -648,11 +1776,13 @@ type MobileDeviceConfigurationProfileScope struct {
 
 // MobileDeviceConfigurationProfileScopeBuildingsItem represents a mobile device configuration profile scope buildings item.
 type MobileDeviceConfigurationProfileScopeBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
 	Building *IDName `xml:"building,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeDepartmentsItem represents a mobile device configuration profile scope departments item.
 type MobileDeviceConfigurationProfileScopeDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
 	Department *IDName `xml:"department,omitempty"`
 }
 
@@ -673,36 +1803,43 @@ type MobileDeviceConfigurationProfileScopeExclusions struct {
 
 // MobileDeviceConfigurationProfileScopeExclusionsBuildingsItem represents a mobile device configuration profile scope exclusions buildings item.
 type MobileDeviceConfigurationProfileScopeExclusionsBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
 	Building *IDName `xml:"building,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeExclusionsDepartmentsItem represents a mobile device configuration profile scope exclusions departments item.
 type MobileDeviceConfigurationProfileScopeExclusionsDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
 	Department *IDName `xml:"department,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeExclusionsIbeaconsItem represents a mobile device configuration profile scope exclusions ibeacons item.
 type MobileDeviceConfigurationProfileScopeExclusionsIbeaconsItem struct {
+	ID      *int    `xml:"id,omitempty"`
 	Ibeacon *IDName `xml:"ibeacon,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeExclusionsJssUserGroupsItem represents a mobile device configuration profile scope exclusions jss user groups item.
 type MobileDeviceConfigurationProfileScopeExclusionsJssUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
 	UserGroup *IDName `xml:"user_group,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeExclusionsJssUsersItem represents a mobile device configuration profile scope exclusions jss users item.
 type MobileDeviceConfigurationProfileScopeExclusionsJssUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
 	User *IDName `xml:"user,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeExclusionsMobileDeviceGroupsItem represents a mobile device configuration profile scope exclusions mobile device groups item.
 type MobileDeviceConfigurationProfileScopeExclusionsMobileDeviceGroupsItem struct {
+	ID                *int    `xml:"id,omitempty"`
 	MobileDeviceGroup *IDName `xml:"mobile_device_group,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeExclusionsMobileDevicesItem represents a mobile device configuration profile scope exclusions mobile devices item.
 type MobileDeviceConfigurationProfileScopeExclusionsMobileDevicesItem struct {
+	ID           *int                                                                          `xml:"id,omitempty"`
 	MobileDevice *MobileDeviceConfigurationProfileScopeExclusionsMobileDevicesItemMobileDevice `xml:"mobile_device,omitempty"`
 }
 
@@ -717,6 +1854,7 @@ type MobileDeviceConfigurationProfileScopeExclusionsMobileDevicesItemMobileDevic
 
 // MobileDeviceConfigurationProfileScopeExclusionsNetworkSegmentsItem represents a mobile device configuration profile scope exclusions network segments item.
 type MobileDeviceConfigurationProfileScopeExclusionsNetworkSegmentsItem struct {
+	ID             *int                                                                              `xml:"id,omitempty"`
 	NetworkSegment *MobileDeviceConfigurationProfileScopeExclusionsNetworkSegmentsItemNetworkSegment `xml:"network_segment,omitempty"`
 }
 
@@ -730,11 +1868,13 @@ type MobileDeviceConfigurationProfileScopeExclusionsNetworkSegmentsItemNetworkSe
 
 // MobileDeviceConfigurationProfileScopeExclusionsUserGroupsItem represents a mobile device configuration profile scope exclusions user groups item.
 type MobileDeviceConfigurationProfileScopeExclusionsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
 	UserGroup *IDName `xml:"user_group,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeExclusionsUsersItem represents a mobile device configuration profile scope exclusions users item.
 type MobileDeviceConfigurationProfileScopeExclusionsUsersItem struct {
+	ID   *int                                                          `xml:"id,omitempty"`
 	User *MobileDeviceConfigurationProfileScopeExclusionsUsersItemUser `xml:"user,omitempty"`
 }
 
@@ -746,11 +1886,13 @@ type MobileDeviceConfigurationProfileScopeExclusionsUsersItemUser struct {
 
 // MobileDeviceConfigurationProfileScopeJssUserGroupsItem represents a mobile device configuration profile scope jss user groups item.
 type MobileDeviceConfigurationProfileScopeJssUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
 	UserGroup *IDName `xml:"user_group,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeJssUsersItem represents a mobile device configuration profile scope jss users item.
 type MobileDeviceConfigurationProfileScopeJssUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
 	User *IDName `xml:"user,omitempty"`
 }
 
@@ -765,31 +1907,37 @@ type MobileDeviceConfigurationProfileScopeLimitations struct {
 
 // MobileDeviceConfigurationProfileScopeLimitationsIbeaconsItem represents a mobile device configuration profile scope limitations ibeacons item.
 type MobileDeviceConfigurationProfileScopeLimitationsIbeaconsItem struct {
+	ID      *int    `xml:"id,omitempty"`
 	Ibeacon *IDName `xml:"ibeacon,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeLimitationsNetworkSegmentsItem represents a mobile device configuration profile scope limitations network segments item.
 type MobileDeviceConfigurationProfileScopeLimitationsNetworkSegmentsItem struct {
+	ID             *int    `xml:"id,omitempty"`
 	NetworkSegment *IDName `xml:"network_segment,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeLimitationsUserGroupsItem represents a mobile device configuration profile scope limitations user groups item.
 type MobileDeviceConfigurationProfileScopeLimitationsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
 	UserGroup *IDName `xml:"user_group,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeLimitationsUsersItem represents a mobile device configuration profile scope limitations users item.
 type MobileDeviceConfigurationProfileScopeLimitationsUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
 	User *IDName `xml:"user,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeMobileDeviceGroupsItem represents a mobile device configuration profile scope mobile device groups item.
 type MobileDeviceConfigurationProfileScopeMobileDeviceGroupsItem struct {
+	ID                *int    `xml:"id,omitempty"`
 	MobileDeviceGroup *IDName `xml:"mobile_device_group,omitempty"`
 }
 
 // MobileDeviceConfigurationProfileScopeMobileDevicesItem represents a mobile device configuration profile scope mobile devices item.
 type MobileDeviceConfigurationProfileScopeMobileDevicesItem struct {
+	ID           *int                                                                `xml:"id,omitempty"`
 	MobileDevice *MobileDeviceConfigurationProfileScopeMobileDevicesItemMobileDevice `xml:"mobile_device,omitempty"`
 }
 
@@ -805,6 +1953,7 @@ type MobileDeviceConfigurationProfileScopeMobileDevicesItemMobileDevice struct {
 // MobileDeviceConfigurationProfileSelfService represents a mobile device configuration profile self service.
 type MobileDeviceConfigurationProfileSelfService struct {
 	XMLName                xml.Name                                                    `xml:"self_service"`
+	ID                     *int                                                        `xml:"id,omitempty"`
 	FeatureOnMainPage      *bool                                                       `xml:"feature_on_main_page,omitempty"`
 	SecurityName           *MobileDeviceConfigurationProfileSelfServiceSecurityName    `xml:"security_name,omitempty"`
 	SelfServiceCategories  *[]any                                                      `xml:"self_service_categories,omitempty"`
@@ -896,6 +2045,34 @@ type MobileDevicePostGeneral struct {
 	WifiMacAddress           *string  `xml:"wifi_mac_address,omitempty"`
 }
 
+// NetworkSegment represents a network segment.
+type NetworkSegment struct {
+	XMLName             xml.Name `xml:"network_segment"`
+	Building            *string  `xml:"building,omitempty"`
+	Department          *string  `xml:"department,omitempty"`
+	DistributionPoint   *string  `xml:"distribution_point,omitempty"`
+	DistributionServer  *string  `xml:"distribution_server,omitempty"`
+	EndingAddress       *string  `xml:"ending_address,omitempty"`
+	ID                  *int     `xml:"id,omitempty"`
+	Name                *string  `xml:"name,omitempty"`
+	OverrideBuildings   *bool    `xml:"override_buildings,omitempty"`
+	OverrideDepartments *bool    `xml:"override_departments,omitempty"`
+	StartingAddress     *string  `xml:"starting_address,omitempty"`
+	SwuServer           *string  `xml:"swu_server,omitempty"`
+	URL                 *string  `xml:"url,omitempty"`
+}
+
+// NetworkSegmentPost represents a network segment post.
+type NetworkSegmentPost struct {
+	XMLName             xml.Name `xml:"network_segment"`
+	EndingAddress       *string  `xml:"ending_address,omitempty"`
+	ID                  *int     `xml:"id,omitempty"`
+	Name                *string  `xml:"name,omitempty"`
+	OverrideBuildings   *bool    `xml:"override_buildings,omitempty"`
+	OverrideDepartments *bool    `xml:"override_departments,omitempty"`
+	StartingAddress     *string  `xml:"starting_address,omitempty"`
+}
+
 // OsXConfigurationProfile represents a os x configuration profile.
 type OsXConfigurationProfile struct {
 	XMLName     xml.Name                            `xml:"os_x_configuration_profile"`
@@ -924,6 +2101,7 @@ type OsXConfigurationProfileGeneral struct {
 // OsXConfigurationProfileScope represents a os x configuration profile scope.
 type OsXConfigurationProfileScope struct {
 	XMLName        xml.Name                                          `xml:"scope"`
+	ID             *int                                              `xml:"id,omitempty"`
 	AllComputers   *bool                                             `xml:"all_computers,omitempty"`
 	AllJssUsers    *bool                                             `xml:"all_jss_users,omitempty"`
 	Buildings      *[]OsXConfigurationProfileScopeBuildingsItem      `xml:"buildings,omitempty"`
@@ -938,16 +2116,19 @@ type OsXConfigurationProfileScope struct {
 
 // OsXConfigurationProfileScopeBuildingsItem represents a os x configuration profile scope buildings item.
 type OsXConfigurationProfileScopeBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
 	Building *IDName `xml:"building,omitempty"`
 }
 
 // OsXConfigurationProfileScopeComputerGroupsItem represents a os x configuration profile scope computer groups item.
 type OsXConfigurationProfileScopeComputerGroupsItem struct {
+	ID            *int    `xml:"id,omitempty"`
 	ComputerGroup *IDName `xml:"computer_group,omitempty"`
 }
 
 // OsXConfigurationProfileScopeComputersItem represents a os x configuration profile scope computers item.
 type OsXConfigurationProfileScopeComputersItem struct {
+	ID       *int                                               `xml:"id,omitempty"`
 	Computer *OsXConfigurationProfileScopeComputersItemComputer `xml:"computer,omitempty"`
 }
 
@@ -961,6 +2142,7 @@ type OsXConfigurationProfileScopeComputersItemComputer struct {
 
 // OsXConfigurationProfileScopeDepartmentsItem represents a os x configuration profile scope departments item.
 type OsXConfigurationProfileScopeDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
 	Department *IDName `xml:"department,omitempty"`
 }
 
@@ -981,16 +2163,19 @@ type OsXConfigurationProfileScopeExclusions struct {
 
 // OsXConfigurationProfileScopeExclusionsBuildingsItem represents a os x configuration profile scope exclusions buildings item.
 type OsXConfigurationProfileScopeExclusionsBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
 	Building *IDName `xml:"building,omitempty"`
 }
 
 // OsXConfigurationProfileScopeExclusionsComputerGroupsItem represents a os x configuration profile scope exclusions computer groups item.
 type OsXConfigurationProfileScopeExclusionsComputerGroupsItem struct {
+	ID            *int    `xml:"id,omitempty"`
 	ComputerGroup *IDName `xml:"computer_group,omitempty"`
 }
 
 // OsXConfigurationProfileScopeExclusionsComputersItem represents a os x configuration profile scope exclusions computers item.
 type OsXConfigurationProfileScopeExclusionsComputersItem struct {
+	ID       *int                                                         `xml:"id,omitempty"`
 	Computer *OsXConfigurationProfileScopeExclusionsComputersItemComputer `xml:"computer,omitempty"`
 }
 
@@ -1004,26 +2189,31 @@ type OsXConfigurationProfileScopeExclusionsComputersItemComputer struct {
 
 // OsXConfigurationProfileScopeExclusionsDepartmentsItem represents a os x configuration profile scope exclusions departments item.
 type OsXConfigurationProfileScopeExclusionsDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
 	Department *IDName `xml:"department,omitempty"`
 }
 
 // OsXConfigurationProfileScopeExclusionsIbeaconsItem represents a os x configuration profile scope exclusions ibeacons item.
 type OsXConfigurationProfileScopeExclusionsIbeaconsItem struct {
+	ID      *int    `xml:"id,omitempty"`
 	Ibeacon *IDName `xml:"ibeacon,omitempty"`
 }
 
 // OsXConfigurationProfileScopeExclusionsJssUserGroupsItem represents a os x configuration profile scope exclusions jss user groups item.
 type OsXConfigurationProfileScopeExclusionsJssUserGroupsItem struct {
+	ID           *int    `xml:"id,omitempty"`
 	JssUserGroup *IDName `xml:"jss_user_group,omitempty"`
 }
 
 // OsXConfigurationProfileScopeExclusionsJssUsersItem represents a os x configuration profile scope exclusions jss users item.
 type OsXConfigurationProfileScopeExclusionsJssUsersItem struct {
+	ID      *int    `xml:"id,omitempty"`
 	JssUser *IDName `xml:"jss_user,omitempty"`
 }
 
 // OsXConfigurationProfileScopeExclusionsNetworkSegmentsItem represents a os x configuration profile scope exclusions network segments item.
 type OsXConfigurationProfileScopeExclusionsNetworkSegmentsItem struct {
+	ID             *int                                                                     `xml:"id,omitempty"`
 	NetworkSegment *OsXConfigurationProfileScopeExclusionsNetworkSegmentsItemNetworkSegment `xml:"network_segment,omitempty"`
 }
 
@@ -1037,11 +2227,13 @@ type OsXConfigurationProfileScopeExclusionsNetworkSegmentsItemNetworkSegment str
 
 // OsXConfigurationProfileScopeExclusionsUserGroupsItem represents a os x configuration profile scope exclusions user groups item.
 type OsXConfigurationProfileScopeExclusionsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
 	UserGroup *IDName `xml:"user_group,omitempty"`
 }
 
 // OsXConfigurationProfileScopeExclusionsUsersItem represents a os x configuration profile scope exclusions users item.
 type OsXConfigurationProfileScopeExclusionsUsersItem struct {
+	ID   *int                                                 `xml:"id,omitempty"`
 	User *OsXConfigurationProfileScopeExclusionsUsersItemUser `xml:"user,omitempty"`
 }
 
@@ -1053,11 +2245,13 @@ type OsXConfigurationProfileScopeExclusionsUsersItemUser struct {
 
 // OsXConfigurationProfileScopeJssUserGroupsItem represents a os x configuration profile scope jss user groups item.
 type OsXConfigurationProfileScopeJssUserGroupsItem struct {
+	ID           *int    `xml:"id,omitempty"`
 	JssUserGroup *IDName `xml:"jss_user_group,omitempty"`
 }
 
 // OsXConfigurationProfileScopeJssUsersItem represents a os x configuration profile scope jss users item.
 type OsXConfigurationProfileScopeJssUsersItem struct {
+	ID    *int    `xml:"id,omitempty"`
 	Users *IDName `xml:"users,omitempty"`
 }
 
@@ -1072,27 +2266,32 @@ type OsXConfigurationProfileScopeLimitations struct {
 
 // OsXConfigurationProfileScopeLimitationsIbeaconsItem represents a os x configuration profile scope limitations ibeacons item.
 type OsXConfigurationProfileScopeLimitationsIbeaconsItem struct {
+	ID      *int    `xml:"id,omitempty"`
 	Ibeacon *IDName `xml:"ibeacon,omitempty"`
 }
 
 // OsXConfigurationProfileScopeLimitationsNetworkSegmentsItem represents a os x configuration profile scope limitations network segments item.
 type OsXConfigurationProfileScopeLimitationsNetworkSegmentsItem struct {
+	ID             *int    `xml:"id,omitempty"`
 	NetworkSegment *IDName `xml:"network_segment,omitempty"`
 }
 
 // OsXConfigurationProfileScopeLimitationsUserGroupsItem represents a os x configuration profile scope limitations user groups item.
 type OsXConfigurationProfileScopeLimitationsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
 	UserGroup *IDName `xml:"user_group,omitempty"`
 }
 
 // OsXConfigurationProfileScopeLimitationsUsersItem represents a os x configuration profile scope limitations users item.
 type OsXConfigurationProfileScopeLimitationsUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
 	User *IDName `xml:"user,omitempty"`
 }
 
 // OsXConfigurationProfileSelfService represents a os x configuration profile self service.
 type OsXConfigurationProfileSelfService struct {
 	XMLName                     xml.Name                                                 `xml:"self_service"`
+	ID                          *int                                                     `xml:"id,omitempty"`
 	FeatureOnMainPage           *bool                                                    `xml:"feature_on_main_page,omitempty"`
 	ForceUsersToViewDescription *bool                                                    `xml:"force_users_to_view_description,omitempty"`
 	InstallButtonText           *string                                                  `xml:"install_button_text,omitempty"`
@@ -1107,6 +2306,7 @@ type OsXConfigurationProfileSelfService struct {
 // OsXConfigurationProfileSelfServiceSelfServiceCategories represents a os x configuration profile self service self service categories.
 type OsXConfigurationProfileSelfServiceSelfServiceCategories struct {
 	XMLName  xml.Name                                                         `xml:"self_service_categories"`
+	ID       *int                                                             `xml:"id,omitempty"`
 	Category *OsXConfigurationProfileSelfServiceSelfServiceCategoriesCategory `xml:"category,omitempty"`
 }
 
@@ -1173,6 +2373,7 @@ type Policy struct {
 // PolicyAccountMaintenance represents a policy account maintenance.
 type PolicyAccountMaintenance struct {
 	XMLName                 xml.Name                                         `xml:"account_maintenance"`
+	ID                      *int                                             `xml:"id,omitempty"`
 	Accounts                []any                                            `xml:"accounts"`
 	DirectoryBindings       []any                                            `xml:"directory_bindings"`
 	ManagementAccount       *PolicyAccountMaintenanceManagementAccount       `xml:"management_account,omitempty"`
@@ -1249,6 +2450,7 @@ type PolicyGeneral struct {
 // PolicyGeneralDateTimeLimitations represents a policy general date time limitations.
 type PolicyGeneralDateTimeLimitations struct {
 	XMLName             xml.Name                                     `xml:"date_time_limitations"`
+	ID                  *int                                         `xml:"id,omitempty"`
 	ActivationDate      *string                                      `xml:"activation_date,omitempty"`
 	ActivationDateEpoch *int                                         `xml:"activation_date_epoch,omitempty"`
 	ActivationDateUtc   *string                                      `xml:"activation_date_utc,omitempty"`
@@ -1306,6 +2508,7 @@ type PolicyPackageConfiguration struct {
 // PolicyScope represents a policy scope.
 type PolicyScope struct {
 	XMLName        xml.Name                        `xml:"scope"`
+	ID             *int                            `xml:"id,omitempty"`
 	AllComputers   *bool                           `xml:"all_computers,omitempty"`
 	Buildings      []PolicyScopeBuildingsItem      `xml:"buildings"`
 	ComputerGroups []PolicyScopeComputerGroupsItem `xml:"computer_groups"`
@@ -1318,16 +2521,19 @@ type PolicyScope struct {
 
 // PolicyScopeBuildingsItem represents a policy scope buildings item.
 type PolicyScopeBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
 	Building *IDName `xml:"building,omitempty"`
 }
 
 // PolicyScopeComputerGroupsItem represents a policy scope computer groups item.
 type PolicyScopeComputerGroupsItem struct {
+	ID            *int    `xml:"id,omitempty"`
 	ComputerGroup *IDName `xml:"computer_group,omitempty"`
 }
 
 // PolicyScopeComputersItem represents a policy scope computers item.
 type PolicyScopeComputersItem struct {
+	ID       *int                              `xml:"id,omitempty"`
 	Computer *PolicyScopeComputersItemComputer `xml:"computer,omitempty"`
 }
 
@@ -1341,6 +2547,7 @@ type PolicyScopeComputersItemComputer struct {
 
 // PolicyScopeDepartmentsItem represents a policy scope departments item.
 type PolicyScopeDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
 	Department *IDName `xml:"department,omitempty"`
 }
 
@@ -1359,16 +2566,19 @@ type PolicyScopeExclusions struct {
 
 // PolicyScopeExclusionsBuildingsItem represents a policy scope exclusions buildings item.
 type PolicyScopeExclusionsBuildingsItem struct {
+	ID       *int    `xml:"id,omitempty"`
 	Building *IDName `xml:"building,omitempty"`
 }
 
 // PolicyScopeExclusionsComputerGroupsItem represents a policy scope exclusions computer groups item.
 type PolicyScopeExclusionsComputerGroupsItem struct {
+	ID            *int    `xml:"id,omitempty"`
 	ComputerGroup *IDName `xml:"computer_group,omitempty"`
 }
 
 // PolicyScopeExclusionsComputersItem represents a policy scope exclusions computers item.
 type PolicyScopeExclusionsComputersItem struct {
+	ID       *int                                        `xml:"id,omitempty"`
 	Computer *PolicyScopeExclusionsComputersItemComputer `xml:"computer,omitempty"`
 }
 
@@ -1382,16 +2592,19 @@ type PolicyScopeExclusionsComputersItemComputer struct {
 
 // PolicyScopeExclusionsDepartmentsItem represents a policy scope exclusions departments item.
 type PolicyScopeExclusionsDepartmentsItem struct {
+	ID         *int    `xml:"id,omitempty"`
 	Department *IDName `xml:"department,omitempty"`
 }
 
 // PolicyScopeExclusionsIbeaconsItem represents a policy scope exclusions ibeacons item.
 type PolicyScopeExclusionsIbeaconsItem struct {
+	ID      *int    `xml:"id,omitempty"`
 	Ibeacon *IDName `xml:"ibeacon,omitempty"`
 }
 
 // PolicyScopeExclusionsNetworkSegmentsItem represents a policy scope exclusions network segments item.
 type PolicyScopeExclusionsNetworkSegmentsItem struct {
+	ID             *int                                                    `xml:"id,omitempty"`
 	NetworkSegment *PolicyScopeExclusionsNetworkSegmentsItemNetworkSegment `xml:"network_segment,omitempty"`
 }
 
@@ -1405,11 +2618,13 @@ type PolicyScopeExclusionsNetworkSegmentsItemNetworkSegment struct {
 
 // PolicyScopeExclusionsUserGroupsItem represents a policy scope exclusions user groups item.
 type PolicyScopeExclusionsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
 	UserGroup *IDName `xml:"user_group,omitempty"`
 }
 
 // PolicyScopeExclusionsUsersItem represents a policy scope exclusions users item.
 type PolicyScopeExclusionsUsersItem struct {
+	ID   *int                                `xml:"id,omitempty"`
 	User *PolicyScopeExclusionsUsersItemUser `xml:"user,omitempty"`
 }
 
@@ -1436,27 +2651,32 @@ type PolicyScopeLimitations struct {
 
 // PolicyScopeLimitationsIbeaconsItem represents a policy scope limitations ibeacons item.
 type PolicyScopeLimitationsIbeaconsItem struct {
+	ID      *int    `xml:"id,omitempty"`
 	Ibeacon *IDName `xml:"ibeacon,omitempty"`
 }
 
 // PolicyScopeLimitationsNetworkSegmentsItem represents a policy scope limitations network segments item.
 type PolicyScopeLimitationsNetworkSegmentsItem struct {
+	ID             *int    `xml:"id,omitempty"`
 	NetworkSegment *IDName `xml:"network_segment,omitempty"`
 }
 
 // PolicyScopeLimitationsUserGroupsItem represents a policy scope limitations user groups item.
 type PolicyScopeLimitationsUserGroupsItem struct {
+	ID        *int    `xml:"id,omitempty"`
 	UserGroup *IDName `xml:"user_group,omitempty"`
 }
 
 // PolicyScopeLimitationsUsersItem represents a policy scope limitations users item.
 type PolicyScopeLimitationsUsersItem struct {
+	ID   *int    `xml:"id,omitempty"`
 	User *IDName `xml:"user,omitempty"`
 }
 
 // PolicyScripts represents a policy scripts.
 type PolicyScripts struct {
 	XMLName xml.Name `xml:"scripts"`
+	ID      *int     `xml:"id,omitempty"`
 	Script  []any    `xml:"script"`
 	Size    *Size    `xml:"size,omitempty"`
 }
@@ -1464,6 +2684,7 @@ type PolicyScripts struct {
 // PolicySelfService represents a policy self service.
 type PolicySelfService struct {
 	XMLName                     xml.Name                                `xml:"self_service"`
+	ID                          *int                                    `xml:"id,omitempty"`
 	FeatureOnMainPage           *bool                                   `xml:"feature_on_main_page,omitempty"`
 	ForceUsersToViewDescription *bool                                   `xml:"force_users_to_view_description,omitempty"`
 	InstallButtonText           *string                                 `xml:"install_button_text,omitempty"`
@@ -1478,6 +2699,7 @@ type PolicySelfService struct {
 // PolicySelfServiceSelfServiceCategories represents a policy self service self service categories.
 type PolicySelfServiceSelfServiceCategories struct {
 	XMLName  xml.Name                                        `xml:"self_service_categories"`
+	ID       *int                                            `xml:"id,omitempty"`
 	Category *PolicySelfServiceSelfServiceCategoriesCategory `xml:"category,omitempty"`
 }
 
@@ -1662,6 +2884,7 @@ type UserLdapServer struct {
 // UserLinks represents a user links.
 type UserLinks struct {
 	XMLName           xml.Name                 `xml:"links"`
+	ID                *int                     `xml:"id,omitempty"`
 	Computers         *UserLinksComputers      `xml:"computers,omitempty"`
 	MobileDevices     *UserLinksMobileDevices  `xml:"mobile_devices,omitempty"`
 	Peripherals       *UserLinksPeripherals    `xml:"peripherals,omitempty"`
@@ -1672,24 +2895,28 @@ type UserLinks struct {
 // UserLinksComputers represents a user links computers.
 type UserLinksComputers struct {
 	XMLName  xml.Name `xml:"computers"`
+	ID       *int     `xml:"id,omitempty"`
 	Computer *IDName  `xml:"computer,omitempty"`
 }
 
 // UserLinksMobileDevices represents a user links mobile devices.
 type UserLinksMobileDevices struct {
 	XMLName      xml.Name `xml:"mobile_devices"`
+	ID           *int     `xml:"id,omitempty"`
 	MobileDevice *IDName  `xml:"mobile_device,omitempty"`
 }
 
 // UserLinksPeripherals represents a user links peripherals.
 type UserLinksPeripherals struct {
 	XMLName    xml.Name `xml:"peripherals"`
+	ID         *int     `xml:"id,omitempty"`
 	Peripheral *IDName  `xml:"peripheral,omitempty"`
 }
 
 // UserLinksVppAssignments represents a user links vpp assignments.
 type UserLinksVppAssignments struct {
 	XMLName       xml.Name `xml:"vpp_assignments"`
+	ID            *int     `xml:"id,omitempty"`
 	VppAssignment *IDName  `xml:"vpp_assignment,omitempty"`
 }
 
