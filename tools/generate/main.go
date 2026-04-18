@@ -917,10 +917,13 @@ func stripVersionPrefix(path string) string {
 }
 
 // extractVersion returns "v1" from "/v1/devices" or "v2" from "/v2/benchmarks".
+// Returns empty string for non-versioned paths (e.g. "/startup-status") so
+// tenantPrefix collapses the segment instead of forcing "v1". Callers that
+// need a specific version for a non-versioned path must set it in config.
 func extractVersion(path string) string {
 	match := versionPrefixRe.FindString(path)
 	if match == "" {
-		return "v1"
+		return ""
 	}
 	return match[1:] // strip leading "/"
 }

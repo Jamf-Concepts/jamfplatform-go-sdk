@@ -91,6 +91,23 @@
         {"op": "GET /v1/benchmarks/{id}/devices", "name": "ListBenchmarkRuleDevices", "pagination": "sizeCheck", "params": ["rule-id:string:ruleID", "sort:string", "device-search:string:deviceSearch", "rule-result:string:ruleResult"]},
         {"op": "GET /v1/benchmarks/{benchmarkId}/compliance-percentage", "name": "GetBenchmarkCompliancePercentage"}
       ]
+    },
+    {
+      "file": "testing/pro.json",
+      "namespace": "pro",
+      "specFile": "pro_api.json",
+      "excludePaths": [
+        "POST /v1/auth/token",
+        "POST /v1/auth/keep-alive",
+        "POST /v1/auth/invalidate-token",
+        "GET /auth/current",
+        "POST /v1/oauth/token"
+      ],
+      "operations": [
+        {"op": "GET /v1/buildings", "name": "ListBuildingsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/buildings/{id}", "name": "GetBuildingV1"},
+        {"op": "GET /startup-status", "name": "GetStartupStatus"}
+      ]
     }
   ]
 }

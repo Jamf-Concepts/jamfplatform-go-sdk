@@ -1,0 +1,488 @@
+{
+  "components": {
+    "parameters": {
+      "export-fields": {
+        "description": "Export fields parameter, used to change default order or ignore some of the response properties. Default is empty array, which means that all fields of the response entity will be serialized. Example: export-fields=id,username",
+        "explode": true,
+        "in": "query",
+        "name": "export-fields",
+        "schema": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "style": "form"
+      },
+      "export-labels": {
+        "description": "Export labels parameter, used to customize fieldnames/columns in the exported file. Default is empty array, which means that response properties names will be used. Number of the provided labels must match the number of export-fields Example: export-labels=identifier,name with matching: export-fields=id,username",
+        "explode": true,
+        "in": "query",
+        "name": "export-labels",
+        "schema": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "style": "form"
+      },
+      "filter": {
+        "description": "Query in the RSQL format, allowing to filter results. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: status, updated, version This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+        "explode": true,
+        "in": "query",
+        "name": "filter",
+        "schema": {
+          "default": "",
+          "type": "string"
+        },
+        "style": "form"
+      },
+      "page": {
+        "explode": true,
+        "in": "query",
+        "name": "page",
+        "schema": {
+          "default": 0,
+          "type": "integer"
+        },
+        "style": "form"
+      },
+      "page-size": {
+        "explode": true,
+        "in": "query",
+        "name": "page-size",
+        "schema": {
+          "default": 100,
+          "type": "integer"
+        },
+        "style": "form"
+      },
+      "pagesize": {
+        "deprecated": true,
+        "explode": true,
+        "in": "query",
+        "name": "pagesize",
+        "schema": {
+          "default": 100,
+          "type": "integer"
+        },
+        "style": "form"
+      },
+      "size": {
+        "deprecated": true,
+        "explode": true,
+        "in": "query",
+        "name": "size",
+        "schema": {
+          "default": 100,
+          "type": "integer"
+        },
+        "style": "form"
+      },
+      "sort": {
+        "description": "Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort' query param is not duplicated for each sort criterion, e.g., ...\u0026sort=name:asc,date:desc. Fields that can be sorted: status, updated",
+        "explode": true,
+        "in": "query",
+        "name": "sort",
+        "schema": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "style": "form"
+      }
+    },
+    "schemas": {
+      "ApiError": {
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ApiErrorCause"
+            },
+            "type": "array"
+          },
+          "httpStatus": {
+            "description": "HTTP status of the response",
+            "example": 400,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ApiErrorCause": {
+        "properties": {
+          "code": {
+            "description": "Error-specific code that can be used to identify localization string, etc.",
+            "example": "8675309",
+            "type": "string"
+          },
+          "description": {
+            "description": "A general description of error for troubleshooting/debugging. Generally this text should not be displayed to a user; instead refer to errorCode and it's localized text",
+            "example": "I've just picked up a fault in the AE35 unit. It's going to go 100% failure in 72 hours",
+            "type": "string"
+          },
+          "field": {
+            "description": "Name of the field that caused the error.",
+            "example": "Name",
+            "type": "string"
+          },
+          "id": {
+            "description": "id of object with error. Optional.",
+            "example": "3",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "field"
+        ],
+        "type": "object"
+      },
+      "Building": {
+        "properties": {
+          "city": {
+            "example": "Cupertino",
+            "nullable": true,
+            "type": "string"
+          },
+          "country": {
+            "example": "The United States of America",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "Apple Park",
+            "type": "string"
+          },
+          "stateProvince": {
+            "example": "California",
+            "nullable": true,
+            "type": "string"
+          },
+          "streetAddress1": {
+            "example": "The McIntosh Tree",
+            "nullable": true,
+            "type": "string"
+          },
+          "streetAddress2": {
+            "example": "One Apple Park Way",
+            "nullable": true,
+            "type": "string"
+          },
+          "zipPostalCode": {
+            "example": "95014",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "BuildingSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/Building"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "StartupStatus": {
+        "properties": {
+          "error": {
+            "example": "Jamf Pro Startup Suspended",
+            "nullable": true,
+            "type": "string"
+          },
+          "errorCode": {
+            "enum": [
+              "CACHE_CONFIGURATION_ERROR",
+              "SECONDARY_NODE_STARTUP_ERROR",
+              "MORE_THAN_ONE_CLUSTER_SETTINGS_ERROR",
+              "PRIMARY_NODE_NOT_SET_ERROR",
+              "DATABASE_ERROR",
+              "DATABASE_PASSWORD_MISSING",
+              "EHCACHE_ERROR",
+              "FLAG_INITIALIZATION_FAILED",
+              "MEMCACHED_ERROR",
+              "DATABASE_MYISAM_ERROR",
+              "OLD_VERSION_ERROR"
+            ],
+            "example": "SERVER_INIT_ERROR_INITIALIZATION_FAILED",
+            "nullable": true,
+            "type": "string"
+          },
+          "percentage": {
+            "example": 50,
+            "type": "integer"
+          },
+          "setupAssistantNecessary": {
+            "example": false,
+            "type": "boolean"
+          },
+          "step": {
+            "example": "Initializing",
+            "type": "string"
+          },
+          "stepCode": {
+            "enum": [
+              "SERVER_INIT_START",
+              "SERVER_INIT_ANALYZING_WEBAPP",
+              "SERVER_INIT_POPULATING_NAVIGATION",
+              "SERVER_INIT_POPULATING_OBJECTS",
+              "SERVER_INIT_INITIALIZING_OBJ",
+              "SERVER_INIT_VERIFYING_CACHE",
+              "SERVER_INIT_INITIALIZING_CHANGE_MANAGEMENT",
+              "SERVER_INIT_INITIALIZING_COMMUNICATION_SYSTEM",
+              "SERVER_INIT_INITIALIZING_MDM_QUEUE_MONITOR",
+              "SERVER_INIT_CALCULATING_SMART_GROUPS",
+              "SERVER_INIT_DB_SCHEMA_COMPARE",
+              "SERVER_INIT_DB_TABLE_CHECK_FOR_RENAME",
+              "SERVER_INIT_DB_TABLE_ALTER",
+              "SERVER_INIT_DB_TABLE_ANALYZING",
+              "SERVER_INIT_DB_TABLE_CREATE",
+              "SERVER_INIT_DB_TABLE_DROP",
+              "SERVER_INIT_DB_TABLE_RENAME",
+              "SERVER_INIT_DB_COLUMN_RENAME",
+              "SERVER_INIT_DB_COLUMN_ENCODING_CHANGE_STEP_1",
+              "SERVER_INIT_DB_COLUMN_ENCODING_CHANGE_STEP_2",
+              "SERVER_INIT_DB_COLUMN_ENCODING_CHANGE_STEP_3",
+              "SERVER_INIT_DB_UPGRADE_CHECK",
+              "SERVER_INIT_DB_UPGRADE_COMPLETE",
+              "SERVER_INIT_SS_GENERATE_NOTIFICATIONS",
+              "SERVER_INIT_SS_GENERATE_NOTIFICATIONS_STATUS",
+              "SERVER_INIT_SS_GENERATE_NOTIFICATIONS_FINALIZE",
+              "SERVER_INIT_PKI_MIGRATION_DONE",
+              "SERVER_INIT_PKI_MIGRATION_STATUS",
+              "SERVER_INIT_MEMCACHED_ENDPOINTS_CHECK",
+              "SERVER_INIT_CACHE_FLUSHING",
+              "SERVER_INIT_COMPLETE"
+            ],
+            "example": "SERVER_INIT_START",
+            "type": "string"
+          },
+          "stepParam": {
+            "example": "buildings",
+            "nullable": true,
+            "type": "string"
+          },
+          "warning": {
+            "example": "Converting buildings, do not restart your JSS",
+            "nullable": true,
+            "type": "string"
+          },
+          "warningCode": {
+            "enum": [
+              "SERVER_INIT_WARNING_DB_TABLE_ENCODING"
+            ],
+            "example": "SERVER_INIT_WARNING_DB_TABLE_ENCODING",
+            "nullable": true,
+            "type": "string"
+          },
+          "warningParam": {
+            "example": "13 MB",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "ApiClient": {
+        "description": "Jamf Pro API Roles and Clients provide a client ID and secret for obtaining access tokens using the OAuth2 client_credentials grant type",
+        "flows": {
+          "clientCredentials": {
+            "scopes": {},
+            "tokenUrl": "/api/v1/oauth/token"
+          }
+        },
+        "type": "oauth2"
+      },
+      "BasicAuth": {
+        "description": "Basic auth is used only for obtaining bearer tokens from the /v1/auth/token endpoint",
+        "scheme": "basic",
+        "type": "http"
+      },
+      "Bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "## Overview\nThe Jamf Pro API is a RESTful API for Jamf Pro built to enable consistent and efficient programmatic access to Jamf Pro.\u003cbr/\u003e\u003cbr/\u003e\nThe swagger schema can be found [here](/api/schema/).\n",
+    "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
+    "title": "Jamf Pro API",
+    "version": "production"
+  },
+  "openapi": "3.0.1",
+  "paths": {
+    "/startup-status": {
+      "get": {
+        "description": "Retrieves information about application startup. Current startup operation taking place (if any) and overall startup completion percentage.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Retrieve information about application startup\n",
+        "tags": [
+          "startup-status"
+        ],
+        "x-authentication-required": false
+      }
+    },
+    "/v1/buildings": {
+      "get": {
+        "description": "Search for sorted and paged buildings",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter buildings collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: name, streetAddress1, streetAddress2, city, stateProvince, zipPostalCode, country. This param can be combined with paging and sorting. Example: filter=city==\"Chicago\" and name==\"*build*\"",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Search for sorted and paged Buildings\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-required-privileges": [
+          "Read Buildings"
+        ]
+      }
+    },
+    "/v1/buildings/{id}": {
+      "get": {
+        "description": "Gets specified Building object\n",
+        "parameters": [
+          {
+            "description": "instance id of building record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Building"
+                }
+              }
+            },
+            "description": "Details of building were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified building object does not exist."
+          }
+        },
+        "summary": "Get specified Building object\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-required-privileges": [
+          "Read Buildings"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    },
+    {
+      "ApiClient": []
+    },
+    {
+      "BasicAuth": [
+        "/v1/auth/token"
+      ]
+    }
+  ],
+  "servers": [
+    {
+      "url": "/api"
+    }
+  ]
+}
