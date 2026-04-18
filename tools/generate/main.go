@@ -43,11 +43,12 @@ type Config struct {
 }
 
 type SpecDef struct {
-	File         string         `json:"file"`
-	Namespace    string         `json:"namespace"`
-	SpecFile     string         `json:"specFile,omitempty"`     // override published spec filename
-	Operations   []OperationDef `json:"operations"`
-	ExcludePaths []string       `json:"excludePaths,omitempty"` // "METHOD /path" entries the generator must refuse to include
+	File           string         `json:"file"`
+	Namespace      string         `json:"namespace"`
+	SpecFile       string         `json:"specFile,omitempty"`       // override published spec filename
+	Operations     []OperationDef `json:"operations"`
+	ExcludePaths   []string       `json:"excludePaths,omitempty"`   // "METHOD /path" entries the generator must refuse to include
+	SkipDeprecated bool           `json:"skipDeprecated,omitempty"` // omit operations marked deprecated in the spec
 }
 
 // baseName derives a Go file base name from the spec file path.
@@ -281,6 +282,10 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 	doc, err := openapi3.NewLoader().LoadFromFile(specPath)
 	if err != nil {
 		return fmt.Errorf("loading spec: %w", err)
+	}
+
+	if spec.SkipDeprecated {
+		spec.Operations = dropDeprecatedOps(doc, spec)
 	}
 
 	methods, err := extractMethods(doc, spec)
@@ -769,6 +774,28 @@ func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
 	return methods, nil
 }
 
+// dropDeprecatedOps returns spec.Operations with any operations whose spec
+// marks them deprecated removed. Logs each drop so the curator can see why
+// the generated surface shrank.
+func dropDeprecatedOps(doc *openapi3.T, spec SpecDef) []OperationDef {
+	kept := make([]OperationDef, 0, len(spec.Operations))
+	for _, opDef := range spec.Operations {
+		httpMethod, specPath := opDef.parseOp()
+		pathItem := doc.Paths.Find(specPath)
+		if pathItem == nil {
+			kept = append(kept, opDef)
+			continue
+		}
+		op := pathItem.GetOperation(httpMethod)
+		if op != nil && op.Deprecated {
+			log.Printf("skipping deprecated operation %s (%s)", opDef.Name, opDef.Op)
+			continue
+		}
+		kept = append(kept, opDef)
+	}
+	return kept
+}
+
 func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, error) {
 	httpMethod, specPath := opDef.parseOp()
 
@@ -801,6 +828,13 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 
 	if op.Summary != "" {
 		m.Comment = opDef.Name + " " + lowerFirst(cleanComment(op.Summary))
+	}
+
+	if op.Deprecated {
+		if m.Comment == "" {
+			m.Comment = opDef.Name + " is deprecated."
+		}
+		m.Comment += "\n//\n// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release."
 	}
 
 	m.PathParams = extractPathParams(specPath, opDef.PathNames)
