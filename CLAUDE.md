@@ -66,8 +66,20 @@ All API paths use `/api/{namespace}/{version}/tenant/{tenantId}/{resource}`. The
 ## Conventions
 
 - MIT license. Copyright headers managed by HashiCorp `copywrite` (uses `--plan` flag, not `--check`).
-- Options pattern for client configuration: `WithTenantID`, `WithUserAgent`, `WithHTTPClient`, `WithLogger`, `WithFileTokenCache`.
+- Options pattern for client configuration: `WithTenantID`, `WithUserAgent`, `WithHTTPClient`, `WithLogger`, `WithFileTokenCache`, `WithFileCookieJar`.
 - Generated types use spec schema names directly. Pointer fields for nullable/optional JSON per spec annotations.
 - `url.PathEscape` for path parameters, `url.QueryEscape` for query parameters.
 - Error wrapping: `fmt.Errorf("MethodName(%s): %w", id, err)`.
 - Do not hand-edit generated files — modify the spec or generator config instead.
+
+## Acceptance tests
+
+Every new generated method MUST get an acceptance test in `jamfplatform/acc_<pkg>_test.go` (external `jamfplatform_test` package, `//go:build acceptance`). Read-only endpoints (list, get) call directly and log shape. Mutating endpoints (create/update/delete) use a CRUD lifecycle pattern: `t.Cleanup` defers delete, test verifies round-trip.
+
+Be clever about destructive endpoints — don't run them against shared state. Examples:
+
+- **Password changes**: don't change the OAuth client's own credential. Either create a test user via `/v1/accounts` and change its password, or call with clearly-wrong values and assert the API rejects.
+- **Device actions** (erase, restart): target a known fixture device declared via env var (e.g. `JAMFPLATFORM_DEVICE_ID`) or skip when unset.
+- **Delete endpoints**: always pair with a preceding create in the same test; never delete pre-existing resources the tenant owns.
+
+When an endpoint can't be exercised safely, `t.Skip()` with a comment explaining why. A skipped test still documents the intent; a destructive test that corrupts the tenant costs more than the coverage is worth.

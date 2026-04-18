@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -115,4 +116,61 @@ func TestAcceptance_Pro_BuildingCRUD(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
 		t.Fatalf("GetBuildingV1(%s) after delete: want 404, got %v", created.ID, err)
 	}
+}
+
+func TestAcceptance_Pro_ExportBuildings(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	// Ensure at least one building exists so the export isn't empty-header-only.
+	name := "sdk-acc-export-" + runSuffix()
+	created, err := p.CreateBuildingV1(ctx, &pro.Building{Name: name})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateBuildingV1: %v", err)
+	}
+	t.Cleanup(func() { _ = p.DeleteBuildingV1(ctx, created.ID) })
+
+	csv, err := p.ExportBuildingsV1(ctx, nil)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ExportBuildingsV1: %v", err)
+	}
+	if len(csv) == 0 {
+		t.Fatal("ExportBuildingsV1 returned empty body")
+	}
+	// Sanity: first line should look like a CSV header row (contains "name" column).
+	firstLine := string(csv)
+	if nl := strings.IndexByte(firstLine, '\n'); nl >= 0 {
+		firstLine = firstLine[:nl]
+	}
+	if !strings.Contains(strings.ToLower(firstLine), "name") {
+		t.Errorf("export header %q does not contain 'name'", firstLine)
+	}
+	t.Logf("Exported %d bytes; header: %s", len(csv), firstLine)
+}
+
+// TestAcceptance_Pro_ChangeUserPassword intentionally calls with a
+// clearly-wrong current password and expects the API to reject. The
+// alternative — actually rotating a credential — would lock out either the
+// OAuth API client (our test auth) or an admin user. The test still
+// exercises the transport path and payload encoding end-to-end.
+func TestAcceptance_Pro_ChangeUserPassword(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	err := pro.New(c).ChangeUserPasswordV1(ctx, &pro.ChangePassword{
+		CurrentPassword: "sdk-acc-clearly-not-valid-" + runSuffix(),
+		NewPassword:     "sdk-acc-unused",
+	})
+	if err == nil {
+		t.Fatal("expected server to reject wrong currentPassword, got nil error (did credentials actually rotate?)")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if errors.As(err, &apiErr) {
+		t.Logf("ChangeUserPasswordV1 rejected as expected: status=%d", apiErr.StatusCode)
+		return
+	}
+	t.Logf("ChangeUserPasswordV1 rejected as expected: %v", err)
 }
