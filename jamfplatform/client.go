@@ -5,6 +5,7 @@ package jamfplatform
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"path/filepath"
 
@@ -44,6 +45,8 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 		jarPath := filepath.Join(cfg.cookieJarDir, "jamfplatform-cookies-"+client.CacheKey(baseURL, clientID))
 		if jar, err := client.NewFileCookieJar(jarPath); err == nil {
 			transportOpts = append(transportOpts, client.WithCookieJar(jar))
+		} else {
+			log.Printf("jamfplatform: WithFileCookieJar: failed to open %s: %v — falling back to in-memory jar", jarPath, err)
 		}
 	}
 	if cfg.tenantID != "" {

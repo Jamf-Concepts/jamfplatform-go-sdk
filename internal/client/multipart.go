@@ -26,6 +26,12 @@ type MultipartField struct {
 // body. The transport builds the body (including boundary) and sets
 // Content-Type appropriately. result follows the same rules as Do — either a
 // JSON-unmarshal target or *[]byte for raw responses.
+//
+// Unlike Do, DoMultipart does not apply the 429/Retry-After retry from execute:
+// file-upload bodies arrive as io.Reader (not guaranteed rewindable), so a
+// blind retry could produce a truncated second request. A 429 surfaces as an
+// APIResponseError and the caller is expected to re-invoke with a fresh
+// Content reader.
 func (c *Transport) DoMultipart(ctx context.Context, method, path string, fields []MultipartField, expectedStatus int, result any) error {
 	var buf bytes.Buffer
 	w := multipart.NewWriter(&buf)

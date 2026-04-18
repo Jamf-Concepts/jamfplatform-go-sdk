@@ -275,7 +275,7 @@ func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string
 // execute funnels every Do* variant through one place so the 429/Retry-After
 // retry and Deprecation-header logging live in a single hook point.
 func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any) error {
-	resp, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
+	resp, classic, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
 	if err != nil {
 		return err
 	}
@@ -288,7 +288,7 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 			case <-ctx.Done():
 				return ctx.Err()
 			}
-			resp, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
+			resp, classic, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
 			if err != nil {
 				return err
 			}
@@ -304,7 +304,7 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 			}
 		}
 	}
-	return c.handleResponse(ctx, resp, expectedStatus, result)
+	return c.handleResponse(ctx, resp, classic, expectedStatus, result)
 }
 
 // parseRetryAfter interprets a Retry-After header value as either seconds
@@ -356,14 +356,18 @@ func (c *Transport) buildURL(endpoint string) string {
 	return c.baseURL + "/" + endpoint
 }
 
-// doRequestFull performs an authenticated API request with optional content type and extra headers.
-func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header) (*http.Response, error) {
+// doRequestFull performs an authenticated API request with optional content
+// type and extra headers. Returns the response, the classic-codec flag
+// captured from the request URL (used by the caller to route XML vs JSON
+// unmarshal — avoids re-sniffing the response URL, which may have mutated
+// through redirects), and any transport error.
+func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header) (*http.Response, bool, error) {
 	var requestBodyBytes []byte
 
 	fullURL := c.buildURL(endpoint)
 
 	if err := checkDeniedPath(method, fullURL); err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	classic := isClassicPath(fullURL)
@@ -381,7 +385,7 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 				requestBodyBytes, err = json.Marshal(body)
 			}
 			if err != nil {
-				return nil, fmt.Errorf("failed to marshal request body: %w", err)
+				return nil, false, fmt.Errorf("failed to marshal request body: %w", err)
 			}
 		}
 	}
@@ -397,7 +401,7 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 
 	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, false, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	for key, values := range extraHeaders {
@@ -423,14 +427,16 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("API request failed: %w", err)
+		return nil, false, fmt.Errorf("API request failed: %w", err)
 	}
 
-	return resp, nil
+	return resp, classic, nil
 }
 
 // handleResponse processes API responses and handles common error cases.
-func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, expectedStatus int, result any) error {
+// classic comes from the request URL captured by doRequestFull so codec
+// selection is stable across any redirect path rewriting.
+func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, classic bool, expectedStatus int, result any) error {
 	defer func() { _ = resp.Body.Close() }()
 
 	c.logDeprecation(resp)
@@ -466,7 +472,7 @@ func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, exp
 		// Raw byte responses (e.g. text/csv exports) bypass decoding.
 		if bp, ok := result.(*[]byte); ok {
 			*bp = append((*bp)[:0], body...)
-		} else if isClassicPath(resp.Request.URL.Path) {
+		} else if classic {
 			if err := xml.Unmarshal(body, result); err != nil {
 				return fmt.Errorf("failed to decode XML response: %w", err)
 			}
