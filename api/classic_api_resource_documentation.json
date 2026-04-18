@@ -6115,6 +6115,568 @@
         ],
         "type": "object"
       },
+      "patch_available_titles": {
+        "properties": {
+          "available_titles": {
+            "items": {
+              "properties": {
+                "available_title": {
+                  "properties": {
+                    "app_name": {
+                      "example": "Google Chrome",
+                      "type": "string"
+                    },
+                    "current_version": {
+                      "example": "65.0.3325.181",
+                      "type": "string"
+                    },
+                    "last_modified": {
+                      "example": "2018-03-20T22:00:09:000Z",
+                      "type": "string"
+                    },
+                    "name_id": {
+                      "example": "GoogleChrome",
+                      "type": "string"
+                    },
+                    "publisher": {
+                      "example": "Google",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "size": {
+            "$ref": "#/components/schemas/size"
+          }
+        },
+        "type": "object"
+      },
+      "patch_external_source": {
+        "properties": {
+          "host_name": {
+            "example": "patch.url.com/v1",
+            "type": "string"
+          },
+          "id": {
+            "example": 2,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Company Currated Patches",
+            "type": "string"
+          },
+          "port": {
+            "type": "integer"
+          },
+          "ssl_enabled": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "patch_internal_source": {
+        "properties": {
+          "enabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "endpoint": {
+            "example": "https://jamf-patch.jamfcloud.com/v1/",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Jamf",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "patch_policy": {
+        "properties": {
+          "general": {
+            "properties": {
+              "allow_downgrade": {
+                "type": "boolean"
+              },
+              "distribution_method": {
+                "enum": [
+                  "selfservice",
+                  "prompt"
+                ],
+                "type": "string"
+              },
+              "enabled": {
+                "example": true,
+                "type": "boolean"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "incremental_updates": {
+                "example": false,
+                "type": "boolean"
+              },
+              "kill_apps": {
+                "items": {
+                  "properties": {
+                    "kill_app": {
+                      "properties": {
+                        "kill_app_bundle_id": {
+                          "example": "com.google.Chrome",
+                          "type": "string"
+                        },
+                        "kill_app_name": {
+                          "example": "Google Chrome.app",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "minimum_os": {
+                "example": 10.9,
+                "type": "string"
+              },
+              "name": {
+                "example": "Google Chrome - 62.0.3202.75",
+                "type": "string"
+              },
+              "patch_unknown": {
+                "description": "Set to true to patch versions unidentified by Jamf Pro patch reporting",
+                "type": "boolean"
+              },
+              "reboot": {
+                "type": "boolean"
+              },
+              "release_date": {
+                "example": 1509048027663,
+                "type": "integer"
+              },
+              "target_version": {
+                "example": "62.0.3202.75",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "target_version"
+            ],
+            "type": "object"
+          },
+          "scope": {
+            "properties": {
+              "all_computers": {
+                "type": "boolean"
+              },
+              "buildings": {
+                "items": {
+                  "properties": {
+                    "building": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "computer_groups": {
+                "items": {
+                  "properties": {
+                    "computer_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "computers": {
+                "items": {
+                  "properties": {
+                    "computer": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "example": "Joe's MacBook Pro",
+                          "type": "string"
+                        },
+                        "udid": {
+                          "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "departments": {
+                "items": {
+                  "properties": {
+                    "department": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "exclusions": {
+                "properties": {
+                  "buildings": {
+                    "items": {
+                      "properties": {
+                        "building": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "computer_groups": {
+                    "items": {
+                      "properties": {
+                        "computer_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "computers": {
+                    "items": {
+                      "properties": {
+                        "computer": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "example": "Joe's MacBook Pro",
+                              "type": "string"
+                            },
+                            "udid": {
+                              "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "departments": {
+                    "items": {
+                      "properties": {
+                        "department": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "ibeacons": {
+                    "items": {
+                      "properties": {
+                        "ibeacon": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "properties": {
+                  "ibeacons": {
+                    "items": {
+                      "properties": {
+                        "ibeacon": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "software_title_configuration_id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "user_interaction": {
+            "properties": {
+              "deadlines": {
+                "properties": {
+                  "deadline_enabled": {
+                    "example": true,
+                    "type": "boolean"
+                  },
+                  "deadline_period": {
+                    "example": 7,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "grace_period": {
+                "properties": {
+                  "grace_period_duration": {
+                    "description": "Number of minutes to wait before automatically closing all apps required to be closed for an update",
+                    "example": 15,
+                    "type": "integer"
+                  },
+                  "message": {
+                    "example": "$APP_NAMES will quit in $DELAY_MINUTES minutes so that $SOFTWARE_TITLE can be updated. Save anything you are working on and quit the app(s)",
+                    "type": "string"
+                  },
+                  "notification_center_subject": {
+                    "example": "Important",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "install_button_text": {
+                "example": "Update",
+                "type": "string"
+              },
+              "notifications": {
+                "properties": {
+                  "notification_enabled": {
+                    "example": true,
+                    "type": "boolean"
+                  },
+                  "notification_message": {
+                    "example": "An update for Google Chrome is available within Self Service",
+                    "type": "string"
+                  },
+                  "notification_subject": {
+                    "example": "Google Chrome Update Available",
+                    "type": "string"
+                  },
+                  "notification_type": {
+                    "enum": [
+                      "Self Service",
+                      "Self Service and Notification Center"
+                    ],
+                    "type": "string"
+                  },
+                  "reminders": {
+                    "properties": {
+                      "notification_reminder_frequency": {
+                        "example": 1,
+                        "type": "integer"
+                      },
+                      "notification_reminders_enabled": {
+                        "example": true,
+                        "type": "boolean"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "self_service_description": {
+                "example": "Latest update for Google Chrome",
+                "type": "string"
+              },
+              "self_service_icon": {
+                "properties": {
+                  "filename": {
+                    "example": "Chrome.png",
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "uri": {
+                    "example": "https://jssURL.jamfcloud.com/iconservlet/?id=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "patch_report": {
+        "properties": {
+          "name": {
+            "example": "Google Chrome",
+            "type": "string"
+          },
+          "patch_software_title_id": {
+            "example": 1,
+            "type": "string"
+          },
+          "total_computers": {
+            "example": 1,
+            "type": "integer"
+          },
+          "total_versions": {
+            "example": 1,
+            "type": "integer"
+          },
+          "versions": {
+            "items": {
+              "properties": {
+                "version": {
+                  "properties": {
+                    "computers": {
+                      "items": {
+                        "properties": {
+                          "computer": {
+                            "properties": {
+                              "id": {
+                                "example": 1,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "example": "Admins MacBook Pro",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "size": {
+                            "example": 1,
+                            "type": "integer"
+                          }
+                        }
+                      },
+                      "type": "array"
+                    },
+                    "software_version": {
+                      "example": "65.0.3325.181",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "patch_software_title": {
+        "properties": {
+          "categories": {
+            "$ref": "#/components/schemas/category_object"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Google Chrome",
+            "type": "string"
+          },
+          "name_id": {
+            "example": "GoogleChrome",
+            "type": "string"
+          },
+          "notifications": {
+            "properties": {
+              "email_notification": {
+                "default": true,
+                "type": "boolean"
+              },
+              "web_notification": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "source_id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "versions": {
+            "items": {
+              "properties": {
+                "version": {
+                  "properties": {
+                    "package": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "example": "Google Chrome.dmg",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "software_version": {
+                      "example": "65.0.3325.181",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "peripheral": {
         "properties": {
           "attachments": {
@@ -7561,6 +8123,105 @@
       "size": {
         "example": 1,
         "type": "integer"
+      },
+      "software_title": {
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/category"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the patch software title",
+            "example": "Google Chrome",
+            "type": "string"
+          },
+          "notifications": {
+            "properties": {
+              "email_notification": {
+                "type": "boolean"
+              },
+              "jss_notification": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "total_computers": {
+            "type": "integer"
+          },
+          "total_versions": {
+            "type": "integer"
+          },
+          "versions": {
+            "items": {
+              "properties": {
+                "version": {
+                  "properties": {
+                    "computers": {
+                      "items": {
+                        "properties": {
+                          "computer": {
+                            "properties": {
+                              "alt_mac_address": {
+                                "example": "E0:AC:CB:97:36:G5",
+                                "type": "string"
+                              },
+                              "id": {
+                                "example": 1,
+                                "type": "integer"
+                              },
+                              "mac_address": {
+                                "example": "E0:AC:CB:97:36:G4",
+                                "type": "string"
+                              },
+                              "name": {
+                                "example": "Admins MacBook Pro",
+                                "type": "string"
+                              },
+                              "serial_number": {
+                                "example": "C02Q7KHTGFWF",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        }
+                      },
+                      "type": "array"
+                    },
+                    "package": {
+                      "properties": {
+                        "id": {
+                          "default": -1,
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "example": "Google Chrome.dmg",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "software_version": {
+                      "example": "64.0.3282.119",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
       },
       "user": {
         "properties": {
@@ -12373,6 +13034,559 @@
         "summary": "Updates an existing package by ID",
         "tags": [
           "packages"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/patchavailabletitles/sourceid/{id}": {
+      "get": {
+        "operationId": "PatchavailabletitlesSourceidByIdGet",
+        "parameters": [
+          {
+            "description": "ID of the internal or external patch source to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_available_titles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_available_titles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all available title from a source by ID",
+        "tags": [
+          "patchavailabletitles"
+        ]
+      }
+    },
+    "/patches/id/{id}": {
+      "delete": {
+        "deprecated": true,
+        "operationId": "deleteSoftwareTitlesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a Patch Software Title by ID (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".)",
+        "tags": [
+          "patches"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "operationId": "findPatchesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_title"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_title"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds patches by ID (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".)",
+        "tags": [
+          "patches"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "The patch title must exist within a specific site or Full Jamf Pro. Use this endpoint to create additional instances of the patch software title for specific sites. The name_id element can be obtained from the /patches and/or /patches/id/{id} resources.",
+        "operationId": "createPatchSoftwareTitlesById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "created"
+          }
+        },
+        "summary": "Creates a patch software title (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Using an empty \u003cpackage/\u003e tag will disassociate any previous packages associated with a specific software title version.",
+        "operationId": "updateSoftwareTitlesById",
+        "parameters": [
+          {
+            "description": "ID value to update by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates a Patch Software Title by ID (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/patchexternalsources/id/{id}": {
+      "delete": {
+        "operationId": "deletePatchExternalSourcesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a patch external source by ID",
+        "tags": [
+          "patchexternalsources"
+        ]
+      },
+      "get": {
+        "operationId": "findPatchExternalSourcesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_external_source"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_external_source"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a patch external source by ID",
+        "tags": [
+          "patchexternalsources"
+        ]
+      },
+      "post": {
+        "operationId": "createPatchExternalSourcesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created"
+          }
+        },
+        "summary": "Create a new patch external source by ID",
+        "tags": [
+          "patchexternalsources"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updatePatchExternalSourcesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates a patch external source by ID",
+        "tags": [
+          "patchexternalsources"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/patchinternalsources/id/{id}": {
+      "get": {
+        "operationId": "findPatchInternalSourcesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_internal_source"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_internal_source"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a patch internal source by ID",
+        "tags": [
+          "patchinternalsources"
+        ]
+      }
+    },
+    "/patchpolicies/id/{id}": {
+      "delete": {
+        "operationId": "deletePatchPolicyById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a patch policy by ID",
+        "tags": [
+          "patchpolicies"
+        ]
+      },
+      "get": {
+        "operationId": "findPatchPolicyById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a patch policy by ID",
+        "tags": [
+          "patchpolicies"
+        ]
+      },
+      "put": {
+        "operationId": "updatePatchPolicyById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing patch policy by ID",
+        "tags": [
+          "patchpolicies"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}": {
+      "post": {
+        "description": "softwaretitleconfig refers to the ID of the patch software title the policy is to be associated to",
+        "operationId": "createPatchPolicyBySoftwareTitleConfigId",
+        "parameters": [
+          {
+            "description": "Patch software title config ID value to filter by",
+            "in": "path",
+            "name": "softwaretitleconfigid",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Create a new patch policy associated with a patch software title configuration ID",
+        "tags": [
+          "patchpolicies"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/patchreports/patchsoftwaretitleid/{id}": {
+      "get": {
+        "deprecated": true,
+        "operationId": "PatchreportsPatchsoftwaretitleidByIdGet",
+        "parameters": [
+          {
+            "description": "Patch software title id to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds patch reports by patch software title ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}/patch-report\".",
+        "tags": [
+          "patchreports"
+        ]
+      }
+    },
+    "/patchsoftwaretitles/id/{id}": {
+      "delete": {
+        "deprecated": true,
+        "operationId": "PatchsoftwaretitlesIdByIdDelete",
+        "parameters": [
+          {
+            "description": "ID value to update by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a patch software title by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "operationId": "PatchsoftwaretitlesIdByIdGet",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_software_title"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a patch software titles by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "operationId": "PatchsoftwaretitlesIdByIdPost",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates new patch software title by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Including an empty package element \u003cpackage/\u003e within the version element will disassociate any previously associated packages with that version of the software title.",
+        "operationId": "PatchsoftwaretitlesIdByIdPut",
+        "parameters": [
+          {
+            "description": "ID value to update by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates a patch software title by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
         ],
         "x-explorer-enabled": false
       }

@@ -401,7 +401,33 @@
         {"op": "GET /mobiledeviceprovisioningprofiles/id/{id}", "name": "GetMobileDeviceProvisioningProfileByID", "responseType": "mobile_device_provisioning_profile", "pathNames": {"id": "id"}},
         {"op": "POST /mobiledeviceprovisioningprofiles/id/{id}", "name": "CreateMobileDeviceProvisioningProfileByID", "requestType": "mobile_device_provisioning_profile", "responseType": "mobile_device_provisioning_profile", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /mobiledeviceprovisioningprofiles/id/{id}", "name": "UpdateMobileDeviceProvisioningProfileByID", "requestType": "mobile_device_provisioning_profile", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /mobiledeviceprovisioningprofiles/id/{id}", "name": "DeleteMobileDeviceProvisioningProfileByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /mobiledeviceprovisioningprofiles/id/{id}", "name": "DeleteMobileDeviceProvisioningProfileByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /patchavailabletitles/sourceid/{id}", "name": "ListPatchAvailableTitlesBySourceID", "responseType": "patch_available_titles", "pathNames": {"id": "id"}},
+
+        {"op": "GET /patches/id/{id}", "name": "GetPatchByID", "responseType": "software_title", "pathNames": {"id": "id"}},
+        {"op": "POST /patches/id/{id}", "name": "CreatePatchByID", "requestType": "software_title", "responseType": "software_title", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /patches/id/{id}", "name": "UpdatePatchByID", "requestType": "software_title", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /patches/id/{id}", "name": "DeletePatchByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /patchexternalsources/id/{id}", "name": "GetPatchExternalSourceByID", "responseType": "patch_external_source", "pathNames": {"id": "id"}},
+        {"op": "POST /patchexternalsources/id/{id}", "name": "CreatePatchExternalSourceByID", "requestType": "patch_external_source", "responseType": "patch_external_source", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /patchexternalsources/id/{id}", "name": "UpdatePatchExternalSourceByID", "requestType": "patch_external_source", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /patchexternalsources/id/{id}", "name": "DeletePatchExternalSourceByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /patchinternalsources/id/{id}", "name": "GetPatchInternalSourceByID", "responseType": "patch_internal_source", "pathNames": {"id": "id"}},
+
+        {"op": "GET /patchpolicies/id/{id}", "name": "GetPatchPolicyByID", "responseType": "patch_policy", "pathNames": {"id": "id"}},
+        {"op": "POST /patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}", "name": "CreatePatchPolicyBySoftwareTitleConfigID", "requestType": "patch_policy", "responseType": "patch_policy", "pathNames": {"softwaretitleconfigid": "softwareTitleConfigID"}, "expectedStatus": 201},
+        {"op": "PUT /patchpolicies/id/{id}", "name": "UpdatePatchPolicyByID", "requestType": "patch_policy", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /patchpolicies/id/{id}", "name": "DeletePatchPolicyByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /patchreports/patchsoftwaretitleid/{id}", "name": "GetPatchReportByPatchSoftwareTitleID", "responseType": "patch_report", "pathNames": {"id": "id"}},
+
+        {"op": "GET /patchsoftwaretitles/id/{id}", "name": "GetPatchSoftwareTitleByID", "responseType": "patch_software_title", "pathNames": {"id": "id"}},
+        {"op": "POST /patchsoftwaretitles/id/{id}", "name": "CreatePatchSoftwareTitleByID", "requestType": "patch_software_title", "responseType": "patch_software_title", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /patchsoftwaretitles/id/{id}", "name": "UpdatePatchSoftwareTitleByID", "requestType": "patch_software_title", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /patchsoftwaretitles/id/{id}", "name": "DeletePatchSoftwareTitleByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

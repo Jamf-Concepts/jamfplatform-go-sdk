@@ -5218,6 +5218,394 @@ func (t Package) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
+// PatchAvailableTitles represents a patch available titles.
+type PatchAvailableTitles struct {
+	XMLName         xml.Name
+	ID              *int  `xml:"id,omitempty"`
+	AvailableTitles []any `xml:"available_titles"`
+	Size            *Size `xml:"size,omitempty"`
+}
+
+// MarshalXML forces the PatchAvailableTitles root element name to the wire value
+// declared by the spec (<patch_available_titles>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchAvailableTitles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "patch_available_titles"}
+	type shadow PatchAvailableTitles
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchExternalSource represents a patch external source.
+type PatchExternalSource struct {
+	XMLName    xml.Name
+	HostName   *string `xml:"host_name,omitempty"`
+	ID         *int    `xml:"id,omitempty"`
+	Name       *string `xml:"name,omitempty"`
+	Port       *int    `xml:"port,omitempty"`
+	SslEnabled *bool   `xml:"ssl_enabled,omitempty"`
+}
+
+// MarshalXML forces the PatchExternalSource root element name to the wire value
+// declared by the spec (<patch_external_source>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchExternalSource) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "patch_external_source"}
+	type shadow PatchExternalSource
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchInternalSource represents a patch internal source.
+type PatchInternalSource struct {
+	XMLName  xml.Name
+	Enabled  *bool   `xml:"enabled,omitempty"`
+	Endpoint *string `xml:"endpoint,omitempty"`
+	ID       *int    `xml:"id,omitempty"`
+	Name     *string `xml:"name,omitempty"`
+}
+
+// MarshalXML forces the PatchInternalSource root element name to the wire value
+// declared by the spec (<patch_internal_source>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchInternalSource) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "patch_internal_source"}
+	type shadow PatchInternalSource
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicy represents a patch policy.
+type PatchPolicy struct {
+	XMLName                      xml.Name
+	ID                           *int                        `xml:"id,omitempty"`
+	General                      *PatchPolicyGeneral         `xml:"general,omitempty"`
+	Scope                        *PatchPolicyScope           `xml:"scope,omitempty"`
+	SoftwareTitleConfigurationID *int                        `xml:"software_title_configuration_id,omitempty"`
+	UserInteraction              *PatchPolicyUserInteraction `xml:"user_interaction,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicy root element name to the wire value
+// declared by the spec (<patch_policy>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicy) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "patch_policy"}
+	type shadow PatchPolicy
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyGeneral represents a patch policy general.
+type PatchPolicyGeneral struct {
+	XMLName            xml.Name
+	AllowDowngrade     *bool   `xml:"allow_downgrade,omitempty"`
+	DistributionMethod *string `xml:"distribution_method,omitempty"`
+	Enabled            *bool   `xml:"enabled,omitempty"`
+	ID                 *int    `xml:"id,omitempty"`
+	IncrementalUpdates *bool   `xml:"incremental_updates,omitempty"`
+	KillApps           *[]any  `xml:"kill_apps,omitempty"`
+	MinimumOs          *string `xml:"minimum_os,omitempty"`
+	Name               *string `xml:"name,omitempty"`
+	PatchUnknown       *bool   `xml:"patch_unknown,omitempty"`
+	Reboot             *bool   `xml:"reboot,omitempty"`
+	ReleaseDate        *int    `xml:"release_date,omitempty"`
+	TargetVersion      *string `xml:"target_version,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyGeneral root element name to the wire value
+// declared by the spec (<general>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyGeneral) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "general"}
+	type shadow PatchPolicyGeneral
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyScope represents a patch policy scope.
+type PatchPolicyScope struct {
+	XMLName        xml.Name
+	ID             *int                         `xml:"id,omitempty"`
+	AllComputers   *bool                        `xml:"all_computers,omitempty"`
+	Buildings      *[]any                       `xml:"buildings,omitempty"`
+	ComputerGroups *[]any                       `xml:"computer_groups,omitempty"`
+	Computers      *[]any                       `xml:"computers,omitempty"`
+	Departments    *[]any                       `xml:"departments,omitempty"`
+	Exclusions     *PatchPolicyScopeExclusions  `xml:"exclusions,omitempty"`
+	Limitations    *PatchPolicyScopeLimitations `xml:"limitations,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyScope root element name to the wire value
+// declared by the spec (<scope>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyScope) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "scope"}
+	type shadow PatchPolicyScope
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyScopeExclusions represents a patch policy scope exclusions.
+type PatchPolicyScopeExclusions struct {
+	XMLName         xml.Name
+	Buildings       *[]any `xml:"buildings,omitempty"`
+	ComputerGroups  *[]any `xml:"computer_groups,omitempty"`
+	Computers       *[]any `xml:"computers,omitempty"`
+	Departments     *[]any `xml:"departments,omitempty"`
+	Ibeacons        *[]any `xml:"ibeacons,omitempty"`
+	NetworkSegments *[]any `xml:"network_segments,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyScopeExclusions root element name to the wire value
+// declared by the spec (<exclusions>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyScopeExclusions) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "exclusions"}
+	type shadow PatchPolicyScopeExclusions
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyScopeLimitations represents a patch policy scope limitations.
+type PatchPolicyScopeLimitations struct {
+	XMLName         xml.Name
+	Ibeacons        *[]any `xml:"ibeacons,omitempty"`
+	NetworkSegments *[]any `xml:"network_segments,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyScopeLimitations root element name to the wire value
+// declared by the spec (<limitations>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyScopeLimitations) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "limitations"}
+	type shadow PatchPolicyScopeLimitations
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyUserInteraction represents a patch policy user interaction.
+type PatchPolicyUserInteraction struct {
+	XMLName                xml.Name
+	ID                     *int                                       `xml:"id,omitempty"`
+	Deadlines              *PatchPolicyUserInteractionDeadlines       `xml:"deadlines,omitempty"`
+	GracePeriod            *PatchPolicyUserInteractionGracePeriod     `xml:"grace_period,omitempty"`
+	InstallButtonText      *string                                    `xml:"install_button_text,omitempty"`
+	Notifications          *PatchPolicyUserInteractionNotifications   `xml:"notifications,omitempty"`
+	SelfServiceDescription *string                                    `xml:"self_service_description,omitempty"`
+	SelfServiceIcon        *PatchPolicyUserInteractionSelfServiceIcon `xml:"self_service_icon,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyUserInteraction root element name to the wire value
+// declared by the spec (<user_interaction>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyUserInteraction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "user_interaction"}
+	type shadow PatchPolicyUserInteraction
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyUserInteractionDeadlines represents a patch policy user interaction deadlines.
+type PatchPolicyUserInteractionDeadlines struct {
+	XMLName         xml.Name
+	DeadlineEnabled *bool `xml:"deadline_enabled,omitempty"`
+	DeadlinePeriod  *int  `xml:"deadline_period,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyUserInteractionDeadlines root element name to the wire value
+// declared by the spec (<deadlines>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyUserInteractionDeadlines) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "deadlines"}
+	type shadow PatchPolicyUserInteractionDeadlines
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyUserInteractionGracePeriod represents a patch policy user interaction grace period.
+type PatchPolicyUserInteractionGracePeriod struct {
+	XMLName                   xml.Name
+	GracePeriodDuration       *int    `xml:"grace_period_duration,omitempty"`
+	Message                   *string `xml:"message,omitempty"`
+	NotificationCenterSubject *string `xml:"notification_center_subject,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyUserInteractionGracePeriod root element name to the wire value
+// declared by the spec (<grace_period>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyUserInteractionGracePeriod) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "grace_period"}
+	type shadow PatchPolicyUserInteractionGracePeriod
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyUserInteractionNotifications represents a patch policy user interaction notifications.
+type PatchPolicyUserInteractionNotifications struct {
+	XMLName             xml.Name
+	ID                  *int                                              `xml:"id,omitempty"`
+	NotificationEnabled *bool                                             `xml:"notification_enabled,omitempty"`
+	NotificationMessage *string                                           `xml:"notification_message,omitempty"`
+	NotificationSubject *string                                           `xml:"notification_subject,omitempty"`
+	NotificationType    *string                                           `xml:"notification_type,omitempty"`
+	Reminders           *PatchPolicyUserInteractionNotificationsReminders `xml:"reminders,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyUserInteractionNotifications root element name to the wire value
+// declared by the spec (<notifications>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyUserInteractionNotifications) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "notifications"}
+	type shadow PatchPolicyUserInteractionNotifications
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyUserInteractionNotificationsReminders represents a patch policy user interaction notifications reminders.
+type PatchPolicyUserInteractionNotificationsReminders struct {
+	XMLName                       xml.Name
+	NotificationReminderFrequency *int  `xml:"notification_reminder_frequency,omitempty"`
+	NotificationRemindersEnabled  *bool `xml:"notification_reminders_enabled,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyUserInteractionNotificationsReminders root element name to the wire value
+// declared by the spec (<reminders>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyUserInteractionNotificationsReminders) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "reminders"}
+	type shadow PatchPolicyUserInteractionNotificationsReminders
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchPolicyUserInteractionSelfServiceIcon represents a patch policy user interaction self service icon.
+type PatchPolicyUserInteractionSelfServiceIcon struct {
+	XMLName  xml.Name
+	Filename *string `xml:"filename,omitempty"`
+	ID       *int    `xml:"id,omitempty"`
+	URI      *string `xml:"uri,omitempty"`
+}
+
+// MarshalXML forces the PatchPolicyUserInteractionSelfServiceIcon root element name to the wire value
+// declared by the spec (<self_service_icon>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchPolicyUserInteractionSelfServiceIcon) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "self_service_icon"}
+	type shadow PatchPolicyUserInteractionSelfServiceIcon
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchReport represents a patch report.
+type PatchReport struct {
+	XMLName              xml.Name
+	Name                 *string `xml:"name,omitempty"`
+	PatchSoftwareTitleID *string `xml:"patch_software_title_id,omitempty"`
+	TotalComputers       *int    `xml:"total_computers,omitempty"`
+	TotalVersions        *int    `xml:"total_versions,omitempty"`
+	Versions             []any   `xml:"versions"`
+}
+
+// MarshalXML forces the PatchReport root element name to the wire value
+// declared by the spec (<patch_report>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchReport) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "patch_report"}
+	type shadow PatchReport
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchSoftwareTitle represents a patch software title.
+type PatchSoftwareTitle struct {
+	XMLName       xml.Name
+	Categories    *CategoryObject                  `xml:"categories,omitempty"`
+	ID            *int                             `xml:"id,omitempty"`
+	Name          *string                          `xml:"name,omitempty"`
+	NameID        *string                          `xml:"name_id,omitempty"`
+	Notifications *PatchSoftwareTitleNotifications `xml:"notifications,omitempty"`
+	SourceID      *int                             `xml:"source_id,omitempty"`
+	Versions      *[]any                           `xml:"versions,omitempty"`
+}
+
+// MarshalXML forces the PatchSoftwareTitle root element name to the wire value
+// declared by the spec (<patch_software_title>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchSoftwareTitle) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "patch_software_title"}
+	type shadow PatchSoftwareTitle
+	return e.EncodeElement(shadow(t), start)
+}
+
+// PatchSoftwareTitleNotifications represents a patch software title notifications.
+type PatchSoftwareTitleNotifications struct {
+	XMLName           xml.Name
+	EmailNotification *bool `xml:"email_notification,omitempty"`
+	WebNotification   *bool `xml:"web_notification,omitempty"`
+}
+
+// MarshalXML forces the PatchSoftwareTitleNotifications root element name to the wire value
+// declared by the spec (<notifications>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PatchSoftwareTitleNotifications) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "notifications"}
+	type shadow PatchSoftwareTitleNotifications
+	return e.EncodeElement(shadow(t), start)
+}
+
 // Peripheral represents a peripheral.
 type Peripheral struct {
 	XMLName     xml.Name
@@ -6455,6 +6843,51 @@ func (t SiteObject) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 // Size is an alias for int.
 type Size = int
+
+// SoftwareTitle represents a software title.
+type SoftwareTitle struct {
+	XMLName        xml.Name
+	Category       *Category                   `xml:"category,omitempty"`
+	ID             *int                        `xml:"id,omitempty"`
+	Name           *string                     `xml:"name,omitempty"`
+	Notifications  *SoftwareTitleNotifications `xml:"notifications,omitempty"`
+	TotalComputers *int                        `xml:"total_computers,omitempty"`
+	TotalVersions  *int                        `xml:"total_versions,omitempty"`
+	Versions       *[]any                      `xml:"versions,omitempty"`
+}
+
+// MarshalXML forces the SoftwareTitle root element name to the wire value
+// declared by the spec (<software_title>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t SoftwareTitle) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "software_title"}
+	type shadow SoftwareTitle
+	return e.EncodeElement(shadow(t), start)
+}
+
+// SoftwareTitleNotifications represents a software title notifications.
+type SoftwareTitleNotifications struct {
+	XMLName           xml.Name
+	EmailNotification *bool `xml:"email_notification,omitempty"`
+	JssNotification   *bool `xml:"jss_notification,omitempty"`
+}
+
+// MarshalXML forces the SoftwareTitleNotifications root element name to the wire value
+// declared by the spec (<notifications>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t SoftwareTitleNotifications) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "notifications"}
+	type shadow SoftwareTitleNotifications
+	return e.EncodeElement(shadow(t), start)
+}
 
 // User represents a user.
 type User struct {

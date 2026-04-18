@@ -65,7 +65,7 @@ func TestUpdateMobileDeviceProvisioningProfileByID(t *testing.T) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
-		writeXML(t, w, http.StatusCreated, "<mobile_device_provisioning_profile></mobile_device_provisioning_profile>")
+		writeXML(t, w, http.StatusCreated, "<></>")
 	})
 
 	result, err := c.UpdateMobileDeviceProvisioningProfileByID(context.Background(), "test-id", &MobileDeviceProvisioningProfile{})

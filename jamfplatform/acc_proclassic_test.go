@@ -1336,6 +1336,52 @@ func TestAcceptance_Classic_MobileDeviceProvisioningProfileCRUD(t *testing.T) {
 	t.Skip("mobile_device_provisioning_profile requires a real provisioning profile blob; test scaffolding only covers endpoint shape via unit tests")
 }
 
+func TestAcceptance_Classic_PatchExternalSourceCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-pes-" + runSuffix()
+	port := 443
+	sslEnabled := true
+	created, err := pc.CreatePatchExternalSourceByID(ctx, "0", &proclassic.PatchExternalSource{
+		Name:       classicStrPtr(name),
+		HostName:   classicStrPtr("patches.example.test"),
+		Port:       &port,
+		SslEnabled: &sslEnabled,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) { t.Skipf("forbidden: %v", err) }
+		t.Fatalf("CreatePatchExternalSourceByID: %v", err)
+	}
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeletePatchExternalSourceByID(ctx, intToStr(id)) })
+	if err := pc.DeletePatchExternalSourceByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetPatchExternalSourceByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+// TestAcceptance_Classic_GetPatchInternalSource is read-only. The built-in
+// Jamf internal source is id=1; endpoint reports it whether or not
+// customers have configured it. No write endpoints exist for internal
+// sources.
+func TestAcceptance_Classic_GetPatchInternalSource(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	src, err := pc.GetPatchInternalSourceByID(ctx, "1")
+	if err != nil { skipOnServerError(t, err); t.Skipf("GetPatchInternalSourceByID(1): %v", err) }
+	if src == nil { t.Fatal("expected non-nil internal source") }
+}
+
+// TestAcceptance_Classic_GetPatchAvailableTitles reads catalog data for
+// the built-in internal source. No write surface needed.
+func TestAcceptance_Classic_GetPatchAvailableTitles(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	titles, err := pc.ListPatchAvailableTitlesBySourceID(ctx, "1")
+	if err != nil { skipOnServerError(t, err); t.Skipf("ListPatchAvailableTitlesBySourceID(1): %v", err) }
+	if titles == nil { t.Fatal("expected non-nil available titles") }
+}
+
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
