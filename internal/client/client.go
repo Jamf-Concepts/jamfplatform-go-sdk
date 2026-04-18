@@ -253,6 +253,10 @@ func (c *Client) doRequestFull(ctx context.Context, method, endpoint string, bod
 
 	fullURL := c.buildURL(endpoint)
 
+	if err := checkDeniedPath(method, fullURL); err != nil {
+		return nil, err
+	}
+
 	if body != nil {
 		var err error
 		requestBodyBytes, err = json.Marshal(body)

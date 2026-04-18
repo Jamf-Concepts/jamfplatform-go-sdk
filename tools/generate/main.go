@@ -1491,8 +1491,9 @@ package %s
 import "%s/internal/client"
 
 var (
-	ErrAuthentication = client.ErrAuthentication
-	ErrNotFound       = client.ErrNotFound
+	ErrAuthentication   = client.ErrAuthentication
+	ErrNotFound         = client.ErrNotFound
+	ErrPathNotSupported = client.ErrPathNotSupported
 )
 
 type APIResponseError = client.APIResponseError
