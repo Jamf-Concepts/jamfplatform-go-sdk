@@ -88,3 +88,63 @@ func TestDeleteDirectoryBindingByID(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGetDirectoryBindingByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<directory_binding></directory_binding>")
+	})
+
+	result, err := c.GetDirectoryBindingByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetDirectoryBindingByName_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/directorybindings/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetDirectoryBindingByName(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateDirectoryBindingByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.UpdateDirectoryBindingByName(context.Background(), "test-id", &DirectoryBinding{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteDirectoryBindingByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	err := c.DeleteDirectoryBindingByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

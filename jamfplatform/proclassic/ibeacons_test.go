@@ -88,3 +88,63 @@ func TestDeleteIBeaconByID(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGetIBeaconByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<ibeacon></ibeacon>")
+	})
+
+	result, err := c.GetIBeaconByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetIBeaconByName_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetIBeaconByName(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateIBeaconByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.UpdateIBeaconByName(context.Background(), "test-id", &Ibeacon{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteIBeaconByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	err := c.DeleteIBeaconByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

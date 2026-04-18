@@ -503,7 +503,167 @@
         {"op": "GET /vppinvitations/id/{id}", "name": "GetVPPInvitationByID", "responseType": "vpp_invitation", "pathNames": {"id": "id"}},
         {"op": "POST /vppinvitations/id/{id}", "name": "CreateVPPInvitationByID", "requestType": "vpp_invitation", "responseType": "vpp_invitation", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /vppinvitations/id/{id}", "name": "UpdateVPPInvitationByID", "requestType": "vpp_invitation", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /vppinvitations/id/{id}", "name": "DeleteVPPInvitationByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /vppinvitations/id/{id}", "name": "DeleteVPPInvitationByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /buildings/name/{name}", "name": "GetBuildingByName", "responseType": "building"},
+        {"op": "PUT /buildings/name/{name}", "name": "UpdateBuildingByName", "requestType": "building", "expectedStatus": 201},
+        {"op": "DELETE /buildings/name/{name}", "name": "DeleteBuildingByName"},
+
+        {"op": "GET /categories/name/{name}", "name": "GetCategoryByName", "responseType": "category"},
+        {"op": "PUT /categories/name/{name}", "name": "UpdateCategoryByName", "requestType": "category", "expectedStatus": 201},
+        {"op": "DELETE /categories/name/{name}", "name": "DeleteCategoryByName"},
+
+        {"op": "GET /classes/name/{name}", "name": "GetClassByName", "responseType": "class"},
+        {"op": "PUT /classes/name/{name}", "name": "UpdateClassByName", "requestType": "class_post", "expectedStatus": 201},
+        {"op": "DELETE /classes/name/{name}", "name": "DeleteClassByName"},
+
+        {"op": "GET /departments/name/{name}", "name": "GetDepartmentByName", "responseType": "department"},
+        {"op": "PUT /departments/name/{name}", "name": "UpdateDepartmentByName", "requestType": "department", "expectedStatus": 201},
+        {"op": "DELETE /departments/name/{name}", "name": "DeleteDepartmentByName"},
+
+        {"op": "GET /sites/name/{name}", "name": "GetSiteByName", "responseType": "site"},
+        {"op": "PUT /sites/name/{name}", "name": "UpdateSiteByName", "requestType": "site", "expectedStatus": 201},
+        {"op": "DELETE /sites/name/{name}", "name": "DeleteSiteByName"},
+
+        {"op": "GET /scripts/name/{name}", "name": "GetScriptByName", "responseType": "script"},
+        {"op": "PUT /scripts/name/{name}", "name": "UpdateScriptByName", "requestType": "script", "expectedStatus": 201},
+        {"op": "DELETE /scripts/name/{name}", "name": "DeleteScriptByName"},
+
+        {"op": "GET /users/name/{name}", "name": "GetUserByName", "responseType": "user"},
+        {"op": "PUT /users/name/{name}", "name": "UpdateUserByName", "requestType": "user_post", "expectedStatus": 201},
+        {"op": "DELETE /users/name/{name}", "name": "DeleteUserByName"},
+        {"op": "GET /users/email/{email}", "name": "GetUserByEmail", "responseType": "user", "pathNames": {"email": "email"}},
+        {"op": "PUT /users/email/{email}", "name": "UpdateUserByEmail", "requestType": "user_post", "pathNames": {"email": "email"}, "expectedStatus": 201},
+        {"op": "DELETE /users/email/{email}", "name": "DeleteUserByEmail", "pathNames": {"email": "email"}},
+
+        {"op": "GET /directorybindings/name/{name}", "name": "GetDirectoryBindingByName", "responseType": "directory_binding"},
+        {"op": "PUT /directorybindings/name/{name}", "name": "UpdateDirectoryBindingByName", "requestType": "directory_binding", "expectedStatus": 201},
+        {"op": "DELETE /directorybindings/name/{name}", "name": "DeleteDirectoryBindingByName"},
+
+        {"op": "GET /diskencryptionconfigurations/name/{name}", "name": "GetDiskEncryptionConfigurationByName", "responseType": "disk_encryption_configuration"},
+        {"op": "PUT /diskencryptionconfigurations/name/{name}", "name": "UpdateDiskEncryptionConfigurationByName", "requestType": "disk_encryption_configuration", "expectedStatus": 201},
+        {"op": "DELETE /diskencryptionconfigurations/name/{name}", "name": "DeleteDiskEncryptionConfigurationByName"},
+
+        {"op": "GET /dockitems/name/{name}", "name": "GetDockItemByName", "responseType": "dock_item"},
+        {"op": "PUT /dockitems/name/{name}", "name": "UpdateDockItemByName", "requestType": "dock_item", "expectedStatus": 201},
+        {"op": "DELETE /dockitems/name/{name}", "name": "DeleteDockItemByName"},
+
+        {"op": "GET /ibeacons/name/{name}", "name": "GetIBeaconByName", "responseType": "ibeacon"},
+        {"op": "PUT /ibeacons/name/{name}", "name": "UpdateIBeaconByName", "requestType": "ibeacon", "expectedStatus": 201},
+        {"op": "DELETE /ibeacons/name/{name}", "name": "DeleteIBeaconByName"},
+
+        {"op": "GET /ldapservers/name/{name}", "name": "GetLDAPServerByName", "responseType": "ldap_server"},
+        {"op": "PUT /ldapservers/name/{name}", "name": "UpdateLDAPServerByName", "requestType": "ldap_server_post", "expectedStatus": 201},
+        {"op": "DELETE /ldapservers/name/{name}", "name": "DeleteLDAPServerByName"},
+
+        {"op": "GET /licensedsoftware/name/{name}", "name": "GetLicensedSoftwareByName", "responseType": "licensed_software"},
+        {"op": "PUT /licensedsoftware/name/{name}", "name": "UpdateLicensedSoftwareByName", "requestType": "licensed_software", "expectedStatus": 201},
+        {"op": "DELETE /licensedsoftware/name/{name}", "name": "DeleteLicensedSoftwareByName"},
+
+        {"op": "GET /restrictedsoftware/name/{name}", "name": "GetRestrictedSoftwareByName", "responseType": "restricted_software"},
+        {"op": "PUT /restrictedsoftware/name/{name}", "name": "UpdateRestrictedSoftwareByName", "requestType": "restricted_software", "expectedStatus": 201},
+        {"op": "DELETE /restrictedsoftware/name/{name}", "name": "DeleteRestrictedSoftwareByName"},
+
+        {"op": "GET /printers/name/{name}", "name": "GetPrinterByName", "responseType": "printer"},
+        {"op": "PUT /printers/name/{name}", "name": "UpdatePrinterByName", "requestType": "printer", "expectedStatus": 201},
+        {"op": "DELETE /printers/name/{name}", "name": "DeletePrinterByName"},
+
+        {"op": "GET /allowedfileextensions/extension/{extension}", "name": "GetAllowedFileExtensionByExtension", "responseType": "allowed_file_extension", "pathNames": {"extension": "extension"}},
+
+        {"op": "GET /softwareupdateservers/name/{name}", "name": "GetSoftwareUpdateServerByName", "responseType": "software_update_server"},
+        {"op": "PUT /softwareupdateservers/name/{name}", "name": "UpdateSoftwareUpdateServerByName", "requestType": "software_update_server", "expectedStatus": 201},
+        {"op": "DELETE /softwareupdateservers/name/{name}", "name": "DeleteSoftwareUpdateServerByName"},
+
+        {"op": "GET /advancedcomputersearches/name/{name}", "name": "GetAdvancedComputerSearchByName", "responseType": "advanced_computer_search"},
+        {"op": "DELETE /advancedcomputersearches/name/{name}", "name": "DeleteAdvancedComputerSearchByName"},
+        {"op": "GET /advancedmobiledevicesearches/name/{name}", "name": "GetAdvancedMobileDeviceSearchByName", "responseType": "advanced_mobile_device_search"},
+        {"op": "DELETE /advancedmobiledevicesearches/name/{name}", "name": "DeleteAdvancedMobileDeviceSearchByName"},
+        {"op": "GET /advancedusersearches/name/{name}", "name": "GetAdvancedUserSearchByName", "responseType": "advanced_user_search"},
+        {"op": "DELETE /advancedusersearches/name/{name}", "name": "DeleteAdvancedUserSearchByName"},
+
+        {"op": "GET /computergroups/name/{name}", "name": "GetComputerGroupByName", "responseType": "computer_group"},
+        {"op": "PUT /computergroups/name/{name}", "name": "UpdateComputerGroupByName", "requestType": "computer_group_post", "expectedStatus": 201},
+        {"op": "DELETE /computergroups/name/{name}", "name": "DeleteComputerGroupByName"},
+        {"op": "GET /mobiledevicegroups/name/{name}", "name": "GetMobileDeviceGroupByName", "responseType": "mobile_device_group"},
+        {"op": "PUT /mobiledevicegroups/name/{name}", "name": "UpdateMobileDeviceGroupByName", "requestType": "mobile_device_group", "expectedStatus": 201},
+        {"op": "DELETE /mobiledevicegroups/name/{name}", "name": "DeleteMobileDeviceGroupByName"},
+        {"op": "GET /usergroups/name/{name}", "name": "GetUserGroupByName", "responseType": "user_group"},
+        {"op": "PUT /usergroups/name/{name}", "name": "UpdateUserGroupByName", "requestType": "user_group", "expectedStatus": 201},
+        {"op": "DELETE /usergroups/name/{name}", "name": "DeleteUserGroupByName"},
+
+        {"op": "GET /computerextensionattributes/name/{name}", "name": "GetComputerExtensionAttributeByName", "responseType": "computer_extension_attribute"},
+        {"op": "PUT /computerextensionattributes/name/{name}", "name": "UpdateComputerExtensionAttributeByName", "requestType": "computer_extension_attribute", "expectedStatus": 201},
+        {"op": "DELETE /computerextensionattributes/name/{name}", "name": "DeleteComputerExtensionAttributeByName"},
+        {"op": "GET /mobiledeviceextensionattributes/name/{name}", "name": "GetMobileDeviceExtensionAttributeByName", "responseType": "mobile_device_extension_attribute"},
+        {"op": "PUT /mobiledeviceextensionattributes/name/{name}", "name": "UpdateMobileDeviceExtensionAttributeByName", "requestType": "mobile_device_extension_attribute", "expectedStatus": 201},
+        {"op": "DELETE /mobiledeviceextensionattributes/name/{name}", "name": "DeleteMobileDeviceExtensionAttributeByName"},
+        {"op": "GET /userextensionattributes/name/{name}", "name": "GetUserExtensionAttributeByName", "responseType": "user_extension_attribute"},
+        {"op": "PUT /userextensionattributes/name/{name}", "name": "UpdateUserExtensionAttributeByName", "requestType": "user_extension_attribute", "expectedStatus": 201},
+        {"op": "DELETE /userextensionattributes/name/{name}", "name": "DeleteUserExtensionAttributeByName"},
+
+        {"op": "GET /byoprofiles/name/{name}", "name": "GetBYOProfileByName", "responseType": "byoprofile"},
+        {"op": "PUT /byoprofiles/name/{name}", "name": "UpdateBYOProfileByName", "requestType": "byoprofile", "expectedStatus": 201},
+        {"op": "DELETE /byoprofiles/name/{name}", "name": "DeleteBYOProfileByName"},
+
+        {"op": "GET /osxconfigurationprofiles/name/{name}", "name": "GetOSXConfigurationProfileByName", "responseType": "os_x_configuration_profile"},
+        {"op": "PUT /osxconfigurationprofiles/name/{name}", "name": "UpdateOSXConfigurationProfileByName", "requestType": "os_x_configuration_profile", "expectedStatus": 201},
+        {"op": "DELETE /osxconfigurationprofiles/name/{name}", "name": "DeleteOSXConfigurationProfileByName"},
+        {"op": "GET /mobiledeviceconfigurationprofiles/name/{name}", "name": "GetMobileDeviceConfigurationProfileByName", "responseType": "mobile_device_configuration_profile"},
+        {"op": "PUT /mobiledeviceconfigurationprofiles/name/{name}", "name": "UpdateMobileDeviceConfigurationProfileByName", "requestType": "mobile_device_configuration_profile", "expectedStatus": 201},
+        {"op": "DELETE /mobiledeviceconfigurationprofiles/name/{name}", "name": "DeleteMobileDeviceConfigurationProfileByName"},
+
+        {"op": "GET /macapplications/name/{name}", "name": "GetMacApplicationByName", "responseType": "mac_application"},
+        {"op": "PUT /macapplications/name/{name}", "name": "UpdateMacApplicationByName", "requestType": "mac_application", "expectedStatus": 201},
+        {"op": "DELETE /macapplications/name/{name}", "name": "DeleteMacApplicationByName"},
+        {"op": "GET /mobiledeviceapplications/name/{name}", "name": "GetMobileDeviceApplicationByName", "responseType": "mobile_device_application"},
+        {"op": "PUT /mobiledeviceapplications/name/{name}", "name": "UpdateMobileDeviceApplicationByName", "requestType": "mobile_device_application", "expectedStatus": 201},
+        {"op": "DELETE /mobiledeviceapplications/name/{name}", "name": "DeleteMobileDeviceApplicationByName"},
+        {"op": "GET /mobiledeviceapplications/bundleid/{bundleid}", "name": "GetMobileDeviceApplicationByBundleID", "responseType": "mobile_device_application", "pathNames": {"bundleid": "bundleID"}},
+
+        {"op": "GET /ebooks/name/{name}", "name": "GetEbookByName", "responseType": "ebook"},
+        {"op": "PUT /ebooks/name/{name}", "name": "UpdateEbookByName", "requestType": "ebook_post", "expectedStatus": 201},
+        {"op": "DELETE /ebooks/name/{name}", "name": "DeleteEbookByName"},
+
+        {"op": "GET /networksegments/name/{name}", "name": "GetNetworkSegmentByName", "responseType": "network_segment"},
+        {"op": "PUT /networksegments/name/{name}", "name": "UpdateNetworkSegmentByName", "requestType": "network_segment_post", "expectedStatus": 201},
+        {"op": "DELETE /networksegments/name/{name}", "name": "DeleteNetworkSegmentByName"},
+
+        {"op": "GET /distributionpoints/name/{name}", "name": "GetDistributionPointByName", "responseType": "distribution_point"},
+        {"op": "PUT /distributionpoints/name/{name}", "name": "UpdateDistributionPointByName", "requestType": "distribution_point_post", "expectedStatus": 201},
+        {"op": "DELETE /distributionpoints/name/{name}", "name": "DeleteDistributionPointByName"},
+
+        {"op": "GET /mobiledeviceprovisioningprofiles/name/{name}", "name": "GetMobileDeviceProvisioningProfileByName", "responseType": "mobile_device_provisioning_profile"},
+        {"op": "DELETE /mobiledeviceprovisioningprofiles/name/{name}", "name": "DeleteMobileDeviceProvisioningProfileByName"},
+        {"op": "GET /mobiledeviceprovisioningprofiles/uuid/{uuid}", "name": "GetMobileDeviceProvisioningProfileByUUID", "responseType": "mobile_device_provisioning_profile", "pathNames": {"uuid": "uuid"}},
+        {"op": "DELETE /mobiledeviceprovisioningprofiles/uuid/{uuid}", "name": "DeleteMobileDeviceProvisioningProfileByUUID", "pathNames": {"uuid": "uuid"}},
+
+        {"op": "GET /mobiledeviceenrollmentprofiles/name/{name}", "name": "GetMobileDeviceEnrollmentProfileByName", "responseType": "mobile_device_enrollment_profile"},
+        {"op": "DELETE /mobiledeviceenrollmentprofiles/name/{name}", "name": "DeleteMobileDeviceEnrollmentProfileByName"},
+        {"op": "GET /mobiledeviceenrollmentprofiles/invitation/{invitation}", "name": "GetMobileDeviceEnrollmentProfileByInvitation", "responseType": "mobile_device_enrollment_profile", "pathNames": {"invitation": "invitation"}},
+
+        {"op": "GET /accounts/groupname/{name}", "name": "GetAccountGroupByName", "responseType": "group"},
+        {"op": "PUT /accounts/groupname/{name}", "name": "UpdateAccountGroupByName", "requestType": "group", "expectedStatus": 201},
+        {"op": "DELETE /accounts/groupname/{name}", "name": "DeleteAccountGroupByName"},
+        {"op": "GET /accounts/username/{name}", "name": "GetAccountByUsername", "responseType": "account"},
+        {"op": "PUT /accounts/username/{name}", "name": "UpdateAccountByUsername", "requestType": "account", "expectedStatus": 201},
+        {"op": "DELETE /accounts/username/{name}", "name": "DeleteAccountByUsername"},
+
+        {"op": "GET /webhooks/name/{name}", "name": "GetWebhookByName", "responseType": "webhook"},
+        {"op": "PUT /webhooks/name/{name}", "name": "UpdateWebhookByName", "requestType": "webhook", "expectedStatus": 201},
+        {"op": "DELETE /webhooks/name/{name}", "name": "DeleteWebhookByName"},
+
+        {"op": "GET /removablemacaddresses/name/{name}", "name": "GetRemovableMacAddressByName", "responseType": "removable_mac_address"},
+        {"op": "PUT /removablemacaddresses/name/{name}", "name": "UpdateRemovableMacAddressByName", "requestType": "removable_mac_address", "expectedStatus": 201},
+        {"op": "DELETE /removablemacaddresses/name/{name}", "name": "DeleteRemovableMacAddressByName"},
+
+        {"op": "GET /patchexternalsources/name/{name}", "name": "GetPatchExternalSourceByName", "responseType": "patch_external_source"},
+        {"op": "GET /patchinternalsources/name/{name}", "name": "GetPatchInternalSourceByName", "responseType": "patch_internal_source"},
+        {"op": "GET /patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}", "name": "ListPatchPoliciesBySoftwareTitleConfigID", "responseType": "patch_policy", "pathNames": {"softwaretitleconfigid": "softwareTitleConfigID"}},
+
+        {"op": "GET /peripherals/id/{id}/subset/{subset}", "name": "GetPeripheralByIDSubset", "responseType": "peripheral", "pathNames": {"id": "id", "subset": "subset"}},
+
+        {"op": "GET /computercommands/name/{name}", "name": "GetComputerCommandByName", "responseType": "computer_command"},
+        {"op": "GET /mobiledevicecommands/name/{name}", "name": "GetMobileDeviceCommandByName", "responseType": "mobile_device_command"}
       ]
     }
   ]

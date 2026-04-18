@@ -53,3 +53,35 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 	}
 	return nil
 }
+
+// GetMobileDeviceEnrollmentProfileByName finds mobile device enrollment profiles by name.
+func (c *Client) GetMobileDeviceEnrollmentProfileByName(ctx context.Context, name string) (*MobileDeviceEnrollmentProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceEnrollmentProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceEnrollmentProfileByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// DeleteMobileDeviceEnrollmentProfileByName deletes a mobile device enrollment profile by name.
+func (c *Client) DeleteMobileDeviceEnrollmentProfileByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceEnrollmentProfileByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// GetMobileDeviceEnrollmentProfileByInvitation finds mobile device enrollment profiles by invitation.
+func (c *Client) GetMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string) (*MobileDeviceEnrollmentProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceEnrollmentProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceEnrollmentProfileByInvitation(%s): %w", invitation, err)
+	}
+	return &result, nil
+}

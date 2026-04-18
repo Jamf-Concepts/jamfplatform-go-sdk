@@ -53,3 +53,34 @@ func (c *Client) DeleteDistributionPointByID(ctx context.Context, id string) err
 	}
 	return nil
 }
+
+// GetDistributionPointByName finds distribution points by name.
+func (c *Client) GetDistributionPointByName(ctx context.Context, name string) (*DistributionPoint, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result DistributionPoint
+	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetDistributionPointByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateDistributionPointByName updates an existing distribution point by name.
+func (c *Client) UpdateDistributionPointByName(ctx context.Context, name string, request *DistributionPointPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateDistributionPointByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteDistributionPointByName deletes a distribution point by name.
+func (c *Client) DeleteDistributionPointByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteDistributionPointByName(%s): %w", name, err)
+	}
+	return nil
+}

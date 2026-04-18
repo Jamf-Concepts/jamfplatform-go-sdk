@@ -53,3 +53,34 @@ func (c *Client) DeletePrinterByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetPrinterByName finds printers by name.
+func (c *Client) GetPrinterByName(ctx context.Context, name string) (*Printer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Printer
+	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPrinterByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdatePrinterByName updates an existing printer by name.
+func (c *Client) UpdatePrinterByName(ctx context.Context, name string, request *Printer) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdatePrinterByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeletePrinterByName deletes a printer by name.
+func (c *Client) DeletePrinterByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeletePrinterByName(%s): %w", name, err)
+	}
+	return nil
+}

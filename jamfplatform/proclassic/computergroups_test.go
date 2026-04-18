@@ -88,3 +88,63 @@ func TestDeleteComputerGroupByID(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGetComputerGroupByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<computer_group></computer_group>")
+	})
+
+	result, err := c.GetComputerGroupByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerGroupByName_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetComputerGroupByName(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateComputerGroupByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.UpdateComputerGroupByName(context.Background(), "test-id", &ComputerGroupPost{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteComputerGroupByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	err := c.DeleteComputerGroupByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

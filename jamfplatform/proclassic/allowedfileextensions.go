@@ -43,3 +43,14 @@ func (c *Client) DeleteAllowedFileExtensionByID(ctx context.Context, id string) 
 	}
 	return nil
 }
+
+// GetAllowedFileExtensionByExtension finds an allowed file extension value by name.
+func (c *Client) GetAllowedFileExtensionByExtension(ctx context.Context, extension string) (*AllowedFileExtension, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result AllowedFileExtension
+	endpoint := fmt.Sprintf("%s/allowedfileextensions/extension/%s", prefix, url.PathEscape(extension))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetAllowedFileExtensionByExtension(%s): %w", extension, err)
+	}
+	return &result, nil
+}

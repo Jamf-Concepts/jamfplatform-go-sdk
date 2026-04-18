@@ -95,3 +95,65 @@ func (c *Client) DeleteAccountGroupByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetAccountGroupByName finds groups by name.
+func (c *Client) GetAccountGroupByName(ctx context.Context, name string) (*Group, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Group
+	endpoint := fmt.Sprintf("%s/accounts/groupname/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetAccountGroupByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateAccountGroupByName updates an existing group by name.
+func (c *Client) UpdateAccountGroupByName(ctx context.Context, name string, request *Group) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/accounts/groupname/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateAccountGroupByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteAccountGroupByName deletes a group by name.
+func (c *Client) DeleteAccountGroupByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/accounts/groupname/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteAccountGroupByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// GetAccountByUsername finds accounts by name.
+func (c *Client) GetAccountByUsername(ctx context.Context, name string) (*Account, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Account
+	endpoint := fmt.Sprintf("%s/accounts/username/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetAccountByUsername(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateAccountByUsername updates an existing account by name.
+func (c *Client) UpdateAccountByUsername(ctx context.Context, name string, request *Account) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/accounts/username/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateAccountByUsername(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteAccountByUsername deletes an account by name.
+func (c *Client) DeleteAccountByUsername(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/accounts/username/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteAccountByUsername(%s): %w", name, err)
+	}
+	return nil
+}

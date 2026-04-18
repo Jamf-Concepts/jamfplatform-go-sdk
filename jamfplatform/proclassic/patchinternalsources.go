@@ -22,3 +22,14 @@ func (c *Client) GetPatchInternalSourceByID(ctx context.Context, id string) (*Pa
 	}
 	return &result, nil
 }
+
+// GetPatchInternalSourceByName finds the first patch internal source with the name provided.
+func (c *Client) GetPatchInternalSourceByName(ctx context.Context, name string) (*PatchInternalSource, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchInternalSource
+	endpoint := fmt.Sprintf("%s/patchinternalsources/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchInternalSourceByName(%s): %w", name, err)
+	}
+	return &result, nil
+}

@@ -54,3 +54,45 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByID(ctx context.Context, 
 	}
 	return nil
 }
+
+// GetMobileDeviceProvisioningProfileByName finds a mobile device provisioning profiles by name.
+func (c *Client) GetMobileDeviceProvisioningProfileByName(ctx context.Context, name string) (*MobileDeviceProvisioningProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceProvisioningProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceProvisioningProfileByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// DeleteMobileDeviceProvisioningProfileByName deletes a mobile device provisioning profiles by name.
+func (c *Client) DeleteMobileDeviceProvisioningProfileByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceProvisioningProfileByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// GetMobileDeviceProvisioningProfileByUUID finds a mobile device provisioning profiles by uuid.
+func (c *Client) GetMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string) (*MobileDeviceProvisioningProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceProvisioningProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/uuid/%s", prefix, url.PathEscape(uuid))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceProvisioningProfileByUUID(%s): %w", uuid, err)
+	}
+	return &result, nil
+}
+
+// DeleteMobileDeviceProvisioningProfileByUUID deletes a mobile device provisioning profiles by uuid.
+func (c *Client) DeleteMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/uuid/%s", prefix, url.PathEscape(uuid))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceProvisioningProfileByUUID(%s): %w", uuid, err)
+	}
+	return nil
+}

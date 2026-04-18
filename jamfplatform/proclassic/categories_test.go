@@ -88,3 +88,63 @@ func TestDeleteCategoryByID(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGetCategoryByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<category></category>")
+	})
+
+	result, err := c.GetCategoryByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetCategoryByName_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/categories/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetCategoryByName(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateCategoryByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.UpdateCategoryByName(context.Background(), "test-id", &Category{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteCategoryByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	err := c.DeleteCategoryByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

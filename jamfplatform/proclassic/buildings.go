@@ -53,3 +53,34 @@ func (c *Client) DeleteBuildingByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetBuildingByName finds buildings by name.
+func (c *Client) GetBuildingByName(ctx context.Context, name string) (*Building, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Building
+	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetBuildingByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateBuildingByName updates an existing building by name.
+func (c *Client) UpdateBuildingByName(ctx context.Context, name string, request *Building) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateBuildingByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteBuildingByName deletes a building by name.
+func (c *Client) DeleteBuildingByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteBuildingByName(%s): %w", name, err)
+	}
+	return nil
+}

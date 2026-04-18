@@ -33,3 +33,14 @@ func (c *Client) IssueComputerCommandByID(ctx context.Context, command string, i
 	}
 	return &result, nil
 }
+
+// GetComputerCommandByName finds all computer commands by name.
+func (c *Client) GetComputerCommandByName(ctx context.Context, name string) (*ComputerCommand, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerCommand
+	endpoint := fmt.Sprintf("%s/computercommands/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerCommandByName(%s): %w", name, err)
+	}
+	return &result, nil
+}

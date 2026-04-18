@@ -88,3 +88,63 @@ func TestDeleteBYOProfileByID(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGetBYOProfileByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/byoprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<byoprofile></byoprofile>")
+	})
+
+	result, err := c.GetBYOProfileByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetBYOProfileByName_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/byoprofiles/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetBYOProfileByName(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateBYOProfileByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/byoprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.UpdateBYOProfileByName(context.Background(), "test-id", &Byoprofile{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteBYOProfileByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/byoprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	err := c.DeleteBYOProfileByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

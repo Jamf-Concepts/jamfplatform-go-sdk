@@ -53,3 +53,34 @@ func (c *Client) DeleteMobileDeviceGroupByID(ctx context.Context, id string) err
 	}
 	return nil
 }
+
+// GetMobileDeviceGroupByName finds mobile device groups by name.
+func (c *Client) GetMobileDeviceGroupByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceGroup
+	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceGroupByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateMobileDeviceGroupByName updates an existing mobile device group by name.
+func (c *Client) UpdateMobileDeviceGroupByName(ctx context.Context, name string, request *MobileDeviceGroup) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateMobileDeviceGroupByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteMobileDeviceGroupByName deletes a mobile device group by name.
+func (c *Client) DeleteMobileDeviceGroupByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceGroupByName(%s): %w", name, err)
+	}
+	return nil
+}

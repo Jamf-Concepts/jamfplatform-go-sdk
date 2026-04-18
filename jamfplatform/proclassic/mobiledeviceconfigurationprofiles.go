@@ -53,3 +53,34 @@ func (c *Client) DeleteMobileDeviceConfigurationProfileByID(ctx context.Context,
 	}
 	return nil
 }
+
+// GetMobileDeviceConfigurationProfileByName finds mobile device configuration profiles by name.
+func (c *Client) GetMobileDeviceConfigurationProfileByName(ctx context.Context, name string) (*MobileDeviceConfigurationProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceConfigurationProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceConfigurationProfileByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateMobileDeviceConfigurationProfileByName updates an existing mobile device configuration profile by name.
+func (c *Client) UpdateMobileDeviceConfigurationProfileByName(ctx context.Context, name string, request *MobileDeviceConfigurationProfile) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateMobileDeviceConfigurationProfileByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteMobileDeviceConfigurationProfileByName deletes a mobile device configuration profile by name.
+func (c *Client) DeleteMobileDeviceConfigurationProfileByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceConfigurationProfileByName(%s): %w", name, err)
+	}
+	return nil
+}

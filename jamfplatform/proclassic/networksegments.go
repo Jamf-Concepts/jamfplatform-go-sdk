@@ -53,3 +53,34 @@ func (c *Client) DeleteNetworkSegmentByID(ctx context.Context, id string) error 
 	}
 	return nil
 }
+
+// GetNetworkSegmentByName finds network segments by name.
+func (c *Client) GetNetworkSegmentByName(ctx context.Context, name string) (*NetworkSegment, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result NetworkSegment
+	endpoint := fmt.Sprintf("%s/networksegments/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetNetworkSegmentByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateNetworkSegmentByName updates an existing network segment by name.
+func (c *Client) UpdateNetworkSegmentByName(ctx context.Context, name string, request *NetworkSegmentPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/networksegments/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateNetworkSegmentByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteNetworkSegmentByName deletes a network segment by name.
+func (c *Client) DeleteNetworkSegmentByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/networksegments/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteNetworkSegmentByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -53,3 +53,34 @@ func (c *Client) DeleteMacApplicationByID(ctx context.Context, id string) error 
 	}
 	return nil
 }
+
+// GetMacApplicationByName finds mac applications by name.
+func (c *Client) GetMacApplicationByName(ctx context.Context, name string) (*MacApplication, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MacApplication
+	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMacApplicationByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateMacApplicationByName updates an existing mac application by name.
+func (c *Client) UpdateMacApplicationByName(ctx context.Context, name string, request *MacApplication) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateMacApplicationByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteMacApplicationByName deletes a mac application by name.
+func (c *Client) DeleteMacApplicationByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMacApplicationByName(%s): %w", name, err)
+	}
+	return nil
+}

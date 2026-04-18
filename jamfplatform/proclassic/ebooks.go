@@ -53,3 +53,34 @@ func (c *Client) DeleteEbookByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetEbookByName finds ebooks by name.
+func (c *Client) GetEbookByName(ctx context.Context, name string) (*Ebook, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Ebook
+	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetEbookByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateEbookByName updates an existing ebook by name.
+func (c *Client) UpdateEbookByName(ctx context.Context, name string, request *EbookPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateEbookByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteEbookByName deletes an ebook by name.
+func (c *Client) DeleteEbookByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteEbookByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -53,3 +53,34 @@ func (c *Client) DeleteClassByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetClassByName finds classes by name.
+func (c *Client) GetClassByName(ctx context.Context, name string) (*Class, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Class
+	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetClassByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateClassByName updates an existing class by name.
+func (c *Client) UpdateClassByName(ctx context.Context, name string, request *ClassPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateClassByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteClassByName deletes a class by name.
+func (c *Client) DeleteClassByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteClassByName(%s): %w", name, err)
+	}
+	return nil
+}

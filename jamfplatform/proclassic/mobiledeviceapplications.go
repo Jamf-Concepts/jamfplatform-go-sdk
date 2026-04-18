@@ -53,3 +53,45 @@ func (c *Client) DeleteMobileDeviceApplicationByID(ctx context.Context, id strin
 	}
 	return nil
 }
+
+// GetMobileDeviceApplicationByName finds mobile device applications by name.
+func (c *Client) GetMobileDeviceApplicationByName(ctx context.Context, name string) (*MobileDeviceApplication, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceApplication
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceApplicationByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateMobileDeviceApplicationByName updates an existing mobile device application by name.
+func (c *Client) UpdateMobileDeviceApplicationByName(ctx context.Context, name string, request *MobileDeviceApplication) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateMobileDeviceApplicationByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteMobileDeviceApplicationByName deletes a mobile device application by name.
+func (c *Client) DeleteMobileDeviceApplicationByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceApplicationByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// GetMobileDeviceApplicationByBundleID finds mobile device applications by bundle ID.
+func (c *Client) GetMobileDeviceApplicationByBundleID(ctx context.Context, bundleID string) (*MobileDeviceApplication, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceApplication
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s", prefix, url.PathEscape(bundleID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceApplicationByBundleID(%s): %w", bundleID, err)
+	}
+	return &result, nil
+}

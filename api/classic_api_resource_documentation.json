@@ -11140,6 +11140,93 @@
         "x-explorer-enabled": false
       }
     },
+    "/accounts/groupname/{name}": {
+      "delete": {
+        "operationId": "deleteGroupByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a group by name",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "get": {
+        "operationId": "findGroupsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/group"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/group"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds groups by name",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "Groups updated via this endpoint are updated only within Jamf Pro and will not affect the LDAP server.",
+        "operationId": "updateGroupByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing group by name",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/accounts/userid/{id}": {
       "delete": {
         "operationId": "deleteAccountById",
@@ -11245,6 +11332,92 @@
           }
         },
         "summary": "Updates an existing account by ID",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/accounts/username/{name}": {
+      "delete": {
+        "operationId": "deleteAccountByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes an account by name",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "get": {
+        "operationId": "findAccountsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/account"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/account"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds accounts by name",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateAccountByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing account by name",
         "tags": [
           "accounts"
         ],
@@ -11412,6 +11585,67 @@
         "x-explorer-enabled": false
       }
     },
+    "/advancedcomputersearches/name/{name}": {
+      "delete": {
+        "operationId": "deleteAdvancedComputerSearchByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer search by name",
+        "tags": [
+          "advancedcomputersearches"
+        ]
+      },
+      "get": {
+        "description": "Additional display fields are returned within the `Computer` object",
+        "operationId": "findAdvancedComputerSearchesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_computer_search"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_computer_search"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds advanced computer searches by name",
+        "tags": [
+          "advancedcomputersearches"
+        ]
+      }
+    },
     "/advancedmobiledevicesearches/id/{id}": {
       "delete": {
         "operationId": "deleteAdvancedMobileDeviceSearchById",
@@ -11521,6 +11755,66 @@
         "x-explorer-enabled": false
       }
     },
+    "/advancedmobiledevicesearches/name/{name}": {
+      "delete": {
+        "operationId": "deleteAdvancedMobileDeviceSearchByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device search by name",
+        "tags": [
+          "advancedmobiledevicesearches"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceSearchesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_mobile_device_search"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_mobile_device_search"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds advanced mobile device searches by name",
+        "tags": [
+          "advancedmobiledevicesearches"
+        ]
+      }
+    },
     "/advancedusersearches/id/{id}": {
       "delete": {
         "operationId": "deleteAdvancedUserSearchById",
@@ -11628,6 +11922,103 @@
           "advancedusersearches"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/advancedusersearches/name/{name}": {
+      "delete": {
+        "operationId": "deleteAdvancedUserSearchByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a user search by Name",
+        "tags": [
+          "advancedusersearches"
+        ]
+      },
+      "get": {
+        "operationId": "findUserSearchesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_user_search"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_user_search"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds user searches by name",
+        "tags": [
+          "advancedusersearches"
+        ]
+      }
+    },
+    "/allowedfileextensions/extension/{extension}": {
+      "get": {
+        "operationId": "findAllowedFileExtensionByName",
+        "parameters": [
+          {
+            "description": "String value of extension",
+            "in": "path",
+            "name": "extension",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/allowed_file_extension"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/allowed_file_extension"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds an allowed file extension value by name",
+        "tags": [
+          "allowedfileextensions"
+        ]
       }
     },
     "/allowedfileextensions/id/{id}": {
@@ -11824,6 +12215,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/buildings/name/{name}": {
+      "delete": {
+        "operationId": "deleteBuildingByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a building by name",
+        "tags": [
+          "buildings"
+        ]
+      },
+      "get": {
+        "operationId": "findBuildingsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/building"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/building"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds buildings by name",
+        "tags": [
+          "buildings"
+        ]
+      },
+      "put": {
+        "operationId": "updateBuildingByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing building by name",
+        "tags": [
+          "buildings"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/byoprofiles/id/{id}": {
       "delete": {
         "operationId": "deleteBYOProfilesById",
@@ -11927,6 +12402,91 @@
           }
         },
         "summary": "Updates a personal device profile by ID",
+        "tags": [
+          "byoprofiles"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/byoprofiles/name/{name}": {
+      "delete": {
+        "operationId": "deleteBYOProfilesByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a personal device profile by name",
+        "tags": [
+          "byoprofiles"
+        ]
+      },
+      "get": {
+        "operationId": "findBYOProfilesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/byoprofile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/byoprofile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a personal device profile by name",
+        "tags": [
+          "byoprofiles"
+        ]
+      },
+      "put": {
+        "description": "You cannot reassign the site since it is maintained by Jamf Pro.",
+        "operationId": "updateBYOProfilesByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates a personal device profile by name",
         "tags": [
           "byoprofiles"
         ],
@@ -12042,6 +12602,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/categories/name/{name}": {
+      "delete": {
+        "operationId": "deleteCategoryByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a category by name",
+        "tags": [
+          "categories"
+        ]
+      },
+      "get": {
+        "operationId": "findCategoriesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/category"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/category"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds categories by name",
+        "tags": [
+          "categories"
+        ]
+      },
+      "put": {
+        "operationId": "updateCategoryByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Updates an existing category by name",
+        "tags": [
+          "categories"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/classes/id/{id}": {
       "delete": {
         "operationId": "deleteClassById",
@@ -12147,6 +12791,91 @@
           }
         },
         "summary": "Updates an existing class by ID",
+        "tags": [
+          "classes"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/classes/name/{name}": {
+      "delete": {
+        "operationId": "deleteClassByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a class by name",
+        "tags": [
+          "classes"
+        ]
+      },
+      "get": {
+        "operationId": "findClassesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/class"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/class"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds classes by name",
+        "tags": [
+          "classes"
+        ]
+      },
+      "put": {
+        "description": "The mobile device list is not used by this operation, the mobile device group is used instead.",
+        "operationId": "updateClassByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Updates an existing class by name",
         "tags": [
           "classes"
         ],
@@ -12302,6 +13031,43 @@
         "x-explorer-enabled": false
       }
     },
+    "/computercommands/name/{name}": {
+      "get": {
+        "operationId": "findComputerCommandsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_command"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_command"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all computer commands by name",
+        "tags": [
+          "computercommands"
+        ]
+      }
+    },
     "/computercommands/uuid/{uuid}": {
       "get": {
         "operationId": "findComputerCommandsByUuid",
@@ -12448,6 +13214,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/computerextensionattributes/name/{name}": {
+      "delete": {
+        "operationId": "deleteComputerextensionattributeByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer extension attribute by name",
+        "tags": [
+          "computerextensionattributes"
+        ]
+      },
+      "get": {
+        "operationId": "findComputerextensionattributesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_extension_attribute"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_extension_attribute"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer extension attributes by name",
+        "tags": [
+          "computerextensionattributes"
+        ]
+      },
+      "put": {
+        "operationId": "updateComputerextensionattributeByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing computer extension attribute by name",
+        "tags": [
+          "computerextensionattributes"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/computergroups/id/{id}": {
       "delete": {
         "operationId": "deleteComputerGroupById",
@@ -12552,6 +13402,91 @@
           }
         },
         "summary": "Updates an existing computer group by ID",
+        "tags": [
+          "computergroups"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/computergroups/name/{name}": {
+      "delete": {
+        "operationId": "deleteComputerGroupByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer group by name",
+        "tags": [
+          "computergroups"
+        ]
+      },
+      "get": {
+        "operationId": "findComputerGroupsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_group"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_group"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer groups by name",
+        "tags": [
+          "computergroups"
+        ]
+      },
+      "put": {
+        "description": "One or more computers can be added by using \"computer_additions\" instead of \"computers\". One or more computers can be deleted by using \"computer_deletions\" instead of \"computers\"",
+        "operationId": "updateComputerGroupByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing computer group by name",
         "tags": [
           "computergroups"
         ],
@@ -13524,6 +14459,78 @@
         "x-explorer-enabled": false
       }
     },
+    "/departments/name/{name}": {
+      "delete": {
+        "operationId": "deleteDepartmentByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a department by name",
+        "tags": [
+          "departments"
+        ]
+      },
+      "get": {
+        "operationId": "findDepartmentsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds departments by name",
+        "tags": [
+          "departments"
+        ]
+      },
+      "put": {
+        "operationId": "updateDepartmentByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing department by name",
+        "tags": [
+          "departments"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/directorybindings/id/{id}": {
       "delete": {
         "operationId": "deleteDirectoryBindingById",
@@ -13627,6 +14634,90 @@
           }
         },
         "summary": "Updates an existing directory binding by ID",
+        "tags": [
+          "directorybindings"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/directorybindings/name/{name}": {
+      "delete": {
+        "operationId": "deleteDirectoryBindingByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a directory binding by name",
+        "tags": [
+          "directorybindings"
+        ]
+      },
+      "get": {
+        "operationId": "findDirectoryBindingsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/directory_binding"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/directory_binding"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds directory bindings by name",
+        "tags": [
+          "directorybindings"
+        ]
+      },
+      "put": {
+        "operationId": "updateDirectoryBindingByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing directory binding by name",
         "tags": [
           "directorybindings"
         ],
@@ -13742,6 +14833,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/diskencryptionconfigurations/name/{name}": {
+      "delete": {
+        "operationId": "deleteDiskEncryptionConfigurationByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a disk encryption configuration by name",
+        "tags": [
+          "diskencryptionconfigurations"
+        ]
+      },
+      "get": {
+        "operationId": "findDiskEncryptionConfigurationsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/disk_encryption_configuration"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/disk_encryption_configuration"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds disk encryption configurations by name",
+        "tags": [
+          "diskencryptionconfigurations"
+        ]
+      },
+      "put": {
+        "operationId": "updateDiskEncryptionConfigurationByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing disk encryption configuration by name",
+        "tags": [
+          "diskencryptionconfigurations"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/distributionpoints/id/{id}": {
       "delete": {
         "operationId": "deleteDistributionPointById",
@@ -13845,6 +15020,90 @@
           }
         },
         "summary": "Updates an existing distribution point by ID",
+        "tags": [
+          "distributionpoints"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/distributionpoints/name/{name}": {
+      "delete": {
+        "operationId": "deleteDistributionPointByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a distribution point by name",
+        "tags": [
+          "distributionpoints"
+        ]
+      },
+      "get": {
+        "operationId": "findDistributionPointsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/distribution_point"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/distribution_point"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds distribution points by name",
+        "tags": [
+          "distributionpoints"
+        ]
+      },
+      "put": {
+        "operationId": "updateDistributionPointByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing distribution point by name",
         "tags": [
           "distributionpoints"
         ],
@@ -13960,6 +15219,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/dockitems/name/{name}": {
+      "delete": {
+        "operationId": "deleteDockItemByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a dock item by name",
+        "tags": [
+          "dockitems"
+        ]
+      },
+      "get": {
+        "operationId": "findDockItemsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dock_item"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/dock_item"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds dock items by name",
+        "tags": [
+          "dockitems"
+        ]
+      },
+      "put": {
+        "operationId": "updateDockItemByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing dock item by name",
+        "tags": [
+          "dockitems"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/ebooks/id/{id}": {
       "delete": {
         "operationId": "deleteEBookById",
@@ -14063,6 +15406,90 @@
           }
         },
         "summary": "Updates an existing ebook by ID",
+        "tags": [
+          "ebooks"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/ebooks/name/{name}": {
+      "delete": {
+        "operationId": "deleteEBookByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes an ebook by name",
+        "tags": [
+          "ebooks"
+        ]
+      },
+      "get": {
+        "operationId": "findEBooksByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ebook"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ebook"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds ebooks by name",
+        "tags": [
+          "ebooks"
+        ]
+      },
+      "put": {
+        "operationId": "updateEBookByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing ebook by name",
         "tags": [
           "ebooks"
         ],
@@ -14369,6 +15796,90 @@
           }
         },
         "summary": "Updates an existing iBeacon region by ID",
+        "tags": [
+          "ibeacons"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/ibeacons/name/{name}": {
+      "delete": {
+        "operationId": "deleteIBeaconByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes an iBeacon region by name",
+        "tags": [
+          "ibeacons"
+        ]
+      },
+      "get": {
+        "operationId": "findIBeaconsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ibeacon"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ibeacon"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds iBeacon regions by name",
+        "tags": [
+          "ibeacons"
+        ]
+      },
+      "put": {
+        "operationId": "updateIBeaconByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing iBeacon region by name",
         "tags": [
           "ibeacons"
         ],
@@ -14688,6 +16199,78 @@
         "x-explorer-enabled": false
       }
     },
+    "/ldapservers/name/{name}": {
+      "delete": {
+        "operationId": "deleteLDAPServerByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes an LDAP server by name",
+        "tags": [
+          "ldapservers"
+        ]
+      },
+      "get": {
+        "operationId": "findLDAPServersByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds LDAP servers by name",
+        "tags": [
+          "ldapservers"
+        ]
+      },
+      "put": {
+        "operationId": "updateLDAPServerByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing LDAP server by name",
+        "tags": [
+          "ldapservers"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/licensedsoftware/id/{id}": {
       "delete": {
         "operationId": "deleteLicensedSoftwareById",
@@ -14793,6 +16376,91 @@
           }
         },
         "summary": "Updates existing licensed software by ID",
+        "tags": [
+          "licensedsoftware"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/licensedsoftware/name/{name}": {
+      "delete": {
+        "operationId": "deleteLicensedSoftwareByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes licensed software by name",
+        "tags": [
+          "licensedsoftware"
+        ]
+      },
+      "get": {
+        "operationId": "findLicensedSoftwareByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/licensed_software"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/licensed_software"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds licensed software by name",
+        "tags": [
+          "licensedsoftware"
+        ]
+      },
+      "put": {
+        "description": "Matching computers are derived from software definitions, therefore they cannot be set with this operation.",
+        "operationId": "updateLicensedSoftwareByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing licensed software by name",
         "tags": [
           "licensedsoftware"
         ],
@@ -14910,6 +16578,129 @@
         "x-explorer-enabled": false
       }
     },
+    "/macapplications/name/{name}": {
+      "delete": {
+        "operationId": "deleteMacappByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mac application by name",
+        "tags": [
+          "macapplications"
+        ]
+      },
+      "get": {
+        "operationId": "findMacappsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mac_application"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mac_application"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mac applications by name",
+        "tags": [
+          "macapplications"
+        ]
+      },
+      "put": {
+        "description": "Does not support vpp codes.",
+        "operationId": "updateMacappByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mac application by name",
+        "tags": [
+          "macapplications"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceapplications/bundleid/{bundleid}": {
+      "get": {
+        "description": "If multiple applications match, no application is returned. You may specify both bundle id and version to uniquely identify a mobile device application.",
+        "operationId": "findMobileDeviceApplicationsByBundleID",
+        "parameters": [
+          {
+            "description": "Bundle ID to filter by",
+            "in": "path",
+            "name": "bundleid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device applications by bundle ID",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      }
+    },
     "/mobiledeviceapplications/id/{id}": {
       "delete": {
         "operationId": "deleteMobileDeviceApplicationById",
@@ -15021,6 +16812,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledeviceapplications/name/{name}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceApplicationByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device application by name",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceApplicationsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device applications by name",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      },
+      "put": {
+        "operationId": "updateMobileDeviceApplicationByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device application by name",
+        "tags": [
+          "mobiledeviceapplications"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/mobiledevicecommands/command": {
       "post": {
         "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values  |\n| ---------- | ------- | ------------ | ------  |\n| DeviceName (deprecated) | device_name | Supervised Device | string  |\n| DeviceLocation | N/A | Supervised and in lost mode | N/A  |\n| DisableLostMode | N/A | Supervised and in lost mode | N/A  |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string  |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string  |\n| EnableLostMode | lost_mode_footnote | optional | string  |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean  |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean  |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer)  |\n| PlayLostModeSound | N/A | Supervised and in lost mode | N/A  |\n| RestartDevice (deprecated) | N/A | Supervised device | N/A  |\n| ScheduleOSUpdate (deprecated) | install_action | iOS 9 - 10.2, enrolled via a Prestage enrollment; and/or iOS 10.3 or later; tvOS 12 or later | 1 = Download the update for users to install, 2 = Download and install the update, and restart devices after installation  |\n| ScheduleOSUpdate (deprecated) | product_version | iOS 11.3 or later, tvOS 12.2 or later | string  |\n| Wallpaper | wallpaper_settings | Supervised device | 1 = Lock screen, 2 = Home screen, 3 = both  |\n| Wallpaper | wallpaper_id | Supervised device (required if wallpaper_content is not set) | Jamf Pro icon ID (integer)  |\n| Wallpaper | wallpaper_content | Supervised device (required if wallpaper_id is not set) | base64 encoded PNG or JPEG  |\n| RefreshCellularPlans | e_sim_server_url | N/A | This URL is obtained from each carrier separately |\n",
@@ -15047,6 +16922,43 @@
           "mobiledevicecommands"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevicecommands/name/{name}": {
+      "get": {
+        "operationId": "findMobileDeviceCommandsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_command"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_command"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device commands by command name",
+        "tags": [
+          "mobiledevicecommands"
+        ]
       }
     },
     "/mobiledevicecommands/uuid/{uuid}": {
@@ -15195,6 +17107,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledeviceconfigurationprofiles/name/{name}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceConfigurationProfileByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device configuration profile by name",
+        "tags": [
+          "mobiledeviceconfigurationprofiles"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceConfigurationProfilesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_configuration_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_configuration_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device configuration profiles by name",
+        "tags": [
+          "mobiledeviceconfigurationprofiles"
+        ]
+      },
+      "put": {
+        "operationId": "updateMobileDeviceConfigurationProfileByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device configuration profile by name",
+        "tags": [
+          "mobiledeviceconfigurationprofiles"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/mobiledeviceenrollmentprofiles/id/{id}": {
       "delete": {
         "operationId": "deleteMobileDeviceEnrollmentProfileById",
@@ -15302,6 +17298,103 @@
           "mobiledeviceenrollmentprofiles"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceenrollmentprofiles/invitation/{invitation}": {
+      "get": {
+        "operationId": "findMobileDeviceEnrollmentProfilesByInvitation",
+        "parameters": [
+          {
+            "description": "Invitation value to filter by",
+            "in": "path",
+            "name": "invitation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device enrollment profiles by invitation",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ]
+      }
+    },
+    "/mobiledeviceenrollmentprofiles/name/{name}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceEnrollmentProfileByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device enrollment profile by name",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceEnrollmentProfilesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device enrollment profiles by name",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ]
       }
     },
     "/mobiledeviceextensionattributes/id/{id}": {
@@ -15413,6 +17506,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledeviceextensionattributes/name/{name}": {
+      "delete": {
+        "operationId": "deleteMobiledeviceextensionattributeByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device extension attribute by name",
+        "tags": [
+          "mobiledeviceextensionattributes"
+        ]
+      },
+      "get": {
+        "operationId": "findMobiledeviceextensionattributesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_extension_attribute"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_extension_attribute"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobiledeviceextensionattributes by name",
+        "tags": [
+          "mobiledeviceextensionattributes"
+        ]
+      },
+      "put": {
+        "operationId": "updateMobiledeviceextensionattributeByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device extension attribute by name",
+        "tags": [
+          "mobiledeviceextensionattributes"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/mobiledevicegroups/id/{id}": {
       "delete": {
         "operationId": "deleteMobileDeviceGroupById",
@@ -15517,6 +17694,91 @@
           }
         },
         "summary": "Updates an existing mobile device group by ID",
+        "tags": [
+          "mobiledevicegroups"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevicegroups/name/{name}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceGroupByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device group by name",
+        "tags": [
+          "mobiledevicegroups"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceGroupsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_group"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_group"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device groups by name",
+        "tags": [
+          "mobiledevicegroups"
+        ]
+      },
+      "put": {
+        "description": "One or more mobile devices can be added by using \"mobile_device_additions\" instead of \"mobile_devices\". One or more computers can be deleted by using \"mobile_device_deletions\" instead of \"mobile_devices\".",
+        "operationId": "updateMobileDeviceGroupByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device group by name",
         "tags": [
           "mobiledevicegroups"
         ],
@@ -15917,6 +18179,126 @@
           "mobiledeviceprovisioningprofiles"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceprovisioningprofiles/name/{name}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceProvisioningProfilesByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device provisioning profiles by name",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceProvisioningProfilesByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a mobile device provisioning profiles by name",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ]
+      }
+    },
+    "/mobiledeviceprovisioningprofiles/uuid/{uuid}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceProvisioningProfilesByUUID",
+        "parameters": [
+          {
+            "description": "Uuid value to filter by",
+            "in": "path",
+            "name": "uuid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device provisioning profiles by uuid",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceProvisioningProfilesByUUID",
+        "parameters": [
+          {
+            "description": "Uuid value to filter by",
+            "in": "path",
+            "name": "uuid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a mobile device provisioning profiles by uuid",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ]
       }
     },
     "/mobiledevices/id/{id}": {
@@ -16479,6 +18861,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/networksegments/name/{name}": {
+      "delete": {
+        "operationId": "deleteNetworkSegmentByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a network segment by name",
+        "tags": [
+          "networksegments"
+        ]
+      },
+      "get": {
+        "operationId": "findNetworkSegmentsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/network_segment"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/network_segment"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds network segments by name",
+        "tags": [
+          "networksegments"
+        ]
+      },
+      "put": {
+        "operationId": "updateNetworkSegmentByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing network segment by name",
+        "tags": [
+          "networksegments"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/osxconfigurationprofiles/id/{id}": {
       "delete": {
         "operationId": "deleteOsxConfigurationProfileById",
@@ -16582,6 +19048,90 @@
           }
         },
         "summary": "Updates an existing OS X configuration profile by ID",
+        "tags": [
+          "osxconfigurationprofiles"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/osxconfigurationprofiles/name/{name}": {
+      "delete": {
+        "operationId": "deleteOsxConfigurationProfileByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a OS X configuration profile by name",
+        "tags": [
+          "osxconfigurationprofiles"
+        ]
+      },
+      "get": {
+        "operationId": "findOsxConfigurationProfilesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/os_x_configuration_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/os_x_configuration_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds OS X configuration profiles by name",
+        "tags": [
+          "osxconfigurationprofiles"
+        ]
+      },
+      "put": {
+        "operationId": "updateOsxConfigurationProfileByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing OS X configuration profile by name",
         "tags": [
           "osxconfigurationprofiles"
         ],
@@ -16956,6 +19506,43 @@
         "x-explorer-enabled": false
       }
     },
+    "/patchexternalsources/name/{name}": {
+      "get": {
+        "operationId": "findPatchExternalSourcesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_external_source"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_external_source"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds the first patch external source with the name provided",
+        "tags": [
+          "patchexternalsources"
+        ]
+      }
+    },
     "/patchinternalsources/id/{id}": {
       "get": {
         "operationId": "findPatchInternalSourcesById",
@@ -16988,6 +19575,43 @@
           }
         },
         "summary": "Finds a patch internal source by ID",
+        "tags": [
+          "patchinternalsources"
+        ]
+      }
+    },
+    "/patchinternalsources/name/{name}": {
+      "get": {
+        "operationId": "findPatchInternalSourcesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_internal_source"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_internal_source"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds the first patch internal source with the name provided",
         "tags": [
           "patchinternalsources"
         ]
@@ -17078,6 +19702,43 @@
       }
     },
     "/patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}": {
+      "get": {
+        "deprecated": true,
+        "description": "softwaretitleconfigid refers to the ID of the patch software title the policy is associated to",
+        "operationId": "findPatchPoliciesBySoftwareTitleConfigId",
+        "parameters": [
+          {
+            "description": "Patch software title config ID value to filter by",
+            "in": "path",
+            "name": "softwaretitleconfigid",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all patch policies by patch software title configuration ID (Deprecated). Please transition use to Jamf Pro API endpoint \"/v2/patch-policies\".",
+        "tags": [
+          "patchpolicies"
+        ]
+      },
       "post": {
         "description": "softwaretitleconfig refers to the ID of the patch software title the policy is to be associated to",
         "operationId": "createPatchPolicyBySoftwareTitleConfigId",
@@ -17357,6 +20018,47 @@
           "peripherals"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/peripherals/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Location)",
+        "operationId": "findPeripheralsByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Location",
+                "Purchasing",
+                "Attachments"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for a peripheral",
+        "tags": [
+          "peripherals"
+        ]
       }
     },
     "/peripheraltypes/id/{id}": {
@@ -17770,6 +20472,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/printers/name/{name}": {
+      "delete": {
+        "operationId": "deletePrinterByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a printer by name",
+        "tags": [
+          "printers"
+        ]
+      },
+      "get": {
+        "operationId": "findPrintersByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/printer"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/printer"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds printers by name",
+        "tags": [
+          "printers"
+        ]
+      },
+      "put": {
+        "operationId": "updatePrinterByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing printer by name",
+        "tags": [
+          "printers"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/removablemacaddresses/id/{id}": {
       "delete": {
         "operationId": "deleteRemovableMacAddressById",
@@ -17879,6 +20665,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/removablemacaddresses/name/{name}": {
+      "delete": {
+        "operationId": "deleteRemovableMacAddressByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a removable Mac address by name",
+        "tags": [
+          "removablemacaddresses"
+        ]
+      },
+      "get": {
+        "operationId": "findRemovableMacAddressesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/removable_mac_address"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/removable_mac_address"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds removable Mac addresses by name",
+        "tags": [
+          "removablemacaddresses"
+        ]
+      },
+      "put": {
+        "operationId": "updateRemovableMacAddressByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing removable Mac address by name",
+        "tags": [
+          "removablemacaddresses"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/restrictedsoftware/id/{id}": {
       "delete": {
         "operationId": "deleteRestrictedSoftwareById",
@@ -17982,6 +20852,90 @@
           }
         },
         "summary": "Updates an existing restricted software by ID",
+        "tags": [
+          "restrictedsoftware"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/restrictedsoftware/name/{name}": {
+      "delete": {
+        "operationId": "deleteRestrictedSoftwareByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a restricted software by name",
+        "tags": [
+          "restrictedsoftware"
+        ]
+      },
+      "get": {
+        "operationId": "findRestrictedSoftwareByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restricted_software"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/restricted_software"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds restricted software by name",
+        "tags": [
+          "restrictedsoftware"
+        ]
+      },
+      "put": {
+        "operationId": "updateRestrictedSoftwareByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing restricted software by name",
         "tags": [
           "restrictedsoftware"
         ],
@@ -18100,6 +21054,92 @@
         "x-explorer-enabled": false
       }
     },
+    "/scripts/name/{name}": {
+      "delete": {
+        "operationId": "deleteScriptByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a script by name",
+        "tags": [
+          "scripts"
+        ]
+      },
+      "get": {
+        "description": "script_contents_encoded is the equivalent of script_contents, but it has been Base 64 encoded.",
+        "operationId": "findScriptsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/script"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/script"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds scripts by name",
+        "tags": [
+          "scripts"
+        ]
+      },
+      "put": {
+        "description": "Only one of script_contents_encoded and script_contents should be submitted.",
+        "operationId": "updateScriptByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing script by name",
+        "tags": [
+          "scripts"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/sites/id/{id}": {
       "delete": {
         "operationId": "deleteSiteById",
@@ -18203,6 +21243,90 @@
           }
         },
         "summary": "Updates an existing site by ID",
+        "tags": [
+          "sites"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/sites/name/{name}": {
+      "delete": {
+        "operationId": "deleteSiteByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a site by name",
+        "tags": [
+          "sites"
+        ]
+      },
+      "get": {
+        "operationId": "findSitesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/site"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/site"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds sites by name",
+        "tags": [
+          "sites"
+        ]
+      },
+      "put": {
+        "operationId": "updateSiteByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing site by name",
         "tags": [
           "sites"
         ],
@@ -18369,6 +21493,90 @@
         "x-explorer-enabled": false
       }
     },
+    "/softwareupdateservers/name/{name}": {
+      "delete": {
+        "operationId": "deleteSoftwareUpdateServerByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a software update server by name",
+        "tags": [
+          "softwareupdateservers"
+        ]
+      },
+      "get": {
+        "operationId": "findSoftwareUpdateServersByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_update_server"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_update_server"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds software update servers by name",
+        "tags": [
+          "softwareupdateservers"
+        ]
+      },
+      "put": {
+        "operationId": "updateSoftwareUpdateServerByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing software update server by name",
+        "tags": [
+          "softwareupdateservers"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/userextensionattributes/id/{id}": {
       "delete": {
         "operationId": "deleteUserextensionattributeById",
@@ -18472,6 +21680,90 @@
           }
         },
         "summary": "Updates an existing user extension attribute by ID",
+        "tags": [
+          "userextensionattributes"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/userextensionattributes/name/{name}": {
+      "delete": {
+        "operationId": "deleteUserextensionattributeByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a user extension attribute by name",
+        "tags": [
+          "userextensionattributes"
+        ]
+      },
+      "get": {
+        "operationId": "findUserextensionattributesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_extension_attribute"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_extension_attribute"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds user extension attributes by name",
+        "tags": [
+          "userextensionattributes"
+        ]
+      },
+      "put": {
+        "operationId": "updateUserextensionattributeByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing user extension attribute by name",
         "tags": [
           "userextensionattributes"
         ],
@@ -18588,6 +21880,176 @@
         "x-explorer-enabled": false
       }
     },
+    "/usergroups/name/{name}": {
+      "delete": {
+        "operationId": "deleteUserGroupsByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes user groups by name",
+        "tags": [
+          "usergroups"
+        ]
+      },
+      "get": {
+        "operationId": "findUserGroupsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_group"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_group"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds user groups by name",
+        "tags": [
+          "usergroups"
+        ]
+      },
+      "put": {
+        "description": "One or more users can be added by using \"user_additions\" instead of \"users\". One or more users can be deleted by using \"user_deletions\" instead of \"users\".",
+        "operationId": "updateUserGroupsByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates user groups by name",
+        "tags": [
+          "usergroups"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/users/email/{email}": {
+      "delete": {
+        "operationId": "deleteUserByEmailAddress",
+        "parameters": [
+          {
+            "description": "Email address value to filter by",
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a user by email address",
+        "tags": [
+          "users"
+        ]
+      },
+      "get": {
+        "description": "Because email addresses may not be unique, this operation may return a list of users.",
+        "operationId": "findUsersByEmailAddress",
+        "parameters": [
+          {
+            "description": "Email address to filter by",
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds users by email address",
+        "tags": [
+          "users"
+        ]
+      },
+      "put": {
+        "operationId": "updateUserByEmailAddress",
+        "parameters": [
+          {
+            "description": "Email address value to filter by",
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing user by email address",
+        "tags": [
+          "users"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/users/id/{id}": {
       "delete": {
         "operationId": "deleteUserById",
@@ -18693,6 +22155,91 @@
           }
         },
         "summary": "Updates an existing user by ID",
+        "tags": [
+          "users"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/users/name/{name}": {
+      "delete": {
+        "operationId": "deleteUserByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a user by name",
+        "tags": [
+          "users"
+        ]
+      },
+      "get": {
+        "operationId": "findUsersByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds users by name",
+        "tags": [
+          "users"
+        ]
+      },
+      "put": {
+        "description": "This operation cannot be used to add computers, mobile devices, peripherals, vpp assignments to a user.",
+        "operationId": "updateUserByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing user by name",
         "tags": [
           "users"
         ],
@@ -19135,6 +22682,90 @@
           }
         },
         "summary": "Updates an existing webhook by ID",
+        "tags": [
+          "webhooks"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/webhooks/name/{name}": {
+      "delete": {
+        "operationId": "deleteWebhookByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a webhook by name",
+        "tags": [
+          "webhooks"
+        ]
+      },
+      "get": {
+        "operationId": "findWebhooksByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/webhook"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/webhook"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds webhooks by name",
+        "tags": [
+          "webhooks"
+        ]
+      },
+      "put": {
+        "operationId": "updateWebhookByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing webhook by name",
         "tags": [
           "webhooks"
         ],

@@ -53,3 +53,34 @@ func (c *Client) DeleteWebhookByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetWebhookByName finds webhooks by name.
+func (c *Client) GetWebhookByName(ctx context.Context, name string) (*Webhook, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Webhook
+	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetWebhookByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateWebhookByName updates an existing webhook by name.
+func (c *Client) UpdateWebhookByName(ctx context.Context, name string, request *Webhook) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateWebhookByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteWebhookByName deletes a webhook by name.
+func (c *Client) DeleteWebhookByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteWebhookByName(%s): %w", name, err)
+	}
+	return nil
+}

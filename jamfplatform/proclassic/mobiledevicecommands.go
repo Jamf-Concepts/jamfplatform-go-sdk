@@ -33,3 +33,14 @@ func (c *Client) IssueMobileDeviceCommand(ctx context.Context, request *MobileDe
 	}
 	return &result, nil
 }
+
+// GetMobileDeviceCommandByName finds all mobile device commands by command name.
+func (c *Client) GetMobileDeviceCommandByName(ctx context.Context, name string) (*MobileDeviceCommand, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceCommand
+	endpoint := fmt.Sprintf("%s/mobiledevicecommands/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceCommandByName(%s): %w", name, err)
+	}
+	return &result, nil
+}

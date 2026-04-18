@@ -53,3 +53,34 @@ func (c *Client) DeleteSoftwareUpdateServerByID(ctx context.Context, id string) 
 	}
 	return nil
 }
+
+// GetSoftwareUpdateServerByName finds software update servers by name.
+func (c *Client) GetSoftwareUpdateServerByName(ctx context.Context, name string) (*SoftwareUpdateServer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result SoftwareUpdateServer
+	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetSoftwareUpdateServerByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateSoftwareUpdateServerByName updates an existing software update server by name.
+func (c *Client) UpdateSoftwareUpdateServerByName(ctx context.Context, name string, request *SoftwareUpdateServer) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateSoftwareUpdateServerByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteSoftwareUpdateServerByName deletes a software update server by name.
+func (c *Client) DeleteSoftwareUpdateServerByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteSoftwareUpdateServerByName(%s): %w", name, err)
+	}
+	return nil
+}

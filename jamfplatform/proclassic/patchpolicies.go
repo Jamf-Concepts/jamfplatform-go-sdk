@@ -53,3 +53,16 @@ func (c *Client) DeletePatchPolicyByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// ListPatchPoliciesBySoftwareTitleConfigID finds all patch policies by patch software title configuration ID (Deprecated). Please transition use to Jamf Pro API endpoint "/v2/patch-policies".
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) ListPatchPoliciesBySoftwareTitleConfigID(ctx context.Context, softwareTitleConfigID string) (*PatchPolicy, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchPolicy
+	endpoint := fmt.Sprintf("%s/patchpolicies/softwaretitleconfig/id/%s", prefix, url.PathEscape(softwareTitleConfigID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatchPoliciesBySoftwareTitleConfigID(%s): %w", softwareTitleConfigID, err)
+	}
+	return &result, nil
+}

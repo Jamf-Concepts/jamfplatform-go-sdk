@@ -53,3 +53,34 @@ func (c *Client) DeleteRemovableMacAddressByID(ctx context.Context, id string) e
 	}
 	return nil
 }
+
+// GetRemovableMacAddressByName finds removable Mac addresses by name.
+func (c *Client) GetRemovableMacAddressByName(ctx context.Context, name string) (*RemovableMacAddress, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result RemovableMacAddress
+	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetRemovableMacAddressByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateRemovableMacAddressByName updates an existing removable Mac address by name.
+func (c *Client) UpdateRemovableMacAddressByName(ctx context.Context, name string, request *RemovableMacAddress) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateRemovableMacAddressByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteRemovableMacAddressByName deletes a removable Mac address by name.
+func (c *Client) DeleteRemovableMacAddressByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteRemovableMacAddressByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -53,3 +53,34 @@ func (c *Client) DeleteDepartmentByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetDepartmentByName finds departments by name.
+func (c *Client) GetDepartmentByName(ctx context.Context, name string) (*Department, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Department
+	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetDepartmentByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateDepartmentByName updates an existing department by name.
+func (c *Client) UpdateDepartmentByName(ctx context.Context, name string, request *Department) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateDepartmentByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteDepartmentByName deletes a department by name.
+func (c *Client) DeleteDepartmentByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteDepartmentByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -53,3 +53,24 @@ func (c *Client) DeleteAdvancedComputerSearchByID(ctx context.Context, id string
 	}
 	return nil
 }
+
+// GetAdvancedComputerSearchByName finds advanced computer searches by name.
+func (c *Client) GetAdvancedComputerSearchByName(ctx context.Context, name string) (*AdvancedComputerSearch, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result AdvancedComputerSearch
+	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetAdvancedComputerSearchByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// DeleteAdvancedComputerSearchByName deletes a computer search by name.
+func (c *Client) DeleteAdvancedComputerSearchByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteAdvancedComputerSearchByName(%s): %w", name, err)
+	}
+	return nil
+}

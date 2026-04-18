@@ -53,3 +53,34 @@ func (c *Client) DeleteDirectoryBindingByID(ctx context.Context, id string) erro
 	}
 	return nil
 }
+
+// GetDirectoryBindingByName finds directory bindings by name.
+func (c *Client) GetDirectoryBindingByName(ctx context.Context, name string) (*DirectoryBinding, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result DirectoryBinding
+	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetDirectoryBindingByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateDirectoryBindingByName updates an existing directory binding by name.
+func (c *Client) UpdateDirectoryBindingByName(ctx context.Context, name string, request *DirectoryBinding) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateDirectoryBindingByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteDirectoryBindingByName deletes a directory binding by name.
+func (c *Client) DeleteDirectoryBindingByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteDirectoryBindingByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -53,3 +53,24 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 	}
 	return nil
 }
+
+// GetAdvancedMobileDeviceSearchByName finds advanced mobile device searches by name.
+func (c *Client) GetAdvancedMobileDeviceSearchByName(ctx context.Context, name string) (*AdvancedMobileDeviceSearch, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result AdvancedMobileDeviceSearch
+	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetAdvancedMobileDeviceSearchByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// DeleteAdvancedMobileDeviceSearchByName deletes a mobile device search by name.
+func (c *Client) DeleteAdvancedMobileDeviceSearchByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteAdvancedMobileDeviceSearchByName(%s): %w", name, err)
+	}
+	return nil
+}

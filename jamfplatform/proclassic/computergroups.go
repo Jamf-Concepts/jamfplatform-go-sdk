@@ -53,3 +53,34 @@ func (c *Client) DeleteComputerGroupByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetComputerGroupByName finds computer groups by name.
+func (c *Client) GetComputerGroupByName(ctx context.Context, name string) (*ComputerGroup, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerGroup
+	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerGroupByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateComputerGroupByName updates an existing computer group by name.
+func (c *Client) UpdateComputerGroupByName(ctx context.Context, name string, request *ComputerGroupPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateComputerGroupByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteComputerGroupByName deletes a computer group by name.
+func (c *Client) DeleteComputerGroupByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteComputerGroupByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -53,3 +53,34 @@ func (c *Client) DeleteLDAPServerByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetLDAPServerByName finds LDAP servers by name.
+func (c *Client) GetLDAPServerByName(ctx context.Context, name string) (*LdapServer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LdapServer
+	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLDAPServerByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateLDAPServerByName updates an existing LDAP server by name.
+func (c *Client) UpdateLDAPServerByName(ctx context.Context, name string, request *LdapServerPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateLDAPServerByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteLDAPServerByName deletes an LDAP server by name.
+func (c *Client) DeleteLDAPServerByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteLDAPServerByName(%s): %w", name, err)
+	}
+	return nil
+}

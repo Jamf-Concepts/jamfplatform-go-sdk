@@ -53,3 +53,34 @@ func (c *Client) DeleteUserGroupByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetUserGroupByName finds user groups by name.
+func (c *Client) GetUserGroupByName(ctx context.Context, name string) (*UserGroup, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result UserGroup
+	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetUserGroupByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateUserGroupByName updates user groups by name.
+func (c *Client) UpdateUserGroupByName(ctx context.Context, name string, request *UserGroup) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateUserGroupByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteUserGroupByName deletes user groups by name.
+func (c *Client) DeleteUserGroupByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteUserGroupByName(%s): %w", name, err)
+	}
+	return nil
+}

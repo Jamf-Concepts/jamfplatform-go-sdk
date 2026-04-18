@@ -53,3 +53,34 @@ func (c *Client) DeleteOSXConfigurationProfileByID(ctx context.Context, id strin
 	}
 	return nil
 }
+
+// GetOSXConfigurationProfileByName finds OS X configuration profiles by name.
+func (c *Client) GetOSXConfigurationProfileByName(ctx context.Context, name string) (*OsXConfigurationProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result OsXConfigurationProfile
+	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetOSXConfigurationProfileByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateOSXConfigurationProfileByName updates an existing OS X configuration profile by name.
+func (c *Client) UpdateOSXConfigurationProfileByName(ctx context.Context, name string, request *OsXConfigurationProfile) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateOSXConfigurationProfileByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteOSXConfigurationProfileByName deletes a OS X configuration profile by name.
+func (c *Client) DeleteOSXConfigurationProfileByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteOSXConfigurationProfileByName(%s): %w", name, err)
+	}
+	return nil
+}

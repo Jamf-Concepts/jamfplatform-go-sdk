@@ -53,3 +53,34 @@ func (c *Client) DeleteDockItemByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetDockItemByName finds dock items by name.
+func (c *Client) GetDockItemByName(ctx context.Context, name string) (*DockItem, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result DockItem
+	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetDockItemByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateDockItemByName updates an existing dock item by name.
+func (c *Client) UpdateDockItemByName(ctx context.Context, name string, request *DockItem) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateDockItemByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteDockItemByName deletes a dock item by name.
+func (c *Client) DeleteDockItemByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteDockItemByName(%s): %w", name, err)
+	}
+	return nil
+}

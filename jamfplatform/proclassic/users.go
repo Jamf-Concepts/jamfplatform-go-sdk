@@ -53,3 +53,65 @@ func (c *Client) DeleteUserByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetUserByName finds users by name.
+func (c *Client) GetUserByName(ctx context.Context, name string) (*User, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result User
+	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetUserByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateUserByName updates an existing user by name.
+func (c *Client) UpdateUserByName(ctx context.Context, name string, request *UserPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateUserByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteUserByName deletes a user by name.
+func (c *Client) DeleteUserByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteUserByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// GetUserByEmail finds users by email address.
+func (c *Client) GetUserByEmail(ctx context.Context, email string) (*User, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result User
+	endpoint := fmt.Sprintf("%s/users/email/%s", prefix, url.PathEscape(email))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetUserByEmail(%s): %w", email, err)
+	}
+	return &result, nil
+}
+
+// UpdateUserByEmail updates an existing user by email address.
+func (c *Client) UpdateUserByEmail(ctx context.Context, email string, request *UserPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/users/email/%s", prefix, url.PathEscape(email))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateUserByEmail(%s): %w", email, err)
+	}
+	return nil
+}
+
+// DeleteUserByEmail deletes a user by email address.
+func (c *Client) DeleteUserByEmail(ctx context.Context, email string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/users/email/%s", prefix, url.PathEscape(email))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteUserByEmail(%s): %w", email, err)
+	}
+	return nil
+}

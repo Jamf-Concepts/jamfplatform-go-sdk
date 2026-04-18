@@ -53,3 +53,34 @@ func (c *Client) DeleteScriptByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetScriptByName finds scripts by name.
+func (c *Client) GetScriptByName(ctx context.Context, name string) (*Script, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Script
+	endpoint := fmt.Sprintf("%s/scripts/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetScriptByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateScriptByName updates an existing script by name.
+func (c *Client) UpdateScriptByName(ctx context.Context, name string, request *Script) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/scripts/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateScriptByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteScriptByName deletes a script by name.
+func (c *Client) DeleteScriptByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/scripts/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteScriptByName(%s): %w", name, err)
+	}
+	return nil
+}

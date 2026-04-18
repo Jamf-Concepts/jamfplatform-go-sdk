@@ -53,3 +53,14 @@ func (c *Client) DeletePatchExternalSourceByID(ctx context.Context, id string) e
 	}
 	return nil
 }
+
+// GetPatchExternalSourceByName finds the first patch external source with the name provided.
+func (c *Client) GetPatchExternalSourceByName(ctx context.Context, name string) (*PatchExternalSource, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchExternalSource
+	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchExternalSourceByName(%s): %w", name, err)
+	}
+	return &result, nil
+}

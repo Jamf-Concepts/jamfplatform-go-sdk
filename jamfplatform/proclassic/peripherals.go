@@ -53,3 +53,14 @@ func (c *Client) DeletePeripheralByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetPeripheralByIDSubset finds a subset of data for a peripheral.
+func (c *Client) GetPeripheralByIDSubset(ctx context.Context, id string, subset string) (*Peripheral, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Peripheral
+	endpoint := fmt.Sprintf("%s/peripherals/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPeripheralByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}

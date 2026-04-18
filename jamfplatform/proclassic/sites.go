@@ -53,3 +53,34 @@ func (c *Client) DeleteSiteByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetSiteByName finds sites by name.
+func (c *Client) GetSiteByName(ctx context.Context, name string) (*Site, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Site
+	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetSiteByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateSiteByName updates an existing site by name.
+func (c *Client) UpdateSiteByName(ctx context.Context, name string, request *Site) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateSiteByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteSiteByName deletes a site by name.
+func (c *Client) DeleteSiteByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteSiteByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -53,3 +53,34 @@ func (c *Client) DeleteMobileDeviceExtensionAttributeByID(ctx context.Context, i
 	}
 	return nil
 }
+
+// GetMobileDeviceExtensionAttributeByName finds mobiledeviceextensionattributes by name.
+func (c *Client) GetMobileDeviceExtensionAttributeByName(ctx context.Context, name string) (*MobileDeviceExtensionAttribute, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceExtensionAttribute
+	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceExtensionAttributeByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateMobileDeviceExtensionAttributeByName updates an existing mobile device extension attribute by name.
+func (c *Client) UpdateMobileDeviceExtensionAttributeByName(ctx context.Context, name string, request *MobileDeviceExtensionAttribute) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateMobileDeviceExtensionAttributeByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteMobileDeviceExtensionAttributeByName deletes a mobile device extension attribute by name.
+func (c *Client) DeleteMobileDeviceExtensionAttributeByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceExtensionAttributeByName(%s): %w", name, err)
+	}
+	return nil
+}

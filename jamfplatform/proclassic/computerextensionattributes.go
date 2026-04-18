@@ -53,3 +53,34 @@ func (c *Client) DeleteComputerExtensionAttributeByID(ctx context.Context, id st
 	}
 	return nil
 }
+
+// GetComputerExtensionAttributeByName finds computer extension attributes by name.
+func (c *Client) GetComputerExtensionAttributeByName(ctx context.Context, name string) (*ComputerExtensionAttribute, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerExtensionAttribute
+	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerExtensionAttributeByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateComputerExtensionAttributeByName updates an existing computer extension attribute by name.
+func (c *Client) UpdateComputerExtensionAttributeByName(ctx context.Context, name string, request *ComputerExtensionAttribute) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateComputerExtensionAttributeByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteComputerExtensionAttributeByName deletes a computer extension attribute by name.
+func (c *Client) DeleteComputerExtensionAttributeByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteComputerExtensionAttributeByName(%s): %w", name, err)
+	}
+	return nil
+}

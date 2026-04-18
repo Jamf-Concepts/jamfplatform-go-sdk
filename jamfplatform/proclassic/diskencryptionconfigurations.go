@@ -53,3 +53,34 @@ func (c *Client) DeleteDiskEncryptionConfigurationByID(ctx context.Context, id s
 	}
 	return nil
 }
+
+// GetDiskEncryptionConfigurationByName finds disk encryption configurations by name.
+func (c *Client) GetDiskEncryptionConfigurationByName(ctx context.Context, name string) (*DiskEncryptionConfiguration, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result DiskEncryptionConfiguration
+	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetDiskEncryptionConfigurationByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateDiskEncryptionConfigurationByName updates an existing disk encryption configuration by name.
+func (c *Client) UpdateDiskEncryptionConfigurationByName(ctx context.Context, name string, request *DiskEncryptionConfiguration) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateDiskEncryptionConfigurationByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteDiskEncryptionConfigurationByName deletes a disk encryption configuration by name.
+func (c *Client) DeleteDiskEncryptionConfigurationByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteDiskEncryptionConfigurationByName(%s): %w", name, err)
+	}
+	return nil
+}

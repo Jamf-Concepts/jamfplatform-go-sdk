@@ -53,3 +53,34 @@ func (c *Client) DeleteBYOProfileByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetBYOProfileByName finds a personal device profile by name.
+func (c *Client) GetBYOProfileByName(ctx context.Context, name string) (*Byoprofile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Byoprofile
+	endpoint := fmt.Sprintf("%s/byoprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetBYOProfileByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateBYOProfileByName updates a personal device profile by name.
+func (c *Client) UpdateBYOProfileByName(ctx context.Context, name string, request *Byoprofile) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/byoprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateBYOProfileByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteBYOProfileByName deletes a personal device profile by name.
+func (c *Client) DeleteBYOProfileByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/byoprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteBYOProfileByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -53,3 +53,24 @@ func (c *Client) DeleteAdvancedUserSearchByID(ctx context.Context, id string) er
 	}
 	return nil
 }
+
+// GetAdvancedUserSearchByName finds user searches by name.
+func (c *Client) GetAdvancedUserSearchByName(ctx context.Context, name string) (*AdvancedUserSearch, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result AdvancedUserSearch
+	endpoint := fmt.Sprintf("%s/advancedusersearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetAdvancedUserSearchByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// DeleteAdvancedUserSearchByName deletes a user search by Name.
+func (c *Client) DeleteAdvancedUserSearchByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/advancedusersearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteAdvancedUserSearchByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -53,3 +53,34 @@ func (c *Client) DeleteLicensedSoftwareByID(ctx context.Context, id string) erro
 	}
 	return nil
 }
+
+// GetLicensedSoftwareByName finds licensed software by name.
+func (c *Client) GetLicensedSoftwareByName(ctx context.Context, name string) (*LicensedSoftware, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LicensedSoftware
+	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLicensedSoftwareByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateLicensedSoftwareByName updates an existing licensed software by name.
+func (c *Client) UpdateLicensedSoftwareByName(ctx context.Context, name string, request *LicensedSoftware) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateLicensedSoftwareByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteLicensedSoftwareByName deletes licensed software by name.
+func (c *Client) DeleteLicensedSoftwareByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteLicensedSoftwareByName(%s): %w", name, err)
+	}
+	return nil
+}

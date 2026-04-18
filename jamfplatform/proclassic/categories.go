@@ -53,3 +53,34 @@ func (c *Client) DeleteCategoryByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetCategoryByName finds categories by name.
+func (c *Client) GetCategoryByName(ctx context.Context, name string) (*Category, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Category
+	endpoint := fmt.Sprintf("%s/categories/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetCategoryByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateCategoryByName updates an existing category by name.
+func (c *Client) UpdateCategoryByName(ctx context.Context, name string, request *Category) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/categories/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateCategoryByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteCategoryByName deletes a category by name.
+func (c *Client) DeleteCategoryByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/categories/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteCategoryByName(%s): %w", name, err)
+	}
+	return nil
+}

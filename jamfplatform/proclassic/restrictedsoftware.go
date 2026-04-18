@@ -53,3 +53,34 @@ func (c *Client) DeleteRestrictedSoftwareByID(ctx context.Context, id string) er
 	}
 	return nil
 }
+
+// GetRestrictedSoftwareByName finds restricted software by name.
+func (c *Client) GetRestrictedSoftwareByName(ctx context.Context, name string) (*RestrictedSoftware, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result RestrictedSoftware
+	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetRestrictedSoftwareByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateRestrictedSoftwareByName updates an existing restricted software by name.
+func (c *Client) UpdateRestrictedSoftwareByName(ctx context.Context, name string, request *RestrictedSoftware) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateRestrictedSoftwareByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteRestrictedSoftwareByName deletes a restricted software by name.
+func (c *Client) DeleteRestrictedSoftwareByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteRestrictedSoftwareByName(%s): %w", name, err)
+	}
+	return nil
+}

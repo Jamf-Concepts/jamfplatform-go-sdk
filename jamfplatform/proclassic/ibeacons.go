@@ -53,3 +53,34 @@ func (c *Client) DeleteIBeaconByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetIBeaconByName finds iBeacon regions by name.
+func (c *Client) GetIBeaconByName(ctx context.Context, name string) (*Ibeacon, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Ibeacon
+	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetIBeaconByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateIBeaconByName updates an existing iBeacon region by name.
+func (c *Client) UpdateIBeaconByName(ctx context.Context, name string, request *Ibeacon) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateIBeaconByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// DeleteIBeaconByName deletes an iBeacon region by name.
+func (c *Client) DeleteIBeaconByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteIBeaconByName(%s): %w", name, err)
+	}
+	return nil
+}
