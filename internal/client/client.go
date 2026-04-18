@@ -17,9 +17,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -33,16 +36,17 @@ type Logger interface {
 // Transport represents the HTTP transport layer for the Jamf Platform API.
 // Sub-packages in jamfplatform/ construct service clients that wrap a Transport.
 type Transport struct {
-	baseURL     string
-	tenantID    string
-	httpClient  *http.Client
-	baseClient  *http.Client
-	oauthConfig *clientcredentials.Config
-	logger      Logger
-	userAgent   string
-	tokenCache  TokenCache
-	cacheKey    string
-	cookieJar   http.CookieJar
+	baseURL         string
+	tenantID        string
+	httpClient      *http.Client
+	baseClient      *http.Client
+	oauthConfig     *clientcredentials.Config
+	logger          Logger
+	userAgent       string
+	tokenCache      TokenCache
+	cacheKey        string
+	cookieJar       http.CookieJar
+	deprecationSeen sync.Map // dedup runtime Deprecation header warnings
 }
 
 // PaginatedResponseRepresentation captures pagination metadata shared by multiple endpoints.
@@ -239,21 +243,13 @@ func (c *Transport) Do(ctx context.Context, method, path string, body, result an
 
 // DoExpect performs an authenticated API request expecting the given HTTP status.
 func (c *Transport) DoExpect(ctx context.Context, method, path string, body any, expectedStatus int, result any) error {
-	resp, err := c.doRequest(ctx, method, path, body)
-	if err != nil {
-		return err
-	}
-	return c.handleResponse(ctx, resp, expectedStatus, result)
+	return c.execute(ctx, method, path, body, "", nil, expectedStatus, result)
 }
 
 // DoWithContentType performs an authenticated API request with a custom Content-Type header.
 // It expects HTTP 200 OK as the success status.
 func (c *Transport) DoWithContentType(ctx context.Context, method, path string, body any, contentType string, expectedStatus int, result any) error {
-	resp, err := c.doRequestWithContentType(ctx, method, path, body, contentType)
-	if err != nil {
-		return err
-	}
-	return c.handleResponse(ctx, resp, expectedStatus, result)
+	return c.execute(ctx, method, path, body, contentType, nil, expectedStatus, result)
 }
 
 // DoWithHeaders performs an authenticated API request with extra headers and decodes the response.
@@ -264,11 +260,83 @@ func (c *Transport) DoWithHeaders(ctx context.Context, method, path string, body
 
 // DoExpectWithHeaders performs an authenticated API request with extra headers expecting the given HTTP status.
 func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, expectedStatus int, result any) error {
-	resp, err := c.doRequestFull(ctx, method, path, body, "", headers)
+	return c.execute(ctx, method, path, body, "", headers, expectedStatus, result)
+}
+
+// execute funnels every Do* variant through one place so the 429/Retry-After
+// retry and Deprecation-header logging live in a single hook point.
+func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any) error {
+	resp, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
 	if err != nil {
 		return err
 	}
+	if resp.StatusCode == http.StatusTooManyRequests {
+		delay := parseRetryAfter(resp.Header.Get("Retry-After"), time.Now())
+		_ = resp.Body.Close()
+		if delay > 0 && delay <= 60*time.Second {
+			select {
+			case <-time.After(delay):
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+			resp, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
+			if err != nil {
+				return err
+			}
+		} else {
+			// Out-of-policy Retry-After (missing, negative, or >60s): return
+			// the 429 to the caller as an APIResponseError rather than sleep
+			// unbounded or silently drop.
+			return &APIResponseError{
+				StatusCode: http.StatusTooManyRequests,
+				Method:     method,
+				URL:        c.buildURL(path),
+				Body:       "rate limited",
+			}
+		}
+	}
 	return c.handleResponse(ctx, resp, expectedStatus, result)
+}
+
+// parseRetryAfter interprets a Retry-After header value as either seconds
+// (integer) or an HTTP-date. Returns 0 for empty/invalid values.
+func parseRetryAfter(v string, now time.Time) time.Duration {
+	if v == "" {
+		return 0
+	}
+	if secs, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
+		if secs < 0 {
+			return 0
+		}
+		return time.Duration(secs) * time.Second
+	}
+	if t, err := http.ParseTime(v); err == nil {
+		d := t.Sub(now)
+		if d < 0 {
+			return 0
+		}
+		return d
+	}
+	return 0
+}
+
+// logDeprecation logs once per (method, path) when a server response includes
+// a Deprecation header, so consumers see the notice even without a custom
+// Logger installed. Runtime signal in addition to spec-level // Deprecated:
+// godoc, which only catches endpoints marked in the spec at SDK build time.
+func (c *Transport) logDeprecation(resp *http.Response) {
+	if resp == nil || resp.Request == nil {
+		return
+	}
+	v := resp.Header.Get("Deprecation")
+	if v == "" {
+		return
+	}
+	key := resp.Request.Method + " " + resp.Request.URL.Path
+	if _, seen := c.deprecationSeen.LoadOrStore(key, struct{}{}); seen {
+		return
+	}
+	log.Printf("jamfplatform: endpoint %s returned Deprecation header: %s — migrate callers", key, v)
 }
 
 // buildURL constructs the full API URL from a relative endpoint.
@@ -277,16 +345,6 @@ func (c *Transport) buildURL(endpoint string) string {
 		return c.baseURL + endpoint
 	}
 	return c.baseURL + "/" + endpoint
-}
-
-// doRequest performs an authenticated API request.
-func (c *Transport) doRequest(ctx context.Context, method, endpoint string, body any) (*http.Response, error) {
-	return c.doRequestFull(ctx, method, endpoint, body, "", nil)
-}
-
-// doRequestWithContentType performs an authenticated API request with an optional content type override.
-func (c *Transport) doRequestWithContentType(ctx context.Context, method, endpoint string, body any, contentType string) (*http.Response, error) {
-	return c.doRequestFull(ctx, method, endpoint, body, contentType, nil)
 }
 
 // doRequestFull performs an authenticated API request with optional content type and extra headers.
@@ -348,6 +406,8 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 // handleResponse processes API responses and handles common error cases.
 func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, expectedStatus int, result any) error {
 	defer func() { _ = resp.Body.Close() }()
+
+	c.logDeprecation(resp)
 
 	body, readErr := io.ReadAll(resp.Body)
 	if readErr != nil {
