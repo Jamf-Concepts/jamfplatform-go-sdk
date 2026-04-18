@@ -30,8 +30,9 @@ type Logger interface {
 	LogResponse(ctx context.Context, statusCode int, headers http.Header, body []byte)
 }
 
-// Client represents the main API client for Jamf Platform.
-type Client struct {
+// Transport represents the HTTP transport layer for the Jamf Platform API.
+// Sub-packages in jamfplatform/ construct service clients that wrap a Transport.
+type Transport struct {
 	baseURL     string
 	httpClient  *http.Client
 	baseClient  *http.Client
@@ -104,11 +105,11 @@ func (e *APIResponseError) Error() string {
 }
 
 // Option configures a Client.
-type Option func(*Client)
+type Option func(*Transport)
 
 // WithHTTPClient overrides the HTTP client used by the API client.
 func WithHTTPClient(httpClient *http.Client) Option {
-	return func(c *Client) {
+	return func(c *Transport) {
 		if httpClient != nil {
 			c.baseClient = httpClient
 			c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient)
@@ -118,7 +119,7 @@ func WithHTTPClient(httpClient *http.Client) Option {
 
 // WithTokenCache sets a persistent token cache and its lookup key.
 func WithTokenCache(cache TokenCache, cacheKey string) Option {
-	return func(c *Client) {
+	return func(c *Transport) {
 		if cache != nil && cacheKey != "" {
 			c.tokenCache = cache
 			c.cacheKey = cacheKey
@@ -126,13 +127,13 @@ func WithTokenCache(cache TokenCache, cacheKey string) Option {
 	}
 }
 
-// NewClient creates a new Jamf Platform API client.
-func NewClient(baseURL, clientID, clientSecret string) *Client {
-	return NewClientWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")
+// NewTransport creates a new Jamf Platform API transport.
+func NewTransport(baseURL, clientID, clientSecret string) *Transport {
+	return NewTransportWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")
 }
 
-// NewClientWithUserAgent creates a new Jamf Platform API client with a custom user agent string.
-func NewClientWithUserAgent(baseURL, clientID, clientSecret, userAgent string, opts ...Option) *Client {
+// NewTransportWithUserAgent creates a new Jamf Platform API transport with a custom user agent string.
+func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string, opts ...Option) *Transport {
 	oauthConfig := &clientcredentials.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -141,7 +142,7 @@ func NewClientWithUserAgent(baseURL, clientID, clientSecret, userAgent string, o
 
 	httpClient, baseClient := newOAuth2Client(oauthConfig, userAgent)
 
-	c := &Client{
+	c := &Transport{
 		baseURL:     baseURL,
 		httpClient:  httpClient,
 		baseClient:  baseClient,
@@ -158,45 +159,45 @@ func NewClientWithUserAgent(baseURL, clientID, clientSecret, userAgent string, o
 }
 
 // BaseURL returns the base URL configured for the client.
-func (c *Client) BaseURL() string {
+func (c *Transport) BaseURL() string {
 	return c.baseURL
 }
 
 // ValidateCredentials tests authentication by requesting an OAuth token.
-func (c *Client) ValidateCredentials(ctx context.Context) error {
+func (c *Transport) ValidateCredentials(ctx context.Context) error {
 	return validateCredentials(ctx, c.oauthConfig, c.baseClient)
 }
 
 // HTTPClient returns the underlying OAuth2-managed HTTP client for raw authenticated requests.
-func (c *Client) HTTPClient() *http.Client {
+func (c *Transport) HTTPClient() *http.Client {
 	return c.httpClient
 }
 
 // SetHTTPClient sets a custom base HTTP client (useful for testing).
-func (c *Client) SetHTTPClient(httpClient *http.Client) {
+func (c *Transport) SetHTTPClient(httpClient *http.Client) {
 	c.baseClient = httpClient
 	c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient)
 }
 
 // SetLogger sets the logger for the client.
-func (c *Client) SetLogger(logger Logger) {
+func (c *Transport) SetLogger(logger Logger) {
 	c.logger = logger
 }
 
 // SetUserAgent sets the User-Agent header value used for token and API requests.
-func (c *Client) SetUserAgent(ua string) {
+func (c *Transport) SetUserAgent(ua string) {
 	c.userAgent = ua
 	c.httpClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua)
 }
 
 // Do performs an authenticated API request and decodes the response.
 // It expects HTTP 200 OK as the success status.
-func (c *Client) Do(ctx context.Context, method, path string, body, result any) error {
+func (c *Transport) Do(ctx context.Context, method, path string, body, result any) error {
 	return c.DoExpect(ctx, method, path, body, http.StatusOK, result)
 }
 
 // DoExpect performs an authenticated API request expecting the given HTTP status.
-func (c *Client) DoExpect(ctx context.Context, method, path string, body any, expectedStatus int, result any) error {
+func (c *Transport) DoExpect(ctx context.Context, method, path string, body any, expectedStatus int, result any) error {
 	resp, err := c.doRequest(ctx, method, path, body)
 	if err != nil {
 		return err
@@ -206,7 +207,7 @@ func (c *Client) DoExpect(ctx context.Context, method, path string, body any, ex
 
 // DoWithContentType performs an authenticated API request with a custom Content-Type header.
 // It expects HTTP 200 OK as the success status.
-func (c *Client) DoWithContentType(ctx context.Context, method, path string, body any, contentType string, expectedStatus int, result any) error {
+func (c *Transport) DoWithContentType(ctx context.Context, method, path string, body any, contentType string, expectedStatus int, result any) error {
 	resp, err := c.doRequestWithContentType(ctx, method, path, body, contentType)
 	if err != nil {
 		return err
@@ -216,12 +217,12 @@ func (c *Client) DoWithContentType(ctx context.Context, method, path string, bod
 
 // DoWithHeaders performs an authenticated API request with extra headers and decodes the response.
 // It expects HTTP 200 OK as the success status.
-func (c *Client) DoWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, result any) error {
+func (c *Transport) DoWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, result any) error {
 	return c.DoExpectWithHeaders(ctx, method, path, body, headers, http.StatusOK, result)
 }
 
 // DoExpectWithHeaders performs an authenticated API request with extra headers expecting the given HTTP status.
-func (c *Client) DoExpectWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, expectedStatus int, result any) error {
+func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, expectedStatus int, result any) error {
 	resp, err := c.doRequestFull(ctx, method, path, body, "", headers)
 	if err != nil {
 		return err
@@ -230,7 +231,7 @@ func (c *Client) DoExpectWithHeaders(ctx context.Context, method, path string, b
 }
 
 // buildURL constructs the full API URL from a relative endpoint.
-func (c *Client) buildURL(endpoint string) string {
+func (c *Transport) buildURL(endpoint string) string {
 	if len(endpoint) > 0 && endpoint[0] == '/' {
 		return c.baseURL + endpoint
 	}
@@ -238,17 +239,17 @@ func (c *Client) buildURL(endpoint string) string {
 }
 
 // doRequest performs an authenticated API request.
-func (c *Client) doRequest(ctx context.Context, method, endpoint string, body any) (*http.Response, error) {
+func (c *Transport) doRequest(ctx context.Context, method, endpoint string, body any) (*http.Response, error) {
 	return c.doRequestFull(ctx, method, endpoint, body, "", nil)
 }
 
 // doRequestWithContentType performs an authenticated API request with an optional content type override.
-func (c *Client) doRequestWithContentType(ctx context.Context, method, endpoint string, body any, contentType string) (*http.Response, error) {
+func (c *Transport) doRequestWithContentType(ctx context.Context, method, endpoint string, body any, contentType string) (*http.Response, error) {
 	return c.doRequestFull(ctx, method, endpoint, body, contentType, nil)
 }
 
 // doRequestFull performs an authenticated API request with optional content type and extra headers.
-func (c *Client) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header) (*http.Response, error) {
+func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header) (*http.Response, error) {
 	var requestBodyBytes []byte
 
 	fullURL := c.buildURL(endpoint)
@@ -304,7 +305,7 @@ func (c *Client) doRequestFull(ctx context.Context, method, endpoint string, bod
 }
 
 // handleResponse processes API responses and handles common error cases.
-func (c *Client) handleResponse(ctx context.Context, resp *http.Response, expectedStatus int, result any) error {
+func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, expectedStatus int, result any) error {
 	defer func() { _ = resp.Body.Close() }()
 
 	body, readErr := io.ReadAll(resp.Body)

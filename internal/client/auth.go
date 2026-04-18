@@ -77,14 +77,14 @@ func validateCredentials(ctx context.Context, config *clientcredentials.Config, 
 }
 
 // AccessToken returns a valid OAuth2 token from the client's credentials configuration.
-func (c *Client) AccessToken(ctx context.Context) (*oauth2.Token, error) {
+func (c *Transport) AccessToken(ctx context.Context) (*oauth2.Token, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, c.baseClient)
 	ts := c.tokenSource(ctx)
 	return ts.Token()
 }
 
 // tokenSource returns the appropriate TokenSource, wrapping with caching if configured.
-func (c *Client) tokenSource(ctx context.Context) oauth2.TokenSource {
+func (c *Transport) tokenSource(ctx context.Context) oauth2.TokenSource {
 	ts := c.oauthConfig.TokenSource(ctx)
 	if c.tokenCache == nil {
 		return ts

@@ -13,7 +13,7 @@ import (
 
 // Client provides typed methods for all Jamf Platform API operations.
 type Client struct {
-	transport *client.Client
+	transport *client.Transport
 	tenantID  string
 }
 
@@ -41,7 +41,7 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 		transportOpts = append(transportOpts, client.WithTokenCache(cache, client.CacheKey(baseURL, clientID)))
 	}
 
-	transport := client.NewClientWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
+	transport := client.NewTransportWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
 	if cfg.logger != nil {
 		transport.SetLogger(cfg.logger)
 	}
