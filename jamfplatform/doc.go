@@ -5,22 +5,27 @@
 
 // Package jamfplatform provides a Go client for the Jamf Platform API.
 //
-// Create a client with [NewClient] and use the typed methods to manage
-// Jamf Platform resources such as blueprints, device groups, benchmarks, and devices.
+// Create a root client with [NewClient], then construct service clients
+// from the sub-packages under jamfplatform/ (devices, devicegroups,
+// deviceactions, blueprints, ddmreport, compliancebenchmarks, pro, ...)
+// to call typed methods.
 //
 //	c := jamfplatform.NewClient(
 //		"https://your-tenant.apigw.jamf.com",
 //		os.Getenv("JAMFPLATFORM_CLIENT_ID"),
 //		os.Getenv("JAMFPLATFORM_CLIENT_SECRET"),
+//		jamfplatform.WithTenantID(os.Getenv("JAMFPLATFORM_TENANT_ID")),
 //	)
 //
-//	devices, err := c.ListDevices(ctx, nil, "")
+//	ds, err := devices.New(c).ListDevices(ctx, nil, "")
 //
-// The client handles OAuth2 authentication and token refresh automatically.
+// The root client handles OAuth2 authentication and token refresh
+// automatically; each sub-package shares the same transport via its
+// [New] constructor.
 //
 // Error handling uses [*APIResponseError] for structured API errors:
 //
-//	device, err := c.GetDevice(ctx, id)
+//	d, err := devices.New(c).GetDevice(ctx, id)
 //	if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
 //		// handle not found
 //	}
