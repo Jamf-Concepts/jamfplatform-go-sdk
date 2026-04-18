@@ -1035,6 +1035,29 @@
   "openapi": "3.0.3",
   "paths": {
     "/computers/id/{id}": {
+      "delete": {
+        "operationId": "deleteComputerById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer by ID",
+        "tags": [
+          "computers"
+        ]
+      },
       "get": {
         "deprecated": true,
         "operationId": "findComputersById",
@@ -1067,6 +1090,214 @@
           }
         },
         "summary": "Finds computers by ID",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z"
+      },
+      "post": {
+        "description": "Certificates and mdm_capable are ignored.",
+        "operationId": "createComputerById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a computer",
+        "tags": [
+          "computers"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Certificates and mdm_capable are ignored.",
+        "operationId": "updateComputerById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing computer by ID",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z",
+        "x-explorer-enabled": false
+      }
+    },
+    "/computers/name/{name}": {
+      "delete": {
+        "deprecated": true,
+        "operationId": "deleteComputerByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer by name",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z"
+      },
+      "get": {
+        "deprecated": true,
+        "operationId": "findComputersByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds the first computer with the given name",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z"
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Certificates and mdm_capable are ignored.",
+        "operationId": "updateComputerByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing computer by name",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z",
+        "x-explorer-enabled": false
+      }
+    },
+    "/computers/serialnumber/{serialnumber}": {
+      "delete": {
+        "deprecated": true,
+        "operationId": "deleteComputerBySerialNumber",
+        "parameters": [
+          {
+            "description": "Serial number value to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer by serial number",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z"
+      },
+      "get": {
+        "deprecated": true,
+        "operationId": "findComputersBySerialNumber",
+        "parameters": [
+          {
+            "description": "Serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computers by serial number",
         "tags": [
           "computers"
         ],

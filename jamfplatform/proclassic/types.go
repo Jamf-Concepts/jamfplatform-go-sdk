@@ -167,6 +167,29 @@ type ComputerSoftware struct {
 	UnixExecutables          *string  `xml:"unix_executables,omitempty"`
 }
 
+// ComputerPost represents a computer post.
+type ComputerPost struct {
+	XMLName xml.Name             `xml:"computer"`
+	General *ComputerPostGeneral `xml:"general,omitempty"`
+}
+
+// ComputerPostGeneral represents a computer post general.
+type ComputerPostGeneral struct {
+	XMLName         xml.Name `xml:"general"`
+	Building        *string  `xml:"building,omitempty"`
+	Department      *string  `xml:"department,omitempty"`
+	ID              *int     `xml:"id,omitempty"`
+	MacAddress      *string  `xml:"mac_address,omitempty"`
+	Managed         *bool    `xml:"managed,omitempty"`
+	Model           *string  `xml:"model,omitempty"`
+	Name            *string  `xml:"name,omitempty"`
+	ReportDateEpoch *int     `xml:"report_date_epoch,omitempty"`
+	ReportDateUtc   *string  `xml:"report_date_utc,omitempty"`
+	SerialNumber    *string  `xml:"serial_number,omitempty"`
+	UDID            *string  `xml:"udid,omitempty"`
+	Username        *string  `xml:"username,omitempty"`
+}
+
 // Location represents a location.
 type Location struct {
 	XMLName      xml.Name `xml:"location"`

@@ -146,7 +146,15 @@
       "format": "xml",
       "splitByTag": true,
       "operations": [
-        {"op": "GET /computers/id/{id}", "name": "GetComputerByID", "responseType": "computer", "pathNames": {"id": "id"}}
+        {"op": "GET /computers/id/{id}", "name": "GetComputerByID", "responseType": "computer", "pathNames": {"id": "id"}},
+        {"op": "GET /computers/name/{name}", "name": "GetComputerByName", "responseType": "computer"},
+        {"op": "GET /computers/serialnumber/{serialnumber}", "name": "GetComputerBySerialNumber", "responseType": "computer", "pathNames": {"serialnumber": "serialNumber"}},
+        {"op": "POST /computers/id/{id}", "name": "CreateComputerByID", "requestType": "computer_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /computers/id/{id}", "name": "UpdateComputerByID", "requestType": "computer_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /computers/name/{name}", "name": "UpdateComputerByName", "requestType": "computer_post", "expectedStatus": 201},
+        {"op": "DELETE /computers/id/{id}", "name": "DeleteComputerByID", "pathNames": {"id": "id"}},
+        {"op": "DELETE /computers/name/{name}", "name": "DeleteComputerByName"},
+        {"op": "DELETE /computers/serialnumber/{serialnumber}", "name": "DeleteComputerBySerialNumber", "pathNames": {"serialnumber": "serialNumber"}}
       ]
     }
   ]
