@@ -1024,7 +1024,12 @@ var funcMap = template.FuncMap{
 		return fmt.Sprintf(`"%s(%%s): %%w", %s, err`, m.Name, m.PathParams[0].GoName)
 	},
 	"testPath": func(m GoMethod) string {
-		base := fmt.Sprintf("/api/%s/%s/tenant/t-test", m.Namespace, m.Version)
+		var base string
+		if m.Version == "" {
+			base = fmt.Sprintf("/api/%s/tenant/t-test", m.Namespace)
+		} else {
+			base = fmt.Sprintf("/api/%s/%s/tenant/t-test", m.Namespace, m.Version)
+		}
 		path := pathParamRe.ReplaceAllString(stripVersionPrefix(m.SpecPath), "test-id")
 		return base + path
 	},

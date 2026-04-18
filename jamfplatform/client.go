@@ -127,6 +127,12 @@ func WithTenantID(id string) Option {
 }
 
 // tenantPrefix returns the API path prefix for tenant-scoped resources.
+// An empty version collapses the segment so Classic-style namespaces
+// (/api/proclassic/tenant/{id}/...) and version-less Pro paths
+// (/api/pro/tenant/{id}/preview/...) build correctly.
 func (c *Client) tenantPrefix(namespace, version string) string {
+	if version == "" {
+		return "/api/" + namespace + "/tenant/" + c.tenantID
+	}
 	return "/api/" + namespace + "/" + version + "/tenant/" + c.tenantID
 }

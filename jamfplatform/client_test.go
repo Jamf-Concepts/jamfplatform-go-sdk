@@ -130,6 +130,18 @@ func TestTenantPrefix(t *testing.T) {
 			namespace: "compliance-benchmarks", version: "v1",
 			want: "/api/compliance-benchmarks/v1/tenant/t-abc",
 		},
+		{
+			name:      "version-less pro",
+			tenantID:  "t-abc",
+			namespace: "pro", version: "",
+			want: "/api/pro/tenant/t-abc",
+		},
+		{
+			name:      "proclassic has no version",
+			tenantID:  "t-abc",
+			namespace: "proclassic", version: "",
+			want: "/api/proclassic/tenant/t-abc",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
