@@ -229,7 +229,32 @@
         {"op": "GET /advancedusersearches/id/{id}", "name": "GetAdvancedUserSearchByID", "responseType": "advanced_user_search", "pathNames": {"id": "id"}},
         {"op": "POST /advancedusersearches/id/{id}", "name": "CreateAdvancedUserSearchByID", "requestType": "advanced_user_search", "responseType": "advanced_user_search", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /advancedusersearches/id/{id}", "name": "UpdateAdvancedUserSearchByID", "requestType": "advanced_user_search", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /advancedusersearches/id/{id}", "name": "DeleteAdvancedUserSearchByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /advancedusersearches/id/{id}", "name": "DeleteAdvancedUserSearchByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /policies/id/{id}", "name": "GetPolicyByID", "responseType": "policy", "pathNames": {"id": "id"}},
+        {"op": "GET /policies/name/{name}", "name": "GetPolicyByName", "responseType": "policy"},
+        {"op": "POST /policies/id/{id}", "name": "CreatePolicyByID", "requestType": "policy_post", "responseType": "policy", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /policies/id/{id}", "name": "UpdatePolicyByID", "requestType": "policy_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /policies/name/{name}", "name": "UpdatePolicyByName", "requestType": "policy_post", "expectedStatus": 201},
+        {"op": "DELETE /policies/id/{id}", "name": "DeletePolicyByID", "pathNames": {"id": "id"}},
+        {"op": "DELETE /policies/name/{name}", "name": "DeletePolicyByName"},
+
+        {"op": "GET /mobiledevices/id/{id}", "name": "GetMobileDeviceByID", "responseType": "mobile_device", "pathNames": {"id": "id"}},
+        {"op": "GET /mobiledevices/name/{name}", "name": "GetMobileDeviceByName", "responseType": "mobile_device"},
+        {"op": "GET /mobiledevices/serialnumber/{serialnumber}", "name": "GetMobileDeviceBySerialNumber", "responseType": "mobile_device", "pathNames": {"serialnumber": "serialNumber"}},
+        {"op": "GET /mobiledevices/udid/{udid}", "name": "GetMobileDeviceByUDID", "responseType": "mobile_device", "pathNames": {"udid": "udid"}},
+        {"op": "GET /mobiledevices/macaddress/{macaddress}", "name": "GetMobileDeviceByMacAddress", "responseType": "mobile_device", "pathNames": {"macaddress": "macAddress"}},
+        {"op": "POST /mobiledevices/id/{id}", "name": "CreateMobileDeviceByID", "requestType": "mobile_device_post", "responseType": "mobile_device", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledevices/id/{id}", "name": "UpdateMobileDeviceByID", "requestType": "mobile_device_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledevices/name/{name}", "name": "UpdateMobileDeviceByName", "requestType": "mobile_device_post", "expectedStatus": 201},
+        {"op": "PUT /mobiledevices/serialnumber/{serialnumber}", "name": "UpdateMobileDeviceBySerialNumber", "requestType": "mobile_device_post", "pathNames": {"serialnumber": "serialNumber"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledevices/udid/{udid}", "name": "UpdateMobileDeviceByUDID", "requestType": "mobile_device_post", "pathNames": {"udid": "udid"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledevices/macaddress/{macaddress}", "name": "UpdateMobileDeviceByMacAddress", "requestType": "mobile_device_post", "pathNames": {"macaddress": "macAddress"}, "expectedStatus": 201},
+        {"op": "DELETE /mobiledevices/id/{id}", "name": "DeleteMobileDeviceByID", "pathNames": {"id": "id"}},
+        {"op": "DELETE /mobiledevices/name/{name}", "name": "DeleteMobileDeviceByName"},
+        {"op": "DELETE /mobiledevices/serialnumber/{serialnumber}", "name": "DeleteMobileDeviceBySerialNumber", "pathNames": {"serialnumber": "serialNumber"}},
+        {"op": "DELETE /mobiledevices/udid/{udid}", "name": "DeleteMobileDeviceByUDID", "pathNames": {"udid": "udid"}},
+        {"op": "DELETE /mobiledevices/macaddress/{macaddress}", "name": "DeleteMobileDeviceByMacAddress", "pathNames": {"macaddress": "macAddress"}}
       ]
     }
   ]

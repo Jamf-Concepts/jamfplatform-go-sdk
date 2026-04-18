@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
+	"os"
 	"strconv"
 	"testing"
 
@@ -619,6 +620,74 @@ func TestAcceptance_Classic_AdvancedUserSearchCRUD(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
 		t.Fatalf("after delete: want 404, got %v", err)
 	}
+}
+
+func TestAcceptance_Classic_PolicyCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-policy-" + runSuffix()
+	enabled := false
+	_, err := pc.CreatePolicyByID(ctx, "0", &proclassic.PolicyPost{
+		General: &proclassic.PolicyPostGeneral{
+			Name:    classicStrPtr(name),
+			Enabled: &enabled,
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreatePolicyByID: %v", err)
+	}
+	// Server returns <policy><id>N</id></policy> on create — id at top level,
+	// but the spec puts id inside <general>, so the generated Policy type
+	// can't capture it. Recover via GetPolicyByName which fills the full
+	// <general> section.
+	t.Cleanup(func() { _ = pc.DeletePolicyByName(ctx, name) })
+
+	got, err := pc.GetPolicyByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetPolicyByName(%q): %v", name, err)
+	}
+	if got == nil || got.General == nil || got.General.ID == nil {
+		t.Fatalf("expected Policy.General.ID after round-trip, got %+v", got)
+	}
+	id := *got.General.ID
+	if got.General.Name == nil || *got.General.Name != name {
+		t.Errorf("Name = %v, want %q", got.General.Name, name)
+	}
+
+	if err := pc.DeletePolicyByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetPolicyByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+// TestAcceptance_Classic_GetMobileDeviceByID is read-only: mobile-device
+// endpoints target real enrolled devices on the tenant. Uses env-provided
+// id if available; otherwise logs that the endpoint shape is exercised
+// by unit tests only.
+func TestAcceptance_Classic_GetMobileDeviceByID(t *testing.T) {
+	id := os.Getenv("JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID")
+	if id == "" {
+		t.Skip("set JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID to exercise GetMobileDeviceByID against a real enrolled device")
+	}
+	c := accClient(t)
+	md, err := proclassic.New(c).GetMobileDeviceByID(context.Background(), id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceByID(%s): %v", id, err)
+	}
+	if md == nil || md.General == nil {
+		t.Fatalf("expected MobileDevice.General populated, got %+v", md)
+	}
+	t.Logf("MobileDevice id=%v serial=%v", md.General.ID, md.General.SerialNumber)
 }
 
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {

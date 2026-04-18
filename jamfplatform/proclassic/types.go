@@ -184,6 +184,12 @@ type Category struct {
 	Priority *int     `xml:"priority,omitempty"`
 }
 
+// CategoryObject represents a category object.
+type CategoryObject struct {
+	ID   *int    `xml:"id,omitempty"`
+	Name *string `xml:"name,omitempty"`
+}
+
 // Computer represents a computer.
 type Computer struct {
 	XMLName               xml.Name                `xml:"computer"`
@@ -467,6 +473,123 @@ type Location struct {
 	Username     *string  `xml:"username,omitempty"`
 }
 
+// MobileDevice represents a mobile device.
+type MobileDevice struct {
+	XMLName               xml.Name                    `xml:"mobile_device"`
+	Applications          []any                       `xml:"applications"`
+	Certificates          []any                       `xml:"certificates"`
+	ConfigurationProfiles []any                       `xml:"configuration_profiles"`
+	ExtensionAttributes   []any                       `xml:"extension_attributes"`
+	General               *MobileDeviceGeneral        `xml:"general,omitempty"`
+	Location              *Location                   `xml:"location,omitempty"`
+	MobileDeviceGroups    []any                       `xml:"mobile_device_groups"`
+	Network               *MobileDeviceNetwork        `xml:"network,omitempty"`
+	ProvisioningProfiles  []any                       `xml:"provisioning_profiles"`
+	Purchasing            *Purchasing                 `xml:"purchasing,omitempty"`
+	SecurityObject        *MobileDeviceSecurityObject `xml:"security_object,omitempty"`
+}
+
+// MobileDeviceGeneral represents a mobile device general.
+type MobileDeviceGeneral struct {
+	XMLName                            xml.Name `xml:"general"`
+	AssetTag                           *string  `xml:"asset_tag,omitempty"`
+	Available                          *int     `xml:"available,omitempty"`
+	AvailableMb                        *int     `xml:"available_mb,omitempty"`
+	BatteryLevel                       *int     `xml:"battery_level,omitempty"`
+	BleCapable                         *bool    `xml:"ble_capable,omitempty"`
+	BluetoothMacAddress                *string  `xml:"bluetooth_mac_address,omitempty"`
+	Capacity                           *int     `xml:"capacity,omitempty"`
+	CapacityMb                         *int     `xml:"capacity_mb,omitempty"`
+	CloudBackupEnabled                 *bool    `xml:"cloud_backup_enabled,omitempty"`
+	DeviceLocatorServiceEnabled        *bool    `xml:"device_locator_service_enabled,omitempty"`
+	DeviceName                         *string  `xml:"device_name,omitempty"`
+	DeviceOwnershipLevel               *string  `xml:"device_ownership_level,omitempty"`
+	DisplayName                        *string  `xml:"display_name,omitempty"`
+	DoNotDisturbEnabled                *bool    `xml:"do_not_disturb_enabled,omitempty"`
+	ExchangeActivesyncDeviceIdentifier *string  `xml:"exchange_activesync_device_identifier,omitempty"`
+	ID                                 *int     `xml:"id,omitempty"`
+	InitialEntryDateEpoch              *int     `xml:"initial_entry_date_epoch,omitempty"`
+	InitialEntryDateUtc                *string  `xml:"initial_entry_date_utc,omitempty"`
+	IPAddress                          *string  `xml:"ip_address,omitempty"`
+	ItunesStoreAccountIsActive         *bool    `xml:"itunes_store_account_is_active,omitempty"`
+	LastBackupTimeEpoch                *int     `xml:"last_backup_time_epoch,omitempty"`
+	LastBackupTimeUtc                  *string  `xml:"last_backup_time_utc,omitempty"`
+	LastCloudBackupDateEpoch           *int     `xml:"last_cloud_backup_date_epoch,omitempty"`
+	LastCloudBackupDateUtc             *string  `xml:"last_cloud_backup_date_utc,omitempty"`
+	LastEnrollmentEpoch                *int     `xml:"last_enrollment_epoch,omitempty"`
+	LastEnrollmentUtc                  *string  `xml:"last_enrollment_utc,omitempty"`
+	LastInventoryUpdate                *string  `xml:"last_inventory_update,omitempty"`
+	LastInventoryUpdateEpoch           *int     `xml:"last_inventory_update_epoch,omitempty"`
+	LastInventoryUpdateUtc             *string  `xml:"last_inventory_update_utc,omitempty"`
+	LocationServicesEnabled            *bool    `xml:"location_services_enabled,omitempty"`
+	Managed                            *bool    `xml:"managed,omitempty"`
+	Model                              *string  `xml:"model,omitempty"`
+	ModelDisplay                       *string  `xml:"model_display,omitempty"`
+	ModelIdentifier                    *string  `xml:"model_identifier,omitempty"`
+	ModelNumber                        *string  `xml:"model_number,omitempty"`
+	ModemFirmware                      *string  `xml:"modem_firmware,omitempty"`
+	Name                               *string  `xml:"name,omitempty"`
+	OsBuild                            *string  `xml:"os_build,omitempty"`
+	OsType                             *string  `xml:"os_type,omitempty"`
+	OsVersion                          *string  `xml:"os_version,omitempty"`
+	PercentageUsed                     *int     `xml:"percentage_used,omitempty"`
+	PhoneNumber                        *string  `xml:"phone_number,omitempty"`
+	SerialNumber                       *string  `xml:"serial_number,omitempty"`
+	Shared                             *string  `xml:"shared,omitempty"`
+	Supervised                         *bool    `xml:"supervised,omitempty"`
+	Tethered                           *string  `xml:"tethered,omitempty"`
+	UDID                               *string  `xml:"udid,omitempty"`
+	WifiMacAddress                     *string  `xml:"wifi_mac_address,omitempty"`
+}
+
+// MobileDeviceNetwork represents a mobile device network.
+type MobileDeviceNetwork struct {
+	XMLName                  xml.Name `xml:"network"`
+	CarrierSettingsVersion   *string  `xml:"carrier_settings_version,omitempty"`
+	CellularTechnology       *string  `xml:"cellular_technology,omitempty"`
+	CurrentCarrierNetwork    *string  `xml:"current_carrier_network,omitempty"`
+	CurrentMobileCountryCode *string  `xml:"current_mobile_country_code,omitempty"`
+	CurrentMobileNetworkCode *string  `xml:"current_mobile_network_code,omitempty"`
+	DataRoamingEnabled       *bool    `xml:"data_roaming_enabled,omitempty"`
+	HomeCarrierNetwork       *string  `xml:"home_carrier_network,omitempty"`
+	HomeMobileCountryCode    *string  `xml:"home_mobile_country_code,omitempty"`
+	HomeMobileNetworkCode    *string  `xml:"home_mobile_network_code,omitempty"`
+	Iccid                    *string  `xml:"iccid,omitempty"`
+	Imei                     *string  `xml:"imei,omitempty"`
+	PhoneNumber              *string  `xml:"phone_number,omitempty"`
+	VoiceRoamingEnabled      *string  `xml:"voice_roaming_enabled,omitempty"`
+}
+
+// MobileDeviceSecurityObject represents a mobile device security object.
+type MobileDeviceSecurityObject struct {
+	ActivationLockEnabled           *bool   `xml:"activation_lock_enabled,omitempty"`
+	BlockLevelEncryptionCapable     *bool   `xml:"block_level_encryption_capable,omitempty"`
+	DataProtection                  *bool   `xml:"data_protection,omitempty"`
+	FileLevelEncryptionCapable      *bool   `xml:"file_level_encryption_capable,omitempty"`
+	HardwareEncryption              *string `xml:"hardware_encryption,omitempty"`
+	JailbreakDetected               *string `xml:"jailbreak_detected,omitempty"`
+	LostLocationAltitude            *string `xml:"lost_location_altitude,omitempty"`
+	LostLocationCourse              *string `xml:"lost_location_course,omitempty"`
+	LostLocationEpoch               *int    `xml:"lost_location_epoch,omitempty"`
+	LostLocationHorizontalAccuracy  *string `xml:"lost_location_horizontal_accuracy,omitempty"`
+	LostLocationLatitude            *string `xml:"lost_location_latitude,omitempty"`
+	LostLocationLongitude           *string `xml:"lost_location_longitude,omitempty"`
+	LostLocationSpeed               *string `xml:"lost_location_speed,omitempty"`
+	LostLocationUtc                 *string `xml:"lost_location_utc,omitempty"`
+	LostLocationVerticalAccuracy    *string `xml:"lost_location_vertical_accuracy,omitempty"`
+	LostModeEnableIssuedEpoch       *int    `xml:"lost_mode_enable_issued_epoch,omitempty"`
+	LostModeEnableIssuedUtc         *string `xml:"lost_mode_enable_issued_utc,omitempty"`
+	LostModeEnabled                 *string `xml:"lost_mode_enabled,omitempty"`
+	LostModeEnforced                *bool   `xml:"lost_mode_enforced,omitempty"`
+	LostModeFootnote                *string `xml:"lost_mode_footnote,omitempty"`
+	LostModeMessage                 *string `xml:"lost_mode_message,omitempty"`
+	LostModePhone                   *string `xml:"lost_mode_phone,omitempty"`
+	PasscodeCompliant               *bool   `xml:"passcode_compliant,omitempty"`
+	PasscodeCompliantWithProfile    *bool   `xml:"passcode_compliant_with_profile,omitempty"`
+	PasscodeLockGracePeriodEnforced *string `xml:"passcode_lock_grace_period_enforced,omitempty"`
+	PasscodePresent                 *bool   `xml:"passcode_present,omitempty"`
+}
+
 // MobileDeviceExtensionAttribute represents a mobile device extension attribute.
 type MobileDeviceExtensionAttribute struct {
 	XMLName          xml.Name                                 `xml:"mobile_device_extension_attribute"`
@@ -493,6 +616,440 @@ type MobileDeviceGroup struct {
 	MobileDevices *[]any      `xml:"mobile_devices,omitempty"`
 	Name          *string     `xml:"name,omitempty"`
 	Site          *SiteObject `xml:"site,omitempty"`
+}
+
+// MobileDevicePost represents a mobile device post.
+type MobileDevicePost struct {
+	XMLName xml.Name                 `xml:"mobile_device"`
+	General *MobileDevicePostGeneral `xml:"general,omitempty"`
+}
+
+// MobileDevicePostGeneral represents a mobile device post general.
+type MobileDevicePostGeneral struct {
+	XMLName                  xml.Name `xml:"general"`
+	AssetTag                 *string  `xml:"asset_tag,omitempty"`
+	Available                *int     `xml:"available,omitempty"`
+	AvailableMb              *int     `xml:"available_mb,omitempty"`
+	BatteryLevel             *int     `xml:"battery_level,omitempty"`
+	BluetoothMacAddress      *string  `xml:"bluetooth_mac_address,omitempty"`
+	Capacity                 *int     `xml:"capacity,omitempty"`
+	CapacityMb               *int     `xml:"capacity_mb,omitempty"`
+	DeviceName               *string  `xml:"device_name,omitempty"`
+	DeviceOwnershipLevel     *string  `xml:"device_ownership_level,omitempty"`
+	DisplayName              *string  `xml:"display_name,omitempty"`
+	ID                       *int     `xml:"id,omitempty"`
+	InitialEntryDateEpoch    *int     `xml:"initial_entry_date_epoch,omitempty"`
+	IPAddress                *string  `xml:"ip_address,omitempty"`
+	LastEnrollmentEpoch      *int     `xml:"last_enrollment_epoch,omitempty"`
+	LastInventoryUpdateEpoch *int     `xml:"last_inventory_update_epoch,omitempty"`
+	Managed                  *bool    `xml:"managed,omitempty"`
+	Model                    *string  `xml:"model,omitempty"`
+	ModelDisplay             *string  `xml:"model_display,omitempty"`
+	ModelIdentifier          *string  `xml:"model_identifier,omitempty"`
+	ModelNumber              *string  `xml:"model_number,omitempty"`
+	ModemFirmware            *string  `xml:"modem_firmware,omitempty"`
+	Name                     *string  `xml:"name,omitempty"`
+	OsBuild                  *string  `xml:"os_build,omitempty"`
+	OsType                   *string  `xml:"os_type,omitempty"`
+	OsVersion                *string  `xml:"os_version,omitempty"`
+	PercentageUsed           *int     `xml:"percentage_used,omitempty"`
+	PhoneNumber              *string  `xml:"phone_number,omitempty"`
+	SerialNumber             *string  `xml:"serial_number,omitempty"`
+	Supervised               *bool    `xml:"supervised,omitempty"`
+	UDID                     *string  `xml:"udid,omitempty"`
+	WifiMacAddress           *string  `xml:"wifi_mac_address,omitempty"`
+}
+
+// Policy represents a policy.
+type Policy struct {
+	XMLName              xml.Name                    `xml:"policy"`
+	AccountMaintenance   *PolicyAccountMaintenance   `xml:"account_maintenance,omitempty"`
+	DiskEncryption       *PolicyDiskEncryption       `xml:"disk_encryption,omitempty"`
+	DockItems            []any                       `xml:"dock_items"`
+	FilesProcesses       *PolicyFilesProcesses       `xml:"files_processes,omitempty"`
+	General              *PolicyGeneral              `xml:"general,omitempty"`
+	Maintenance          *PolicyMaintenance          `xml:"maintenance,omitempty"`
+	PackageConfiguration *PolicyPackageConfiguration `xml:"package_configuration,omitempty"`
+	Printers             []any                       `xml:"printers"`
+	Scope                *PolicyScope                `xml:"scope,omitempty"`
+	Scripts              *PolicyScripts              `xml:"scripts,omitempty"`
+	SelfService          *PolicySelfService          `xml:"self_service,omitempty"`
+	UserInteraction      *PolicyUserInteraction      `xml:"user_interaction,omitempty"`
+}
+
+// PolicyAccountMaintenance represents a policy account maintenance.
+type PolicyAccountMaintenance struct {
+	XMLName                 xml.Name                                         `xml:"account_maintenance"`
+	Accounts                []any                                            `xml:"accounts"`
+	DirectoryBindings       []any                                            `xml:"directory_bindings"`
+	ManagementAccount       *PolicyAccountMaintenanceManagementAccount       `xml:"management_account,omitempty"`
+	OpenFirmwareEfiPassword *PolicyAccountMaintenanceOpenFirmwareEfiPassword `xml:"open_firmware_efi_password,omitempty"`
+}
+
+// PolicyAccountMaintenanceManagementAccount represents a policy account maintenance management account.
+type PolicyAccountMaintenanceManagementAccount struct {
+	XMLName               xml.Name `xml:"management_account"`
+	Action                *string  `xml:"action,omitempty"`
+	ManagedPassword       *string  `xml:"managed_password,omitempty"`
+	ManagedPasswordLength *int     `xml:"managed_password_length,omitempty"`
+}
+
+// PolicyAccountMaintenanceOpenFirmwareEfiPassword represents a policy account maintenance open firmware efi password.
+type PolicyAccountMaintenanceOpenFirmwareEfiPassword struct {
+	XMLName    xml.Name `xml:"open_firmware_efi_password"`
+	OfMode     *string  `xml:"of_mode,omitempty"`
+	OfPassword *string  `xml:"of_password,omitempty"`
+}
+
+// PolicyDiskEncryption represents a policy disk encryption.
+type PolicyDiskEncryption struct {
+	XMLName                                xml.Name `xml:"disk_encryption"`
+	Action                                 *string  `xml:"action,omitempty"`
+	AuthRestart                            *bool    `xml:"auth_restart,omitempty"`
+	DiskEncryptionConfigurationID          *int     `xml:"disk_encryption_configuration_id,omitempty"`
+	RemediateDiskEncryptionConfigurationID *int     `xml:"remediate_disk_encryption_configuration_id,omitempty"`
+	RemediateKeyType                       *string  `xml:"remediate_key_type,omitempty"`
+}
+
+// PolicyFilesProcesses represents a policy files processes.
+type PolicyFilesProcesses struct {
+	XMLName              xml.Name `xml:"files_processes"`
+	DeleteFile           *bool    `xml:"delete_file,omitempty"`
+	KillProcess          *bool    `xml:"kill_process,omitempty"`
+	LocateFile           *string  `xml:"locate_file,omitempty"`
+	RunCommand           *string  `xml:"run_command,omitempty"`
+	SearchByPath         *string  `xml:"search_by_path,omitempty"`
+	SearchForProcess     *string  `xml:"search_for_process,omitempty"`
+	SpotlightSearch      *string  `xml:"spotlight_search,omitempty"`
+	UpdateLocateDatabase *bool    `xml:"update_locate_database,omitempty"`
+}
+
+// PolicyGeneral represents a policy general.
+type PolicyGeneral struct {
+	XMLName                    xml.Name                              `xml:"general"`
+	Category                   *CategoryObject                       `xml:"category,omitempty"`
+	DateTimeLimitations        *PolicyGeneralDateTimeLimitations     `xml:"date_time_limitations,omitempty"`
+	Enabled                    *bool                                 `xml:"enabled,omitempty"`
+	Frequency                  *string                               `xml:"frequency,omitempty"`
+	ID                         *int                                  `xml:"id,omitempty"`
+	LocationUserOnly           *bool                                 `xml:"location_user_only,omitempty"`
+	Name                       *string                               `xml:"name,omitempty"`
+	NetworkLimitations         *PolicyGeneralNetworkLimitations      `xml:"network_limitations,omitempty"`
+	NetworkRequirements        *string                               `xml:"network_requirements,omitempty"`
+	NotifyOnEachFailedRetry    *bool                                 `xml:"notify_on_each_failed_retry,omitempty"`
+	Offline                    *bool                                 `xml:"offline,omitempty"`
+	OverrideDefaultSettings    *PolicyGeneralOverrideDefaultSettings `xml:"override_default_settings,omitempty"`
+	RetryAttempts              *int                                  `xml:"retry_attempts,omitempty"`
+	RetryEvent                 *string                               `xml:"retry_event,omitempty"`
+	Site                       *SiteObject                           `xml:"site,omitempty"`
+	TargetDrive                *string                               `xml:"target_drive,omitempty"`
+	Trigger                    *string                               `xml:"trigger,omitempty"`
+	TriggerCheckin             *bool                                 `xml:"trigger_checkin,omitempty"`
+	TriggerEnrollmentComplete  *bool                                 `xml:"trigger_enrollment_complete,omitempty"`
+	TriggerLogin               *bool                                 `xml:"trigger_login,omitempty"`
+	TriggerLogout              *bool                                 `xml:"trigger_logout,omitempty"`
+	TriggerNetworkStateChanged *bool                                 `xml:"trigger_network_state_changed,omitempty"`
+	TriggerOther               *string                               `xml:"trigger_other,omitempty"`
+	TriggerStartup             *bool                                 `xml:"trigger_startup,omitempty"`
+}
+
+// PolicyGeneralDateTimeLimitations represents a policy general date time limitations.
+type PolicyGeneralDateTimeLimitations struct {
+	XMLName             xml.Name                                     `xml:"date_time_limitations"`
+	ActivationDate      *string                                      `xml:"activation_date,omitempty"`
+	ActivationDateEpoch *int                                         `xml:"activation_date_epoch,omitempty"`
+	ActivationDateUtc   *string                                      `xml:"activation_date_utc,omitempty"`
+	ExpirationDate      *string                                      `xml:"expiration_date,omitempty"`
+	ExpirationDateEpoch *int                                         `xml:"expiration_date_epoch,omitempty"`
+	ExpirationDateUtc   *string                                      `xml:"expiration_date_utc,omitempty"`
+	NoExecuteEnd        *string                                      `xml:"no_execute_end,omitempty"`
+	NoExecuteOn         *PolicyGeneralDateTimeLimitationsNoExecuteOn `xml:"no_execute_on,omitempty"`
+	NoExecuteStart      *string                                      `xml:"no_execute_start,omitempty"`
+}
+
+// PolicyGeneralDateTimeLimitationsNoExecuteOn represents a policy general date time limitations no execute on.
+type PolicyGeneralDateTimeLimitationsNoExecuteOn struct {
+	XMLName xml.Name `xml:"no_execute_on"`
+	Day     *string  `xml:"day,omitempty"`
+}
+
+// PolicyGeneralNetworkLimitations represents a policy general network limitations.
+type PolicyGeneralNetworkLimitations struct {
+	XMLName                  xml.Name `xml:"network_limitations"`
+	AnyIPAddress             *bool    `xml:"any_ip_address,omitempty"`
+	MinimumNetworkConnection *string  `xml:"minimum_network_connection,omitempty"`
+}
+
+// PolicyGeneralOverrideDefaultSettings represents a policy general override default settings.
+type PolicyGeneralOverrideDefaultSettings struct {
+	XMLName           xml.Name `xml:"override_default_settings"`
+	DistributionPoint *string  `xml:"distribution_point,omitempty"`
+	ForceAfpSmb       *bool    `xml:"force_afp_smb,omitempty"`
+	Sus               *string  `xml:"sus,omitempty"`
+	TargetDrive       *string  `xml:"target_drive,omitempty"`
+}
+
+// PolicyMaintenance represents a policy maintenance.
+type PolicyMaintenance struct {
+	XMLName                  xml.Name `xml:"maintenance"`
+	Byhost                   *bool    `xml:"byhost,omitempty"`
+	Heal                     *bool    `xml:"heal,omitempty"`
+	InstallAllCachedPackages *bool    `xml:"install_all_cached_packages,omitempty"`
+	Permissions              *bool    `xml:"permissions,omitempty"`
+	Prebindings              *bool    `xml:"prebindings,omitempty"`
+	Recon                    *bool    `xml:"recon,omitempty"`
+	ResetName                *bool    `xml:"reset_name,omitempty"`
+	SystemCache              *bool    `xml:"system_cache,omitempty"`
+	UserCache                *bool    `xml:"user_cache,omitempty"`
+	Verify                   *bool    `xml:"verify,omitempty"`
+}
+
+// PolicyPackageConfiguration represents a policy package configuration.
+type PolicyPackageConfiguration struct {
+	XMLName  xml.Name `xml:"package_configuration"`
+	Packages []any    `xml:"packages"`
+}
+
+// PolicyScope represents a policy scope.
+type PolicyScope struct {
+	XMLName        xml.Name                        `xml:"scope"`
+	AllComputers   *bool                           `xml:"all_computers,omitempty"`
+	Buildings      []PolicyScopeBuildingsItem      `xml:"buildings"`
+	ComputerGroups []PolicyScopeComputerGroupsItem `xml:"computer_groups"`
+	Computers      []PolicyScopeComputersItem      `xml:"computers"`
+	Departments    []PolicyScopeDepartmentsItem    `xml:"departments"`
+	Exclusions     *PolicyScopeExclusions          `xml:"exclusions,omitempty"`
+	LimitToUsers   *PolicyScopeLimitToUsers        `xml:"limit_to_users,omitempty"`
+	Limitations    *PolicyScopeLimitations         `xml:"limitations,omitempty"`
+}
+
+// PolicyScopeBuildingsItem represents a policy scope buildings item.
+type PolicyScopeBuildingsItem struct {
+	Building *IDName `xml:"building,omitempty"`
+}
+
+// PolicyScopeComputerGroupsItem represents a policy scope computer groups item.
+type PolicyScopeComputerGroupsItem struct {
+	ComputerGroup *IDName `xml:"computer_group,omitempty"`
+}
+
+// PolicyScopeComputersItem represents a policy scope computers item.
+type PolicyScopeComputersItem struct {
+	Computer *PolicyScopeComputersItemComputer `xml:"computer,omitempty"`
+}
+
+// PolicyScopeComputersItemComputer represents a policy scope computers item computer.
+type PolicyScopeComputersItemComputer struct {
+	XMLName xml.Name `xml:"computer"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	UDID    *string  `xml:"udid,omitempty"`
+}
+
+// PolicyScopeDepartmentsItem represents a policy scope departments item.
+type PolicyScopeDepartmentsItem struct {
+	Department *IDName `xml:"department,omitempty"`
+}
+
+// PolicyScopeExclusions represents a policy scope exclusions.
+type PolicyScopeExclusions struct {
+	XMLName         xml.Name                                   `xml:"exclusions"`
+	Buildings       []PolicyScopeExclusionsBuildingsItem       `xml:"buildings"`
+	ComputerGroups  []PolicyScopeExclusionsComputerGroupsItem  `xml:"computer_groups"`
+	Computers       []PolicyScopeExclusionsComputersItem       `xml:"computers"`
+	Departments     []PolicyScopeExclusionsDepartmentsItem     `xml:"departments"`
+	Ibeacons        []PolicyScopeExclusionsIbeaconsItem        `xml:"ibeacons"`
+	NetworkSegments []PolicyScopeExclusionsNetworkSegmentsItem `xml:"network_segments"`
+	UserGroups      []PolicyScopeExclusionsUserGroupsItem      `xml:"user_groups"`
+	Users           []PolicyScopeExclusionsUsersItem           `xml:"users"`
+}
+
+// PolicyScopeExclusionsBuildingsItem represents a policy scope exclusions buildings item.
+type PolicyScopeExclusionsBuildingsItem struct {
+	Building *IDName `xml:"building,omitempty"`
+}
+
+// PolicyScopeExclusionsComputerGroupsItem represents a policy scope exclusions computer groups item.
+type PolicyScopeExclusionsComputerGroupsItem struct {
+	ComputerGroup *IDName `xml:"computer_group,omitempty"`
+}
+
+// PolicyScopeExclusionsComputersItem represents a policy scope exclusions computers item.
+type PolicyScopeExclusionsComputersItem struct {
+	Computer *PolicyScopeExclusionsComputersItemComputer `xml:"computer,omitempty"`
+}
+
+// PolicyScopeExclusionsComputersItemComputer represents a policy scope exclusions computers item computer.
+type PolicyScopeExclusionsComputersItemComputer struct {
+	XMLName xml.Name `xml:"computer"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	UDID    *string  `xml:"udid,omitempty"`
+}
+
+// PolicyScopeExclusionsDepartmentsItem represents a policy scope exclusions departments item.
+type PolicyScopeExclusionsDepartmentsItem struct {
+	Department *IDName `xml:"department,omitempty"`
+}
+
+// PolicyScopeExclusionsIbeaconsItem represents a policy scope exclusions ibeacons item.
+type PolicyScopeExclusionsIbeaconsItem struct {
+	Ibeacon *IDName `xml:"ibeacon,omitempty"`
+}
+
+// PolicyScopeExclusionsNetworkSegmentsItem represents a policy scope exclusions network segments item.
+type PolicyScopeExclusionsNetworkSegmentsItem struct {
+	NetworkSegment *PolicyScopeExclusionsNetworkSegmentsItemNetworkSegment `xml:"network_segment,omitempty"`
+}
+
+// PolicyScopeExclusionsNetworkSegmentsItemNetworkSegment represents a policy scope exclusions network segments item network segment.
+type PolicyScopeExclusionsNetworkSegmentsItemNetworkSegment struct {
+	XMLName xml.Name `xml:"network_segment"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	Uid     *string  `xml:"uid,omitempty"`
+}
+
+// PolicyScopeExclusionsUserGroupsItem represents a policy scope exclusions user groups item.
+type PolicyScopeExclusionsUserGroupsItem struct {
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// PolicyScopeExclusionsUsersItem represents a policy scope exclusions users item.
+type PolicyScopeExclusionsUsersItem struct {
+	User *PolicyScopeExclusionsUsersItemUser `xml:"user,omitempty"`
+}
+
+// PolicyScopeExclusionsUsersItemUser represents a policy scope exclusions users item user.
+type PolicyScopeExclusionsUsersItemUser struct {
+	XMLName xml.Name `xml:"user"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// PolicyScopeLimitToUsers represents a policy scope limit to users.
+type PolicyScopeLimitToUsers struct {
+	XMLName    xml.Name `xml:"limit_to_users"`
+	UserGroups []any    `xml:"user_groups"`
+}
+
+// PolicyScopeLimitations represents a policy scope limitations.
+type PolicyScopeLimitations struct {
+	XMLName         xml.Name                                    `xml:"limitations"`
+	Ibeacons        []PolicyScopeLimitationsIbeaconsItem        `xml:"ibeacons"`
+	NetworkSegments []PolicyScopeLimitationsNetworkSegmentsItem `xml:"network_segments"`
+	UserGroups      []PolicyScopeLimitationsUserGroupsItem      `xml:"user_groups"`
+	Users           []PolicyScopeLimitationsUsersItem           `xml:"users"`
+}
+
+// PolicyScopeLimitationsIbeaconsItem represents a policy scope limitations ibeacons item.
+type PolicyScopeLimitationsIbeaconsItem struct {
+	Ibeacon *IDName `xml:"ibeacon,omitempty"`
+}
+
+// PolicyScopeLimitationsNetworkSegmentsItem represents a policy scope limitations network segments item.
+type PolicyScopeLimitationsNetworkSegmentsItem struct {
+	NetworkSegment *IDName `xml:"network_segment,omitempty"`
+}
+
+// PolicyScopeLimitationsUserGroupsItem represents a policy scope limitations user groups item.
+type PolicyScopeLimitationsUserGroupsItem struct {
+	UserGroup *IDName `xml:"user_group,omitempty"`
+}
+
+// PolicyScopeLimitationsUsersItem represents a policy scope limitations users item.
+type PolicyScopeLimitationsUsersItem struct {
+	User *IDName `xml:"user,omitempty"`
+}
+
+// PolicyScripts represents a policy scripts.
+type PolicyScripts struct {
+	XMLName xml.Name `xml:"scripts"`
+	Script  []any    `xml:"script"`
+	Size    *Size    `xml:"size,omitempty"`
+}
+
+// PolicySelfService represents a policy self service.
+type PolicySelfService struct {
+	XMLName                     xml.Name                                `xml:"self_service"`
+	FeatureOnMainPage           *bool                                   `xml:"feature_on_main_page,omitempty"`
+	ForceUsersToViewDescription *bool                                   `xml:"force_users_to_view_description,omitempty"`
+	InstallButtonText           *string                                 `xml:"install_button_text,omitempty"`
+	ReInstallButtonText         *string                                 `xml:"re-install_button_text,omitempty"`
+	SelfServiceCategories       *PolicySelfServiceSelfServiceCategories `xml:"self_service_categories,omitempty"`
+	SelfServiceDescription      *string                                 `xml:"self_service_description,omitempty"`
+	SelfServiceDisplayName      *string                                 `xml:"self_service_display_name,omitempty"`
+	SelfServiceIcon             *PolicySelfServiceSelfServiceIcon       `xml:"self_service_icon,omitempty"`
+	UseForSelfService           *bool                                   `xml:"use_for_self_service,omitempty"`
+}
+
+// PolicySelfServiceSelfServiceCategories represents a policy self service self service categories.
+type PolicySelfServiceSelfServiceCategories struct {
+	XMLName  xml.Name                                        `xml:"self_service_categories"`
+	Category *PolicySelfServiceSelfServiceCategoriesCategory `xml:"category,omitempty"`
+}
+
+// PolicySelfServiceSelfServiceCategoriesCategory represents a policy self service self service categories category.
+type PolicySelfServiceSelfServiceCategoriesCategory struct {
+	XMLName   xml.Name `xml:"category"`
+	DisplayIn *bool    `xml:"display_in,omitempty"`
+	FeatureIn *bool    `xml:"feature_in,omitempty"`
+	ID        *int     `xml:"id,omitempty"`
+	Name      *string  `xml:"name,omitempty"`
+}
+
+// PolicySelfServiceSelfServiceIcon represents a policy self service self service icon.
+type PolicySelfServiceSelfServiceIcon struct {
+	XMLName  xml.Name `xml:"self_service_icon"`
+	Filename *string  `xml:"filename,omitempty"`
+	ID       *int     `xml:"id,omitempty"`
+	URI      *string  `xml:"uri,omitempty"`
+}
+
+// PolicyUserInteraction represents a policy user interaction.
+type PolicyUserInteraction struct {
+	XMLName               xml.Name `xml:"user_interaction"`
+	AllowDeferralMinutes  *int     `xml:"allow_deferral_minutes,omitempty"`
+	AllowDeferralUntilUtc *string  `xml:"allow_deferral_until_utc,omitempty"`
+	AllowUserToDefer      *bool    `xml:"allow_user_to_defer,omitempty"`
+	MessageFinish         *string  `xml:"message_finish,omitempty"`
+	MessageStart          *string  `xml:"message_start,omitempty"`
+}
+
+// PolicyPost represents a policy post.
+type PolicyPost struct {
+	XMLName xml.Name           `xml:"policy"`
+	General *PolicyPostGeneral `xml:"general,omitempty"`
+}
+
+// PolicyPostGeneral represents a policy post general.
+type PolicyPostGeneral struct {
+	XMLName                    xml.Name                             `xml:"general"`
+	Category                   *CategoryObject                      `xml:"category,omitempty"`
+	Enabled                    *bool                                `xml:"enabled,omitempty"`
+	Frequency                  *string                              `xml:"frequency,omitempty"`
+	ID                         *int                                 `xml:"id,omitempty"`
+	LocationUserOnly           *bool                                `xml:"location_user_only,omitempty"`
+	Name                       *string                              `xml:"name,omitempty"`
+	NetworkLimitations         *PolicyPostGeneralNetworkLimitations `xml:"network_limitations,omitempty"`
+	NetworkRequirements        *string                              `xml:"network_requirements,omitempty"`
+	Offline                    *bool                                `xml:"offline,omitempty"`
+	Site                       *SiteObject                          `xml:"site,omitempty"`
+	TargetDrive                *string                              `xml:"target_drive,omitempty"`
+	Trigger                    *string                              `xml:"trigger,omitempty"`
+	TriggerCheckin             *bool                                `xml:"trigger_checkin,omitempty"`
+	TriggerEnrollmentComplete  *bool                                `xml:"trigger_enrollment_complete,omitempty"`
+	TriggerLogin               *bool                                `xml:"trigger_login,omitempty"`
+	TriggerLogout              *bool                                `xml:"trigger_logout,omitempty"`
+	TriggerNetworkStateChanged *bool                                `xml:"trigger_network_state_changed,omitempty"`
+	TriggerOther               *string                              `xml:"trigger_other,omitempty"`
+	TriggerStartup             *bool                                `xml:"trigger_startup,omitempty"`
+}
+
+// PolicyPostGeneralNetworkLimitations represents a policy post general network limitations.
+type PolicyPostGeneralNetworkLimitations struct {
+	XMLName                  xml.Name `xml:"network_limitations"`
+	AnyIPAddress             *bool    `xml:"any_ip_address,omitempty"`
+	MinimumNetworkConnection *string  `xml:"minimum_network_connection,omitempty"`
 }
 
 // Purchasing represents a purchasing.

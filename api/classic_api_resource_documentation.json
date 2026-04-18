@@ -377,6 +377,24 @@
         "title": "category",
         "type": "object"
       },
+      "category_object": {
+        "properties": {
+          "id": {
+            "default": -1,
+            "type": "integer"
+          },
+          "name": {
+            "default": "Unknown",
+            "description": "Name of the category",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "category",
+        "type": "object"
+      },
       "computer": {
         "properties": {
           "certificates": {
@@ -1492,6 +1510,516 @@
         },
         "type": "object"
       },
+      "mobile_device": {
+        "properties": {
+          "applications": {
+            "items": {
+              "properties": {
+                "application": {
+                  "properties": {
+                    "application_name": {
+                      "example": "Self Service Mobile",
+                      "type": "string"
+                    },
+                    "application_version": {
+                      "example": "10.1.1",
+                      "type": "string"
+                    },
+                    "identifier": {
+                      "example": "com.jamfsoftware.selfservice",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "properties": {
+                "certificate": {
+                  "properties": {
+                    "common_name": {
+                      "example": "JSS Built-in Certificate Authority",
+                      "type": "string"
+                    },
+                    "identity": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "configuration_profiles": {
+            "items": {
+              "properties": {
+                "configuration_profile": {
+                  "properties": {
+                    "display_name": {
+                      "example": "WiFi",
+                      "type": "string"
+                    },
+                    "identifier": {
+                      "example": "279889AF-1564-4480-A61D-860DF5EFDF26",
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "example": "279889AF-1564-4480-A61D-860DF5EFDF26",
+                      "type": "string"
+                    },
+                    "version": {
+                      "example": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "extension_attributes": {
+            "items": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "example": "Asset Selector",
+                  "type": "string"
+                },
+                "type": {
+                  "example": "String",
+                  "type": "string"
+                },
+                "value": {
+                  "example": "Sample Value",
+                  "type": "string"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "general": {
+            "properties": {
+              "asset_tag": {
+                "type": "string"
+              },
+              "available": {
+                "example": 11487,
+                "type": "integer"
+              },
+              "available_mb": {
+                "example": 11487,
+                "type": "integer"
+              },
+              "battery_level": {
+                "example": 95,
+                "type": "integer"
+              },
+              "ble_capable": {
+                "type": "boolean"
+              },
+              "bluetooth_mac_address": {
+                "example": "E0:AC:CB:97:36:G6",
+                "type": "string"
+              },
+              "capacity": {
+                "example": 12159,
+                "type": "integer"
+              },
+              "capacity_mb": {
+                "example": 12159,
+                "type": "integer"
+              },
+              "cloud_backup_enabled": {
+                "type": "boolean"
+              },
+              "device_locator_service_enabled": {
+                "type": "boolean"
+              },
+              "device_name": {
+                "example": "Tinas iPad",
+                "type": "string"
+              },
+              "device_ownership_level": {
+                "example": "Institutional",
+                "type": "string"
+              },
+              "display_name": {
+                "example": "Tinas iPad",
+                "type": "string"
+              },
+              "do_not_disturb_enabled": {
+                "type": "boolean"
+              },
+              "exchange_activesync_device_identifier": {
+                "example": "TUCLLFJHPL779ACL9DCJQFN39F",
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "initial_entry_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "initial_entry_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "ip_address": {
+                "example": "192.0.0.1",
+                "type": "string"
+              },
+              "itunes_store_account_is_active": {
+                "type": "boolean"
+              },
+              "last_backup_time_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_backup_time_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_cloud_backup_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_cloud_backup_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_enrollment_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_enrollment_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_inventory_update": {
+                "example": "2017-07-07T18:37:04Z",
+                "type": "string"
+              },
+              "last_inventory_update_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_inventory_update_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "location_services_enabled": {
+                "type": "boolean"
+              },
+              "managed": {
+                "type": "boolean"
+              },
+              "model": {
+                "example": "iPhone 6S",
+                "type": "string"
+              },
+              "model_display": {
+                "example": "iPhone 6S",
+                "type": "string"
+              },
+              "model_identifier": {
+                "example": "iPhone8,1",
+                "type": "string"
+              },
+              "model_number": {
+                "example": "MKRY2LL",
+                "type": "string"
+              },
+              "modem_firmware": {
+                "example": "2.61.00",
+                "type": "string"
+              },
+              "name": {
+                "example": "Tinas iPad",
+                "type": "string"
+              },
+              "os_build": {
+                "example": "14F89",
+                "type": "string"
+              },
+              "os_type": {
+                "example": "iOS",
+                "type": "string"
+              },
+              "os_version": {
+                "example": "10.3.2",
+                "type": "string"
+              },
+              "percentage_used": {
+                "example": 5,
+                "type": "integer"
+              },
+              "phone_number": {
+                "example": "123-555-6789",
+                "type": "string"
+              },
+              "serial_number": {
+                "example": "C02Q7KHTGFWF",
+                "type": "string"
+              },
+              "shared": {
+                "type": "string"
+              },
+              "supervised": {
+                "type": "boolean"
+              },
+              "tethered": {
+                "type": "string"
+              },
+              "udid": {
+                "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                "type": "string"
+              },
+              "wifi_mac_address": {
+                "example": "E0:AC:CB:97:36:G4",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "udid",
+              "serial_number"
+            ],
+            "type": "object"
+          },
+          "location": {
+            "$ref": "#/components/schemas/location"
+          },
+          "mobile_device_groups": {
+            "items": {
+              "properties": {
+                "mobile_device_group": {
+                  "$ref": "#/components/schemas/id_name"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "network": {
+            "properties": {
+              "carrier_settings_version": {
+                "example": 20,
+                "type": "string"
+              },
+              "cellular_technology": {
+                "example": "Unknown",
+                "type": "string"
+              },
+              "current_carrier_network": {
+                "type": "string"
+              },
+              "current_mobile_country_code": {
+                "example": 311,
+                "type": "string"
+              },
+              "current_mobile_network_code": {
+                "example": 480,
+                "type": "string"
+              },
+              "data_roaming_enabled": {
+                "type": "boolean"
+              },
+              "home_carrier_network": {
+                "example": "Verizon",
+                "type": "string"
+              },
+              "home_mobile_country_code": {
+                "example": 311,
+                "type": "string"
+              },
+              "home_mobile_network_code": {
+                "example": 480,
+                "type": "string"
+              },
+              "iccid": {
+                "example": "8914 8000 0010 0254 6259",
+                "type": "string"
+              },
+              "imei": {
+                "example": "35 200706 056227 1",
+                "type": "string"
+              },
+              "phone_number": {
+                "example": 5555555555,
+                "type": "string"
+              },
+              "voice_roaming_enabled": {
+                "example": "Yes",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "provisioning_profiles": {
+            "items": {
+              "properties": {
+                "mobile_device_provisioning_profile": {
+                  "properties": {
+                    "display_name": {
+                      "example": "In-House App Provisioning Profile",
+                      "type": "string"
+                    },
+                    "expiration_date": {
+                      "example": "2018-01-29T00:00:00Z",
+                      "type": "string"
+                    },
+                    "expiration_date_epoch": {
+                      "type": "integer"
+                    },
+                    "expiration_date_utc": {
+                      "example": "2018-01-29T14:18:02.000-0600",
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "example": "279889AF-1564-4480-A61D-860DF5EFDF26",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/purchasing"
+          },
+          "security_object": {
+            "properties": {
+              "activation_lock_enabled": {
+                "type": "boolean"
+              },
+              "block_level_encryption_capable": {
+                "type": "boolean"
+              },
+              "data_protection": {
+                "type": "boolean"
+              },
+              "file_level_encryption_capable": {
+                "type": "boolean"
+              },
+              "hardware_encryption": {
+                "type": "string"
+              },
+              "jailbreak_detected": {
+                "example": "Normal",
+                "type": "string"
+              },
+              "lost_location_altitude": {
+                "example": 242.88067627,
+                "type": "string"
+              },
+              "lost_location_course": {
+                "example": -1,
+                "type": "string"
+              },
+              "lost_location_epoch": {
+                "example": 1517598680459,
+                "type": "integer"
+              },
+              "lost_location_horizontal_accuracy": {
+                "example": 65,
+                "type": "string"
+              },
+              "lost_location_latitude": {
+                "example": 44.81436821,
+                "type": "string"
+              },
+              "lost_location_longitude": {
+                "example": -91.502672,
+                "type": "string"
+              },
+              "lost_location_speed": {
+                "example": -1,
+                "type": "string"
+              },
+              "lost_location_utc": {
+                "example": "2018-02-02T13:11:20.459-0600",
+                "type": "string"
+              },
+              "lost_location_vertical_accuracy": {
+                "example": 10,
+                "type": "string"
+              },
+              "lost_mode_enable_issued_epoch": {
+                "example": 1517598768512,
+                "type": "integer"
+              },
+              "lost_mode_enable_issued_utc": {
+                "example": "2018-02-02T13:12:48.512-0600",
+                "type": "string"
+              },
+              "lost_mode_enabled": {
+                "example": true,
+                "type": "string"
+              },
+              "lost_mode_enforced": {
+                "example": true,
+                "type": "boolean"
+              },
+              "lost_mode_footnote": {
+                "type": "string"
+              },
+              "lost_mode_message": {
+                "example": "Please return to Company",
+                "type": "string"
+              },
+              "lost_mode_phone": {
+                "example": "555-555-5555",
+                "type": "string"
+              },
+              "passcode_compliant": {
+                "type": "boolean"
+              },
+              "passcode_compliant_with_profile": {
+                "type": "boolean"
+              },
+              "passcode_lock_grace_period_enforced": {
+                "example": "Not Available",
+                "type": "string"
+              },
+              "passcode_present": {
+                "type": "boolean"
+              }
+            },
+            "type": "object",
+            "xml": {
+              "name": "security"
+            }
+          }
+        },
+        "type": "object"
+      },
       "mobile_device_extension_attribute": {
         "properties": {
           "date_type": {
@@ -1616,6 +2144,934 @@
           "name",
           "is_smart"
         ],
+        "type": "object"
+      },
+      "policy": {
+        "properties": {
+          "account_maintenance": {
+            "properties": {
+              "accounts": {
+                "items": {
+                  "properties": {
+                    "account": {
+                      "properties": {
+                        "action": {
+                          "enum": [
+                            "Create",
+                            "Reset",
+                            "Delete",
+                            "DisableFileVault"
+                          ],
+                          "type": "string"
+                        },
+                        "admin": {
+                          "type": "boolean"
+                        },
+                        "archive_home_directory": {
+                          "type": "boolean"
+                        },
+                        "archive_home_directory_to": {
+                          "example": "/Users/Deleted Users/admin.dmg",
+                          "type": "string"
+                        },
+                        "filevault_enabled": {
+                          "type": "boolean"
+                        },
+                        "home": {
+                          "example": "/Users/admin",
+                          "type": "string"
+                        },
+                        "password": {
+                          "type": "string"
+                        },
+                        "picture": {
+                          "example": "/Library/User Pictures/Animals/Eagle.tif",
+                          "type": "string"
+                        },
+                        "realname": {
+                          "example": "Administrator",
+                          "type": "string"
+                        },
+                        "username": {
+                          "example": "admin",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "directory_bindings": {
+                "items": {
+                  "properties": {
+                    "binding": {
+                      "$ref": "#/components/schemas/id_name"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "management_account": {
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "rotate",
+                      "doNotChange"
+                    ],
+                    "type": "string"
+                  },
+                  "managed_password": {
+                    "type": "string"
+                  },
+                  "managed_password_length": {
+                    "description": "Only necessary when utilizing the random action",
+                    "example": 8,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "open_firmware_efi_password": {
+                "properties": {
+                  "of_mode": {
+                    "enum": [
+                      "command",
+                      "none"
+                    ],
+                    "type": "string"
+                  },
+                  "of_password": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "disk_encryption": {
+            "properties": {
+              "action": {
+                "enum": [
+                  "apply",
+                  "remediate"
+                ],
+                "type": "string"
+              },
+              "auth_restart": {
+                "type": "boolean"
+              },
+              "disk_encryption_configuration_id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "remediate_disk_encryption_configuration_id": {
+                "description": "disk encryption ID to utilize for remediating institutional recovery key types.",
+                "example": 1,
+                "type": "integer"
+              },
+              "remediate_key_type": {
+                "enum": [
+                  "Individual",
+                  "Institutional",
+                  "Individual And Institutional"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "dock_items": {
+            "items": {
+              "properties": {
+                "dock_item": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "Add To Beginning",
+                        "Add To End",
+                        "Remove"
+                      ],
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Safari",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "files_processes": {
+            "properties": {
+              "delete_file": {
+                "type": "boolean"
+              },
+              "kill_process": {
+                "type": "boolean"
+              },
+              "locate_file": {
+                "example": "/Library/Fonts/testFont.ttc",
+                "type": "string"
+              },
+              "run_command": {
+                "example": "echo \"foobar\"",
+                "type": "string"
+              },
+              "search_by_path": {
+                "example": "/Applications/appName.app",
+                "type": "string"
+              },
+              "search_for_process": {
+                "example": "processName",
+                "type": "string"
+              },
+              "spotlight_search": {
+                "example": "Screenshot.pdf",
+                "type": "string"
+              },
+              "update_locate_database": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "general": {
+            "properties": {
+              "category": {
+                "$ref": "#/components/schemas/category_object"
+              },
+              "date_time_limitations": {
+                "properties": {
+                  "activation_date": {
+                    "example": "2017-07-07T18:37:04Z",
+                    "type": "string"
+                  },
+                  "activation_date_epoch": {
+                    "example": 1499470624555,
+                    "type": "integer"
+                  },
+                  "activation_date_utc": {
+                    "example": "2017-07-07T18:37:04.555-0500",
+                    "type": "string"
+                  },
+                  "expiration_date": {
+                    "example": "2017-07-07T18:37:04Z",
+                    "type": "string"
+                  },
+                  "expiration_date_epoch": {
+                    "example": 1499470624555,
+                    "type": "integer"
+                  },
+                  "expiration_date_utc": {
+                    "example": "2017-07-07T18:37:04.555-0500",
+                    "type": "string"
+                  },
+                  "no_execute_end": {
+                    "example": "4:00 AM",
+                    "type": "string"
+                  },
+                  "no_execute_on": {
+                    "properties": {
+                      "day": {
+                        "enum": [
+                          "Sun",
+                          "Mon",
+                          "Tue",
+                          "Wed",
+                          "Thu",
+                          "Fri",
+                          "Sat"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "no_execute_start": {
+                    "example": "2:00 AM",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "frequency": {
+                "enum": [
+                  "Once per computer",
+                  "Once per user per computer",
+                  "Once per user",
+                  "Once every day",
+                  "Once every week",
+                  "Once every month",
+                  "Ongoing"
+                ],
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "location_user_only": {
+                "type": "boolean"
+              },
+              "name": {
+                "example": "Disk Encryption",
+                "type": "string"
+              },
+              "network_limitations": {
+                "properties": {
+                  "any_ip_address": {
+                    "type": "boolean"
+                  },
+                  "minimum_network_connection": {
+                    "enum": [
+                      "No Minimum",
+                      "Ethernet"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "network_requirements": {
+                "enum": [
+                  "Any",
+                  "Ethernet"
+                ],
+                "type": "string"
+              },
+              "notify_on_each_failed_retry": {
+                "default": false,
+                "type": "boolean"
+              },
+              "offline": {
+                "type": "boolean"
+              },
+              "override_default_settings": {
+                "properties": {
+                  "distribution_point": {
+                    "type": "string"
+                  },
+                  "force_afp_smb": {
+                    "type": "boolean"
+                  },
+                  "sus": {
+                    "type": "string"
+                  },
+                  "target_drive": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "retry_attempts": {
+                "default": -1,
+                "type": "integer"
+              },
+              "retry_event": {
+                "default": "none",
+                "enum": [
+                  "none",
+                  "trigger",
+                  "check-in"
+                ],
+                "type": "string"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
+              "target_drive": {
+                "example": "/",
+                "type": "string"
+              },
+              "trigger": {
+                "type": "string"
+              },
+              "trigger_checkin": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_enrollment_complete": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_login": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_logout": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_network_state_changed": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_other": {
+                "type": "string"
+              },
+              "trigger_startup": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "maintenance": {
+            "properties": {
+              "byhost": {
+                "type": "boolean"
+              },
+              "heal": {
+                "type": "boolean"
+              },
+              "install_all_cached_packages": {
+                "type": "boolean"
+              },
+              "permissions": {
+                "type": "boolean"
+              },
+              "prebindings": {
+                "type": "boolean"
+              },
+              "recon": {
+                "type": "boolean"
+              },
+              "reset_name": {
+                "type": "boolean"
+              },
+              "system_cache": {
+                "type": "boolean"
+              },
+              "user_cache": {
+                "type": "boolean"
+              },
+              "verify": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "package_configuration": {
+            "properties": {
+              "packages": {
+                "items": {
+                  "properties": {
+                    "package": {
+                      "properties": {
+                        "action": {
+                          "enum": [
+                            "Install",
+                            "Cache",
+                            "Install Cached"
+                          ],
+                          "type": "string"
+                        },
+                        "feu": {
+                          "type": "boolean"
+                        },
+                        "fut": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "example": "Firefox.dmg",
+                          "type": "string"
+                        },
+                        "update_autorun": {
+                          "type": "boolean"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "printers": {
+            "items": {
+              "properties": {
+                "leave_existing_default": {
+                  "type": "string"
+                },
+                "printer": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "install",
+                        "uninstall"
+                      ],
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "make_default": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "example": "Kyocera",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "scope": {
+            "properties": {
+              "all_computers": {
+                "default": false,
+                "type": "boolean"
+              },
+              "buildings": {
+                "items": {
+                  "properties": {
+                    "building": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computer_groups": {
+                "items": {
+                  "properties": {
+                    "computer_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computers": {
+                "items": {
+                  "properties": {
+                    "computer": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "description": "Name of the computer",
+                          "example": "Admins MacBook Pro",
+                          "type": "string"
+                        },
+                        "udid": {
+                          "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "departments": {
+                "items": {
+                  "properties": {
+                    "department": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "exclusions": {
+                "properties": {
+                  "buildings": {
+                    "items": {
+                      "properties": {
+                        "building": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computer_groups": {
+                    "items": {
+                      "properties": {
+                        "computer_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computers": {
+                    "items": {
+                      "properties": {
+                        "computer": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the computer",
+                              "example": "Johns iMac",
+                              "type": "string"
+                            },
+                            "udid": {
+                              "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "departments": {
+                    "items": {
+                      "properties": {
+                        "department": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "ibeacons": {
+                    "items": {
+                      "properties": {
+                        "ibeacon": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the network segment",
+                              "example": "New York",
+                              "type": "string"
+                            },
+                            "uid": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "properties": {
+                            "name": {
+                              "example": "Adam",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "limit_to_users": {
+                "properties": {
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "example": "Teachers",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "properties": {
+                  "ibeacons": {
+                    "items": {
+                      "properties": {
+                        "ibeacon": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "scripts": {
+            "properties": {
+              "script": {
+                "items": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "mountNetworkShare.sh",
+                      "type": "string"
+                    },
+                    "parameter10": {
+                      "type": "string"
+                    },
+                    "parameter11": {
+                      "type": "string"
+                    },
+                    "parameter4": {
+                      "type": "string"
+                    },
+                    "parameter5": {
+                      "type": "string"
+                    },
+                    "parameter6": {
+                      "type": "string"
+                    },
+                    "parameter7": {
+                      "type": "string"
+                    },
+                    "parameter8": {
+                      "type": "string"
+                    },
+                    "parameter9": {
+                      "type": "string"
+                    },
+                    "priority": {
+                      "enum": [
+                        "Before",
+                        "After"
+                      ],
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "size": {
+                "$ref": "#/components/schemas/size"
+              }
+            },
+            "type": "object"
+          },
+          "self_service": {
+            "properties": {
+              "feature_on_main_page": {
+                "default": false,
+                "type": "boolean"
+              },
+              "force_users_to_view_description": {
+                "default": false,
+                "type": "boolean"
+              },
+              "install_button_text": {
+                "example": "Encrypt",
+                "type": "string"
+              },
+              "re-install_button_text": {
+                "example": "Re-encrypt",
+                "type": "string"
+              },
+              "self_service_categories": {
+                "properties": {
+                  "category": {
+                    "properties": {
+                      "display_in": {
+                        "default": true,
+                        "type": "boolean"
+                      },
+                      "feature_in": {
+                        "default": false,
+                        "type": "boolean"
+                      },
+                      "id": {
+                        "example": 2,
+                        "type": "integer"
+                      },
+                      "name": {
+                        "example": "Compliance",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "self_service_description": {
+                "example": "Encrypt the boot drive of this device",
+                "type": "string"
+              },
+              "self_service_display_name": {
+                "example": "Disk Encryption",
+                "type": "string"
+              },
+              "self_service_icon": {
+                "properties": {
+                  "filename": {
+                    "example": "Encryption.png",
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "uri": {
+                    "example": "https://jssURL.jamfcloud.com/iconservlet/?id=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "use_for_self_service": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "user_interaction": {
+            "properties": {
+              "allow_deferral_minutes": {
+                "example": 0,
+                "type": "integer"
+              },
+              "allow_deferral_until_utc": {
+                "example": "2019-01-01T01:00:00.000-0600",
+                "type": "string"
+              },
+              "allow_user_to_defer": {
+                "type": "boolean"
+              },
+              "message_finish": {
+                "example": "Policy completed",
+                "type": "string"
+              },
+              "message_start": {
+                "example": "Policy is begining execution",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
         "type": "object"
       },
       "purchasing": {
@@ -3463,6 +4919,650 @@
         "summary": "Updates an existing mobile device group by ID",
         "tags": [
           "mobiledevicegroups"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevices/id/{id}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device by ID",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDevicesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile devices by ID",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "post": {
+        "description": "To distinguish between mobile device types (e.g., iPad, iPhone, or Apple TV), use the \u003cmodel_identifier\u003e field. Default mobile device type is 'Unknown'. Can include a subset for Android devices if applicable. \u003cos_name\u003e in \u003candroid\u003e is derived from the API level and cannot be set.",
+        "operationId": "createMobileDeviceById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new mobile device by ID",
+        "tags": [
+          "mobiledevices"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "\u003cos_name\u003e in \u003candroid\u003e is derived from the api level and cannot be set.",
+        "operationId": "updateMobileDeviceById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device by ID",
+        "tags": [
+          "mobiledevices"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevices/macaddress/{macaddress}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceByMacAddress",
+        "parameters": [
+          {
+            "description": "Mac address value to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device by Mac address",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDevicesByMacAddress",
+        "parameters": [
+          {
+            "description": "Mac address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile devices by Mac address",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "put": {
+        "description": "\u003cos_name\u003e in \u003candroid\u003e is derived from the api level and cannot be set.",
+        "operationId": "updateMobileDeviceByMacAddress",
+        "parameters": [
+          {
+            "description": "Mac address value to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device by Mac address",
+        "tags": [
+          "mobiledevices"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevices/name/{name}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device by name",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDevicesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile devices by name",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "put": {
+        "description": "\u003cos_name\u003e in \u003candroid\u003e is derived from the api level and cannot be set.",
+        "operationId": "updateMobileDeviceByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device by name",
+        "tags": [
+          "mobiledevices"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevices/serialnumber/{serialnumber}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceBySerialNumber",
+        "parameters": [
+          {
+            "description": "Serial number value to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device by serial number",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDevicesBySerialNumber",
+        "parameters": [
+          {
+            "description": "Serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile devices by serial number",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "put": {
+        "description": "\u003cos_name\u003e in \u003candroid\u003e is derived from the api level and cannot be set.",
+        "operationId": "updateMobileDeviceBySerialNumber",
+        "parameters": [
+          {
+            "description": "Serial number value to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device by serial number",
+        "tags": [
+          "mobiledevices"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevices/udid/{udid}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceByUDID",
+        "parameters": [
+          {
+            "description": "UDID value to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device by UDID",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDevicesByUDID",
+        "parameters": [
+          {
+            "description": "UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile devices by UDID",
+        "tags": [
+          "mobiledevices"
+        ]
+      },
+      "put": {
+        "description": "\u003cos_name\u003e in \u003candroid\u003e is derived from the api level and cannot be set.",
+        "operationId": "updateMobileDeviceByUDID",
+        "parameters": [
+          {
+            "description": "UDID value to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device by UDID",
+        "tags": [
+          "mobiledevices"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/policies/id/{id}": {
+      "delete": {
+        "operationId": "deletePolicyById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a policy by ID",
+        "tags": [
+          "policies"
+        ]
+      },
+      "get": {
+        "operationId": "findPoliciesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/policy"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/policy"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds policies by ID",
+        "tags": [
+          "policies"
+        ]
+      },
+      "post": {
+        "operationId": "createPolicyById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new policy by ID",
+        "tags": [
+          "policies"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updatePolicyById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing policy by ID",
+        "tags": [
+          "policies"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/policies/name/{name}": {
+      "delete": {
+        "operationId": "deletePolicyByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a policy by name",
+        "tags": [
+          "policies"
+        ]
+      },
+      "get": {
+        "operationId": "findPoliciesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/policy"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/policy"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds policies by name",
+        "tags": [
+          "policies"
+        ]
+      },
+      "put": {
+        "operationId": "updatePolicyByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing policy by name",
+        "tags": [
+          "policies"
         ],
         "x-explorer-enabled": false
       }
