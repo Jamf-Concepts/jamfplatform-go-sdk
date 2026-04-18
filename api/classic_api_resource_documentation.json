@@ -944,6 +944,18 @@
         ],
         "type": "object"
       },
+      "id_name": {
+        "properties": {
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "location": {
         "properties": {
           "building": {
@@ -1048,6 +1060,85 @@
         },
         "type": "object"
       },
+      "script": {
+        "properties": {
+          "category": {
+            "example": "None",
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "info": {
+            "example": "Script information",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the script",
+            "example": "Decrypt Drive",
+            "type": "string"
+          },
+          "notes": {
+            "example": "Script to decrypt FV2 encrypted drives",
+            "type": "string"
+          },
+          "os_requirements": {
+            "type": "string"
+          },
+          "parameters": {
+            "properties": {
+              "parameter10": {
+                "type": "string"
+              },
+              "parameter11": {
+                "type": "string"
+              },
+              "parameter4": {
+                "type": "string"
+              },
+              "parameter5": {
+                "type": "string"
+              },
+              "parameter6": {
+                "type": "string"
+              },
+              "parameter7": {
+                "type": "string"
+              },
+              "parameter8": {
+                "type": "string"
+              },
+              "parameter9": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "priority": {
+            "enum": [
+              "Before",
+              "After",
+              "At Reboot"
+            ],
+            "type": "string"
+          },
+          "script_contents": {
+            "example": "echo \"Sample script\"",
+            "type": "string"
+          },
+          "script_contents_encoded": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "site": {
         "properties": {
           "id": {
@@ -1088,6 +1179,144 @@
       "size": {
         "example": 1,
         "type": "integer"
+      },
+      "user": {
+        "properties": {
+          "custom_photo_url": {
+            "type": "string"
+          },
+          "email": {
+            "example": "aharrison@company.com",
+            "type": "string"
+          },
+          "email_address": {
+            "example": "aharrison@company.com",
+            "type": "string"
+          },
+          "enable_custom_photo_url": {
+            "type": "boolean"
+          },
+          "extension_attributes": {
+            "items": {
+              "properties": {
+                "extension_attribute": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Teacher ID",
+                      "type": "string"
+                    },
+                    "type": {
+                      "enum": [
+                        "String",
+                        "Integer",
+                        "Date"
+                      ],
+                      "type": "string"
+                    },
+                    "value": {
+                      "example": "K12",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "full_name": {
+            "example": "Ashley Harrison",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "ldap_server": {
+            "properties": {
+              "id": {
+                "example": -1,
+                "type": "integer"
+              },
+              "name": {
+                "example": "None",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "links": {
+            "properties": {
+              "computers": {
+                "properties": {
+                  "computer": {
+                    "$ref": "#/components/schemas/id_name"
+                  }
+                },
+                "type": "object"
+              },
+              "mobile_devices": {
+                "properties": {
+                  "mobile_device": {
+                    "$ref": "#/components/schemas/id_name"
+                  }
+                },
+                "type": "object"
+              },
+              "peripherals": {
+                "properties": {
+                  "peripheral": {
+                    "$ref": "#/components/schemas/id_name"
+                  }
+                },
+                "type": "object"
+              },
+              "total_vpp_code_count": {
+                "type": "integer"
+              },
+              "vpp_assignments": {
+                "properties": {
+                  "vpp_assignment": {
+                    "$ref": "#/components/schemas/id_name"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "description": "Name of the user",
+            "example": "AHarrison",
+            "type": "string"
+          },
+          "phone_number": {
+            "example": "123-555-6789",
+            "type": "string"
+          },
+          "position": {
+            "example": "Teachers",
+            "type": "string"
+          },
+          "sites": {
+            "items": {
+              "properties": {
+                "site": {
+                  "$ref": "#/components/schemas/site_object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -1704,6 +1933,118 @@
         "x-explorer-enabled": false
       }
     },
+    "/scripts/id/{id}": {
+      "delete": {
+        "operationId": "deleteScriptById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a script by ID",
+        "tags": [
+          "scripts"
+        ]
+      },
+      "get": {
+        "description": "script_contents_encoded is the equivalent of script_contents, but it has been Base 64 encoded.",
+        "operationId": "findScriptsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/script"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/script"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds scripts by ID",
+        "tags": [
+          "scripts"
+        ]
+      },
+      "post": {
+        "description": "Only one of script_contents_encoded and script_contents should be submitted.",
+        "operationId": "createScriptById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new script by ID",
+        "tags": [
+          "scripts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "Only one of script_contents_encoded and script_contents should be submitted.",
+        "operationId": "updateScriptById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing script by ID",
+        "tags": [
+          "scripts"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/sites/id/{id}": {
       "delete": {
         "operationId": "deleteSiteById",
@@ -1809,6 +2150,117 @@
         "summary": "Updates an existing site by ID",
         "tags": [
           "sites"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/users/id/{id}": {
+      "delete": {
+        "operationId": "deleteUserById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a user by ID",
+        "tags": [
+          "users"
+        ]
+      },
+      "get": {
+        "operationId": "findUsersById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds users by ID",
+        "tags": [
+          "users"
+        ]
+      },
+      "post": {
+        "description": "This operation cannot be used to add computers, mobile devices, peripherals, vpp assignments to a user.",
+        "operationId": "createUserById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new user by ID",
+        "tags": [
+          "users"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "This operation cannot be used to add computers, mobile devices, peripherals, vpp assignments to a user.",
+        "operationId": "updateUserById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing user by ID",
+        "tags": [
+          "users"
         ],
         "x-explorer-enabled": false
       }

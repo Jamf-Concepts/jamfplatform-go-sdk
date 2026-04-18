@@ -244,6 +244,95 @@ func TestAcceptance_Classic_CategoryCRUD(t *testing.T) {
 	}
 }
 
+func TestAcceptance_Classic_ScriptCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-script-" + runSuffix()
+	contents := "#!/bin/sh\necho hello\n"
+	created, err := pc.CreateScriptByID(ctx, "0", &proclassic.Script{
+		Name:           classicStrPtr(name),
+		ScriptContents: classicStrPtr(contents),
+		Priority:       classicStrPtr("After"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateScriptByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateScriptByID returned no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteScriptByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetScriptByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetScriptByID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("Name = %v, want %q", got.Name, name)
+	}
+
+	newName := name + "-updated"
+	if err := pc.UpdateScriptByID(ctx, intToStr(id), &proclassic.Script{Name: classicStrPtr(newName)}); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateScriptByID(%d): %v", id, err)
+	}
+
+	if err := pc.DeleteScriptByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteScriptByID(%d): %v", id, err)
+	}
+	_, err = pc.GetScriptByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_UserCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-user-" + runSuffix()
+	email := name + "@example.test"
+	created, err := pc.CreateUserByID(ctx, "0", &proclassic.UserPost{
+		Name:  classicStrPtr(name),
+		Email: classicStrPtr(email),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateUserByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateUserByID returned no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteUserByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetUserByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetUserByID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("Name = %v, want %q", got.Name, name)
+	}
+
+	if err := pc.DeleteUserByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteUserByID(%d): %v", id, err)
+	}
+	_, err = pc.GetUserByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()

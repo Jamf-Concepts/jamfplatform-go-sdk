@@ -174,7 +174,17 @@
         {"op": "GET /sites/id/{id}", "name": "GetSiteByID", "responseType": "site", "pathNames": {"id": "id"}},
         {"op": "POST /sites/id/{id}", "name": "CreateSiteByID", "requestType": "site", "responseType": "site", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /sites/id/{id}", "name": "UpdateSiteByID", "requestType": "site", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /sites/id/{id}", "name": "DeleteSiteByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /sites/id/{id}", "name": "DeleteSiteByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /scripts/id/{id}", "name": "GetScriptByID", "responseType": "script", "pathNames": {"id": "id"}},
+        {"op": "POST /scripts/id/{id}", "name": "CreateScriptByID", "requestType": "script", "responseType": "script", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /scripts/id/{id}", "name": "UpdateScriptByID", "requestType": "script", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /scripts/id/{id}", "name": "DeleteScriptByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /users/id/{id}", "name": "GetUserByID", "responseType": "user", "pathNames": {"id": "id"}},
+        {"op": "POST /users/id/{id}", "name": "CreateUserByID", "requestType": "user_post", "responseType": "user", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /users/id/{id}", "name": "UpdateUserByID", "requestType": "user_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /users/id/{id}", "name": "DeleteUserByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

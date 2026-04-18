@@ -212,6 +212,12 @@ type Department struct {
 	Name    *string  `xml:"name,omitempty"`
 }
 
+// IDName represents a i d name.
+type IDName struct {
+	ID   *int    `xml:"id,omitempty"`
+	Name *string `xml:"name,omitempty"`
+}
+
 // Location represents a location.
 type Location struct {
 	XMLName      xml.Name `xml:"location"`
@@ -250,6 +256,35 @@ type Purchasing struct {
 	WarrantyExpiresUtc   *string  `xml:"warranty_expires_utc,omitempty"`
 }
 
+// Script represents a script.
+type Script struct {
+	XMLName               xml.Name          `xml:"script"`
+	Category              *string           `xml:"category,omitempty"`
+	Filename              *string           `xml:"filename,omitempty"`
+	ID                    *int              `xml:"id,omitempty"`
+	Info                  *string           `xml:"info,omitempty"`
+	Name                  *string           `xml:"name,omitempty"`
+	Notes                 *string           `xml:"notes,omitempty"`
+	OsRequirements        *string           `xml:"os_requirements,omitempty"`
+	Parameters            *ScriptParameters `xml:"parameters,omitempty"`
+	Priority              *string           `xml:"priority,omitempty"`
+	ScriptContents        *string           `xml:"script_contents,omitempty"`
+	ScriptContentsEncoded *string           `xml:"script_contents_encoded,omitempty"`
+}
+
+// ScriptParameters represents a script parameters.
+type ScriptParameters struct {
+	XMLName     xml.Name `xml:"parameters"`
+	Parameter10 *string  `xml:"parameter10,omitempty"`
+	Parameter11 *string  `xml:"parameter11,omitempty"`
+	Parameter4  *string  `xml:"parameter4,omitempty"`
+	Parameter5  *string  `xml:"parameter5,omitempty"`
+	Parameter6  *string  `xml:"parameter6,omitempty"`
+	Parameter7  *string  `xml:"parameter7,omitempty"`
+	Parameter8  *string  `xml:"parameter8,omitempty"`
+	Parameter9  *string  `xml:"parameter9,omitempty"`
+}
+
 // Site represents a site.
 type Site struct {
 	XMLName xml.Name `xml:"site"`
@@ -266,3 +301,75 @@ type SiteObject struct {
 
 // Size is an alias for int.
 type Size = int
+
+// User represents a user.
+type User struct {
+	XMLName              xml.Name        `xml:"user"`
+	CustomPhotoURL       *string         `xml:"custom_photo_url,omitempty"`
+	Email                *string         `xml:"email,omitempty"`
+	EmailAddress         *string         `xml:"email_address,omitempty"`
+	EnableCustomPhotoURL *bool           `xml:"enable_custom_photo_url,omitempty"`
+	ExtensionAttributes  []any           `xml:"extension_attributes"`
+	FullName             *string         `xml:"full_name,omitempty"`
+	ID                   *int            `xml:"id,omitempty"`
+	LdapServer           *UserLdapServer `xml:"ldap_server,omitempty"`
+	Links                *UserLinks      `xml:"links,omitempty"`
+	Name                 *string         `xml:"name,omitempty"`
+	PhoneNumber          *string         `xml:"phone_number,omitempty"`
+	Position             *string         `xml:"position,omitempty"`
+	Sites                []any           `xml:"sites"`
+}
+
+// UserLdapServer represents a user ldap server.
+type UserLdapServer struct {
+	XMLName xml.Name `xml:"ldap_server"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// UserLinks represents a user links.
+type UserLinks struct {
+	XMLName           xml.Name                 `xml:"links"`
+	Computers         *UserLinksComputers      `xml:"computers,omitempty"`
+	MobileDevices     *UserLinksMobileDevices  `xml:"mobile_devices,omitempty"`
+	Peripherals       *UserLinksPeripherals    `xml:"peripherals,omitempty"`
+	TotalVppCodeCount *int                     `xml:"total_vpp_code_count,omitempty"`
+	VppAssignments    *UserLinksVppAssignments `xml:"vpp_assignments,omitempty"`
+}
+
+// UserLinksComputers represents a user links computers.
+type UserLinksComputers struct {
+	XMLName  xml.Name `xml:"computers"`
+	Computer *IDName  `xml:"computer,omitempty"`
+}
+
+// UserLinksMobileDevices represents a user links mobile devices.
+type UserLinksMobileDevices struct {
+	XMLName      xml.Name `xml:"mobile_devices"`
+	MobileDevice *IDName  `xml:"mobile_device,omitempty"`
+}
+
+// UserLinksPeripherals represents a user links peripherals.
+type UserLinksPeripherals struct {
+	XMLName    xml.Name `xml:"peripherals"`
+	Peripheral *IDName  `xml:"peripheral,omitempty"`
+}
+
+// UserLinksVppAssignments represents a user links vpp assignments.
+type UserLinksVppAssignments struct {
+	XMLName       xml.Name `xml:"vpp_assignments"`
+	VppAssignment *IDName  `xml:"vpp_assignment,omitempty"`
+}
+
+// UserPost represents a user post.
+type UserPost struct {
+	XMLName      xml.Name `xml:"user"`
+	Email        *string  `xml:"email,omitempty"`
+	EmailAddress *string  `xml:"email_address,omitempty"`
+	FullName     *string  `xml:"full_name,omitempty"`
+	ID           *int     `xml:"id,omitempty"`
+	Name         *string  `xml:"name,omitempty"`
+	PhoneNumber  *string  `xml:"phone_number,omitempty"`
+	Position     *string  `xml:"position,omitempty"`
+	Sites        *[]any   `xml:"sites,omitempty"`
+}

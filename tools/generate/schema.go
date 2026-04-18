@@ -454,7 +454,60 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 		t.XMLName = xmlName
 		types = append(types, t)
 	}
+	if format == "xml" {
+		stripConflictingXMLNames(types)
+	}
 	return types
+}
+
+// stripConflictingXMLNames clears the XMLName on any struct that is
+// referenced as a field in another struct under a different tag. Go's
+// encoding/xml refuses to unmarshal when a field tag and the target
+// struct's XMLName disagree — Classic hits this via shared schemas like
+// `id_name` that are embedded under parent-defined tags (`<computer>`,
+// `<user>`, etc.). When a type is used only as a root (no referrers) or
+// always as a matching tag, its XMLName stays. When it appears under at
+// least one mismatching tag, we drop the XMLName — decoding relies on
+// the parent field's tag to bind the element, and marshal of the root
+// still works for fully-qualified request roots whose tag matches.
+func stripConflictingXMLNames(types []GoType) {
+	tagsByType := make(map[string]map[string]bool)
+	for _, t := range types {
+		for _, f := range t.Fields {
+			ref := normalizeTypeRef(f.Type)
+			if ref == "" {
+				continue
+			}
+			tag := f.JSONTag
+			if i := strings.Index(tag, ","); i >= 0 {
+				tag = tag[:i]
+			}
+			if tagsByType[ref] == nil {
+				tagsByType[ref] = map[string]bool{}
+			}
+			tagsByType[ref][tag] = true
+		}
+	}
+	for i := range types {
+		t := &types[i]
+		if t.XMLName == "" {
+			continue
+		}
+		tags, ok := tagsByType[t.Name]
+		if !ok {
+			continue
+		}
+		conflict := false
+		for tag := range tags {
+			if tag != "" && tag != t.XMLName {
+				conflict = true
+				break
+			}
+		}
+		if conflict {
+			t.XMLName = ""
+		}
+	}
 }
 
 // schemaToDiscriminatorType builds a GoType for a oneOf+discriminator schema.
