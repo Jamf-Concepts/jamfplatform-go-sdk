@@ -83,6 +83,21 @@ Two formats are supported, selected per-spec via `"format": "json"` (default) or
 - **allOf composition**: flattened — properties merged across composed schemas into one Go struct. Avoids Go embedding rules for OpenAPI's "base + extensions" pattern.
 - **oneOf + discriminator**: emits a union struct with one pointer field per variant plus `UnmarshalJSON`/`MarshalJSON` that dispatches on the discriminator property.
 
+## Field pointers — TF plugin framework first
+
+Every field in an XML spec (currently: Classic) is emitted as a pointer with `,omitempty`, regardless of the spec's `required:` or `nullable:` markers. JSON specs retain the usual heuristic (pointer when nullable, non-required non-scalar, or request-type non-required).
+
+Why: this SDK's primary consumer is the upcoming Terraform provider using the plugin framework, where three-state null/value semantics are load-bearing. Without pointers:
+
+- **Write-side ambiguity.** Config `name = null` (no change) vs `name = ""` (explicit clear) collapse to the same zero-string. Pointer distinguishes: `nil` → field omitted from XML request body → server untouched; `&""` → `<name></name>` → server clears.
+- **Read-side ambiguity.** Server-omitted field and server-returns-empty field both decode to zero-string. Pointer distinguishes: `nil` → map to `types.StringNull()` in state; `&""` → `types.StringValue("")`. Prevents recurring diffs when a Computed/Optional attribute flips between absent and empty between refreshes.
+- **Partial updates.** Plugin framework plan contains some attributes as null (user removed from config). Converting to SDK via `plan.Name.ValueStringPointer()` maps null → `nil` → field omitted. Clean intent preservation.
+- **Nested objects.** `*ComputerGeneral` distinguishes "server didn't return a `<general>` section" from "server returned an empty one". Matters for optional nested blocks.
+
+Cost: non-TF consumers of Classic pay a pointer-deref tax on every field access. Acceptable trade-off given the primary consumer.
+
+For JSON APIs (Platform, Pro), the spec-driven heuristic is sufficient — those specs mark required/nullable accurately enough, and JSON has explicit field-presence in responses.
+
 ## Conventions
 
 - MIT license. Copyright headers managed by HashiCorp `copywrite` (uses `--plan` flag, not `--check`).
