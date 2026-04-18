@@ -115,7 +115,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 			Enabled: true,
 		}
 		if r.ODV != nil {
-			rr.ODV = &compliancebenchmarks.OdvRequest{Value: r.ODV.Value}
+			rr.ODV = &compliancebenchmarks.ODVRequest{Value: r.ODV.Value}
 		}
 		ruleRequests = append(ruleRequests, rr)
 	}
@@ -196,7 +196,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 			Enabled: true,
 		}
 		if r.ODV != nil {
-			rr.ODV = &compliancebenchmarks.OdvRequest{Value: r.ODV.Value}
+			rr.ODV = &compliancebenchmarks.ODVRequest{Value: r.ODV.Value}
 		}
 		ruleRequests = append(ruleRequests, rr)
 	}

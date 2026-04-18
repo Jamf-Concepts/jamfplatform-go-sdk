@@ -4,3 +4,195 @@
 // SPDX-License-Identifier: MIT
 
 package proclassic
+
+// Attachment represents a attachment.
+type Attachment struct {
+	Filename string `xml:"filename"`
+	ID       int    `xml:"id"`
+	URI      string `xml:"uri"`
+}
+
+// Computer represents a computer.
+type Computer struct {
+	Certificates          []any                   `xml:"certificates"`
+	ConfigurationProfiles []any                   `xml:"configuration_profiles"`
+	ExtensionAttributes   []any                   `xml:"extension_attributes"`
+	General               *ComputerGeneral        `xml:"general,omitempty"`
+	GroupsAccounts        *ComputerGroupsAccounts `xml:"groups_accounts,omitempty"`
+	Hardware              *ComputerHardware       `xml:"hardware,omitempty"`
+	Location              *Location               `xml:"location,omitempty"`
+	Peripherals           any                     `xml:"peripherals"`
+	Purchasing            *Purchasing             `xml:"purchasing,omitempty"`
+	Security              *ComputerSecurity       `xml:"security,omitempty"`
+	Software              *ComputerSoftware       `xml:"software,omitempty"`
+}
+
+// ComputerGeneral represents a computer general.
+type ComputerGeneral struct {
+	AltMacAddress              string                           `xml:"alt_mac_address"`
+	AltNetworkAdapterType      string                           `xml:"alt_network_adapter_type"`
+	AssetTag                   string                           `xml:"asset_tag"`
+	Barcode1                   string                           `xml:"barcode_1"`
+	Barcode2                   string                           `xml:"barcode_2"`
+	DistributionPoint          string                           `xml:"distribution_point"`
+	ID                         int                              `xml:"id"`
+	InitialEntryDate           string                           `xml:"initial_entry_date"`
+	InitialEntryDateEpoch      int                              `xml:"initial_entry_date_epoch"`
+	InitialEntryDateUtc        string                           `xml:"initial_entry_date_utc"`
+	IPAddress                  string                           `xml:"ip_address"`
+	ItunesStoreAccountIsActive bool                             `xml:"itunes_store_account_is_active"`
+	JamfVersion                string                           `xml:"jamf_version"`
+	LastCloudBackupDateEpoch   int                              `xml:"last_cloud_backup_date_epoch"`
+	LastCloudBackupDateUtc     string                           `xml:"last_cloud_backup_date_utc"`
+	LastContactTime            string                           `xml:"last_contact_time"`
+	LastContactTimeEpoch       int                              `xml:"last_contact_time_epoch"`
+	LastContactTimeUtc         string                           `xml:"last_contact_time_utc"`
+	LastEnrolledDateEpoch      int                              `xml:"last_enrolled_date_epoch"`
+	LastEnrolledDateUtc        string                           `xml:"last_enrolled_date_utc"`
+	LastReportedIp             string                           `xml:"last_reported_ip"`
+	MacAddress                 string                           `xml:"mac_address"`
+	ManagementStatus           *ComputerGeneralManagementStatus `xml:"management_status,omitempty"`
+	MDMCapable                 bool                             `xml:"mdm_capable"`
+	MDMCapableUsers            *ComputerGeneralMDMCapableUsers  `xml:"mdm_capable_users,omitempty"`
+	Name                       string                           `xml:"name"`
+	NetworkAdapterType         string                           `xml:"network_adapter_type"`
+	Platform                   string                           `xml:"platform"`
+	RemoteManagement           *ComputerGeneralRemoteManagement `xml:"remote_management,omitempty"`
+	ReportDate                 string                           `xml:"report_date"`
+	ReportDateEpoch            int                              `xml:"report_date_epoch"`
+	ReportDateUtc              string                           `xml:"report_date_utc"`
+	SerialNumber               string                           `xml:"serial_number"`
+	Site                       *SiteObject                      `xml:"site,omitempty"`
+	Sus                        string                           `xml:"sus"`
+	UDID                       string                           `xml:"udid"`
+}
+
+// ComputerGeneralMDMCapableUsers represents a computer general m d m capable users.
+type ComputerGeneralMDMCapableUsers struct {
+	MDMCapableUser string `xml:"mdm_capable_user"`
+}
+
+// ComputerGeneralManagementStatus represents a computer general management status.
+type ComputerGeneralManagementStatus struct {
+	EnrolledViaDep         bool `xml:"enrolled_via_dep"`
+	UserApprovedEnrollment bool `xml:"user_approved_enrollment"`
+	UserApprovedMDM        bool `xml:"user_approved_mdm"`
+}
+
+// ComputerGeneralRemoteManagement represents a computer general remote management.
+type ComputerGeneralRemoteManagement struct {
+	Managed            bool   `xml:"managed"`
+	ManagementUsername string `xml:"management_username"`
+}
+
+// ComputerGroupsAccounts represents a computer groups accounts.
+type ComputerGroupsAccounts struct {
+	ComputerGroupMemberships []any `xml:"computer_group_memberships"`
+	LocalAccounts            []any `xml:"local_accounts"`
+}
+
+// ComputerHardware represents a computer hardware.
+type ComputerHardware struct {
+	ActiveDirectoryStatus       string `xml:"active_directory_status"`
+	AvailableRamSlots           int    `xml:"available_ram_slots"`
+	BatteryCapacity             int    `xml:"battery_capacity"`
+	BleCapable                  bool   `xml:"ble_capable"`
+	BootRom                     string `xml:"boot_rom"`
+	BusSpeed                    int    `xml:"bus_speed"`
+	BusSpeedMhz                 int    `xml:"bus_speed_mhz"`
+	CacheSize                   int    `xml:"cache_size"`
+	CacheSizeKb                 int    `xml:"cache_size_kb"`
+	DiskEncryptionConfiguration string `xml:"disk_encryption_configuration"`
+	Filevault2Users             []any  `xml:"filevault_2_users"`
+	GatekeeperStatus            string `xml:"gatekeeper_status"`
+	InstitutionalRecoveryKey    string `xml:"institutional_recovery_key"`
+	Make                        string `xml:"make"`
+	MappedPrinters              []any  `xml:"mapped_printers"`
+	MasterPasswordSet           bool   `xml:"master_password_set"`
+	Model                       string `xml:"model"`
+	ModelIdentifier             string `xml:"model_identifier"`
+	NicSpeed                    string `xml:"nic_speed"`
+	NumberCores                 int    `xml:"number_cores"`
+	NumberProcessors            int    `xml:"number_processors"`
+	OpticalDrive                string `xml:"optical_drive"`
+	OsBuild                     string `xml:"os_build"`
+	OsName                      string `xml:"os_name"`
+	OsVersion                   string `xml:"os_version"`
+	ProcessorArchitechture      string `xml:"processor_architechture"`
+	ProcessorSpeed              string `xml:"processor_speed"`
+	ProcessorSpeedMhz           string `xml:"processor_speed_mhz"`
+	ProcessorType               string `xml:"processor_type"`
+	ServicePack                 string `xml:"service_pack"`
+	SipStatus                   string `xml:"sip_status"`
+	SmcVersion                  string `xml:"smc_version"`
+	Storage                     []any  `xml:"storage"`
+	TotalRam                    int    `xml:"total_ram"`
+	TotalRamMb                  int    `xml:"total_ram_mb"`
+	XprotectVersion             string `xml:"xprotect_version"`
+}
+
+// ComputerSecurity represents a computer security.
+type ComputerSecurity struct {
+	ActivationLock      bool   `xml:"activation_lock"`
+	ExternalBootLevel   string `xml:"external_boot_level"`
+	FirewallEnabled     bool   `xml:"firewall_enabled"`
+	RecoveryLockEnabled bool   `xml:"recovery_lock_enabled"`
+	SecureBootLevel     string `xml:"secure_boot_level"`
+}
+
+// ComputerSoftware represents a computer software.
+type ComputerSoftware struct {
+	Applications             []any  `xml:"applications"`
+	AvailableSoftwareUpdates []any  `xml:"available_software_updates"`
+	AvailableUpdates         []any  `xml:"available_updates"`
+	CachedByCasper           []any  `xml:"cached_by_casper"`
+	Fonts                    []any  `xml:"fonts"`
+	InstalledByCasper        []any  `xml:"installed_by_casper"`
+	InstalledByInstallerSwu  []any  `xml:"installed_by_installer_swu"`
+	LicensedSoftware         []any  `xml:"licensed_software"`
+	Plugins                  []any  `xml:"plugins"`
+	RunningServices          []any  `xml:"running_services"`
+	UnixExecutables          string `xml:"unix_executables"`
+}
+
+// Location represents a location.
+type Location struct {
+	Building     string `xml:"building"`
+	Department   string `xml:"department"`
+	EmailAddress string `xml:"email_address"`
+	Phone        string `xml:"phone"`
+	PhoneNumber  string `xml:"phone_number"`
+	Position     string `xml:"position"`
+	RealName     string `xml:"real_name"`
+	Realname     string `xml:"realname"`
+	Room         string `xml:"room"`
+	Username     string `xml:"username"`
+}
+
+// Purchasing represents a purchasing.
+type Purchasing struct {
+	ApplecareID          string `xml:"applecare_id"`
+	IsLeased             bool   `xml:"is_leased"`
+	IsPurchased          bool   `xml:"is_purchased"`
+	LeaseExpires         string `xml:"lease_expires"`
+	LeaseExpiresEpoch    int    `xml:"lease_expires_epoch"`
+	LeaseExpiresUtc      string `xml:"lease_expires_utc"`
+	LifeExpectancy       int    `xml:"life_expectancy"`
+	PoDate               string `xml:"po_date"`
+	PoDateEpoch          int    `xml:"po_date_epoch"`
+	PoDateUtc            string `xml:"po_date_utc"`
+	PoNumber             string `xml:"po_number"`
+	PurchasePrice        string `xml:"purchase_price"`
+	PurchasingAccount    string `xml:"purchasing_account"`
+	PurchasingContact    string `xml:"purchasing_contact"`
+	Vendor               string `xml:"vendor"`
+	WarrantyExpires      string `xml:"warranty_expires"`
+	WarrantyExpiresEpoch int    `xml:"warranty_expires_epoch"`
+	WarrantyExpiresUtc   string `xml:"warranty_expires_utc"`
+}
+
+// SiteObject represents a site object.
+type SiteObject struct {
+	ID   int    `xml:"id"`
+	Name string `xml:"name"`
+}

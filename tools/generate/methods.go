@@ -174,12 +174,13 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 
 	// Config-level overrides for request/response types and expected status.
 	// Used when the spec is untyped (e.g. Jamf Classic) so the curator
-	// explicitly names the schema from definitions/.
+	// explicitly names the schema from definitions/. Names are spec-level
+	// (may be snake_case); the generator normalises to Go PascalCase.
 	if opDef.RequestType != "" {
-		m.RequestType = opDef.RequestType
+		m.RequestType = goTypeName(opDef.RequestType)
 	}
 	if opDef.ResponseType != "" {
-		m.ResponseType = opDef.ResponseType
+		m.ResponseType = goTypeName(opDef.ResponseType)
 	}
 	if opDef.ExpectedStatus != 0 {
 		m.ExpectedStatus = opDef.ExpectedStatus

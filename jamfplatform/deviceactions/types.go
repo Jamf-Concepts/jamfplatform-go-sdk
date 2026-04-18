@@ -7,9 +7,17 @@ package deviceactions
 
 // ApiError represents a api error.
 type ApiError struct {
-	Errors     []map[string]any `json:"errors"`
-	HttpStatus int              `json:"httpStatus"`
-	TraceID    string           `json:"traceId"`
+	Errors     []ApiErrorErrorsItem `json:"errors"`
+	HttpStatus int                  `json:"httpStatus"`
+	TraceID    string               `json:"traceId"`
+}
+
+// ApiErrorErrorsItem represents a api error errors item.
+type ApiErrorErrorsItem struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Field       string `json:"field"`
+	ID          string `json:"id"`
 }
 
 // DeviceCommandResponse represents a device command response.

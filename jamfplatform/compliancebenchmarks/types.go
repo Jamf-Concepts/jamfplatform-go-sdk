@@ -63,14 +63,14 @@ type BenchmarksResponseV2 struct {
 	Benchmarks []BenchmarkV2 `json:"benchmarks"`
 }
 
-// OdvRecommendation represents a odv recommendation.
-type OdvRecommendation struct {
+// ODVRecommendation represents a o d v recommendation.
+type ODVRecommendation struct {
 	Hint  string `json:"hint"`
 	Value string `json:"value"`
 }
 
-// OdvRequest represents a odv request.
-type OdvRequest struct {
+// ODVRequest represents a o d v request.
+type ODVRequest struct {
 	Value string `json:"value"`
 }
 
@@ -93,7 +93,7 @@ type OsInfo struct {
 // OsSpecificRuleInfo represents a os specific rule info.
 type OsSpecificRuleInfo struct {
 	Description string             `json:"description"`
-	ODV         *OdvRecommendation `json:"odv,omitempty"`
+	ODV         *ODVRecommendation `json:"odv,omitempty"`
 	Title       string             `json:"title"`
 }
 
@@ -124,7 +124,7 @@ type RuleRelation struct {
 type RuleRequest struct {
 	Enabled bool        `json:"enabled"`
 	ID      string      `json:"id"`
-	ODV     *OdvRequest `json:"odv,omitempty"`
+	ODV     *ODVRequest `json:"odv,omitempty"`
 }
 
 // Source represents a source.
@@ -154,9 +154,16 @@ type ValidationConstraints struct {
 
 // ApiError represents a api error.
 type ApiError struct {
-	Errors     []map[string]any `json:"errors"`
-	HttpStatus int              `json:"httpStatus"`
-	TraceID    string           `json:"traceId"`
+	Errors     []ApiErrorErrorsItem `json:"errors"`
+	HttpStatus int                  `json:"httpStatus"`
+	TraceID    string               `json:"traceId"`
+}
+
+// ApiErrorErrorsItem represents a api error errors item.
+type ApiErrorErrorsItem struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Field       string `json:"field"`
 }
 
 // BenchmarkRuleDevicesResponse Representation of devices for a benchmark rule. Used for drill-down view controller.

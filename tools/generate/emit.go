@@ -199,6 +199,8 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 		return fmt.Errorf("loading spec: %w", err)
 	}
 
+	hoistInlineObjects(doc)
+
 	if spec.SkipDeprecated {
 		spec.Operations = dropDeprecatedOps(doc, spec)
 	}
@@ -289,6 +291,9 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 
 	for _, ls := range specs {
 		doc, err := loadSpec(ls.specPath, allowedOpsSet(ls.spec))
+		if err == nil {
+			hoistInlineObjects(doc)
+		}
 		if err != nil {
 			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
 		}

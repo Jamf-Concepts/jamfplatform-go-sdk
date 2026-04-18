@@ -11,6 +11,87 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
+// hoistInlineObjects promotes every inline object-with-properties found in
+// component schemas to its own named top-level schema and replaces the
+// property with a $ref. Specs that model deeply-nested XML resources
+// (Classic's Computer has general/hardware/software sections defined
+// inline) depend on this pass — without it those nested objects collapse
+// to map[string]any, which encoding/xml can't populate from structured
+// XML content. Runs in-place on the doc; safe for specs that already use
+// named schemas (no inline objects found → no-op).
+func hoistInlineObjects(doc *openapi3.T) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
+		return
+	}
+	changed := true
+	for changed {
+		changed = false
+		for _, name := range sortedKeys(doc.Components.Schemas) {
+			schema := doc.Components.Schemas[name].Value
+			if schema == nil {
+				continue
+			}
+			if hoistInlineObjectsInSchema(name, schema, doc) {
+				changed = true
+			}
+		}
+	}
+}
+
+// hoistInlineObjectsInSchema walks one schema's properties and items, lifting
+// inline typed objects into named top-level schemas. Returns true when any
+// lift happened so the outer loop can revisit schemas added mid-walk.
+func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc *openapi3.T) bool {
+	if schema == nil {
+		return false
+	}
+	hoisted := false
+	lift := func(propName string, ref *openapi3.SchemaRef) *openapi3.SchemaRef {
+		if ref == nil || ref.Ref != "" || ref.Value == nil {
+			return ref
+		}
+		v := ref.Value
+		inlineObject := v.Type.Is("object") && len(v.Properties) > 0
+		inlineArrayOfObject := v.Type.Is("array") && v.Items != nil && v.Items.Ref == "" &&
+			v.Items.Value != nil && v.Items.Value.Type.Is("object") && len(v.Items.Value.Properties) > 0
+		if !inlineObject && !inlineArrayOfObject {
+			return ref
+		}
+		if inlineObject {
+			nested := parentName + exportedGoName(propName)
+			nested = uniqueSchemaName(doc, nested)
+			doc.Components.Schemas[nested] = &openapi3.SchemaRef{Value: v}
+			hoisted = true
+			return &openapi3.SchemaRef{Ref: "#/components/schemas/" + nested, Value: v}
+		}
+		// inline array of object — hoist the element schema.
+		nested := parentName + exportedGoName(propName) + "Item"
+		nested = uniqueSchemaName(doc, nested)
+		doc.Components.Schemas[nested] = &openapi3.SchemaRef{Value: v.Items.Value}
+		v.Items = &openapi3.SchemaRef{Ref: "#/components/schemas/" + nested, Value: v.Items.Value}
+		hoisted = true
+		return ref
+	}
+	for _, propName := range sortedKeys(schema.Properties) {
+		schema.Properties[propName] = lift(propName, schema.Properties[propName])
+	}
+	return hoisted
+}
+
+// uniqueSchemaName disambiguates a proposed schema name if the name is
+// already taken by an unrelated schema.
+func uniqueSchemaName(doc *openapi3.T, base string) string {
+	if _, exists := doc.Components.Schemas[base]; !exists {
+		return base
+	}
+	for i := 2; ; i++ {
+		candidate := fmt.Sprintf("%s%d", base, i)
+		if _, exists := doc.Components.Schemas[candidate]; !exists {
+			return candidate
+		}
+	}
+}
+
 // ---------------------------------------------------------------------------
 // Shared schema walker
 // ---------------------------------------------------------------------------
@@ -223,15 +304,16 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 	names := sortedKeys(doc.Components.Schemas)
 	var types []GoType
 
-	for _, name := range names {
-		usage := allow[name]
+	for _, specName := range names {
+		usage := allow[specName]
 		if usage == nil {
 			continue
 		}
-		schema := doc.Components.Schemas[name].Value
+		schema := doc.Components.Schemas[specName].Value
 		if schema == nil {
 			continue
 		}
+		name := goTypeName(specName)
 		// allOf composition without an explicit type: merge properties from
 		// each composed schema into a single flat struct.
 		if len(schema.AllOf) > 0 && (schema.Type == nil || !schema.Type.Is("object")) {
@@ -384,8 +466,15 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool) GoType
 
 	props, requiredList := flattenAllOf(schema)
 	required := toSet(requiredList)
-	for _, pname := range sortedKeys(props) {
-		propRef := props[pname]
+	for _, pnameRaw := range sortedKeys(props) {
+		propRef := props[pnameRaw]
+		// Classic's spec encodes deprecation inline in property names
+		// (e.g. `management_username deprecated="10.48"`). Everything after
+		// the first whitespace is metadata the generator doesn't model.
+		pname := pnameRaw
+		if i := strings.IndexAny(pname, " \t"); i >= 0 {
+			pname = pname[:i]
+		}
 		prop := propRef.Value
 
 		goType := schemaRefToGoType(propRef)
@@ -409,10 +498,10 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool) GoType
 			// callers can distinguish "omit field" (nil) from "send empty" (&[]T{}).
 			goType = "*" + goType
 			jsonTag += ",omitempty"
-		} else if needsPtr && !strings.HasPrefix(goType, "*") && !strings.HasPrefix(goType, "[]") && !strings.HasPrefix(goType, "map[") {
+		} else if needsPtr && !strings.HasPrefix(goType, "*") && !strings.HasPrefix(goType, "[]") && !strings.HasPrefix(goType, "map[") && goType != "any" {
 			goType = "*" + goType
 			jsonTag += ",omitempty"
-		} else if isNullable && !strings.HasPrefix(goType, "*") {
+		} else if isNullable && !strings.HasPrefix(goType, "*") && goType != "any" {
 			goType = "*" + goType
 			jsonTag += ",omitempty"
 		}
@@ -438,7 +527,7 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool) GoType
 func schemaRefToGoType(ref *openapi3.SchemaRef) string {
 	if ref.Ref != "" {
 		parts := strings.Split(ref.Ref, "/")
-		return parts[len(parts)-1]
+		return goTypeName(parts[len(parts)-1])
 	}
 	schema := ref.Value
 	if schema == nil {
@@ -484,7 +573,21 @@ func schemaRefToGoType(ref *openapi3.SchemaRef) string {
 func refName(ref *openapi3.SchemaRef) string {
 	if ref.Ref != "" {
 		parts := strings.Split(ref.Ref, "/")
-		return parts[len(parts)-1]
+		return goTypeName(parts[len(parts)-1])
 	}
 	return schemaRefToGoType(ref)
+}
+
+// goTypeName converts a spec schema name to a valid Go identifier: PascalCase,
+// underscores/hyphens removed, leading lowercase letter capitalised. Platform
+// specs already use PascalCase so these are no-ops; Classic uses snake_case.
+func goTypeName(specName string) string {
+	if specName == "" {
+		return specName
+	}
+	// Already a canonical Go reserved name like []byte, any, map[...] etc.
+	if strings.HasPrefix(specName, "[]") || strings.HasPrefix(specName, "map[") || specName == "any" {
+		return specName
+	}
+	return exportedGoName(specName)
 }

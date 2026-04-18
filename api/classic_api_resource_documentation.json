@@ -1,11 +1,1023 @@
 {
   "components": {
-    "securitySchemes": {
-      "Bearer": {
-        "in": "header",
-        "name": "Authorization",
-        "type": "apiKey"
+    "schemas": {
+      "attachment": {
+        "properties": {
+          "filename": {
+            "example": "icon.png",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "uri": {
+            "example": "https://example.jamfcloud/attachment.html?id=1\u0026amp;o=r",
+            "type": "string"
+          }
+        },
+        "type": "object"
       },
+      "computer": {
+        "properties": {
+          "certificates": {
+            "items": {
+              "properties": {
+                "certificate": {
+                  "properties": {
+                    "common_name": {
+                      "example": "JSS Built-in Certificate Authority",
+                      "type": "string"
+                    },
+                    "expires_epoch": {
+                      "example": 1709345569000,
+                      "type": "integer"
+                    },
+                    "expires_utc": {
+                      "example": "2024-03-02T02:12:49.000+0000",
+                      "type": "string"
+                    },
+                    "identify": {
+                      "example": false,
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "configuration_profiles": {
+            "items": {
+              "properties": {
+                "configuration_profile": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "is_removable": {
+                      "example": false,
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "extension_attributes": {
+            "items": {
+              "properties": {
+                "extension_attribute": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Battery Cycle Count",
+                      "type": "string"
+                    },
+                    "type": {
+                      "example": "String",
+                      "type": "string"
+                    },
+                    "value": {
+                      "example": 191,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "general": {
+            "properties": {
+              "alt_mac_address": {
+                "example": "E0:AC:CB:97:36:G4",
+                "type": "string"
+              },
+              "alt_network_adapter_type": {
+                "example": "IEEE80211",
+                "type": "string"
+              },
+              "asset_tag": {
+                "type": "string"
+              },
+              "barcode_1": {
+                "type": "string"
+              },
+              "barcode_2": {
+                "type": "string"
+              },
+              "distribution_point": {
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "initial_entry_date": {
+                "example": "2017-07-07T18:37:04Z",
+                "type": "string"
+              },
+              "initial_entry_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "initial_entry_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "ip_address": {
+                "example": "10.1.1.1",
+                "type": "string"
+              },
+              "itunes_store_account_is_active": {
+                "type": "boolean"
+              },
+              "jamf_version": {
+                "example": "9.99.0-t1494340586",
+                "type": "string"
+              },
+              "last_cloud_backup_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_cloud_backup_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_contact_time": {
+                "example": "2017-07-07T18:37:04Z",
+                "type": "string"
+              },
+              "last_contact_time_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_contact_time_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_enrolled_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_enrolled_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_reported_ip": {
+                "example": "192.0.0.1",
+                "type": "string"
+              },
+              "mac_address": {
+                "example": "E0:AC:CB:97:36:G4",
+                "type": "string"
+              },
+              "management_status": {
+                "properties": {
+                  "enrolled_via_dep": {
+                    "type": "boolean"
+                  },
+                  "user_approved_enrollment": {
+                    "type": "boolean"
+                  },
+                  "user_approved_mdm": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              },
+              "mdm_capable": {
+                "type": "boolean"
+              },
+              "mdm_capable_users": {
+                "properties": {
+                  "mdm_capable_user": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "name": {
+                "description": "Name of computer",
+                "example": "Admins iMac",
+                "type": "string"
+              },
+              "network_adapter_type": {
+                "example": "Ethernet",
+                "type": "string"
+              },
+              "platform": {
+                "example": "Mac",
+                "type": "string"
+              },
+              "remote_management": {
+                "properties": {
+                  "managed": {
+                    "type": "boolean"
+                  },
+                  "management_username deprecated=\"10.48\"": {
+                    "example": "deprecated",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "report_date": {
+                "example": "2017-07-07T18:37:04Z",
+                "type": "string"
+              },
+              "report_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "report_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "serial_number": {
+                "example": "C02Q7KHTGFWF",
+                "type": "string"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
+              "sus": {
+                "type": "string"
+              },
+              "udid": {
+                "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "groups_accounts": {
+            "properties": {
+              "computer_group_memberships": {
+                "items": {
+                  "properties": {
+                    "group": {
+                      "example": "All Managed Clients",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "local_accounts": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "properties": {
+                        "administrator": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "filevault_enabled": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "home": {
+                          "example": "/var/virusmails",
+                          "type": "string"
+                        },
+                        "home_size": {
+                          "example": "-1MB",
+                          "type": "string"
+                        },
+                        "home_size_mb": {
+                          "example": -1,
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "_amavisd",
+                          "type": "string"
+                        },
+                        "realname": {
+                          "example": "AMaViS Daemon",
+                          "type": "string"
+                        },
+                        "uid": {
+                          "example": 83,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "hardware": {
+            "properties": {
+              "active_directory_status": {
+                "example": "AD.company.com",
+                "type": "string"
+              },
+              "available_ram_slots": {
+                "example": 0,
+                "type": "integer"
+              },
+              "battery_capacity": {
+                "example": 90,
+                "type": "integer"
+              },
+              "ble_capable": {
+                "type": "boolean"
+              },
+              "boot_rom": {
+                "example": "MBP111.0142.B00",
+                "type": "string"
+              },
+              "bus_speed": {
+                "example": 0,
+                "type": "integer"
+              },
+              "bus_speed_mhz": {
+                "example": 0,
+                "type": "integer"
+              },
+              "cache_size": {
+                "example": 3072,
+                "type": "integer"
+              },
+              "cache_size_kb": {
+                "example": 3072,
+                "type": "integer"
+              },
+              "disk_encryption_configuration": {
+                "example": "Individual and Institutional Encryption",
+                "type": "string"
+              },
+              "filevault_2_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "example": "admin",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "gatekeeper_status": {
+                "example": "App Store and identified developers",
+                "type": "string"
+              },
+              "institutional_recovery_key": {
+                "example": "Not Present",
+                "type": "string"
+              },
+              "make": {
+                "example": "Apple",
+                "type": "string"
+              },
+              "mapped_printers": {
+                "items": {
+                  "properties": {
+                    "printer": {
+                      "properties": {
+                        "location": {
+                          "example": "2nd Floor / Stairwell",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "2nd Floor HP",
+                          "type": "string"
+                        },
+                        "type": {
+                          "example": "HP LaserJet 500 color MFP M575",
+                          "type": "string"
+                        },
+                        "uri": {
+                          "example": "lpd://10.11.182.21/",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "master_password_set": {
+                "type": "boolean"
+              },
+              "model": {
+                "example": "13-inch Retina MacBook Pro (Late 2013)",
+                "type": "string"
+              },
+              "model_identifier": {
+                "example": "MacBookPro11,1",
+                "type": "string"
+              },
+              "nic_speed": {
+                "example": "n/a",
+                "type": "string"
+              },
+              "number_cores": {
+                "example": 2,
+                "type": "integer"
+              },
+              "number_processors": {
+                "example": 1,
+                "type": "integer"
+              },
+              "optical_drive": {
+                "type": "string"
+              },
+              "os_build": {
+                "example": "17C88",
+                "type": "string"
+              },
+              "os_name": {
+                "example": "Mac OS X",
+                "type": "string"
+              },
+              "os_version": {
+                "example": "10.13.2",
+                "type": "string"
+              },
+              "processor_architechture": {
+                "example": "x86_64",
+                "type": "string"
+              },
+              "processor_speed": {
+                "example": 2600,
+                "type": "string"
+              },
+              "processor_speed_mhz": {
+                "example": 2600,
+                "type": "string"
+              },
+              "processor_type": {
+                "example": "Intel Core i5",
+                "type": "string"
+              },
+              "service_pack": {
+                "type": "string"
+              },
+              "sip_status": {
+                "enum": [
+                  "Enabled",
+                  "Disabled"
+                ],
+                "type": "string"
+              },
+              "smc_version": {
+                "example": "2.16f68",
+                "type": "string"
+              },
+              "storage": {
+                "items": {
+                  "properties": {
+                    "device": {
+                      "properties": {
+                        "connection_type": {
+                          "example": "NO",
+                          "type": "string"
+                        },
+                        "disk": {
+                          "example": "disk0",
+                          "type": "string"
+                        },
+                        "drive_capacity_mb": {
+                          "example": 512287,
+                          "type": "integer"
+                        },
+                        "model": {
+                          "example": "Apple SSD SM0512F",
+                          "type": "string"
+                        },
+                        "partition": {
+                          "items": {
+                            "properties": {
+                              "boot_drive_available_mb": {
+                                "example": 425198,
+                                "type": "integer"
+                              },
+                              "filevault2_percent": {
+                                "example": 100,
+                                "type": "integer"
+                              },
+                              "filevault2_status": {
+                                "example": "Encrypted",
+                                "type": "string"
+                              },
+                              "filevault_percent": {
+                                "example": 100,
+                                "type": "integer"
+                              },
+                              "filevault_status": {
+                                "example": "Encrypted",
+                                "type": "string"
+                              },
+                              "lvUUID": {
+                                "type": "string"
+                              },
+                              "lvgUUID": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "example": "Macintosh HD",
+                                "type": "string"
+                              },
+                              "partition_capacity_mb": {
+                                "example": 94128,
+                                "type": "integer"
+                              },
+                              "percentage_full": {
+                                "example": 17,
+                                "type": "integer"
+                              },
+                              "pvUUID": {
+                                "type": "string"
+                              },
+                              "size": {
+                                "example": 94128,
+                                "type": "integer"
+                              },
+                              "type": {
+                                "example": "boot",
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "type": "array"
+                        },
+                        "revision": {
+                          "example": "UXM2JA1Q",
+                          "type": "string"
+                        },
+                        "serial_number": {
+                          "example": "S1K5NYADC12934",
+                          "type": "string"
+                        },
+                        "size": {
+                          "example": 512287,
+                          "type": "integer"
+                        },
+                        "smart_status": {
+                          "example": "Verified",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "total_ram": {
+                "example": 16384,
+                "type": "integer"
+              },
+              "total_ram_mb": {
+                "example": 16384,
+                "type": "integer"
+              },
+              "xprotect_version": {
+                "example": 2098,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "location": {
+            "$ref": "#/components/schemas/location"
+          },
+          "peripherals": {
+            "properties": {
+              "peripherals": {
+                "items": {
+                  "properties": {
+                    "attachments": {
+                      "items": {
+                        "properties": {
+                          "attachment": {
+                            "$ref": "#/components/schemas/attachment"
+                          },
+                          "size": {
+                            "$ref": "#/components/schemas/size"
+                          }
+                        }
+                      },
+                      "type": "array"
+                    },
+                    "peripheral": {
+                      "properties": {
+                        "bar_code_1": {
+                          "type": "string"
+                        },
+                        "bar_code_2": {
+                          "type": "string"
+                        },
+                        "fields": {
+                          "properties": {
+                            "field": {
+                              "properties": {
+                                "name": {
+                                  "example": "Peripheral Field Name",
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "example": "Value for menu type",
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "type": {
+                          "description": "Name of the peripheral type",
+                          "example": "Peripheral Type Name",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "purchasing": {
+                      "$ref": "#/components/schemas/purchasing"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "size": {
+                "$ref": "#/components/schemas/size"
+              }
+            }
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/purchasing"
+          },
+          "security": {
+            "properties": {
+              "activation_lock": {
+                "example": false,
+                "type": "boolean"
+              },
+              "external_boot_level": {
+                "example": "unknown",
+                "type": "string"
+              },
+              "firewall_enabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "recovery_lock_enabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "secure_boot_level": {
+                "example": "unknown",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "software": {
+            "properties": {
+              "applications": {
+                "items": {
+                  "properties": {
+                    "application": {
+                      "properties": {
+                        "name": {
+                          "example": "Activity Monitor.app",
+                          "type": "string"
+                        },
+                        "path": {
+                          "example": "/Applications/Utilities/Activity Monitor.app",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": 10.13,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "available_software_updates": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "example": "iTunesXPatch-12.7.3",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "available_updates": {
+                "items": {
+                  "properties": {
+                    "update": {
+                      "properties": {
+                        "name": {
+                          "example": "iTunes",
+                          "type": "string"
+                        },
+                        "package_name": {
+                          "example": "iTunesXPatch-12.7.3",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "12.7.3",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "cached_by_casper": {
+                "items": {
+                  "properties": {
+                    "package": {
+                      "example": "GoogleChrome.pkg",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "fonts": {
+                "items": {
+                  "properties": {
+                    "font": {
+                      "properties": {
+                        "name": {
+                          "example": "Al Nile.ttc",
+                          "type": "string"
+                        },
+                        "path": {
+                          "example": "/Library/Fonts/Al Nile.ttc",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "n/a",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "installed_by_casper": {
+                "items": {
+                  "properties": {
+                    "package": {
+                      "example": "FireFox.pkg",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "installed_by_installer_swu": {
+                "items": {
+                  "properties": {
+                    "package": {
+                      "example": "com.apple.pkg.iTunesX",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "licensed_software": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "example": "Adobe CS5",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "plugins": {
+                "items": {
+                  "properties": {
+                    "plugin": {
+                      "properties": {
+                        "name": {
+                          "example": "QuickTime Plugin.plugin",
+                          "type": "string"
+                        },
+                        "path": {
+                          "example": "/Library/Internet Plug-Ins/Disabled Plug-Ins/QuickTime Plugin.plugin",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "7.7.3",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "running_services": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "example": "com.apple.airportd",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "unix_executables": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "location": {
+        "properties": {
+          "building": {
+            "example": "New York Office",
+            "type": "string"
+          },
+          "department": {
+            "example": "Sales Staff",
+            "type": "string"
+          },
+          "email_address": {
+            "example": "jbetty@company.com",
+            "type": "string"
+          },
+          "phone": {
+            "example": "123-555-6789",
+            "type": "string"
+          },
+          "phone_number": {
+            "example": "123-555-6789",
+            "type": "string"
+          },
+          "position": {
+            "example": "Systems Engineer",
+            "type": "string"
+          },
+          "real_name": {
+            "example": "Betty Jackson",
+            "type": "string"
+          },
+          "realname": {
+            "example": "Betty Jackson",
+            "type": "string"
+          },
+          "room": {
+            "example": 1159,
+            "type": "string"
+          },
+          "username": {
+            "example": "JBetty",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "purchasing": {
+        "properties": {
+          "applecare_id": {
+            "type": "string"
+          },
+          "is_leased": {
+            "type": "boolean"
+          },
+          "is_purchased": {
+            "type": "boolean"
+          },
+          "lease_expires": {
+            "type": "string"
+          },
+          "lease_expires_epoch": {
+            "type": "integer"
+          },
+          "lease_expires_utc": {
+            "type": "string"
+          },
+          "life_expectancy": {
+            "type": "integer"
+          },
+          "po_date": {
+            "type": "string"
+          },
+          "po_date_epoch": {
+            "type": "integer"
+          },
+          "po_date_utc": {
+            "type": "string"
+          },
+          "po_number": {
+            "type": "string"
+          },
+          "purchase_price": {
+            "type": "string"
+          },
+          "purchasing_account": {
+            "type": "string"
+          },
+          "purchasing_contact": {
+            "type": "string"
+          },
+          "vendor": {
+            "type": "string"
+          },
+          "warranty_expires": {
+            "type": "string"
+          },
+          "warranty_expires_epoch": {
+            "type": "integer"
+          },
+          "warranty_expires_utc": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "site_object": {
+        "properties": {
+          "id": {
+            "default": -1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the site",
+            "example": "None",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "xml": {
+          "name": "site"
+        }
+      },
+      "size": {
+        "example": 1,
+        "type": "integer"
+      }
+    },
+    "securitySchemes": {
       "basicAuth": {
         "scheme": "basic",
         "type": "http"
@@ -13,116 +1025,48 @@
     }
   },
   "info": {
-    "description": "A full featured API that requires basic authentication for interacting with Jamf Pro in a programmatic manner.",
-    "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
-    "title": "Classic API Resource Documentation",
-    "version": "production"
+    "license": {
+      "name": "Jamf API License Agreement",
+      "url": "https://developer.jamf.com/developer-guide/docs/api-license-agreement"
+    },
+    "title": "Classic API",
+    "version": "11.20.0"
   },
   "openapi": "3.0.3",
   "paths": {
     "/computers/id/{id}": {
-      "delete": {
-        "deprecated": true,
-        "description": "You can DELETE using the resource URLs with parameters of {name}, {udid}, {serial number}, or {macaddress}.",
-        "operationId": "deleteComputerById",
-        "parameters": [
-          {
-            "description": "Id value to filter by",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "int64",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified"
-          }
-        },
-        "summary": "Deletes a computer by id",
-        "tags": [
-          "computers"
-        ],
-        "x-deprecation-date": "2025-02-11T00:00:00Z"
-      },
       "get": {
         "deprecated": true,
         "operationId": "findComputersById",
         "parameters": [
           {
-            "description": "Id value to filter by",
+            "description": "ID value to filter by",
             "in": "path",
             "name": "id",
             "required": true,
             "schema": {
-              "format": "int64",
               "type": "integer"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "No response was specified"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer"
+                }
+              }
+            },
+            "description": "OK"
           }
         },
-        "summary": "Finds computers by id",
-        "tags": [
-          "computers"
-        ],
-        "x-deprecation-date": "2025-02-11T00:00:00Z"
-      },
-      "post": {
-        "deprecated": true,
-        "description": "You can POST using the resource URLs with parameters of {name}, {udid}, {serial number}, or {macaddress}. Certificates and mdm_capable are ignored in a POST.",
-        "operationId": "createComputerById",
-        "parameters": [
-          {
-            "description": "Id value to filter by",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "int64",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified"
-          }
-        },
-        "summary": "Creates a computer by specifying an id of 0",
-        "tags": [
-          "computers"
-        ],
-        "x-deprecation-date": "2025-03-07T00:00:00Z"
-      },
-      "put": {
-        "deprecated": true,
-        "description": "You can PUT using the resource URLs with parameters of {name}, {udid}, {serial number}, or {macaddress}.  Certificates and mdm_capable are ignored in a PUT.",
-        "operationId": "updateComputerById",
-        "parameters": [
-          {
-            "description": "Id value to filter by",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "int64",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified"
-          }
-        },
-        "summary": "Updates an existing computer by id",
+        "summary": "Finds computers by ID",
         "tags": [
           "computers"
         ],
@@ -132,328 +1076,21 @@
   },
   "security": [
     {
-      "Bearer": []
-    },
-    {
       "basicAuth": []
     }
   ],
-  "tags": [
+  "servers": [
     {
-      "description": "Operations on Jamf Pro accounts",
-      "name": "accounts"
-    },
-    {
-      "description": "Operations on activationcode",
-      "name": "activationcode"
-    },
-    {
-      "description": "Operations on advanced computer searches",
-      "name": "advancedcomputersearches"
-    },
-    {
-      "description": "Operations on advanced mobile device searches",
-      "name": "advancedmobiledevicesearches"
-    },
-    {
-      "description": "Operations on advanced user searches",
-      "name": "advancedusersearches"
-    },
-    {
-      "description": "Operations on allowed file extensions",
-      "name": "allowedfileextensions"
-    },
-    {
-      "description": "Operations on buildings",
-      "name": "buildings"
-    },
-    {
-      "description": "Operations on categories",
-      "name": "categories"
-    },
-    {
-      "description": "Operations on classes",
-      "name": "classes"
-    },
-    {
-      "description": "Operations on commandflush",
-      "name": "commandflush"
-    },
-    {
-      "description": "Operations on computer applications",
-      "name": "computerapplications"
-    },
-    {
-      "description": "Operations on computerapplicationusage",
-      "name": "computerapplicationusage"
-    },
-    {
-      "description": "Operations on computercheckin",
-      "name": "computercheckin"
-    },
-    {
-      "description": "Operations on computercommands",
-      "name": "computercommands"
-    },
-    {
-      "description": "Operations on computerextensionattributes",
-      "name": "computerextensionattributes"
-    },
-    {
-      "description": "Operations on computergroups",
-      "name": "computergroups"
-    },
-    {
-      "description": "Operations on computerhardwaresoftwarereports",
-      "name": "computerhardwaresoftwarereports"
-    },
-    {
-      "description": "Operations on computerhistory",
-      "name": "computerhistory"
-    },
-    {
-      "description": "Operations on computerinventorycollection",
-      "name": "computerinventorycollection"
-    },
-    {
-      "description": "Operations on computerinvitations",
-      "name": "computerinvitations"
-    },
-    {
-      "description": "Operations on computermanagement",
-      "name": "computermanagement"
-    },
-    {
-      "description": "Operations on computerreports",
-      "name": "computerreports"
-    },
-    {
-      "description": "Operations on computers",
-      "name": "computers"
-    },
-    {
-      "description": "Operations on departments",
-      "name": "departments"
-    },
-    {
-      "description": "Operations on directory bindings",
-      "name": "directorybindings"
-    },
-    {
-      "description": "Operations on disk encryption configurations",
-      "name": "diskencryptionconfigurations"
-    },
-    {
-      "description": "Operations on distributionpoints",
-      "name": "distributionpoints"
-    },
-    {
-      "description": "Operations on dockitems",
-      "name": "dockitems"
-    },
-    {
-      "description": "Operations on ebooks",
-      "name": "ebooks"
-    },
-    {
-      "description": "Operations on fileuploads",
-      "name": "fileuploads"
-    },
-    {
-      "description": "Operations on gsxconnection",
-      "name": "gsxconnection"
-    },
-    {
-      "description": "Operations on Healthcare Listener",
-      "name": "healthcarelistener"
-    },
-    {
-      "description": "Operations on Healthcare Listener rules",
-      "name": "healthcarelistenerrule"
-    },
-    {
-      "description": "Operations on iBeacon regions",
-      "name": "ibeacons"
-    },
-    {
-      "description": "Operations on infrastructure manager",
-      "name": "infrastructuremanager"
-    },
-    {
-      "description": "Operations on JSON Web Tokens",
-      "name": "jsonwebtokenconfigurations"
-    },
-    {
-      "description": "Operations on accounts (Deprecated)",
-      "name": "jssuser"
-    },
-    {
-      "description": "Operations on ldapservers",
-      "name": "ldapservers"
-    },
-    {
-      "description": "Operations on licensedsoftware",
-      "name": "licensedsoftware"
-    },
-    {
-      "description": "Operations on logflush",
-      "name": "logflush"
-    },
-    {
-      "description": "Operations on macapplications",
-      "name": "macapplications"
-    },
-    {
-      "description": "Operations on mobiledeviceapplications",
-      "name": "mobiledeviceapplications"
-    },
-    {
-      "description": "Operations on mobiledevicecommands",
-      "name": "mobiledevicecommands"
-    },
-    {
-      "description": "Operations on mobiledeviceconfigurationprofiles",
-      "name": "mobiledeviceconfigurationprofiles"
-    },
-    {
-      "description": "Operations on mobiledeviceenrollmentprofiles",
-      "name": "mobiledeviceenrollmentprofiles"
-    },
-    {
-      "description": "Operations on mobiledeviceextensionattributes",
-      "name": "mobiledeviceextensionattributes"
-    },
-    {
-      "description": "Operations on mobiledevicegroups",
-      "name": "mobiledevicegroups"
-    },
-    {
-      "description": "Operations on mobiledevicehistory",
-      "name": "mobiledevicehistory"
-    },
-    {
-      "description": "Operations on mobiledeviceinvitations",
-      "name": "mobiledeviceinvitations"
-    },
-    {
-      "description": "Operations on mobiledeviceprovisioningprofiles",
-      "name": "mobiledeviceprovisioningprofiles"
-    },
-    {
-      "description": "Operations on mobiledevices",
-      "name": "mobiledevices"
-    },
-    {
-      "description": "Operations on networksegments",
-      "name": "networksegments"
-    },
-    {
-      "description": "Operations on osxconfigurationprofiles",
-      "name": "osxconfigurationprofiles"
-    },
-    {
-      "description": "Operations on packages",
-      "name": "packages"
-    },
-    {
-      "description": "Operations on available patch titles from a source",
-      "name": "patchavailabletitles"
-    },
-    {
-      "description": "Operations on patches",
-      "name": "patches"
-    },
-    {
-      "description": "Operations on patch external sources",
-      "name": "patchexternalsources"
-    },
-    {
-      "description": "Operations on patch internal sources",
-      "name": "patchinternalsources"
-    },
-    {
-      "description": "Operations on patch policies",
-      "name": "patchpolicies"
-    },
-    {
-      "description": "Operations on patch reports",
-      "name": "patchreports"
-    },
-    {
-      "description": "Operations on patch software titles",
-      "name": "patchsoftwaretitles"
-    },
-    {
-      "description": "Operations on peripherals",
-      "name": "peripherals"
-    },
-    {
-      "description": "Operations on peripheraltypes",
-      "name": "peripheraltypes"
-    },
-    {
-      "description": "Operations on policies",
-      "name": "policies"
-    },
-    {
-      "description": "Operations on printers",
-      "name": "printers"
-    },
-    {
-      "description": "Operations on removablemmacaddresses",
-      "name": "removablemacaddresses"
-    },
-    {
-      "description": "Operations on restrictedsoftware",
-      "name": "restrictedsoftware"
-    },
-    {
-      "description": "Operations on savedsearches (deprecated)",
-      "name": "savedsearches"
-    },
-    {
-      "description": "Operations on scripts",
-      "name": "scripts"
-    },
-    {
-      "description": "Operations on sites",
-      "name": "sites"
-    },
-    {
-      "description": "Operations on smtpserver",
-      "name": "smtpserver"
-    },
-    {
-      "description": "Operations on softwareupdateservers",
-      "name": "softwareupdateservers"
-    },
-    {
-      "description": "Operations on userextensionattributes",
-      "name": "userextensionattributes"
-    },
-    {
-      "description": "Operations on usergroups",
-      "name": "usergroups"
-    },
-    {
-      "description": "Operations on users",
-      "name": "users"
-    },
-    {
-      "description": "Operations on vppaccounts",
-      "name": "vppaccounts"
-    },
-    {
-      "description": "Operations on vppassignments",
-      "name": "vppassignments"
-    },
-    {
-      "description": "Operations on vppinvitations",
-      "name": "vppinvitations"
-    },
-    {
-      "description": "Operations on webhooks",
-      "name": "webhooks"
+      "url": "https://yourServer.jamfcloud.com/JSSResource"
     }
-  ]
+  ],
+  "x-readme": {
+    "explorer-enabled": false,
+    "samples-languages": [
+      "curl",
+      "swift",
+      "ruby",
+      "python"
+    ]
+  }
 }

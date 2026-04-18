@@ -12,53 +12,15 @@ import (
 	"net/url"
 )
 
-// GetComputerByID finds computers by id.
+// GetComputerByID finds computers by ID.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
-func (c *Client) GetComputerByID(ctx context.Context, id string) ([]byte, error) {
+func (c *Client) GetComputerByID(ctx context.Context, id string) (*Computer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result []byte
+	var result Computer
 	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodGet, endpoint, nil, http.StatusOK, &result); err != nil {
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetComputerByID(%s): %w", id, err)
 	}
-	return result, nil
-}
-
-// CreateComputer creates a computer by specifying an id of 0.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
-func (c *Client) CreateComputer(ctx context.Context, id string, body []byte) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result []byte
-	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, body, http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("CreateComputer(%s): %w", id, err)
-	}
-	return result, nil
-}
-
-// UpdateComputerByID updates an existing computer by id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
-func (c *Client) UpdateComputerByID(ctx context.Context, id string, body []byte) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result []byte
-	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, body, http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UpdateComputerByID(%s): %w", id, err)
-	}
-	return result, nil
-}
-
-// DeleteComputerByID deletes a computer by id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
-func (c *Client) DeleteComputerByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
-		return fmt.Errorf("DeleteComputerByID(%s): %w", id, err)
-	}
-	return nil
+	return &result, nil
 }

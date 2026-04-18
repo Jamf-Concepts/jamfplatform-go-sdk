@@ -7,9 +7,17 @@ package devices
 
 // ApiErrorRepresentation represents a api error representation.
 type ApiErrorRepresentation struct {
-	Errors     []map[string]any `json:"errors"`
-	HttpStatus int              `json:"httpStatus"`
-	TraceID    string           `json:"traceId"`
+	Errors     []ApiErrorRepresentationErrorsItem `json:"errors"`
+	HttpStatus int                                `json:"httpStatus"`
+	TraceID    string                             `json:"traceId"`
+}
+
+// ApiErrorRepresentationErrorsItem represents a api error representation errors item.
+type ApiErrorRepresentationErrorsItem struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Field       string `json:"field"`
+	ID          string `json:"id"`
 }
 
 // DeviceHardwareReadRepresentationV1 represents a device hardware read representation v1.
