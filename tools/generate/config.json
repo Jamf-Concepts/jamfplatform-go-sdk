@@ -145,6 +145,11 @@
       "specFile": "classic_api_resource_documentation.json",
       "format": "xml",
       "splitByTag": true,
+      "fieldTypeOverrides": {
+        "*.invitation": "*BigInt",
+        "*.expiration_date_epoch": "*BigInt",
+        "*.date_sent_epoch": "*BigInt"
+      },
       "operations": [
         {"op": "GET /computers/id/{id}", "name": "GetComputerByID", "responseType": "computer", "pathNames": {"id": "id"}},
         {"op": "GET /computers/name/{name}", "name": "GetComputerByName", "responseType": "computer"},

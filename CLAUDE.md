@@ -105,7 +105,8 @@ For JSON APIs (Platform, Pro), the spec-driven heuristic is sufficient — those
 - Generated types use spec schema names directly. Pointer fields for nullable/optional JSON per spec annotations.
 - `url.PathEscape` for path parameters, `url.QueryEscape` for query parameters.
 - Error wrapping: `fmt.Errorf("MethodName(%s): %w", id, err)`.
-- Do not hand-edit generated files — modify the spec or generator config instead.
+- Do not hand-edit generated files — modify the generator config instead.
+- **Never modify the OpenAPI specs under `testing/`**. They are the source-of-truth mirrors of Jamf's published specs. Spec quirks (typos, wrong types, polymorphic roots, missing fields) are fixed at the generator level — via config overrides, post-processing passes, or hand-written supplemental files in the target package — not by patching the spec. Specs must round-trip upstream changes cleanly; our fixups live in the generator so they stay attached to the code that needs them.
 
 ## Acceptance tests
 

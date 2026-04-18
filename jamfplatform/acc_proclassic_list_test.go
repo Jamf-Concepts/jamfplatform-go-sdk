@@ -177,7 +177,15 @@ func TestAcceptance_Classic_ListComputerGroups(t *testing.T) {
 }
 
 func TestAcceptance_Classic_ListComputerInvitations(t *testing.T) {
-	t.Skip("spec types computer_invitation.invitation as int; server returns 39-digit code that overflows int64")
+	c := accClient(t)
+	if _, err := proclassic.New(c).ListComputerInvitations(context.Background()); err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("ListComputerInvitations forbidden on this tenant/credentials: %v", err)
+		}
+		t.Fatalf("ListComputerInvitations: %v", err)
+	}
 }
 
 func TestAcceptance_Classic_ListComputerReports(t *testing.T) {
@@ -445,7 +453,15 @@ func TestAcceptance_Classic_ListMobileDeviceGroups(t *testing.T) {
 }
 
 func TestAcceptance_Classic_ListMobileDeviceInvitations(t *testing.T) {
-	t.Skip("spec types mobile_device_invitation.invitation as int; server returns 39-digit code that overflows int64")
+	c := accClient(t)
+	if _, err := proclassic.New(c).ListMobileDeviceInvitations(context.Background()); err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("ListMobileDeviceInvitations forbidden on this tenant/credentials: %v", err)
+		}
+		t.Fatalf("ListMobileDeviceInvitations: %v", err)
+	}
 }
 
 func TestAcceptance_Classic_ListMobileDeviceProvisioningProfiles(t *testing.T) {

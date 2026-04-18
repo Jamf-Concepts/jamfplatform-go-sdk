@@ -20,17 +20,35 @@ func classicStrPtr(s string) *string { return &s }
 func intToStr(i int) string          { return strconv.Itoa(i) }
 
 // TestAcceptance_Classic_GetComputerByID exercises the Classic XML path
-// end-to-end. With the v11.20.0 Swagger 2.0 spec replaced in-tree, the
-// generator now emits a fully-typed Computer with nested ComputerGeneral,
-// ComputerHardware, etc. sub-structs; xml.Unmarshal populates them from
-// the real 30KB XML response.
+// end-to-end. Uses JAMFPLATFORM_CLASSIC_COMPUTER_ID if set; otherwise
+// pulls the first id from ListComputers. Skips only when the tenant
+// has no computers enrolled.
 func TestAcceptance_Classic_GetComputerByID(t *testing.T) {
 	c := accClient(t)
+	pc := proclassic.New(c)
+	ctx := context.Background()
 
-	comp, err := proclassic.New(c).GetComputerByID(context.Background(), "4")
+	id := os.Getenv("JAMFPLATFORM_CLASSIC_COMPUTER_ID")
+	if id == "" {
+		list, err := pc.ListComputers(ctx)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("ListComputers: %v", err)
+		}
+		if list == nil || len(list.Computers) == 0 {
+			t.Skip("tenant has no computers; set JAMFPLATFORM_CLASSIC_COMPUTER_ID to override")
+		}
+		first := list.Computers[0]
+		if first.ID == nil {
+			t.Fatalf("first computer has no ID: %+v", first)
+		}
+		id = intToStr(*first.ID)
+	}
+
+	comp, err := pc.GetComputerByID(ctx, id)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Skipf("GetComputerByID(4): %v", err)
+		t.Fatalf("GetComputerByID(%s): %v", id, err)
 	}
 	if comp == nil || comp.General == nil {
 		t.Fatalf("expected Computer.General populated, got %+v", comp)
@@ -41,11 +59,11 @@ func TestAcceptance_Classic_GetComputerByID(t *testing.T) {
 		}
 		return *p
 	}
-	id := 0
+	cid := 0
 	if comp.General.ID != nil {
-		id = *comp.General.ID
+		cid = *comp.General.ID
 	}
-	t.Logf("Computer id=%d name=%q serial=%q udid=%q", id, deref(comp.General.Name), deref(comp.General.SerialNumber), deref(comp.General.UDID))
+	t.Logf("Computer id=%d name=%q serial=%q udid=%q", cid, deref(comp.General.Name), deref(comp.General.SerialNumber), deref(comp.General.UDID))
 }
 
 // TestAcceptance_Classic_ComputerCRUD exercises the Classic computer CRUD
@@ -729,17 +747,34 @@ func TestAcceptance_Classic_MobileDeviceConfigurationProfileCRUD(t *testing.T) {
 	}
 }
 
-// TestAcceptance_Classic_GetMobileDeviceByID is read-only: mobile-device
-// endpoints target real enrolled devices on the tenant. Uses env-provided
-// id if available; otherwise logs that the endpoint shape is exercised
-// by unit tests only.
+// TestAcceptance_Classic_GetMobileDeviceByID exercises the endpoint
+// against a real enrolled device. If JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID
+// is set, uses that id; otherwise pulls the first entry from the live
+// /mobiledevices list and probes it. Skipped only when the tenant has
+// zero enrolled mobile devices.
 func TestAcceptance_Classic_GetMobileDeviceByID(t *testing.T) {
+	c := accClient(t)
+	pc := proclassic.New(c)
+	ctx := context.Background()
+
 	id := os.Getenv("JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID")
 	if id == "" {
-		t.Skip("set JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID to exercise GetMobileDeviceByID against a real enrolled device")
+		list, err := pc.ListMobileDevices(ctx)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("ListMobileDevices: %v", err)
+		}
+		if list == nil || len(list.MobileDevices) == 0 {
+			t.Skip("tenant has no enrolled mobile devices; set JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID to override")
+		}
+		first := list.MobileDevices[0]
+		if first.ID == nil {
+			t.Fatalf("first mobile device in list has no ID: %+v", first)
+		}
+		id = intToStr(*first.ID)
 	}
-	c := accClient(t)
-	md, err := proclassic.New(c).GetMobileDeviceByID(context.Background(), id)
+
+	md, err := pc.GetMobileDeviceByID(ctx, id)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetMobileDeviceByID(%s): %v", id, err)

@@ -397,7 +397,7 @@ func (t AdvancedComputerSearchDisplayFieldsItemDisplayField) MarshalXML(e *xml.E
 	return e.EncodeElement(shadow(t), start)
 }
 
-// AdvancedComputerSearches wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// AdvancedComputerSearches wraps a Jamf Classic list response with a flat slice of IDName.
 type AdvancedComputerSearches struct {
 	XMLName                  xml.Name
 	Size                     *Size    `xml:"size,omitempty"`
@@ -542,7 +542,7 @@ func (t AdvancedMobileDeviceSearchMobileDevicesItemMobileDevice) MarshalXML(e *x
 	return e.EncodeElement(shadow(t), start)
 }
 
-// AdvancedMobileDeviceSearches wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// AdvancedMobileDeviceSearches wraps a Jamf Classic list response with a flat slice of IDName.
 type AdvancedMobileDeviceSearches struct {
 	XMLName                      xml.Name
 	Size                         *Size    `xml:"size,omitempty"`
@@ -707,7 +707,7 @@ func (t AdvancedUserSearchUsersItemUser) MarshalXML(e *xml.Encoder, start xml.St
 	return e.EncodeElement(shadow(t), start)
 }
 
-// AdvancedUserSearches wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// AdvancedUserSearches wraps a Jamf Classic list response with a flat slice of IDName.
 type AdvancedUserSearches struct {
 	XMLName              xml.Name
 	Size                 *Size    `xml:"size,omitempty"`
@@ -768,7 +768,7 @@ func (t AllowedFileExtension) MarshalXML(e *xml.Encoder, start xml.StartElement)
 	return e.EncodeElement(shadow(t), start)
 }
 
-// AllowedFileExtensions wraps a Jamf Classic list response with a top-level size count and a flat slice of AllowedFileExtension.
+// AllowedFileExtensions wraps a Jamf Classic list response with a flat slice of AllowedFileExtension.
 type AllowedFileExtensions struct {
 	XMLName               xml.Name
 	Size                  *Size                  `xml:"size,omitempty"`
@@ -850,7 +850,7 @@ func (t Building) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Buildings wraps a Jamf Classic list response with a top-level size count and a flat slice of Building.
+// Buildings wraps a Jamf Classic list response with a flat slice of Building.
 type Buildings struct {
 	XMLName   xml.Name
 	Size      *Size      `xml:"size,omitempty"`
@@ -934,7 +934,7 @@ func (t ByoprofileGeneral) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Byoprofiles wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// Byoprofiles wraps a Jamf Classic list response with a flat slice of IDName.
 type Byoprofiles struct {
 	XMLName     xml.Name
 	Size        *Size    `xml:"size,omitempty"`
@@ -975,7 +975,7 @@ func (t ByoprofilesItem) MarshalXML(e *xml.Encoder, start xml.StartElement) erro
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Categories wraps a Jamf Classic list response with a top-level size count and a flat slice of Category.
+// Categories wraps a Jamf Classic list response with a flat slice of Category.
 type Categories struct {
 	XMLName    xml.Name
 	Size       *Size      `xml:"size,omitempty"`
@@ -1282,7 +1282,7 @@ func (t ClassPostMeetingTimesMeetingTime) MarshalXML(e *xml.Encoder, start xml.S
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Classes wraps a Jamf Classic list response with a top-level size count and a flat slice of ClassesItemClass.
+// Classes wraps a Jamf Classic list response with a flat slice of ClassesItemClass.
 type Classes struct {
 	XMLName xml.Name
 	Size    *Size              `xml:"size,omitempty"`
@@ -1614,8 +1614,24 @@ func (t ComputerSoftware) MarshalXML(e *xml.Encoder, start xml.StartElement) err
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ComputerApplicationUsage is a list of ComputerApplicationUsageItem.
-type ComputerApplicationUsage = []ComputerApplicationUsageItem
+// ComputerApplicationUsage wraps a Jamf Classic list response with a flat slice of ComputerApplicationUsageItemUsage.
+type ComputerApplicationUsage struct {
+	XMLName xml.Name
+	Usages  []ComputerApplicationUsageItemUsage `xml:"usage"`
+}
+
+// MarshalXML forces the ComputerApplicationUsage root element name to the wire value
+// declared by the spec (<computer_application_usage>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ComputerApplicationUsage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "computer_application_usage"}
+	type shadow ComputerApplicationUsage
+	return e.EncodeElement(shadow(t), start)
+}
 
 // ComputerApplicationUsageItem represents a computer application usage item.
 type ComputerApplicationUsageItem struct {
@@ -1771,7 +1787,7 @@ type ComputerCommandGeneral struct {
 	ApnsResultStatus *string `xml:"apns_result_status,omitempty"`
 	Command          *string `xml:"command,omitempty"`
 	DateSent         *string `xml:"date_sent,omitempty"`
-	DateSentEpoch    *string `xml:"date_sent_epoch,omitempty"`
+	DateSentEpoch    *BigInt `xml:"date_sent_epoch"`
 	DateSentUtc      *string `xml:"date_sent_utc,omitempty"`
 	ID               *int    `xml:"id,omitempty"`
 	ProfileID        *int    `xml:"profile_id,omitempty"`
@@ -1873,7 +1889,7 @@ func (t ComputerCommandPostGeneral) MarshalXML(e *xml.Encoder, start xml.StartEl
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ComputerCommands wraps a Jamf Classic list response with a top-level size count and a flat slice of ComputerCommandsItemComputerCommand.
+// ComputerCommands wraps a Jamf Classic list response with a flat slice of ComputerCommandsItemComputerCommand.
 type ComputerCommands struct {
 	XMLName          xml.Name
 	Size             *Size                                 `xml:"size,omitempty"`
@@ -2011,7 +2027,7 @@ func (t ComputerExtensionAttributeInputType) MarshalXML(e *xml.Encoder, start xm
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ComputerExtensionAttributes wraps a Jamf Classic list response with a top-level size count and a flat slice of any.
+// ComputerExtensionAttributes wraps a Jamf Classic list response with a flat slice of any.
 type ComputerExtensionAttributes struct {
 	XMLName                     xml.Name
 	Size                        *Size `xml:"size,omitempty"`
@@ -2170,7 +2186,7 @@ func (t ComputerGroupPostCriteriaItem) MarshalXML(e *xml.Encoder, start xml.Star
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ComputerGroups wraps a Jamf Classic list response with a top-level size count and a flat slice of []ComputerGroupsItemComputerGroupItem.
+// ComputerGroups wraps a Jamf Classic list response with a flat slice of []ComputerGroupsItemComputerGroupItem.
 type ComputerGroups struct {
 	XMLName        xml.Name
 	Size           *Size                                   `xml:"size,omitempty"`
@@ -2443,11 +2459,11 @@ type ComputerInvitation struct {
 	CreateAccountIfDoesNotExist *bool                             `xml:"create_account_if_does_not_exist,omitempty"`
 	EnrollIntoSite              *ComputerInvitationEnrollIntoSite `xml:"enroll_into_site,omitempty"`
 	ExpirationDate              *string                           `xml:"expiration_date,omitempty"`
-	ExpirationDateEpoch         *int                              `xml:"expiration_date_epoch,omitempty"`
+	ExpirationDateEpoch         *BigInt                           `xml:"expiration_date_epoch"`
 	ExpirationDateUtc           *string                           `xml:"expiration_date_utc,omitempty"`
 	HideAccount                 *bool                             `xml:"hide_account,omitempty"`
 	ID                          *int                              `xml:"id,omitempty"`
-	Invitation                  *int                              `xml:"invitation,omitempty"`
+	Invitation                  *BigInt                           `xml:"invitation"`
 	InvitationStatus            *string                           `xml:"invitation_status,omitempty"`
 	InvitationType              *string                           `xml:"invitation_type,omitempty"`
 	InvitedUserUUID             *string                           `xml:"invited_user_uuid,omitempty"`
@@ -2493,7 +2509,7 @@ func (t ComputerInvitationEnrollIntoSite) MarshalXML(e *xml.Encoder, start xml.S
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ComputerInvitations wraps a Jamf Classic list response with a top-level size count and a flat slice of ComputerInvitationsItemComputerInvitation.
+// ComputerInvitations wraps a Jamf Classic list response with a flat slice of ComputerInvitationsItemComputerInvitation.
 type ComputerInvitations struct {
 	XMLName             xml.Name
 	Size                *Size                                       `xml:"size,omitempty"`
@@ -2538,10 +2554,10 @@ func (t ComputerInvitationsItem) MarshalXML(e *xml.Encoder, start xml.StartEleme
 type ComputerInvitationsItemComputerInvitation struct {
 	XMLName             xml.Name
 	ExpirationDate      *string `xml:"expiration_date,omitempty"`
-	ExpirationDateEpoch *int    `xml:"expiration_date_epoch,omitempty"`
+	ExpirationDateEpoch *BigInt `xml:"expiration_date_epoch"`
 	ExpirationDateUtc   *string `xml:"expiration_date_utc,omitempty"`
 	ID                  *int    `xml:"id,omitempty"`
-	Invitation          *int    `xml:"invitation,omitempty"`
+	Invitation          *BigInt `xml:"invitation"`
 	InvitationType      *string `xml:"invitation_type,omitempty"`
 }
 
@@ -2660,8 +2676,24 @@ func (t ComputerPostGeneral) MarshalXML(e *xml.Encoder, start xml.StartElement) 
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ComputerReport is a list of ComputerReportItem.
-type ComputerReport = []ComputerReportItem
+// ComputerReport wraps a Jamf Classic list response with a flat slice of ComputerReportItemComputer.
+type ComputerReport struct {
+	XMLName   xml.Name
+	Computers []ComputerReportItemComputer `xml:"Computer"`
+}
+
+// MarshalXML forces the ComputerReport root element name to the wire value
+// declared by the spec (<computer_report>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ComputerReport) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "computer_report"}
+	type shadow ComputerReport
+	return e.EncodeElement(shadow(t), start)
+}
 
 // ComputerReportItem represents a computer report item.
 type ComputerReportItem struct {
@@ -2703,7 +2735,7 @@ func (t ComputerReportItemComputer) MarshalXML(e *xml.Encoder, start xml.StartEl
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ComputerReports wraps a Jamf Classic list response with a top-level size count and a flat slice of ComputerReportsItemComputerReport.
+// ComputerReports wraps a Jamf Classic list response with a flat slice of ComputerReportsItemComputerReport.
 type ComputerReports struct {
 	XMLName         xml.Name
 	Size            *Size                               `xml:"size,omitempty"`
@@ -2764,7 +2796,7 @@ func (t ComputerReportsItemComputerReport) MarshalXML(e *xml.Encoder, start xml.
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Computers wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// Computers wraps a Jamf Classic list response with a flat slice of IDName.
 type Computers struct {
 	XMLName   xml.Name
 	Size      *Size    `xml:"size,omitempty"`
@@ -2850,7 +2882,7 @@ func (t Department) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Departments wraps a Jamf Classic list response with a top-level size count and a flat slice of Department.
+// Departments wraps a Jamf Classic list response with a flat slice of Department.
 type Departments struct {
 	XMLName     xml.Name
 	Size        *Size        `xml:"size,omitempty"`
@@ -2917,7 +2949,7 @@ func (t DirectoryBinding) MarshalXML(e *xml.Encoder, start xml.StartElement) err
 	return e.EncodeElement(shadow(t), start)
 }
 
-// DirectoryBindings wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// DirectoryBindings wraps a Jamf Classic list response with a flat slice of IDName.
 type DirectoryBindings struct {
 	XMLName           xml.Name
 	Size              *Size    `xml:"size,omitempty"`
@@ -2980,7 +3012,7 @@ func (t DiskEncryptionConfiguration) MarshalXML(e *xml.Encoder, start xml.StartE
 	return e.EncodeElement(shadow(t), start)
 }
 
-// DiskEncryptionConfigurations wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// DiskEncryptionConfigurations wraps a Jamf Classic list response with a flat slice of IDName.
 type DiskEncryptionConfigurations struct {
 	XMLName                      xml.Name
 	Size                         *Size    `xml:"size,omitempty"`
@@ -3109,7 +3141,7 @@ func (t DistributionPointPost) MarshalXML(e *xml.Encoder, start xml.StartElement
 	return e.EncodeElement(shadow(t), start)
 }
 
-// DistributionPoints wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// DistributionPoints wraps a Jamf Classic list response with a flat slice of IDName.
 type DistributionPoints struct {
 	XMLName            xml.Name
 	Size               *Size    `xml:"size,omitempty"`
@@ -3173,7 +3205,7 @@ func (t DockItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// DockItems wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// DockItems wraps a Jamf Classic list response with a flat slice of IDName.
 type DockItems struct {
 	XMLName   xml.Name
 	Size      *Size    `xml:"size,omitempty"`
@@ -3798,7 +3830,7 @@ func (t EbookPostScope) MarshalXML(e *xml.Encoder, start xml.StartElement) error
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Ebooks wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// Ebooks wraps a Jamf Classic list response with a flat slice of IDName.
 type Ebooks struct {
 	XMLName xml.Name
 	Size    *Size    `xml:"size,omitempty"`
@@ -4088,7 +4120,7 @@ func (t HealthcareListenerRuleNotificationEmails) MarshalXML(e *xml.Encoder, sta
 	return e.EncodeElement(shadow(t), start)
 }
 
-// HealthcareListenerRules wraps a Jamf Classic list response with a top-level size count and a flat slice of HealthcareListenerRule.
+// HealthcareListenerRules wraps a Jamf Classic list response with a flat slice of HealthcareListenerRule.
 type HealthcareListenerRules struct {
 	XMLName                 xml.Name
 	Size                    *Size                    `xml:"size,omitempty"`
@@ -4129,7 +4161,7 @@ func (t HealthcareListenerRulesItem) MarshalXML(e *xml.Encoder, start xml.StartE
 	return e.EncodeElement(shadow(t), start)
 }
 
-// HealthcareListeners wraps a Jamf Classic list response with a top-level size count and a flat slice of HealthcareListener.
+// HealthcareListeners wraps a Jamf Classic list response with a flat slice of HealthcareListener.
 type HealthcareListeners struct {
 	XMLName             xml.Name
 	Size                *Size                `xml:"size,omitempty"`
@@ -4193,7 +4225,7 @@ func (t Ibeacon) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Ibeacons wraps a Jamf Classic list response with a top-level size count and a flat slice of Ibeacon.
+// Ibeacons wraps a Jamf Classic list response with a flat slice of Ibeacon.
 type Ibeacons struct {
 	XMLName  xml.Name
 	Size     *Size     `xml:"size,omitempty"`
@@ -4267,7 +4299,7 @@ func (t InfrastructureManager) MarshalXML(e *xml.Encoder, start xml.StartElement
 	return e.EncodeElement(shadow(t), start)
 }
 
-// InfrastructureManagers wraps a Jamf Classic list response with a top-level size count and a flat slice of InfrastructureManager.
+// InfrastructureManagers wraps a Jamf Classic list response with a flat slice of InfrastructureManager.
 type InfrastructureManagers struct {
 	XMLName                xml.Name
 	Size                   *Size                   `xml:"size,omitempty"`
@@ -4330,8 +4362,24 @@ func (t JsonWebTokenConfiguration) MarshalXML(e *xml.Encoder, start xml.StartEle
 	return e.EncodeElement(shadow(t), start)
 }
 
-// JsonWebTokenConfigurations is a list of JsonWebTokenConfigurationsItem.
-type JsonWebTokenConfigurations = []JsonWebTokenConfigurationsItem
+// JsonWebTokenConfigurations wraps a Jamf Classic list response with a flat slice of JsonWebTokenConfiguration.
+type JsonWebTokenConfigurations struct {
+	XMLName                    xml.Name
+	JsonWebTokenConfigurations []JsonWebTokenConfiguration `xml:"json_web_token_configuration"`
+}
+
+// MarshalXML forces the JsonWebTokenConfigurations root element name to the wire value
+// declared by the spec (<json_web_token_configurations>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t JsonWebTokenConfigurations) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "json_web_token_configurations"}
+	type shadow JsonWebTokenConfigurations
+	return e.EncodeElement(shadow(t), start)
+}
 
 // JsonWebTokenConfigurationsItem represents a json web token configurations item.
 type JsonWebTokenConfigurationsItem struct {
@@ -4744,7 +4792,7 @@ func (t LdapServerPostMappingsForUsersUserMappings) MarshalXML(e *xml.Encoder, s
 	return e.EncodeElement(shadow(t), start)
 }
 
-// LdapServers wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// LdapServers wraps a Jamf Classic list response with a flat slice of IDName.
 type LdapServers struct {
 	XMLName     xml.Name
 	Size        *Size    `xml:"size,omitempty"`
@@ -4836,8 +4884,24 @@ func (t LicensedSoftwareGeneral) MarshalXML(e *xml.Encoder, start xml.StartEleme
 	return e.EncodeElement(shadow(t), start)
 }
 
-// LicensedSoftwareAll is a list of LicensedSoftwareAllItem.
-type LicensedSoftwareAll = []LicensedSoftwareAllItem
+// LicensedSoftwareAll wraps a Jamf Classic list response with a flat slice of LicensedSoftwareAllItemLicensedSoftware.
+type LicensedSoftwareAll struct {
+	XMLName           xml.Name
+	LicensedSoftwares []LicensedSoftwareAllItemLicensedSoftware `xml:"licensed_software"`
+}
+
+// MarshalXML forces the LicensedSoftwareAll root element name to the wire value
+// declared by the spec (<licensed_software_all>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t LicensedSoftwareAll) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "licensed_software_all"}
+	type shadow LicensedSoftwareAll
+	return e.EncodeElement(shadow(t), start)
+}
 
 // LicensedSoftwareAllItem represents a licensed software all item.
 type LicensedSoftwareAllItem struct {
@@ -5341,8 +5405,24 @@ func (t MacApplicationSelfServiceVpp) MarshalXML(e *xml.Encoder, start xml.Start
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MacApplications is a list of MacApplicationsItem.
-type MacApplications = []MacApplicationsItem
+// MacApplications wraps a Jamf Classic list response with a flat slice of MacApplicationsItemMacApplication.
+type MacApplications struct {
+	XMLName         xml.Name
+	MacApplications []MacApplicationsItemMacApplication `xml:"mac_application"`
+}
+
+// MarshalXML forces the MacApplications root element name to the wire value
+// declared by the spec (<mac_applications>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MacApplications) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "mac_applications"}
+	type shadow MacApplications
+	return e.EncodeElement(shadow(t), start)
+}
 
 // MacApplicationsItem represents a mac applications item.
 type MacApplicationsItem struct {
@@ -6035,8 +6115,24 @@ func (t MobileDeviceApplicationVpp) MarshalXML(e *xml.Encoder, start xml.StartEl
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDeviceApplications is a list of MobileDeviceApplicationsItem.
-type MobileDeviceApplications = []MobileDeviceApplicationsItem
+// MobileDeviceApplications wraps a Jamf Classic list response with a flat slice of MobileDeviceApplicationsItemMobileDeviceApplication.
+type MobileDeviceApplications struct {
+	XMLName                  xml.Name
+	MobileDeviceApplications []MobileDeviceApplicationsItemMobileDeviceApplication `xml:"mobile_device_application"`
+}
+
+// MarshalXML forces the MobileDeviceApplications root element name to the wire value
+// declared by the spec (<mobile_device_applications>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MobileDeviceApplications) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "mobile_device_applications"}
+	type shadow MobileDeviceApplications
+	return e.EncodeElement(shadow(t), start)
+}
 
 // MobileDeviceApplicationsItem represents a mobile device applications item.
 type MobileDeviceApplicationsItem struct {
@@ -6109,7 +6205,7 @@ type MobileDeviceCommandGeneral struct {
 	ApnsResultStatus *string `xml:"apns_result_status,omitempty"`
 	Command          *string `xml:"command,omitempty"`
 	DateSent         *string `xml:"date_sent,omitempty"`
-	DateSentEpoch    *string `xml:"date_sent_epoch,omitempty"`
+	DateSentEpoch    *BigInt `xml:"date_sent_epoch"`
 	DateSentUtc      *string `xml:"date_sent_utc,omitempty"`
 	ID               *int    `xml:"id,omitempty"`
 	ProfileID        *int    `xml:"profile_id,omitempty"`
@@ -6741,8 +6837,24 @@ func (t MobileDeviceConfigurationProfileSelfServiceSelfServiceIcon) MarshalXML(e
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDeviceConfigurationProfiles is a list of MobileDeviceConfigurationProfilesItem.
-type MobileDeviceConfigurationProfiles = []MobileDeviceConfigurationProfilesItem
+// MobileDeviceConfigurationProfiles wraps a Jamf Classic list response with a flat slice of MobileDeviceConfigurationProfilesItemConfigurationProfile.
+type MobileDeviceConfigurationProfiles struct {
+	XMLName               xml.Name
+	ConfigurationProfiles []MobileDeviceConfigurationProfilesItemConfigurationProfile `xml:"configuration_profile"`
+}
+
+// MarshalXML forces the MobileDeviceConfigurationProfiles root element name to the wire value
+// declared by the spec (<mobile_device_configuration_profiles>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MobileDeviceConfigurationProfiles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "mobile_device_configuration_profiles"}
+	type shadow MobileDeviceConfigurationProfiles
+	return e.EncodeElement(shadow(t), start)
+}
 
 // MobileDeviceConfigurationProfilesItem represents a mobile device configuration profiles item.
 type MobileDeviceConfigurationProfilesItem struct {
@@ -6812,7 +6924,7 @@ type MobileDeviceEnrollmentProfileGeneral struct {
 	XMLName     xml.Name
 	Description *string `xml:"description,omitempty"`
 	ID          *int    `xml:"id,omitempty"`
-	Invitation  *string `xml:"invitation,omitempty"`
+	Invitation  *BigInt `xml:"invitation"`
 	Name        *string `xml:"name,omitempty"`
 	UDID        *string `xml:"udid,omitempty"`
 }
@@ -6855,7 +6967,7 @@ type MobileDeviceEnrollmentProfilePostGeneral struct {
 	XMLName     xml.Name
 	Description *string `xml:"description,omitempty"`
 	ID          *int    `xml:"id,omitempty"`
-	Invitation  *string `xml:"invitation,omitempty"`
+	Invitation  *BigInt `xml:"invitation"`
 	Name        *string `xml:"name,omitempty"`
 	UDID        *string `xml:"udid,omitempty"`
 }
@@ -6873,7 +6985,7 @@ func (t MobileDeviceEnrollmentProfilePostGeneral) MarshalXML(e *xml.Encoder, sta
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDeviceEnrollmentProfiles wraps a Jamf Classic list response with a top-level size count and a flat slice of MobileDeviceEnrollmentProfilesItemMobileDeviceEnrollmentProfile.
+// MobileDeviceEnrollmentProfiles wraps a Jamf Classic list response with a flat slice of MobileDeviceEnrollmentProfilesItemMobileDeviceEnrollmentProfile.
 type MobileDeviceEnrollmentProfiles struct {
 	XMLName                        xml.Name
 	Size                           *Size                                                             `xml:"size,omitempty"`
@@ -6918,7 +7030,7 @@ func (t MobileDeviceEnrollmentProfilesItem) MarshalXML(e *xml.Encoder, start xml
 type MobileDeviceEnrollmentProfilesItemMobileDeviceEnrollmentProfile struct {
 	XMLName    xml.Name
 	ID         *int    `xml:"id,omitempty"`
-	Invitation *string `xml:"invitation,omitempty"`
+	Invitation *BigInt `xml:"invitation"`
 	Name       *string `xml:"name,omitempty"`
 }
 
@@ -6978,7 +7090,7 @@ func (t MobileDeviceExtensionAttributeInputType) MarshalXML(e *xml.Encoder, star
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDeviceExtensionAttributes wraps a Jamf Classic list response with a top-level size count and a flat slice of MobileDeviceExtensionAttributesItemMobileDeviceExtensionAttribute.
+// MobileDeviceExtensionAttributes wraps a Jamf Classic list response with a flat slice of MobileDeviceExtensionAttributesItemMobileDeviceExtensionAttribute.
 type MobileDeviceExtensionAttributes struct {
 	XMLName                         xml.Name
 	Size                            *Size                                                               `xml:"size,omitempty"`
@@ -7063,8 +7175,24 @@ func (t MobileDeviceGroup) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDeviceGroups is a list of MobileDeviceGroupsItem.
-type MobileDeviceGroups = []MobileDeviceGroupsItem
+// MobileDeviceGroups wraps a Jamf Classic list response with a flat slice of MobileDeviceGroupsItemMobileDeviceGroup.
+type MobileDeviceGroups struct {
+	XMLName            xml.Name
+	MobileDeviceGroups []MobileDeviceGroupsItemMobileDeviceGroup `xml:"mobile_device_group"`
+}
+
+// MarshalXML forces the MobileDeviceGroups root element name to the wire value
+// declared by the spec (<mobile_device_groups>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MobileDeviceGroups) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "mobile_device_groups"}
+	type shadow MobileDeviceGroups
+	return e.EncodeElement(shadow(t), start)
+}
 
 // MobileDeviceGroupsItem represents a mobile device groups item.
 type MobileDeviceGroupsItem struct {
@@ -7266,14 +7394,14 @@ func (t MobileDeviceHistoryApp) MarshalXML(e *xml.Encoder, start xml.StartElemen
 type MobileDeviceInvitation struct {
 	XMLName                    xml.Name
 	DateSent                   *string                                 `xml:"date_sent,omitempty"`
-	DateSentEpoch              *int                                    `xml:"date_sent_epoch,omitempty"`
+	DateSentEpoch              *BigInt                                 `xml:"date_sent_epoch"`
 	DateSentUtc                *string                                 `xml:"date_sent_utc,omitempty"`
 	EnrolledIntoSite           *MobileDeviceInvitationEnrolledIntoSite `xml:"enrolled_into_site,omitempty"`
 	ExpirationDate             *string                                 `xml:"expiration_date,omitempty"`
-	ExpirationDateEpoch        *int                                    `xml:"expiration_date_epoch,omitempty"`
+	ExpirationDateEpoch        *BigInt                                 `xml:"expiration_date_epoch"`
 	ExpirationDateUtc          *string                                 `xml:"expiration_date_utc,omitempty"`
 	ID                         *int                                    `xml:"id,omitempty"`
-	Invitation                 *int                                    `xml:"invitation,omitempty"`
+	Invitation                 *BigInt                                 `xml:"invitation"`
 	InvitationType             *string                                 `xml:"invitation_type,omitempty"`
 	KeepExistingSiteMembership *bool                                   `xml:"keep_existing_site_membership,omitempty"`
 	LastAction                 *string                                 `xml:"last_action,omitempty"`
@@ -7327,14 +7455,14 @@ type MobileDeviceInvitationPost struct {
 	XMLName                    xml.Name
 	AllowMultipleUses          *bool                                       `xml:"allow_multiple_uses,omitempty"`
 	DateSent                   *string                                     `xml:"date_sent,omitempty"`
-	DateSentEpoch              *int                                        `xml:"date_sent_epoch,omitempty"`
+	DateSentEpoch              *BigInt                                     `xml:"date_sent_epoch"`
 	DateSentUtc                *string                                     `xml:"date_sent_utc,omitempty"`
 	EnrolledIntoSite           *MobileDeviceInvitationPostEnrolledIntoSite `xml:"enrolled_into_site,omitempty"`
 	ExpirationDate             *string                                     `xml:"expiration_date,omitempty"`
-	ExpirationDateEpoch        *int                                        `xml:"expiration_date_epoch,omitempty"`
+	ExpirationDateEpoch        *BigInt                                     `xml:"expiration_date_epoch"`
 	ExpirationDateUtc          *string                                     `xml:"expiration_date_utc,omitempty"`
 	ID                         *int                                        `xml:"id,omitempty"`
-	Invitation                 *int                                        `xml:"invitation,omitempty"`
+	Invitation                 *BigInt                                     `xml:"invitation"`
 	InvitationType             *string                                     `xml:"invitation_type,omitempty"`
 	KeepExistingSiteMembership *bool                                       `xml:"keep_existing_site_membership,omitempty"`
 	LastAction                 *string                                     `xml:"last_action,omitempty"`
@@ -7382,7 +7510,7 @@ func (t MobileDeviceInvitationPostEnrolledIntoSite) MarshalXML(e *xml.Encoder, s
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDeviceInvitations wraps a Jamf Classic list response with a top-level size count and a flat slice of MobileDeviceInvitationsItemMobileDeviceInvitation.
+// MobileDeviceInvitations wraps a Jamf Classic list response with a flat slice of MobileDeviceInvitationsItemMobileDeviceInvitation.
 type MobileDeviceInvitations struct {
 	XMLName                 xml.Name
 	Size                    *Size                                               `xml:"size,omitempty"`
@@ -7427,10 +7555,10 @@ func (t MobileDeviceInvitationsItem) MarshalXML(e *xml.Encoder, start xml.StartE
 type MobileDeviceInvitationsItemMobileDeviceInvitation struct {
 	XMLName             xml.Name
 	ExpirationDate      *string `xml:"expiration_date,omitempty"`
-	ExpirationDateEpoch *int    `xml:"expiration_date_epoch,omitempty"`
+	ExpirationDateEpoch *BigInt `xml:"expiration_date_epoch"`
 	ExpirationDateUtc   *string `xml:"expiration_date_utc,omitempty"`
 	ID                  *int    `xml:"id,omitempty"`
-	Invitation          *int    `xml:"invitation,omitempty"`
+	Invitation          *BigInt `xml:"invitation"`
 	InvitationType      *string `xml:"invitation_type,omitempty"`
 	LastAction          *string `xml:"last_action,omitempty"`
 }
@@ -7559,7 +7687,7 @@ func (t MobileDeviceProvisioningProfileGeneral) MarshalXML(e *xml.Encoder, start
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDeviceProvisioningProfiles wraps a Jamf Classic list response with a top-level size count and a flat slice of MobileDeviceProvisioningProfilesItemMobileDeviceProvisioningProfile.
+// MobileDeviceProvisioningProfiles wraps a Jamf Classic list response with a flat slice of MobileDeviceProvisioningProfilesItemMobileDeviceProvisioningProfile.
 type MobileDeviceProvisioningProfiles struct {
 	XMLName                          xml.Name
 	Size                             *Size                                                                 `xml:"size,omitempty"`
@@ -7622,8 +7750,24 @@ func (t MobileDeviceProvisioningProfilesItemMobileDeviceProvisioningProfile) Mar
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDevices is a list of MobileDevicesItem.
-type MobileDevices = []MobileDevicesItem
+// MobileDevices wraps a Jamf Classic list response with a flat slice of MobileDevicesItemMobileDevice.
+type MobileDevices struct {
+	XMLName       xml.Name
+	MobileDevices []MobileDevicesItemMobileDevice `xml:"mobile_device"`
+}
+
+// MarshalXML forces the MobileDevices root element name to the wire value
+// declared by the spec (<mobile_devices>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MobileDevices) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "mobile_devices"}
+	type shadow MobileDevices
+	return e.EncodeElement(shadow(t), start)
+}
 
 // MobileDevicesItem represents a mobile devices item.
 type MobileDevicesItem struct {
@@ -7730,7 +7874,7 @@ func (t NetworkSegmentPost) MarshalXML(e *xml.Encoder, start xml.StartElement) e
 	return e.EncodeElement(shadow(t), start)
 }
 
-// NetworkSegments wraps a Jamf Classic list response with a top-level size count and a flat slice of NetworkSegmentsItemNetworkSegment.
+// NetworkSegments wraps a Jamf Classic list response with a flat slice of NetworkSegmentsItemNetworkSegment.
 type NetworkSegments struct {
 	XMLName         xml.Name
 	Size            *Size                               `xml:"size,omitempty"`
@@ -8216,7 +8360,7 @@ func (t OsXConfigurationProfileSelfServiceSelfServiceIcon) MarshalXML(e *xml.Enc
 	return e.EncodeElement(shadow(t), start)
 }
 
-// OsXConfigurationProfiles wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// OsXConfigurationProfiles wraps a Jamf Classic list response with a flat slice of IDName.
 type OsXConfigurationProfiles struct {
 	XMLName                  xml.Name
 	Size                     *Size    `xml:"size,omitempty"`
@@ -8295,7 +8439,7 @@ func (t Package) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Packages wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// Packages wraps a Jamf Classic list response with a flat slice of IDName.
 type Packages struct {
 	XMLName  xml.Name
 	Size     *Size    `xml:"size,omitempty"`
@@ -8380,7 +8524,7 @@ func (t PatchExternalSource) MarshalXML(e *xml.Encoder, start xml.StartElement) 
 	return e.EncodeElement(shadow(t), start)
 }
 
-// PatchExternalSources wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// PatchExternalSources wraps a Jamf Classic list response with a flat slice of IDName.
 type PatchExternalSources struct {
 	XMLName              xml.Name
 	Size                 *Size    `xml:"size,omitempty"`
@@ -8443,7 +8587,7 @@ func (t PatchInternalSource) MarshalXML(e *xml.Encoder, start xml.StartElement) 
 	return e.EncodeElement(shadow(t), start)
 }
 
-// PatchInternalSources wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// PatchInternalSources wraps a Jamf Classic list response with a flat slice of IDName.
 type PatchInternalSources struct {
 	XMLName              xml.Name
 	Size                 *Size    `xml:"size,omitempty"`
@@ -8484,7 +8628,7 @@ func (t PatchInternalSourcesItem) MarshalXML(e *xml.Encoder, start xml.StartElem
 	return e.EncodeElement(shadow(t), start)
 }
 
-// PatchManagementSoftwareTitles wraps a Jamf Classic list response with a top-level size count and a flat slice of PatchManagementSoftwareTitlesItemPatchManagementSoftwareTitle.
+// PatchManagementSoftwareTitles wraps a Jamf Classic list response with a flat slice of PatchManagementSoftwareTitlesItemPatchManagementSoftwareTitle.
 type PatchManagementSoftwareTitles struct {
 	XMLName                       xml.Name
 	Size                          *Size                                                           `xml:"size,omitempty"`
@@ -8547,7 +8691,7 @@ func (t PatchManagementSoftwareTitlesItemPatchManagementSoftwareTitle) MarshalXM
 	return e.EncodeElement(shadow(t), start)
 }
 
-// PatchPolicies wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// PatchPolicies wraps a Jamf Classic list response with a flat slice of IDName.
 type PatchPolicies struct {
 	XMLName       xml.Name
 	Size          *Size    `xml:"size,omitempty"`
@@ -8910,7 +9054,7 @@ func (t PatchSoftwareTitleNotifications) MarshalXML(e *xml.Encoder, start xml.St
 	return e.EncodeElement(shadow(t), start)
 }
 
-// PatchSoftwareTitles wraps a Jamf Classic list response with a top-level size count and a flat slice of PatchSoftwareTitlesItemPatchSoftwareTitle.
+// PatchSoftwareTitles wraps a Jamf Classic list response with a flat slice of PatchSoftwareTitlesItemPatchSoftwareTitle.
 type PatchSoftwareTitles struct {
 	XMLName             xml.Name
 	Size                *int                                        `xml:"size,omitempty"`
@@ -9122,7 +9266,7 @@ func (t PeripheralType) MarshalXML(e *xml.Encoder, start xml.StartElement) error
 	return e.EncodeElement(shadow(t), start)
 }
 
-// PeripheralTypes wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// PeripheralTypes wraps a Jamf Classic list response with a flat slice of IDName.
 type PeripheralTypes struct {
 	XMLName         xml.Name
 	Size            *Size    `xml:"size,omitempty"`
@@ -9163,7 +9307,7 @@ func (t PeripheralTypesItem) MarshalXML(e *xml.Encoder, start xml.StartElement) 
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Peripherals wraps a Jamf Classic list response with a top-level size count and a flat slice of PeripheralsItemPeripheral.
+// Peripherals wraps a Jamf Classic list response with a flat slice of PeripheralsItemPeripheral.
 type Peripherals struct {
 	XMLName     xml.Name
 	Size        *Size                       `xml:"size,omitempty"`
@@ -9228,7 +9372,7 @@ func (t PeripheralsItemPeripheral) MarshalXML(e *xml.Encoder, start xml.StartEle
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Policies wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// Policies wraps a Jamf Classic list response with a flat slice of IDName.
 type Policies struct {
 	XMLName  xml.Name
 	Size     *Size    `xml:"size,omitempty"`
@@ -9463,7 +9607,7 @@ type PolicyGeneralDateTimeLimitations struct {
 	ActivationDateEpoch *int                                         `xml:"activation_date_epoch,omitempty"`
 	ActivationDateUtc   *string                                      `xml:"activation_date_utc,omitempty"`
 	ExpirationDate      *string                                      `xml:"expiration_date,omitempty"`
-	ExpirationDateEpoch *int                                         `xml:"expiration_date_epoch,omitempty"`
+	ExpirationDateEpoch *BigInt                                      `xml:"expiration_date_epoch"`
 	ExpirationDateUtc   *string                                      `xml:"expiration_date_utc,omitempty"`
 	NoExecuteEnd        *string                                      `xml:"no_execute_end,omitempty"`
 	NoExecuteOn         *PolicyGeneralDateTimeLimitationsNoExecuteOn `xml:"no_execute_on,omitempty"`
@@ -10107,7 +10251,7 @@ func (t Printer) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Printers wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// Printers wraps a Jamf Classic list response with a flat slice of IDName.
 type Printers struct {
 	XMLName  xml.Name
 	Size     *Size    `xml:"size,omitempty"`
@@ -10204,8 +10348,24 @@ func (t RemovableMacAddress) MarshalXML(e *xml.Encoder, start xml.StartElement) 
 	return e.EncodeElement(shadow(t), start)
 }
 
-// RemovableMacAddresses is a list of RemovableMacAddressesItem.
-type RemovableMacAddresses = []RemovableMacAddressesItem
+// RemovableMacAddresses wraps a Jamf Classic list response with a flat slice of RemovableMacAddress.
+type RemovableMacAddresses struct {
+	XMLName               xml.Name
+	RemovableMacAddresses []RemovableMacAddress `xml:"removable_mac_address"`
+}
+
+// MarshalXML forces the RemovableMacAddresses root element name to the wire value
+// declared by the spec (<removable_mac_addresses>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t RemovableMacAddresses) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "removable_mac_addresses"}
+	type shadow RemovableMacAddresses
+	return e.EncodeElement(shadow(t), start)
+}
 
 // RemovableMacAddressesItem represents a removable mac addresses item.
 type RemovableMacAddressesItem struct {
@@ -10323,7 +10483,7 @@ func (t RestrictedSoftwareScopeExclusions) MarshalXML(e *xml.Encoder, start xml.
 	return e.EncodeElement(shadow(t), start)
 }
 
-// RestrictedSoftwareAll wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// RestrictedSoftwareAll wraps a Jamf Classic list response with a flat slice of IDName.
 type RestrictedSoftwareAll struct {
 	XMLName                  xml.Name
 	Size                     *Size    `xml:"size,omitempty"`
@@ -10419,7 +10579,7 @@ func (t ScriptParameters) MarshalXML(e *xml.Encoder, start xml.StartElement) err
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Scripts wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// Scripts wraps a Jamf Classic list response with a flat slice of IDName.
 type Scripts struct {
 	XMLName xml.Name
 	Size    *Size    `xml:"size,omitempty"`
@@ -10500,7 +10660,7 @@ func (t SiteObject) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Sites wraps a Jamf Classic list response with a top-level size count and a flat slice of Site.
+// Sites wraps a Jamf Classic list response with a flat slice of Site.
 type Sites struct {
 	XMLName xml.Name
 	Size    *Size  `xml:"size,omitempty"`
@@ -10641,7 +10801,7 @@ func (t SoftwareUpdateServer) MarshalXML(e *xml.Encoder, start xml.StartElement)
 	return e.EncodeElement(shadow(t), start)
 }
 
-// SoftwareUpdateServers wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// SoftwareUpdateServers wraps a Jamf Classic list response with a flat slice of IDName.
 type SoftwareUpdateServers struct {
 	XMLName               xml.Name
 	Size                  *Size    `xml:"size,omitempty"`
@@ -10879,7 +11039,7 @@ func (t UserExtensionAttributeInputType) MarshalXML(e *xml.Encoder, start xml.St
 	return e.EncodeElement(shadow(t), start)
 }
 
-// UserExtensionAttributes wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// UserExtensionAttributes wraps a Jamf Classic list response with a flat slice of IDName.
 type UserExtensionAttributes struct {
 	XMLName                 xml.Name
 	Size                    *Size    `xml:"size,omitempty"`
@@ -10945,7 +11105,7 @@ func (t UserGroup) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// UserGroups wraps a Jamf Classic list response with a top-level size count and a flat slice of UserGroupsItemUserGroup.
+// UserGroups wraps a Jamf Classic list response with a flat slice of UserGroupsItemUserGroup.
 type UserGroups struct {
 	XMLName    xml.Name
 	Size       *Size                     `xml:"size,omitempty"`
@@ -11034,7 +11194,7 @@ func (t UserPost) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Users wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// Users wraps a Jamf Classic list response with a flat slice of IDName.
 type Users struct {
 	XMLName xml.Name
 	Size    *Size    `xml:"size,omitempty"`
@@ -11105,7 +11265,7 @@ func (t VppAccount) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(shadow(t), start)
 }
 
-// VppAccounts wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// VppAccounts wraps a Jamf Classic list response with a flat slice of IDName.
 type VppAccounts struct {
 	XMLName     xml.Name
 	Size        *Size    `xml:"size,omitempty"`
@@ -11297,8 +11457,24 @@ func (t VppAssignmentPostGeneral) MarshalXML(e *xml.Encoder, start xml.StartElem
 	return e.EncodeElement(shadow(t), start)
 }
 
-// VppAssignments is a list of VppAssignmentsItem.
-type VppAssignments = []VppAssignmentsItem
+// VppAssignments wraps a Jamf Classic list response with a flat slice of VppAssignmentsItemVppAssignment.
+type VppAssignments struct {
+	XMLName        xml.Name
+	VppAssignments []VppAssignmentsItemVppAssignment `xml:"vpp_assignment"`
+}
+
+// MarshalXML forces the VppAssignments root element name to the wire value
+// declared by the spec (<vpp_assignments>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t VppAssignments) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "vpp_assignments"}
+	type shadow VppAssignments
+	return e.EncodeElement(shadow(t), start)
+}
 
 // VppAssignmentsItem represents a vpp assignments item.
 type VppAssignmentsItem struct {
@@ -11473,7 +11649,7 @@ func (t VppInvitationScopeLimitations) MarshalXML(e *xml.Encoder, start xml.Star
 	return e.EncodeElement(shadow(t), start)
 }
 
-// VppInvitations wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// VppInvitations wraps a Jamf Classic list response with a flat slice of IDName.
 type VppInvitations struct {
 	XMLName        xml.Name
 	Size           *Size    `xml:"size,omitempty"`
@@ -11571,7 +11747,7 @@ func (t WebhookDisplayFieldsItemDisplayField) MarshalXML(e *xml.Encoder, start x
 	return e.EncodeElement(shadow(t), start)
 }
 
-// Webhooks wraps a Jamf Classic list response with a top-level size count and a flat slice of IDName.
+// Webhooks wraps a Jamf Classic list response with a flat slice of IDName.
 type Webhooks struct {
 	XMLName  xml.Name
 	Size     *Size    `xml:"size,omitempty"`

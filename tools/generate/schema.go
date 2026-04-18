@@ -352,6 +352,12 @@ func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]*schemaU
 // Schema → Go types
 // ---------------------------------------------------------------------------
 
+// currentFieldOverrides threads the per-spec override map into extractTypes
+// without adding a parameter to schemaToGoType. Set by the caller for the
+// duration of the extractTypes call; intentionally package-level because
+// the schema walker already relies on package-level helpers.
+var currentFieldOverrides map[string]string
+
 func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string) []GoType {
 	names := sortedKeys(doc.Components.Schemas)
 	var types []GoType
@@ -513,23 +519,25 @@ func classicListWrapper(goName, specName string, schema *openapi3.Schema, doc *o
 		resourceName = name
 		resourceProp = prop
 	}
-	if sizeProp == nil || resourceName == "" || resourceProp == nil {
+	if resourceName == "" || resourceProp == nil {
 		return GoType{}, false
 	}
-	sizeGo := "*int"
-	if sizeProp.Ref != "" {
-		sizeGo = "*" + refName(sizeProp)
-	}
 	resourceGo := refName(resourceProp)
+	fields := []GoField{}
+	if sizeProp != nil {
+		sizeGo := "*int"
+		if sizeProp.Ref != "" {
+			sizeGo = "*" + refName(sizeProp)
+		}
+		fields = append(fields, GoField{Name: "Size", Type: sizeGo, JSONTag: "size,omitempty"})
+	}
+	fields = append(fields, GoField{Name: exportedGoName(plural(resourceName)), Type: "[]" + resourceGo, JSONTag: resourceName})
 	wrapper := GoType{
 		Name:          goName,
 		XMLName:       specName,
 		IsListWrapper: true,
-		Comment:       fmt.Sprintf("%s wraps a Jamf Classic list response with a top-level size count and a flat slice of %s.", goName, resourceGo),
-		Fields: []GoField{
-			{Name: "Size", Type: sizeGo, JSONTag: "size,omitempty"},
-			{Name: exportedGoName(plural(resourceName)), Type: "[]" + resourceGo, JSONTag: resourceName},
-		},
+		Comment:       fmt.Sprintf("%s wraps a Jamf Classic list response with a flat slice of %s.", goName, resourceGo),
+		Fields:        fields,
 	}
 	_ = doc
 	return wrapper, true
@@ -741,6 +749,12 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 		gt.Comment = name + " " + cleanComment(schema.Description)
 	}
 
+	// specName is the lowercase_snake name the override table keys on.
+	// Passed down through currentFieldOverrides; we recover it by lowering
+	// the Go identifier back to snake case — good enough for the Classic
+	// spec's naming which is already snake_case.
+	specName := goNameToSpecName(name)
+
 	props, requiredList := flattenAllOf(schema)
 	required := toSet(requiredList)
 	for _, pnameRaw := range sortedKeys(props) {
@@ -755,6 +769,22 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 		prop := propRef.Value
 
 		goType := schemaRefToGoType(propRef)
+		// Per-spec field-type override (config.fieldTypeOverrides). Applied
+		// at the shallowest opportunity so needsPtr/isNullable reasoning
+		// below still drives pointer wrapping exactly as it would for the
+		// spec-declared type. Override lookup: exact "schema.prop" wins
+		// over the "*.prop" wildcard. The wildcard lets a single entry
+		// cover both a canonical schema and its hoisted list-item clones
+		// (e.g. computer_invitation's invitation field appears under the
+		// parent schema AND under ComputerInvitationsItemComputerInvitation
+		// after array hoisting; one "*.invitation" entry handles both).
+		if currentFieldOverrides != nil {
+			if v, ok := currentFieldOverrides[specName+"."+pname]; ok {
+				goType = v
+			} else if v, ok := currentFieldOverrides["*."+pname]; ok {
+				goType = v
+			}
+		}
 		jsonTag := pname
 
 		isNullable := prop != nil && prop.Nullable
@@ -882,6 +912,17 @@ func goTypeName(specName string) string {
 		return specName
 	}
 	return exportedGoName(specName)
+}
+
+// goNameToSpecName converts a PascalCase Go type name back to its spec
+// snake_case form for looking up per-field config overrides. Relies on
+// the generator's round-trip property: exportedGoName("computer_invitation")
+// == "ComputerInvitation", so the inverse is just splitting on case
+// boundaries and re-joining with underscores (lowercased). Good enough
+// for the Classic/Pro specs whose schema names are either snake_case or
+// camelCase; would need refinement for specs with exotic naming.
+func goNameToSpecName(goName string) string {
+	return toSnakeCase(goName)
 }
 
 // xmlWireName returns the root XML element name a schema serializes to.
