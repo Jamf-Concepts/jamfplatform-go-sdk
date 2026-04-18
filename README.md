@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
 )
 
 func main() {
@@ -35,11 +36,11 @@ func main() {
 	ctx := context.Background()
 
 	// List all devices
-	devices, err := client.ListDevices(ctx, nil, "")
+	ds, err := devices.New(client).ListDevices(ctx, nil, "")
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, d := range devices {
+	for _, d := range ds {
 		fmt.Printf("%s  %s  %s\n", d.ID, d.Name, d.SerialNumber)
 	}
 }
@@ -66,9 +67,14 @@ client := jamfplatform.NewClient(baseURL, clientID, clientSecret,
 ### Error handling
 
 ```go
-import "errors"
+import (
+	"errors"
 
-device, err := client.GetDevice(ctx, id)
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
+)
+
+device, err := devices.New(client).GetDevice(ctx, id)
 if errors.Is(err, jamfplatform.ErrNotFound) {
 	// handle not found
 }
@@ -89,7 +95,7 @@ filter := jamfplatform.BuildRSQLExpression([]jamfplatform.RSQLClause{
 	{Selector: "name", Operator: "==", Argument: "MacBook*"},
 	{Selector: "operatingSystemVersion", Operator: "=gt=", Argument: "15.0"},
 })
-devices, err := client.ListDevices(ctx, nil, filter)
+ds, err := devices.New(client).ListDevices(ctx, nil, filter)
 ```
 
 ### Async polling
@@ -100,8 +106,9 @@ For async operations (e.g. benchmark sync), use the `PollUntil` helper:
 ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 defer cancel()
 
+cb := compliancebenchmarks.New(client)
 err := jamfplatform.PollUntil(ctx, 5*time.Second, func(ctx context.Context) (bool, error) {
-	bm, err := client.GetBenchmark(ctx, id)
+	bm, err := cb.GetBenchmark(ctx, id)
 	if err != nil {
 		return false, err
 	}
@@ -111,15 +118,17 @@ err := jamfplatform.PollUntil(ctx, 5*time.Second, func(ctx context.Context) (boo
 
 ## API coverage
 
-| Domain | Methods |
+Each API family lives in its own sub-package under `jamfplatform/`. Construct a service client with `<pkg>.New(rootClient)`.
+
+| Sub-package | Methods |
 |--------|---------|
-| Devices | ListDevices, GetDevice, UpdateDevice, DeleteDevice, ListDeviceApplications, ListDevicesForUser |
-| Device Groups | ListDeviceGroups, GetDeviceGroup, CreateDeviceGroup, UpdateDeviceGroup, DeleteDeviceGroup, ListDeviceGroupMembers, UpdateDeviceGroupMembers, ListDeviceGroupsForDevice |
-| Device Actions | CheckInDevice, EraseDevice, RestartDevice, ShutdownDevice, UnmanageDevice |
-| Blueprints | ListBlueprints, GetBlueprint, CreateBlueprint, UpdateBlueprint, DeleteBlueprint, DeployBlueprint, UndeployBlueprint, GetBlueprintReport, ListBlueprintComponents, GetBlueprintComponent |
-| Compliance Benchmarks | ListBaselines, GetBaselineRules, ListBenchmarks, GetBenchmark, CreateBenchmark, DeleteBenchmark |
-| Benchmark Reporting | ListBenchmarkRulesStats, ListBenchmarkRuleDevices, GetBenchmarkCompliancePercentage |
-| DDM Declarations | GetDeviceDeclarationReport, ListDeclarationReportClients |
+| `jamfplatform/devices` | ListDevices, GetDevice, UpdateDevice, DeleteDevice, ListDeviceApplications, ListDevicesForUser |
+| `jamfplatform/devicegroups` | ListDeviceGroups, GetDeviceGroup, CreateDeviceGroup, UpdateDeviceGroup, DeleteDeviceGroup, ListDeviceGroupMembers, UpdateDeviceGroupMembers, ListDeviceGroupsForDevice |
+| `jamfplatform/deviceactions` | CheckInDevice, EraseDevice, RestartDevice, ShutdownDevice, UnmanageDevice |
+| `jamfplatform/blueprints` | ListBlueprints, GetBlueprint, CreateBlueprint, UpdateBlueprint, DeleteBlueprint, DeployBlueprint, UndeployBlueprint, GetBlueprintReport, ListBlueprintComponents, GetBlueprintComponent |
+| `jamfplatform/compliancebenchmarks` | ListBaselines, GetBaselineRules, ListBenchmarks, GetBenchmark, CreateBenchmark, DeleteBenchmark, ListBenchmarkRulesStats, ListBenchmarkRuleDevices, GetBenchmarkCompliancePercentage |
+| `jamfplatform/ddmreport` | GetDeviceDeclarationReport, ListDeclarationReportClients |
+| `jamfplatform/pro` | ListBuildingsV1, GetBuildingV1, GetStartupStatus (pilot — more endpoints to be whitelisted) |
 
 All list methods handle pagination automatically.
 
