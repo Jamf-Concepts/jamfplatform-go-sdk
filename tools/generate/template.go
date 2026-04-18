@@ -587,7 +587,9 @@ func Test<% .Name %>(t *testing.T) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
 		}
-<%- if .ReturnsSlice %>
+<%- if eq .Format "xml" %>
+		writeXML(t, w, <% statusConst .ExpectedStatus %>, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
+<%- else if .ReturnsSlice %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{"id": "new-id"}})
 <%- else %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{"id": "new-id"})

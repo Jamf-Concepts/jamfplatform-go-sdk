@@ -120,3 +120,163 @@ func TestAcceptance_Classic_ComputerCRUD(t *testing.T) {
 		t.Fatalf("GetComputerByID(%d) after delete: want 404, got %v", id, err)
 	}
 }
+
+func TestAcceptance_Classic_BuildingCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-building-" + runSuffix()
+	created, err := pc.CreateBuildingByID(ctx, "0", &proclassic.Building{Name: classicStrPtr(name)})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateBuildingByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateBuildingByID returned no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteBuildingByID(ctx, intToStr(id)) })
+	t.Logf("Created building id=%d name=%q", id, name)
+
+	got, err := pc.GetBuildingByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetBuildingByID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("GetBuildingByID Name = %v, want %q", got.Name, name)
+	}
+
+	newName := name + "-updated"
+	if err := pc.UpdateBuildingByID(ctx, intToStr(id), &proclassic.Building{Name: classicStrPtr(newName)}); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateBuildingByID(%d): %v", id, err)
+	}
+
+	if err := pc.DeleteBuildingByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteBuildingByID(%d): %v", id, err)
+	}
+
+	_, err = pc.GetBuildingByID(ctx, intToStr(id))
+	if err == nil {
+		t.Fatalf("GetBuildingByID(%d) after delete should 404, succeeded", id)
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("GetBuildingByID(%d) after delete: want 404, got %v", id, err)
+	}
+}
+
+func TestAcceptance_Classic_DepartmentCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-dept-" + runSuffix()
+	created, err := pc.CreateDepartmentByID(ctx, "0", &proclassic.Department{Name: classicStrPtr(name)})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateDepartmentByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateDepartmentByID returned no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteDepartmentByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetDepartmentByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetDepartmentByID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("Name = %v, want %q", got.Name, name)
+	}
+
+	if err := pc.DeleteDepartmentByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteDepartmentByID(%d): %v", id, err)
+	}
+	_, err = pc.GetDepartmentByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_CategoryCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-cat-" + runSuffix()
+	prio := 5
+	created, err := pc.CreateCategoryByID(ctx, "0", &proclassic.Category{Name: classicStrPtr(name), Priority: &prio})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateCategoryByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateCategoryByID returned no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteCategoryByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetCategoryByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetCategoryByID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("Name = %v, want %q", got.Name, name)
+	}
+
+	if err := pc.DeleteCategoryByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteCategoryByID(%d): %v", id, err)
+	}
+	_, err = pc.GetCategoryByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-site-" + runSuffix()
+	created, err := pc.CreateSiteByID(ctx, "0", &proclassic.Site{Name: classicStrPtr(name)})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateSiteByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateSiteByID returned no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteSiteByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetSiteByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetSiteByID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("Name = %v, want %q", got.Name, name)
+	}
+
+	if err := pc.DeleteSiteByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteSiteByID(%d): %v", id, err)
+	}
+	_, err = pc.GetSiteByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}

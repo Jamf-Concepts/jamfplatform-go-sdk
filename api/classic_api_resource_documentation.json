@@ -18,6 +18,45 @@
         },
         "type": "object"
       },
+      "building": {
+        "properties": {
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the building",
+            "example": "Empire State Building",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "category": {
+        "properties": {
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the category",
+            "example": "Applications",
+            "type": "string"
+          },
+          "priority": {
+            "default": 9,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "category",
+        "type": "object"
+      },
       "computer": {
         "properties": {
           "certificates": {
@@ -888,6 +927,23 @@
         },
         "type": "object"
       },
+      "department": {
+        "properties": {
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the department",
+            "example": "Information Technology",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "location": {
         "properties": {
           "building": {
@@ -992,6 +1048,23 @@
         },
         "type": "object"
       },
+      "site": {
+        "properties": {
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the site",
+            "example": "Minneapolis",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "site_object": {
         "properties": {
           "id": {
@@ -1034,6 +1107,224 @@
   },
   "openapi": "3.0.3",
   "paths": {
+    "/buildings/id/{id}": {
+      "delete": {
+        "operationId": "deleteBuildingById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a building by ID",
+        "tags": [
+          "buildings"
+        ]
+      },
+      "get": {
+        "operationId": "findBuildingsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/building"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/building"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds buildings by ID",
+        "tags": [
+          "buildings"
+        ]
+      },
+      "post": {
+        "operationId": "createBuildingById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new building",
+        "tags": [
+          "buildings"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateBuildingById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing building by ID",
+        "tags": [
+          "buildings"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/categories/id/{id}": {
+      "delete": {
+        "operationId": "deleteCategoryById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a category by ID",
+        "tags": [
+          "categories"
+        ]
+      },
+      "get": {
+        "operationId": "findCategoriesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/category"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/category"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds categories by ID",
+        "tags": [
+          "categories"
+        ]
+      },
+      "post": {
+        "operationId": "createCategoryById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new category by ID",
+        "tags": [
+          "categories"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateCategoryById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Updates an existing category by ID",
+        "tags": [
+          "categories"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/computers/id/{id}": {
       "delete": {
         "operationId": "deleteComputerById",
@@ -1302,6 +1593,224 @@
           "computers"
         ],
         "x-deprecation-date": "2025-02-11T00:00:00Z"
+      }
+    },
+    "/departments/id/{id}": {
+      "delete": {
+        "operationId": "deleteDepartmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a department by ID",
+        "tags": [
+          "departments"
+        ]
+      },
+      "get": {
+        "operationId": "findDepartmentsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/department"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/department"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds departments by ID",
+        "tags": [
+          "departments"
+        ]
+      },
+      "post": {
+        "operationId": "createDepartmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new department by ID",
+        "tags": [
+          "departments"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateDepartmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing department by ID",
+        "tags": [
+          "departments"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/sites/id/{id}": {
+      "delete": {
+        "operationId": "deleteSiteById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a site by ID",
+        "tags": [
+          "sites"
+        ]
+      },
+      "get": {
+        "operationId": "findSitesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/site"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/site"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds sites by ID",
+        "tags": [
+          "sites"
+        ]
+      },
+      "post": {
+        "operationId": "createSiteById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new site by ID",
+        "tags": [
+          "sites"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateSiteById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing site by ID",
+        "tags": [
+          "sites"
+        ],
+        "x-explorer-enabled": false
       }
     }
   },

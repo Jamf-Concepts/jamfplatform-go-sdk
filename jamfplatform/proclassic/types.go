@@ -15,6 +15,21 @@ type Attachment struct {
 	URI      *string  `xml:"uri,omitempty"`
 }
 
+// Building represents a building.
+type Building struct {
+	XMLName xml.Name `xml:"building"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// Category represents a category.
+type Category struct {
+	XMLName  xml.Name `xml:"category"`
+	ID       *int     `xml:"id,omitempty"`
+	Name     *string  `xml:"name,omitempty"`
+	Priority *int     `xml:"priority,omitempty"`
+}
+
 // Computer represents a computer.
 type Computer struct {
 	XMLName               xml.Name                `xml:"computer"`
@@ -190,6 +205,13 @@ type ComputerPostGeneral struct {
 	Username        *string  `xml:"username,omitempty"`
 }
 
+// Department represents a department.
+type Department struct {
+	XMLName xml.Name `xml:"department"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
 // Location represents a location.
 type Location struct {
 	XMLName      xml.Name `xml:"location"`
@@ -226,6 +248,13 @@ type Purchasing struct {
 	WarrantyExpires      *string  `xml:"warranty_expires,omitempty"`
 	WarrantyExpiresEpoch *int     `xml:"warranty_expires_epoch,omitempty"`
 	WarrantyExpiresUtc   *string  `xml:"warranty_expires_utc,omitempty"`
+}
+
+// Site represents a site.
+type Site struct {
+	XMLName xml.Name `xml:"site"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
 }
 
 // SiteObject represents a site object.

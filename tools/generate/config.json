@@ -154,7 +154,27 @@
         {"op": "PUT /computers/name/{name}", "name": "UpdateComputerByName", "requestType": "computer_post", "expectedStatus": 201},
         {"op": "DELETE /computers/id/{id}", "name": "DeleteComputerByID", "pathNames": {"id": "id"}},
         {"op": "DELETE /computers/name/{name}", "name": "DeleteComputerByName"},
-        {"op": "DELETE /computers/serialnumber/{serialnumber}", "name": "DeleteComputerBySerialNumber", "pathNames": {"serialnumber": "serialNumber"}}
+        {"op": "DELETE /computers/serialnumber/{serialnumber}", "name": "DeleteComputerBySerialNumber", "pathNames": {"serialnumber": "serialNumber"}},
+
+        {"op": "GET /buildings/id/{id}", "name": "GetBuildingByID", "responseType": "building", "pathNames": {"id": "id"}},
+        {"op": "POST /buildings/id/{id}", "name": "CreateBuildingByID", "requestType": "building", "responseType": "building", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /buildings/id/{id}", "name": "UpdateBuildingByID", "requestType": "building", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /buildings/id/{id}", "name": "DeleteBuildingByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /departments/id/{id}", "name": "GetDepartmentByID", "responseType": "department", "pathNames": {"id": "id"}},
+        {"op": "POST /departments/id/{id}", "name": "CreateDepartmentByID", "requestType": "department", "responseType": "department", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /departments/id/{id}", "name": "UpdateDepartmentByID", "requestType": "department", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /departments/id/{id}", "name": "DeleteDepartmentByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /categories/id/{id}", "name": "GetCategoryByID", "responseType": "category", "pathNames": {"id": "id"}},
+        {"op": "POST /categories/id/{id}", "name": "CreateCategoryByID", "requestType": "category", "responseType": "category", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /categories/id/{id}", "name": "UpdateCategoryByID", "requestType": "category", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /categories/id/{id}", "name": "DeleteCategoryByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /sites/id/{id}", "name": "GetSiteByID", "responseType": "site", "pathNames": {"id": "id"}},
+        {"op": "POST /sites/id/{id}", "name": "CreateSiteByID", "requestType": "site", "responseType": "site", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /sites/id/{id}", "name": "UpdateSiteByID", "requestType": "site", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /sites/id/{id}", "name": "DeleteSiteByID", "pathNames": {"id": "id"}}
       ]
     }
   ]
