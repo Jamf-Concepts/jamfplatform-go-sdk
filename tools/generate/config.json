@@ -7,6 +7,7 @@
       "file": "testing/device-inventory.yaml",
       "namespace": "devices",
       "package": "devices",
+      "splitByTag": true,
       "specFile": "device_inventory_api.json",
       "operations": [
         {"op": "GET /v1/devices", "name": "ListDevices", "pagination": "hasNext", "params": ["sort:[]string", "filter"]},
@@ -21,6 +22,7 @@
       "file": "testing/blueprints.json",
       "namespace": "blueprints",
       "package": "blueprints",
+      "splitByTag": true,
       "specFile": "blueprints_api.json",
       "operations": [
         {"op": "GET /v1/blueprints", "name": "ListBlueprints", "pagination": "sizeCheck", "params": ["sort:[]string", "search"]},
@@ -39,6 +41,7 @@
       "file": "testing/devicegroups.yaml",
       "namespace": "device-groups",
       "package": "devicegroups",
+      "splitByTag": true,
       "specFile": "device_group_inventory_api.json",
       "operations": [
         {"op": "GET /v1/device-groups", "name": "ListDeviceGroups", "pagination": "hasNext", "params": ["sort:[]string", "filter"]},
@@ -55,6 +58,7 @@
       "file": "testing/deviceaction.yaml",
       "namespace": "device-actions",
       "package": "deviceactions",
+      "splitByTag": true,
       "specFile": "device_management_action_api.json",
       "operations": [
         {"op": "POST /v1/devices/{id}/check-in", "name": "CheckInDevice"},
@@ -68,6 +72,7 @@
       "file": "testing/declarations.json",
       "namespace": "ddm/report",
       "package": "ddmreport",
+      "splitByTag": true,
       "specFile": "declaration_reporting_service.json",
       "operations": [
         {"op": "GET /v1/devices/{deviceId}", "name": "GetDeviceDeclarationReport"},
@@ -78,6 +83,7 @@
       "file": "testing/benchmarks.json",
       "namespace": "compliance-benchmarks",
       "package": "compliancebenchmarks",
+      "splitByTag": true,
       "specFile": "compliance_benchmark_engine.json",
       "operations": [
         {"op": "GET /v2/benchmarks", "name": "ListBenchmarks", "version": "v1"},
@@ -92,6 +98,7 @@
       "file": "testing/benchmarks-report.yaml",
       "namespace": "compliance-benchmarks",
       "package": "compliancebenchmarks",
+      "splitByTag": true,
       "specFile": "compliance_benchmarks_reporting_api.json",
       "operations": [
         {"op": "GET /v1/benchmarks/{id}/rules", "name": "ListBenchmarkRulesStats", "pagination": "sizeCheck", "params": ["sort:string", "rule-search:string:ruleSearch"]},
@@ -114,7 +121,10 @@
       ],
       "operations": [
         {"op": "GET /v1/buildings", "name": "ListBuildingsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/buildings", "name": "CreateBuildingV1"},
         {"op": "GET /v1/buildings/{id}", "name": "GetBuildingV1"},
+        {"op": "PUT /v1/buildings/{id}", "name": "UpdateBuildingV1"},
+        {"op": "DELETE /v1/buildings/{id}", "name": "DeleteBuildingV1"},
         {"op": "GET /startup-status", "name": "GetStartupStatus"}
       ]
     }

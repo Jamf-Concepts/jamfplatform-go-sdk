@@ -480,10 +480,22 @@ func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, m
 	return nil
 }
 
-// tagToFileBase converts an OpenAPI tag ("startup-status", "mobile-device-extension-attributes-preview")
-// into a Go-friendly filename base by kebab-to-snake-casing.
+// tagToFileBase converts an OpenAPI tag ("startup-status", "declaration report",
+// "mobile-device-extension-attributes-preview") into a Go-friendly filename base.
+// Hyphens and whitespace collapse to underscores; non-word characters are dropped.
 func tagToFileBase(tag string) string {
-	return strings.ReplaceAll(tag, "-", "_")
+	s := strings.ToLower(strings.TrimSpace(tag))
+	var b strings.Builder
+	b.Grow(len(s))
+	for _, r := range s {
+		switch {
+		case r >= 'a' && r <= 'z', r >= '0' && r <= '9':
+			b.WriteRune(r)
+		case r == '-', r == '_', r == ' ', r == '\t':
+			b.WriteByte('_')
+		}
+	}
+	return b.String()
 }
 
 // emitTemplated executes a template and writes the goimports-formatted result
@@ -1160,14 +1172,16 @@ func categorize(m GoMethod) string {
 	hasResp := m.ResponseType != ""
 	isOK := m.ExpectedStatus == 200
 
+	// "create" covers any shape that sends a body AND returns one — POST 201,
+	// PUT/PATCH 200, etc. Naming is historical; the template is request+response.
 	switch {
+	case hasReq && hasResp:
+		return "create"
 	case isOK && hasResp:
 		return "get"
-	case !isOK && hasResp && hasReq:
-		return "create"
-	case !isOK && hasResp && !hasReq:
+	case hasResp:
 		return "actionWithResponse"
-	case !isOK && !hasResp && hasReq:
+	case hasReq:
 		return "update"
 	default:
 		return "action"

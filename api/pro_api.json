@@ -206,6 +206,20 @@
         },
         "type": "object"
       },
+      "HrefResponse": {
+        "properties": {
+          "href": {
+            "example": "https://yourJamfProUrl.jamf/api/v1/resource/1",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "StartupStatus": {
         "properties": {
           "error": {
@@ -417,9 +431,70 @@
         "x-required-privileges": [
           "Read Buildings"
         ]
+      },
+      "post": {
+        "description": "Create building record\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Building"
+              }
+            }
+          },
+          "description": "building object to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Building record was created"
+          }
+        },
+        "summary": "Create Building record\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-required-privileges": [
+          "Create Buildings"
+        ]
       }
     },
     "/v1/buildings/{id}": {
+      "delete": {
+        "description": "Removes specified building record\n",
+        "parameters": [
+          {
+            "description": "instance id of building record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Building record was deleted"
+          }
+        },
+        "summary": "Remove specified Building record\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-required-privileges": [
+          "Delete Buildings"
+        ]
+      },
       "get": {
         "description": "Gets specified Building object\n",
         "parameters": [
@@ -463,6 +538,52 @@
         ],
         "x-required-privileges": [
           "Read Buildings"
+        ]
+      },
+      "put": {
+        "description": "Update specified building object\n",
+        "parameters": [
+          {
+            "description": "instance id of building record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Building"
+              }
+            }
+          },
+          "description": "building object to update. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Building"
+                }
+              }
+            },
+            "description": "Building update"
+          }
+        },
+        "summary": "Update specified Building object\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-required-privileges": [
+          "Update Buildings"
         ]
       }
     }

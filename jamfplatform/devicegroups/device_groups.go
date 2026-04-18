@@ -119,18 +119,3 @@ func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, reques
 	}
 	return nil
 }
-
-// ListDeviceGroupsForDevice get device groups for a device.
-func (c *Client) ListDeviceGroupsForDevice(ctx context.Context, deviceID string) ([]DeviceGroupMemberOfRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
-	endpoint := fmt.Sprintf("%s/devices/%s/device-groups", prefix, url.PathEscape(deviceID))
-
-	var result struct {
-		TotalCount int                                   `json:"totalCount"`
-		Results    []DeviceGroupMemberOfRepresentationV1 `json:"results"`
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("ListDeviceGroupsForDevice(%s): %w", deviceID, err)
-	}
-	return result.Results, nil
-}

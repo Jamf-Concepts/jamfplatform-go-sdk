@@ -147,21 +147,3 @@ func TestUpdateDeviceGroupMembers(t *testing.T) {
 		t.Fatal(err)
 	}
 }
-
-func TestListDeviceGroupsForDevice(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/device-groups/v1/tenant/t-test/devices/test-id/device-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{"id": "item-1"}}})
-	})
-
-	results, err := c.ListDeviceGroupsForDevice(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}

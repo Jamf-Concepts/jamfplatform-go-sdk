@@ -33,6 +33,24 @@ func TestListBuildingsV1(t *testing.T) {
 	}
 }
 
+func TestCreateBuildingV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/buildings", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{"id": "new-id"})
+	})
+
+	result, err := c.CreateBuildingV1(context.Background(), &Building{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestGetBuildingV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v1/tenant/t-test/buildings/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -64,5 +82,38 @@ func TestGetBuildingV1_NotFound(t *testing.T) {
 	_, err := c.GetBuildingV1(context.Background(), "test-id")
 	if err == nil {
 		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateBuildingV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/buildings/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "new-id"})
+	})
+
+	result, err := c.UpdateBuildingV1(context.Background(), "test-id", &Building{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestDeleteBuildingV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/buildings/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteBuildingV1(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
 	}
 }

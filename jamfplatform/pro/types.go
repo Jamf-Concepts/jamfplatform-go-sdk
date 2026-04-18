@@ -27,7 +27,7 @@ type ApiErrorCause struct {
 type Building struct {
 	City           *string `json:"city,omitempty"`
 	Country        *string `json:"country,omitempty"`
-	ID             string  `json:"id"`
+	ID             *string `json:"id,omitempty"`
 	Name           string  `json:"name"`
 	StateProvince  *string `json:"stateProvince,omitempty"`
 	StreetAddress1 *string `json:"streetAddress1,omitempty"`
@@ -39,6 +39,12 @@ type Building struct {
 type BuildingSearchResults struct {
 	Results    []Building `json:"results"`
 	TotalCount int        `json:"totalCount"`
+}
+
+// HrefResponse represents a href response.
+type HrefResponse struct {
+	Href string `json:"href"`
+	ID   string `json:"id"`
 }
 
 // StartupStatus represents a startup status.

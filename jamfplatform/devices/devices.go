@@ -112,32 +112,3 @@ func (c *Client) ListDeviceApplications(ctx context.Context, id string, sort []s
 		return result.Results, result.HasNext, nil
 	})
 }
-
-// ListDevicesForUser get devices for a user.
-func (c *Client) ListDevicesForUser(ctx context.Context, userID string, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("devices", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := fmt.Sprintf("%s/users/%s/devices", prefix, url.PathEscape(userID))
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			client.PaginatedResponseRepresentation
-			Results []DeviceListReadRepresentationV1 `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		return result.Results, result.HasNext, nil
-	})
-}

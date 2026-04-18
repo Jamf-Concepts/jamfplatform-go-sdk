@@ -24,17 +24,6 @@ import (
 // Methods
 // ---------------------------------------------------------------------------
 
-// GetDeviceDeclarationReport get device report declarations.
-func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string) (*DeviceReportDto, error) {
-	prefix := c.transport.TenantPrefix("ddm/report", "v1")
-	var result DeviceReportDto
-	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(deviceID))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetDeviceDeclarationReport(%s): %w", deviceID, err)
-	}
-	return &result, nil
-}
-
 // ListDeclarationReportClients get declaration report devices.
 func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationIdentifier string, sort []string) ([]DeclarationReportClientDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")

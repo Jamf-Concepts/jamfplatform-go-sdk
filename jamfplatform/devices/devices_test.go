@@ -118,25 +118,3 @@ func TestListDeviceApplications(t *testing.T) {
 		t.Fatalf("len = %d, want 1", len(results))
 	}
 }
-
-func TestListDevicesForUser(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/users/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{"id": "item-1"}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListDevicesForUser(context.Background(), "test-id", nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}

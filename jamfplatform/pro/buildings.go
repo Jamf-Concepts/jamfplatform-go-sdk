@@ -54,6 +54,17 @@ func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter stri
 	})
 }
 
+// CreateBuildingV1 create Building record.
+func (c *Client) CreateBuildingV1(ctx context.Context, request *Building) (*HrefResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result HrefResponse
+	endpoint := prefix + "/buildings"
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateBuildingV1: %w", err)
+	}
+	return &result, nil
+}
+
 // GetBuildingV1 get specified Building object.
 func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -63,4 +74,25 @@ func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error
 		return nil, fmt.Errorf("GetBuildingV1(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// UpdateBuildingV1 update specified Building object.
+func (c *Client) UpdateBuildingV1(ctx context.Context, id string, request *Building) (*Building, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result Building
+	endpoint := fmt.Sprintf("%s/buildings/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateBuildingV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// DeleteBuildingV1 remove specified Building record.
+func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	endpoint := fmt.Sprintf("%s/buildings/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteBuildingV1(%s): %w", id, err)
+	}
+	return nil
 }

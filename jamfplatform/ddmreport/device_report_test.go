@@ -44,25 +44,3 @@ func TestGetDeviceDeclarationReport_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
-
-func TestListDeclarationReportClients(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/tenant/t-test/declarations/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{"id": "item-1"}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListDeclarationReportClients(context.Background(), "test-id", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
