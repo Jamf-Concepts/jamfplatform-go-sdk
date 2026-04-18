@@ -95,6 +95,7 @@
     {
       "file": "testing/pro.json",
       "namespace": "pro",
+      "package": "pro",
       "specFile": "pro_api.json",
       "excludePaths": [
         "POST /v1/auth/token",
