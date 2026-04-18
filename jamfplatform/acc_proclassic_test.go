@@ -28,5 +28,15 @@ func TestAcceptance_Classic_GetComputerByID(t *testing.T) {
 	if comp == nil || comp.General == nil {
 		t.Fatalf("expected Computer.General populated, got %+v", comp)
 	}
-	t.Logf("Computer id=%d name=%q serial=%q udid=%q", comp.General.ID, comp.General.Name, comp.General.SerialNumber, comp.General.UDID)
+	deref := func(p *string) string {
+		if p == nil {
+			return ""
+		}
+		return *p
+	}
+	id := 0
+	if comp.General.ID != nil {
+		id = *comp.General.ID
+	}
+	t.Logf("Computer id=%d name=%q serial=%q udid=%q", id, deref(comp.General.Name), deref(comp.General.SerialNumber), deref(comp.General.UDID))
 }

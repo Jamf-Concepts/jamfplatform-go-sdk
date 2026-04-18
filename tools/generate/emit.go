@@ -218,7 +218,7 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 			delete(referencedSchemas, name)
 		}
 	}
-	types := extractTypes(doc, referencedSchemas)
+	types := extractTypes(doc, referencedSchemas, spec.Format)
 
 	for _, t := range types {
 		emittedTypes[t.Name] = true
@@ -313,7 +313,7 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 				delete(refs, name)
 			}
 		}
-		types := extractTypes(doc, refs)
+		types := extractTypes(doc, refs, spec.Format)
 		for _, t := range types {
 			pkgEmitted[t.Name] = true
 		}

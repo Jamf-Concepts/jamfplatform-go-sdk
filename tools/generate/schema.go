@@ -334,7 +334,7 @@ func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]*schemaU
 // Schema → Go types
 // ---------------------------------------------------------------------------
 
-func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
+func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string) []GoType {
 	names := sortedKeys(doc.Components.Schemas)
 	var types []GoType
 
@@ -352,7 +352,7 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 		// allOf composition without an explicit type: merge properties from
 		// each composed schema into a single flat struct.
 		if len(schema.AllOf) > 0 && (schema.Type == nil || !schema.Type.Is("object")) {
-			t := schemaToGoType(name, schema, false)
+			t := schemaToGoType(name, schema, false, format)
 			t.XMLName = xmlName
 			types = append(types, t)
 			continue
@@ -362,7 +362,7 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 			// clearly objects (Classic spec does this). If there are
 			// properties, treat it as an object anyway.
 			if len(schema.Properties) > 0 {
-				t := schemaToGoType(name, schema, usage.isRequest)
+				t := schemaToGoType(name, schema, usage.isRequest, format)
 				t.XMLName = xmlName
 				types = append(types, t)
 			}
@@ -398,7 +398,7 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 			continue
 		}
 
-		t := schemaToGoType(name, schema, usage.isRequest)
+		t := schemaToGoType(name, schema, usage.isRequest, format)
 		t.XMLName = xmlName
 		types = append(types, t)
 	}
@@ -496,7 +496,7 @@ func flattenAllOf(schema *openapi3.Schema) (map[string]*openapi3.SchemaRef, []st
 	return props, required
 }
 
-func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool) GoType {
+func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format string) GoType {
 	gt := GoType{
 		Name:    name,
 		Comment: fmt.Sprintf("%s represents a %s.", name, camelToWords(name)),
@@ -529,10 +529,17 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool) GoType
 		// distinguish "omit field" from "send zero value" (critical for PATCH).
 		// $ref struct pointers only apply to response types; for request types the
 		// (isRequest && !isRequired) term handles optional fields instead.
+		//
+		// For XML specs (Jamf Classic) every field becomes a pointer with
+		// omitempty regardless of required/nullable flags. Classic consumers
+		// (especially the TF provider) rely on three-state semantics: nil to
+		// omit, &"" to clear, &value to set. The spec under-declares
+		// nullability so the usual heuristic produces non-pointer scalars
+		// that conflate "omit" and "clear" on the wire.
 		isStructRef := propRef.Ref != "" && prop != nil && prop.Type != nil &&
 			prop.Type.Is("object") && len(prop.Properties) > 0
 		needsPtr := isNullable || (isStructRef && !isRequest) || (!isRequired && !isScalar(goType)) ||
-			(isRequest && !isRequired)
+			(isRequest && !isRequired) || format == "xml"
 
 		if isRequest && !isRequired && !strings.HasPrefix(goType, "*") && (strings.HasPrefix(goType, "[]") || strings.HasPrefix(goType, "map[")) {
 			// For request types, unrequired slices/maps get pointer-wrapped so
