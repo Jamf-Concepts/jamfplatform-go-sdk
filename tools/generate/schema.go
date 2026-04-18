@@ -522,9 +522,10 @@ func classicListWrapper(goName, specName string, schema *openapi3.Schema, doc *o
 	}
 	resourceGo := refName(resourceProp)
 	wrapper := GoType{
-		Name:    goName,
-		XMLName: specName,
-		Comment: fmt.Sprintf("%s wraps a Jamf Classic list response with a top-level size count and a flat slice of %s.", goName, resourceGo),
+		Name:          goName,
+		XMLName:       specName,
+		IsListWrapper: true,
+		Comment:       fmt.Sprintf("%s wraps a Jamf Classic list response with a top-level size count and a flat slice of %s.", goName, resourceGo),
 		Fields: []GoField{
 			{Name: "Size", Type: sizeGo, JSONTag: "size,omitempty"},
 			{Name: exportedGoName(plural(resourceName)), Type: "[]" + resourceGo, JSONTag: resourceName},
@@ -560,20 +561,13 @@ func plural(singular string) string {
 func addTopLevelIDsForClassic(types []GoType) {
 	for i := range types {
 		t := &types[i]
-		if len(t.Fields) == 0 || t.AliasTarget != "" || t.IsRawJSON {
+		if len(t.Fields) == 0 || t.AliasTarget != "" || t.IsRawJSON || t.IsListWrapper {
 			continue
 		}
-		var hasSubObject, hasTopID, hasSlice bool
+		var hasSubObject, hasTopID bool
 		for _, f := range t.Fields {
 			if f.Name == "ID" {
 				hasTopID = true
-			}
-			// Slice-typed fields signal a list wrapper (Classic's list
-			// response pattern) rather than a single resource. List
-			// wrappers carry no id of their own — the caller reads ids
-			// from the element structs.
-			if strings.HasPrefix(f.Type, "[]") {
-				hasSlice = true
 			}
 			// Any pointer-to-struct field — i.e. a nested sub-object like
 			// General, Connection, Scope — is a signal the server probably
@@ -586,7 +580,7 @@ func addTopLevelIDsForClassic(types []GoType) {
 				hasSubObject = true
 			}
 		}
-		if !hasSubObject || hasTopID || hasSlice {
+		if !hasSubObject || hasTopID {
 			continue
 		}
 		t.Fields = append([]GoField{{

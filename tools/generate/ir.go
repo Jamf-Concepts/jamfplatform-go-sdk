@@ -15,6 +15,7 @@ type GoType struct {
 	Discriminator *GoDiscriminator
 	XMLName       string // wire element name when format=xml and it differs from Go type name; emitted as XMLName xml.Name `xml:"..."` field
 	AliasTarget   string // non-empty → emit as `type Name = AliasTarget` (used for top-level array schemas)
+	IsListWrapper bool   // true when this is a Classic list wrapper (flattens {size, resource} array items into sibling fields). Excludes the type from heuristics that inject top-level id or carry id as a resource signal.
 }
 
 // GoDiscriminator describes a oneOf-with-discriminator polymorphic schema.

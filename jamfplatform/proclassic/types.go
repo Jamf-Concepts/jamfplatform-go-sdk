@@ -1347,6 +1347,7 @@ func (t ClassesItemClass) MarshalXML(e *xml.Encoder, start xml.StartElement) err
 // Computer represents a computer.
 type Computer struct {
 	XMLName               xml.Name
+	ID                    *int                    `xml:"id,omitempty"`
 	Certificates          []any                   `xml:"certificates"`
 	ConfigurationProfiles []any                   `xml:"configuration_profiles"`
 	ExtensionAttributes   []any                   `xml:"extension_attributes"`
@@ -1639,6 +1640,7 @@ func (t ComputerApplicationUsageItem) MarshalXML(e *xml.Encoder, start xml.Start
 // ComputerApplicationUsageItemUsage represents a computer application usage item usage.
 type ComputerApplicationUsageItemUsage struct {
 	XMLName xml.Name
+	ID      *int                                        `xml:"id,omitempty"`
 	Apps    []ComputerApplicationUsageItemUsageAppsItem `xml:"apps"`
 	Date    *ComputerApplicationUsageDate               `xml:"date,omitempty"`
 }
@@ -2191,6 +2193,7 @@ func (t ComputerGroups) MarshalXML(e *xml.Encoder, start xml.StartElement) error
 // ComputerGroupsItem represents a computer groups item.
 type ComputerGroupsItem struct {
 	XMLName       xml.Name
+	ID            *int                                  `xml:"id,omitempty"`
 	ComputerGroup []ComputerGroupsItemComputerGroupItem `xml:"computer_group"`
 	Size          *Size                                 `xml:"size,omitempty"`
 }
@@ -2232,6 +2235,7 @@ func (t ComputerGroupsItemComputerGroupItem) MarshalXML(e *xml.Encoder, start xm
 // ComputerHistory represents a computer history.
 type ComputerHistory struct {
 	XMLName                 xml.Name
+	ID                      *int                                    `xml:"id,omitempty"`
 	Audits                  []any                                   `xml:"audits"`
 	CasperImagingLogs       []any                                   `xml:"casper_imaging_logs"`
 	CasperRemoteLogs        []any                                   `xml:"casper_remote_logs"`
@@ -2557,6 +2561,7 @@ func (t ComputerInvitationsItemComputerInvitation) MarshalXML(e *xml.Encoder, st
 // ComputerManagement represents a computer management.
 type ComputerManagement struct {
 	XMLName                      xml.Name
+	ID                           *int                       `xml:"id,omitempty"`
 	Ebooks                       []any                      `xml:"ebooks"`
 	General                      *ComputerManagementGeneral `xml:"general,omitempty"`
 	MacAppStoreApps              []any                      `xml:"mac_app_store_apps"`
@@ -3285,6 +3290,7 @@ func (t EbookGeneralSelfServiceIcon) MarshalXML(e *xml.Encoder, start xml.StartE
 // EbookScope represents a ebook scope.
 type EbookScope struct {
 	XMLName            xml.Name
+	ID                 *int                               `xml:"id,omitempty"`
 	AllComputers       *bool                              `xml:"all_computers,omitempty"`
 	AllJssUsers        *bool                              `xml:"all_jss_users,omitempty"`
 	AllMobileDevices   *bool                              `xml:"all_mobile_devices,omitempty"`
@@ -5381,6 +5387,7 @@ func (t MacApplicationsItemMacApplication) MarshalXML(e *xml.Encoder, start xml.
 // MobileDevice represents a mobile device.
 type MobileDevice struct {
 	XMLName               xml.Name
+	ID                    *int                        `xml:"id,omitempty"`
 	Applications          []any                       `xml:"applications"`
 	Certificates          []any                       `xml:"certificates"`
 	ConfigurationProfiles []any                       `xml:"configuration_profiles"`
@@ -6780,6 +6787,7 @@ func (t MobileDeviceConfigurationProfilesItemConfigurationProfile) MarshalXML(e 
 // MobileDeviceEnrollmentProfile represents a mobile device enrollment profile.
 type MobileDeviceEnrollmentProfile struct {
 	XMLName     xml.Name
+	ID          *int                                  `xml:"id,omitempty"`
 	Attachments []any                                 `xml:"attachments"`
 	General     *MobileDeviceEnrollmentProfileGeneral `xml:"general,omitempty"`
 	Location    *Location                             `xml:"location,omitempty"`
@@ -7102,6 +7110,7 @@ func (t MobileDeviceGroupsItemMobileDeviceGroup) MarshalXML(e *xml.Encoder, star
 // MobileDeviceHistory represents a mobile device history.
 type MobileDeviceHistory struct {
 	XMLName            xml.Name
+	ID                 *int                                   `xml:"id,omitempty"`
 	Applications       *MobileDeviceHistoryApplications       `xml:"applications,omitempty"`
 	Audits             []any                                  `xml:"audits"`
 	Ebooks             *MobileDeviceHistoryEbooks             `xml:"ebooks,omitempty"`
@@ -7147,6 +7156,7 @@ func (t MobileDeviceHistoryApplications) MarshalXML(e *xml.Encoder, start xml.St
 // MobileDeviceHistoryEbooks represents a mobile device history ebooks.
 type MobileDeviceHistoryEbooks struct {
 	XMLName   xml.Name
+	ID        *int                                `xml:"id,omitempty"`
 	Failed    []any                               `xml:"failed"`
 	Installed *MobileDeviceHistoryEbooksInstalled `xml:"installed,omitempty"`
 	Pending   []any                               `xml:"pending"`
@@ -8329,6 +8339,7 @@ func (t PackagesItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // PatchAvailableTitles represents a patch available titles.
 type PatchAvailableTitles struct {
 	XMLName         xml.Name
+	ID              *int  `xml:"id,omitempty"`
 	AvailableTitles []any `xml:"available_titles"`
 	Size            *Size `xml:"size,omitempty"`
 }
@@ -8964,6 +8975,7 @@ func (t PatchSoftwareTitlesItemPatchSoftwareTitle) MarshalXML(e *xml.Encoder, st
 // Peripheral represents a peripheral.
 type Peripheral struct {
 	XMLName     xml.Name
+	ID          *int               `xml:"id,omitempty"`
 	Attachments []any              `xml:"attachments"`
 	General     *PeripheralGeneral `xml:"general,omitempty"`
 	Location    *Location          `xml:"location,omitempty"`
@@ -9260,6 +9272,7 @@ func (t PoliciesItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // Policy represents a policy.
 type Policy struct {
 	XMLName              xml.Name
+	ID                   *int                        `xml:"id,omitempty"`
 	AccountMaintenance   *PolicyAccountMaintenance   `xml:"account_maintenance,omitempty"`
 	DiskEncryption       *PolicyDiskEncryption       `xml:"disk_encryption,omitempty"`
 	DockItems            []any                       `xml:"dock_items"`
@@ -9290,6 +9303,7 @@ func (t Policy) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // PolicyAccountMaintenance represents a policy account maintenance.
 type PolicyAccountMaintenance struct {
 	XMLName                 xml.Name
+	ID                      *int                                             `xml:"id,omitempty"`
 	Accounts                []any                                            `xml:"accounts"`
 	DirectoryBindings       []any                                            `xml:"directory_bindings"`
 	ManagementAccount       *PolicyAccountMaintenanceManagementAccount       `xml:"management_account,omitempty"`
@@ -9580,6 +9594,7 @@ func (t PolicyPackageConfiguration) MarshalXML(e *xml.Encoder, start xml.StartEl
 // PolicyScope represents a policy scope.
 type PolicyScope struct {
 	XMLName        xml.Name
+	ID             *int                            `xml:"id,omitempty"`
 	AllComputers   *bool                           `xml:"all_computers,omitempty"`
 	Buildings      []PolicyScopeBuildingsItem      `xml:"buildings"`
 	ComputerGroups []PolicyScopeComputerGroupsItem `xml:"computer_groups"`
@@ -9851,6 +9866,7 @@ type PolicyScopeLimitationsUsersItem struct {
 // PolicyScripts represents a policy scripts.
 type PolicyScripts struct {
 	XMLName xml.Name
+	ID      *int  `xml:"id,omitempty"`
 	Script  []any `xml:"script"`
 	Size    *Size `xml:"size,omitempty"`
 }
@@ -11133,6 +11149,7 @@ func (t VppAccountsItem) MarshalXML(e *xml.Encoder, start xml.StartElement) erro
 // VppAssignment represents a vpp assignment.
 type VppAssignment struct {
 	XMLName xml.Name
+	ID      *int                  `xml:"id,omitempty"`
 	Ebooks  []any                 `xml:"ebooks"`
 	General *VppAssignmentGeneral `xml:"general,omitempty"`
 	IosApps []any                 `xml:"ios_apps"`
@@ -11178,6 +11195,7 @@ func (t VppAssignmentGeneral) MarshalXML(e *xml.Encoder, start xml.StartElement)
 // VppAssignmentScope represents a vpp assignment scope.
 type VppAssignmentScope struct {
 	XMLName       xml.Name
+	ID            *int                           `xml:"id,omitempty"`
 	AllJssUsers   *bool                          `xml:"all_jss_users,omitempty"`
 	Exclusions    *VppAssignmentScopeExclusions  `xml:"exclusions,omitempty"`
 	JssUserGroups []any                          `xml:"jss_user_groups"`
