@@ -471,7 +471,39 @@
         {"op": "POST /computercommands/command/{command}/id/{id}", "name": "IssueComputerCommandByID", "requestType": "computer_command_post", "responseType": "computer_command", "pathNames": {"command": "command", "id": "id"}, "expectedStatus": 201},
 
         {"op": "GET /mobiledevicecommands/uuid/{uuid}", "name": "GetMobileDeviceCommandByUUID", "responseType": "mobile_device_command", "pathNames": {"uuid": "uuid"}},
-        {"op": "POST /mobiledevicecommands/command", "name": "IssueMobileDeviceCommand", "requestType": "mobile_device_command_post", "responseType": "mobile_device_command", "expectedStatus": 201}
+        {"op": "POST /mobiledevicecommands/command", "name": "IssueMobileDeviceCommand", "requestType": "mobile_device_command_post", "responseType": "mobile_device_command", "expectedStatus": 201},
+
+        {"op": "GET /computerhistory/id/{id}", "name": "GetComputerHistoryByID", "responseType": "computer_history", "pathNames": {"id": "id"}},
+        {"op": "GET /computerhistory/name/{name}", "name": "GetComputerHistoryByName", "responseType": "computer_history"},
+        {"op": "GET /computerhistory/udid/{udid}", "name": "GetComputerHistoryByUDID", "responseType": "computer_history", "pathNames": {"udid": "udid"}},
+        {"op": "GET /computerhistory/serialnumber/{serialnumber}", "name": "GetComputerHistoryBySerialNumber", "responseType": "computer_history", "pathNames": {"serialnumber": "serialNumber"}},
+        {"op": "GET /computerhistory/macaddress/{macaddress}", "name": "GetComputerHistoryByMacAddress", "responseType": "computer_history", "pathNames": {"macaddress": "macAddress"}},
+
+        {"op": "GET /mobiledevicehistory/id/{id}", "name": "GetMobileDeviceHistoryByID", "responseType": "mobile_device_history", "pathNames": {"id": "id"}},
+        {"op": "GET /mobiledevicehistory/name/{name}", "name": "GetMobileDeviceHistoryByName", "responseType": "mobile_device_history"},
+        {"op": "GET /mobiledevicehistory/udid/{udid}", "name": "GetMobileDeviceHistoryByUDID", "responseType": "mobile_device_history", "pathNames": {"udid": "udid"}},
+        {"op": "GET /mobiledevicehistory/serialnumber/{serialnumber}", "name": "GetMobileDeviceHistoryBySerialNumber", "responseType": "mobile_device_history", "pathNames": {"serialnumber": "serialNumber"}},
+        {"op": "GET /mobiledevicehistory/macaddress/{macaddress}", "name": "GetMobileDeviceHistoryByMacAddress", "responseType": "mobile_device_history", "pathNames": {"macaddress": "macAddress"}},
+
+        {"op": "GET /computerapplicationusage/id/{id}/{start_date}_{end_date}", "name": "GetComputerApplicationUsageByID", "responseType": "computer_application_usage", "pathNames": {"id": "id", "start_date": "startDate", "end_date": "endDate"}},
+
+        {"op": "GET /computerreports/id/{id}", "name": "GetComputerReportByID", "responseType": "computer_report", "pathNames": {"id": "id"}},
+        {"op": "GET /computerreports/name/{name}", "name": "GetComputerReportByName", "responseType": "computer_report"},
+
+        {"op": "GET /vppaccounts/id/{id}", "name": "GetVPPAccountByID", "responseType": "vpp_account", "pathNames": {"id": "id"}},
+        {"op": "POST /vppaccounts/id/{id}", "name": "CreateVPPAccountByID", "requestType": "vpp_account", "responseType": "vpp_account", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /vppaccounts/id/{id}", "name": "UpdateVPPAccountByID", "requestType": "vpp_account", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /vppaccounts/id/{id}", "name": "DeleteVPPAccountByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /vppassignments/id/{id}", "name": "GetVPPAssignmentByID", "responseType": "vpp_assignment", "pathNames": {"id": "id"}},
+        {"op": "POST /vppassignments/id/{id}", "name": "CreateVPPAssignmentByID", "requestType": "vpp_assignment_post", "responseType": "vpp_assignment", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /vppassignments/id/{id}", "name": "UpdateVPPAssignmentByID", "requestType": "vpp_assignment_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /vppassignments/id/{id}", "name": "DeleteVPPAssignmentByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /vppinvitations/id/{id}", "name": "GetVPPInvitationByID", "responseType": "vpp_invitation", "pathNames": {"id": "id"}},
+        {"op": "POST /vppinvitations/id/{id}", "name": "CreateVPPInvitationByID", "requestType": "vpp_invitation", "responseType": "vpp_invitation", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /vppinvitations/id/{id}", "name": "UpdateVPPInvitationByID", "requestType": "vpp_invitation", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /vppinvitations/id/{id}", "name": "DeleteVPPInvitationByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

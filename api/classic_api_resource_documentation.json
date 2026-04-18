@@ -1676,6 +1676,60 @@
         },
         "type": "object"
       },
+      "computer_application_usage": {
+        "items": {
+          "properties": {
+            "usage": {
+              "properties": {
+                "apps": {
+                  "items": {
+                    "properties": {
+                      "app": {
+                        "$ref": "#/components/schemas/computer_application_usage_app"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "date": {
+                  "$ref": "#/components/schemas/computer_application_usage_date"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "computer_application_usage_app": {
+        "properties": {
+          "foreground": {
+            "description": "Number of minutes application was in the foreground",
+            "example": 45,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Safari.app",
+            "type": "string"
+          },
+          "open": {
+            "description": "Number of minutes the application was open",
+            "example": 150,
+            "type": "integer"
+          },
+          "version": {
+            "example": 11,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "computer_application_usage_date": {
+        "example": "2018/01/29",
+        "type": "string"
+      },
       "computer_check_in": {
         "properties": {
           "check_for_policies_at_login_logout": {
@@ -1921,6 +1975,527 @@
           },
           "site": {
             "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "type": "object"
+      },
+      "computer_history": {
+        "properties": {
+          "audits": {
+            "items": {
+              "properties": {
+                "audit": {
+                  "properties": {
+                    "date_time": {
+                      "example": "2017-07-07T18:37:04Z",
+                      "type": "string"
+                    },
+                    "date_time_epoch": {
+                      "example": 1499470624555,
+                      "type": "string"
+                    },
+                    "date_time_utc": {
+                      "example": "2017-07-07T18:37:04.555-0500",
+                      "type": "string"
+                    },
+                    "event": {
+                      "example": "Viewed FileVault Encryption Key",
+                      "type": "string"
+                    },
+                    "username": {
+                      "example": "Jamf Pro Admin",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "type": "array"
+          },
+          "casper_imaging_logs": {
+            "items": {
+              "properties": {
+                "casper_imaging_log": {
+                  "properties": {
+                    "date_time": {
+                      "example": "2017-07-07T18:37:04Z",
+                      "type": "string"
+                    },
+                    "date_time_epoch": {
+                      "example": 1499470624555,
+                      "type": "string"
+                    },
+                    "date_time_utc": {
+                      "example": "2017-07-07T18:37:04.555-0500",
+                      "type": "string"
+                    },
+                    "status": {
+                      "example": "Completed",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "type": "array"
+          },
+          "casper_remote_logs": {
+            "items": {
+              "properties": {
+                "casper_remote_log": {
+                  "properties": {
+                    "date_time": {
+                      "example": "2017-07-07T18:37:04Z",
+                      "type": "string"
+                    },
+                    "date_time_epoch": {
+                      "example": 1499470624555,
+                      "type": "string"
+                    },
+                    "date_time_utc": {
+                      "example": "2017-07-07T18:37:04.555-0500",
+                      "type": "string"
+                    },
+                    "status": {
+                      "example": "Completed",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "type": "array"
+          },
+          "commands": {
+            "properties": {
+              "completed": {
+                "items": {
+                  "properties": {
+                    "command": {
+                      "properties": {
+                        "completed": {
+                          "example": "2017/07/07 at 6:37 PM",
+                          "type": "string"
+                        },
+                        "completed_epoch": {
+                          "example": 1499470624555,
+                          "type": "string"
+                        },
+                        "completed_utc": {
+                          "example": "2017-07-07T18:37:04.555-0500",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "WiFi Configuration Profile",
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "failed": {
+                "items": {
+                  "properties": {
+                    "command": {
+                      "properties": {
+                        "failed": {
+                          "example": "2017/07/07 at 6:38 PM",
+                          "type": "string"
+                        },
+                        "failed_epoch": {
+                          "example": 1499470735555,
+                          "type": "string"
+                        },
+                        "failed_utc": {
+                          "example": "2017-07-07T18:38:55.555-0500",
+                          "type": "string"
+                        },
+                        "issued": {
+                          "example": "2017/07/07 at 6:37 PM",
+                          "type": "string"
+                        },
+                        "issued_epoch": {
+                          "example": 1499470624555,
+                          "type": "string"
+                        },
+                        "issued_utc": {
+                          "example": "2017-07-07T18:37:04.555-0500",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "Install Configuration Profile AD Binding",
+                          "type": "string"
+                        },
+                        "status": {
+                          "example": "The Directory Binding Account payload could not be installed",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "pending": {
+                "items": {
+                  "properties": {
+                    "command": {
+                      "properties": {
+                        "issued": {
+                          "example": "2017/07/07 at 6:37 PM",
+                          "type": "string"
+                        },
+                        "issued_epoch": {
+                          "example": 1499470624555,
+                          "type": "string"
+                        },
+                        "issued_utc": {
+                          "example": "2017-07-07T18:37:04.555-0500",
+                          "type": "string"
+                        },
+                        "last_push": {
+                          "example": "2017/07/07 at 6:38 PM",
+                          "type": "string"
+                        },
+                        "last_push_epoch": {
+                          "example": 1499470735555,
+                          "type": "string"
+                        },
+                        "last_push_utc": {
+                          "example": "2017-07-07T18:38:55.555-0500",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "ProfileList",
+                          "type": "string"
+                        },
+                        "status": {
+                          "example": "Pending",
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "computer_usage_logs": {
+            "items": {
+              "properties": {
+                "usage_log": {
+                  "properties": {
+                    "date_time": {
+                      "example": "2017-07-07T18:37:04Z",
+                      "type": "string"
+                    },
+                    "date_time_epoch": {
+                      "example": 1499470624555,
+                      "type": "string"
+                    },
+                    "date_time_utc": {
+                      "example": "2017-07-07T18:37:04.555-0500",
+                      "type": "string"
+                    },
+                    "event": {
+                      "example": "login",
+                      "type": "string"
+                    },
+                    "username": {
+                      "example": "Admin",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "type": "array"
+          },
+          "general": {
+            "properties": {
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "mac_address": {
+                "example": "E0:AC:CB:97:36:G4",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the computer",
+                "example": "Admins MacBook Pro",
+                "type": "string"
+              },
+              "serial_number": {
+                "example": "C02Q7KHTGFWF",
+                "type": "string"
+              },
+              "udid": {
+                "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "mac_app_store_applications": {
+            "properties": {
+              "failed": {
+                "items": {
+                  "properties": {
+                    "app": {
+                      "properties": {
+                        "deployed": {
+                          "example": "2 minutes ago",
+                          "type": "string"
+                        },
+                        "deployed_epoch": {
+                          "example": 1499470624555,
+                          "type": "integer"
+                        },
+                        "deployed_utc": {
+                          "example": "2018-02-22T16:55:14.000-0600",
+                          "type": "string"
+                        },
+                        "last_update": {
+                          "example": "2 minutes ago",
+                          "type": "string"
+                        },
+                        "last_update_epoch": {
+                          "example": 1499470624555,
+                          "type": "integer"
+                        },
+                        "last_update_utc": {
+                          "example": "2018-02-22T16:55:14.000-0600",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "Xcode",
+                          "type": "string"
+                        },
+                        "status": {
+                          "example": "Failed",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "8.3.2",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "installed": {
+                "items": {
+                  "properties": {
+                    "app": {
+                      "properties": {
+                        "name": {
+                          "example": "Xcode",
+                          "type": "string"
+                        },
+                        "size_mb": {
+                          "example": 150,
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "8.3.3",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "pending": {
+                "items": {
+                  "properties": {
+                    "app": {
+                      "properties": {
+                        "deployed": {
+                          "example": "2 minutes ago",
+                          "type": "string"
+                        },
+                        "deployed_epoch": {
+                          "example": 1499470624555,
+                          "type": "integer"
+                        },
+                        "deployed_utc": {
+                          "example": "2018-02-22T16:55:14.000-0600",
+                          "type": "string"
+                        },
+                        "last_update": {
+                          "example": "2 minutes ago",
+                          "type": "string"
+                        },
+                        "last_update_epoch": {
+                          "example": 1499470624555,
+                          "type": "integer"
+                        },
+                        "last_update_utc": {
+                          "example": "2018-02-22T16:55:14.000-0600",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "Xcode",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "8.3.2",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "policy_logs": {
+            "items": {
+              "properties": {
+                "policy_log": {
+                  "properties": {
+                    "date_time": {
+                      "example": "2017-07-07T18:37:04Z",
+                      "type": "string"
+                    },
+                    "date_time_epoch": {
+                      "example": 1499470624555,
+                      "type": "string"
+                    },
+                    "date_time_utc": {
+                      "example": "2017-07-07T18:37:04.555-0500",
+                      "type": "string"
+                    },
+                    "policy_id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "policy_name": {
+                      "example": "Update Inventory",
+                      "type": "string"
+                    },
+                    "status": {
+                      "example": "Completed",
+                      "type": "string"
+                    },
+                    "username": {
+                      "example": "Username",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "type": "array"
+          },
+          "screen_sharing_logs": {
+            "items": {
+              "properties": {
+                "screen_sharing_log": {
+                  "properties": {
+                    "date_time": {
+                      "example": "2017-07-07T18:37:04Z",
+                      "type": "string"
+                    },
+                    "date_time_epoch": {
+                      "example": 1499470624555,
+                      "type": "string"
+                    },
+                    "date_time_utc": {
+                      "example": "2017-07-07T18:37:04.555-0500",
+                      "type": "string"
+                    },
+                    "details": {
+                      "example": "admin authenticated to screen share with computer at 10.1.1.1",
+                      "type": "string"
+                    },
+                    "status": {
+                      "example": "Completed",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "type": "array"
+          },
+          "user_location": {
+            "items": {
+              "properties": {
+                "location": {
+                  "properties": {
+                    "building": {
+                      "example": "Block D",
+                      "type": "string"
+                    },
+                    "date_time": {
+                      "example": "2017/07/07 at 6:37 PM",
+                      "type": "string"
+                    },
+                    "date_time_epoch": {
+                      "example": 1499470624555,
+                      "type": "string"
+                    },
+                    "date_time_utc": {
+                      "example": "2017-07-07T18:37:04.555-0500",
+                      "type": "string"
+                    },
+                    "department": {
+                      "example": "Information Technology",
+                      "type": "string"
+                    },
+                    "email_address": {
+                      "example": "betty.johnson@company.com",
+                      "type": "string"
+                    },
+                    "full_name": {
+                      "example": "Betty Johnson",
+                      "type": "string"
+                    },
+                    "phone_number": {
+                      "example": "555-555-5555",
+                      "type": "string"
+                    },
+                    "position": {
+                      "example": "Chief of Everything",
+                      "type": "string"
+                    },
+                    "room": {
+                      "example": 134,
+                      "type": "string"
+                    },
+                    "username": {
+                      "example": "Betty.Johnson",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -2278,6 +2853,30 @@
           }
         },
         "type": "object"
+      },
+      "computer_report": {
+        "items": {
+          "properties": {
+            "Computer": {
+              "properties": {
+                "Computer_Name": {
+                  "example": "Joes MacBook Pro",
+                  "type": "string"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "title": "computer_reports",
+        "type": "array",
+        "xml": {
+          "name": "computer_reports"
+        }
       },
       "criterion": {
         "properties": {
@@ -6299,6 +6898,426 @@
         ],
         "type": "object"
       },
+      "mobile_device_history": {
+        "properties": {
+          "applications": {
+            "properties": {
+              "failed": {
+                "items": {
+                  "properties": {
+                    "app": {
+                      "properties": {
+                        "management_status": {
+                          "example": "Failed",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "Angry Birds",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "1.0.0",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "installed": {
+                "items": {
+                  "properties": {
+                    "app_store_from_mobile_device_app_catalog": {
+                      "$ref": "#/components/schemas/mobile_device_history_app"
+                    },
+                    "in_house_from_mobile_device_app_catalog": {
+                      "$ref": "#/components/schemas/mobile_device_history_app"
+                    },
+                    "other": {
+                      "$ref": "#/components/schemas/mobile_device_history_app"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "pending": {
+                "items": {
+                  "properties": {
+                    "app": {
+                      "properties": {
+                        "management_status": {
+                          "example": "Pending",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "Angry Birds",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "1.0.0",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "audits": {
+            "items": {
+              "properties": {
+                "audit": {
+                  "properties": {
+                    "date_time": {
+                      "example": "2017/09/19 at 1:02 PM",
+                      "type": "string"
+                    },
+                    "date_time_epoch": {
+                      "example": 1505844136509,
+                      "type": "integer"
+                    },
+                    "event": {
+                      "example": "Viewed Activation Lock Bypass Code",
+                      "type": "string"
+                    },
+                    "username": {
+                      "example": "Jamf Pro Admin",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "ebooks": {
+            "properties": {
+              "failed": {
+                "items": {
+                  "properties": {
+                    "author": {
+                      "example": "Apple Inc.",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string"
+                    },
+                    "management_status": {
+                      "example": "Managed",
+                      "type": "string"
+                    },
+                    "title": {
+                      "example": "iPhone Users Guide for iOS 11.2",
+                      "type": "string"
+                    },
+                    "version": {
+                      "example": "1.0.0",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "installed": {
+                "properties": {
+                  "ibookstore": {
+                    "items": {
+                      "properties": {
+                        "author": {
+                          "example": "Apple Inc.",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string"
+                        },
+                        "management_status": {
+                          "example": "Managed",
+                          "type": "string"
+                        },
+                        "title": {
+                          "example": "iPhone Users Guide for iOS 11.2",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "1.0.0",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "inhouse": {
+                    "items": {
+                      "properties": {
+                        "author": {
+                          "example": "Apple Inc.",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string"
+                        },
+                        "management_status": {
+                          "example": "Managed",
+                          "type": "string"
+                        },
+                        "title": {
+                          "example": "iPhone Users Guide for iOS 11.2",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "1.0.0",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "pending": {
+                "items": {
+                  "properties": {
+                    "author": {
+                      "example": "Apple Inc.",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string"
+                    },
+                    "management_status": {
+                      "example": "Managed",
+                      "type": "string"
+                    },
+                    "title": {
+                      "example": "iPhone Users Guide for iOS 11.2",
+                      "type": "string"
+                    },
+                    "version": {
+                      "example": "1.0.0",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "general": {
+            "properties": {
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "mac_address": {
+                "example": "E0:AC:CB:97:36:G4",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the device",
+                "example": "Jesses iPad",
+                "type": "string"
+              },
+              "serial_number": {
+                "example": "C02Q7KHTGFWF",
+                "type": "string"
+              },
+              "udid": {
+                "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "management_commands": {
+            "properties": {
+              "completed": {
+                "items": {
+                  "properties": {
+                    "command": {
+                      "properties": {
+                        "date_time_completed": {
+                          "example": "2017/09/19 at 1:02 PM",
+                          "type": "string"
+                        },
+                        "date_time_completed_epoch": {
+                          "example": 1505844136509,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "example": "Profile List",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "failed": {
+                "items": {
+                  "properties": {
+                    "command": {
+                      "properties": {
+                        "date_time_failed": {
+                          "type": "string"
+                        },
+                        "date_time_failed_epoch": {
+                          "example": 0,
+                          "type": "integer"
+                        },
+                        "date_time_issued": {
+                          "example": "2017/09/19 at 1:02 PM",
+                          "type": "string"
+                        },
+                        "date_time_issued_epoch": {
+                          "example": 1505844136509,
+                          "type": "string"
+                        },
+                        "error": {
+                          "example": "The location of the device could not be determined.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "DeviceLocation",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "pending": {
+                "items": {
+                  "properties": {
+                    "command": {
+                      "properties": {
+                        "date_time_failed": {
+                          "type": "string"
+                        },
+                        "date_time_failed_epoch": {
+                          "example": 0,
+                          "type": "integer"
+                        },
+                        "date_time_issued": {
+                          "example": "2017/09/19 at 1:02 PM",
+                          "type": "string"
+                        },
+                        "date_time_issued_epoch": {
+                          "example": 1505844136509,
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "Profile List",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "user_location": {
+            "items": {
+              "properties": {
+                "location": {
+                  "properties": {
+                    "building": {
+                      "example": "Block D",
+                      "type": "string"
+                    },
+                    "date_time": {
+                      "example": "2017/09/19 at 1:02 PM",
+                      "type": "string"
+                    },
+                    "date_time_epoch": {
+                      "example": 1505844136509,
+                      "type": "integer"
+                    },
+                    "department": {
+                      "example": "Information Technology",
+                      "type": "string"
+                    },
+                    "email_address": {
+                      "example": "ashley.harrison@company.com",
+                      "type": "string"
+                    },
+                    "full_name": {
+                      "example": "Ashley Harrison",
+                      "type": "string"
+                    },
+                    "phone_number": {
+                      "example": "555-555-5555",
+                      "type": "string"
+                    },
+                    "position": {
+                      "example": "Chief of Chiefs",
+                      "type": "string"
+                    },
+                    "room": {
+                      "example": 287,
+                      "type": "string"
+                    },
+                    "username": {
+                      "example": "AHarrison",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "mobile_device_history_app": {
+        "properties": {
+          "bundle_size": {
+            "example": "3 MB",
+            "type": "string"
+          },
+          "dynamic_size": {
+            "example": "12 KB",
+            "type": "string"
+          },
+          "management_status": {
+            "enum": [
+              "Unmanaged",
+              "Managed"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "example": "Self Service Mobile",
+            "type": "string"
+          },
+          "version": {
+            "example": "10.1.1",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "app"
+        }
+      },
       "mobile_device_invitation": {
         "properties": {
           "date_sent": {
@@ -9470,6 +10489,420 @@
         ],
         "type": "object"
       },
+      "vpp_account": {
+        "properties": {
+          "account_name": {
+            "example": "Company Name",
+            "type": "string"
+          },
+          "apple_id": {
+            "example": "vpp@company.com",
+            "type": "string"
+          },
+          "auto_register_managed_users": {
+            "default": false,
+            "type": "boolean"
+          },
+          "contact": {
+            "example": "Company Admin",
+            "type": "string"
+          },
+          "country": {
+            "example": "US",
+            "type": "string"
+          },
+          "expiration_date": {
+            "example": "2018/09/13",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the VPP account",
+            "example": "Company VPP Account",
+            "type": "string"
+          },
+          "notify_disassociation": {
+            "default": true,
+            "type": "boolean"
+          },
+          "populate_catalog_from_vpp_content": {
+            "type": "boolean"
+          },
+          "service_token": {
+            "example": "eyJvcmdOYWadveaz40d2FyZSIsImV4cERhdGUiOiIyMDE3LTA5LTEzVDA5OjQ5OjA5LTA3MDAiLCJ0b2tlbiI6Ik5yVUtPK1RXeityUXQyWFpIeENtd0xxby8ydUFmSFU1NW40V1FTZU8wR1E5eFh4UUZTckVJQjlzbGdYei95WkpaeVZ3SklJbW0rWEhJdGtKM1BEZGRRPT0ifQ==",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "required": [
+          "name",
+          "service_token"
+        ],
+        "type": "object"
+      },
+      "vpp_assignment": {
+        "properties": {
+          "ebooks": {
+            "items": {
+              "properties": {
+                "ebook": {
+                  "properties": {
+                    "adam_id": {
+                      "example": 1058120411,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Algebra 1",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "general": {
+            "properties": {
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "name": {
+                "example": "9th Grade VPP Assignments",
+                "type": "string"
+              },
+              "vpp_admin_account_id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "vpp_admin_account_name": {
+                "example": "Company Name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "vpp_admin_account_id"
+            ],
+            "type": "object"
+          },
+          "ios_apps": {
+            "items": {
+              "properties": {
+                "ios_app": {
+                  "properties": {
+                    "adam_id": {
+                      "example": 767319014,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Angry Birds",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "mac_apps": {
+            "items": {
+              "properties": {
+                "mac_app": {
+                  "properties": {
+                    "adam_id": {
+                      "example": 803453959,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Slack",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "scope": {
+            "properties": {
+              "all_jss_users": {
+                "type": "boolean"
+              },
+              "exclusions": {
+                "properties": {
+                  "jss_user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "jss_users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "properties": {
+                            "name": {
+                              "example": "LDAP User Group Name",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "jss_user_groups": {
+                "items": {
+                  "properties": {
+                    "user_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "jss_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "limitations": {
+                "properties": {
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "vpp_invitation": {
+        "properties": {
+          "general": {
+            "properties": {
+              "distribution_method": {
+                "enum": [
+                  "Prompt users to accept/make available in Self Service",
+                  "Send emails",
+                  "Make available in Self Service only"
+                ],
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "message": {
+                "type": "string"
+              },
+              "name": {
+                "example": "User VPP Invitations",
+                "type": "string"
+              },
+              "require_login": {
+                "default": false,
+                "type": "boolean"
+              },
+              "sender_email_address": {
+                "type": "string"
+              },
+              "sender_name": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "vpp_account": {
+                "properties": {
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "invitation_usage": {
+            "items": {
+              "properties": {
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                },
+                "usage": {
+                  "properties": {
+                    "email_address": {
+                      "example": "user@company.com",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "last_action_date_utc": {
+                      "example": "2017-07-07T18:37:04.555-0500",
+                      "type": "string"
+                    },
+                    "last_action_epoch": {
+                      "example": 1499470624555,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Username",
+                      "type": "string"
+                    },
+                    "status": {
+                      "example": "MDM Invitations was sent",
+                      "type": "string"
+                    },
+                    "vpp_account": {
+                      "example": "Company VPP Account",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "scope": {
+            "properties": {
+              "all_jss_users": {
+                "type": "boolean"
+              },
+              "exclusions": {
+                "properties": {
+                  "jss_user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "jss_users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "properties": {
+                            "name": {
+                              "example": "LDAP User Group Name",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "jss_user_groups": {
+                "items": {
+                  "properties": {
+                    "user_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "jss_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "limitations": {
+                "properties": {
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
       "webhook": {
         "properties": {
           "authentication_type": {
@@ -10720,6 +12153,63 @@
         "x-explorer-enabled": false
       }
     },
+    "/computerapplicationusage/id/{id}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerApplicationUsageById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer application usage by computer ID",
+        "tags": [
+          "computerapplicationusage"
+        ]
+      }
+    },
     "/computercheckin": {
       "get": {
         "operationId": "findComputerCheckin",
@@ -11068,6 +12558,191 @@
         "x-explorer-enabled": false
       }
     },
+    "/computerhistory/id/{id}": {
+      "get": {
+        "operationId": "findComputerHistoryById",
+        "parameters": [
+          {
+            "description": "Computer ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer history by ID",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
+    "/computerhistory/macaddress/{macaddress}": {
+      "get": {
+        "operationId": "findComputerHistoryByMacAddress",
+        "parameters": [
+          {
+            "description": "Computer Mac Address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer history by MAC address",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
+    "/computerhistory/name/{name}": {
+      "get": {
+        "operationId": "findComputerHistoryByName",
+        "parameters": [
+          {
+            "description": "Computer Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer history by name",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
+    "/computerhistory/serialnumber/{serialnumber}": {
+      "get": {
+        "operationId": "findComputerHistoryBySerialNumber",
+        "parameters": [
+          {
+            "description": "Computer Serial Number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer history by serial number",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
+    "/computerhistory/udid/{udid}": {
+      "get": {
+        "operationId": "findComputerHistoryByUDID",
+        "parameters": [
+          {
+            "description": "Computer UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer history by UDID",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
     "/computerinventorycollection": {
       "get": {
         "operationId": "findComputerInventoryCollection",
@@ -11391,6 +13066,82 @@
         "summary": "Finds computer management information by UDID",
         "tags": [
           "computermanagement"
+        ]
+      }
+    },
+    "/computerreports/id/{id}": {
+      "get": {
+        "description": "Additional display fields are returned within the `Computer` object",
+        "operationId": "findComputerReportsById",
+        "parameters": [
+          {
+            "description": "Computer Report ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_report"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_report"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer reports by id",
+        "tags": [
+          "computerreports"
+        ]
+      }
+    },
+    "/computerreports/name/{name}": {
+      "get": {
+        "description": "Additional display fields are returned within the `Computer` object",
+        "operationId": "findComputerReportsByName",
+        "parameters": [
+          {
+            "description": "Computer Report name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_report"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_report"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer reports by name",
+        "tags": [
+          "computerreports"
         ]
       }
     },
@@ -13770,6 +15521,191 @@
           "mobiledevicegroups"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevicehistory/id/{id}": {
+      "get": {
+        "operationId": "findMobileDeviceHistoryById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device history by ID",
+        "tags": [
+          "mobiledevicehistory"
+        ]
+      }
+    },
+    "/mobiledevicehistory/macaddress/{macaddress}": {
+      "get": {
+        "operationId": "findMobileDeviceHistoryByMacAddress",
+        "parameters": [
+          {
+            "description": "Mac address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device history by wifi mac address",
+        "tags": [
+          "mobiledevicehistory"
+        ]
+      }
+    },
+    "/mobiledevicehistory/name/{name}": {
+      "get": {
+        "operationId": "findMobileDeviceHistoryByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device history by name",
+        "tags": [
+          "mobiledevicehistory"
+        ]
+      }
+    },
+    "/mobiledevicehistory/serialnumber/{serialnumber}": {
+      "get": {
+        "operationId": "findMobileDeviceHistoryBySerialNumber",
+        "parameters": [
+          {
+            "description": "Serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device history by serial number",
+        "tags": [
+          "mobiledevicehistory"
+        ]
+      }
+    },
+    "/mobiledevicehistory/udid/{udid}": {
+      "get": {
+        "operationId": "findMobileDeviceHistoryByUDID",
+        "parameters": [
+          {
+            "description": "UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device history by UDID",
+        "tags": [
+          "mobiledevicehistory"
+        ]
       }
     },
     "/mobiledeviceinvitations/id/{id}": {
@@ -16759,6 +18695,337 @@
         "summary": "Updates an existing user by ID",
         "tags": [
           "users"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/vppaccounts/id/{id}": {
+      "delete": {
+        "operationId": "deleteVPPAdminAccountById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a VPP account by ID",
+        "tags": [
+          "vppaccounts"
+        ]
+      },
+      "get": {
+        "operationId": "findVPPAdminAccountById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_account"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_account"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds VPP Account by ID",
+        "tags": [
+          "vppaccounts"
+        ]
+      },
+      "post": {
+        "description": "The service_token value may not match another vpp account. account_name and expiration_date are derived from the service token.",
+        "operationId": "createVPPAdminAccountById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new VPP account by ID",
+        "tags": [
+          "vppaccounts"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "The service_token value may not match another vpp account. account_name and expiration_date are derived from the service token.",
+        "operationId": "updateVPPAdminAccountById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates a VPP account by ID",
+        "tags": [
+          "vppaccounts"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/vppassignments/id/{id}": {
+      "delete": {
+        "operationId": "deleteAssignmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a VPP assignment by ID",
+        "tags": [
+          "vppassignments"
+        ]
+      },
+      "get": {
+        "operationId": "findAssignmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_assignment"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_assignment"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds VPP Assignment by ID",
+        "tags": [
+          "vppassignments"
+        ]
+      },
+      "post": {
+        "operationId": "createAssignmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new VPP assignment by ID",
+        "tags": [
+          "vppassignments"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateAssignmentById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates a VPP assignment by ID",
+        "tags": [
+          "vppassignments"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/vppinvitations/id/{id}": {
+      "delete": {
+        "operationId": "deleteInvitationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a VPP invitation by ID",
+        "tags": [
+          "vppinvitations"
+        ]
+      },
+      "get": {
+        "operationId": "findInvitationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_invitation"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_invitation"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a VPP Invitation by ID",
+        "tags": [
+          "vppinvitations"
+        ]
+      },
+      "post": {
+        "description": "The following fields are also required if 'Send Emails' distribution method is specified - sender_name, sender_email_address, subject",
+        "operationId": "createInvitationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new VPP invitation by ID",
+        "tags": [
+          "vppinvitations"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "Usages are ignored for this operation",
+        "operationId": "updateInvitationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates a VPP invitation by ID",
+        "tags": [
+          "vppinvitations"
         ],
         "x-explorer-enabled": false
       }

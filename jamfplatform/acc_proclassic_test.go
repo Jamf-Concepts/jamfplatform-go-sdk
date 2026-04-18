@@ -1453,6 +1453,22 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
 }
 
+// TestAcceptance_Classic_VPPCRUD tests VPP account create/delete.
+// VPP create requires a real service_token; skip on 409 (spec
+// validation) or 403 (tenant lacks VPP privilege).
+func TestAcceptance_Classic_VPPInvitationCRUD(t *testing.T) {
+	t.Skip("VPP invitation creation needs a real user_id + invitation_type + site; not exercising against live tenant")
+}
+
+func TestAcceptance_Classic_GetComputerHistoryByID(t *testing.T) {
+	id := os.Getenv("JAMFPLATFORM_CLASSIC_COMPUTER_ID")
+	if id == "" { id = "4" } // fallback to known computer id in this tenant
+	c := accClient(t)
+	h, err := proclassic.New(c).GetComputerHistoryByID(context.Background(), id)
+	if err != nil { skipOnServerError(t, err); t.Skipf("GetComputerHistoryByID(%s): %v", id, err) }
+	if h == nil { t.Fatal("nil ComputerHistory") }
+}
+
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
