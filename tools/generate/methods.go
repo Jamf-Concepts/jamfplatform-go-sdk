@@ -1,0 +1,317 @@
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package main
+
+import (
+	"fmt"
+	"log"
+	"regexp"
+	"strings"
+
+	"github.com/getkin/kin-openapi/openapi3"
+)
+
+// ---------------------------------------------------------------------------
+// Operations → Go methods
+// ---------------------------------------------------------------------------
+
+func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
+	var methods []GoMethod
+	for _, opDef := range spec.Operations {
+		m, err := buildMethod(doc, spec, opDef)
+		if err != nil {
+			return nil, fmt.Errorf("operation %s: %w", opDef.Op, err)
+		}
+		methods = append(methods, m)
+	}
+	return methods, nil
+}
+
+// extractMultipartFields walks a multipart/form-data request body schema's
+// properties and returns a list of multipart fields for generator use.
+// Binary fields (format: binary) become file uploads; other scalars become
+// string form fields.
+func extractMultipartFields(schema *openapi3.Schema) []GoMultipartField {
+	if schema == nil {
+		return nil
+	}
+	fields := make([]GoMultipartField, 0, len(schema.Properties))
+	for _, name := range sortedKeys(schema.Properties) {
+		prop := schema.Properties[name].Value
+		isFile := prop != nil && prop.Type != nil && prop.Type.Is("string") && prop.Format == "binary"
+		f := GoMultipartField{
+			Name:   name,
+			GoName: toLowerCamelCase(name),
+			IsFile: isFile,
+		}
+		if !isFile && prop != nil {
+			f.Type = schemaRefToGoType(schema.Properties[name])
+		}
+		fields = append(fields, f)
+	}
+	return fields
+}
+
+// isRateLimited reports whether the operation carries x-rate-limit: true.
+// kin-openapi stores vendor extensions as raw JSON bytes keyed by the
+// extension name.
+func isRateLimited(op *openapi3.Operation) bool {
+	if op == nil {
+		return false
+	}
+	raw, ok := op.Extensions["x-rate-limit"]
+	if !ok {
+		return false
+	}
+	switch v := raw.(type) {
+	case bool:
+		return v
+	case []byte:
+		return string(v) == "true"
+	case string:
+		return v == "true"
+	default:
+		// Some kin-openapi versions return json.RawMessage.
+		s := fmt.Sprintf("%s", v)
+		return s == "true"
+	}
+}
+
+// dropDeprecatedOps returns spec.Operations with any operations whose spec
+// marks them deprecated removed. Logs each drop so the curator can see why
+// the generated surface shrank.
+func dropDeprecatedOps(doc *openapi3.T, spec SpecDef) []OperationDef {
+	kept := make([]OperationDef, 0, len(spec.Operations))
+	for _, opDef := range spec.Operations {
+		httpMethod, specPath := opDef.parseOp()
+		pathItem := doc.Paths.Find(specPath)
+		if pathItem == nil {
+			kept = append(kept, opDef)
+			continue
+		}
+		op := pathItem.GetOperation(httpMethod)
+		if op != nil && op.Deprecated {
+			log.Printf("skipping deprecated operation %s (%s)", opDef.Name, opDef.Op)
+			continue
+		}
+		kept = append(kept, opDef)
+	}
+	return kept
+}
+
+func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, error) {
+	httpMethod, specPath := opDef.parseOp()
+
+	pathItem := doc.Paths.Find(specPath)
+	if pathItem == nil {
+		return GoMethod{}, fmt.Errorf("path %s not found in spec", specPath)
+	}
+	op := pathItem.GetOperation(httpMethod)
+	if op == nil {
+		return GoMethod{}, fmt.Errorf("%s not found", opDef.Op)
+	}
+
+	// Version: operation override > extract from path > "v1"
+	version := coalesce(opDef.Version, extractVersion(specPath))
+
+	m := GoMethod{
+		Name:            opDef.Name,
+		HTTPMethod:      httpMethod,
+		Namespace:       spec.Namespace,
+		Version:         version,
+		ResourcePath:    stripVersionPrefix(specPath),
+		QueryParams:     opDef.parseParams(),
+		ContentType:     opDef.ContentType,
+		PaginationStyle: opDef.Pagination,
+		PageSizeParam:   coalesce(opDef.PageSizeParam, "page-size"),
+		ResultsField:    "results",
+		SpecPath:        specPath,
+		UnwrapResults:   opDef.UnwrapResults,
+	}
+
+	if op.Summary != "" {
+		m.Comment = opDef.Name + " " + lowerFirst(cleanComment(op.Summary))
+	}
+
+	if len(op.Tags) > 0 {
+		m.Tag = op.Tags[0]
+	}
+
+	if isRateLimited(op) {
+		if m.Comment != "" {
+			m.Comment += "\n//\n// This endpoint is rate-limited. The transport retries a 429 response once if the server returns a bounded Retry-After; otherwise the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy."
+		} else {
+			m.Comment = opDef.Name + " is rate-limited."
+		}
+	}
+
+	if op.Deprecated {
+		if m.Comment == "" {
+			m.Comment = opDef.Name + " is deprecated."
+		}
+		m.Comment += "\n//\n// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release."
+	}
+
+	m.PathParams = extractPathParams(specPath, opDef.PathNames)
+	m.ExpectedStatus, m.ResponseType = detectResponse(op)
+
+	// Request body
+	if op.RequestBody != nil && op.RequestBody.Value != nil {
+		if mpContent, ok := op.RequestBody.Value.Content["multipart/form-data"]; ok && mpContent.Schema != nil && mpContent.Schema.Value != nil {
+			m.MultipartFields = extractMultipartFields(mpContent.Schema.Value)
+		} else {
+			for _, content := range op.RequestBody.Value.Content {
+				if content.Schema != nil {
+					m.RequestType = refName(content.Schema)
+					break
+				}
+			}
+		}
+	}
+
+	// Paginated item type
+	if m.PaginationStyle != "" {
+		m.ItemType = detectPaginatedItemType(op)
+		m.ResponseType = ""
+	}
+
+	m.ReturnsSlice = strings.HasPrefix(m.ResponseType, "[]")
+
+	// Determine category
+	m.Category = categorize(m)
+
+	return m, nil
+}
+
+func categorize(m GoMethod) string {
+	if len(m.MultipartFields) > 0 {
+		return "multipart"
+	}
+	if m.UnwrapResults != "" {
+		return "unwrap"
+	}
+	if m.PaginationStyle != "" {
+		return "paginated"
+	}
+	hasReq := m.RequestType != ""
+	hasResp := m.ResponseType != ""
+	isOK := m.ExpectedStatus == 200
+
+	// "create" covers any shape that sends a body AND returns one — POST 201,
+	// PUT/PATCH 200, etc. Naming is historical; the template is request+response.
+	switch {
+	case hasReq && hasResp:
+		return "create"
+	case isOK && hasResp:
+		return "get"
+	case hasResp:
+		return "actionWithResponse"
+	case hasReq:
+		return "update"
+	default:
+		return "action"
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Spec helpers
+// ---------------------------------------------------------------------------
+
+var pathParamRe = regexp.MustCompile(`\{(\w+)\}`)
+var versionPrefixRe = regexp.MustCompile(`^/v\d+`)
+
+func extractPathParams(path string, overrides map[string]string) []GoPathParam {
+	matches := pathParamRe.FindAllStringSubmatch(path, -1)
+	params := make([]GoPathParam, 0, len(matches))
+	for _, m := range matches {
+		specName := m[1]
+		var goName string
+		if override, ok := overrides[specName]; ok {
+			goName = override
+		} else {
+			goName = toLowerCamelCase(specName)
+		}
+		params = append(params, GoPathParam{SpecName: specName, GoName: goName})
+	}
+	return params
+}
+
+func stripVersionPrefix(path string) string {
+	return versionPrefixRe.ReplaceAllString(path, "")
+}
+
+// extractVersion returns "v1" from "/v1/devices" or "v2" from "/v2/benchmarks".
+// Returns empty string for non-versioned paths (e.g. "/startup-status") so
+// tenantPrefix collapses the segment instead of forcing "v1". Callers that
+// need a specific version for a non-versioned path must set it in config.
+func extractVersion(path string) string {
+	match := versionPrefixRe.FindString(path)
+	if match == "" {
+		return ""
+	}
+	return match[1:] // strip leading "/"
+}
+
+func detectResponse(op *openapi3.Operation) (int, string) {
+	for _, code := range []int{200, 201, 202, 204} {
+		resp := op.Responses.Status(code)
+		if resp == nil {
+			continue
+		}
+		if resp.Value == nil {
+			return code, ""
+		}
+		for ct, content := range resp.Value.Content {
+			if content.Schema == nil {
+				continue
+			}
+			// Non-JSON content (text/csv, application/octet-stream, etc.)
+			// returns raw bytes — the transport passes the body through
+			// unchanged when result is *[]byte.
+			if !isJSONContentType(ct) {
+				return code, "[]byte"
+			}
+			return code, refName(content.Schema)
+		}
+		return code, ""
+	}
+	return 200, ""
+}
+
+// isJSONContentType reports whether ct is a JSON content type we should
+// decode via encoding/json. Anything else is treated as raw bytes.
+func isJSONContentType(ct string) bool {
+	base := strings.ToLower(strings.TrimSpace(strings.SplitN(ct, ";", 2)[0]))
+	return base == "" || base == "application/json" || strings.HasSuffix(base, "+json")
+}
+
+func detectPaginatedItemType(op *openapi3.Operation) string {
+	resp := op.Responses.Status(200)
+	if resp == nil || resp.Value == nil {
+		return "any"
+	}
+	for _, content := range resp.Value.Content {
+		if content.Schema == nil {
+			continue
+		}
+		schema := content.Schema.Value
+		if schema == nil {
+			continue
+		}
+		// allOf composition (pagination wrapper)
+		for _, part := range schema.AllOf {
+			if part.Value == nil {
+				continue
+			}
+			if r := part.Value.Properties["results"]; r != nil && r.Value != nil && r.Value.Items != nil {
+				return refName(r.Value.Items)
+			}
+		}
+		// Direct results field
+		if r := schema.Properties["results"]; r != nil && r.Value != nil && r.Value.Items != nil {
+			return refName(r.Value.Items)
+		}
+	}
+	return "any"
+}
