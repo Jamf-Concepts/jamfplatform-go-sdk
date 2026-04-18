@@ -184,7 +184,22 @@
         {"op": "GET /users/id/{id}", "name": "GetUserByID", "responseType": "user", "pathNames": {"id": "id"}},
         {"op": "POST /users/id/{id}", "name": "CreateUserByID", "requestType": "user_post", "responseType": "user", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /users/id/{id}", "name": "UpdateUserByID", "requestType": "user_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /users/id/{id}", "name": "DeleteUserByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /users/id/{id}", "name": "DeleteUserByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /computerextensionattributes/id/{id}", "name": "GetComputerExtensionAttributeByID", "responseType": "computer_extension_attribute", "pathNames": {"id": "id"}},
+        {"op": "POST /computerextensionattributes/id/{id}", "name": "CreateComputerExtensionAttributeByID", "requestType": "computer_extension_attribute", "responseType": "computer_extension_attribute", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /computerextensionattributes/id/{id}", "name": "UpdateComputerExtensionAttributeByID", "requestType": "computer_extension_attribute", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /computerextensionattributes/id/{id}", "name": "DeleteComputerExtensionAttributeByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /mobiledeviceextensionattributes/id/{id}", "name": "GetMobileDeviceExtensionAttributeByID", "responseType": "mobile_device_extension_attribute", "pathNames": {"id": "id"}},
+        {"op": "POST /mobiledeviceextensionattributes/id/{id}", "name": "CreateMobileDeviceExtensionAttributeByID", "requestType": "mobile_device_extension_attribute", "responseType": "mobile_device_extension_attribute", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledeviceextensionattributes/id/{id}", "name": "UpdateMobileDeviceExtensionAttributeByID", "requestType": "mobile_device_extension_attribute", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /mobiledeviceextensionattributes/id/{id}", "name": "DeleteMobileDeviceExtensionAttributeByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /userextensionattributes/id/{id}", "name": "GetUserExtensionAttributeByID", "responseType": "user_extension_attribute", "pathNames": {"id": "id"}},
+        {"op": "POST /userextensionattributes/id/{id}", "name": "CreateUserExtensionAttributeByID", "requestType": "user_extension_attribute", "responseType": "user_extension_attribute", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /userextensionattributes/id/{id}", "name": "UpdateUserExtensionAttributeByID", "requestType": "user_extension_attribute", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /userextensionattributes/id/{id}", "name": "DeleteUserExtensionAttributeByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

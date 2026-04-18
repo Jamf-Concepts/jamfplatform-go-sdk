@@ -182,6 +182,24 @@ type ComputerSoftware struct {
 	UnixExecutables          *string  `xml:"unix_executables,omitempty"`
 }
 
+// ComputerExtensionAttribute represents a computer extension attribute.
+type ComputerExtensionAttribute struct {
+	XMLName          xml.Name                             `xml:"computer_extension_attribute"`
+	DataType         *string                              `xml:"data_type,omitempty"`
+	Description      *string                              `xml:"description,omitempty"`
+	Enabled          *bool                                `xml:"enabled,omitempty"`
+	ID               *int                                 `xml:"id,omitempty"`
+	InputType        *ComputerExtensionAttributeInputType `xml:"input_type,omitempty"`
+	InventoryDisplay *string                              `xml:"inventory_display,omitempty"`
+	Name             *string                              `xml:"name,omitempty"`
+}
+
+// ComputerExtensionAttributeInputType represents a computer extension attribute input type.
+type ComputerExtensionAttributeInputType struct {
+	XMLName xml.Name `xml:"input_type"`
+	Type    *string  `xml:"type,omitempty"`
+}
+
 // ComputerPost represents a computer post.
 type ComputerPost struct {
 	XMLName xml.Name             `xml:"computer"`
@@ -231,6 +249,23 @@ type Location struct {
 	Realname     *string  `xml:"realname,omitempty"`
 	Room         *string  `xml:"room,omitempty"`
 	Username     *string  `xml:"username,omitempty"`
+}
+
+// MobileDeviceExtensionAttribute represents a mobile device extension attribute.
+type MobileDeviceExtensionAttribute struct {
+	XMLName          xml.Name                                 `xml:"mobile_device_extension_attribute"`
+	DateType         *string                                  `xml:"date_type,omitempty"`
+	Description      *string                                  `xml:"description,omitempty"`
+	ID               *int                                     `xml:"id,omitempty"`
+	InputType        *MobileDeviceExtensionAttributeInputType `xml:"input_type,omitempty"`
+	InventoryDisplay *string                                  `xml:"inventory_display,omitempty"`
+	Name             *string                                  `xml:"name,omitempty"`
+}
+
+// MobileDeviceExtensionAttributeInputType represents a mobile device extension attribute input type.
+type MobileDeviceExtensionAttributeInputType struct {
+	XMLName xml.Name `xml:"input_type"`
+	Type    *string  `xml:"type,omitempty"`
 }
 
 // Purchasing represents a purchasing.
@@ -359,6 +394,22 @@ type UserLinksPeripherals struct {
 type UserLinksVppAssignments struct {
 	XMLName       xml.Name `xml:"vpp_assignments"`
 	VppAssignment *IDName  `xml:"vpp_assignment,omitempty"`
+}
+
+// UserExtensionAttribute represents a user extension attribute.
+type UserExtensionAttribute struct {
+	XMLName     xml.Name                         `xml:"user_extension_attribute"`
+	DataType    *string                          `xml:"data_type,omitempty"`
+	Description *string                          `xml:"description,omitempty"`
+	ID          *int                             `xml:"id,omitempty"`
+	InputType   *UserExtensionAttributeInputType `xml:"input_type,omitempty"`
+	Name        *string                          `xml:"name,omitempty"`
+}
+
+// UserExtensionAttributeInputType represents a user extension attribute input type.
+type UserExtensionAttributeInputType struct {
+	XMLName xml.Name `xml:"input_type"`
+	Type    *string  `xml:"type,omitempty"`
 }
 
 // UserPost represents a user post.

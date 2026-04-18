@@ -927,6 +927,68 @@
         },
         "type": "object"
       },
+      "computer_extension_attribute": {
+        "properties": {
+          "data_type": {
+            "enum": [
+              "String",
+              "Integer",
+              "Date"
+            ],
+            "type": "string"
+          },
+          "description": {
+            "description": "Description of the extension attribute",
+            "example": "Number of charge cycles logged on the current battery",
+            "type": "string"
+          },
+          "enabled": {
+            "description": "Only applicable to script input type",
+            "example": true,
+            "type": "boolean"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "input_type": {
+            "properties": {
+              "type": {
+                "default": "Text Field",
+                "enum": [
+                  "script",
+                  "Text Field",
+                  "LDAP Mapping",
+                  "Pop-up Menu"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "inventory_display": {
+            "description": "Category in which to display the extension attribute in Jamf Pro",
+            "enum": [
+              "General",
+              "Hardware",
+              "Operating System",
+              "User and Location",
+              "Purchasing",
+              "Extension Attributes"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Extension attribute name",
+            "example": "Battery Cycle Count",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "department": {
         "properties": {
           "id": {
@@ -999,6 +1061,59 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "mobile_device_extension_attribute": {
+        "properties": {
+          "date_type": {
+            "default": "String",
+            "enum": [
+              "String",
+              "Date",
+              "Integer"
+            ],
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "input_type": {
+            "properties": {
+              "type": {
+                "default": "Text Field",
+                "enum": [
+                  "Text Field",
+                  "Pop-up Menu",
+                  "LDAP Attribute Mapping"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "inventory_display": {
+            "default": "General",
+            "enum": [
+              "General",
+              "Hardware",
+              "User and Location",
+              "Purchasing",
+              "Extension Attributes"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "example": "Asset Selector",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "purchasing": {
@@ -1317,6 +1432,48 @@
           "name"
         ],
         "type": "object"
+      },
+      "user_extension_attribute": {
+        "properties": {
+          "data_type": {
+            "enum": [
+              "String",
+              "Integer",
+              "Date"
+            ],
+            "type": "string"
+          },
+          "description": {
+            "example": "Text field for logging custom data",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "input_type": {
+            "properties": {
+              "type": {
+                "default": "Text Field",
+                "enum": [
+                  "Text Field",
+                  "Pop-up Menu"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "description": "Name of the user extension attribute",
+            "example": "User Attributes",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -1550,6 +1707,115 @@
         "summary": "Updates an existing category by ID",
         "tags": [
           "categories"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/computerextensionattributes/id/{id}": {
+      "delete": {
+        "operationId": "deleteComputerextensionattributeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer extension attribute by ID",
+        "tags": [
+          "computerextensionattributes"
+        ]
+      },
+      "get": {
+        "operationId": "findComputerextensionattributesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_extension_attribute"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_extension_attribute"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer extension attributes by ID",
+        "tags": [
+          "computerextensionattributes"
+        ]
+      },
+      "post": {
+        "operationId": "createComputerextensionattributeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new computer extension attribute by ID",
+        "tags": [
+          "computerextensionattributes"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateComputerextensionattributeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing computer extension attribute by ID",
+        "tags": [
+          "computerextensionattributes"
         ],
         "x-explorer-enabled": false
       }
@@ -1933,6 +2199,115 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledeviceextensionattributes/id/{id}": {
+      "delete": {
+        "operationId": "deleteMobiledeviceextensionattributeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device extension attribute by ID",
+        "tags": [
+          "mobiledeviceextensionattributes"
+        ]
+      },
+      "get": {
+        "operationId": "findMobiledeviceextensionattributesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_extension_attribute"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_extension_attribute"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device extension attributes by ID",
+        "tags": [
+          "mobiledeviceextensionattributes"
+        ]
+      },
+      "post": {
+        "operationId": "createMobiledeviceextensionattributeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new mobile device extension attribute by ID",
+        "tags": [
+          "mobiledeviceextensionattributes"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateMobiledeviceextensionattributeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device extension attribute by ID",
+        "tags": [
+          "mobiledeviceextensionattributes"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/scripts/id/{id}": {
       "delete": {
         "operationId": "deleteScriptById",
@@ -2150,6 +2525,115 @@
         "summary": "Updates an existing site by ID",
         "tags": [
           "sites"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/userextensionattributes/id/{id}": {
+      "delete": {
+        "operationId": "deleteUserextensionattributeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a user extension attribute by ID",
+        "tags": [
+          "userextensionattributes"
+        ]
+      },
+      "get": {
+        "operationId": "findUserextensionattributesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_extension_attribute"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_extension_attribute"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds user extension attributes by ID",
+        "tags": [
+          "userextensionattributes"
+        ]
+      },
+      "post": {
+        "operationId": "createUserextensionattributeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new user extension attribute by ID",
+        "tags": [
+          "userextensionattributes"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateUserextensionattributeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing user extension attribute by ID",
+        "tags": [
+          "userextensionattributes"
         ],
         "x-explorer-enabled": false
       }

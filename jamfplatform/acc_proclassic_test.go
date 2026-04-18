@@ -333,6 +333,108 @@ func TestAcceptance_Classic_UserCRUD(t *testing.T) {
 	}
 }
 
+func TestAcceptance_Classic_ComputerEACRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-ea-" + runSuffix()
+	created, err := pc.CreateComputerExtensionAttributeByID(ctx, "0", &proclassic.ComputerExtensionAttribute{
+		Name:     classicStrPtr(name),
+		DataType: classicStrPtr("String"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateComputerExtensionAttributeByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateComputerExtensionAttributeByID returned no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteComputerExtensionAttributeByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetComputerExtensionAttributeByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerExtensionAttributeByID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("Name = %v, want %q", got.Name, name)
+	}
+
+	if err := pc.DeleteComputerExtensionAttributeByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteComputerExtensionAttributeByID(%d): %v", id, err)
+	}
+	_, err = pc.GetComputerExtensionAttributeByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_MobileDeviceEACRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-mdea-" + runSuffix()
+	created, err := pc.CreateMobileDeviceExtensionAttributeByID(ctx, "0", &proclassic.MobileDeviceExtensionAttribute{
+		Name:     classicStrPtr(name),
+		DateType: classicStrPtr("String"), // spec typo: date_type; Jamf spec has this misspelling
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateMobileDeviceExtensionAttributeByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteMobileDeviceExtensionAttributeByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteMobileDeviceExtensionAttributeByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetMobileDeviceExtensionAttributeByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_UserEACRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-uea-" + runSuffix()
+	created, err := pc.CreateUserExtensionAttributeByID(ctx, "0", &proclassic.UserExtensionAttribute{
+		Name:     classicStrPtr(name),
+		DataType: classicStrPtr("String"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateUserExtensionAttributeByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteUserExtensionAttributeByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteUserExtensionAttributeByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetUserExtensionAttributeByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
