@@ -321,6 +321,23 @@
         "title": "advanced_user_search",
         "type": "object"
       },
+      "allowed_file_extension": {
+        "properties": {
+          "extension": {
+            "description": "File extension",
+            "example": "jpg",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "extension"
+        ],
+        "type": "object"
+      },
       "attachment": {
         "properties": {
           "filename": {
@@ -353,6 +370,38 @@
         "required": [
           "name"
         ],
+        "type": "object"
+      },
+      "byoprofile": {
+        "properties": {
+          "general": {
+            "properties": {
+              "description": {
+                "example": "Used for Android or iOS BYO device enrollments",
+                "type": "string"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "name": {
+                "description": "Name of the BYO profile",
+                "example": "Personal Device Profile",
+                "type": "string"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          }
+        },
         "type": "object"
       },
       "category": {
@@ -393,6 +442,198 @@
           "name"
         ],
         "title": "category",
+        "type": "object"
+      },
+      "class": {
+        "properties": {
+          "apple_tvs": {
+            "items": {
+              "properties": {
+                "apple_tv": {
+                  "properties": {
+                    "airplay_password": {
+                      "example": "password",
+                      "type": "string"
+                    },
+                    "device_id": {
+                      "example": "E0:AC:CB:97:36:g5",
+                      "type": "string"
+                    },
+                    "name": {
+                      "example": "Apple TV",
+                      "type": "string"
+                    },
+                    "udid": {
+                      "example": "3e8c9775cb3302ed9e645adf632cfa533adc3aa8",
+                      "type": "string"
+                    },
+                    "wifi_mac_address": {
+                      "example": "E0:AC:CB:97:36:G4",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "meeting_times": {
+            "properties": {
+              "meeting_time": {
+                "properties": {
+                  "days": {
+                    "enum": [
+                      "M",
+                      "T",
+                      "W",
+                      "Th",
+                      "F",
+                      "Sa",
+                      "Su"
+                    ],
+                    "example": "M W F",
+                    "type": "string"
+                  },
+                  "end_time": {
+                    "example": 1345,
+                    "type": "integer"
+                  },
+                  "start_time": {
+                    "example": 1300,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "mobile_device_group": {
+            "$ref": "#/components/schemas/id_name"
+          },
+          "mobile_device_group_id": {
+            "items": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "mobile_devices": {
+            "items": {
+              "properties": {
+                "mobile_device": {
+                  "properties": {
+                    "name": {
+                      "description": "Name of the device",
+                      "example": "Tinas iPad",
+                      "type": "string"
+                    },
+                    "udid": {
+                      "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                      "type": "string"
+                    },
+                    "wifi_mac_address": {
+                      "example": "E0:AC:CB:97:36:G4",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Name of the class",
+            "example": "Math 101",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "source": {
+            "example": "N/A",
+            "type": "string"
+          },
+          "student_group_ids": {
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "students": {
+            "items": {
+              "properties": {
+                "student": {
+                  "description": "Name of the student",
+                  "example": "Joey",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "teacher_group_ids": {
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "teacher_ids": {
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "teachers": {
+            "items": {
+              "properties": {
+                "teacher": {
+                  "description": "Name of the teacher",
+                  "example": "Mr. Smith",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "class",
         "type": "object"
       },
       "computer": {
@@ -1496,6 +1737,40 @@
         ],
         "type": "object"
       },
+      "disk_encryption_configuration": {
+        "properties": {
+          "file_vault_enabled_users": {
+            "default": "Management Account",
+            "enum": [
+              "Current or Next User",
+              "Management Account"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "key_type": {
+            "default": "Individual",
+            "enum": [
+              "Individual",
+              "Institutional",
+              "Individual And Institutional"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the disk encryption configuration",
+            "example": "Corporate Encryption",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "distribution_point": {
         "properties": {
           "connection_type": {
@@ -1628,6 +1903,41 @@
           "share_name",
           "read_only_username",
           "read_write_username"
+        ],
+        "type": "object"
+      },
+      "dock_item": {
+        "properties": {
+          "contents": {
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the dock item",
+            "example": "Safari",
+            "type": "string"
+          },
+          "path": {
+            "example": "file://localhost/Applications/Safari.app/",
+            "type": "string"
+          },
+          "type": {
+            "default": "App",
+            "enum": [
+              "App",
+              "File",
+              "Folder"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "type"
         ],
         "type": "object"
       },
@@ -2149,6 +2459,36 @@
         },
         "type": "object"
       },
+      "ibeacon": {
+        "properties": {
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "major": {
+            "example": -1,
+            "type": "string"
+          },
+          "minor": {
+            "example": -1,
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the ibeacon",
+            "example": "Room 123 Beacon",
+            "type": "string"
+          },
+          "uuid": {
+            "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "uuid"
+        ],
+        "type": "object"
+      },
       "id_name": {
         "properties": {
           "id": {
@@ -2159,6 +2499,30 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "json_web_token_configuration": {
+        "properties": {
+          "disabled": {
+            "default": false,
+            "type": "boolean"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "example": "JSON Token Name",
+            "type": "string"
+          },
+          "token_expiry": {
+            "default": 5,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "ldap_server": {
@@ -2426,6 +2790,204 @@
           }
         },
         "type": "object"
+      },
+      "licensed_software": {
+        "properties": {
+          "font_definitions": {
+            "items": {
+              "properties": {
+                "definition": {
+                  "$ref": "#/components/schemas/licensed_software_defintion"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "general": {
+            "properties": {
+              "exclude_titles_purchased_from_app_store": {
+                "type": "boolean"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "name": {
+                "description": "Name of the licensed software",
+                "example": "Adobe Creative Suite",
+                "type": "string"
+              },
+              "notes": {
+                "type": "string"
+              },
+              "platform": {
+                "example": "Mac",
+                "type": "string"
+              },
+              "publisher": {
+                "example": "Adobe Systems Incorporated",
+                "type": "string"
+              },
+              "remove_titles_from_inventory_reports": {
+                "type": "boolean"
+              },
+              "send_email_on_violation": {
+                "type": "boolean"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "licenses": {
+            "items": {
+              "properties": {
+                "license": {
+                  "properties": {
+                    "attachments": {
+                      "items": {
+                        "properties": {
+                          "attachment": {
+                            "$ref": "#/components/schemas/attachment"
+                          }
+                        }
+                      },
+                      "type": "array"
+                    },
+                    "license_count": {
+                      "example": 500,
+                      "type": "integer"
+                    },
+                    "license_type": {
+                      "enum": [
+                        "Standard",
+                        "Concurrent",
+                        "Site License"
+                      ],
+                      "type": "string"
+                    },
+                    "notes": {
+                      "type": "string"
+                    },
+                    "organization_name": {
+                      "type": "string"
+                    },
+                    "purchasing": {
+                      "properties": {
+                        "is_annual": {
+                          "default": false,
+                          "type": "boolean"
+                        },
+                        "is_perpetual": {
+                          "default": true,
+                          "type": "boolean"
+                        },
+                        "license_expires": {
+                          "type": "string"
+                        },
+                        "license_expires_epoch": {
+                          "type": "integer"
+                        },
+                        "license_expires_utc": {
+                          "type": "string"
+                        },
+                        "life_expectancy": {
+                          "type": "integer"
+                        },
+                        "po_date": {
+                          "type": "string"
+                        },
+                        "po_date_epoch": {
+                          "type": "integer"
+                        },
+                        "po_date_utc": {
+                          "type": "string"
+                        },
+                        "po_number": {
+                          "type": "string"
+                        },
+                        "purchase_price": {
+                          "type": "string"
+                        },
+                        "purchasing_account": {
+                          "type": "string"
+                        },
+                        "purchasing_contact": {
+                          "type": "string"
+                        },
+                        "vendor": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "registered_to": {
+                      "type": "string"
+                    },
+                    "serial_number_1": {
+                      "type": "string"
+                    },
+                    "serial_number_2": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "plugin_definitions": {
+            "items": {
+              "properties": {
+                "definition": {
+                  "$ref": "#/components/schemas/licensed_software_defintion"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "software_definitions": {
+            "items": {
+              "properties": {
+                "definition": {
+                  "$ref": "#/components/schemas/licensed_software_defintion"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "licensed_software_defintion": {
+        "properties": {
+          "compare_type": {
+            "enum": [
+              "like",
+              "is"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "example": 14,
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "definition"
+        }
       },
       "location": {
         "properties": {
@@ -4986,6 +5548,124 @@
         ],
         "type": "object"
       },
+      "peripheral": {
+        "properties": {
+          "attachments": {
+            "items": {
+              "properties": {
+                "attachment": {
+                  "$ref": "#/components/schemas/attachment"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "general": {
+            "properties": {
+              "bar_code_1": {
+                "type": "string"
+              },
+              "bar_code_2": {
+                "type": "string"
+              },
+              "fields": {
+                "items": {
+                  "properties": {
+                    "field": {
+                      "properties": {
+                        "name": {
+                          "example": "Peripheral Field Name",
+                          "type": "string"
+                        },
+                        "value": {
+                          "example": "Value for menu type",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "type": {
+                "description": "Name of the peripheral type",
+                "example": "Peripheral Type Name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          "location": {
+            "$ref": "#/components/schemas/location"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/purchasing"
+          }
+        },
+        "type": "object"
+      },
+      "peripheral_type": {
+        "properties": {
+          "fields": {
+            "items": {
+              "properties": {
+                "field": {
+                  "properties": {
+                    "choices": {
+                      "items": {
+                        "properties": {
+                          "choice": {
+                            "example": "Value for menu type",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "example": "Peripheral Field Name",
+                      "type": "string"
+                    },
+                    "order": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "type": {
+                      "enum": [
+                        "menu",
+                        "text"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Peripheral Type Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "policy": {
         "properties": {
           "account_maintenance": {
@@ -6033,6 +6713,168 @@
         },
         "type": "object"
       },
+      "removable_mac_address": {
+        "properties": {
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "MAC address to ignore when identifying computers",
+            "example": "E0:AC:CB:97:36:G4",
+            "type": "string"
+          }
+        }
+      },
+      "restricted_software": {
+        "properties": {
+          "general": {
+            "properties": {
+              "delete_executable": {
+                "type": "boolean"
+              },
+              "display_message": {
+                "example": "High Sierra is not yet supported, check Self Service after public release.",
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "kill_process": {
+                "type": "boolean"
+              },
+              "match_exact_process_name": {
+                "type": "boolean"
+              },
+              "name": {
+                "description": "Name of the restricted software",
+                "example": "Restrict High Sierra",
+                "type": "string"
+              },
+              "process_name": {
+                "example": "Install macOS High Sierra.app",
+                "type": "string"
+              },
+              "send_notification": {
+                "type": "boolean"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              }
+            },
+            "required": [
+              "name",
+              "process_name"
+            ],
+            "type": "object"
+          },
+          "scope": {
+            "properties": {
+              "all_computers": {
+                "type": "boolean"
+              },
+              "buildings": {
+                "items": {
+                  "properties": {
+                    "building": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "computer_groups": {
+                "items": {
+                  "properties": {
+                    "computer_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "computers": {
+                "items": {
+                  "properties": {
+                    "computer": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "departments": {
+                "items": {
+                  "properties": {
+                    "department": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "exclusions": {
+                "properties": {
+                  "buildings": {
+                    "items": {
+                      "properties": {
+                        "building": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "computer_groups": {
+                    "items": {
+                      "properties": {
+                        "computer_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "computers": {
+                    "items": {
+                      "properties": {
+                        "computer": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "departments": {
+                    "items": {
+                      "properties": {
+                        "department": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
       "script": {
         "properties": {
           "category": {
@@ -6441,6 +7283,112 @@
           "is_smart"
         ],
         "type": "object"
+      },
+      "webhook": {
+        "properties": {
+          "authentication_type": {
+            "default": "NONE",
+            "enum": [
+              "NONE",
+              "BASIC"
+            ],
+            "type": "string"
+          },
+          "connection_timeout": {
+            "default": 5,
+            "description": "Number of seconds to attempt to connect to the webhooks host server",
+            "type": "integer"
+          },
+          "content_type": {
+            "default": "text/xml",
+            "enum": [
+              "text/xml",
+              "application/json"
+            ],
+            "type": "string"
+          },
+          "display_fields": {
+            "items": {
+              "properties": {
+                "display_field": {
+                  "properties": {
+                    "name": {
+                      "description": "Name of the display field to include for smart group based webhook events",
+                      "example": "IP Address",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "enable_display_fields_for_group_object": {
+            "default": false,
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "event": {
+            "enum": [
+              "ComputerAdded",
+              "ComputerCheckIn",
+              "ComputerInventoryCompleted",
+              "ComputerPolicyFinished",
+              "ComputerPushCapabilityChanged",
+              "JSSShutdown",
+              "JSSStartup",
+              "MobileDeviceCheckIn",
+              "MobileDeviceCommandCompleted",
+              "MobileDeviceEnrolled",
+              "MobileDevicePushSent",
+              "MobileDeviceUnEnrolled",
+              "PatchSoftwareTitleUpdated",
+              "PushSent",
+              "RestAPIOperation",
+              "SCEPChallenge",
+              "SmartGroupComputerMembershipChange",
+              "SmartGroupMobileDeviceMembershipChange"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Computer Enrolled Hook",
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "read_timeout": {
+            "default": 2,
+            "description": "Number of seconds to wait for a response from the webhooks host server after sending a request",
+            "type": "integer"
+          },
+          "url": {
+            "example": "https://requestb.in/wsfasfws",
+            "type": "string"
+          },
+          "username": {
+            "example": "webhook_admin",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "event",
+          "url"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -6788,6 +7736,91 @@
         "x-explorer-enabled": false
       }
     },
+    "/allowedfileextensions/id/{id}": {
+      "delete": {
+        "operationId": "deleteAllowedFileExtensionById",
+        "parameters": [
+          {
+            "description": "Database ID of the extension",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes an allowed file extension value by ID",
+        "tags": [
+          "allowedfileextensions"
+        ]
+      },
+      "get": {
+        "operationId": "findAllowedFileExtensionById",
+        "parameters": [
+          {
+            "description": "Database ID of the extension",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/allowed_file_extension"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/allowed_file_extension"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds an allowed file extension value by ID",
+        "tags": [
+          "allowedfileextensions"
+        ]
+      },
+      "post": {
+        "operationId": "createAllowedFileExtensionById",
+        "parameters": [
+          {
+            "description": "Database ID of the extension",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new allowed file extension value by ID",
+        "tags": [
+          "allowedfileextensions"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/buildings/id/{id}": {
       "delete": {
         "operationId": "deleteBuildingById",
@@ -6897,6 +7930,115 @@
         "x-explorer-enabled": false
       }
     },
+    "/byoprofiles/id/{id}": {
+      "delete": {
+        "operationId": "deleteBYOProfilesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a personal device profile by ID",
+        "tags": [
+          "byoprofiles"
+        ]
+      },
+      "get": {
+        "operationId": "findBYOProfilesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/byoprofile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/byoprofile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds personal device profile by ID",
+        "tags": [
+          "byoprofiles"
+        ]
+      },
+      "post": {
+        "operationId": "createBYOProfilesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a personal device profile by ID",
+        "tags": [
+          "byoprofiles"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateBYOProfilesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates a personal device profile by ID",
+        "tags": [
+          "byoprofiles"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/categories/id/{id}": {
       "delete": {
         "operationId": "deleteCategoryById",
@@ -7002,6 +8144,117 @@
         "summary": "Updates an existing category by ID",
         "tags": [
           "categories"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/classes/id/{id}": {
+      "delete": {
+        "operationId": "deleteClassById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a class by ID",
+        "tags": [
+          "classes"
+        ]
+      },
+      "get": {
+        "operationId": "findClassesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/class"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/class"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds classes by ID",
+        "tags": [
+          "classes"
+        ]
+      },
+      "post": {
+        "description": "The mobile device list is not used by this operation, the mobile device group is used instead.",
+        "operationId": "createClassById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new class by ID",
+        "tags": [
+          "classes"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "The mobile device list is not used by this operation, the mobile device group is used instead.",
+        "operationId": "updateClassById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Updates an existing class by ID",
+        "tags": [
+          "classes"
         ],
         "x-explorer-enabled": false
       }
@@ -7713,6 +8966,115 @@
         "x-explorer-enabled": false
       }
     },
+    "/diskencryptionconfigurations/id/{id}": {
+      "delete": {
+        "operationId": "deleteDiskEncryptionConfigurationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a disk encryption configuration by ID",
+        "tags": [
+          "diskencryptionconfigurations"
+        ]
+      },
+      "get": {
+        "operationId": "findDiskEncryptionConfigurationsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/disk_encryption_configuration"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/disk_encryption_configuration"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds disk encryption configurations by ID",
+        "tags": [
+          "diskencryptionconfigurations"
+        ]
+      },
+      "post": {
+        "operationId": "createDiskEncryptionConfigurationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new disk encryption configuration by ID",
+        "tags": [
+          "diskencryptionconfigurations"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateDiskEncryptionConfigurationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing disk encryption configuration by ID",
+        "tags": [
+          "diskencryptionconfigurations"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/distributionpoints/id/{id}": {
       "delete": {
         "operationId": "deleteDistributionPointById",
@@ -7818,6 +9180,115 @@
         "summary": "Updates an existing distribution point by ID",
         "tags": [
           "distributionpoints"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/dockitems/id/{id}": {
+      "delete": {
+        "operationId": "deleteDockItemById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a dock item by ID",
+        "tags": [
+          "dockitems"
+        ]
+      },
+      "get": {
+        "operationId": "findDockItemsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dock_item"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/dock_item"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds dock items by ID",
+        "tags": [
+          "dockitems"
+        ]
+      },
+      "post": {
+        "operationId": "createDockItemById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new dock item by ID",
+        "tags": [
+          "dockitems"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateDockItemById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing dock item by ID",
+        "tags": [
+          "dockitems"
         ],
         "x-explorer-enabled": false
       }
@@ -7931,6 +9402,231 @@
         "x-explorer-enabled": false
       }
     },
+    "/ibeacons/id/{id}": {
+      "delete": {
+        "operationId": "deleteIBeaconById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes an iBeacon region by ID",
+        "tags": [
+          "ibeacons"
+        ]
+      },
+      "get": {
+        "operationId": "findIBeaconsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ibeacon"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ibeacon"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds iBeacon regions by ID",
+        "tags": [
+          "ibeacons"
+        ]
+      },
+      "post": {
+        "operationId": "createIBeaconById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new iBeacon region by ID",
+        "tags": [
+          "ibeacons"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateIBeaconById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing iBeacon region by ID",
+        "tags": [
+          "ibeacons"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/jsonwebtokenconfigurations/id/{id}": {
+      "delete": {
+        "operationId": "deleteJsonWebTokenConfigurationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a JSON Web Token configuration by ID",
+        "tags": [
+          "jsonwebtokenconfigurations"
+        ]
+      },
+      "get": {
+        "operationId": "findJsonWebTokenConfigurationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/json_web_token_configuration"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/json_web_token_configuration"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Find JSON Web Token configuration by ID",
+        "tags": [
+          "jsonwebtokenconfigurations"
+        ]
+      },
+      "post": {
+        "operationId": "createJsonWebTokenConfigurationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/json_web_token_configuration"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new JSON Web Token configuration by ID",
+        "tags": [
+          "jsonwebtokenconfigurations"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateJsonWebTokenConfigurationById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing JSON Web Token configuration by ID",
+        "tags": [
+          "jsonwebtokenconfigurations"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/ldapservers/id/{id}": {
       "delete": {
         "operationId": "deleteLDAPServerById",
@@ -8036,6 +9732,117 @@
         "summary": "Updates an existing LDAP server by ID",
         "tags": [
           "ldapservers"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/licensedsoftware/id/{id}": {
+      "delete": {
+        "operationId": "deleteLicensedSoftwareById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes licensed software by ID",
+        "tags": [
+          "licensedsoftware"
+        ]
+      },
+      "get": {
+        "operationId": "findLicensedSoftwareById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/licensed_software"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/licensed_software"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds licensed software by ID",
+        "tags": [
+          "licensedsoftware"
+        ]
+      },
+      "post": {
+        "description": "Matching computers are derived from software definitions, therefore they cannot be set with this operation.",
+        "operationId": "createLicensedSoftwareById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates new licensed software by ID",
+        "tags": [
+          "licensedsoftware"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "Matching computers are derived from software definitions, therefore they cannot be set with this operation.",
+        "operationId": "updateLicensedSoftwareById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates existing licensed software by ID",
+        "tags": [
+          "licensedsoftware"
         ],
         "x-explorer-enabled": false
       }
@@ -9368,6 +11175,224 @@
         "x-explorer-enabled": false
       }
     },
+    "/peripherals/id/{id}": {
+      "delete": {
+        "operationId": "deletePeripheralById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a peripheral by ID",
+        "tags": [
+          "peripherals"
+        ]
+      },
+      "get": {
+        "operationId": "findPeripheralsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/peripheral"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/peripheral"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds peripherals by ID",
+        "tags": [
+          "peripherals"
+        ]
+      },
+      "post": {
+        "operationId": "createPeripheralById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new peripheral by ID",
+        "tags": [
+          "peripherals"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updatePeripheralById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing peripheral by ID",
+        "tags": [
+          "peripherals"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/peripheraltypes/id/{id}": {
+      "delete": {
+        "operationId": "deletePeripheralTypeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a peripheral by ID",
+        "tags": [
+          "peripheraltypes"
+        ]
+      },
+      "get": {
+        "operationId": "findPeripheralTypesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/peripheral_type"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/peripheral_type"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds peripheral types by ID",
+        "tags": [
+          "peripheraltypes"
+        ]
+      },
+      "post": {
+        "operationId": "createPeripheralTypeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new peripheral by ID",
+        "tags": [
+          "peripheraltypes"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updatePeripheralTypeById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing peripheral by ID",
+        "tags": [
+          "peripheraltypes"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/policies/id/{id}": {
       "delete": {
         "operationId": "deletePolicyById",
@@ -9666,6 +11691,224 @@
         "summary": "Updates an existing printer by ID",
         "tags": [
           "printers"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/removablemacaddresses/id/{id}": {
+      "delete": {
+        "operationId": "deleteRemovableMacAddressById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a removable Mac address by ID",
+        "tags": [
+          "removablemacaddresses"
+        ]
+      },
+      "get": {
+        "operationId": "findRemovableMacAddressesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/removable_mac_address"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/removable_mac_address"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds removable Mac addresses by ID",
+        "tags": [
+          "removablemacaddresses"
+        ]
+      },
+      "post": {
+        "operationId": "createRemovableMacAddressById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new removable Mac address by ID",
+        "tags": [
+          "removablemacaddresses"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateRemovableMacAddressById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing removable Mac address by ID",
+        "tags": [
+          "removablemacaddresses"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/restrictedsoftware/id/{id}": {
+      "delete": {
+        "operationId": "deleteRestrictedSoftwareById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a restricted software by ID",
+        "tags": [
+          "restrictedsoftware"
+        ]
+      },
+      "get": {
+        "operationId": "findRestrictedSoftwareById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restricted_software"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/restricted_software"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds restricted software by ID",
+        "tags": [
+          "restrictedsoftware"
+        ]
+      },
+      "post": {
+        "operationId": "createRestrictedSoftwareById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new restricted software by ID",
+        "tags": [
+          "restrictedsoftware"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateRestrictedSoftwareById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing restricted software by ID",
+        "tags": [
+          "restrictedsoftware"
         ],
         "x-explorer-enabled": false
       }
@@ -10217,6 +12460,117 @@
         "summary": "Updates an existing user by ID",
         "tags": [
           "users"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/webhooks/id/{id}": {
+      "delete": {
+        "operationId": "deleteWebhookById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a webhook by ID",
+        "tags": [
+          "webhooks"
+        ]
+      },
+      "get": {
+        "operationId": "findWebhooksById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/webhook"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/webhook"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds webhooks by ID",
+        "tags": [
+          "webhooks"
+        ]
+      },
+      "post": {
+        "description": "The `display_fields` are only applicable to the `SmartGroupMobileDeviceMembershipChange` event. Accepted values (capitlization sensitive) are the same as those available from the GUI when making and Advanced Search.",
+        "operationId": "createWebhookById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new webhook by ID",
+        "tags": [
+          "webhooks"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "The `display_fields` are only applicable to the `SmartGroupMobileDeviceMembershipChange` event. Accepted values (capitlization sensitive) are the same as those available from the GUI when making and Advanced Search. `display_field_additions` can be used in place of the `display_fields` element to append new fields to an existing webhook.",
+        "operationId": "updateWebhookById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing webhook by ID",
+        "tags": [
+          "webhooks"
         ],
         "x-explorer-enabled": false
       }

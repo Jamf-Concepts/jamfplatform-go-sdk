@@ -309,7 +309,71 @@
         {"op": "GET /ebooks/id/{id}", "name": "GetEbookByID", "responseType": "ebook", "pathNames": {"id": "id"}},
         {"op": "POST /ebooks/id/{id}", "name": "CreateEbookByID", "requestType": "ebook_post", "responseType": "ebook", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /ebooks/id/{id}", "name": "UpdateEbookByID", "requestType": "ebook_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /ebooks/id/{id}", "name": "DeleteEbookByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /ebooks/id/{id}", "name": "DeleteEbookByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /classes/id/{id}", "name": "GetClassByID", "responseType": "class", "pathNames": {"id": "id"}},
+        {"op": "POST /classes/id/{id}", "name": "CreateClassByID", "requestType": "class_post", "responseType": "class", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /classes/id/{id}", "name": "UpdateClassByID", "requestType": "class_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /classes/id/{id}", "name": "DeleteClassByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /licensedsoftware/id/{id}", "name": "GetLicensedSoftwareByID", "responseType": "licensed_software", "pathNames": {"id": "id"}},
+        {"op": "POST /licensedsoftware/id/{id}", "name": "CreateLicensedSoftwareByID", "requestType": "licensed_software", "responseType": "licensed_software", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /licensedsoftware/id/{id}", "name": "UpdateLicensedSoftwareByID", "requestType": "licensed_software", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /licensedsoftware/id/{id}", "name": "DeleteLicensedSoftwareByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /restrictedsoftware/id/{id}", "name": "GetRestrictedSoftwareByID", "responseType": "restricted_software", "pathNames": {"id": "id"}},
+        {"op": "POST /restrictedsoftware/id/{id}", "name": "CreateRestrictedSoftwareByID", "requestType": "restricted_software", "responseType": "restricted_software", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /restrictedsoftware/id/{id}", "name": "UpdateRestrictedSoftwareByID", "requestType": "restricted_software", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /restrictedsoftware/id/{id}", "name": "DeleteRestrictedSoftwareByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /peripheraltypes/id/{id}", "name": "GetPeripheralTypeByID", "responseType": "peripheral_type", "pathNames": {"id": "id"}},
+        {"op": "POST /peripheraltypes/id/{id}", "name": "CreatePeripheralTypeByID", "requestType": "peripheral_type", "responseType": "peripheral_type", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /peripheraltypes/id/{id}", "name": "UpdatePeripheralTypeByID", "requestType": "peripheral_type", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /peripheraltypes/id/{id}", "name": "DeletePeripheralTypeByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /peripherals/id/{id}", "name": "GetPeripheralByID", "responseType": "peripheral", "pathNames": {"id": "id"}},
+        {"op": "POST /peripherals/id/{id}", "name": "CreatePeripheralByID", "requestType": "peripheral_post", "responseType": "peripheral", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /peripherals/id/{id}", "name": "UpdatePeripheralByID", "requestType": "peripheral_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /peripherals/id/{id}", "name": "DeletePeripheralByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /diskencryptionconfigurations/id/{id}", "name": "GetDiskEncryptionConfigurationByID", "responseType": "disk_encryption_configuration", "pathNames": {"id": "id"}},
+        {"op": "POST /diskencryptionconfigurations/id/{id}", "name": "CreateDiskEncryptionConfigurationByID", "requestType": "disk_encryption_configuration", "responseType": "disk_encryption_configuration", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /diskencryptionconfigurations/id/{id}", "name": "UpdateDiskEncryptionConfigurationByID", "requestType": "disk_encryption_configuration", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /diskencryptionconfigurations/id/{id}", "name": "DeleteDiskEncryptionConfigurationByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /byoprofiles/id/{id}", "name": "GetBYOProfileByID", "responseType": "byoprofile", "pathNames": {"id": "id"}},
+        {"op": "POST /byoprofiles/id/{id}", "name": "CreateBYOProfileByID", "requestType": "byoprofile", "responseType": "byoprofile", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /byoprofiles/id/{id}", "name": "UpdateBYOProfileByID", "requestType": "byoprofile", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /byoprofiles/id/{id}", "name": "DeleteBYOProfileByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /ibeacons/id/{id}", "name": "GetIBeaconByID", "responseType": "ibeacon", "pathNames": {"id": "id"}},
+        {"op": "POST /ibeacons/id/{id}", "name": "CreateIBeaconByID", "requestType": "ibeacon", "responseType": "ibeacon", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /ibeacons/id/{id}", "name": "UpdateIBeaconByID", "requestType": "ibeacon", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /ibeacons/id/{id}", "name": "DeleteIBeaconByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /dockitems/id/{id}", "name": "GetDockItemByID", "responseType": "dock_item", "pathNames": {"id": "id"}},
+        {"op": "POST /dockitems/id/{id}", "name": "CreateDockItemByID", "requestType": "dock_item", "responseType": "dock_item", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /dockitems/id/{id}", "name": "UpdateDockItemByID", "requestType": "dock_item", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /dockitems/id/{id}", "name": "DeleteDockItemByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /removablemacaddresses/id/{id}", "name": "GetRemovableMacAddressByID", "responseType": "removable_mac_address", "pathNames": {"id": "id"}},
+        {"op": "POST /removablemacaddresses/id/{id}", "name": "CreateRemovableMacAddressByID", "requestType": "removable_mac_address", "responseType": "removable_mac_address", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /removablemacaddresses/id/{id}", "name": "UpdateRemovableMacAddressByID", "requestType": "removable_mac_address", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /removablemacaddresses/id/{id}", "name": "DeleteRemovableMacAddressByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /allowedfileextensions/id/{id}", "name": "GetAllowedFileExtensionByID", "responseType": "allowed_file_extension", "pathNames": {"id": "id"}},
+        {"op": "POST /allowedfileextensions/id/{id}", "name": "CreateAllowedFileExtensionByID", "requestType": "allowed_file_extension", "responseType": "allowed_file_extension", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /allowedfileextensions/id/{id}", "name": "DeleteAllowedFileExtensionByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /jsonwebtokenconfigurations/id/{id}", "name": "GetJsonWebTokenConfigurationByID", "responseType": "json_web_token_configuration", "pathNames": {"id": "id"}},
+        {"op": "POST /jsonwebtokenconfigurations/id/{id}", "name": "CreateJsonWebTokenConfigurationByID", "requestType": "json_web_token_configuration", "responseType": "json_web_token_configuration", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /jsonwebtokenconfigurations/id/{id}", "name": "UpdateJsonWebTokenConfigurationByID", "requestType": "json_web_token_configuration", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /jsonwebtokenconfigurations/id/{id}", "name": "DeleteJsonWebTokenConfigurationByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /webhooks/id/{id}", "name": "GetWebhookByID", "responseType": "webhook", "pathNames": {"id": "id"}},
+        {"op": "POST /webhooks/id/{id}", "name": "CreateWebhookByID", "requestType": "webhook", "responseType": "webhook", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /webhooks/id/{id}", "name": "UpdateWebhookByID", "requestType": "webhook", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /webhooks/id/{id}", "name": "DeleteWebhookByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

@@ -170,6 +170,13 @@ type AdvancedUserSearchUsersItemUser struct {
 	Name     *string  `xml:"name,omitempty"`
 }
 
+// AllowedFileExtension represents a allowed file extension.
+type AllowedFileExtension struct {
+	XMLName   xml.Name `xml:"allowed_file_extension"`
+	Extension *string  `xml:"extension,omitempty"`
+	ID        *int     `xml:"id,omitempty"`
+}
+
 // Attachment represents a attachment.
 type Attachment struct {
 	XMLName  xml.Name `xml:"attachment"`
@@ -185,6 +192,23 @@ type Building struct {
 	Name    *string  `xml:"name,omitempty"`
 }
 
+// Byoprofile represents a byoprofile.
+type Byoprofile struct {
+	XMLName xml.Name           `xml:"byoprofile"`
+	ID      *int               `xml:"id,omitempty"`
+	General *ByoprofileGeneral `xml:"general,omitempty"`
+}
+
+// ByoprofileGeneral represents a byoprofile general.
+type ByoprofileGeneral struct {
+	XMLName     xml.Name    `xml:"general"`
+	Description *string     `xml:"description,omitempty"`
+	Enabled     *bool       `xml:"enabled,omitempty"`
+	ID          *int        `xml:"id,omitempty"`
+	Name        *string     `xml:"name,omitempty"`
+	Site        *SiteObject `xml:"site,omitempty"`
+}
+
 // Category represents a category.
 type Category struct {
 	XMLName  xml.Name `xml:"category"`
@@ -197,6 +221,128 @@ type Category struct {
 type CategoryObject struct {
 	ID   *int    `xml:"id,omitempty"`
 	Name *string `xml:"name,omitempty"`
+}
+
+// Class represents a class.
+type Class struct {
+	XMLName             xml.Name                       `xml:"class"`
+	AppleTvs            []ClassAppleTvsItem            `xml:"apple_tvs"`
+	Description         *string                        `xml:"description,omitempty"`
+	ID                  *int                           `xml:"id,omitempty"`
+	MeetingTimes        *ClassMeetingTimes             `xml:"meeting_times,omitempty"`
+	MobileDeviceGroup   *IDName                        `xml:"mobile_device_group,omitempty"`
+	MobileDeviceGroupID []ClassMobileDeviceGroupIDItem `xml:"mobile_device_group_id"`
+	MobileDevices       []ClassMobileDevicesItem       `xml:"mobile_devices"`
+	Name                *string                        `xml:"name,omitempty"`
+	Site                *SiteObject                    `xml:"site,omitempty"`
+	Source              *string                        `xml:"source,omitempty"`
+	StudentGroupIds     []ClassStudentGroupIdsItem     `xml:"student_group_ids"`
+	Students            []ClassStudentsItem            `xml:"students"`
+	TeacherGroupIds     []ClassTeacherGroupIdsItem     `xml:"teacher_group_ids"`
+	TeacherIds          []ClassTeacherIdsItem          `xml:"teacher_ids"`
+	Teachers            []ClassTeachersItem            `xml:"teachers"`
+}
+
+// ClassAppleTvsItem represents a class apple tvs item.
+type ClassAppleTvsItem struct {
+	ID      *int                      `xml:"id,omitempty"`
+	AppleTv *ClassAppleTvsItemAppleTv `xml:"apple_tv,omitempty"`
+}
+
+// ClassAppleTvsItemAppleTv represents a class apple tvs item apple tv.
+type ClassAppleTvsItemAppleTv struct {
+	XMLName         xml.Name `xml:"apple_tv"`
+	AirplayPassword *string  `xml:"airplay_password,omitempty"`
+	DeviceID        *string  `xml:"device_id,omitempty"`
+	Name            *string  `xml:"name,omitempty"`
+	UDID            *string  `xml:"udid,omitempty"`
+	WifiMacAddress  *string  `xml:"wifi_mac_address,omitempty"`
+}
+
+// ClassMeetingTimes represents a class meeting times.
+type ClassMeetingTimes struct {
+	XMLName     xml.Name                      `xml:"meeting_times"`
+	ID          *int                          `xml:"id,omitempty"`
+	MeetingTime *ClassMeetingTimesMeetingTime `xml:"meeting_time,omitempty"`
+}
+
+// ClassMeetingTimesMeetingTime represents a class meeting times meeting time.
+type ClassMeetingTimesMeetingTime struct {
+	XMLName   xml.Name `xml:"meeting_time"`
+	Days      *string  `xml:"days,omitempty"`
+	EndTime   *int     `xml:"end_time,omitempty"`
+	StartTime *int     `xml:"start_time,omitempty"`
+}
+
+// ClassMobileDeviceGroupIDItem represents a class mobile device group i d item.
+type ClassMobileDeviceGroupIDItem struct {
+	XMLName xml.Name `xml:"mobile_device_group_id"`
+	ID      *int     `xml:"id,omitempty"`
+}
+
+// ClassMobileDevicesItem represents a class mobile devices item.
+type ClassMobileDevicesItem struct {
+	ID           *int                                `xml:"id,omitempty"`
+	MobileDevice *ClassMobileDevicesItemMobileDevice `xml:"mobile_device,omitempty"`
+}
+
+// ClassMobileDevicesItemMobileDevice represents a class mobile devices item mobile device.
+type ClassMobileDevicesItemMobileDevice struct {
+	XMLName        xml.Name `xml:"mobile_device"`
+	Name           *string  `xml:"name,omitempty"`
+	UDID           *string  `xml:"udid,omitempty"`
+	WifiMacAddress *string  `xml:"wifi_mac_address,omitempty"`
+}
+
+// ClassStudentGroupIdsItem represents a class student group ids item.
+type ClassStudentGroupIdsItem struct {
+	ID *int `xml:"id,omitempty"`
+}
+
+// ClassStudentsItem represents a class students item.
+type ClassStudentsItem struct {
+	Student *string `xml:"student,omitempty"`
+}
+
+// ClassTeacherGroupIdsItem represents a class teacher group ids item.
+type ClassTeacherGroupIdsItem struct {
+	ID *int `xml:"id,omitempty"`
+}
+
+// ClassTeacherIdsItem represents a class teacher ids item.
+type ClassTeacherIdsItem struct {
+	ID *int `xml:"id,omitempty"`
+}
+
+// ClassTeachersItem represents a class teachers item.
+type ClassTeachersItem struct {
+	Teacher *string `xml:"teacher,omitempty"`
+}
+
+// ClassPost represents a class post.
+type ClassPost struct {
+	XMLName      xml.Name               `xml:"class"`
+	Description  *string                `xml:"description,omitempty"`
+	ID           *int                   `xml:"id,omitempty"`
+	MeetingTimes *ClassPostMeetingTimes `xml:"meeting_times,omitempty"`
+	Name         *string                `xml:"name,omitempty"`
+	Site         *SiteObject            `xml:"site,omitempty"`
+	Source       *string                `xml:"source,omitempty"`
+}
+
+// ClassPostMeetingTimes represents a class post meeting times.
+type ClassPostMeetingTimes struct {
+	XMLName     xml.Name                          `xml:"meeting_times"`
+	ID          *int                              `xml:"id,omitempty"`
+	MeetingTime *ClassPostMeetingTimesMeetingTime `xml:"meeting_time,omitempty"`
+}
+
+// ClassPostMeetingTimesMeetingTime represents a class post meeting times meeting time.
+type ClassPostMeetingTimesMeetingTime struct {
+	XMLName   xml.Name `xml:"meeting_time"`
+	Days      *string  `xml:"days,omitempty"`
+	EndTime   *int     `xml:"end_time,omitempty"`
+	StartTime *int     `xml:"start_time,omitempty"`
 }
 
 // Computer represents a computer.
@@ -479,6 +625,15 @@ type DirectoryBinding struct {
 	Username   *string  `xml:"username,omitempty"`
 }
 
+// DiskEncryptionConfiguration represents a disk encryption configuration.
+type DiskEncryptionConfiguration struct {
+	XMLName               xml.Name `xml:"disk_encryption_configuration"`
+	FileVaultEnabledUsers *string  `xml:"file_vault_enabled_users,omitempty"`
+	ID                    *int     `xml:"id,omitempty"`
+	KeyType               *string  `xml:"key_type,omitempty"`
+	Name                  *string  `xml:"name,omitempty"`
+}
+
 // DistributionPoint represents a distribution point.
 type DistributionPoint struct {
 	XMLName                  xml.Name `xml:"distribution_point"`
@@ -539,6 +694,16 @@ type DistributionPointPost struct {
 	SshUsername              *string  `xml:"ssh_username,omitempty"`
 	UsernamePasswordRequired *bool    `xml:"username_password_required,omitempty"`
 	WorkgroupOrDomain        *string  `xml:"workgroup_or_domain,omitempty"`
+}
+
+// DockItem represents a dock item.
+type DockItem struct {
+	XMLName  xml.Name `xml:"dock_item"`
+	Contents *string  `xml:"contents,omitempty"`
+	ID       *int     `xml:"id,omitempty"`
+	Name     *string  `xml:"name,omitempty"`
+	Path     *string  `xml:"path,omitempty"`
+	Type     *string  `xml:"type,omitempty"`
 }
 
 // Ebook represents a ebook.
@@ -878,10 +1043,29 @@ type EbookPostScope struct {
 	AllMobileDevices *bool    `xml:"all_mobile_devices,omitempty"`
 }
 
+// Ibeacon represents a ibeacon.
+type Ibeacon struct {
+	XMLName xml.Name `xml:"ibeacon"`
+	ID      *int     `xml:"id,omitempty"`
+	Major   *string  `xml:"major,omitempty"`
+	Minor   *string  `xml:"minor,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+	UUID    *string  `xml:"uuid,omitempty"`
+}
+
 // IDName represents a i d name.
 type IDName struct {
 	ID   *int    `xml:"id,omitempty"`
 	Name *string `xml:"name,omitempty"`
+}
+
+// JsonWebTokenConfiguration represents a json web token configuration.
+type JsonWebTokenConfiguration struct {
+	XMLName     xml.Name `xml:"json_web_token_configuration"`
+	Disabled    *bool    `xml:"disabled,omitempty"`
+	ID          *int     `xml:"id,omitempty"`
+	Name        *string  `xml:"name,omitempty"`
+	TokenExpiry *int     `xml:"token_expiry,omitempty"`
 }
 
 // LdapServer represents a ldap server.
@@ -1068,6 +1252,39 @@ type LdapServerPostMappingsForUsersUserMappings struct {
 	ObjectClasses            *string  `xml:"object_classes,omitempty"`
 	SearchBase               *string  `xml:"search_base,omitempty"`
 	SearchScope              *string  `xml:"search_scope,omitempty"`
+}
+
+// LicensedSoftware represents a licensed software.
+type LicensedSoftware struct {
+	XMLName             xml.Name                 `xml:"licensed_software"`
+	ID                  *int                     `xml:"id,omitempty"`
+	FontDefinitions     *[]any                   `xml:"font_definitions,omitempty"`
+	General             *LicensedSoftwareGeneral `xml:"general,omitempty"`
+	Licenses            *[]any                   `xml:"licenses,omitempty"`
+	PluginDefinitions   *[]any                   `xml:"plugin_definitions,omitempty"`
+	SoftwareDefinitions *[]any                   `xml:"software_definitions,omitempty"`
+}
+
+// LicensedSoftwareGeneral represents a licensed software general.
+type LicensedSoftwareGeneral struct {
+	XMLName                            xml.Name    `xml:"general"`
+	ExcludeTitlesPurchasedFromAppStore *bool       `xml:"exclude_titles_purchased_from_app_store,omitempty"`
+	ID                                 *int        `xml:"id,omitempty"`
+	Name                               *string     `xml:"name,omitempty"`
+	Notes                              *string     `xml:"notes,omitempty"`
+	Platform                           *string     `xml:"platform,omitempty"`
+	Publisher                          *string     `xml:"publisher,omitempty"`
+	RemoveTitlesFromInventoryReports   *bool       `xml:"remove_titles_from_inventory_reports,omitempty"`
+	SendEmailOnViolation               *bool       `xml:"send_email_on_violation,omitempty"`
+	Site                               *SiteObject `xml:"site,omitempty"`
+}
+
+// LicensedSoftwareDefintion represents a licensed software defintion.
+type LicensedSoftwareDefintion struct {
+	XMLName     xml.Name `xml:"definition"`
+	CompareType *string  `xml:"compare_type,omitempty"`
+	Name        *string  `xml:"name,omitempty"`
+	Version     *string  `xml:"version,omitempty"`
 }
 
 // Location represents a location.
@@ -2352,6 +2569,65 @@ type Package struct {
 	TriggeringFiles            *string  `xml:"triggering_files,omitempty"`
 }
 
+// Peripheral represents a peripheral.
+type Peripheral struct {
+	XMLName     xml.Name           `xml:"peripheral"`
+	ID          *int               `xml:"id,omitempty"`
+	Attachments []any              `xml:"attachments"`
+	General     *PeripheralGeneral `xml:"general,omitempty"`
+	Location    *Location          `xml:"location,omitempty"`
+	Purchasing  *Purchasing        `xml:"purchasing,omitempty"`
+}
+
+// PeripheralGeneral represents a peripheral general.
+type PeripheralGeneral struct {
+	XMLName  xml.Name `xml:"general"`
+	BarCode1 *string  `xml:"bar_code_1,omitempty"`
+	BarCode2 *string  `xml:"bar_code_2,omitempty"`
+	Fields   []any    `xml:"fields"`
+	ID       *int     `xml:"id,omitempty"`
+	Type     *string  `xml:"type,omitempty"`
+}
+
+// PeripheralPost represents a peripheral post.
+type PeripheralPost struct {
+	XMLName xml.Name               `xml:"peripheral"`
+	ID      *int                   `xml:"id,omitempty"`
+	General *PeripheralPostGeneral `xml:"general,omitempty"`
+}
+
+// PeripheralPostGeneral represents a peripheral post general.
+type PeripheralPostGeneral struct {
+	XMLName  xml.Name                     `xml:"general"`
+	BarCode1 *string                      `xml:"bar_code_1,omitempty"`
+	BarCode2 *string                      `xml:"bar_code_2,omitempty"`
+	Fields   *PeripheralPostGeneralFields `xml:"fields,omitempty"`
+	ID       *int                         `xml:"id,omitempty"`
+	Type     *string                      `xml:"type,omitempty"`
+}
+
+// PeripheralPostGeneralFields represents a peripheral post general fields.
+type PeripheralPostGeneralFields struct {
+	XMLName xml.Name                          `xml:"fields"`
+	ID      *int                              `xml:"id,omitempty"`
+	Field   *PeripheralPostGeneralFieldsField `xml:"field,omitempty"`
+}
+
+// PeripheralPostGeneralFieldsField represents a peripheral post general fields field.
+type PeripheralPostGeneralFieldsField struct {
+	XMLName xml.Name `xml:"field"`
+	Name    *string  `xml:"name,omitempty"`
+	Value   *string  `xml:"value,omitempty"`
+}
+
+// PeripheralType represents a peripheral type.
+type PeripheralType struct {
+	XMLName xml.Name `xml:"peripheral_type"`
+	Fields  *[]any   `xml:"fields,omitempty"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
 // Policy represents a policy.
 type Policy struct {
 	XMLName              xml.Name                    `xml:"policy"`
@@ -2810,6 +3086,57 @@ type Purchasing struct {
 	WarrantyExpiresUtc   *string  `xml:"warranty_expires_utc,omitempty"`
 }
 
+// RemovableMacAddress represents a removable mac address.
+type RemovableMacAddress struct {
+	XMLName xml.Name `xml:"removable_mac_address"`
+	ID      *int     `xml:"id,omitempty"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// RestrictedSoftware represents a restricted software.
+type RestrictedSoftware struct {
+	XMLName xml.Name                   `xml:"restricted_software"`
+	ID      *int                       `xml:"id,omitempty"`
+	General *RestrictedSoftwareGeneral `xml:"general,omitempty"`
+	Scope   *RestrictedSoftwareScope   `xml:"scope,omitempty"`
+}
+
+// RestrictedSoftwareGeneral represents a restricted software general.
+type RestrictedSoftwareGeneral struct {
+	XMLName               xml.Name    `xml:"general"`
+	DeleteExecutable      *bool       `xml:"delete_executable,omitempty"`
+	DisplayMessage        *string     `xml:"display_message,omitempty"`
+	ID                    *int        `xml:"id,omitempty"`
+	KillProcess           *bool       `xml:"kill_process,omitempty"`
+	MatchExactProcessName *bool       `xml:"match_exact_process_name,omitempty"`
+	Name                  *string     `xml:"name,omitempty"`
+	ProcessName           *string     `xml:"process_name,omitempty"`
+	SendNotification      *bool       `xml:"send_notification,omitempty"`
+	Site                  *SiteObject `xml:"site,omitempty"`
+}
+
+// RestrictedSoftwareScope represents a restricted software scope.
+type RestrictedSoftwareScope struct {
+	XMLName        xml.Name                           `xml:"scope"`
+	ID             *int                               `xml:"id,omitempty"`
+	AllComputers   *bool                              `xml:"all_computers,omitempty"`
+	Buildings      *[]any                             `xml:"buildings,omitempty"`
+	ComputerGroups *[]any                             `xml:"computer_groups,omitempty"`
+	Computers      *[]any                             `xml:"computers,omitempty"`
+	Departments    *[]any                             `xml:"departments,omitempty"`
+	Exclusions     *RestrictedSoftwareScopeExclusions `xml:"exclusions,omitempty"`
+}
+
+// RestrictedSoftwareScopeExclusions represents a restricted software scope exclusions.
+type RestrictedSoftwareScopeExclusions struct {
+	XMLName        xml.Name `xml:"exclusions"`
+	Buildings      *[]any   `xml:"buildings,omitempty"`
+	ComputerGroups *[]any   `xml:"computer_groups,omitempty"`
+	Computers      *[]any   `xml:"computers,omitempty"`
+	Departments    *[]any   `xml:"departments,omitempty"`
+	Users          *[]any   `xml:"users,omitempty"`
+}
+
 // Script represents a script.
 type Script struct {
 	XMLName               xml.Name          `xml:"script"`
@@ -2959,4 +3286,35 @@ type UserPost struct {
 	PhoneNumber  *string  `xml:"phone_number,omitempty"`
 	Position     *string  `xml:"position,omitempty"`
 	Sites        *[]any   `xml:"sites,omitempty"`
+}
+
+// Webhook represents a webhook.
+type Webhook struct {
+	XMLName                           xml.Name                    `xml:"webhook"`
+	AuthenticationType                *string                     `xml:"authentication_type,omitempty"`
+	ConnectionTimeout                 *int                        `xml:"connection_timeout,omitempty"`
+	ContentType                       *string                     `xml:"content_type,omitempty"`
+	DisplayFields                     *[]WebhookDisplayFieldsItem `xml:"display_fields,omitempty"`
+	EnableDisplayFieldsForGroupObject *bool                       `xml:"enable_display_fields_for_group_object,omitempty"`
+	Enabled                           *bool                       `xml:"enabled,omitempty"`
+	Event                             *string                     `xml:"event,omitempty"`
+	ID                                *int                        `xml:"id,omitempty"`
+	Name                              *string                     `xml:"name,omitempty"`
+	Password                          *string                     `xml:"password,omitempty"`
+	ReadTimeout                       *int                        `xml:"read_timeout,omitempty"`
+	URL                               *string                     `xml:"url,omitempty"`
+	Username                          *string                     `xml:"username,omitempty"`
+}
+
+// WebhookDisplayFieldsItem represents a webhook display fields item.
+type WebhookDisplayFieldsItem struct {
+	ID           *int                                  `xml:"id,omitempty"`
+	DisplayField *WebhookDisplayFieldsItemDisplayField `xml:"display_field,omitempty"`
+	Size         *Size                                 `xml:"size,omitempty"`
+}
+
+// WebhookDisplayFieldsItemDisplayField represents a webhook display fields item display field.
+type WebhookDisplayFieldsItemDisplayField struct {
+	XMLName xml.Name `xml:"display_field"`
+	Name    *string  `xml:"name,omitempty"`
 }

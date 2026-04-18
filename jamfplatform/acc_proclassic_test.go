@@ -1048,6 +1048,200 @@ func TestAcceptance_Classic_EbookCRUD(t *testing.T) {
 	t.Logf("created ebook id=%d; delete is async-best-effort on this tenant", id)
 }
 
+func TestAcceptance_Classic_ClassCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-class-" + runSuffix()
+	created, err := pc.CreateClassByID(ctx, "0", &proclassic.ClassPost{Name: classicStrPtr(name)})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateClassByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteClassByID(ctx, intToStr(id)) })
+	if err := pc.DeleteClassByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetClassByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_LicensedSoftwareCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-licsw-" + runSuffix()
+	created, err := pc.CreateLicensedSoftwareByID(ctx, "0", &proclassic.LicensedSoftware{
+		General: &proclassic.LicensedSoftwareGeneral{Name: classicStrPtr(name)},
+	})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateLicensedSoftwareByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteLicensedSoftwareByID(ctx, intToStr(id)) })
+	if err := pc.DeleteLicensedSoftwareByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetLicensedSoftwareByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_RestrictedSoftwareCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-restsw-" + runSuffix()
+	created, err := pc.CreateRestrictedSoftwareByID(ctx, "0", &proclassic.RestrictedSoftware{
+		General: &proclassic.RestrictedSoftwareGeneral{Name: classicStrPtr(name), ProcessName: classicStrPtr("evil.app")},
+	})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateRestrictedSoftwareByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteRestrictedSoftwareByID(ctx, intToStr(id)) })
+	if err := pc.DeleteRestrictedSoftwareByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetRestrictedSoftwareByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_PeripheralTypeCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-ptype-" + runSuffix()
+	created, err := pc.CreatePeripheralTypeByID(ctx, "0", &proclassic.PeripheralType{Name: classicStrPtr(name)})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreatePeripheralTypeByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeletePeripheralTypeByID(ctx, intToStr(id)) })
+	if err := pc.DeletePeripheralTypeByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetPeripheralTypeByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_DiskEncryptionConfigurationCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-dec-" + runSuffix()
+	created, err := pc.CreateDiskEncryptionConfigurationByID(ctx, "0", &proclassic.DiskEncryptionConfiguration{
+		Name:                  classicStrPtr(name),
+		KeyType:               classicStrPtr("Individual"),
+		FileVaultEnabledUsers: classicStrPtr("Management Account"),
+	})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateDiskEncryptionConfigurationByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteDiskEncryptionConfigurationByID(ctx, intToStr(id)) })
+	if err := pc.DeleteDiskEncryptionConfigurationByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetDiskEncryptionConfigurationByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_BYOProfileCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-byo-" + runSuffix()
+	enabled := true
+	created, err := pc.CreateBYOProfileByID(ctx, "0", &proclassic.Byoprofile{
+		General: &proclassic.ByoprofileGeneral{Name: classicStrPtr(name), Enabled: &enabled},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("CreateBYOProfileByID forbidden on this tenant/credentials: %v", err)
+		}
+		t.Fatalf("CreateBYOProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteBYOProfileByID(ctx, intToStr(id)) })
+	if err := pc.DeleteBYOProfileByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetBYOProfileByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_IBeaconCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-ibeacon-" + runSuffix()
+	created, err := pc.CreateIBeaconByID(ctx, "0", &proclassic.Ibeacon{
+		Name: classicStrPtr(name),
+		UUID: classicStrPtr("12345678-1234-1234-1234-123456789012"),
+	})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateIBeaconByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteIBeaconByID(ctx, intToStr(id)) })
+	if err := pc.DeleteIBeaconByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetIBeaconByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_DockItemCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-dock-" + runSuffix()
+	created, err := pc.CreateDockItemByID(ctx, "0", &proclassic.DockItem{
+		Name: classicStrPtr(name),
+		Path: classicStrPtr("file:///Applications/Safari.app/"),
+		Type: classicStrPtr("App"),
+	})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateDockItemByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteDockItemByID(ctx, intToStr(id)) })
+	if err := pc.DeleteDockItemByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetDockItemByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_RemovableMacAddressCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "AA:BB:CC:DD:EE:" + runSuffix()[len(runSuffix())-2:]
+	created, err := pc.CreateRemovableMacAddressByID(ctx, "0", &proclassic.RemovableMacAddress{Name: classicStrPtr(name)})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateRemovableMacAddressByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteRemovableMacAddressByID(ctx, intToStr(id)) })
+	if err := pc.DeleteRemovableMacAddressByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetRemovableMacAddressByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+func TestAcceptance_Classic_AllowedFileExtensionCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	ext := "sdk" + runSuffix()
+	created, err := pc.CreateAllowedFileExtensionByID(ctx, "0", &proclassic.AllowedFileExtension{Extension: classicStrPtr(ext)})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateAllowedFileExtensionByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteAllowedFileExtensionByID(ctx, intToStr(id)) })
+	if err := pc.DeleteAllowedFileExtensionByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetAllowedFileExtensionByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
+// TestAcceptance_Classic_JsonWebTokenConfigurationCRUD is intentionally
+// skipped: the server requires an `encryption_key` field on create that
+// Jamf's v11.20.0 spec does not declare, so the generated
+// JsonWebTokenConfiguration struct can't carry it. The SDK's CRUD path
+// is exercised by the unit tests; restoring this live test needs a
+// spec patch (or a generator option for spec-unmodeled required fields).
+func TestAcceptance_Classic_JsonWebTokenConfigurationCRUD(t *testing.T) {
+	t.Skip("spec omits required encryption_key; generated struct can't carry it. See unit tests for endpoint coverage.")
+}
+
+func TestAcceptance_Classic_WebhookCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-wh-" + runSuffix()
+	created, err := pc.CreateWebhookByID(ctx, "0", &proclassic.Webhook{
+		Name:     classicStrPtr(name),
+		URL:      classicStrPtr("https://webhook.example.test/receiver"),
+		Event:    classicStrPtr("ComputerAdded"),
+		ContentType: classicStrPtr("application/json"),
+	})
+	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateWebhookByID: %v", err) }
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteWebhookByID(ctx, intToStr(id)) })
+	if err := pc.DeleteWebhookByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetWebhookByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
