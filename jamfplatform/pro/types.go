@@ -37,6 +37,14 @@ type BuildingSearchResults struct {
 	TotalCount int        `json:"totalCount"`
 }
 
+// ChangePassword represents a change password.
+type ChangePassword struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	CurrentPassword string `json:"currentPassword"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	NewPassword string `json:"newPassword"`
+}
+
 // HrefResponse represents a href response.
 type HrefResponse struct {
 	Href string `json:"href"`

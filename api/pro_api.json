@@ -206,6 +206,27 @@
         },
         "type": "object"
       },
+      "ChangePassword": {
+        "properties": {
+          "currentPassword": {
+            "example": "oldPassword",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "newPassword": {
+            "example": "updatedPassword",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object"
+      },
       "HrefResponse": {
         "properties": {
           "href": {
@@ -584,6 +605,50 @@
         ],
         "x-required-privileges": [
           "Update Buildings"
+        ]
+      }
+    },
+    "/v1/user/change-password": {
+      "post": {
+        "description": "Changes the account password for a currently authenticated user.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            }
+          },
+          "description": "Current account password and new password.",
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Password for user successfully changed."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Changes the user account password.\n",
+        "tags": [
+          "user"
+        ],
+        "x-action": true,
+        "x-authentication-required": true,
+        "x-rate-limit": true,
+        "x-required-privileges": [
+          "Change Password"
         ]
       }
     }

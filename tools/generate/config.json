@@ -125,7 +125,8 @@
         {"op": "GET /v1/buildings/{id}", "name": "GetBuildingV1"},
         {"op": "PUT /v1/buildings/{id}", "name": "UpdateBuildingV1"},
         {"op": "DELETE /v1/buildings/{id}", "name": "DeleteBuildingV1"},
-        {"op": "GET /startup-status", "name": "GetStartupStatus"}
+        {"op": "GET /startup-status", "name": "GetStartupStatus"},
+        {"op": "POST /v1/user/change-password", "name": "ChangeUserPasswordV1"}
       ]
     }
   ]

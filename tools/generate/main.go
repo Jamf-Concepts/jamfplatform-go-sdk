@@ -1020,6 +1020,11 @@ func schemaRefToGoType(ref *openapi3.SchemaRef) string {
 	}
 	switch {
 	case schema.Type.Is("string"):
+		// OpenAPI format: byte means base64-encoded bytes. Go's encoding/json
+		// handles base64 natively for []byte so callers work with raw bytes.
+		if schema.Format == "byte" {
+			return "[]byte"
+		}
 		return "string"
 	case schema.Type.Is("integer"):
 		if schema.Format == "int64" {
@@ -1072,6 +1077,31 @@ func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
 		methods = append(methods, m)
 	}
 	return methods, nil
+}
+
+// isRateLimited reports whether the operation carries x-rate-limit: true.
+// kin-openapi stores vendor extensions as raw JSON bytes keyed by the
+// extension name.
+func isRateLimited(op *openapi3.Operation) bool {
+	if op == nil {
+		return false
+	}
+	raw, ok := op.Extensions["x-rate-limit"]
+	if !ok {
+		return false
+	}
+	switch v := raw.(type) {
+	case bool:
+		return v
+	case []byte:
+		return string(v) == "true"
+	case string:
+		return v == "true"
+	default:
+		// Some kin-openapi versions return json.RawMessage.
+		s := fmt.Sprintf("%s", v)
+		return s == "true"
+	}
 }
 
 // dropDeprecatedOps returns spec.Operations with any operations whose spec
@@ -1132,6 +1162,14 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 
 	if len(op.Tags) > 0 {
 		m.Tag = op.Tags[0]
+	}
+
+	if isRateLimited(op) {
+		if m.Comment != "" {
+			m.Comment += "\n//\n// This endpoint is rate-limited. The transport retries a 429 response once if the server returns a bounded Retry-After; otherwise the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy."
+		} else {
+			m.Comment = opDef.Name + " is rate-limited."
+		}
 	}
 
 	if op.Deprecated {
