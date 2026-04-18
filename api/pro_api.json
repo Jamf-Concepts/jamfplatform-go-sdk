@@ -227,6 +227,19 @@
         ],
         "type": "object"
       },
+      "EnrollmentMethodPrestage": {
+        "properties": {
+          "mobileDevicePrestageId": {
+            "example": "5",
+            "type": "string"
+          },
+          "profileName": {
+            "example": "All Mobiles",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ExportField": {
         "description": "Field to be included in the export operation.",
         "properties": {
@@ -314,6 +327,1212 @@
           }
         },
         "type": "object"
+      },
+      "MobileDeviceApplicationInventoryDetail": {
+        "properties": {
+          "bundleSize": {
+            "example": "1024",
+            "type": "string"
+          },
+          "dynamicSize": {
+            "example": "1423",
+            "type": "string"
+          },
+          "identifier": {
+            "example": "com.apple.airport.mobileairportutility",
+            "type": "string"
+          },
+          "managementStatus": {
+            "example": "Managed",
+            "type": "string"
+          },
+          "name": {
+            "example": "AirPort Utility",
+            "type": "string"
+          },
+          "shortVersion": {
+            "example": "7.0",
+            "type": "string"
+          },
+          "validationStatus": {
+            "example": true,
+            "type": "boolean"
+          },
+          "version": {
+            "example": "135.24",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceCertificate": {
+        "properties": {
+          "commonName": {
+            "example": "3B259E4B-FAD5-4860-B1DD-336ADA786EBA",
+            "type": "string"
+          },
+          "expirationDate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "identity": {
+            "example": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceEbookInventoryDetail": {
+        "properties": {
+          "author": {
+            "example": "Homer J Simpson",
+            "type": "string"
+          },
+          "kind": {
+            "example": "PDF",
+            "type": "string"
+          },
+          "managementState": {
+            "example": "Managed",
+            "type": "string"
+          },
+          "title": {
+            "example": "The Odyssey",
+            "type": "string"
+          },
+          "version": {
+            "example": "0.1",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceExtensionAttribute": {
+        "properties": {
+          "extensionAttributeCollectionAllowed": {
+            "example": false,
+            "type": "boolean"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "inventoryDisplay": {
+            "example": "General",
+            "type": "string"
+          },
+          "name": {
+            "example": "Example EA",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "STRING",
+              "INTEGER",
+              "DATE"
+            ],
+            "example": "STRING",
+            "type": "string"
+          },
+          "value": {
+            "items": {
+              "example": "EA Value",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceGeneral": {
+        "properties": {
+          "assetTag": {
+            "example": "8675309",
+            "type": "string"
+          },
+          "declarativeDeviceManagementEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "deviceOwnershipType": {
+            "description": "The enrollment method used for the device. **Note:** The `PersonalDeviceProfile` enrollment method was removed as of 11.25.\n",
+            "enum": [
+              "Institutional",
+              "UserEnrollment",
+              "AccountDrivenUserEnrollment",
+              "AccountDrivenDeviceEnrollment"
+            ],
+            "example": "Institutional",
+            "type": "string"
+          },
+          "displayName": {
+            "example": "Banezicron",
+            "type": "string"
+          },
+          "enrollmentMethodPrestage": {
+            "$ref": "#/components/schemas/EnrollmentMethodPrestage"
+          },
+          "enrollmentSessionTokenValid": {
+            "example": false,
+            "type": "boolean"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "ipAddress": {
+            "example": "10.0.0.1",
+            "type": "string"
+          },
+          "lastEnrolledDate": {
+            "example": "2022-10-17T11:48:56.307Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastInventoryUpdateDate": {
+            "example": "2022-10-17T11:48:56.307Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastLoggedInUsernameSelfService": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastLoggedInUsernameSelfServiceTimestamp": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "managed": {
+            "example": true,
+            "type": "boolean"
+          },
+          "managementId": {
+            "example": "9932fad3-29e9-4b71-bc7c-77dcefce819d",
+            "type": "string"
+          },
+          "mdmProfileExpirationDate": {
+            "example": "2022-10-17T11:48:56.307Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "osBuild": {
+            "example": "15F79",
+            "type": "string"
+          },
+          "osRapidSecurityResponse": {
+            "example": "(a)",
+            "type": "string"
+          },
+          "osSupplementalBuildVersion": {
+            "example": "22A103310o",
+            "type": "string"
+          },
+          "osVersion": {
+            "example": "11.4",
+            "type": "string"
+          },
+          "siteId": {
+            "example": "-1",
+            "type": "string"
+          },
+          "softwareUpdateDeviceId": {
+            "example": "J132AP",
+            "type": "string"
+          },
+          "supervised": {
+            "example": true,
+            "type": "boolean"
+          },
+          "timeZone": {
+            "description": "IANA time zone database name",
+            "example": "Europe/Warsaw",
+            "type": "string"
+          },
+          "udid": {
+            "example": "0dad565fb40b010a9e490440188063a378721069",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceHardware": {
+        "properties": {
+          "availableSpaceMb": {
+            "example": 30,
+            "type": "integer"
+          },
+          "batteryHealth": {
+            "default": "UNKNOWN",
+            "description": "- NON_GENUINE: The battery isn’t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldn’t determine battery health information.\n- UNSUPPORTED: The device doesn’t support battery health reporting.\n",
+            "enum": [
+              "NON_GENUINE",
+              "NORMAL",
+              "SERVICE_RECOMMENDED",
+              "UNKNOWN",
+              "UNSUPPORTED"
+            ],
+            "type": "string"
+          },
+          "batteryLevel": {
+            "example": 60,
+            "type": "integer"
+          },
+          "bluetoothLowEnergyCapable": {
+            "example": false,
+            "type": "boolean"
+          },
+          "bluetoothMacAddress": {
+            "example": "ee:00:7c:f0:e5:aa",
+            "type": "string"
+          },
+          "capacityMb": {
+            "example": 100,
+            "type": "integer"
+          },
+          "deviceId": {
+            "example": "c6a49c6d-8c09-4d71-a37d-2f6a9dfbb69b",
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "model": {
+            "example": "iPad 7th Generation (Wi-Fi)",
+            "type": "string"
+          },
+          "modelIdentifier": {
+            "example": "iPad7,11",
+            "type": "string"
+          },
+          "modelNumber": {
+            "example": "MW742LL",
+            "type": "string"
+          },
+          "modemFirmwareVersion": {
+            "example": "iPad7,11",
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "5c28fdae",
+            "type": "string"
+          },
+          "usedSpacePercentage": {
+            "example": 70,
+            "type": "integer"
+          },
+          "wifiMacAddress": {
+            "example": "ee:00:7c:f0:e5:ff",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceInventory": {
+        "properties": {
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceApplicationInventoryDetail"
+            },
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceCertificate"
+            },
+            "type": "array"
+          },
+          "deviceType": {
+            "description": "Based on the value of this type either ios, appleTv, watch or visionOS objects will be populated.",
+            "example": "iOS",
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceInventoryGroup"
+            },
+            "type": "array"
+          },
+          "hardware": {
+            "$ref": "#/components/schemas/MobileDeviceHardware"
+          },
+          "mobileDeviceId": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "profiles": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceProfile"
+            },
+            "type": "array"
+          },
+          "userAndLocation": {
+            "$ref": "#/components/schemas/MobileDeviceUserAndLocation"
+          }
+        },
+        "required": [
+          "deviceType"
+        ],
+        "type": "object"
+      },
+      "MobileDeviceInventoryGroup": {
+        "properties": {
+          "groupDescription": {
+            "example": "Test Group Description",
+            "type": "string"
+          },
+          "groupId": {
+            "example": "1",
+            "type": "string"
+          },
+          "groupName": {
+            "example": "Test Group",
+            "minLength": 1,
+            "type": "string"
+          },
+          "smart": {
+            "example": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceInventorySearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceResponse"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 2,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceIosGeneral": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDeviceGeneral"
+          },
+          {
+            "properties": {
+              "appAnalyticsEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "cloudBackupEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "deviceLocatorServiceEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "diagnosticAndUsageReportingEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "doNotDisturbEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "exchangeDeviceId": {
+                "example": "eas-1",
+                "type": "string"
+              },
+              "itunesStoreAccountActive": {
+                "example": false,
+                "type": "boolean"
+              },
+              "lastBackupDate": {
+                "example": "2022-10-17T11:48:56.307Z",
+                "format": "date-time",
+                "type": "string"
+              },
+              "lastCloudBackupDate": {
+                "example": "2022-10-17T11:48:56.307Z",
+                "format": "date-time",
+                "type": "string"
+              },
+              "locationServicesForSelfServiceMobileEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "maximumSharediPadUsersStored": {
+                "example": 16,
+                "type": "integer"
+              },
+              "quotaSize": {
+                "example": 1024,
+                "type": "integer"
+              },
+              "residentUsers": {
+                "example": 0,
+                "type": "integer"
+              },
+              "sharedIpad": {
+                "example": false,
+                "type": "boolean"
+              },
+              "syncedToComputer": {
+                "example": 30,
+                "type": "integer"
+              },
+              "temporarySessionOnly": {
+                "example": false,
+                "type": "boolean"
+              },
+              "temporarySessionTimeout": {
+                "example": 30,
+                "type": "integer"
+              },
+              "tethered": {
+                "example": false,
+                "type": "boolean"
+              },
+              "userSessionTimeout": {
+                "example": 30,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "MobileDeviceIosInventory": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDeviceInventory"
+          },
+          {
+            "properties": {
+              "ebooks": {
+                "items": {
+                  "$ref": "#/components/schemas/MobileDeviceEbookInventoryDetail"
+                },
+                "type": "array"
+              },
+              "general": {
+                "$ref": "#/components/schemas/MobileDeviceIosGeneral"
+              },
+              "network": {
+                "$ref": "#/components/schemas/MobileDeviceNetwork"
+              },
+              "provisioningProfiles": {
+                "items": {
+                  "$ref": "#/components/schemas/MobileDeviceProvisioningProfiles"
+                },
+                "type": "array"
+              },
+              "purchasing": {
+                "$ref": "#/components/schemas/MobileDevicePurchasing"
+              },
+              "security": {
+                "$ref": "#/components/schemas/MobileDeviceSecurity"
+              },
+              "serviceSubscriptions": {
+                "items": {
+                  "$ref": "#/components/schemas/MobileDeviceServiceSubscriptions"
+                },
+                "type": "array"
+              },
+              "sharedUsers": {
+                "items": {
+                  "$ref": "#/components/schemas/MobileDeviceSharedUser"
+                },
+                "type": "array"
+              },
+              "userProfiles": {
+                "items": {
+                  "$ref": "#/components/schemas/MobileDeviceUserProfile"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "MobileDeviceLostModeLocation": {
+        "properties": {
+          "lastLocationUpdate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lostModeLocationAltitudeMeters": {
+            "example": 7.9,
+            "type": "number"
+          },
+          "lostModeLocationCourseDegrees": {
+            "example": 15,
+            "type": "number"
+          },
+          "lostModeLocationHorizontalAccuracyMeters": {
+            "example": 7,
+            "type": "number"
+          },
+          "lostModeLocationSpeedMetersPerSecond": {
+            "example": 10,
+            "type": "number"
+          },
+          "lostModeLocationTimestamp": {
+            "example": "2023-04-21 12:30:00 UTC",
+            "type": "string"
+          },
+          "lostModeLocationVerticalAccuracyMeters": {
+            "example": 5,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceNetwork": {
+        "description": "This section only avaiable for Ios type.",
+        "properties": {
+          "carrierSettingsVersion": {
+            "example": "33.1",
+            "type": "string"
+          },
+          "cellularTechnology": {
+            "example": "Unknown",
+            "type": "string"
+          },
+          "currentCarrierNetwork": {
+            "example": "Verizon Wireless",
+            "type": "string"
+          },
+          "currentMobileCountryCode": {
+            "example": "311",
+            "type": "string"
+          },
+          "currentMobileNetworkCode": {
+            "example": "480",
+            "type": "string"
+          },
+          "dataRoamingEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "eid": {
+            "description": "EID or \"embedded identity document\" is a number associated with the eSIM on a device",
+            "example": "12547444452496388545569920380795",
+            "readOnly": true,
+            "type": "string"
+          },
+          "homeCarrierNetwork": {
+            "example": "Verizon",
+            "type": "string"
+          },
+          "homeMobileCountryCode": {
+            "example": "US",
+            "type": "string"
+          },
+          "homeMobileNetworkCode": {
+            "example": "480",
+            "type": "string"
+          },
+          "iccid": {
+            "example": "8991101200003204514",
+            "type": "string"
+          },
+          "imei": {
+            "example": "59 105109 176278 3",
+            "type": "string"
+          },
+          "meid": {
+            "example": "15302309236898",
+            "type": "string"
+          },
+          "personalHotspotEnabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "phoneNumber": {
+            "example": "555-555-5555 ext 5",
+            "type": "string"
+          },
+          "preferredVoiceNumber": {
+            "example": "555-555-5555",
+            "type": "string"
+          },
+          "roaming": {
+            "example": false,
+            "type": "boolean"
+          },
+          "voiceRoamingEnabled": {
+            "example": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceProfile": {
+        "properties": {
+          "displayName": {
+            "example": "Test WiFi",
+            "type": "string"
+          },
+          "identifier": {
+            "example": "ac2-server4.D0EFAC2D-326C-4BB6-87E6-2BCB88490AAA",
+            "type": "string"
+          },
+          "lastInstalled": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "removable": {
+            "example": true,
+            "type": "boolean"
+          },
+          "uuid": {
+            "example": "D29DD9FB-0D5B-422F-A3A2-ABBC5848E949",
+            "type": "string"
+          },
+          "version": {
+            "example": "1",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceProvisioningProfiles": {
+        "properties": {
+          "displayName": {
+            "example": "jamfnation",
+            "type": "string"
+          },
+          "expirationDate": {
+            "example": "2018-10-24T21:57:37Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "uuid": {
+            "example": "89AF33FC-123C-1231-AEFD-9C3ED123AFCC",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDevicePurchasing": {
+        "properties": {
+          "appleCareId": {
+            "example": "9546567.0",
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "leaseExpiresDate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "leased": {
+            "example": false,
+            "type": "boolean"
+          },
+          "lifeExpectancy": {
+            "example": 7,
+            "type": "integer"
+          },
+          "poDate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "poNumber": {
+            "example": "8675309",
+            "type": "string"
+          },
+          "purchasePrice": {
+            "example": "$399",
+            "type": "string"
+          },
+          "purchased": {
+            "example": true,
+            "type": "boolean"
+          },
+          "purchasingAccount": {
+            "example": "IT Budget",
+            "type": "string"
+          },
+          "purchasingContact": {
+            "example": "Nick in IT",
+            "type": "string"
+          },
+          "vendor": {
+            "example": "Apple",
+            "type": "string"
+          },
+          "warrantyExpiresDate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceResponse": {
+        "discriminator": {
+          "mapping": {
+            "iOS": "#/components/schemas/MobileDeviceIosInventory",
+            "tvOS": "#/components/schemas/MobileDeviceTvOsInventory",
+            "watchOS": "#/components/schemas/MobileDeviceWatchOsInventory"
+          },
+          "propertyName": "deviceType"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/MobileDeviceIosInventory"
+          },
+          {
+            "$ref": "#/components/schemas/MobileDeviceTvOsInventory"
+          },
+          {
+            "$ref": "#/components/schemas/MobileDeviceWatchOsInventory"
+          }
+        ],
+        "type": "object"
+      },
+      "MobileDeviceSection": {
+        "enum": [
+          "GENERAL",
+          "HARDWARE",
+          "USER_AND_LOCATION",
+          "PURCHASING",
+          "SECURITY",
+          "APPLICATIONS",
+          "EBOOKS",
+          "NETWORK",
+          "SERVICE_SUBSCRIPTIONS",
+          "CERTIFICATES",
+          "PROFILES",
+          "USER_PROFILES",
+          "PROVISIONING_PROFILES",
+          "SHARED_USERS",
+          "GROUPS",
+          "EXTENSION_ATTRIBUTES"
+        ],
+        "example": "GENERAL",
+        "type": "string"
+      },
+      "MobileDeviceSecurity": {
+        "description": "This section only available for Ios type.",
+        "properties": {
+          "activationLockEnabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "attestationStatus": {
+            "enum": [
+              "PENDING",
+              "SUCCESS",
+              "CERTIFICATE_INVALID",
+              "DEVICE_PROPERTIES_MISMATCH",
+              "MDA_UNSUPPORTED_DUE_TO_HARDWARE",
+              "MDA_UNSUPPORTED_DUE_TO_SOFTWARE"
+            ],
+            "example": "SUCCESS",
+            "readOnly": true,
+            "type": "string"
+          },
+          "blockLevelEncryptionCapable": {
+            "example": true,
+            "type": "boolean"
+          },
+          "bootstrapTokenEscrowed": {
+            "description": "Indicates the bootstrap token escrow status for the device",
+            "enum": [
+              "ESCROWED",
+              "NOT_ESCROWED",
+              "NOT_SUPPORTED"
+            ],
+            "example": "NOT_SUPPORTED",
+            "type": "string"
+          },
+          "dataProtected": {
+            "example": false,
+            "type": "boolean"
+          },
+          "fileLevelEncryptionCapable": {
+            "example": true,
+            "type": "boolean"
+          },
+          "hardwareEncryption": {
+            "example": 3,
+            "type": "integer"
+          },
+          "jailBreakDetected": {
+            "example": false,
+            "type": "boolean"
+          },
+          "lastAttestationAttemptDate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "lastSuccessfulAttestationDate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "lostModeEnabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "lostModeFootnote": {
+            "example": "Note",
+            "type": "string"
+          },
+          "lostModeLocation": {
+            "$ref": "#/components/schemas/MobileDeviceLostModeLocation"
+          },
+          "lostModeMessage": {
+            "example": "Lost phone",
+            "type": "string"
+          },
+          "lostModePersistent": {
+            "example": false,
+            "type": "boolean"
+          },
+          "lostModePhoneNumber": {
+            "example": "555-555-5555",
+            "type": "string"
+          },
+          "passcodeCompliant": {
+            "example": true,
+            "type": "boolean"
+          },
+          "passcodeCompliantWithProfile": {
+            "example": true,
+            "type": "boolean"
+          },
+          "passcodeLockGracePeriodEnforcedSeconds": {
+            "example": 3,
+            "type": "integer"
+          },
+          "passcodePresent": {
+            "example": false,
+            "type": "boolean"
+          },
+          "personalDeviceProfileCurrent": {
+            "default": false,
+            "deprecated": true,
+            "description": "**Deprecated as of 11.25.** This field always returns false\n",
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceServiceSubscriptions": {
+        "properties": {
+          "carrierSettingsVersion": {
+            "example": "47.1",
+            "type": "string"
+          },
+          "currentCarrierNetwork": {
+            "example": "T-Mobile Wi-Fi",
+            "type": "string"
+          },
+          "currentMobileCountryCode": {
+            "example": "310",
+            "type": "string"
+          },
+          "currentMobileNetworkCode": {
+            "example": "260",
+            "type": "string"
+          },
+          "dataPreferred": {
+            "example": true,
+            "type": "boolean"
+          },
+          "eid": {
+            "example": "89049032007008882600085727376656",
+            "type": "string"
+          },
+          "iccid": {
+            "example": "8901 2605 7071 8002 130",
+            "type": "string"
+          },
+          "imei": {
+            "example": "35 882334 083223 0",
+            "type": "string"
+          },
+          "label": {
+            "example": "Primary",
+            "type": "string"
+          },
+          "labelId": {
+            "description": "The unique identifier for this subscription.",
+            "example": "D1F4AEC5-2FCD-4A6D-A09E-A940F60F856B",
+            "type": "string"
+          },
+          "meid": {
+            "example": "35882334083223",
+            "type": "string"
+          },
+          "phoneNumber": {
+            "example": "+15128145868",
+            "type": "string"
+          },
+          "roaming": {
+            "example": true,
+            "type": "boolean"
+          },
+          "slot": {
+            "description": "The description of the slot that contains the SIM representing this subscription.",
+            "example": "CTSubscriptionSlotOne",
+            "type": "string"
+          },
+          "subscriberCarrierNetwork": {
+            "example": "T-Mobile Wi-Fi",
+            "type": "string"
+          },
+          "voicePreferred": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceSharedUser": {
+        "properties": {
+          "dataToSync": {
+            "example": true,
+            "type": "boolean"
+          },
+          "loggedIn": {
+            "example": true,
+            "type": "boolean"
+          },
+          "managedAppleId": {
+            "example": "astark@jamf.edu",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceTvOsGeneral": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDeviceGeneral"
+          },
+          {
+            "properties": {
+              "airPlayPassword": {
+                "example": "1234",
+                "type": "string"
+              },
+              "languages": {
+                "example": "english",
+                "type": "string"
+              },
+              "locales": {
+                "example": "null",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "MobileDeviceTvOsInventory": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDeviceInventory"
+          },
+          {
+            "properties": {
+              "general": {
+                "$ref": "#/components/schemas/MobileDeviceTvOsGeneral"
+              },
+              "purchasing": {
+                "$ref": "#/components/schemas/MobileDevicePurchasing"
+              },
+              "userProfiles": {
+                "items": {
+                  "$ref": "#/components/schemas/MobileDeviceUserProfile"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "MobileDeviceUserAndLocation": {
+        "properties": {
+          "building": {
+            "example": "Building 1",
+            "type": "string"
+          },
+          "buildingId": {
+            "example": "1",
+            "type": "string"
+          },
+          "department": {
+            "example": "Department 1",
+            "type": "string"
+          },
+          "departmentId": {
+            "example": "1",
+            "type": "string"
+          },
+          "emailAddress": {
+            "example": "ITBob@jamf.com",
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDeviceExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "phoneNumber": {
+            "example": "555-555-5555",
+            "type": "string"
+          },
+          "position": {
+            "example": "IT Team Lead",
+            "type": "string"
+          },
+          "realName": {
+            "example": "IT Bob",
+            "type": "string"
+          },
+          "room": {
+            "example": "room",
+            "type": "string"
+          },
+          "username": {
+            "example": "admin",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceUserProfile": {
+        "properties": {
+          "displayName": {
+            "example": "Test WiFi",
+            "type": "string"
+          },
+          "identifier": {
+            "example": "ac2-server4.D0EFAC2D-326C-4BB6-87E6-2BCB88490AAA",
+            "type": "string"
+          },
+          "lastInstalled": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "removable": {
+            "example": true,
+            "type": "boolean"
+          },
+          "username": {
+            "example": "admin",
+            "type": "string"
+          },
+          "uuid": {
+            "example": "D29DD9FB-0D5B-422F-A3A2-ABBC5848E949",
+            "type": "string"
+          },
+          "version": {
+            "example": "1",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceWatchOsGeneral": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDeviceGeneral"
+          },
+          {
+            "properties": {
+              "appAnalyticsEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "deviceLocatorServiceEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "diagnosticAndUsageReportingEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "doNotDisturbEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "itunesStoreAccountActive": {
+                "example": false,
+                "type": "boolean"
+              },
+              "lastCloudBackupDate": {
+                "example": "2022-10-17T11:48:56.307Z",
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "MobileDeviceWatchOsInventory": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDeviceInventory"
+          },
+          {
+            "properties": {
+              "general": {
+                "$ref": "#/components/schemas/MobileDeviceWatchOsGeneral"
+              },
+              "provisioningProfiles": {
+                "items": {
+                  "$ref": "#/components/schemas/MobileDeviceProvisioningProfiles"
+                },
+                "type": "array"
+              },
+              "security": {
+                "$ref": "#/components/schemas/MobileDeviceSecurity"
+              }
+            },
+            "type": "object"
+          }
+        ]
       },
       "StartupStatus": {
         "properties": {
@@ -882,6 +2101,84 @@
         "x-rate-limit": true,
         "x-required-privileges": [
           "Change Password"
+        ]
+      }
+    },
+    "/v2/mobile-devices/detail": {
+      "get": {
+        "description": "Return paginated Mobile Device Inventory records",
+        "parameters": [
+          {
+            "description": "section of mobile device details, if not specified, General section data is returned. Multiple section parameters are supported, e.g. section=GENERAL\u0026section=HARDWARE",
+            "explode": true,
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "default": [
+                "GENERAL"
+              ],
+              "example": [
+                "GENERAL"
+              ],
+              "items": {
+                "$ref": "#/components/schemas/MobileDeviceSection"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort\nis displayName:asc. Multiple sort criteria are supported and must be separated with\na comma. \n\nFields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`, \n`batteryLevel`, `batteryHealth`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`, \n`lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,\n`devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`, \n`enrollmentSessionTokenValid`, `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`,\n`osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`,\n`mobileDeviceId`, `managementId`, `languages`, `lastBackupDate`, `lastEnrolledDate`, `lastCloudBackupDate`,\n`lastInventoryUpdateDate`, `locales`, `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`,\n`managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`,\n`modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`, `residentUsers`,\n`serialNumber`, `sharedIpad`, `supervised`, `tethered`,\n`timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,\n`deviceOwnershipType`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`,\n`poDate`, `poNumber`, `purchasePrice`, `purchasedOrLeased`,\n`purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,\n`activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,\n`hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`, `passcodeCompliantWithProfile`,\n`passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`, `carrierSettingsVersion`,\n`cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`, `currentMobileNetworkCode`, \n`dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`, \n`homeMobileNetworkCode`, `iccid`, `imei`, `imei2`,\n`meid`, `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`\n\nExample: `sort=displayName:desc,username:asc`\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "displayName:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter mobile device collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`, \n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`, \n`declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,\n`diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`, `exchangeDeviceId`, \n`cloudBackupEnabled`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `managementId`, `languages`, `lastInventoryUpdateDate`, `locales`,\n`locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`, `model`, \n`modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`, \n`residentUsers`, `serialNumber`, `sharedIpad`, `supervised`,\n`tethered`, `timeZone`, `udid`, `usedSpacePercentage`, \n`wifiMacAddress`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`, \n`purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`,\n`vendor`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, \n`fileEncryptionCapable`, `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,\n`passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`,\n`currentMobileCountryCode`, `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`,\n`network`, `homeMobileCountryCode`, `homeMobileNetworkCode`, `iccid`,\n`imei`, `imei2`, `meid`, `personalHotspotEnabled`,\n`roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`,\n`groupId`, `groupName`\n\nThis param can be combined with paging and sorting.\nExample: `filter=displayName==\"iPad\"`\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileDeviceInventorySearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Return paginated Mobile Device Inventory records",
+        "tags": [
+          "mobile-devices"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Devices"
         ]
       }
     }

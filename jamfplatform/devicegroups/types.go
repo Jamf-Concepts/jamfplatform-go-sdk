@@ -96,9 +96,32 @@ type HrefRepresentation struct {
 // JoinTypeV1 represents a join type v1 value.
 type JoinTypeV1 = string
 
+// ListDeviceGroupMemberOfResponseRepresentation represents a list device group member of response representation.
+type ListDeviceGroupMemberOfResponseRepresentation struct {
+	Results    []DeviceGroupMemberOfRepresentationV1 `json:"results"`
+	TotalCount int                                   `json:"totalCount"`
+}
+
+// ListDeviceGroupMemberReadRepresentation represents a list device group member read representation.
+type ListDeviceGroupMemberReadRepresentation struct {
+	Results    []string `json:"results"`
+	TotalCount int      `json:"totalCount"`
+}
+
 // ListResponseRepresentation represents a list response representation.
 type ListResponseRepresentation struct {
 	TotalCount int `json:"totalCount"`
+}
+
+// PaginatedDeviceGroupResponseRepresentation represents a paginated device group response representation.
+type PaginatedDeviceGroupResponseRepresentation struct {
+	HasNext     bool                                  `json:"hasNext"`
+	HasPrevious bool                                  `json:"hasPrevious"`
+	Page        int                                   `json:"page"`
+	PageSize    int                                   `json:"pageSize"`
+	Results     []DeviceGroupListReadRepresentationV1 `json:"results"`
+	TotalCount  int                                   `json:"totalCount"`
+	TotalPages  int                                   `json:"totalPages"`
 }
 
 // PaginatedResponseRepresentation represents a paginated response representation.

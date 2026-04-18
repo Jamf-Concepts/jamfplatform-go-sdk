@@ -148,10 +148,27 @@ func normalizeOpKey(s string) string {
 // ---------------------------------------------------------------------------
 
 type GoType struct {
-	Name      string
-	Comment   string
-	Fields    []GoField
-	IsRawJSON bool
+	Name          string
+	Comment       string
+	Fields        []GoField
+	IsRawJSON     bool
+	Discriminator *GoDiscriminator
+}
+
+// GoDiscriminator describes a oneOf-with-discriminator polymorphic schema.
+// The Go representation is a single struct carrying the discriminator value
+// plus one pointer per variant; a generated UnmarshalJSON dispatches on
+// the discriminator and populates the matching variant field.
+type GoDiscriminator struct {
+	PropertyName string // JSON property name of the discriminator field (e.g. "deviceType")
+	GoFieldName  string // Go exported name for the discriminator field (e.g. "DeviceType")
+	Variants     []GoDiscriminatorVariant
+}
+
+type GoDiscriminatorVariant struct {
+	Value     string // discriminator value as seen on the wire (e.g. "iOS")
+	TypeName  string // Go type name (e.g. "MobileDeviceIosInventory")
+	FieldName string // exported Go field name in the union struct (e.g. "IOS")
 }
 
 type GoField struct {
@@ -924,11 +941,17 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 			continue
 		}
 		schema := doc.Components.Schemas[name].Value
-		if schema == nil || schema.Type == nil {
+		if schema == nil {
 			continue
 		}
-		if len(schema.AllOf) > 0 {
-			continue // pagination envelopes
+		// allOf composition without an explicit type: merge properties from
+		// each composed schema into a single flat struct.
+		if len(schema.AllOf) > 0 && (schema.Type == nil || !schema.Type.Is("object")) {
+			types = append(types, schemaToGoType(name, schema, false))
+			continue
+		}
+		if schema.Type == nil {
+			continue
 		}
 
 		// Enum string → type alias
@@ -941,6 +964,12 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 		}
 
 		if !schema.Type.Is("object") {
+			continue
+		}
+
+		// oneOf + discriminator → union type with per-variant pointer fields.
+		if schema.Discriminator != nil && len(schema.OneOf) > 0 {
+			types = append(types, schemaToDiscriminatorType(name, schema))
 			continue
 		}
 
@@ -959,6 +988,97 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 	return types
 }
 
+// schemaToDiscriminatorType builds a GoType for a oneOf+discriminator schema.
+// Variants come from the discriminator Mapping if present, else from the
+// OneOf refs directly. The on-the-wire discriminator value lives in the
+// mapping keys (or falls back to the Go type name) — important for specs
+// where the wire value differs from the variant schema name.
+func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
+	gt := GoType{
+		Name:    name,
+		Comment: fmt.Sprintf("%s is a polymorphic response keyed by %s. Exactly one variant pointer is populated after unmarshaling.", name, schema.Discriminator.PropertyName),
+	}
+	if schema.Description != "" {
+		gt.Comment = name + " " + cleanComment(schema.Description)
+	}
+	gt.Discriminator = &GoDiscriminator{
+		PropertyName: schema.Discriminator.PropertyName,
+		GoFieldName:  exportedGoName(schema.Discriminator.PropertyName),
+	}
+	seen := make(map[string]bool)
+	addVariant := func(value, typeName string) {
+		if value == "" || typeName == "" || seen[typeName] {
+			return
+		}
+		seen[typeName] = true
+		gt.Discriminator.Variants = append(gt.Discriminator.Variants, GoDiscriminatorVariant{
+			Value:     value,
+			TypeName:  typeName,
+			FieldName: exportedGoName(value),
+		})
+	}
+	for _, mapKey := range sortedMapKeys(schema.Discriminator.Mapping) {
+		ref := schema.Discriminator.Mapping[mapKey]
+		parts := strings.Split(ref.Ref, "/")
+		addVariant(mapKey, parts[len(parts)-1])
+	}
+	if len(gt.Discriminator.Variants) == 0 {
+		for _, one := range schema.OneOf {
+			if one.Ref == "" {
+				continue
+			}
+			parts := strings.Split(one.Ref, "/")
+			tn := parts[len(parts)-1]
+			addVariant(tn, tn)
+		}
+	}
+	return gt
+}
+
+// sortedMapKeys returns deterministically-ordered keys for a string-keyed map.
+func sortedMapKeys[V any](m map[string]V) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+// flattenAllOf merges properties and required lists from an allOf composition
+// into a single property map. Resolved schemas carried on SchemaRef.Value
+// (kin-openapi pre-populates these) let us walk $refs without a separate
+// lookup. Later properties override earlier ones on name collision, matching
+// OpenAPI's "latest wins" semantic.
+func flattenAllOf(schema *openapi3.Schema) (map[string]*openapi3.SchemaRef, []string) {
+	props := make(map[string]*openapi3.SchemaRef)
+	reqSet := make(map[string]bool)
+	var walk func(s *openapi3.Schema)
+	walk = func(s *openapi3.Schema) {
+		if s == nil {
+			return
+		}
+		for k, v := range s.Properties {
+			props[k] = v
+		}
+		for _, r := range s.Required {
+			reqSet[r] = true
+		}
+		for _, one := range s.AllOf {
+			if one.Value != nil {
+				walk(one.Value)
+			}
+		}
+	}
+	walk(schema)
+	required := make([]string, 0, len(reqSet))
+	for r := range reqSet {
+		required = append(required, r)
+	}
+	sort.Strings(required)
+	return props, required
+}
+
 func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool) GoType {
 	gt := GoType{
 		Name:    name,
@@ -968,9 +1088,10 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool) GoType
 		gt.Comment = name + " " + cleanComment(schema.Description)
 	}
 
-	required := toSet(schema.Required)
-	for _, pname := range sortedKeys(schema.Properties) {
-		propRef := schema.Properties[pname]
+	props, requiredList := flattenAllOf(schema)
+	required := toSet(requiredList)
+	for _, pname := range sortedKeys(props) {
+		propRef := props[pname]
 		prop := propRef.Value
 
 		goType := schemaRefToGoType(propRef)
@@ -1509,6 +1630,47 @@ import (
 {{- if .IsRawJSON }}
 // {{ .Comment }}
 type {{ .Name }} = json.RawMessage
+{{- else if .Discriminator }}
+// {{ .Comment }}
+type {{ .Name }} struct {
+	{{ .Discriminator.GoFieldName }} string ` + "`" + `json:"{{ .Discriminator.PropertyName }}"` + "`" + `
+{{- range .Discriminator.Variants }}
+	{{ .FieldName }} *{{ .TypeName }} ` + "`" + `json:"-"` + "`" + `
+{{- end }}
+}
+
+// UnmarshalJSON dispatches the payload to the variant matching the
+// {{ .Discriminator.PropertyName }} discriminator. Unknown values leave the variant
+// pointers nil but preserve the discriminator string.
+func (m *{{ .Name }}) UnmarshalJSON(data []byte) error {
+	var d struct {
+		{{ .Discriminator.GoFieldName }} string ` + "`" + `json:"{{ .Discriminator.PropertyName }}"` + "`" + `
+	}
+	if err := json.Unmarshal(data, &d); err != nil {
+		return err
+	}
+	m.{{ .Discriminator.GoFieldName }} = d.{{ .Discriminator.GoFieldName }}
+	switch d.{{ .Discriminator.GoFieldName }} {
+{{- range .Discriminator.Variants }}
+	case "{{ .Value }}":
+		m.{{ .FieldName }} = new({{ .TypeName }})
+		return json.Unmarshal(data, m.{{ .FieldName }})
+{{- end }}
+	}
+	return nil
+}
+
+// MarshalJSON emits the active variant's JSON. If the matching variant
+// pointer is nil, emits a minimal object carrying only the discriminator.
+func (m {{ .Name }}) MarshalJSON() ([]byte, error) {
+	switch m.{{ .Discriminator.GoFieldName }} {
+{{- range .Discriminator.Variants }}
+	case "{{ .Value }}":
+		return json.Marshal(m.{{ .FieldName }})
+{{- end }}
+	}
+	return json.Marshal(map[string]string{"{{ .Discriminator.PropertyName }}": m.{{ .Discriminator.GoFieldName }}})
+}
 {{- else if .Fields }}
 // {{ .Comment }}
 type {{ .Name }} struct {

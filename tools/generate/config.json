@@ -128,7 +128,8 @@
         {"op": "GET /startup-status", "name": "GetStartupStatus"},
         {"op": "POST /v1/user/change-password", "name": "ChangeUserPasswordV1"},
         {"op": "POST /v1/buildings/export", "name": "ExportBuildingsV1", "params": ["sort:[]string", "filter"]},
-        {"op": "POST /v1/icon", "name": "UploadIconV1"}
+        {"op": "POST /v1/icon", "name": "UploadIconV1"},
+        {"op": "GET /v2/mobile-devices/detail", "name": "ListMobileDevicesDetailV2", "pagination": "totalCount", "params": ["section:[]string", "sort:[]string", "filter"]}
       ]
     }
   ]

@@ -95,6 +95,28 @@ type DeviceUpdateRepresentationV1 struct {
 	UserID *string `json:"userId,omitempty"`
 }
 
+// PaginatedDeviceInstalledApplicationReadRepresentationV1 represents a paginated device installed application read representation v1.
+type PaginatedDeviceInstalledApplicationReadRepresentationV1 struct {
+	HasNext     bool                                             `json:"hasNext"`
+	HasPrevious bool                                             `json:"hasPrevious"`
+	Page        int                                              `json:"page"`
+	PageSize    int                                              `json:"pageSize"`
+	Results     []DeviceInstalledApplicationReadRepresentationV1 `json:"results"`
+	TotalCount  int                                              `json:"totalCount"`
+	TotalPages  int                                              `json:"totalPages"`
+}
+
+// PaginatedDeviceResponseRepresentation represents a paginated device response representation.
+type PaginatedDeviceResponseRepresentation struct {
+	HasNext     bool                             `json:"hasNext"`
+	HasPrevious bool                             `json:"hasPrevious"`
+	Page        int                              `json:"page"`
+	PageSize    int                              `json:"pageSize"`
+	Results     []DeviceListReadRepresentationV1 `json:"results"`
+	TotalCount  int                              `json:"totalCount"`
+	TotalPages  int                              `json:"totalPages"`
+}
+
 // PaginatedResponseRepresentation represents a paginated response representation.
 type PaginatedResponseRepresentation struct {
 	HasNext     bool `json:"hasNext"`

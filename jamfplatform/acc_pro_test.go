@@ -157,6 +157,42 @@ func TestAcceptance_Pro_ExportBuildings(t *testing.T) {
 // alternative — actually rotating a credential — would lock out either the
 // OAuth API client (our test auth) or an admin user. The test still
 // exercises the transport path and payload encoding end-to-end.
+// TestAcceptance_Pro_ListMobileDevicesDetail exercises the oneOf/discriminator
+// path: the response carries a paginated slice of MobileDeviceResponse
+// where each element is one of iOS / tvOS / watchOS variants keyed by the
+// deviceType discriminator. The generated UnmarshalJSON dispatches each
+// element to the matching variant pointer.
+func TestAcceptance_Pro_ListMobileDevicesDetail(t *testing.T) {
+	c := accClient(t)
+
+	devices, err := pro.New(c).ListMobileDevicesDetailV2(context.Background(), nil, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListMobileDevicesDetailV2: %v", err)
+	}
+	t.Logf("Found %d mobile devices", len(devices))
+	for i, d := range devices {
+		if i >= 5 {
+			break
+		}
+		switch d.DeviceType {
+		case "iOS":
+			if d.IOS == nil {
+				t.Errorf("device[%d] DeviceType=iOS but IOS variant is nil", i)
+			}
+		case "tvOS":
+			if d.TvOS == nil {
+				t.Errorf("device[%d] DeviceType=tvOS but TvOS variant is nil", i)
+			}
+		case "watchOS":
+			if d.WatchOS == nil {
+				t.Errorf("device[%d] DeviceType=watchOS but WatchOS variant is nil", i)
+			}
+		}
+		t.Logf("device[%d] type=%s", i, d.DeviceType)
+	}
+}
+
 // TestAcceptance_Pro_UploadIcon uploads a PNG fixture via the multipart
 // endpoint and asserts the server returned a usable id + URL. Icons
 // persist on the tenant (no delete endpoint) — a handful of test icons
