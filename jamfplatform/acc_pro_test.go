@@ -165,7 +165,7 @@ func TestAcceptance_Pro_UploadIcon(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 
-	const fixturePath = "../testing/fixtures/jamf-cli-icon-1024.png"
+	const fixturePath = "testdata/jamf-cli-icon-1024.png"
 	f, err := os.Open(fixturePath)
 	if err != nil {
 		t.Skipf("fixture %s unavailable: %v", fixturePath, err)
