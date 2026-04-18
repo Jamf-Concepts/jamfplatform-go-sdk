@@ -456,8 +456,44 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 	}
 	if format == "xml" {
 		stripConflictingXMLNames(types)
+		addTopLevelIDsForClassic(types)
 	}
 	return types
+}
+
+// addTopLevelIDsForClassic injects a top-level `ID *int` field on Classic
+// types whose id lives inside a nested General sub-object. Classic servers
+// return the new record's id at the top level of the create-response body
+// (<policy><id>N</id></policy>), but Jamf's spec nests id under <general>
+// in the shared read schema — so the generated struct has no top-level
+// ID to capture the write-response id. Without this, callers must look
+// up the new record by name after every Create. The injected field is a
+// no-op on reads (server never populates it there) and populates cleanly
+// on writes.
+func addTopLevelIDsForClassic(types []GoType) {
+	for i := range types {
+		t := &types[i]
+		if len(t.Fields) == 0 || t.AliasTarget != "" || t.IsRawJSON {
+			continue
+		}
+		var hasGeneral, hasTopID bool
+		for _, f := range t.Fields {
+			if f.Name == "General" {
+				hasGeneral = true
+			}
+			if f.Name == "ID" {
+				hasTopID = true
+			}
+		}
+		if !hasGeneral || hasTopID {
+			continue
+		}
+		t.Fields = append([]GoField{{
+			Name:    "ID",
+			Type:    "*int",
+			JSONTag: "id,omitempty",
+		}}, t.Fields...)
+	}
 }
 
 // stripConflictingXMLNames clears the XMLName on any struct that is

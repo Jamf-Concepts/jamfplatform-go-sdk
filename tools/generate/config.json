@@ -254,7 +254,32 @@
         {"op": "DELETE /mobiledevices/name/{name}", "name": "DeleteMobileDeviceByName"},
         {"op": "DELETE /mobiledevices/serialnumber/{serialnumber}", "name": "DeleteMobileDeviceBySerialNumber", "pathNames": {"serialnumber": "serialNumber"}},
         {"op": "DELETE /mobiledevices/udid/{udid}", "name": "DeleteMobileDeviceByUDID", "pathNames": {"udid": "udid"}},
-        {"op": "DELETE /mobiledevices/macaddress/{macaddress}", "name": "DeleteMobileDeviceByMacAddress", "pathNames": {"macaddress": "macAddress"}}
+        {"op": "DELETE /mobiledevices/macaddress/{macaddress}", "name": "DeleteMobileDeviceByMacAddress", "pathNames": {"macaddress": "macAddress"}},
+
+        {"op": "GET /osxconfigurationprofiles/id/{id}", "name": "GetOSXConfigurationProfileByID", "responseType": "os_x_configuration_profile", "pathNames": {"id": "id"}},
+        {"op": "POST /osxconfigurationprofiles/id/{id}", "name": "CreateOSXConfigurationProfileByID", "requestType": "os_x_configuration_profile", "responseType": "os_x_configuration_profile", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /osxconfigurationprofiles/id/{id}", "name": "UpdateOSXConfigurationProfileByID", "requestType": "os_x_configuration_profile", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /osxconfigurationprofiles/id/{id}", "name": "DeleteOSXConfigurationProfileByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /mobiledeviceconfigurationprofiles/id/{id}", "name": "GetMobileDeviceConfigurationProfileByID", "responseType": "mobile_device_configuration_profile", "pathNames": {"id": "id"}},
+        {"op": "POST /mobiledeviceconfigurationprofiles/id/{id}", "name": "CreateMobileDeviceConfigurationProfileByID", "requestType": "mobile_device_configuration_profile", "responseType": "mobile_device_configuration_profile", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledeviceconfigurationprofiles/id/{id}", "name": "UpdateMobileDeviceConfigurationProfileByID", "requestType": "mobile_device_configuration_profile", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /mobiledeviceconfigurationprofiles/id/{id}", "name": "DeleteMobileDeviceConfigurationProfileByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /packages/id/{id}", "name": "GetClassicPackageByID", "responseType": "package", "pathNames": {"id": "id"}},
+        {"op": "POST /packages/id/{id}", "name": "CreateClassicPackageByID", "requestType": "package", "responseType": "package", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /packages/id/{id}", "name": "UpdateClassicPackageByID", "requestType": "package", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /packages/id/{id}", "name": "DeleteClassicPackageByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /printers/id/{id}", "name": "GetPrinterByID", "responseType": "printer", "pathNames": {"id": "id"}},
+        {"op": "POST /printers/id/{id}", "name": "CreatePrinterByID", "requestType": "printer", "responseType": "printer", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /printers/id/{id}", "name": "UpdatePrinterByID", "requestType": "printer", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /printers/id/{id}", "name": "DeletePrinterByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /directorybindings/id/{id}", "name": "GetDirectoryBindingByID", "responseType": "directory_binding", "pathNames": {"id": "id"}},
+        {"op": "POST /directorybindings/id/{id}", "name": "CreateDirectoryBindingByID", "requestType": "directory_binding", "responseType": "directory_binding", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /directorybindings/id/{id}", "name": "UpdateDirectoryBindingByID", "requestType": "directory_binding", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /directorybindings/id/{id}", "name": "DeleteDirectoryBindingByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

@@ -629,7 +629,7 @@ func TestAcceptance_Classic_PolicyCRUD(t *testing.T) {
 
 	name := "sdk-acc-policy-" + runSuffix()
 	enabled := false
-	_, err := pc.CreatePolicyByID(ctx, "0", &proclassic.PolicyPost{
+	created, err := pc.CreatePolicyByID(ctx, "0", &proclassic.PolicyPost{
 		General: &proclassic.PolicyPostGeneral{
 			Name:    classicStrPtr(name),
 			Enabled: &enabled,
@@ -639,22 +639,18 @@ func TestAcceptance_Classic_PolicyCRUD(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreatePolicyByID: %v", err)
 	}
-	// Server returns <policy><id>N</id></policy> on create — id at top level,
-	// but the spec puts id inside <general>, so the generated Policy type
-	// can't capture it. Recover via GetPolicyByName which fills the full
-	// <general> section.
-	t.Cleanup(func() { _ = pc.DeletePolicyByName(ctx, name) })
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeletePolicyByID(ctx, intToStr(id)) })
 
-	got, err := pc.GetPolicyByName(ctx, name)
+	got, err := pc.GetPolicyByID(ctx, intToStr(id))
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetPolicyByName(%q): %v", name, err)
+		t.Fatalf("GetPolicyByID(%d): %v", id, err)
 	}
-	if got == nil || got.General == nil || got.General.ID == nil {
-		t.Fatalf("expected Policy.General.ID after round-trip, got %+v", got)
-	}
-	id := *got.General.ID
-	if got.General.Name == nil || *got.General.Name != name {
+	if got.General == nil || got.General.Name == nil || *got.General.Name != name {
 		t.Errorf("Name = %v, want %q", got.General.Name, name)
 	}
 
@@ -663,6 +659,70 @@ func TestAcceptance_Classic_PolicyCRUD(t *testing.T) {
 		t.Fatalf("delete: %v", err)
 	}
 	_, err = pc.GetPolicyByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_OSXConfigurationProfileCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-osxcp-" + runSuffix()
+	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
+		General: &proclassic.OsXConfigurationProfileGeneral{
+			Name: classicStrPtr(name),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateOSXConfigurationProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_MobileDeviceConfigurationProfileCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-mdcp-" + runSuffix()
+	created, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
+		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
+			Name: classicStrPtr(name),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateMobileDeviceConfigurationProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteMobileDeviceConfigurationProfileByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteMobileDeviceConfigurationProfileByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetMobileDeviceConfigurationProfileByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
 		t.Fatalf("after delete: want 404, got %v", err)
@@ -688,6 +748,102 @@ func TestAcceptance_Classic_GetMobileDeviceByID(t *testing.T) {
 		t.Fatalf("expected MobileDevice.General populated, got %+v", md)
 	}
 	t.Logf("MobileDevice id=%v serial=%v", md.General.ID, md.General.SerialNumber)
+}
+
+func TestAcceptance_Classic_PrinterCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-printer-" + runSuffix()
+	created, err := pc.CreatePrinterByID(ctx, "0", &proclassic.Printer{
+		Name:     classicStrPtr(name),
+		CUPSName: classicStrPtr("PDF"),
+		URI:      classicStrPtr("lpd://printer.local/queue"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreatePrinterByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeletePrinterByID(ctx, intToStr(id)) })
+
+	if err := pc.DeletePrinterByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetPrinterByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_DirectoryBindingCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-dirbind-" + runSuffix()
+	created, err := pc.CreateDirectoryBindingByID(ctx, "0", &proclassic.DirectoryBinding{
+		Name:   classicStrPtr(name),
+		Domain: classicStrPtr("example.test"),
+		Type:   classicStrPtr("Active Directory"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateDirectoryBindingByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteDirectoryBindingByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteDirectoryBindingByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetDirectoryBindingByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_ClassicPackageCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-pkg-" + runSuffix()
+	filename := name + ".pkg"
+	created, err := pc.CreateClassicPackageByID(ctx, "0", &proclassic.Package{
+		Name:     classicStrPtr(name),
+		Filename: classicStrPtr(filename),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateClassicPackageByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteClassicPackageByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteClassicPackageByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetClassicPackageByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
 }
 
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
