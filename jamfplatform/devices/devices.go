@@ -60,7 +60,7 @@ func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresent
 func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpdateRepresentationV1) error {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodPatch, endpoint, request, http.StatusNoContent, nil); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDevice(%s): %w", id, err)
 	}
 	return nil

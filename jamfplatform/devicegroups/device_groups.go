@@ -50,7 +50,7 @@ func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCrea
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	var result HrefRepresentation
 	endpoint := prefix + "/device-groups"
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateDeviceGroup: %w", err)
 	}
 	return &result, nil

@@ -17,7 +17,7 @@ import (
 func (c *Client) ChangeUserPasswordV1(ctx context.Context, request *ChangePassword) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/user/change-password"
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusAccepted, nil); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("ChangeUserPasswordV1: %w", err)
 	}
 	return nil

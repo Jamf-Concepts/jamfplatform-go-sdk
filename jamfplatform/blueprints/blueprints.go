@@ -50,7 +50,7 @@ func (c *Client) CreateBlueprint(ctx context.Context, request *CreateBlueprintRe
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	var result CreateResponse
 	endpoint := prefix + "/blueprints"
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateBlueprint: %w", err)
 	}
 	return &result, nil
@@ -71,7 +71,7 @@ func (c *Client) GetBlueprint(ctx context.Context, blueprintID string) (*Bluepri
 func (c *Client) UpdateBlueprint(ctx context.Context, blueprintID string, request *UpdateBlueprintRequest) error {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(blueprintID))
-	if err := c.transport.DoExpect(ctx, http.MethodPatch, endpoint, request, http.StatusNoContent, nil); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateBlueprint(%s): %w", blueprintID, err)
 	}
 	return nil

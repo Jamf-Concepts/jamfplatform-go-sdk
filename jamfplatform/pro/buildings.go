@@ -51,7 +51,7 @@ func (c *Client) CreateBuildingV1(ctx context.Context, request *Building) (*Href
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/buildings"
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateBuildingV1: %w", err)
 	}
 	return &result, nil
@@ -73,7 +73,7 @@ func (c *Client) UpdateBuildingV1(ctx context.Context, id string, request *Build
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Building
 	endpoint := fmt.Sprintf("%s/buildings/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusOK, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("UpdateBuildingV1(%s): %w", id, err)
 	}
 	return &result, nil
@@ -94,7 +94,7 @@ func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameter
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/buildings/export"
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusOK, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("ExportBuildingsV1: %w", err)
 	}
 	return result, nil

@@ -52,7 +52,7 @@ func (c *Client) CreatePackageV1(ctx context.Context, request *Package) (*HrefRe
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/packages"
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreatePackageV1: %w", err)
 	}
 	return &result, nil
@@ -74,7 +74,7 @@ func (c *Client) UpdatePackageV1(ctx context.Context, id string, request *Packag
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Package
 	endpoint := fmt.Sprintf("%s/packages/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusOK, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("UpdatePackageV1(%s): %w", id, err)
 	}
 	return &result, nil

@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -52,6 +53,23 @@ func extractMultipartFields(schema *openapi3.Schema) []GoMultipartField {
 		fields = append(fields, f)
 	}
 	return fields
+}
+
+// sortedContentEntries iterates a content map in a deterministic order so
+// generator output doesn't flip on map iteration randomness.
+func sortedContentEntries(content map[string]*openapi3.MediaType) func(yield func(string, *openapi3.MediaType) bool) {
+	return func(yield func(string, *openapi3.MediaType) bool) {
+		keys := make([]string, 0, len(content))
+		for k := range content {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			if !yield(k, content[k]) {
+				return
+			}
+		}
+	}
 }
 
 // isRateLimited reports whether the operation carries x-rate-limit: true.
@@ -163,9 +181,19 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 		if mpContent, ok := op.RequestBody.Value.Content["multipart/form-data"]; ok && mpContent.Schema != nil && mpContent.Schema.Value != nil {
 			m.MultipartFields = extractMultipartFields(mpContent.Schema.Value)
 		} else {
-			for _, content := range op.RequestBody.Value.Content {
+			// Pick the first content-type the spec declares. The generator
+			// emits it verbatim so endpoints that spec application/merge-patch+json,
+			// application/x-www-form-urlencoded, or application/xml travel with
+			// the correct Content-Type header rather than relying on transport
+			// heuristics.
+			// Honor the spec's declared content-type verbatim. The transport
+			// has method-based defaults (PATCH -> merge-patch+json) that
+			// would override an endpoint spec'd as application/json — so
+			// we always set it explicitly when declared.
+			for ct, content := range sortedContentEntries(op.RequestBody.Value.Content) {
 				if content.Schema != nil {
 					m.RequestType = refName(content.Schema)
+					m.ContentType = ct
 					break
 				}
 			}

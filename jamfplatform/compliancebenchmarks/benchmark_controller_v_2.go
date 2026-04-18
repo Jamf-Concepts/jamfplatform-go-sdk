@@ -28,7 +28,7 @@ func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
 	endpoint := prefix + "/benchmarks"
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusAccepted, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
 		return nil, fmt.Errorf("CreateBenchmark: %w", err)
 	}
 	return &result, nil

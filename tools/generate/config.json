@@ -47,10 +47,10 @@
         {"op": "GET /v1/device-groups", "name": "ListDeviceGroups", "pagination": "hasNext", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v1/device-groups", "name": "CreateDeviceGroup"},
         {"op": "GET /v1/device-groups/{id}", "name": "GetDeviceGroup"},
-        {"op": "PATCH /v1/device-groups/{id}", "name": "UpdateDeviceGroup", "contentType": "application/json"},
+        {"op": "PATCH /v1/device-groups/{id}", "name": "UpdateDeviceGroup"},
         {"op": "DELETE /v1/device-groups/{id}", "name": "DeleteDeviceGroup"},
         {"op": "GET /v1/device-groups/{id}/members", "name": "ListDeviceGroupMembers", "unwrapResults": "[]string"},
-        {"op": "PATCH /v1/device-groups/{id}/members", "name": "UpdateDeviceGroupMembers", "contentType": "application/json"},
+        {"op": "PATCH /v1/device-groups/{id}/members", "name": "UpdateDeviceGroupMembers"},
         {"op": "GET /v1/devices/{id}/device-groups", "name": "ListDeviceGroupsForDevice", "pathNames": {"id": "deviceID"}, "unwrapResults": "[]DeviceGroupMemberOfRepresentationV1"}
       ]
     },

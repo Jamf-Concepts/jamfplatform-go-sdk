@@ -27,7 +27,7 @@ func (c *Client) EraseDevice(ctx context.Context, id string, request *EraseDevic
 	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
 	endpoint := fmt.Sprintf("%s/devices/%s/erase", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("EraseDevice(%s): %w", id, err)
 	}
 	return result, nil
