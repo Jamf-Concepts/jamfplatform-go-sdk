@@ -435,6 +435,192 @@ func TestAcceptance_Classic_UserEACRUD(t *testing.T) {
 	}
 }
 
+func TestAcceptance_Classic_ComputerGroupCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-cg-" + runSuffix()
+	isSmart := false
+	created, err := pc.CreateComputerGroupByID(ctx, "0", &proclassic.ComputerGroupPost{
+		Name:    classicStrPtr(name),
+		IsSmart: &isSmart,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateComputerGroupByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteComputerGroupByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteComputerGroupByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetComputerGroupByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_MobileDeviceGroupCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-mdg-" + runSuffix()
+	isSmart := false
+	created, err := pc.CreateMobileDeviceGroupByID(ctx, "0", &proclassic.MobileDeviceGroup{
+		Name:    classicStrPtr(name),
+		IsSmart: &isSmart,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateMobileDeviceGroupByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteMobileDeviceGroupByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteMobileDeviceGroupByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetMobileDeviceGroupByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_UserGroupCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-ug-" + runSuffix()
+	isSmart := false
+	created, err := pc.CreateUserGroupByID(ctx, "0", &proclassic.UserGroup{
+		Name:    classicStrPtr(name),
+		IsSmart: &isSmart,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateUserGroupByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteUserGroupByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteUserGroupByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetUserGroupByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_AdvancedComputerSearchCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-acs-" + runSuffix()
+	created, err := pc.CreateAdvancedComputerSearchByID(ctx, "0", &proclassic.AdvancedComputerSearch{
+		Name: classicStrPtr(name),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateAdvancedComputerSearchByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteAdvancedComputerSearchByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteAdvancedComputerSearchByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetAdvancedComputerSearchByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_AdvancedMobileDeviceSearchCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-amds-" + runSuffix()
+	created, err := pc.CreateAdvancedMobileDeviceSearchByID(ctx, "0", &proclassic.AdvancedMobileDeviceSearch{
+		Name: classicStrPtr(name),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateAdvancedMobileDeviceSearchByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteAdvancedMobileDeviceSearchByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteAdvancedMobileDeviceSearchByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetAdvancedMobileDeviceSearchByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+func TestAcceptance_Classic_AdvancedUserSearchCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-aus-" + runSuffix()
+	created, err := pc.CreateAdvancedUserSearchByID(ctx, "0", &proclassic.AdvancedUserSearch{
+		Name: classicStrPtr(name),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateAdvancedUserSearchByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteAdvancedUserSearchByID(ctx, intToStr(id)) })
+
+	if err := pc.DeleteAdvancedUserSearchByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetAdvancedUserSearchByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()

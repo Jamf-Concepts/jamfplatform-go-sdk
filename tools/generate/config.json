@@ -199,7 +199,37 @@
         {"op": "GET /userextensionattributes/id/{id}", "name": "GetUserExtensionAttributeByID", "responseType": "user_extension_attribute", "pathNames": {"id": "id"}},
         {"op": "POST /userextensionattributes/id/{id}", "name": "CreateUserExtensionAttributeByID", "requestType": "user_extension_attribute", "responseType": "user_extension_attribute", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /userextensionattributes/id/{id}", "name": "UpdateUserExtensionAttributeByID", "requestType": "user_extension_attribute", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /userextensionattributes/id/{id}", "name": "DeleteUserExtensionAttributeByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /userextensionattributes/id/{id}", "name": "DeleteUserExtensionAttributeByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /computergroups/id/{id}", "name": "GetComputerGroupByID", "responseType": "computer_group", "pathNames": {"id": "id"}},
+        {"op": "POST /computergroups/id/{id}", "name": "CreateComputerGroupByID", "requestType": "computer_group_post", "responseType": "computer_group", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /computergroups/id/{id}", "name": "UpdateComputerGroupByID", "requestType": "computer_group_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /computergroups/id/{id}", "name": "DeleteComputerGroupByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /mobiledevicegroups/id/{id}", "name": "GetMobileDeviceGroupByID", "responseType": "mobile_device_group", "pathNames": {"id": "id"}},
+        {"op": "POST /mobiledevicegroups/id/{id}", "name": "CreateMobileDeviceGroupByID", "requestType": "mobile_device_group", "responseType": "mobile_device_group", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /mobiledevicegroups/id/{id}", "name": "UpdateMobileDeviceGroupByID", "requestType": "mobile_device_group", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /mobiledevicegroups/id/{id}", "name": "DeleteMobileDeviceGroupByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /usergroups/id/{id}", "name": "GetUserGroupByID", "responseType": "user_group", "pathNames": {"id": "id"}},
+        {"op": "POST /usergroups/id/{id}", "name": "CreateUserGroupByID", "requestType": "user_group", "responseType": "user_group", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /usergroups/id/{id}", "name": "UpdateUserGroupByID", "requestType": "user_group", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /usergroups/id/{id}", "name": "DeleteUserGroupByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /advancedcomputersearches/id/{id}", "name": "GetAdvancedComputerSearchByID", "responseType": "advanced_computer_search", "pathNames": {"id": "id"}},
+        {"op": "POST /advancedcomputersearches/id/{id}", "name": "CreateAdvancedComputerSearchByID", "requestType": "advanced_computer_search", "responseType": "advanced_computer_search", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /advancedcomputersearches/id/{id}", "name": "UpdateAdvancedComputerSearchByID", "requestType": "advanced_computer_search", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /advancedcomputersearches/id/{id}", "name": "DeleteAdvancedComputerSearchByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /advancedmobiledevicesearches/id/{id}", "name": "GetAdvancedMobileDeviceSearchByID", "responseType": "advanced_mobile_device_search", "pathNames": {"id": "id"}},
+        {"op": "POST /advancedmobiledevicesearches/id/{id}", "name": "CreateAdvancedMobileDeviceSearchByID", "requestType": "advanced_mobile_device_search", "responseType": "advanced_mobile_device_search", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /advancedmobiledevicesearches/id/{id}", "name": "UpdateAdvancedMobileDeviceSearchByID", "requestType": "advanced_mobile_device_search", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /advancedmobiledevicesearches/id/{id}", "name": "DeleteAdvancedMobileDeviceSearchByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /advancedusersearches/id/{id}", "name": "GetAdvancedUserSearchByID", "responseType": "advanced_user_search", "pathNames": {"id": "id"}},
+        {"op": "POST /advancedusersearches/id/{id}", "name": "CreateAdvancedUserSearchByID", "requestType": "advanced_user_search", "responseType": "advanced_user_search", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /advancedusersearches/id/{id}", "name": "UpdateAdvancedUserSearchByID", "requestType": "advanced_user_search", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /advancedusersearches/id/{id}", "name": "DeleteAdvancedUserSearchByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

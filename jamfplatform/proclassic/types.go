@@ -7,6 +7,160 @@ package proclassic
 
 import "encoding/xml"
 
+// AdvancedComputerSearch represents a advanced computer search.
+type AdvancedComputerSearch struct {
+	XMLName       xml.Name                                   `xml:"advanced_computer_search"`
+	Computers     *[]AdvancedComputerSearchComputersItem     `xml:"computers,omitempty"`
+	Criteria      *[]AdvancedComputerSearchCriteriaItem      `xml:"criteria,omitempty"`
+	DisplayFields *[]AdvancedComputerSearchDisplayFieldsItem `xml:"display_fields,omitempty"`
+	ID            *int                                       `xml:"id,omitempty"`
+	Name          *string                                    `xml:"name,omitempty"`
+	Site          *SiteObject                                `xml:"site,omitempty"`
+	Sort1         *string                                    `xml:"sort_1,omitempty"`
+	Sort2         *string                                    `xml:"sort_2,omitempty"`
+	Sort3         *string                                    `xml:"sort_3,omitempty"`
+	ViewAs        *string                                    `xml:"view_as,omitempty"`
+}
+
+// AdvancedComputerSearchComputersItem represents a advanced computer search computers item.
+type AdvancedComputerSearchComputersItem struct {
+	Computer *AdvancedComputerSearchComputersItemComputer `xml:"computer,omitempty"`
+	Size     *Size                                        `xml:"size,omitempty"`
+}
+
+// AdvancedComputerSearchComputersItemComputer represents a advanced computer search computers item computer.
+type AdvancedComputerSearchComputersItemComputer struct {
+	XMLName      xml.Name `xml:"computer"`
+	ComputerName *string  `xml:"Computer_Name,omitempty"`
+	ID           *int     `xml:"id,omitempty"`
+	Name         *string  `xml:"name,omitempty"`
+	UDID         *string  `xml:"udid,omitempty"`
+}
+
+// AdvancedComputerSearchCriteriaItem represents a advanced computer search criteria item.
+type AdvancedComputerSearchCriteriaItem struct {
+	XMLName   xml.Name   `xml:"criteria"`
+	Criterion *Criterion `xml:"criterion,omitempty"`
+	Size      *Size      `xml:"size,omitempty"`
+}
+
+// AdvancedComputerSearchDisplayFieldsItem represents a advanced computer search display fields item.
+type AdvancedComputerSearchDisplayFieldsItem struct {
+	DisplayField *AdvancedComputerSearchDisplayFieldsItemDisplayField `xml:"display_field,omitempty"`
+	Size         *Size                                                `xml:"size,omitempty"`
+}
+
+// AdvancedComputerSearchDisplayFieldsItemDisplayField represents a advanced computer search display fields item display field.
+type AdvancedComputerSearchDisplayFieldsItemDisplayField struct {
+	XMLName xml.Name `xml:"display_field"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// AdvancedMobileDeviceSearch represents a advanced mobile device search.
+type AdvancedMobileDeviceSearch struct {
+	XMLName       xml.Name                                       `xml:"advanced_mobile_device_search"`
+	Criteria      *[]AdvancedMobileDeviceSearchCriteriaItem      `xml:"criteria,omitempty"`
+	DisplayFields *[]AdvancedMobileDeviceSearchDisplayFieldsItem `xml:"display_fields,omitempty"`
+	ID            *int                                           `xml:"id,omitempty"`
+	MobileDevices *[]AdvancedMobileDeviceSearchMobileDevicesItem `xml:"mobile_devices,omitempty"`
+	Name          *string                                        `xml:"name,omitempty"`
+	Site          *SiteObject                                    `xml:"site,omitempty"`
+	Sort1         *string                                        `xml:"sort_1,omitempty"`
+	Sort2         *string                                        `xml:"sort_2,omitempty"`
+	Sort3         *string                                        `xml:"sort_3,omitempty"`
+	ViewAs        *string                                        `xml:"view_as,omitempty"`
+}
+
+// AdvancedMobileDeviceSearchCriteriaItem represents a advanced mobile device search criteria item.
+type AdvancedMobileDeviceSearchCriteriaItem struct {
+	XMLName   xml.Name   `xml:"criteria"`
+	Criterion *Criterion `xml:"criterion,omitempty"`
+	Size      *Size      `xml:"size,omitempty"`
+}
+
+// AdvancedMobileDeviceSearchDisplayFieldsItem represents a advanced mobile device search display fields item.
+type AdvancedMobileDeviceSearchDisplayFieldsItem struct {
+	DisplayField *AdvancedMobileDeviceSearchDisplayFieldsItemDisplayField `xml:"display_field,omitempty"`
+	Size         *Size                                                    `xml:"size,omitempty"`
+}
+
+// AdvancedMobileDeviceSearchDisplayFieldsItemDisplayField represents a advanced mobile device search display fields item display field.
+type AdvancedMobileDeviceSearchDisplayFieldsItemDisplayField struct {
+	XMLName xml.Name `xml:"display_field"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// AdvancedMobileDeviceSearchMobileDevicesItem represents a advanced mobile device search mobile devices item.
+type AdvancedMobileDeviceSearchMobileDevicesItem struct {
+	MobileDevice *AdvancedMobileDeviceSearchMobileDevicesItemMobileDevice `xml:"mobile_device,omitempty"`
+	Size         *Size                                                    `xml:"size,omitempty"`
+}
+
+// AdvancedMobileDeviceSearchMobileDevicesItemMobileDevice represents a advanced mobile device search mobile devices item mobile device.
+type AdvancedMobileDeviceSearchMobileDevicesItemMobileDevice struct {
+	XMLName     xml.Name `xml:"mobile_device"`
+	DisplayName *string  `xml:"Display_Name,omitempty"`
+	ID          *int     `xml:"id,omitempty"`
+	Name        *string  `xml:"name,omitempty"`
+	UDID        *string  `xml:"udid,omitempty"`
+}
+
+// AdvancedUserSearch represents a advanced user search.
+type AdvancedUserSearch struct {
+	XMLName       xml.Name                               `xml:"advanced_user_search"`
+	Criteria      *[]AdvancedUserSearchCriteriaItem      `xml:"criteria,omitempty"`
+	DisplayFields *[]AdvancedUserSearchDisplayFieldsItem `xml:"display_fields,omitempty"`
+	ID            *int                                   `xml:"id,omitempty"`
+	Name          *string                                `xml:"name,omitempty"`
+	Site          *SiteObject                            `xml:"site,omitempty"`
+	Users         *[]AdvancedUserSearchUsersItem         `xml:"users,omitempty"`
+}
+
+// AdvancedUserSearchCriteriaItem represents a advanced user search criteria item.
+type AdvancedUserSearchCriteriaItem struct {
+	XMLName   xml.Name                                 `xml:"criteria"`
+	Criterion *AdvancedUserSearchCriteriaItemCriterion `xml:"criterion,omitempty"`
+	Size      *Size                                    `xml:"size,omitempty"`
+}
+
+// AdvancedUserSearchCriteriaItemCriterion represents a advanced user search criteria item criterion.
+type AdvancedUserSearchCriteriaItemCriterion struct {
+	XMLName      xml.Name `xml:"criterion"`
+	AndOr        *string  `xml:"and_or,omitempty"`
+	ClosingParen *bool    `xml:"closing_paren,omitempty"`
+	Name         *string  `xml:"name,omitempty"`
+	OpeningParen *bool    `xml:"opening_paren,omitempty"`
+	Priority     *int     `xml:"priority,omitempty"`
+	SearchType   *string  `xml:"search_type,omitempty"`
+	Value        *string  `xml:"value,omitempty"`
+}
+
+// AdvancedUserSearchDisplayFieldsItem represents a advanced user search display fields item.
+type AdvancedUserSearchDisplayFieldsItem struct {
+	DisplayField *AdvancedUserSearchDisplayFieldsItemDisplayField `xml:"display_field,omitempty"`
+	Size         *Size                                            `xml:"size,omitempty"`
+}
+
+// AdvancedUserSearchDisplayFieldsItemDisplayField represents a advanced user search display fields item display field.
+type AdvancedUserSearchDisplayFieldsItemDisplayField struct {
+	XMLName xml.Name `xml:"display_field"`
+	Name    *string  `xml:"name,omitempty"`
+}
+
+// AdvancedUserSearchUsersItem represents a advanced user search users item.
+type AdvancedUserSearchUsersItem struct {
+	Size *Size                            `xml:"size,omitempty"`
+	User *AdvancedUserSearchUsersItemUser `xml:"user,omitempty"`
+}
+
+// AdvancedUserSearchUsersItemUser represents a advanced user search users item user.
+type AdvancedUserSearchUsersItemUser struct {
+	XMLName  xml.Name `xml:"user"`
+	Username *string  `xml:"Username,omitempty"`
+	ID       *int     `xml:"id,omitempty"`
+	Name     *string  `xml:"name,omitempty"`
+}
+
 // Attachment represents a attachment.
 type Attachment struct {
 	XMLName  xml.Name `xml:"attachment"`
@@ -200,6 +354,56 @@ type ComputerExtensionAttributeInputType struct {
 	Type    *string  `xml:"type,omitempty"`
 }
 
+// ComputerGroup represents a computer group.
+type ComputerGroup struct {
+	XMLName   xml.Name                     `xml:"computer_group"`
+	Computers []ComputerGroupComputersItem `xml:"computers"`
+	Criteria  []ComputerGroupCriteriaItem  `xml:"criteria"`
+	ID        *int                         `xml:"id,omitempty"`
+	IsSmart   *bool                        `xml:"is_smart,omitempty"`
+	Name      *string                      `xml:"name,omitempty"`
+	Site      *SiteObject                  `xml:"site,omitempty"`
+}
+
+// ComputerGroupComputersItem represents a computer group computers item.
+type ComputerGroupComputersItem struct {
+	Computer *ComputerGroupComputersItemComputer `xml:"computer,omitempty"`
+	Size     *Size                               `xml:"size,omitempty"`
+}
+
+// ComputerGroupComputersItemComputer represents a computer group computers item computer.
+type ComputerGroupComputersItemComputer struct {
+	XMLName       xml.Name `xml:"computer"`
+	AltMacAddress *string  `xml:"alt_mac_address,omitempty"`
+	ID            *int     `xml:"id,omitempty"`
+	MacAddress    *string  `xml:"mac_address,omitempty"`
+	Name          *string  `xml:"name,omitempty"`
+	SerialNumber  *string  `xml:"serial_number,omitempty"`
+}
+
+// ComputerGroupCriteriaItem represents a computer group criteria item.
+type ComputerGroupCriteriaItem struct {
+	XMLName   xml.Name   `xml:"criteria"`
+	Criterion *Criterion `xml:"criterion,omitempty"`
+	Size      *Size      `xml:"size,omitempty"`
+}
+
+// ComputerGroupPost represents a computer group post.
+type ComputerGroupPost struct {
+	XMLName  xml.Name                         `xml:"computer_group"`
+	Criteria *[]ComputerGroupPostCriteriaItem `xml:"criteria,omitempty"`
+	ID       *int                             `xml:"id,omitempty"`
+	IsSmart  *bool                            `xml:"is_smart,omitempty"`
+	Name     *string                          `xml:"name,omitempty"`
+	Site     *SiteObject                      `xml:"site,omitempty"`
+}
+
+// ComputerGroupPostCriteriaItem represents a computer group post criteria item.
+type ComputerGroupPostCriteriaItem struct {
+	XMLName   xml.Name   `xml:"criteria"`
+	Criterion *Criterion `xml:"criterion,omitempty"`
+}
+
 // ComputerPost represents a computer post.
 type ComputerPost struct {
 	XMLName xml.Name             `xml:"computer"`
@@ -221,6 +425,18 @@ type ComputerPostGeneral struct {
 	SerialNumber    *string  `xml:"serial_number,omitempty"`
 	UDID            *string  `xml:"udid,omitempty"`
 	Username        *string  `xml:"username,omitempty"`
+}
+
+// Criterion represents a criterion.
+type Criterion struct {
+	XMLName      xml.Name `xml:"criterion"`
+	AndOr        *string  `xml:"and_or,omitempty"`
+	ClosingParen *bool    `xml:"closing_paren,omitempty"`
+	Name         *string  `xml:"name,omitempty"`
+	OpeningParen *bool    `xml:"opening_paren,omitempty"`
+	Priority     *int     `xml:"priority,omitempty"`
+	SearchType   *string  `xml:"search_type,omitempty"`
+	Value        *string  `xml:"value,omitempty"`
 }
 
 // Department represents a department.
@@ -266,6 +482,17 @@ type MobileDeviceExtensionAttribute struct {
 type MobileDeviceExtensionAttributeInputType struct {
 	XMLName xml.Name `xml:"input_type"`
 	Type    *string  `xml:"type,omitempty"`
+}
+
+// MobileDeviceGroup represents a mobile device group.
+type MobileDeviceGroup struct {
+	XMLName       xml.Name    `xml:"mobile_device_group"`
+	Criteria      *[]any      `xml:"criteria,omitempty"`
+	ID            *int        `xml:"id,omitempty"`
+	IsSmart       *bool       `xml:"is_smart,omitempty"`
+	MobileDevices *[]any      `xml:"mobile_devices,omitempty"`
+	Name          *string     `xml:"name,omitempty"`
+	Site          *SiteObject `xml:"site,omitempty"`
 }
 
 // Purchasing represents a purchasing.
@@ -410,6 +637,18 @@ type UserExtensionAttribute struct {
 type UserExtensionAttributeInputType struct {
 	XMLName xml.Name `xml:"input_type"`
 	Type    *string  `xml:"type,omitempty"`
+}
+
+// UserGroup represents a user group.
+type UserGroup struct {
+	XMLName          xml.Name    `xml:"user_group"`
+	Criteria         *[]any      `xml:"criteria,omitempty"`
+	ID               *int        `xml:"id,omitempty"`
+	IsNotifyOnChange *bool       `xml:"is_notify_on_change,omitempty"`
+	IsSmart          *bool       `xml:"is_smart,omitempty"`
+	Name             *string     `xml:"name,omitempty"`
+	Site             *SiteObject `xml:"site,omitempty"`
+	Users            *[]any      `xml:"users,omitempty"`
 }
 
 // UserPost represents a user post.

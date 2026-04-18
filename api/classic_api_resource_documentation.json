@@ -1,6 +1,326 @@
 {
   "components": {
     "schemas": {
+      "advanced_computer_search": {
+        "properties": {
+          "computers": {
+            "items": {
+              "properties": {
+                "computer": {
+                  "properties": {
+                    "Computer_Name": {
+                      "example": "Joes iMac",
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "description": "Name of the computer",
+                      "example": "Joes iMac",
+                      "type": "string"
+                    },
+                    "udid": {
+                      "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "criteria": {
+            "items": {
+              "properties": {
+                "criterion": {
+                  "$ref": "#/components/schemas/criterion"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "display_fields": {
+            "items": {
+              "properties": {
+                "display_field": {
+                  "properties": {
+                    "name": {
+                      "description": "Name of the display field",
+                      "example": "IP Address",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the advanced computer search",
+            "example": "Advanced Search Name",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "sort_1": {
+            "type": "string"
+          },
+          "sort_2": {
+            "type": "string"
+          },
+          "sort_3": {
+            "type": "string"
+          },
+          "view_as": {
+            "example": "Standard Web Page",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "advanced_mobile_device_search": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "properties": {
+                "criterion": {
+                  "$ref": "#/components/schemas/criterion"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "display_fields": {
+            "items": {
+              "properties": {
+                "display_field": {
+                  "properties": {
+                    "name": {
+                      "description": "Name of the display field",
+                      "example": "IP Address",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "mobile_devices": {
+            "items": {
+              "properties": {
+                "mobile_device": {
+                  "properties": {
+                    "Display_Name": {
+                      "example": "Tinas iPad",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "description": "Name of the mobile device",
+                      "example": "Tinas iPad",
+                      "type": "string"
+                    },
+                    "udid": {
+                      "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Name of the advanced mobile device search",
+            "example": "Advanced Search Name",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "sort_1": {
+            "type": "string"
+          },
+          "sort_2": {
+            "type": "string"
+          },
+          "sort_3": {
+            "type": "string"
+          },
+          "view_as": {
+            "example": "Standard Web Page",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "advanced_user_search": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "properties": {
+                "criterion": {
+                  "properties": {
+                    "and_or": {
+                      "enum": [
+                        "and",
+                        "or"
+                      ],
+                      "type": "string"
+                    },
+                    "closing_paren": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "description": "Name of the criteria",
+                      "example": "Email Address",
+                      "type": "string"
+                    },
+                    "opening_paren": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "priority": {
+                      "type": "integer"
+                    },
+                    "search_type": {
+                      "description": "Operator",
+                      "example": "like",
+                      "type": "string"
+                    },
+                    "value": {
+                      "example": "company.com",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "display_fields": {
+            "items": {
+              "properties": {
+                "display_field": {
+                  "properties": {
+                    "name": {
+                      "description": "Name of the display field",
+                      "example": "Email Address",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the advanced user search",
+            "example": "Advanced Search Name",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "users": {
+            "items": {
+              "properties": {
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                },
+                "user": {
+                  "properties": {
+                    "Username": {
+                      "example": "Ted Johnson",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "description": "Name of the user",
+                      "example": "Ted Johnson",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "advanced_user_search",
+        "type": "object"
+      },
       "attachment": {
         "properties": {
           "filename": {
@@ -989,6 +1309,115 @@
         ],
         "type": "object"
       },
+      "computer_group": {
+        "properties": {
+          "computers": {
+            "items": {
+              "properties": {
+                "computer": {
+                  "properties": {
+                    "alt_mac_address": {
+                      "example": "E0:AC:CB:67:36:T4",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "mac_address": {
+                      "example": "E0:AC:CB:97:36:G4",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Name of the computer",
+                      "example": "Joes iMac",
+                      "type": "string"
+                    },
+                    "serial_number": {
+                      "example": "C02Q7KHTGFWF",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "criteria": {
+            "items": {
+              "properties": {
+                "criterion": {
+                  "$ref": "#/components/schemas/criterion"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "is_smart": {
+            "description": "Smart or static group",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Name of the group",
+            "example": "Group Name",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "type": "object"
+      },
+      "criterion": {
+        "properties": {
+          "and_or": {
+            "enum": [
+              "and",
+              "or"
+            ],
+            "type": "string"
+          },
+          "closing_paren": {
+            "default": false,
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Name of the criteria",
+            "example": "Last Inventory Update",
+            "type": "string"
+          },
+          "opening_paren": {
+            "default": false,
+            "type": "boolean"
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "search_type": {
+            "description": "Operator",
+            "example": "more than x days ago",
+            "type": "string"
+          },
+          "value": {
+            "example": 7,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "department": {
         "properties": {
           "id": {
@@ -1113,6 +1542,79 @@
         },
         "required": [
           "name"
+        ],
+        "type": "object"
+      },
+      "mobile_device_group": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "properties": {
+                "criterion": {
+                  "$ref": "#/components/schemas/criterion"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "is_smart": {
+            "type": "boolean"
+          },
+          "mobile_devices": {
+            "items": {
+              "properties": {
+                "mobile_device": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "mac_address": {
+                      "example": "E0:AC:CB:97:36:G4",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Name of the device",
+                      "example": "Shawns iPhone",
+                      "type": "string"
+                    },
+                    "serial_number": {
+                      "example": "C02Q7KHTGFWF",
+                      "type": "string"
+                    },
+                    "udid": {
+                      "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                      "type": "string"
+                    },
+                    "wifi_mac_address": {
+                      "example": "E0:AC:CB:97:36:G4",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "name": {
+            "example": "iPhones",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "required": [
+          "name",
+          "is_smart"
         ],
         "type": "object"
       },
@@ -1474,6 +1976,115 @@
           "name"
         ],
         "type": "object"
+      },
+      "user_group": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "properties": {
+                "criterion": {
+                  "properties": {
+                    "and_or": {
+                      "enum": [
+                        "and",
+                        "or"
+                      ],
+                      "type": "string"
+                    },
+                    "closing_paren": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "description": "Name of the criteria",
+                      "example": "Email Address",
+                      "type": "string"
+                    },
+                    "opening_paren": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "priority": {
+                      "type": "integer"
+                    },
+                    "search_type": {
+                      "description": "Operator",
+                      "example": "like",
+                      "type": "string"
+                    },
+                    "value": {
+                      "example": "company.com",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "is_notify_on_change": {
+            "type": "boolean"
+          },
+          "is_smart": {
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Name of the user group",
+            "example": "Teachers",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "users": {
+            "items": {
+              "properties": {
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                },
+                "user": {
+                  "properties": {
+                    "email_address": {
+                      "example": "aharrison@company.com",
+                      "type": "string"
+                    },
+                    "full_name": {
+                      "example": "Ashley Harrison",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "phone_number": {
+                      "example": "123-555-6789",
+                      "type": "string"
+                    },
+                    "username": {
+                      "example": "AHarrison",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "is_smart"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -1493,6 +2104,334 @@
   },
   "openapi": "3.0.3",
   "paths": {
+    "/advancedcomputersearches/id/{id}": {
+      "delete": {
+        "operationId": "deleteAdvancedComputerSearchById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer search by ID",
+        "tags": [
+          "advancedcomputersearches"
+        ]
+      },
+      "get": {
+        "description": "Additional display fields are returned within the `Computer` object",
+        "operationId": "findAdvancedComputerSearchesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_computer_search"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_computer_search"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer searches by ID",
+        "tags": [
+          "advancedcomputersearches"
+        ]
+      },
+      "post": {
+        "operationId": "createAdvancedComputerSearchgById",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new advanced computer search",
+        "tags": [
+          "advancedcomputersearches"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateAdvancedComputerSearchById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing advanced computer search by ID",
+        "tags": [
+          "advancedcomputersearches"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/advancedmobiledevicesearches/id/{id}": {
+      "delete": {
+        "operationId": "deleteAdvancedMobileDeviceSearchById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device search by ID",
+        "tags": [
+          "advancedmobiledevicesearches"
+        ]
+      },
+      "get": {
+        "operationId": "findAdvancedMobileDeviceSearchesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_mobile_device_search"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_mobile_device_search"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device searches by ID",
+        "tags": [
+          "advancedmobiledevicesearches"
+        ]
+      },
+      "post": {
+        "operationId": "createAdvancedMobileDeviceSearchById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new advanced mobile device search",
+        "tags": [
+          "advancedmobiledevicesearches"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateAdvancedMobileDeviceSearchById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing advanced mobile device search by ID",
+        "tags": [
+          "advancedmobiledevicesearches"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/advancedusersearches/id/{id}": {
+      "delete": {
+        "operationId": "deleteAdvancedUserSearchById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a user search by ID",
+        "tags": [
+          "advancedusersearches"
+        ]
+      },
+      "get": {
+        "operationId": "findAdvancedUserSearchesById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_user_search"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_user_search"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds user searches by ID",
+        "tags": [
+          "advancedusersearches"
+        ]
+      },
+      "post": {
+        "operationId": "createAdvancedUserSearchgById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new advanced user search by ID",
+        "tags": [
+          "advancedusersearches"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateAdvancedUserSearchById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Updates an existing advanced user search by ID",
+        "tags": [
+          "advancedusersearches"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/buildings/id/{id}": {
       "delete": {
         "operationId": "deleteBuildingById",
@@ -1816,6 +2755,116 @@
         "summary": "Updates an existing computer extension attribute by ID",
         "tags": [
           "computerextensionattributes"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/computergroups/id/{id}": {
+      "delete": {
+        "operationId": "deleteComputerGroupById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer group by ID",
+        "tags": [
+          "computergroups"
+        ]
+      },
+      "get": {
+        "operationId": "findComputerGroupsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_group"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_group"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer groups by ID",
+        "tags": [
+          "computergroups"
+        ]
+      },
+      "post": {
+        "operationId": "createComputerGroupById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new computer group by ID",
+        "tags": [
+          "computergroups"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "One or more computers can be added by using \"computer_additions\" instead of \"computers\". One or more computers can be deleted by using \"computer_deletions\" instead of \"computers\"",
+        "operationId": "updateComputerGroupById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing computer group by ID",
+        "tags": [
+          "computergroups"
         ],
         "x-explorer-enabled": false
       }
@@ -2308,6 +3357,116 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledevicegroups/id/{id}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceGroupById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device group by ID",
+        "tags": [
+          "mobiledevicegroups"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceGroupsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_group"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_group"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device groups by ID",
+        "tags": [
+          "mobiledevicegroups"
+        ]
+      },
+      "post": {
+        "operationId": "createMobileDeviceGroupById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new mobile device group by ID",
+        "tags": [
+          "mobiledevicegroups"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "One or more mobile devices can be added by using \"mobile_device_additions\" instead of \"mobile_devices\". One or more computers can be deleted by using \"mobile_device_deletions\" instead of \"mobile_devices\".",
+        "operationId": "updateMobileDeviceGroupById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device group by ID",
+        "tags": [
+          "mobiledevicegroups"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/scripts/id/{id}": {
       "delete": {
         "operationId": "deleteScriptById",
@@ -2634,6 +3793,116 @@
         "summary": "Updates an existing user extension attribute by ID",
         "tags": [
           "userextensionattributes"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/usergroups/id/{id}": {
+      "delete": {
+        "operationId": "deleteUserGroupsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes user groups by ID",
+        "tags": [
+          "usergroups"
+        ]
+      },
+      "get": {
+        "operationId": "findUserGroupsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_group"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_group"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds user groups by ID",
+        "tags": [
+          "usergroups"
+        ]
+      },
+      "post": {
+        "operationId": "createUserGroupsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "default": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates user groups by ID",
+        "tags": [
+          "usergroups"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "description": "One or more users can be added by using \"user_additions\" instead of \"users\". One or more users can be deleted by using \"user_deletions\" instead of \"users\".",
+        "operationId": "updateUserGroupsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates user groups by ID",
+        "tags": [
+          "usergroups"
         ],
         "x-explorer-enabled": false
       }
