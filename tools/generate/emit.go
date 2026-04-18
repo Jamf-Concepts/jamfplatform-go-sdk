@@ -224,6 +224,17 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 		emittedTypes[t.Name] = true
 	}
 
+	// All root-package specs share a single Go package (legacy path), so the
+	// validator has visibility into every type already emitted across prior
+	// specs — any method reference must resolve against that accumulated set.
+	declared := make([]GoType, 0, len(emittedTypes))
+	for name := range emittedTypes {
+		declared = append(declared, GoType{Name: name})
+	}
+	if err := validateTypeReferences(fmt.Sprintf("spec %s", spec.File), declared, methods); err != nil {
+		return err
+	}
+
 	gf := GeneratedFile{
 		Package: cfg.Package,
 		Module:  cfg.Module,
@@ -323,6 +334,17 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	pkgFormat := ""
 	if len(allSpecs) > 0 {
 		pkgFormat = allSpecs[0].spec.Format
+	}
+
+	// Validate references before writing any file — an unresolved Go type
+	// reference in a method will surface later as a go build error with no
+	// pointer back to the spec/op responsible. The validator works on the
+	// union of types emitted across all specs in this package, matching
+	// the way the templates will actually see them.
+	for _, sm := range allSpecs {
+		if err := validateTypeReferences(fmt.Sprintf("spec %s (package %s)", sm.spec.File, pkgName), allTypes, sm.methods); err != nil {
+			return err
+		}
 	}
 
 	if err := emitPkgClient(pkgDir, cfg, pkgName); err != nil {

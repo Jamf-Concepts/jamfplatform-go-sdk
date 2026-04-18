@@ -128,7 +128,10 @@ import (
 
 {{- if .Types }}
 {{ range .Types }}
-{{- if .IsRawJSON }}
+{{- if .AliasTarget }}
+// {{ .Comment }}
+type {{ .Name }} = {{ .AliasTarget }}
+{{- else if .IsRawJSON }}
 // {{ .Comment }}
 type {{ .Name }} = json.RawMessage
 {{- else if .Discriminator }}

@@ -263,3 +263,6 @@ type SiteObject struct {
 	ID      *int     `xml:"id,omitempty"`
 	Name    *string  `xml:"name,omitempty"`
 }
+
+// Size is an alias for int.
+type Size = int

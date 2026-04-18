@@ -14,6 +14,7 @@ type GoType struct {
 	IsRawJSON     bool
 	Discriminator *GoDiscriminator
 	XMLName       string // wire element name when format=xml and it differs from Go type name; emitted as XMLName xml.Name `xml:"..."` field
+	AliasTarget   string // non-empty → emit as `type Name = AliasTarget` (used for top-level array schemas)
 }
 
 // GoDiscriminator describes a oneOf-with-discriminator polymorphic schema.

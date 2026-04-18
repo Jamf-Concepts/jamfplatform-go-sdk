@@ -46,6 +46,24 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 		return false
 	}
 	hoisted := false
+	// Top-level array schemas whose items are an inline object need
+	// their items promoted so the generated alias has a named element
+	// type. The Classic spec is riddled with `type: array, items: {
+	// properties: {size, building} }` list shapes; without hoisting
+	// the items collapse to map[string]any.
+	if schema.Type.Is("array") && schema.Items != nil && schema.Items.Ref == "" &&
+		schema.Items.Value != nil && len(schema.Items.Value.Properties) > 0 {
+		nested := uniqueSchemaName(doc, parentName+"Item")
+		if schema.Items.Value.XML == nil {
+			schema.Items.Value.XML = &openapi3.XML{}
+		}
+		if schema.Items.Value.XML.Name == "" {
+			schema.Items.Value.XML.Name = singularize(parentName)
+		}
+		doc.Components.Schemas[nested] = &openapi3.SchemaRef{Value: schema.Items.Value}
+		schema.Items = &openapi3.SchemaRef{Ref: "#/components/schemas/" + nested, Value: schema.Items.Value}
+		hoisted = true
+	}
 	lift := func(propName string, ref *openapi3.SchemaRef) *openapi3.SchemaRef {
 		if ref == nil || ref.Ref != "" || ref.Value == nil {
 			return ref
@@ -374,6 +392,40 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 			types = append(types, GoType{
 				Name:    name,
 				Comment: fmt.Sprintf("%s represents a %s value.", name, camelToWords(name)),
+			})
+			continue
+		}
+
+		// Top-level array → type alias `type Foo = []FooItem`. Classic's
+		// list schemas (buildings, scripts, etc.) are modelled this way;
+		// the items schema is often inline, so we resolve to a Go type via
+		// schemaRefToGoType, which follows $refs and falls back to a hoisted
+		// nested type for inline object items. Without this branch the
+		// array schema silently drops, leaving methods that reference the
+		// name to fail at compile.
+		if schema.Type.Is("array") {
+			itemType := "any"
+			if schema.Items != nil {
+				itemType = schemaRefToGoType(schema.Items)
+			}
+			types = append(types, GoType{
+				Name:        name,
+				AliasTarget: "[]" + itemType,
+				Comment:     fmt.Sprintf("%s is a list of %s.", name, itemType),
+			})
+			continue
+		}
+
+		// Top-level scalar (integer/number/string/boolean without enum) →
+		// type alias. Classic uses these as shared field schemas (`size`,
+		// `id_name`, etc.) referenced by $ref from other schemas. Skipping
+		// them leaves the referencing struct with an undefined Go type.
+		if schema.Type.Is("string") || schema.Type.Is("integer") || schema.Type.Is("number") || schema.Type.Is("boolean") {
+			target := schemaRefToGoType(&openapi3.SchemaRef{Value: schema})
+			types = append(types, GoType{
+				Name:        name,
+				AliasTarget: target,
+				Comment:     fmt.Sprintf("%s is an alias for %s.", name, target),
 			})
 			continue
 		}
