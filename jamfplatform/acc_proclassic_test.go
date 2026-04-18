@@ -1382,6 +1382,77 @@ func TestAcceptance_Classic_GetPatchAvailableTitles(t *testing.T) {
 	if titles == nil { t.Fatal("expected non-nil available titles") }
 }
 
+// Read-only probes of Classic singletons — all Jamf tenants have these
+// endpoints populated, and updating them via the test credentials would
+// mutate tenant state (SMTP settings, activation code, etc.) which is
+// not safe. Coverage is shape-of-response only; unit tests cover writes.
+
+func TestAcceptance_Classic_GetActivationCode(t *testing.T) {
+	c := accClient(t)
+	a, err := proclassic.New(c).GetActivationCode(context.Background())
+	if err != nil { skipOnServerError(t, err); t.Fatalf("GetActivationCode: %v", err) }
+	if a == nil { t.Fatal("nil ActivationCode") }
+}
+
+func TestAcceptance_Classic_GetSMTPServer(t *testing.T) {
+	c := accClient(t)
+	s, err := proclassic.New(c).GetSMTPServer(context.Background())
+	if err != nil { skipOnServerError(t, err); t.Fatalf("GetSMTPServer: %v", err) }
+	if s == nil { t.Fatal("nil SMTPServer") }
+}
+
+func TestAcceptance_Classic_GetGSXConnection(t *testing.T) {
+	c := accClient(t)
+	g, err := proclassic.New(c).GetGSXConnection(context.Background())
+	if err != nil { skipOnServerError(t, err); t.Fatalf("GetGSXConnection: %v", err) }
+	if g == nil { t.Fatal("nil GSXConnection") }
+}
+
+func TestAcceptance_Classic_GetComputerCheckIn(t *testing.T) {
+	c := accClient(t)
+	ci, err := proclassic.New(c).GetComputerCheckIn(context.Background())
+	if err != nil { skipOnServerError(t, err); t.Fatalf("GetComputerCheckIn: %v", err) }
+	if ci == nil { t.Fatal("nil") }
+}
+
+func TestAcceptance_Classic_GetComputerInventoryCollection(t *testing.T) {
+	c := accClient(t)
+	ic, err := proclassic.New(c).GetComputerInventoryCollection(context.Background())
+	if err != nil { skipOnServerError(t, err); t.Fatalf("GetComputerInventoryCollection: %v", err) }
+	if ic == nil { t.Fatal("nil") }
+}
+
+func TestAcceptance_Classic_GetJSSUser(t *testing.T) {
+	c := accClient(t)
+	u, err := proclassic.New(c).GetJSSUser(context.Background())
+	if err != nil { skipOnServerError(t, err); t.Fatalf("GetJSSUser: %v", err) }
+	if u == nil { t.Fatal("nil JSSUser") }
+}
+
+func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
+	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	name := "sdk-acc-sus-" + runSuffix()
+	port := 8088
+	created, err := pc.CreateSoftwareUpdateServerByID(ctx, "0", &proclassic.SoftwareUpdateServer{
+		Name:      classicStrPtr(name),
+		IPAddress: classicStrPtr("sus.example.test"),
+		Port:      &port,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) { t.Skipf("forbidden: %v", err) }
+		t.Fatalf("CreateSoftwareUpdateServerByID: %v", err)
+	}
+	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteSoftwareUpdateServerByID(ctx, intToStr(id)) })
+	if err := pc.DeleteSoftwareUpdateServerByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+	_, err = pc.GetSoftwareUpdateServerByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+}
+
 func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()

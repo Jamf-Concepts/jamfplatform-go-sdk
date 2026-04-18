@@ -427,7 +427,51 @@
         {"op": "GET /patchsoftwaretitles/id/{id}", "name": "GetPatchSoftwareTitleByID", "responseType": "patch_software_title", "pathNames": {"id": "id"}},
         {"op": "POST /patchsoftwaretitles/id/{id}", "name": "CreatePatchSoftwareTitleByID", "requestType": "patch_software_title", "responseType": "patch_software_title", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /patchsoftwaretitles/id/{id}", "name": "UpdatePatchSoftwareTitleByID", "requestType": "patch_software_title", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /patchsoftwaretitles/id/{id}", "name": "DeletePatchSoftwareTitleByID", "pathNames": {"id": "id"}}
+        {"op": "DELETE /patchsoftwaretitles/id/{id}", "name": "DeletePatchSoftwareTitleByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /activationcode", "name": "GetActivationCode", "responseType": "activation_code"},
+        {"op": "PUT /activationcode", "name": "UpdateActivationCode", "requestType": "activation_code", "expectedStatus": 201},
+
+        {"op": "GET /smtpserver", "name": "GetSMTPServer", "responseType": "smtp_server"},
+        {"op": "PUT /smtpserver", "name": "UpdateSMTPServer", "requestType": "smtp_server", "expectedStatus": 201},
+
+        {"op": "GET /gsxconnection", "name": "GetGSXConnection", "responseType": "gsx_connection"},
+        {"op": "PUT /gsxconnection", "name": "UpdateGSXConnection", "requestType": "gsx_connection", "expectedStatus": 201},
+
+        {"op": "GET /computercheckin", "name": "GetComputerCheckIn", "responseType": "computer_check_in"},
+        {"op": "PUT /computercheckin", "name": "UpdateComputerCheckIn", "requestType": "computer_check_in", "expectedStatus": 201},
+
+        {"op": "GET /computerinventorycollection", "name": "GetComputerInventoryCollection", "responseType": "computer_inventory_collection"},
+        {"op": "PUT /computerinventorycollection", "name": "UpdateComputerInventoryCollection", "requestType": "computer_inventory_collection", "expectedStatus": 201},
+
+        {"op": "GET /jssuser", "name": "GetJSSUser", "responseType": "jss_user"},
+
+        {"op": "GET /computermanagement/id/{id}", "name": "GetComputerManagementByID", "responseType": "computer_management", "pathNames": {"id": "id"}},
+        {"op": "GET /computermanagement/name/{name}", "name": "GetComputerManagementByName", "responseType": "computer_management"},
+        {"op": "GET /computermanagement/udid/{udid}", "name": "GetComputerManagementByUDID", "responseType": "computer_management", "pathNames": {"udid": "udid"}},
+        {"op": "GET /computermanagement/serialnumber/{serialnumber}", "name": "GetComputerManagementBySerialNumber", "responseType": "computer_management", "pathNames": {"serialnumber": "serialNumber"}},
+        {"op": "GET /computermanagement/macaddress/{macaddress}", "name": "GetComputerManagementByMacAddress", "responseType": "computer_management", "pathNames": {"macaddress": "macAddress"}},
+
+        {"op": "GET /healthcarelistener/id/{id}", "name": "GetHealthcareListenerByID", "responseType": "healthcare_listener", "pathNames": {"id": "id"}},
+        {"op": "PUT /healthcarelistener/id/{id}", "name": "UpdateHealthcareListenerByID", "requestType": "healthcare_listener", "pathNames": {"id": "id"}, "expectedStatus": 201},
+
+        {"op": "GET /healthcarelistenerrule/id/{id}", "name": "GetHealthcareListenerRuleByID", "responseType": "healthcare_listener_rule", "pathNames": {"id": "id"}},
+        {"op": "POST /healthcarelistenerrule/id/{id}", "name": "CreateHealthcareListenerRuleByID", "requestType": "healthcare_listener_rule", "responseType": "healthcare_listener_rule", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /healthcarelistenerrule/id/{id}", "name": "UpdateHealthcareListenerRuleByID", "requestType": "healthcare_listener_rule", "pathNames": {"id": "id"}, "expectedStatus": 201},
+
+        {"op": "GET /infrastructuremanager/id/{id}", "name": "GetInfrastructureManagerByID", "responseType": "infrastructure_manager", "pathNames": {"id": "id"}},
+        {"op": "PUT /infrastructuremanager/id/{id}", "name": "UpdateInfrastructureManagerByID", "requestType": "infrastructure_manager", "pathNames": {"id": "id"}, "expectedStatus": 201},
+
+        {"op": "GET /softwareupdateservers/id/{id}", "name": "GetSoftwareUpdateServerByID", "responseType": "software_update_server", "pathNames": {"id": "id"}},
+        {"op": "POST /softwareupdateservers/id/{id}", "name": "CreateSoftwareUpdateServerByID", "requestType": "software_update_server", "responseType": "software_update_server", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "PUT /softwareupdateservers/id/{id}", "name": "UpdateSoftwareUpdateServerByID", "requestType": "software_update_server", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "DELETE /softwareupdateservers/id/{id}", "name": "DeleteSoftwareUpdateServerByID", "pathNames": {"id": "id"}},
+
+        {"op": "GET /computercommands/uuid/{uuid}", "name": "GetComputerCommandByUUID", "responseType": "computer_command", "pathNames": {"uuid": "uuid"}},
+        {"op": "POST /computercommands/command/{command}/id/{id}", "name": "IssueComputerCommandByID", "requestType": "computer_command_post", "responseType": "computer_command", "pathNames": {"command": "command", "id": "id"}, "expectedStatus": 201},
+
+        {"op": "GET /mobiledevicecommands/uuid/{uuid}", "name": "GetMobileDeviceCommandByUUID", "responseType": "mobile_device_command", "pathNames": {"uuid": "uuid"}},
+        {"op": "POST /mobiledevicecommands/command", "name": "IssueMobileDeviceCommand", "requestType": "mobile_device_command_post", "responseType": "mobile_device_command", "expectedStatus": 201}
       ]
     }
   ]
