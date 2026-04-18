@@ -34,6 +34,7 @@ type Logger interface {
 // Sub-packages in jamfplatform/ construct service clients that wrap a Transport.
 type Transport struct {
 	baseURL     string
+	tenantID    string
 	httpClient  *http.Client
 	baseClient  *http.Client
 	oauthConfig *clientcredentials.Config
@@ -127,6 +128,13 @@ func WithTokenCache(cache TokenCache, cacheKey string) Option {
 	}
 }
 
+// WithTenantID sets the tenant ID used by TenantPrefix when building URLs.
+func WithTenantID(id string) Option {
+	return func(c *Transport) {
+		c.tenantID = id
+	}
+}
+
 // NewTransport creates a new Jamf Platform API transport.
 func NewTransport(baseURL, clientID, clientSecret string) *Transport {
 	return NewTransportWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")
@@ -161,6 +169,22 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 // BaseURL returns the base URL configured for the client.
 func (c *Transport) BaseURL() string {
 	return c.baseURL
+}
+
+// TenantID returns the tenant ID configured on the transport.
+func (c *Transport) TenantID() string {
+	return c.tenantID
+}
+
+// TenantPrefix returns the /api/{namespace}/{version}/tenant/{tenantID} URL
+// prefix used by tenant-scoped resources. An empty version collapses the
+// segment for APIs that don't use a version in the URL (proclassic, Pro
+// preview paths).
+func (c *Transport) TenantPrefix(namespace, version string) string {
+	if version == "" {
+		return "/api/" + namespace + "/tenant/" + c.tenantID
+	}
+	return "/api/" + namespace + "/" + version + "/tenant/" + c.tenantID
 }
 
 // ValidateCredentials tests authentication by requesting an OAuth token.

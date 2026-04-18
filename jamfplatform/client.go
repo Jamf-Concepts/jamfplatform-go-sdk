@@ -14,7 +14,6 @@ import (
 // Client provides typed methods for all Jamf Platform API operations.
 type Client struct {
 	transport *client.Transport
-	tenantID  string
 }
 
 // NewClient creates a new Jamf Platform API client.
@@ -40,6 +39,9 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	if cache != nil {
 		transportOpts = append(transportOpts, client.WithTokenCache(cache, client.CacheKey(baseURL, clientID)))
 	}
+	if cfg.tenantID != "" {
+		transportOpts = append(transportOpts, client.WithTenantID(cfg.tenantID))
+	}
 
 	transport := client.NewTransportWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
 	if cfg.logger != nil {
@@ -48,7 +50,6 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 
 	return &Client{
 		transport: transport,
-		tenantID:  cfg.tenantID,
 	}
 }
 
@@ -126,13 +127,9 @@ func WithTenantID(id string) Option {
 	}
 }
 
-// tenantPrefix returns the API path prefix for tenant-scoped resources.
-// An empty version collapses the segment so Classic-style namespaces
-// (/api/proclassic/tenant/{id}/...) and version-less Pro paths
-// (/api/pro/tenant/{id}/preview/...) build correctly.
+// tenantPrefix delegates to the transport. Retained while generated code
+// still calls it; sub-packages built after the package-per-API rework
+// call c.transport.TenantPrefix directly.
 func (c *Client) tenantPrefix(namespace, version string) string {
-	if version == "" {
-		return "/api/" + namespace + "/tenant/" + c.tenantID
-	}
-	return "/api/" + namespace + "/" + version + "/tenant/" + c.tenantID
+	return c.transport.TenantPrefix(namespace, version)
 }

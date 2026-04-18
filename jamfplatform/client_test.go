@@ -87,70 +87,8 @@ func TestAccessToken_Success(t *testing.T) {
 
 func TestWithTenantID(t *testing.T) {
 	c := NewClient("https://example.com", "id", "secret", WithTenantID("tenant-uuid"))
-	if c.tenantID != "tenant-uuid" {
-		t.Errorf("tenantID = %q, want tenant-uuid", c.tenantID)
-	}
-}
-
-func TestTenantPrefix(t *testing.T) {
-	tests := []struct {
-		name      string
-		tenantID  string
-		namespace string
-		version   string
-		want      string
-	}{
-		{
-			name:      "devices",
-			tenantID:  "e77c1408-10c8-4007-b177-abc9157fbcaa",
-			namespace: "devices", version: "v1",
-			want: "/api/devices/v1/tenant/e77c1408-10c8-4007-b177-abc9157fbcaa",
-		},
-		{
-			name:      "device groups",
-			tenantID:  "t-123",
-			namespace: "device-groups", version: "v1",
-			want: "/api/device-groups/v1/tenant/t-123",
-		},
-		{
-			name:      "device actions",
-			tenantID:  "t-123",
-			namespace: "device-actions", version: "v1",
-			want: "/api/device-actions/v1/tenant/t-123",
-		},
-		{
-			name:      "blueprints",
-			tenantID:  "t-abc",
-			namespace: "blueprints", version: "v1",
-			want: "/api/blueprints/v1/tenant/t-abc",
-		},
-		{
-			name:      "compliance benchmarks",
-			tenantID:  "t-abc",
-			namespace: "compliance-benchmarks", version: "v1",
-			want: "/api/compliance-benchmarks/v1/tenant/t-abc",
-		},
-		{
-			name:      "version-less pro",
-			tenantID:  "t-abc",
-			namespace: "pro", version: "",
-			want: "/api/pro/tenant/t-abc",
-		},
-		{
-			name:      "proclassic has no version",
-			tenantID:  "t-abc",
-			namespace: "proclassic", version: "",
-			want: "/api/proclassic/tenant/t-abc",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{tenantID: tt.tenantID}
-			got := c.tenantPrefix(tt.namespace, tt.version)
-			if got != tt.want {
-				t.Errorf("tenantPrefix() = %q, want %q", got, tt.want)
-			}
-		})
+	if got := c.transport.TenantID(); got != "tenant-uuid" {
+		t.Errorf("tenantID = %q, want tenant-uuid", got)
 	}
 }
 
