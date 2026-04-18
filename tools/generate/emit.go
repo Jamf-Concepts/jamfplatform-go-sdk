@@ -5,6 +5,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -13,9 +14,160 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/getkin/kin-openapi/openapi2"
+	"github.com/getkin/kin-openapi/openapi2conv"
 	"github.com/getkin/kin-openapi/openapi3"
 	"golang.org/x/tools/imports"
+	"gopkg.in/yaml.v3"
 )
+
+// loadSpec reads the OpenAPI spec at path, upconverting Swagger 2.0 documents
+// to OpenAPI 3 when necessary. Returns a kin-openapi v3 document the rest of
+// the generator can treat uniformly.
+//
+// allowed is an optional allowlist of "METHOD /path" keys. For Swagger 2.0
+// specs, paths not in the allowlist are pruned before conversion — Jamf's
+// Classic spec has operations that openapi2conv refuses to convert (multiple
+// body params) but that are outside any SDK whitelist anyway.
+func loadSpec(path string, allowed map[string]bool) (*openapi3.T, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	// Swagger 2.0 detection: the top-level "swagger" key contains "2.0".
+	// Works for both JSON and YAML inputs.
+	var probe struct {
+		Swagger string `json:"swagger" yaml:"swagger"`
+		OpenAPI string `json:"openapi" yaml:"openapi"`
+	}
+	if strings.HasSuffix(strings.ToLower(path), ".yaml") || strings.HasSuffix(strings.ToLower(path), ".yml") {
+		_ = yaml.Unmarshal(data, &probe)
+	} else {
+		_ = json.Unmarshal(data, &probe)
+	}
+	if strings.HasPrefix(probe.Swagger, "2.") {
+		// kin-openapi's openapi2.T unmarshal path expects JSON, because
+		// OpenAPI 3 types nested within it have custom JSON decoders that
+		// handle OAS 3.1's "type can be a string OR a list of strings"
+		// union correctly. YAML decoded directly into the struct fails on
+		// those fields. Convert YAML -> JSON in memory first.
+		jsonData := data
+		if strings.HasSuffix(strings.ToLower(path), ".yaml") || strings.HasSuffix(strings.ToLower(path), ".yml") {
+			var generic any
+			if err := yaml.Unmarshal(data, &generic); err != nil {
+				return nil, fmt.Errorf("parsing swagger 2.0 yaml: %w", err)
+			}
+			generic = yamlMapsToJSON(generic)
+			jsonData, err = json.Marshal(generic)
+			if err != nil {
+				return nil, fmt.Errorf("re-encoding swagger 2.0 yaml as json: %w", err)
+			}
+		}
+		var v2 openapi2.T
+		if err := json.Unmarshal(jsonData, &v2); err != nil {
+			return nil, fmt.Errorf("parsing swagger 2.0: %w", err)
+		}
+		if allowed != nil {
+			pruneSwagger2Paths(&v2, allowed)
+		}
+		basePath := v2.BasePath
+		v3, err := openapi2conv.ToV3(&v2)
+		if err != nil {
+			return nil, err
+		}
+		// openapi2conv prepends v2.basePath to every path in the v3 output.
+		// Strip it so path keys match what the SDK config uses (without
+		// the Classic "/JSSResource/" prefix).
+		if basePath != "" && basePath != "/" && v3.Paths != nil {
+			trimmed := strings.TrimSuffix(basePath, "/")
+			rewritten := openapi3.NewPaths()
+			for _, p := range v3.Paths.InMatchingOrder() {
+				key := p
+				if strings.HasPrefix(p, trimmed) {
+					key = strings.TrimPrefix(p, trimmed)
+					if key == "" {
+						key = "/"
+					}
+				}
+				rewritten.Set(key, v3.Paths.Value(p))
+			}
+			v3.Paths = rewritten
+		}
+		return v3, nil
+	}
+	return openapi3.NewLoader().LoadFromFile(path)
+}
+
+// allowedOpsSet builds the "METHOD /path" allowlist for a spec from its
+// operations + excludePaths lists.
+func allowedOpsSet(spec SpecDef) map[string]bool {
+	m := make(map[string]bool, len(spec.Operations))
+	for _, op := range spec.Operations {
+		m[normalizeOpKey(op.Op)] = true
+	}
+	return m
+}
+
+// pruneSwagger2Paths drops operations from v2.Paths that aren't in the
+// allowlist (keys "METHOD /path"). Leaves path items intact if at least one
+// of their methods survives; otherwise removes the path entry entirely.
+func pruneSwagger2Paths(v2 *openapi2.T, allowed map[string]bool) {
+	for path, item := range v2.Paths {
+		if item == nil {
+			continue
+		}
+		if !allowed["GET "+path] {
+			item.Get = nil
+		}
+		if !allowed["POST "+path] {
+			item.Post = nil
+		}
+		if !allowed["PUT "+path] {
+			item.Put = nil
+		}
+		if !allowed["PATCH "+path] {
+			item.Patch = nil
+		}
+		if !allowed["DELETE "+path] {
+			item.Delete = nil
+		}
+		if !allowed["HEAD "+path] {
+			item.Head = nil
+		}
+		if !allowed["OPTIONS "+path] {
+			item.Options = nil
+		}
+		if item.Get == nil && item.Post == nil && item.Put == nil && item.Patch == nil &&
+			item.Delete == nil && item.Head == nil && item.Options == nil {
+			delete(v2.Paths, path)
+		}
+	}
+}
+
+// yamlMapsToJSON recursively rewrites map[any]any (yaml.v3's map type) as
+// map[string]any so encoding/json can round-trip cleanly.
+func yamlMapsToJSON(v any) any {
+	switch x := v.(type) {
+	case map[any]any:
+		out := make(map[string]any, len(x))
+		for k, v := range x {
+			out[fmt.Sprint(k)] = yamlMapsToJSON(v)
+		}
+		return out
+	case map[string]any:
+		for k, v := range x {
+			x[k] = yamlMapsToJSON(v)
+		}
+		return x
+	case []any:
+		for i, v := range x {
+			x[i] = yamlMapsToJSON(v)
+		}
+		return x
+	default:
+		return v
+	}
+}
 
 // ---------------------------------------------------------------------------
 // Per-spec processing
@@ -42,7 +194,7 @@ func resolveSpecPath(root string, cfg Config, spec SpecDef) (path string, usedFa
 }
 
 func processSpec(root string, cfg Config, spec SpecDef, specPath string, emittedTypes map[string]bool) error {
-	doc, err := openapi3.NewLoader().LoadFromFile(specPath)
+	doc, err := loadSpec(specPath, allowedOpsSet(spec))
 	if err != nil {
 		return fmt.Errorf("loading spec: %w", err)
 	}
@@ -73,6 +225,7 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 	gf := GeneratedFile{
 		Package: cfg.Package,
 		Module:  cfg.Module,
+		Format:  spec.Format,
 		Types:   types,
 		Methods: methods,
 	}
@@ -135,7 +288,7 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	var allTypes []GoType
 
 	for _, ls := range specs {
-		doc, err := openapi3.NewLoader().LoadFromFile(ls.specPath)
+		doc, err := loadSpec(ls.specPath, allowedOpsSet(ls.spec))
 		if err != nil {
 			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
 		}
@@ -162,11 +315,16 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		allTypes = append(allTypes, types...)
 	}
 
+	pkgFormat := ""
+	if len(allSpecs) > 0 {
+		pkgFormat = allSpecs[0].spec.Format
+	}
+
 	if err := emitPkgClient(pkgDir, cfg, pkgName); err != nil {
 		return err
 	}
 
-	typesGF := GeneratedFile{Package: pkgName, Module: cfg.Module, Types: allTypes}
+	typesGF := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
 	if err := emitTemplated(sourceTmpl, typesGF, filepath.Join(pkgDir, "types.go")); err != nil {
 		return err
 	}
@@ -178,7 +336,7 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 			}
 			continue
 		}
-		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Methods: sm.methods}
+		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: sm.spec.Format, Methods: sm.methods}
 		if err := emitTemplated(sourceTmpl, mf, filepath.Join(pkgDir, sm.baseName+".go")); err != nil {
 			return err
 		}
@@ -187,7 +345,7 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		}
 	}
 
-	if err := emitPkgHelpersTest(pkgDir, cfg, pkgName); err != nil {
+	if err := emitPkgHelpersTest(pkgDir, cfg, pkgName, pkgFormat); err != nil {
 		return err
 	}
 	return nil
@@ -213,7 +371,7 @@ func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, m
 
 	for _, tag := range tags {
 		base := tagToFileBase(tag)
-		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Methods: buckets[tag]}
+		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: spec.Format, Methods: buckets[tag]}
 		if err := emitTemplated(sourceTmpl, mf, filepath.Join(pkgDir, base+".go")); err != nil {
 			return err
 		}
@@ -302,7 +460,22 @@ func New(base *jamfplatform.Client) *Client {
 // emitPkgHelpersTest writes the per-sub-package helpers_test.go — test-only
 // shims that alias jamfplatform.Option and WithTenantID into the sub-package
 // namespace so generated test files can use them unqualified.
-func emitPkgHelpersTest(pkgDir string, cfg Config, pkgName string) error {
+func emitPkgHelpersTest(pkgDir string, cfg Config, pkgName, format string) error {
+	xmlHelpers := ""
+	if format == "xml" {
+		xmlHelpers = `
+
+func writeXML(t *testing.T, w http.ResponseWriter, status int, body string) {
+	t.Helper()
+	w.Header().Set("Content-Type", "application/xml")
+	w.WriteHeader(status)
+	if body != "" {
+		if _, err := w.Write([]byte(body)); err != nil {
+			t.Fatalf("writeXML: %v", err)
+		}
+	}
+}`
+	}
 	src := fmt.Sprintf(`// Code generated by tools/generate; DO NOT EDIT.
 
 // Copyright Jamf Software LLC 2026
@@ -360,8 +533,8 @@ func readJSON(t *testing.T, r *http.Request, v any) {
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
 		t.Fatalf("readJSON: %%v", err)
 	}
-}
-`, pkgName, cfg.Module)
+}%s
+`, pkgName, cfg.Module, xmlHelpers)
 	outPath := filepath.Join(pkgDir, "helpers_test.go")
 	formatted, err := imports.Process(outPath, []byte(src), &imports.Options{Comments: true})
 	if err != nil {

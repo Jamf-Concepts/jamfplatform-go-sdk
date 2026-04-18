@@ -117,6 +117,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 
 	m := GoMethod{
 		Name:            opDef.Name,
+		Format:          spec.Format,
 		HTTPMethod:      httpMethod,
 		Namespace:       spec.Namespace,
 		Version:         version,
@@ -168,6 +169,19 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 				}
 			}
 		}
+	}
+
+	// Config-level overrides for request/response types and expected status.
+	// Used when the spec is untyped (e.g. Jamf Classic) so the curator
+	// explicitly names the schema from definitions/.
+	if opDef.RequestType != "" {
+		m.RequestType = opDef.RequestType
+	}
+	if opDef.ResponseType != "" {
+		m.ResponseType = opDef.ResponseType
+	}
+	if opDef.ExpectedStatus != 0 {
+		m.ExpectedStatus = opDef.ExpectedStatus
 	}
 
 	// Paginated item type

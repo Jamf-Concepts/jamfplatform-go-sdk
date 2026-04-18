@@ -10,8 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/getkin/kin-openapi/openapi3"
 )
 
 // ---------------------------------------------------------------------------
@@ -25,7 +23,7 @@ func publishSpecs(root string, cfg Config) error {
 	}
 
 	for _, spec := range cfg.Specs {
-		doc, err := openapi3.NewLoader().LoadFromFile(filepath.Join(root, spec.File))
+		doc, err := loadSpec(filepath.Join(root, spec.File), allowedOpsSet(spec))
 		if err != nil {
 			return fmt.Errorf("loading %s: %w", spec.File, err)
 		}

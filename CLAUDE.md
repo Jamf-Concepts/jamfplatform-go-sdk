@@ -63,6 +63,26 @@ All API paths use `/api/{namespace}/{version}/tenant/{tenantId}/{resource}`. The
 
 `ErrAuthentication` and `ErrNotFound` are sentinel errors. `APIResponseError` has `HasStatus(code)` for status inspection. All re-exported from `internal/client`.
 
+## File organization
+
+- Every spec in `tools/generate/config.json` MUST set `"splitByTag": true`. The generator buckets methods by first OpenAPI tag into one file per tag (`<tag>.go` + `<tag>_test.go`); types pool into a shared `types.go`. Splitting by path would scatter CRUD for a single resource across many files; tag-split keeps each resource coherent.
+- Every spec MUST target a sub-package under `jamfplatform/` via `"package": "<name>"` — e.g. `devices`, `pro`, `proclassic`. Avoids name collisions across Jamf's API families (the same resource name exists in multiple APIs).
+- Sub-package names follow the namespace (kebab → snake → Go identifier). No invention.
+
+## API formats
+
+Two formats are supported, selected per-spec via `"format": "json"` (default) or `"format": "xml"`:
+
+- **JSON specs**: Platform + Pro. Transport marshals/unmarshals via `encoding/json`, emits structs with `json:"..."` tags, sets `Content-Type: application/json`.
+- **XML specs**: Classic (`proclassic.yaml`) is XML-only end-to-end. Transport detects `/proclassic/` in the URL path, switches to `encoding/xml`, sets both `Accept` and `Content-Type` to `application/xml`. Generated structs carry `xml:"..."` tags. Forcing the server to respond as JSON (via Accept: application/json) is technically supported but rejected for the SDK — we keep Classic entirely XML for consistency.
+
+## Schema handling
+
+- **Swagger 2.0**: upconverted in-memory via `openapi2conv.ToV3` before the rest of the generator runs. Paths whitelisted per-spec are pruned from the Swagger 2.0 document before conversion — openapi2conv rejects some Jamf Classic operations (multiple body params) that are outside any SDK whitelist anyway.
+- **Untyped operations**: Classic has 444 ops but 0 typed responses and only 6 typed request bodies in the raw spec. For these, `"requestType"` and `"responseType"` operation-level overrides in config name a schema from `definitions/` (now `components/schemas/` post-conversion) that the generator should wire through.
+- **allOf composition**: flattened — properties merged across composed schemas into one Go struct. Avoids Go embedding rules for OpenAPI's "base + extensions" pattern.
+- **oneOf + discriminator**: emits a union struct with one pointer field per variant plus `UnmarshalJSON`/`MarshalJSON` that dispatches on the discriminator property.
+
 ## Conventions
 
 - MIT license. Copyright headers managed by HashiCorp `copywrite` (uses `--plan` flag, not `--check`).

@@ -61,6 +61,7 @@ type GoMethod struct {
 	ReturnsSlice    bool
 	SpecPath        string
 	UnwrapResults   string
+	Format          string // carried from SpecDef so per-method templates can branch without $-scope
 }
 
 type GoPathParam struct {
@@ -81,6 +82,7 @@ type GoMultipartField struct {
 type GeneratedFile struct {
 	Package string
 	Module  string
+	Format  string // "json" (default) or "xml" — drives struct tag style and transport codec
 	Types   []GoType
 	Methods []GoMethod
 }

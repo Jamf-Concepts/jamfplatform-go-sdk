@@ -15,6 +15,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"log"
@@ -26,6 +27,14 @@ import (
 
 	"golang.org/x/oauth2/clientcredentials"
 )
+
+// isClassicPath reports whether an endpoint targets Jamf's Classic XML API
+// via the platform gateway. The path prefix sniff is the single source of
+// truth for codec selection: Classic paths marshal/unmarshal XML, everything
+// else uses JSON.
+func isClassicPath(path string) bool {
+	return strings.Contains(path, "/proclassic/")
+}
 
 // Logger is an interface for logging HTTP requests and responses.
 type Logger interface {
@@ -357,9 +366,15 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 		return nil, err
 	}
 
+	classic := isClassicPath(fullURL)
+
 	if body != nil {
 		var err error
-		requestBodyBytes, err = json.Marshal(body)
+		if classic {
+			requestBodyBytes, err = xml.Marshal(body)
+		} else {
+			requestBodyBytes, err = json.Marshal(body)
+		}
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal request body: %w", err)
 		}
@@ -385,9 +400,14 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 		}
 	}
 
+	if classic {
+		req.Header.Set("Accept", "application/xml")
+	}
 	if requestBodyBytes != nil {
 		if contentType != "" {
 			req.Header.Set("Content-Type", contentType)
+		} else if classic {
+			req.Header.Set("Content-Type", "application/xml")
 		} else if method == http.MethodPatch {
 			req.Header.Set("Content-Type", "application/merge-patch+json")
 		} else {
@@ -437,9 +457,13 @@ func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, exp
 	}
 
 	if result != nil {
-		// Raw byte responses (e.g. text/csv exports) bypass JSON decoding.
+		// Raw byte responses (e.g. text/csv exports) bypass decoding.
 		if bp, ok := result.(*[]byte); ok {
 			*bp = append((*bp)[:0], body...)
+		} else if isClassicPath(resp.Request.URL.Path) {
+			if err := xml.Unmarshal(body, result); err != nil {
+				return fmt.Errorf("failed to decode XML response: %w", err)
+			}
 		} else if err := json.Unmarshal(body, result); err != nil {
 			return fmt.Errorf("failed to decode response: %w", err)
 		}

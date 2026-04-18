@@ -181,6 +181,36 @@ func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]*schemaU
 				}
 			}
 		}
+		// Config-level type overrides: when the spec is untyped (e.g. Classic)
+		// the curator names request/response schemas explicitly. Record those
+		// as referenced and descend into their properties.
+		walkNamed := func(name string, isRequest bool) {
+			if doc.Components == nil || doc.Components.Schemas == nil {
+				return
+			}
+			ref, ok := doc.Components.Schemas[name]
+			if !ok {
+				return
+			}
+			// The walker only calls onRef when it encounters a $ref. A
+			// top-level schema we're told to walk by name has no $ref, so
+			// register it manually before descending.
+			if used[name] == nil {
+				used[name] = &schemaUsage{}
+			}
+			if isRequest {
+				used[name].isRequest = true
+			} else {
+				used[name].isResponse = true
+			}
+			makeWalker(isRequest)(ref)
+		}
+		if opDef.RequestType != "" {
+			walkNamed(opDef.RequestType, true)
+		}
+		if opDef.ResponseType != "" {
+			walkNamed(opDef.ResponseType, false)
+		}
 	}
 	return used
 }
@@ -209,6 +239,12 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage) []GoType {
 			continue
 		}
 		if schema.Type == nil {
+			// Swagger 2.0 often omits type: object on definitions that are
+			// clearly objects (Classic spec does this). If there are
+			// properties, treat it as an object anyway.
+			if len(schema.Properties) > 0 {
+				types = append(types, schemaToGoType(name, schema, usage.isRequest))
+			}
 			continue
 		}
 

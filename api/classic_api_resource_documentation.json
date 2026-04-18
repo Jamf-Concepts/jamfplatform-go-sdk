@@ -1,0 +1,378 @@
+{
+  "components": {
+    "securitySchemes": {
+      "Bearer": {
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey"
+      },
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "A full featured API that requires basic authentication for interacting with Jamf Pro in a programmatic manner.",
+    "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
+    "title": "Classic API Resource Documentation",
+    "version": "production"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/computers/id/{id}": {
+      "get": {
+        "deprecated": true,
+        "operationId": "findComputersById",
+        "parameters": [
+          {
+            "description": "Id value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified"
+          }
+        },
+        "summary": "Finds computers by id",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    },
+    {
+      "basicAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "description": "Operations on Jamf Pro accounts",
+      "name": "accounts"
+    },
+    {
+      "description": "Operations on activationcode",
+      "name": "activationcode"
+    },
+    {
+      "description": "Operations on advanced computer searches",
+      "name": "advancedcomputersearches"
+    },
+    {
+      "description": "Operations on advanced mobile device searches",
+      "name": "advancedmobiledevicesearches"
+    },
+    {
+      "description": "Operations on advanced user searches",
+      "name": "advancedusersearches"
+    },
+    {
+      "description": "Operations on allowed file extensions",
+      "name": "allowedfileextensions"
+    },
+    {
+      "description": "Operations on buildings",
+      "name": "buildings"
+    },
+    {
+      "description": "Operations on categories",
+      "name": "categories"
+    },
+    {
+      "description": "Operations on classes",
+      "name": "classes"
+    },
+    {
+      "description": "Operations on commandflush",
+      "name": "commandflush"
+    },
+    {
+      "description": "Operations on computer applications",
+      "name": "computerapplications"
+    },
+    {
+      "description": "Operations on computerapplicationusage",
+      "name": "computerapplicationusage"
+    },
+    {
+      "description": "Operations on computercheckin",
+      "name": "computercheckin"
+    },
+    {
+      "description": "Operations on computercommands",
+      "name": "computercommands"
+    },
+    {
+      "description": "Operations on computerextensionattributes",
+      "name": "computerextensionattributes"
+    },
+    {
+      "description": "Operations on computergroups",
+      "name": "computergroups"
+    },
+    {
+      "description": "Operations on computerhardwaresoftwarereports",
+      "name": "computerhardwaresoftwarereports"
+    },
+    {
+      "description": "Operations on computerhistory",
+      "name": "computerhistory"
+    },
+    {
+      "description": "Operations on computerinventorycollection",
+      "name": "computerinventorycollection"
+    },
+    {
+      "description": "Operations on computerinvitations",
+      "name": "computerinvitations"
+    },
+    {
+      "description": "Operations on computermanagement",
+      "name": "computermanagement"
+    },
+    {
+      "description": "Operations on computerreports",
+      "name": "computerreports"
+    },
+    {
+      "description": "Operations on computers",
+      "name": "computers"
+    },
+    {
+      "description": "Operations on departments",
+      "name": "departments"
+    },
+    {
+      "description": "Operations on directory bindings",
+      "name": "directorybindings"
+    },
+    {
+      "description": "Operations on disk encryption configurations",
+      "name": "diskencryptionconfigurations"
+    },
+    {
+      "description": "Operations on distributionpoints",
+      "name": "distributionpoints"
+    },
+    {
+      "description": "Operations on dockitems",
+      "name": "dockitems"
+    },
+    {
+      "description": "Operations on ebooks",
+      "name": "ebooks"
+    },
+    {
+      "description": "Operations on fileuploads",
+      "name": "fileuploads"
+    },
+    {
+      "description": "Operations on gsxconnection",
+      "name": "gsxconnection"
+    },
+    {
+      "description": "Operations on Healthcare Listener",
+      "name": "healthcarelistener"
+    },
+    {
+      "description": "Operations on Healthcare Listener rules",
+      "name": "healthcarelistenerrule"
+    },
+    {
+      "description": "Operations on iBeacon regions",
+      "name": "ibeacons"
+    },
+    {
+      "description": "Operations on infrastructure manager",
+      "name": "infrastructuremanager"
+    },
+    {
+      "description": "Operations on JSON Web Tokens",
+      "name": "jsonwebtokenconfigurations"
+    },
+    {
+      "description": "Operations on accounts (Deprecated)",
+      "name": "jssuser"
+    },
+    {
+      "description": "Operations on ldapservers",
+      "name": "ldapservers"
+    },
+    {
+      "description": "Operations on licensedsoftware",
+      "name": "licensedsoftware"
+    },
+    {
+      "description": "Operations on logflush",
+      "name": "logflush"
+    },
+    {
+      "description": "Operations on macapplications",
+      "name": "macapplications"
+    },
+    {
+      "description": "Operations on mobiledeviceapplications",
+      "name": "mobiledeviceapplications"
+    },
+    {
+      "description": "Operations on mobiledevicecommands",
+      "name": "mobiledevicecommands"
+    },
+    {
+      "description": "Operations on mobiledeviceconfigurationprofiles",
+      "name": "mobiledeviceconfigurationprofiles"
+    },
+    {
+      "description": "Operations on mobiledeviceenrollmentprofiles",
+      "name": "mobiledeviceenrollmentprofiles"
+    },
+    {
+      "description": "Operations on mobiledeviceextensionattributes",
+      "name": "mobiledeviceextensionattributes"
+    },
+    {
+      "description": "Operations on mobiledevicegroups",
+      "name": "mobiledevicegroups"
+    },
+    {
+      "description": "Operations on mobiledevicehistory",
+      "name": "mobiledevicehistory"
+    },
+    {
+      "description": "Operations on mobiledeviceinvitations",
+      "name": "mobiledeviceinvitations"
+    },
+    {
+      "description": "Operations on mobiledeviceprovisioningprofiles",
+      "name": "mobiledeviceprovisioningprofiles"
+    },
+    {
+      "description": "Operations on mobiledevices",
+      "name": "mobiledevices"
+    },
+    {
+      "description": "Operations on networksegments",
+      "name": "networksegments"
+    },
+    {
+      "description": "Operations on osxconfigurationprofiles",
+      "name": "osxconfigurationprofiles"
+    },
+    {
+      "description": "Operations on packages",
+      "name": "packages"
+    },
+    {
+      "description": "Operations on available patch titles from a source",
+      "name": "patchavailabletitles"
+    },
+    {
+      "description": "Operations on patches",
+      "name": "patches"
+    },
+    {
+      "description": "Operations on patch external sources",
+      "name": "patchexternalsources"
+    },
+    {
+      "description": "Operations on patch internal sources",
+      "name": "patchinternalsources"
+    },
+    {
+      "description": "Operations on patch policies",
+      "name": "patchpolicies"
+    },
+    {
+      "description": "Operations on patch reports",
+      "name": "patchreports"
+    },
+    {
+      "description": "Operations on patch software titles",
+      "name": "patchsoftwaretitles"
+    },
+    {
+      "description": "Operations on peripherals",
+      "name": "peripherals"
+    },
+    {
+      "description": "Operations on peripheraltypes",
+      "name": "peripheraltypes"
+    },
+    {
+      "description": "Operations on policies",
+      "name": "policies"
+    },
+    {
+      "description": "Operations on printers",
+      "name": "printers"
+    },
+    {
+      "description": "Operations on removablemmacaddresses",
+      "name": "removablemacaddresses"
+    },
+    {
+      "description": "Operations on restrictedsoftware",
+      "name": "restrictedsoftware"
+    },
+    {
+      "description": "Operations on savedsearches (deprecated)",
+      "name": "savedsearches"
+    },
+    {
+      "description": "Operations on scripts",
+      "name": "scripts"
+    },
+    {
+      "description": "Operations on sites",
+      "name": "sites"
+    },
+    {
+      "description": "Operations on smtpserver",
+      "name": "smtpserver"
+    },
+    {
+      "description": "Operations on softwareupdateservers",
+      "name": "softwareupdateservers"
+    },
+    {
+      "description": "Operations on userextensionattributes",
+      "name": "userextensionattributes"
+    },
+    {
+      "description": "Operations on usergroups",
+      "name": "usergroups"
+    },
+    {
+      "description": "Operations on users",
+      "name": "users"
+    },
+    {
+      "description": "Operations on vppaccounts",
+      "name": "vppaccounts"
+    },
+    {
+      "description": "Operations on vppassignments",
+      "name": "vppassignments"
+    },
+    {
+      "description": "Operations on vppinvitations",
+      "name": "vppinvitations"
+    },
+    {
+      "description": "Operations on webhooks",
+      "name": "webhooks"
+    }
+  ]
+}

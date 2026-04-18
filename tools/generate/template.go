@@ -179,7 +179,11 @@ type {{ .Name }} struct {
 {{- if .Comment }}
 	// {{ .Comment }}
 {{- end }}
+{{- if eq $.Format "xml" }}
+	{{ .Name }} {{ .Type }} ` + "`" + `xml:"{{ .JSONTag }}"` + "`" + `
+{{- else }}
 	{{ .Name }} {{ .Type }} ` + "`" + `json:"{{ .JSONTag }}"` + "`" + `
+{{- end }}
 {{- end }}
 }
 {{- else }}
@@ -489,7 +493,11 @@ func Test<% .Name %>(t *testing.T) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
 		}
+		<%- if eq .Format "xml" %>
+		writeXML(t, w, http.StatusOK, "<<% .ResponseType %>></<% .ResponseType %>>")
+		<%- else %>
 		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		<%- end %>
 	})
 
 	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
@@ -504,11 +512,15 @@ func Test<% .Name %>(t *testing.T) {
 func Test<% .Name %>_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, _ *http.Request) {
+		<%- if eq .Format "xml" %>
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+		<%- else %>
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
 			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
 		})
+		<%- end %>
 	})
 
 	_, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)

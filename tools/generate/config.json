@@ -137,6 +137,17 @@
         {"op": "DELETE /v1/packages/{id}", "name": "DeletePackageV1"},
         {"op": "POST /v1/packages/{id}/upload", "name": "UploadPackageV1"}
       ]
+    },
+    {
+      "file": "testing/proclassic.yaml",
+      "namespace": "proclassic",
+      "package": "proclassic",
+      "specFile": "classic_api_resource_documentation.json",
+      "format": "xml",
+      "splitByTag": true,
+      "operations": [
+        {"op": "GET /computers/id/{id}", "name": "GetComputerByID", "responseType": "Computer", "pathNames": {"id": "id"}}
+      ]
     }
   ]
 }
