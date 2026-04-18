@@ -15,14 +15,6 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------
-
 // ListBenchmarkRuleDevices get devices for a benchmark report rule.
 func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID string, sort string, deviceSearch string, ruleResult string) ([]DeviceRuleResult, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")

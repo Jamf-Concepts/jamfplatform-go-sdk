@@ -5,10 +5,6 @@
 
 package devicegroups
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 // ApiErrorCauseRepresentation represents a api error cause representation.
 type ApiErrorCauseRepresentation struct {
 	Code        string `json:"code"`
@@ -114,7 +110,3 @@ type PaginatedResponseRepresentation struct {
 	TotalCount  int  `json:"totalCount"`
 	TotalPages  int  `json:"totalPages"`
 }
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------

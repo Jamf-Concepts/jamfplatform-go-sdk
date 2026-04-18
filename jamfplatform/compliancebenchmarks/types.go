@@ -5,10 +5,6 @@
 
 package compliancebenchmarks
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 // BaselineInfo represents a baseline info.
 type BaselineInfo struct {
 	BaselineID  string `json:"baselineId"`
@@ -202,7 +198,3 @@ type RuleResult struct {
 
 // RuleResultState represents a rule result state value.
 type RuleResultState = string
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------

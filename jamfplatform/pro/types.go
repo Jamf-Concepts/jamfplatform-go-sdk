@@ -5,10 +5,6 @@
 
 package pro
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 // ApiError represents a api error.
 type ApiError struct {
 	Errors     []ApiErrorCause `json:"errors"`
@@ -60,7 +56,3 @@ type StartupStatus struct {
 	WarningCode             *string `json:"warningCode,omitempty"`
 	WarningParam            *string `json:"warningParam,omitempty"`
 }
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------

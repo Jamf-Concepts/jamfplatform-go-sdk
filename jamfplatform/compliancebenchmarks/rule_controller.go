@@ -12,14 +12,6 @@ import (
 	"net/url"
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------
-
 // GetBaselineRules get list of rules for given baseline.
 func (c *Client) GetBaselineRules(ctx context.Context, baselineID string) (*SourcedRules, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")

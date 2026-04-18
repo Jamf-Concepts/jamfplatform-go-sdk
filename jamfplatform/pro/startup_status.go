@@ -11,14 +11,6 @@ import (
 	"net/http"
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------
-
 // GetStartupStatus retrieve information about application startup.
 func (c *Client) GetStartupStatus(ctx context.Context) (*StartupStatus, error) {
 	prefix := c.transport.TenantPrefix("pro", "")

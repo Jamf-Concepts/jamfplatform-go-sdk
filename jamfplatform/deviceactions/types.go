@@ -5,10 +5,6 @@
 
 package deviceactions
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 // ApiError represents a api error.
 type ApiError struct {
 	Errors     []map[string]any `json:"errors"`
@@ -30,7 +26,3 @@ type EraseDeviceRequest struct {
 	PreserveDataPlan       *bool   `json:"preserveDataPlan,omitempty"`
 	ReturnToService        *bool   `json:"returnToService,omitempty"`
 }
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------

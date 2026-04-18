@@ -5,10 +5,6 @@
 
 package ddmreport
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 // ApiErrorDto represents a api error dto.
 type ApiErrorDto struct {
 	Errors     []ErrorDto `json:"errors"`
@@ -78,7 +74,3 @@ type StatusReportDeclarationReasonDto struct {
 	Description string                                   `json:"description"`
 	Details     []StatusReportDeclarationReasonDetailDto `json:"details"`
 }
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------

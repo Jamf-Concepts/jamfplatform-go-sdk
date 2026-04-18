@@ -12,14 +12,6 @@ import (
 	"net/url"
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------
-
 // ListDeviceGroupsForDevice get device groups for a device.
 func (c *Client) ListDeviceGroupsForDevice(ctx context.Context, deviceID string) ([]DeviceGroupMemberOfRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")

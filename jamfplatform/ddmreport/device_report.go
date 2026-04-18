@@ -12,14 +12,6 @@ import (
 	"net/url"
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------
-
 // GetDeviceDeclarationReport get device report declarations.
 func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string) (*DeviceReportDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")

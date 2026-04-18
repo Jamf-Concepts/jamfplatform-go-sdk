@@ -9,10 +9,6 @@ import (
 	"encoding/json"
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 // ApiError represents a api error.
 type ApiError struct {
 	Errors     *Error `json:"errors,omitempty"`
@@ -146,7 +142,3 @@ type UpdateBlueprintRequest struct {
 	Scope       *BlueprintScope  `json:"scope,omitempty"`
 	Steps       *[]BlueprintStep `json:"steps,omitempty"`
 }
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------

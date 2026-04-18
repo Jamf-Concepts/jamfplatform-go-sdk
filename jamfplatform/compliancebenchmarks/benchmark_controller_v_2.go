@@ -12,14 +12,6 @@ import (
 	"net/url"
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------
-
 // ListBenchmarks returns list of tenant benchmarks.
 func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")

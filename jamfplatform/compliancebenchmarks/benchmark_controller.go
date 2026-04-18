@@ -12,14 +12,6 @@ import (
 	"net/url"
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------
-
 // DeleteBenchmark removes benchmark with given benchmark ID.
 func (c *Client) DeleteBenchmark(ctx context.Context, benchmarkID string) error {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")

@@ -12,14 +12,6 @@ import (
 	"net/url"
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------
-
 // GetBenchmarkCompliancePercentage get compliance percentage for a benchmark report.
 func (c *Client) GetBenchmarkCompliancePercentage(ctx context.Context, benchmarkID string) (*CompliancePercentage, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")

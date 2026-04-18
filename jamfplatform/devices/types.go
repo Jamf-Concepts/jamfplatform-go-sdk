@@ -5,10 +5,6 @@
 
 package devices
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 // ApiErrorRepresentation represents a api error representation.
 type ApiErrorRepresentation struct {
 	Errors     []map[string]any `json:"errors"`
@@ -108,7 +104,3 @@ type PaginatedResponseRepresentation struct {
 	TotalCount  int  `json:"totalCount"`
 	TotalPages  int  `json:"totalPages"`
 }
-
-// ---------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------
