@@ -144,9 +144,13 @@
       "package": "proclassic",
       "specFile": "classic_api_resource_documentation.json",
       "format": "xml",
+      "rawBody": true,
       "splitByTag": true,
       "operations": [
-        {"op": "GET /computers/id/{id}", "name": "GetComputerByID", "responseType": "Computer", "pathNames": {"id": "id"}}
+        {"op": "GET /computers/id/{id}", "name": "GetComputerByID", "pathNames": {"id": "id"}},
+        {"op": "POST /computers/id/{id}", "name": "CreateComputer", "pathNames": {"id": "id"}},
+        {"op": "PUT /computers/id/{id}", "name": "UpdateComputerByID", "pathNames": {"id": "id"}},
+        {"op": "DELETE /computers/id/{id}", "name": "DeleteComputerByID", "pathNames": {"id": "id"}}
       ]
     }
   ]

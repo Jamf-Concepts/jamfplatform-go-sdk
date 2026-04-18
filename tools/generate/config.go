@@ -27,6 +27,7 @@ type SpecDef struct {
 	Package        string         `json:"package,omitempty"`        // target Go sub-package under jamfplatform/; empty emits to root (legacy)
 	SplitByTag     bool           `json:"splitByTag,omitempty"`     // emit one methods file per OpenAPI tag instead of one per spec
 	Format         string         `json:"format,omitempty"`         // "json" (default) or "xml" — drives struct tag style and transport codec
+	RawBody        bool           `json:"rawBody,omitempty"`        // generate methods that take/return []byte instead of typed structs; consumer owns marshaling (used for Classic where spec has no useful types)
 	Operations     []OperationDef `json:"operations"`
 	ExcludePaths   []string       `json:"excludePaths,omitempty"`   // "METHOD /path" entries the generator must refuse to include
 	SkipDeprecated bool           `json:"skipDeprecated,omitempty"` // omit operations marked deprecated in the spec

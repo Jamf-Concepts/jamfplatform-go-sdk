@@ -21,6 +21,33 @@
   "openapi": "3.0.3",
   "paths": {
     "/computers/id/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "You can DELETE using the resource URLs with parameters of {name}, {udid}, {serial number}, or {macaddress}.",
+        "operationId": "deleteComputerById",
+        "parameters": [
+          {
+            "description": "Id value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified"
+          }
+        },
+        "summary": "Deletes a computer by id",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z"
+      },
       "get": {
         "deprecated": true,
         "operationId": "findComputersById",
@@ -42,6 +69,60 @@
           }
         },
         "summary": "Finds computers by id",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z"
+      },
+      "post": {
+        "deprecated": true,
+        "description": "You can POST using the resource URLs with parameters of {name}, {udid}, {serial number}, or {macaddress}. Certificates and mdm_capable are ignored in a POST.",
+        "operationId": "createComputerById",
+        "parameters": [
+          {
+            "description": "Id value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified"
+          }
+        },
+        "summary": "Creates a computer by specifying an id of 0",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-03-07T00:00:00Z"
+      },
+      "put": {
+        "deprecated": true,
+        "description": "You can PUT using the resource URLs with parameters of {name}, {udid}, {serial number}, or {macaddress}.  Certificates and mdm_capable are ignored in a PUT.",
+        "operationId": "updateComputerById",
+        "parameters": [
+          {
+            "description": "Id value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified"
+          }
+        },
+        "summary": "Updates an existing computer by id",
         "tags": [
           "computers"
         ],

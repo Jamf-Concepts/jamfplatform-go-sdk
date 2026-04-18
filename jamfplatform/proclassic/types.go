@@ -4,14 +4,3 @@
 // SPDX-License-Identifier: MIT
 
 package proclassic
-
-// Computer represents a computer.
-type Computer struct {
-	ID           int64  `xml:"id"`
-	Macaddress   string `xml:"macaddress"`
-	Match        string `xml:"match"`
-	Name         string `xml:"name"`
-	Serialnumber string `xml:"serialnumber"`
-	Subset       string `xml:"subset"`
-	UDID         string `xml:"udid"`
-}

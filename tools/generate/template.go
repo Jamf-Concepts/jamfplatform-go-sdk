@@ -207,6 +207,8 @@ type {{ .Name }} = string
 {{ template "update" . }}
 {{- else if eq .Category "multipart" }}
 {{ template "multipart" . }}
+{{- else if eq .Category "raw" }}
+{{ template "raw" . }}
 {{- else }}
 {{ template "action" . }}
 {{- end }}
@@ -372,6 +374,49 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- end }}
 {{ end }}
 
+{{- define "raw" }}
+// {{ .Comment }}
+{{- if and .RequestType .ResponseType }}
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, body []byte) ([]byte, error) {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	var result []byte
+	endpoint := {{ fmtPath . }}
+	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, body, {{ statusConst .ExpectedStatus }}, &result); err != nil {
+		return nil, fmt.Errorf({{ errWrap . }})
+	}
+	return result, nil
+}
+{{- else if .RequestType }}
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, body []byte) error {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	endpoint := {{ fmtPath . }}
+	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, body, {{ statusConst .ExpectedStatus }}, nil); err != nil {
+		return fmt.Errorf({{ errWrap . }})
+	}
+	return nil
+}
+{{- else if .ResponseType }}
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}) ([]byte, error) {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	var result []byte
+	endpoint := {{ fmtPath . }}
+	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, &result); err != nil {
+		return nil, fmt.Errorf({{ errWrap . }})
+	}
+	return result, nil
+}
+{{- else }}
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}) error {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	endpoint := {{ fmtPath . }}
+	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, nil); err != nil {
+		return fmt.Errorf({{ errWrap . }})
+	}
+	return nil
+}
+{{- end }}
+{{ end }}
+
 {{- define "unwrap" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .UnwrapResults }}, error) {
@@ -481,6 +526,8 @@ import (
 <% template "testUpdate" . %>
 <%- else if eq .Category "multipart" %>
 <% template "testMultipart" . %>
+<%- else if eq .Category "raw" %>
+<% template "testRaw" . %>
 <%- else %>
 <% template "testAction" . %>
 <%- end %>
@@ -616,6 +663,41 @@ func Test<% .Name %>(t *testing.T) {
 	<%- if .ResponseType %>
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+	<%- end %>
+}
+<% end %>
+
+<%- define "testRaw" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != <% httpConst .HTTPMethod %> {
+			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
+		}
+		<%- if .ResponseType %>
+		w.WriteHeader(<% statusConst .ExpectedStatus %>)
+		_, _ = w.Write([]byte("<ok/>"))
+		<%- else %>
+		w.WriteHeader(<% statusConst .ExpectedStatus %>)
+		<%- end %>
+	})
+
+	<%- if and .RequestType .ResponseType %>
+	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %>, []byte("<in/>"))
+	<%- else if .RequestType %>
+	err := c.<% .Name %>(context.Background()<% testCallArgs . %>, []byte("<in/>"))
+	<%- else if .ResponseType %>
+	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %>)
+	<%- else %>
+	err := c.<% .Name %>(context.Background()<% testCallArgs . %>)
+	<%- end %>
+	if err != nil {
+		t.Fatal(err)
+	}
+	<%- if .ResponseType %>
+	if len(result) == 0 {
+		t.Fatal("expected non-empty result body")
 	}
 	<%- end %>
 }

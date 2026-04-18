@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"regexp"
 	"strings"
 
@@ -194,6 +195,27 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 
 	// Determine category
 	m.Category = categorize(m)
+
+	// rawBody specs: generator emits []byte methods with no struct marshaling.
+	// Resets type-driven state so the "raw" template takes over.
+	if spec.RawBody {
+		m.Category = "raw"
+		m.MultipartFields = nil
+		m.PaginationStyle = ""
+		m.UnwrapResults = ""
+		m.ItemType = ""
+		m.ReturnsSlice = false
+		if httpMethod == http.MethodGet || httpMethod == http.MethodDelete {
+			m.RequestType = ""
+		} else {
+			m.RequestType = "[]byte"
+		}
+		if httpMethod == http.MethodDelete {
+			m.ResponseType = ""
+		} else {
+			m.ResponseType = "[]byte"
+		}
+	}
 
 	return m, nil
 }

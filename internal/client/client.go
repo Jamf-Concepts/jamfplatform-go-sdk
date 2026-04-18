@@ -369,14 +369,20 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 	classic := isClassicPath(fullURL)
 
 	if body != nil {
-		var err error
-		if classic {
-			requestBodyBytes, err = xml.Marshal(body)
+		// Raw byte bodies (e.g. Classic XML assembled by the caller) bypass
+		// codec selection — send verbatim.
+		if b, ok := body.([]byte); ok {
+			requestBodyBytes = b
 		} else {
-			requestBodyBytes, err = json.Marshal(body)
-		}
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal request body: %w", err)
+			var err error
+			if classic {
+				requestBodyBytes, err = xml.Marshal(body)
+			} else {
+				requestBodyBytes, err = json.Marshal(body)
+			}
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal request body: %w", err)
+			}
 		}
 	}
 
