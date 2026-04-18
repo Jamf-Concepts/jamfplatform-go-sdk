@@ -88,3 +88,14 @@ func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// ExportBuildingsV1 export Buildings collection.
+func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameters) ([]byte, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result []byte
+	endpoint := prefix + "/buildings/export"
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("ExportBuildingsV1: %w", err)
+	}
+	return result, nil
+}

@@ -437,7 +437,10 @@ func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, exp
 	}
 
 	if result != nil {
-		if err := json.Unmarshal(body, result); err != nil {
+		// Raw byte responses (e.g. text/csv exports) bypass JSON decoding.
+		if bp, ok := result.(*[]byte); ok {
+			*bp = append((*bp)[:0], body...)
+		} else if err := json.Unmarshal(body, result); err != nil {
 			return fmt.Errorf("failed to decode response: %w", err)
 		}
 	}

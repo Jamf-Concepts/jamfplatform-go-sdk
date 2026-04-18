@@ -227,6 +227,67 @@
         ],
         "type": "object"
       },
+      "ExportField": {
+        "description": "Field to be included in the export operation.",
+        "properties": {
+          "fieldLabelOverride": {
+            "description": "Name which should be used for the label in the response - can be in any language. When null the fieldName itself will be used as the label.",
+            "example": "identiteit",
+            "nullable": true,
+            "type": "string"
+          },
+          "fieldName": {
+            "description": "English name of the field to be exported.",
+            "example": "id",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ExportParameters": {
+        "properties": {
+          "fields": {
+            "description": "Used to change default order or ignore some of the fields. When null or empty array, all fields will be exported.",
+            "items": {
+              "$ref": "#/components/schemas/ExportField"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "filter": {
+            "example": "id\u003e=100",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": 0,
+            "example": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "pageSize": {
+            "default": 100,
+            "example": 100,
+            "nullable": true,
+            "type": "integer"
+          },
+          "sort": {
+            "default": [
+              "id:desc"
+            ],
+            "description": "Sorting criteria in the format: [\u003cproperty\u003e[:asc/desc]. Default direction when not stated is ascending.",
+            "example": [
+              "id:asc"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "HrefResponse": {
         "properties": {
           "href": {
@@ -484,6 +545,103 @@
         ],
         "x-required-privileges": [
           "Create Buildings"
+        ]
+      }
+    },
+    "/v1/buildings/export": {
+      "post": {
+        "description": "Export Buildings collection\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/export-fields"
+          },
+          {
+            "$ref": "#/components/parameters/export-labels"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=id:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: id, name. This param can be combined with paging and sorting. Example: name==\"*buildings*\"",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportParameters"
+              }
+            }
+          },
+          "description": "Optional. Override query parameters since they can make URI exceed 2,000 character limit."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "id,name\n1,Marketing\n2,Accounting\n",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "Export successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export fields specified incorrectly - non-existing column or duplicate on the list."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export currently unavailable, all export-related resources are in use. Try again later."
+          }
+        },
+        "summary": "Export Buildings collection\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Buildings"
         ]
       }
     },

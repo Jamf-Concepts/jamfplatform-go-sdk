@@ -45,6 +45,21 @@ type ChangePassword struct {
 	NewPassword string `json:"newPassword"`
 }
 
+// ExportField Field to be included in the export operation.
+type ExportField struct {
+	FieldLabelOverride *string `json:"fieldLabelOverride,omitempty"`
+	FieldName          *string `json:"fieldName,omitempty"`
+}
+
+// ExportParameters represents a export parameters.
+type ExportParameters struct {
+	Fields   *[]ExportField `json:"fields,omitempty"`
+	Filter   *string        `json:"filter,omitempty"`
+	Page     *int           `json:"page,omitempty"`
+	PageSize *int           `json:"pageSize,omitempty"`
+	Sort     *[]string      `json:"sort,omitempty"`
+}
+
 // HrefResponse represents a href response.
 type HrefResponse struct {
 	Href string `json:"href"`

@@ -1281,14 +1281,28 @@ func detectResponse(op *openapi3.Operation) (int, string) {
 		if resp.Value == nil {
 			return code, ""
 		}
-		for _, content := range resp.Value.Content {
-			if content.Schema != nil {
-				return code, refName(content.Schema)
+		for ct, content := range resp.Value.Content {
+			if content.Schema == nil {
+				continue
 			}
+			// Non-JSON content (text/csv, application/octet-stream, etc.)
+			// returns raw bytes — the transport passes the body through
+			// unchanged when result is *[]byte.
+			if !isJSONContentType(ct) {
+				return code, "[]byte"
+			}
+			return code, refName(content.Schema)
 		}
 		return code, ""
 	}
 	return 200, ""
+}
+
+// isJSONContentType reports whether ct is a JSON content type we should
+// decode via encoding/json. Anything else is treated as raw bytes.
+func isJSONContentType(ct string) bool {
+	base := strings.ToLower(strings.TrimSpace(strings.SplitN(ct, ";", 2)[0]))
+	return base == "" || base == "application/json" || strings.HasSuffix(base, "+json")
 }
 
 func detectPaginatedItemType(op *openapi3.Operation) string {
