@@ -43,10 +43,11 @@ type Config struct {
 }
 
 type SpecDef struct {
-	File       string         `json:"file"`
-	Namespace  string         `json:"namespace"`
-	SpecFile   string         `json:"specFile,omitempty"` // override published spec filename
-	Operations []OperationDef `json:"operations"`
+	File         string         `json:"file"`
+	Namespace    string         `json:"namespace"`
+	SpecFile     string         `json:"specFile,omitempty"`     // override published spec filename
+	Operations   []OperationDef `json:"operations"`
+	ExcludePaths []string       `json:"excludePaths,omitempty"` // "METHOD /path" entries the generator must refuse to include
 }
 
 // baseName derives a Go file base name from the spec file path.
@@ -104,6 +105,39 @@ type ExtraParam struct {
 	Spec string
 	Go   string
 	Type string
+}
+
+// validateConfig rejects misconfigured specs before generation runs.
+// Currently enforces that no operation in Operations appears in ExcludePaths —
+// the deny list is meant to catch accidental re-adds, so a conflict means
+// either the entry should be removed from one side or the other.
+func validateConfig(cfg Config) error {
+	for _, spec := range cfg.Specs {
+		excluded := make(map[string]bool, len(spec.ExcludePaths))
+		for _, p := range spec.ExcludePaths {
+			norm := normalizeOpKey(p)
+			if excluded[norm] {
+				return fmt.Errorf("spec %q: duplicate entry in excludePaths: %q", spec.File, p)
+			}
+			excluded[norm] = true
+		}
+		for _, op := range spec.Operations {
+			if excluded[normalizeOpKey(op.Op)] {
+				return fmt.Errorf("spec %q: operation %q is listed in both operations and excludePaths", spec.File, op.Op)
+			}
+		}
+	}
+	return nil
+}
+
+// normalizeOpKey canonicalises "METHOD /path" for comparison — uppercase
+// method, single space, trimmed.
+func normalizeOpKey(s string) string {
+	parts := strings.SplitN(strings.TrimSpace(s), " ", 2)
+	if len(parts) != 2 {
+		return strings.ToUpper(strings.TrimSpace(s))
+	}
+	return strings.ToUpper(parts[0]) + " " + strings.TrimSpace(parts[1])
 }
 
 // ---------------------------------------------------------------------------
@@ -185,6 +219,10 @@ func main() {
 	var cfg Config
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		log.Fatalf("parsing config: %v", err)
+	}
+
+	if err := validateConfig(cfg); err != nil {
+		log.Fatalf("config: %v", err)
 	}
 
 	emittedTypes := make(map[string]bool) // dedup types across specs
