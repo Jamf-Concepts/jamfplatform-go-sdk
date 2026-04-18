@@ -29,4 +29,17 @@
 //	if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
 //		// handle not found
 //	}
+//
+// # Response headers
+//
+// Generated methods return the decoded body only. Response headers —
+// including Location on 201 Created, Retry-After on 429 (which the
+// transport already honors with a bounded single retry), and
+// Deprecation on soon-to-be-removed endpoints (logged automatically)
+// — are available to consumers via the [WithLogger] option. Install a
+// Logger whose LogResponse receives http.Header if you need to inspect
+// Location or any other per-request header.
+//
+// Note that the body returned by create endpoints already carries an
+// "href" field pointing at the new resource, equivalent to Location.
 package jamfplatform
