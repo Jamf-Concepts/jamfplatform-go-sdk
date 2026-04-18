@@ -115,3 +115,14 @@ func (c *Client) DeleteUserByEmail(ctx context.Context, email string) error {
 	}
 	return nil
 }
+
+// ListUsers finds all users.
+func (c *Client) ListUsers(ctx context.Context) (*Users, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Users
+	endpoint := prefix + "/users"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListUsers: %w", err)
+	}
+	return &result, nil
+}

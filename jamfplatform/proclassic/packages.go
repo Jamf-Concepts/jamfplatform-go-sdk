@@ -53,3 +53,14 @@ func (c *Client) DeleteClassicPackageByID(ctx context.Context, id string) error 
 	}
 	return nil
 }
+
+// ListClassicPackages finds all packages.
+func (c *Client) ListClassicPackages(ctx context.Context) (*Packages, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Packages
+	endpoint := prefix + "/packages"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListClassicPackages: %w", err)
+	}
+	return &result, nil
+}

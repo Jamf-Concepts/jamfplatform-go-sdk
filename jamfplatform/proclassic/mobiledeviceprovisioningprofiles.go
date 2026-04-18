@@ -96,3 +96,14 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByUUID(ctx context.Context
 	}
 	return nil
 }
+
+// ListMobileDeviceProvisioningProfiles finds all mobile device provisioning profiles.
+func (c *Client) ListMobileDeviceProvisioningProfiles(ctx context.Context) (*MobileDeviceProvisioningProfiles, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceProvisioningProfiles
+	endpoint := prefix + "/mobiledeviceprovisioningprofiles"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMobileDeviceProvisioningProfiles: %w", err)
+	}
+	return &result, nil
+}

@@ -74,3 +74,14 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 	}
 	return nil
 }
+
+// ListAdvancedMobileDeviceSearches finds all advanced mobile device searches.
+func (c *Client) ListAdvancedMobileDeviceSearches(ctx context.Context) (*AdvancedMobileDeviceSearches, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result AdvancedMobileDeviceSearches
+	endpoint := prefix + "/advancedmobiledevicesearches"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListAdvancedMobileDeviceSearches: %w", err)
+	}
+	return &result, nil
+}

@@ -84,3 +84,14 @@ func (c *Client) DeleteClassByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListClasses finds all classes.
+func (c *Client) ListClasses(ctx context.Context) (*Classes, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Classes
+	endpoint := prefix + "/classes"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListClasses: %w", err)
+	}
+	return &result, nil
+}

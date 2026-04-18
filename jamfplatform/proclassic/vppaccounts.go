@@ -53,3 +53,14 @@ func (c *Client) DeleteVPPAccountByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// ListVPPAccounts finds all VPP Accounts.
+func (c *Client) ListVPPAccounts(ctx context.Context) (*VppAccounts, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result VppAccounts
+	endpoint := prefix + "/vppaccounts"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListVPPAccounts: %w", err)
+	}
+	return &result, nil
+}

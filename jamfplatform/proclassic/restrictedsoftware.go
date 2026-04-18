@@ -84,3 +84,14 @@ func (c *Client) DeleteRestrictedSoftwareByName(ctx context.Context, name string
 	}
 	return nil
 }
+
+// ListRestrictedSoftware finds all restricted software.
+func (c *Client) ListRestrictedSoftware(ctx context.Context) (*RestrictedSoftwareAll, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result RestrictedSoftwareAll
+	endpoint := prefix + "/restrictedsoftware"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListRestrictedSoftware: %w", err)
+	}
+	return &result, nil
+}

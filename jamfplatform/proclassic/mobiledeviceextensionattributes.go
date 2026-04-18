@@ -84,3 +84,14 @@ func (c *Client) DeleteMobileDeviceExtensionAttributeByName(ctx context.Context,
 	}
 	return nil
 }
+
+// ListMobileDeviceExtensionAttributes finds all mobile device extension attributes.
+func (c *Client) ListMobileDeviceExtensionAttributes(ctx context.Context) (*MobileDeviceExtensionAttributes, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceExtensionAttributes
+	endpoint := prefix + "/mobiledeviceextensionattributes"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMobileDeviceExtensionAttributes: %w", err)
+	}
+	return &result, nil
+}

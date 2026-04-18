@@ -84,3 +84,14 @@ func (c *Client) DeleteEbookByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListEbooks finds all ebooks.
+func (c *Client) ListEbooks(ctx context.Context) (*Ebooks, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Ebooks
+	endpoint := prefix + "/ebooks"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListEbooks: %w", err)
+	}
+	return &result, nil
+}

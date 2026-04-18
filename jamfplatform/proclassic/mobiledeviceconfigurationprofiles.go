@@ -84,3 +84,14 @@ func (c *Client) DeleteMobileDeviceConfigurationProfileByName(ctx context.Contex
 	}
 	return nil
 }
+
+// ListMobileDeviceConfigurationProfiles finds all mobile device configuration profiles.
+func (c *Client) ListMobileDeviceConfigurationProfiles(ctx context.Context) (*MobileDeviceConfigurationProfiles, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceConfigurationProfiles
+	endpoint := prefix + "/mobiledeviceconfigurationprofiles"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMobileDeviceConfigurationProfiles: %w", err)
+	}
+	return &result, nil
+}

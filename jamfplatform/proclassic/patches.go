@@ -61,3 +61,16 @@ func (c *Client) DeletePatchByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// ListPatches finds all patches (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations".
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) ListPatches(ctx context.Context) (*PatchManagementSoftwareTitles, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchManagementSoftwareTitles
+	endpoint := prefix + "/patches"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatches: %w", err)
+	}
+	return &result, nil
+}

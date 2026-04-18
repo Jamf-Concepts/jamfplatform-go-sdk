@@ -84,3 +84,14 @@ func (c *Client) DeleteMobileDeviceGroupByName(ctx context.Context, name string)
 	}
 	return nil
 }
+
+// ListMobileDeviceGroups finds all mobile device groups.
+func (c *Client) ListMobileDeviceGroups(ctx context.Context) (*MobileDeviceGroups, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceGroups
+	endpoint := prefix + "/mobiledevicegroups"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMobileDeviceGroups: %w", err)
+	}
+	return &result, nil
+}

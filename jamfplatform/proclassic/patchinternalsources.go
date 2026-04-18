@@ -33,3 +33,14 @@ func (c *Client) GetPatchInternalSourceByName(ctx context.Context, name string) 
 	}
 	return &result, nil
 }
+
+// ListPatchInternalSources finds all patch internal sources.
+func (c *Client) ListPatchInternalSources(ctx context.Context) (*PatchInternalSources, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchInternalSources
+	endpoint := prefix + "/patchinternalsources"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatchInternalSources: %w", err)
+	}
+	return &result, nil
+}

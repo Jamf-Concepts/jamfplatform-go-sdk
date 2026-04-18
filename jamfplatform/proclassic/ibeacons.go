@@ -84,3 +84,14 @@ func (c *Client) DeleteIBeaconByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListIBeacons finds all iBeacon regions.
+func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Ibeacons
+	endpoint := prefix + "/ibeacons"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListIBeacons: %w", err)
+	}
+	return &result, nil
+}

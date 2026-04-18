@@ -157,3 +157,14 @@ func (c *Client) DeleteAccountByUsername(ctx context.Context, name string) error
 	}
 	return nil
 }
+
+// ListAccounts finds all accounts.
+func (c *Client) ListAccounts(ctx context.Context) (*Accounts, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Accounts
+	endpoint := prefix + "/accounts"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListAccounts: %w", err)
+	}
+	return &result, nil
+}

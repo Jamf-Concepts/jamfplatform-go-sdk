@@ -95,3 +95,14 @@ func (c *Client) GetMobileDeviceApplicationByBundleID(ctx context.Context, bundl
 	}
 	return &result, nil
 }
+
+// ListMobileDeviceApplications finds all mobile device applications.
+func (c *Client) ListMobileDeviceApplications(ctx context.Context) (*MobileDeviceApplications, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceApplications
+	endpoint := prefix + "/mobiledeviceapplications"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMobileDeviceApplications: %w", err)
+	}
+	return &result, nil
+}

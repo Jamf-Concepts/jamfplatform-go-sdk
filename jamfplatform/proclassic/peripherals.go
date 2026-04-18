@@ -64,3 +64,14 @@ func (c *Client) GetPeripheralByIDSubset(ctx context.Context, id string, subset 
 	}
 	return &result, nil
 }
+
+// ListPeripherals finds all peripherals.
+func (c *Client) ListPeripherals(ctx context.Context) (*Peripherals, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Peripherals
+	endpoint := prefix + "/peripherals"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPeripherals: %w", err)
+	}
+	return &result, nil
+}

@@ -177,3 +177,14 @@ func (c *Client) DeleteMobileDeviceByMacAddress(ctx context.Context, macAddress 
 	}
 	return nil
 }
+
+// ListMobileDevices finds all mobile devices.
+func (c *Client) ListMobileDevices(ctx context.Context) (*MobileDevices, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDevices
+	endpoint := prefix + "/mobiledevices"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMobileDevices: %w", err)
+	}
+	return &result, nil
+}

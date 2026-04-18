@@ -181,3 +181,33 @@ func TestDeleteMobileDeviceProvisioningProfileByUUID(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestListMobileDeviceProvisioningProfiles(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mobile_device_provisioning_profiles></mobile_device_provisioning_profiles>")
+	})
+
+	result, err := c.ListMobileDeviceProvisioningProfiles(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestListMobileDeviceProvisioningProfiles_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.ListMobileDeviceProvisioningProfiles(context.Background())
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}

@@ -84,3 +84,14 @@ func (c *Client) DeleteUserGroupByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListUserGroups finds all user groups.
+func (c *Client) ListUserGroups(ctx context.Context) (*UserGroups, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result UserGroups
+	endpoint := prefix + "/usergroups"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListUserGroups: %w", err)
+	}
+	return &result, nil
+}

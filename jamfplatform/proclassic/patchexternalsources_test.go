@@ -118,3 +118,33 @@ func TestGetPatchExternalSourceByName_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestListPatchExternalSources(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/patchexternalsources", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<patch_external_sources></patch_external_sources>")
+	})
+
+	result, err := c.ListPatchExternalSources(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestListPatchExternalSources_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/patchexternalsources", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.ListPatchExternalSources(context.Background())
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}

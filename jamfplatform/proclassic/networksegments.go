@@ -84,3 +84,14 @@ func (c *Client) DeleteNetworkSegmentByName(ctx context.Context, name string) er
 	}
 	return nil
 }
+
+// ListNetworkSegments finds all network segments.
+func (c *Client) ListNetworkSegments(ctx context.Context) (*NetworkSegments, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result NetworkSegments
+	endpoint := prefix + "/networksegments"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListNetworkSegments: %w", err)
+	}
+	return &result, nil
+}

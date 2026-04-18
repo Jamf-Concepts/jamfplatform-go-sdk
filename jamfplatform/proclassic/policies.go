@@ -84,3 +84,14 @@ func (c *Client) DeletePolicyByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListPolicies finds all policies.
+func (c *Client) ListPolicies(ctx context.Context) (*Policies, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Policies
+	endpoint := prefix + "/policies"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPolicies: %w", err)
+	}
+	return &result, nil
+}

@@ -74,3 +74,14 @@ func (c *Client) DeleteAdvancedComputerSearchByName(ctx context.Context, name st
 	}
 	return nil
 }
+
+// ListAdvancedComputerSearches finds all advanced computer searches.
+func (c *Client) ListAdvancedComputerSearches(ctx context.Context) (*AdvancedComputerSearches, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result AdvancedComputerSearches
+	endpoint := prefix + "/advancedcomputersearches"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListAdvancedComputerSearches: %w", err)
+	}
+	return &result, nil
+}

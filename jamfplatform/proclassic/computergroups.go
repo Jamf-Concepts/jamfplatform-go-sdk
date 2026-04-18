@@ -84,3 +84,14 @@ func (c *Client) DeleteComputerGroupByName(ctx context.Context, name string) err
 	}
 	return nil
 }
+
+// ListComputerGroups finds all computer groups.
+func (c *Client) ListComputerGroups(ctx context.Context) (*ComputerGroups, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerGroups
+	endpoint := prefix + "/computergroups"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListComputerGroups: %w", err)
+	}
+	return &result, nil
+}

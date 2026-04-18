@@ -84,3 +84,14 @@ func (c *Client) DeleteSoftwareUpdateServerByName(ctx context.Context, name stri
 	}
 	return nil
 }
+
+// ListSoftwareUpdateServers finds all software update servers.
+func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdateServers, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result SoftwareUpdateServers
+	endpoint := prefix + "/softwareupdateservers"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListSoftwareUpdateServers: %w", err)
+	}
+	return &result, nil
+}

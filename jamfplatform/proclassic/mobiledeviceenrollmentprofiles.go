@@ -85,3 +85,14 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByInvitation(ctx context.Contex
 	}
 	return &result, nil
 }
+
+// ListMobileDeviceEnrollmentProfiles finds all mobile device enrollment profiles.
+func (c *Client) ListMobileDeviceEnrollmentProfiles(ctx context.Context) (*MobileDeviceEnrollmentProfiles, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceEnrollmentProfiles
+	endpoint := prefix + "/mobiledeviceenrollmentprofiles"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMobileDeviceEnrollmentProfiles: %w", err)
+	}
+	return &result, nil
+}

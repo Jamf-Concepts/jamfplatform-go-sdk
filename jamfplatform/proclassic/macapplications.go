@@ -84,3 +84,14 @@ func (c *Client) DeleteMacApplicationByName(ctx context.Context, name string) er
 	}
 	return nil
 }
+
+// ListMacApplications finds all mac applications.
+func (c *Client) ListMacApplications(ctx context.Context) (*MacApplications, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MacApplications
+	endpoint := prefix + "/macapplications"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMacApplications: %w", err)
+	}
+	return &result, nil
+}

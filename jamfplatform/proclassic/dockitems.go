@@ -84,3 +84,14 @@ func (c *Client) DeleteDockItemByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListDockItems finds all dock items.
+func (c *Client) ListDockItems(ctx context.Context) (*DockItems, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result DockItems
+	endpoint := prefix + "/dockitems"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListDockItems: %w", err)
+	}
+	return &result, nil
+}

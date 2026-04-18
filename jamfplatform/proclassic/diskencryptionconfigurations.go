@@ -84,3 +84,14 @@ func (c *Client) DeleteDiskEncryptionConfigurationByName(ctx context.Context, na
 	}
 	return nil
 }
+
+// ListDiskEncryptionConfigurations finds all disk encryption configurations.
+func (c *Client) ListDiskEncryptionConfigurations(ctx context.Context) (*DiskEncryptionConfigurations, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result DiskEncryptionConfigurations
+	endpoint := prefix + "/diskencryptionconfigurations"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListDiskEncryptionConfigurations: %w", err)
+	}
+	return &result, nil
+}

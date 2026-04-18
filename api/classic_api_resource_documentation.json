@@ -158,6 +158,61 @@
         ],
         "type": "object"
       },
+      "accounts": {
+        "properties": {
+          "groups": {
+            "properties": {
+              "group": {
+                "items": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "description": "Name of the group",
+                      "example": "Information Technology",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "users": {
+            "properties": {
+              "user": {
+                "items": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "description": "Name of the account",
+                      "example": "Steve Jobs",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
       "activation_code": {
         "properties": {
           "code": {
@@ -271,6 +326,20 @@
         ],
         "type": "object"
       },
+      "advanced_computer_searches": {
+        "items": {
+          "properties": {
+            "advanced_computer_search": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "advanced_mobile_device_search": {
         "properties": {
           "criteria": {
@@ -371,6 +440,20 @@
           "name"
         ],
         "type": "object"
+      },
+      "advanced_mobile_device_searches": {
+        "items": {
+          "properties": {
+            "advanced_mobile_device_search": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
       },
       "advanced_user_search": {
         "properties": {
@@ -491,6 +574,20 @@
         "title": "advanced_user_search",
         "type": "object"
       },
+      "advanced_user_searches": {
+        "items": {
+          "properties": {
+            "advanced_user_search": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "allowed_file_extension": {
         "properties": {
           "extension": {
@@ -507,6 +604,20 @@
           "extension"
         ],
         "type": "object"
+      },
+      "allowed_file_extensions": {
+        "items": {
+          "properties": {
+            "allowed_file_extension": {
+              "$ref": "#/components/schemas/allowed_file_extension"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
       },
       "attachment": {
         "properties": {
@@ -542,6 +653,20 @@
         ],
         "type": "object"
       },
+      "buildings": {
+        "items": {
+          "properties": {
+            "building": {
+              "$ref": "#/components/schemas/building"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "byoprofile": {
         "properties": {
           "general": {
@@ -573,6 +698,34 @@
           }
         },
         "type": "object"
+      },
+      "byoprofiles": {
+        "items": {
+          "properties": {
+            "byoprofile": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "categories": {
+        "items": {
+          "properties": {
+            "category": {
+              "$ref": "#/components/schemas/category"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
       },
       "category": {
         "properties": {
@@ -805,6 +958,33 @@
         ],
         "title": "class",
         "type": "object"
+      },
+      "classes": {
+        "items": {
+          "properties": {
+            "class": {
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "description": "Name of the class",
+                  "example": "Biology 101",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "computer": {
         "properties": {
@@ -1845,6 +2025,75 @@
         },
         "type": "object"
       },
+      "computer_commands": {
+        "items": {
+          "properties": {
+            "computer_command": {
+              "properties": {
+                "command": {
+                  "description": "Command type",
+                  "example": "DeviceLock",
+                  "type": "string"
+                },
+                "computers": {
+                  "items": {
+                    "properties": {
+                      "computer": {
+                        "properties": {
+                          "id": {
+                            "example": 1,
+                            "type": "integer"
+                          },
+                          "ip_address": {
+                            "example": "10.1.1.1",
+                            "type": "string"
+                          },
+                          "udid": {
+                            "example": "002d47b9-ad68-4d58-9fc7-0c4a50950020",
+                            "type": "string"
+                          },
+                          "users": {
+                            "example": "Username",
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "size": {
+                        "$ref": "#/components/schemas/size"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "profile_id": {
+                  "example": -1,
+                  "type": "integer"
+                },
+                "udid": {
+                  "example": "002d47b9-ad68-4d58-9fc7-0c4a50950020",
+                  "type": "string"
+                },
+                "uuid": {
+                  "example": "002d47b9-ad68-4d58-9fc7-0c4a50950020",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "computer_extension_attribute": {
         "properties": {
           "data_type": {
@@ -1906,6 +2155,30 @@
           "name"
         ],
         "type": "object"
+      },
+      "computer_extension_attributes": {
+        "items": {
+          "properties": {
+            "computer_extension_attribute": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
       },
       "computer_group": {
         "properties": {
@@ -1978,6 +2251,36 @@
           }
         },
         "type": "object"
+      },
+      "computer_groups": {
+        "items": {
+          "properties": {
+            "computer_group": {
+              "items": {
+                "properties": {
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "is_smart": {
+                    "type": "boolean"
+                  },
+                  "name": {
+                    "description": "Name of the group",
+                    "example": "Group Name",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "computer_history": {
         "properties": {
@@ -2705,6 +3008,46 @@
         },
         "type": "object"
       },
+      "computer_invitations": {
+        "items": {
+          "properties": {
+            "computer_invitation": {
+              "properties": {
+                "expiration_date": {
+                  "example": "2012-05-07T11:13:35Z",
+                  "type": "string"
+                },
+                "expiration_date_epoch": {
+                  "example": 1336407215609,
+                  "type": "integer"
+                },
+                "expiration_date_utc": {
+                  "example": "2012-05-07T11:13:35.609-0500",
+                  "type": "string"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "invitation": {
+                  "example": 7.249663721735319e+37,
+                  "type": "integer"
+                },
+                "invitation_type": {
+                  "example": "USER_INITATIED_EMAIL",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "computer_management": {
         "properties": {
           "ebooks": {
@@ -2878,6 +3221,42 @@
           "name": "computer_reports"
         }
       },
+      "computer_reports": {
+        "items": {
+          "properties": {
+            "computer_report": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "example": "Advanced Search Name",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
+      "computers": {
+        "items": {
+          "properties": {
+            "computer": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "criterion": {
         "properties": {
           "and_or": {
@@ -2932,6 +3311,19 @@
         ],
         "type": "object"
       },
+      "departments": {
+        "items": {
+          "properties": {
+            "department": {
+              "$ref": "#/components/schemas/department"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "directory_binding": {
         "properties": {
           "computer_ou": {
@@ -2975,6 +3367,19 @@
         ],
         "type": "object"
       },
+      "directory_bindings": {
+        "items": {
+          "properties": {
+            "directory_binding": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "disk_encryption_configuration": {
         "properties": {
           "file_vault_enabled_users": {
@@ -3008,6 +3413,19 @@
           "name"
         ],
         "type": "object"
+      },
+      "disk_encryption_configurations": {
+        "items": {
+          "properties": {
+            "disk_encryption_configuration": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "distribution_point": {
         "properties": {
@@ -3144,6 +3562,19 @@
         ],
         "type": "object"
       },
+      "distribution_points": {
+        "items": {
+          "properties": {
+            "distribution_point": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "dock_item": {
         "properties": {
           "contents": {
@@ -3178,6 +3609,19 @@
           "type"
         ],
         "type": "object"
+      },
+      "dock_items": {
+        "items": {
+          "properties": {
+            "dock_item": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "ebook": {
         "properties": {
@@ -3697,6 +4141,20 @@
         },
         "type": "object"
       },
+      "ebooks": {
+        "items": {
+          "properties": {
+            "ebook": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "group": {
         "properties": {
           "access_level": {
@@ -4048,6 +4506,33 @@
           "adt_message_field"
         ]
       },
+      "healthcare_listener_rules": {
+        "items": {
+          "properties": {
+            "healthcare_listener_rule": {
+              "$ref": "#/components/schemas/healthcare_listener_rule"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
+      "healthcare_listeners": {
+        "items": {
+          "properties": {
+            "healthcare_listener": {
+              "$ref": "#/components/schemas/healthcare_listener"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "ibeacon": {
         "properties": {
           "id": {
@@ -4077,6 +4562,20 @@
           "uuid"
         ],
         "type": "object"
+      },
+      "ibeacons": {
+        "items": {
+          "properties": {
+            "ibeacon": {
+              "$ref": "#/components/schemas/ibeacon"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
       },
       "id_name": {
         "properties": {
@@ -4123,6 +4622,20 @@
         },
         "type": "object"
       },
+      "infrastructure_managers": {
+        "items": {
+          "properties": {
+            "infrastructure_manager": {
+              "$ref": "#/components/schemas/infrastructure_manager"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "json_web_token_configuration": {
         "properties": {
           "disabled": {
@@ -4146,6 +4659,17 @@
           "name"
         ],
         "type": "object"
+      },
+      "json_web_token_configurations": {
+        "items": {
+          "properties": {
+            "json_web_token_configuration": {
+              "$ref": "#/components/schemas/json_web_token_configuration"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
       },
       "jss_user": {
         "properties": {
@@ -4448,6 +4972,20 @@
         },
         "type": "object"
       },
+      "ldap_servers": {
+        "items": {
+          "properties": {
+            "ldap_server": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "licensed_software": {
         "properties": {
           "font_definitions": {
@@ -4623,6 +5161,30 @@
           }
         },
         "type": "object"
+      },
+      "licensed_software_all": {
+        "items": {
+          "properties": {
+            "licensed_software": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "description": "Name of the licensed software",
+                  "example": "Adobe Creative Suite",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "type": "array",
+        "xml": {
+          "name": "licensed_software"
+        }
       },
       "licensed_software_defintion": {
         "properties": {
@@ -5095,6 +5657,27 @@
           }
         },
         "type": "object"
+      },
+      "mac_applications": {
+        "items": {
+          "properties": {
+            "mac_application": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "description": "Name of the application",
+                  "example": "TextWrangler.app",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "type": "array"
       },
       "mobile_device": {
         "properties": {
@@ -6105,6 +6688,41 @@
         },
         "type": "object"
       },
+      "mobile_device_applications": {
+        "items": {
+          "properties": {
+            "mobile_device_application": {
+              "properties": {
+                "bundle_id": {
+                  "example": "com.jamfsoftware.selfservice",
+                  "type": "string"
+                },
+                "display_name": {
+                  "example": "Self Service Mobile",
+                  "type": "string"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "internal_app": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "example": "Self Service Mobile",
+                  "type": "string"
+                },
+                "version": {
+                  "example": 9.98,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "type": "array"
+      },
       "mobile_device_command": {
         "properties": {
           "general": {
@@ -6309,6 +6927,69 @@
         "xml": {
           "name": "mobile_device_command"
         }
+      },
+      "mobile_device_commands": {
+        "items": {
+          "properties": {
+            "mobile_device_command": {
+              "properties": {
+                "command": {
+                  "example": "ClearPasscode",
+                  "type": "string"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "profile_id": {
+                  "type": "integer"
+                },
+                "udid": {
+                  "example": "be597b7d-d0a4-42e6-ab98-18d1fd0c5640",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "mobile_devices": {
+              "properties": {
+                "mobile_device": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "phone_number": {
+                      "example": "123-555-6789",
+                      "type": "string"
+                    },
+                    "serial_number": {
+                      "example": "F19QMFBYFRY7",
+                      "type": "string"
+                    },
+                    "udid": {
+                      "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                      "type": "string"
+                    },
+                    "wifi_mac_address": {
+                      "example": "E0:AC:CB:97:36:G4",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "mobile_device_configuration_profile": {
         "properties": {
@@ -6723,6 +7404,30 @@
           "name": "configuration_profile"
         }
       },
+      "mobile_device_configuration_profiles": {
+        "items": {
+          "properties": {
+            "configuration_profile": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "description": "Name of the configuration profile",
+                  "example": "Corporate Wireless",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "type": "array",
+        "xml": {
+          "name": "configuration_profiles"
+        }
+      },
       "mobile_device_enrollment_profile": {
         "properties": {
           "attachments": {
@@ -6771,6 +7476,34 @@
           }
         },
         "type": "object"
+      },
+      "mobile_device_enrollment_profiles": {
+        "items": {
+          "properties": {
+            "mobile_device_enrollment_profile": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "invitation": {
+                  "example": 2.0938027893325487e+38,
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the enrollment profile",
+                  "example": "Configurator Enrollment Profile",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "mobile_device_extension_attribute": {
         "properties": {
@@ -6824,6 +7557,29 @@
           "name"
         ],
         "type": "object"
+      },
+      "mobile_device_extension_attributes": {
+        "items": {
+          "properties": {
+            "mobile_device_extension_attribute": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "example": "Asset Selector",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "mobile_device_group": {
         "properties": {
@@ -6897,6 +7653,29 @@
           "is_smart"
         ],
         "type": "object"
+      },
+      "mobile_device_groups": {
+        "items": {
+          "properties": {
+            "mobile_device_group": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "is_smart": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "example": "iOS 9 Devices",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "type": "array"
       },
       "mobile_device_history": {
         "properties": {
@@ -7431,6 +8210,50 @@
         },
         "type": "object"
       },
+      "mobile_device_invitations": {
+        "items": {
+          "properties": {
+            "mobile_device_invitation": {
+              "properties": {
+                "expiration_date": {
+                  "example": "2012-05-07T11:13:35Z",
+                  "type": "string"
+                },
+                "expiration_date_epoch": {
+                  "example": 1336407215609,
+                  "type": "integer"
+                },
+                "expiration_date_utc": {
+                  "example": "2012-05-07T11:13:35.609-0500",
+                  "type": "string"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "invitation": {
+                  "example": 7.249663721735319e+37,
+                  "type": "integer"
+                },
+                "invitation_type": {
+                  "example": "USER_INITATIED_EMAIL",
+                  "type": "string"
+                },
+                "last_action": {
+                  "example": "NONE",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
       "mobile_device_provisioning_profile": {
         "properties": {
           "general": {
@@ -7456,6 +8279,100 @@
           }
         },
         "type": "object"
+      },
+      "mobile_device_provisioning_profiles": {
+        "items": {
+          "properties": {
+            "mobile_device_provisioning_profile": {
+              "properties": {
+                "display_name": {
+                  "example": "in-house app profile",
+                  "type": "string"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "example": "in-house app profile",
+                  "type": "string"
+                },
+                "uuid": {
+                  "example": "116AF1E6-7EB5-4335-B598-276CDE5E015B",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "mobile_devices": {
+        "items": {
+          "properties": {
+            "mobile_device": {
+              "properties": {
+                "device_name": {
+                  "example": "Kathys iPhone",
+                  "type": "string"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "managed": {
+                  "type": "boolean"
+                },
+                "model": {
+                  "example": "iPhone 6S",
+                  "type": "string"
+                },
+                "model_display": {
+                  "example": "MKRY2LL",
+                  "type": "string"
+                },
+                "model_identifier": {
+                  "example": "iPhone8,1",
+                  "type": "string"
+                },
+                "name": {
+                  "example": "Kathys iPhone",
+                  "type": "string"
+                },
+                "phone_number": {
+                  "example": "123-555-6789",
+                  "type": "string"
+                },
+                "serial_number": {
+                  "example": "C02Q7KHTGFWF",
+                  "type": "string"
+                },
+                "supervised": {
+                  "type": "boolean"
+                },
+                "udid": {
+                  "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                  "type": "string"
+                },
+                "username": {
+                  "example": "Kathy",
+                  "type": "string"
+                },
+                "wifi_mac_address": {
+                  "example": "E0:AC:CB:97:36:G4",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "type": "array"
       },
       "network_segment": {
         "properties": {
@@ -7509,6 +8426,38 @@
           "ending_address"
         ],
         "type": "object"
+      },
+      "network_segments": {
+        "items": {
+          "properties": {
+            "network_segment": {
+              "properties": {
+                "ending_address": {
+                  "example": "10.10.1.1",
+                  "type": "string"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "description": "Name of the network segment",
+                  "example": "Amsterdam Office",
+                  "type": "string"
+                },
+                "starting_address": {
+                  "example": "10.1.1.1",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "os_x_configuration_profile": {
         "properties": {
@@ -7933,6 +8882,19 @@
         },
         "type": "object"
       },
+      "os_x_configuration_profiles": {
+        "items": {
+          "properties": {
+            "os_x_configuration_profile": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "package": {
         "properties": {
           "allow_uninstalled": {
@@ -8018,6 +8980,19 @@
         ],
         "type": "object"
       },
+      "packages": {
+        "items": {
+          "properties": {
+            "package": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "patch_available_titles": {
         "properties": {
           "available_titles": {
@@ -8085,6 +9060,19 @@
         ],
         "type": "object"
       },
+      "patch_external_sources": {
+        "items": {
+          "properties": {
+            "patch_external_source": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "patch_internal_source": {
         "properties": {
           "enabled": {
@@ -8105,6 +9093,63 @@
           }
         },
         "type": "object"
+      },
+      "patch_internal_sources": {
+        "items": {
+          "properties": {
+            "patch_internal_source": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
+      "patch_management_software_titles": {
+        "items": {
+          "properties": {
+            "patch_management_software_title": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "example": "Google Chrome",
+                  "type": "string"
+                },
+                "name_id": {
+                  "example": "GoogleChrome",
+                  "type": "string"
+                },
+                "source_id": {
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
+      "patch_policies": {
+        "items": {
+          "properties": {
+            "patch_policy": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "patch_policy": {
         "properties": {
@@ -8580,6 +9625,34 @@
         },
         "type": "object"
       },
+      "patch_software_titles": {
+        "items": {
+          "properties": {
+            "patch_software_title": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name_id": {
+                  "example": "GoogleChromne",
+                  "type": "string"
+                },
+                "source_id": {
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "example": 1,
+              "type": "integer"
+            }
+          }
+        },
+        "type": "array"
+      },
       "peripheral": {
         "properties": {
           "attachments": {
@@ -8697,6 +9770,67 @@
           "name"
         ],
         "type": "object"
+      },
+      "peripheral_types": {
+        "items": {
+          "properties": {
+            "peripheral_type": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
+      "peripherals": {
+        "items": {
+          "properties": {
+            "peripheral": {
+              "properties": {
+                "bar_code_1": {
+                  "type": "string"
+                },
+                "bar_code_2": {
+                  "type": "string"
+                },
+                "computer_id": {
+                  "example": -1,
+                  "type": "integer"
+                },
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
+      "policies": {
+        "items": {
+          "properties": {
+            "policy": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "policy": {
         "properties": {
@@ -9686,6 +10820,19 @@
         ],
         "type": "object"
       },
+      "printers": {
+        "items": {
+          "properties": {
+            "printer": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "purchasing": {
         "properties": {
           "applecare_id": {
@@ -9757,6 +10904,16 @@
             "type": "string"
           }
         }
+      },
+      "removable_mac_addresses": {
+        "items": {
+          "properties": {
+            "removable_mac_address": {
+              "$ref": "#/components/schemas/removable_mac_address"
+            }
+          }
+        },
+        "type": "array"
       },
       "restricted_software": {
         "properties": {
@@ -9907,6 +11064,22 @@
         },
         "type": "object"
       },
+      "restricted_software_all": {
+        "items": {
+          "properties": {
+            "restricted_software_title": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array",
+        "xml": {
+          "name": "restricted_software"
+        }
+      },
       "script": {
         "properties": {
           "category": {
@@ -9986,6 +11159,19 @@
         ],
         "type": "object"
       },
+      "scripts": {
+        "items": {
+          "properties": {
+            "script": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "site": {
         "properties": {
           "id": {
@@ -10022,6 +11208,19 @@
         "xml": {
           "name": "site"
         }
+      },
+      "sites": {
+        "items": {
+          "properties": {
+            "site": {
+              "$ref": "#/components/schemas/site"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
       },
       "size": {
         "example": 1,
@@ -10199,6 +11398,19 @@
           "ip_address"
         ],
         "type": "object"
+      },
+      "software_update_servers": {
+        "items": {
+          "properties": {
+            "size": {
+              "$ref": "#/components/schemas/size"
+            },
+            "software_update_server": {
+              "$ref": "#/components/schemas/id_name"
+            }
+          }
+        },
+        "type": "array"
       },
       "user": {
         "properties": {
@@ -10380,6 +11592,19 @@
         ],
         "type": "object"
       },
+      "user_extension_attributes": {
+        "items": {
+          "properties": {
+            "size": {
+              "$ref": "#/components/schemas/size"
+            },
+            "user_extension_attribute": {
+              "$ref": "#/components/schemas/id_name"
+            }
+          }
+        },
+        "type": "array"
+      },
       "user_group": {
         "properties": {
           "criteria": {
@@ -10489,6 +11714,49 @@
         ],
         "type": "object"
       },
+      "user_groups": {
+        "items": {
+          "properties": {
+            "size": {
+              "$ref": "#/components/schemas/size"
+            },
+            "user_group": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "is_notify_on_change": {
+                  "type": "boolean"
+                },
+                "is_smart": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "description": "Name of the user group",
+                  "example": "Teachers",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "type": "array"
+      },
+      "users": {
+        "items": {
+          "properties": {
+            "size": {
+              "$ref": "#/components/schemas/size"
+            },
+            "user": {
+              "$ref": "#/components/schemas/id_name"
+            }
+          }
+        },
+        "type": "array"
+      },
       "vpp_account": {
         "properties": {
           "account_name": {
@@ -10544,6 +11812,19 @@
           "service_token"
         ],
         "type": "object"
+      },
+      "vpp_accounts": {
+        "items": {
+          "properties": {
+            "size": {
+              "$ref": "#/components/schemas/size"
+            },
+            "vpp_account": {
+              "$ref": "#/components/schemas/id_name"
+            }
+          }
+        },
+        "type": "array"
       },
       "vpp_assignment": {
         "properties": {
@@ -10718,6 +11999,30 @@
           }
         },
         "type": "object"
+      },
+      "vpp_assignments": {
+        "items": {
+          "properties": {
+            "vpp_assignment": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "example": "9th Grade VPP Assignments",
+                  "type": "string"
+                },
+                "vpp_admin_account_id": {
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "type": "array"
       },
       "vpp_invitation": {
         "properties": {
@@ -10903,6 +12208,19 @@
         },
         "type": "object"
       },
+      "vpp_invitations": {
+        "items": {
+          "properties": {
+            "size": {
+              "$ref": "#/components/schemas/size"
+            },
+            "vpp_invitation": {
+              "$ref": "#/components/schemas/id_name"
+            }
+          }
+        },
+        "type": "array"
+      },
       "webhook": {
         "properties": {
           "authentication_type": {
@@ -11008,6 +12326,19 @@
           "url"
         ],
         "type": "object"
+      },
+      "webhooks": {
+        "items": {
+          "properties": {
+            "size": {
+              "$ref": "#/components/schemas/size"
+            },
+            "webhook": {
+              "$ref": "#/components/schemas/id_name"
+            }
+          }
+        },
+        "type": "array"
       }
     },
     "securitySchemes": {
@@ -11027,6 +12358,33 @@
   },
   "openapi": "3.0.3",
   "paths": {
+    "/accounts": {
+      "get": {
+        "operationId": "findAccounts",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/accounts"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/accounts"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all accounts",
+        "tags": [
+          "accounts"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/accounts/groupid/{id}": {
       "delete": {
         "operationId": "deleteGroupById",
@@ -11475,6 +12833,35 @@
         "x-explorer-enabled": false
       }
     },
+    "/advancedcomputersearches": {
+      "get": {
+        "operationId": "findAdvancedComputerSearches",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_computer_searches"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_computer_searches"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "summary": "Finds all advanced computer searches",
+        "tags": [
+          "advancedcomputersearches"
+        ]
+      }
+    },
     "/advancedcomputersearches/id/{id}": {
       "delete": {
         "operationId": "deleteAdvancedComputerSearchById",
@@ -11643,6 +13030,32 @@
         "summary": "Finds advanced computer searches by name",
         "tags": [
           "advancedcomputersearches"
+        ]
+      }
+    },
+    "/advancedmobiledevicesearches": {
+      "get": {
+        "operationId": "findAdvancedMobileDeviceSearches",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_mobile_device_searches"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_mobile_device_searches"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all advanced mobile device searches",
+        "tags": [
+          "advancedmobiledevicesearches"
         ]
       }
     },
@@ -11815,6 +13228,32 @@
         ]
       }
     },
+    "/advancedusersearches": {
+      "get": {
+        "operationId": "findAdvancedUserSearches",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_user_searches"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/advanced_user_searches"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all advanced user searches",
+        "tags": [
+          "advancedusersearches"
+        ]
+      }
+    },
     "/advancedusersearches/id/{id}": {
       "delete": {
         "operationId": "deleteAdvancedUserSearchById",
@@ -11984,6 +13423,32 @@
         ]
       }
     },
+    "/allowedfileextensions": {
+      "get": {
+        "operationId": "findAllowedFileExtension",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/allowed_file_extensions"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/allowed_file_extensions"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds the allowed file extensions",
+        "tags": [
+          "allowedfileextensions"
+        ]
+      }
+    },
     "/allowedfileextensions/extension/{extension}": {
       "get": {
         "operationId": "findAllowedFileExtensionByName",
@@ -12104,6 +13569,32 @@
           "allowedfileextensions"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/buildings": {
+      "get": {
+        "operationId": "findBuildings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/buildings"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/buildings"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all buildings",
+        "tags": [
+          "buildings"
+        ]
       }
     },
     "/buildings/id/{id}": {
@@ -12297,6 +13788,32 @@
           "buildings"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/byoprofiles": {
+      "get": {
+        "operationId": "findBYOProfiles",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/byoprofiles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/byoprofiles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all personal device profiles",
+        "tags": [
+          "byoprofiles"
+        ]
       }
     },
     "/byoprofiles/id/{id}": {
@@ -12493,6 +14010,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/categories": {
+      "get": {
+        "operationId": "findCategories",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/categories"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/categories"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all categories",
+        "tags": [
+          "categories"
+        ]
+      }
+    },
     "/categories/id/{id}": {
       "delete": {
         "operationId": "deleteCategoryById",
@@ -12684,6 +14227,32 @@
           "categories"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/classes": {
+      "get": {
+        "operationId": "findClasses",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/classes"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/classes"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all classes",
+        "tags": [
+          "classes"
+        ]
       }
     },
     "/classes/id/{id}": {
@@ -12989,6 +14558,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/computercommands": {
+      "get": {
+        "operationId": "findComputerCommands",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_commands"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_commands"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all computer commands",
+        "tags": [
+          "computercommands"
+        ]
+      }
+    },
     "/computercommands/command/{command}/id/{id}": {
       "post": {
         "operationId": "createComputerCommandByCommandAndId",
@@ -13102,6 +14697,32 @@
         "summary": "Finds a computer command by UUID",
         "tags": [
           "computercommands"
+        ]
+      }
+    },
+    "/computerextensionattributes": {
+      "get": {
+        "operationId": "findComputerextensionattributes",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_extension_attributes"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_extension_attributes"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all computer extension attributes",
+        "tags": [
+          "computerextensionattributes"
         ]
       }
     },
@@ -13296,6 +14917,32 @@
           "computerextensionattributes"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/computergroups": {
+      "get": {
+        "operationId": "findComputerGroups",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_groups"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_groups"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all computer groups",
+        "tags": [
+          "computergroups"
+        ]
       }
     },
     "/computergroups/id/{id}": {
@@ -13728,6 +15375,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/computerinvitations": {
+      "get": {
+        "operationId": "findComputerInvitations",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_invitations"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_invitations"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all computer invitations",
+        "tags": [
+          "computerinvitations"
+        ]
+      }
+    },
     "/computerinvitations/id/{id}": {
       "delete": {
         "operationId": "deleteComputerInvitationById",
@@ -14004,6 +15677,32 @@
         ]
       }
     },
+    "/computerreports": {
+      "get": {
+        "operationId": "findComputerReports",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all computer reports",
+        "tags": [
+          "computerreports"
+        ]
+      }
+    },
     "/computerreports/id/{id}": {
       "get": {
         "description": "Additional display fields are returned within the `Computer` object",
@@ -14078,6 +15777,34 @@
         "tags": [
           "computerreports"
         ]
+      }
+    },
+    "/computers": {
+      "get": {
+        "deprecated": true,
+        "operationId": "findComputers",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computers"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computers"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all computers",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00Z"
       }
     },
     "/computers/id/{id}": {
@@ -14350,6 +16077,32 @@
         "x-deprecation-date": "2025-02-11T00:00:00Z"
       }
     },
+    "/departments": {
+      "get": {
+        "operationId": "findDepartments",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/departments"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/departments"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all departments",
+        "tags": [
+          "departments"
+        ]
+      }
+    },
     "/departments/id/{id}": {
       "delete": {
         "operationId": "deleteDepartmentById",
@@ -14529,6 +16282,32 @@
           "departments"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/directorybindings": {
+      "get": {
+        "operationId": "findDirectoryBindings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/directory_bindings"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/directory_bindings"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all directory bindings",
+        "tags": [
+          "directorybindings"
+        ]
       }
     },
     "/directorybindings/id/{id}": {
@@ -14724,6 +16503,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/diskencryptionconfigurations": {
+      "get": {
+        "operationId": "findDiskEncryptionConfigurations",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/disk_encryption_configurations"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/disk_encryption_configurations"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all disk encryption configurations",
+        "tags": [
+          "diskencryptionconfigurations"
+        ]
+      }
+    },
     "/diskencryptionconfigurations/id/{id}": {
       "delete": {
         "operationId": "deleteDiskEncryptionConfigurationById",
@@ -14915,6 +16720,32 @@
           "diskencryptionconfigurations"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/distributionpoints": {
+      "get": {
+        "operationId": "findDistributionPoints",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/distribution_points"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/distribution_points"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all distribution points",
+        "tags": [
+          "distributionpoints"
+        ]
       }
     },
     "/distributionpoints/id/{id}": {
@@ -15110,6 +16941,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/dockitems": {
+      "get": {
+        "operationId": "findDockItems",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dock_items"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/dock_items"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all dock items",
+        "tags": [
+          "dockitems"
+        ]
+      }
+    },
     "/dockitems/id/{id}": {
       "delete": {
         "operationId": "deleteDockItemById",
@@ -15301,6 +17158,32 @@
           "dockitems"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/ebooks": {
+      "get": {
+        "operationId": "findEBooks",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ebooks"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ebooks"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all ebooks",
+        "tags": [
+          "ebooks"
+        ]
       }
     },
     "/ebooks/id/{id}": {
@@ -15546,6 +17429,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/healthcarelistener": {
+      "get": {
+        "operationId": "findHealthcareListener",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/healthcare_listeners"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/healthcare_listeners"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Find all Healthcare Listeners",
+        "tags": [
+          "healthcarelistener"
+        ]
+      }
+    },
     "/healthcarelistener/id/{id}": {
       "get": {
         "operationId": "findHealthcareListenersById",
@@ -15605,6 +17514,32 @@
           "healthcarelistener"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/healthcarelistenerrule": {
+      "get": {
+        "operationId": "findHealthcareListenerRule",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/healthcare_listener_rules"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/healthcare_listener_rules"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Find all Healthcare Listener rules",
+        "tags": [
+          "healthcarelistenerrule"
+        ]
       }
     },
     "/healthcarelistenerrule/id/{id}": {
@@ -15691,6 +17626,32 @@
           "healthcarelistenerrule"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/ibeacons": {
+      "get": {
+        "operationId": "findIBeacons",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ibeacons"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ibeacons"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all iBeacon regions",
+        "tags": [
+          "ibeacons"
+        ]
       }
     },
     "/ibeacons/id/{id}": {
@@ -15886,6 +17847,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/infrastructuremanager": {
+      "get": {
+        "operationId": "findInfrastructureManager",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/infrastructure_managers"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/infrastructure_managers"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Find all Infrastructure Managers",
+        "tags": [
+          "infrastructuremanager"
+        ]
+      }
+    },
     "/infrastructuremanager/id/{id}": {
       "get": {
         "operationId": "findInfrastructureManagerById",
@@ -15945,6 +17932,32 @@
           "infrastructuremanager"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/jsonwebtokenconfigurations": {
+      "get": {
+        "operationId": "findJsonWebTokenConfigurations",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/json_web_token_configurations"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/json_web_token_configurations"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all JSON Web Token configurations",
+        "tags": [
+          "jsonwebtokenconfigurations"
+        ]
       }
     },
     "/jsonwebtokenconfigurations/id/{id}": {
@@ -16087,6 +18100,32 @@
         "summary": "Returns basic information about Jamf Pro, as well as privileges of the person requesting the resource. (Deprecated)",
         "tags": [
           "jssuser"
+        ]
+      }
+    },
+    "/ldapservers": {
+      "get": {
+        "operationId": "findLDAPServers",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ldap_servers"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ldap_servers"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all LDAP servers",
+        "tags": [
+          "ldapservers"
         ]
       }
     },
@@ -16269,6 +18308,32 @@
           "ldapservers"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/licensedsoftware": {
+      "get": {
+        "operationId": "findLicensedSoftware",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/licensed_software_all"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/licensed_software_all"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all licensed software",
+        "tags": [
+          "licensedsoftware"
+        ]
       }
     },
     "/licensedsoftware/id/{id}": {
@@ -16467,6 +18532,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/macapplications": {
+      "get": {
+        "operationId": "findMacapps",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mac_applications"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mac_applications"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mac applications",
+        "tags": [
+          "macapplications"
+        ]
+      }
+    },
     "/macapplications/id/{id}": {
       "delete": {
         "operationId": "deleteMacappById",
@@ -16661,6 +18752,32 @@
           "macapplications"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceapplications": {
+      "get": {
+        "operationId": "findMobileDeviceApplications",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_applications"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_applications"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device applications",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
       }
     },
     "/mobiledeviceapplications/bundleid/{bundleid}": {
@@ -16896,6 +19013,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledevicecommands": {
+      "get": {
+        "operationId": "findMobileDeviceCommands",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_commands"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_commands"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device commands",
+        "tags": [
+          "mobiledevicecommands"
+        ]
+      }
+    },
     "/mobiledevicecommands/command": {
       "post": {
         "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values  |\n| ---------- | ------- | ------------ | ------  |\n| DeviceName (deprecated) | device_name | Supervised Device | string  |\n| DeviceLocation | N/A | Supervised and in lost mode | N/A  |\n| DisableLostMode | N/A | Supervised and in lost mode | N/A  |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string  |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string  |\n| EnableLostMode | lost_mode_footnote | optional | string  |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean  |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean  |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer)  |\n| PlayLostModeSound | N/A | Supervised and in lost mode | N/A  |\n| RestartDevice (deprecated) | N/A | Supervised device | N/A  |\n| ScheduleOSUpdate (deprecated) | install_action | iOS 9 - 10.2, enrolled via a Prestage enrollment; and/or iOS 10.3 or later; tvOS 12 or later | 1 = Download the update for users to install, 2 = Download and install the update, and restart devices after installation  |\n| ScheduleOSUpdate (deprecated) | product_version | iOS 11.3 or later, tvOS 12.2 or later | string  |\n| Wallpaper | wallpaper_settings | Supervised device | 1 = Lock screen, 2 = Home screen, 3 = both  |\n| Wallpaper | wallpaper_id | Supervised device (required if wallpaper_content is not set) | Jamf Pro icon ID (integer)  |\n| Wallpaper | wallpaper_content | Supervised device (required if wallpaper_id is not set) | base64 encoded PNG or JPEG  |\n| RefreshCellularPlans | e_sim_server_url | N/A | This URL is obtained from each carrier separately |\n",
@@ -16995,6 +19138,32 @@
         "summary": "Finds a mobile device command by UUID",
         "tags": [
           "mobiledevicecommands"
+        ]
+      }
+    },
+    "/mobiledeviceconfigurationprofiles": {
+      "get": {
+        "operationId": "findMobileDeviceConfigurationProfiles",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_configuration_profiles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_configuration_profiles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device configuration profiles",
+        "tags": [
+          "mobiledeviceconfigurationprofiles"
         ]
       }
     },
@@ -17189,6 +19358,32 @@
           "mobiledeviceconfigurationprofiles"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceenrollmentprofiles": {
+      "get": {
+        "operationId": "findMobileDeviceEnrollmentProfiles",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profiles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profiles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device enrollment profiles",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ]
       }
     },
     "/mobiledeviceenrollmentprofiles/id/{id}": {
@@ -17397,6 +19592,32 @@
         ]
       }
     },
+    "/mobiledeviceextensionattributes": {
+      "get": {
+        "operationId": "findMobiledeviceextensionattributes",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_extension_attributes"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_extension_attributes"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device extension attributes",
+        "tags": [
+          "mobiledeviceextensionattributes"
+        ]
+      }
+    },
     "/mobiledeviceextensionattributes/id/{id}": {
       "delete": {
         "operationId": "deleteMobiledeviceextensionattributeById",
@@ -17588,6 +19809,32 @@
           "mobiledeviceextensionattributes"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevicegroups": {
+      "get": {
+        "operationId": "findMobileDeviceGroups",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_groups"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_groups"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device groups",
+        "tags": [
+          "mobiledevicegroups"
+        ]
       }
     },
     "/mobiledevicegroups/id/{id}": {
@@ -17970,6 +20217,32 @@
         ]
       }
     },
+    "/mobiledeviceinvitations": {
+      "get": {
+        "operationId": "findMobileDeviceInvitations",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_invitations"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_invitations"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device invitations",
+        "tags": [
+          "mobiledeviceinvitations"
+        ]
+      }
+    },
     "/mobiledeviceinvitations/id/{id}": {
       "delete": {
         "operationId": "deleteMobileDeviceInvitationById",
@@ -18059,6 +20332,32 @@
           "mobiledeviceinvitations"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceprovisioningprofiles": {
+      "get": {
+        "operationId": "findMobileDeviceProvisioningProfiles",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profiles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profiles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device provisioning profiles",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ]
       }
     },
     "/mobiledeviceprovisioningprofiles/id/{id}": {
@@ -18298,6 +20597,32 @@
         "summary": "Finds a mobile device provisioning profiles by uuid",
         "tags": [
           "mobiledeviceprovisioningprofiles"
+        ]
+      }
+    },
+    "/mobiledevices": {
+      "get": {
+        "operationId": "findMobileDevices",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_devices"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_devices"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile devices",
+        "tags": [
+          "mobiledevices"
         ]
       }
     },
@@ -18752,6 +21077,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/networksegments": {
+      "get": {
+        "operationId": "findNetworkSegments",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/network_segments"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/network_segments"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all network segments",
+        "tags": [
+          "networksegments"
+        ]
+      }
+    },
     "/networksegments/id/{id}": {
       "delete": {
         "operationId": "deleteNetworkSegmentById",
@@ -18943,6 +21294,32 @@
           "networksegments"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/osxconfigurationprofiles": {
+      "get": {
+        "operationId": "findOsxConfigurationProfiles",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/os_x_configuration_profiles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/os_x_configuration_profiles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all OS X configuration profiles",
+        "tags": [
+          "osxconfigurationprofiles"
+        ]
       }
     },
     "/osxconfigurationprofiles/id/{id}": {
@@ -19138,6 +21515,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/packages": {
+      "get": {
+        "operationId": "findPackages",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/packages"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/packages"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all packages",
+        "tags": [
+          "packages"
+        ]
+      }
+    },
     "/packages/id/{id}": {
       "delete": {
         "operationId": "deletePackageById",
@@ -19284,6 +21687,33 @@
         ]
       }
     },
+    "/patches": {
+      "get": {
+        "deprecated": true,
+        "operationId": "findPatches",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_management_software_titles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_management_software_titles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all patches (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations\".",
+        "tags": [
+          "patches"
+        ]
+      }
+    },
     "/patches/id/{id}": {
       "delete": {
         "deprecated": true,
@@ -19395,6 +21825,32 @@
           "patches"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/patchexternalsources": {
+      "get": {
+        "operationId": "findPatchExternalSources",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_external_sources"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_external_sources"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all patch external sources",
+        "tags": [
+          "patchexternalsources"
+        ]
       }
     },
     "/patchexternalsources/id/{id}": {
@@ -19543,6 +21999,32 @@
         ]
       }
     },
+    "/patchinternalsources": {
+      "get": {
+        "operationId": "findPatchInternalSources",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_internal_sources"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_internal_sources"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all patch internal sources",
+        "tags": [
+          "patchinternalsources"
+        ]
+      }
+    },
     "/patchinternalsources/id/{id}": {
       "get": {
         "operationId": "findPatchInternalSourcesById",
@@ -19614,6 +22096,33 @@
         "summary": "Finds the first patch internal source with the name provided",
         "tags": [
           "patchinternalsources"
+        ]
+      }
+    },
+    "/patchpolicies": {
+      "get": {
+        "deprecated": true,
+        "operationId": "findPatchPolicies",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policies"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policies"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all patch policies. (Deprecated). Please transition use to Jamf Pro API endpoint \"/v2/patch-policies\".",
+        "tags": [
+          "patchpolicies"
         ]
       }
     },
@@ -19803,6 +22312,33 @@
         ]
       }
     },
+    "/patchsoftwaretitles": {
+      "get": {
+        "deprecated": true,
+        "operationId": "PatchsoftwaretitlesGet",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_software_titles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_software_titles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all patch software titles. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ]
+      }
+    },
     "/patchsoftwaretitles/id/{id}": {
       "delete": {
         "deprecated": true,
@@ -19909,6 +22445,32 @@
           "patchsoftwaretitles"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/peripherals": {
+      "get": {
+        "operationId": "findPeripherals",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/peripherals"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/peripherals"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all peripherals",
+        "tags": [
+          "peripherals"
+        ]
       }
     },
     "/peripherals/id/{id}": {
@@ -20061,6 +22623,32 @@
         ]
       }
     },
+    "/peripheraltypes": {
+      "get": {
+        "operationId": "findPeripheralTypes",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/peripheral_types"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/peripheral_types"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all peripheral types",
+        "tags": [
+          "peripheraltypes"
+        ]
+      }
+    },
     "/peripheraltypes/id/{id}": {
       "delete": {
         "operationId": "deletePeripheralTypeById",
@@ -20168,6 +22756,32 @@
           "peripheraltypes"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/policies": {
+      "get": {
+        "operationId": "findPolicies",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/policies"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/policies"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all policies",
+        "tags": [
+          "policies"
+        ]
       }
     },
     "/policies/id/{id}": {
@@ -20363,6 +22977,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/printers": {
+      "get": {
+        "operationId": "findPrinters",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/printers"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/printers"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all printers",
+        "tags": [
+          "printers"
+        ]
+      }
+    },
     "/printers/id/{id}": {
       "delete": {
         "operationId": "deletePrinterById",
@@ -20554,6 +23194,32 @@
           "printers"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/removablemacaddresses": {
+      "get": {
+        "operationId": "findRemovableMacAddresses",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/removable_mac_addresses"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/removable_mac_addresses"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all removable Mac addresses",
+        "tags": [
+          "removablemacaddresses"
+        ]
       }
     },
     "/removablemacaddresses/id/{id}": {
@@ -20749,6 +23415,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/restrictedsoftware": {
+      "get": {
+        "operationId": "findRestrictedSoftware",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restricted_software_all"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/restricted_software_all"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all restricted software",
+        "tags": [
+          "restrictedsoftware"
+        ]
+      }
+    },
     "/restrictedsoftware/id/{id}": {
       "delete": {
         "operationId": "deleteRestrictedSoftwareById",
@@ -20940,6 +23632,32 @@
           "restrictedsoftware"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/scripts": {
+      "get": {
+        "operationId": "findScripts",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/scripts"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/scripts"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all scripts",
+        "tags": [
+          "scripts"
+        ]
       }
     },
     "/scripts/id/{id}": {
@@ -21138,6 +23856,32 @@
           "scripts"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/sites": {
+      "get": {
+        "operationId": "findSites",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/sites"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sites"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all sites",
+        "tags": [
+          "sites"
+        ]
       }
     },
     "/sites/id/{id}": {
@@ -21384,6 +24128,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/softwareupdateservers": {
+      "get": {
+        "operationId": "findSoftwareUpdateServers",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_update_servers"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_update_servers"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all software update servers",
+        "tags": [
+          "softwareupdateservers"
+        ]
+      }
+    },
     "/softwareupdateservers/id/{id}": {
       "delete": {
         "operationId": "deleteSoftwareUpdateServerById",
@@ -21575,6 +24345,32 @@
           "softwareupdateservers"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/userextensionattributes": {
+      "get": {
+        "operationId": "findUserextensionattributes",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_extension_attributes"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_extension_attributes"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all user extension attributes",
+        "tags": [
+          "userextensionattributes"
+        ]
       }
     },
     "/userextensionattributes/id/{id}": {
@@ -21770,6 +24566,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/usergroups": {
+      "get": {
+        "operationId": "findUserGroups",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_groups"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_groups"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all user groups",
+        "tags": [
+          "usergroups"
+        ]
+      }
+    },
     "/usergroups/id/{id}": {
       "delete": {
         "operationId": "deleteUserGroupsById",
@@ -21963,6 +24785,32 @@
           "usergroups"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "findUsers",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/users"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/users"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all users",
+        "tags": [
+          "users"
+        ]
       }
     },
     "/users/email/{email}": {
@@ -22246,6 +25094,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/vppaccounts": {
+      "get": {
+        "operationId": "findVPPAdminAccount",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_accounts"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_accounts"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all VPP Accounts",
+        "tags": [
+          "vppaccounts"
+        ]
+      }
+    },
     "/vppaccounts/id/{id}": {
       "delete": {
         "operationId": "deleteVPPAdminAccountById",
@@ -22357,6 +25231,32 @@
         "x-explorer-enabled": false
       }
     },
+    "/vppassignments": {
+      "get": {
+        "operationId": "findVPPAdminAssignment",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_assignments"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_assignments"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all VPP Assignments",
+        "tags": [
+          "vppassignments"
+        ]
+      }
+    },
     "/vppassignments/id/{id}": {
       "delete": {
         "operationId": "deleteAssignmentById",
@@ -22464,6 +25364,32 @@
           "vppassignments"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/vppinvitations": {
+      "get": {
+        "operationId": "findVPPAdminInvitation",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_invitations"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/vpp_invitations"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all VPP Invitations",
+        "tags": [
+          "vppinvitations"
+        ]
       }
     },
     "/vppinvitations/id/{id}": {
@@ -22575,6 +25501,32 @@
           "vppinvitations"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/webhooks": {
+      "get": {
+        "operationId": "findWebhooks",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/webhooks"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/webhooks"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all webhooks",
+        "tags": [
+          "webhooks"
+        ]
       }
     },
     "/webhooks/id/{id}": {

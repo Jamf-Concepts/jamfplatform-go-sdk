@@ -54,3 +54,14 @@ func (c *Client) GetAllowedFileExtensionByExtension(ctx context.Context, extensi
 	}
 	return &result, nil
 }
+
+// ListAllowedFileExtensions finds the allowed file extensions.
+func (c *Client) ListAllowedFileExtensions(ctx context.Context) (*AllowedFileExtensions, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result AllowedFileExtensions
+	endpoint := prefix + "/allowedfileextensions"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListAllowedFileExtensions: %w", err)
+	}
+	return &result, nil
+}

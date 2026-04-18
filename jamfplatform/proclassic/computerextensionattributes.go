@@ -84,3 +84,14 @@ func (c *Client) DeleteComputerExtensionAttributeByName(ctx context.Context, nam
 	}
 	return nil
 }
+
+// ListComputerExtensionAttributes finds all computer extension attributes.
+func (c *Client) ListComputerExtensionAttributes(ctx context.Context) (*ComputerExtensionAttributes, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerExtensionAttributes
+	endpoint := prefix + "/computerextensionattributes"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListComputerExtensionAttributes: %w", err)
+	}
+	return &result, nil
+}

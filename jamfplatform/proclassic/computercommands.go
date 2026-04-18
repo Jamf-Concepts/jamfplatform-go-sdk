@@ -44,3 +44,14 @@ func (c *Client) GetComputerCommandByName(ctx context.Context, name string) (*Co
 	}
 	return &result, nil
 }
+
+// ListComputerCommands finds all computer commands.
+func (c *Client) ListComputerCommands(ctx context.Context) (*ComputerCommands, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerCommands
+	endpoint := prefix + "/computercommands"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListComputerCommands: %w", err)
+	}
+	return &result, nil
+}

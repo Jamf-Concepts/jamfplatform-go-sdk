@@ -66,3 +66,16 @@ func (c *Client) ListPatchPoliciesBySoftwareTitleConfigID(ctx context.Context, s
 	}
 	return &result, nil
 }
+
+// ListPatchPolicies finds all patch policies. (Deprecated). Please transition use to Jamf Pro API endpoint "/v2/patch-policies".
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) ListPatchPolicies(ctx context.Context) (*PatchPolicies, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchPolicies
+	endpoint := prefix + "/patchpolicies"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatchPolicies: %w", err)
+	}
+	return &result, nil
+}

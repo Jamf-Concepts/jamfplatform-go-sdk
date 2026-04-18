@@ -84,3 +84,14 @@ func (c *Client) DeleteCategoryByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListCategories finds all categories.
+func (c *Client) ListCategories(ctx context.Context) (*Categories, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Categories
+	endpoint := prefix + "/categories"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListCategories: %w", err)
+	}
+	return &result, nil
+}

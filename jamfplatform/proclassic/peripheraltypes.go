@@ -53,3 +53,14 @@ func (c *Client) DeletePeripheralTypeByID(ctx context.Context, id string) error 
 	}
 	return nil
 }
+
+// ListPeripheralTypes finds all peripheral types.
+func (c *Client) ListPeripheralTypes(ctx context.Context) (*PeripheralTypes, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PeripheralTypes
+	endpoint := prefix + "/peripheraltypes"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPeripheralTypes: %w", err)
+	}
+	return &result, nil
+}

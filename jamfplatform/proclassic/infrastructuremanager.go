@@ -32,3 +32,14 @@ func (c *Client) UpdateInfrastructureManagerByID(ctx context.Context, id string,
 	}
 	return nil
 }
+
+// ListInfrastructureManagers find all Infrastructure Managers.
+func (c *Client) ListInfrastructureManagers(ctx context.Context) (*InfrastructureManagers, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result InfrastructureManagers
+	endpoint := prefix + "/infrastructuremanager"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListInfrastructureManagers: %w", err)
+	}
+	return &result, nil
+}

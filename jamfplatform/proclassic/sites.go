@@ -84,3 +84,14 @@ func (c *Client) DeleteSiteByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListSites finds all sites.
+func (c *Client) ListSites(ctx context.Context) (*Sites, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Sites
+	endpoint := prefix + "/sites"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListSites: %w", err)
+	}
+	return &result, nil
+}

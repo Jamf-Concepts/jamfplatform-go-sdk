@@ -74,3 +74,14 @@ func (c *Client) DeleteAdvancedUserSearchByName(ctx context.Context, name string
 	}
 	return nil
 }
+
+// ListAdvancedUserSearches finds all advanced user searches.
+func (c *Client) ListAdvancedUserSearches(ctx context.Context) (*AdvancedUserSearches, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result AdvancedUserSearches
+	endpoint := prefix + "/advancedusersearches"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListAdvancedUserSearches: %w", err)
+	}
+	return &result, nil
+}

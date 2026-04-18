@@ -118,3 +118,16 @@ func (c *Client) DeleteComputerBySerialNumber(ctx context.Context, serialNumber 
 	}
 	return nil
 }
+
+// ListComputers finds all computers.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) ListComputers(ctx context.Context) (*Computers, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Computers
+	endpoint := prefix + "/computers"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListComputers: %w", err)
+	}
+	return &result, nil
+}

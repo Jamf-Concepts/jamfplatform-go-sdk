@@ -84,3 +84,14 @@ func (c *Client) DeleteBYOProfileByName(ctx context.Context, name string) error 
 	}
 	return nil
 }
+
+// ListBYOProfiles finds all personal device profiles.
+func (c *Client) ListBYOProfiles(ctx context.Context) (*Byoprofiles, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Byoprofiles
+	endpoint := prefix + "/byoprofiles"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListBYOProfiles: %w", err)
+	}
+	return &result, nil
+}

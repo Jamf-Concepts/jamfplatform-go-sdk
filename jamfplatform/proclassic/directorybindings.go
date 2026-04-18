@@ -84,3 +84,14 @@ func (c *Client) DeleteDirectoryBindingByName(ctx context.Context, name string) 
 	}
 	return nil
 }
+
+// ListDirectoryBindings finds all directory bindings.
+func (c *Client) ListDirectoryBindings(ctx context.Context) (*DirectoryBindings, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result DirectoryBindings
+	endpoint := prefix + "/directorybindings"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListDirectoryBindings: %w", err)
+	}
+	return &result, nil
+}

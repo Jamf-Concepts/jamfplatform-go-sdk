@@ -84,3 +84,14 @@ func (c *Client) DeletePrinterByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListPrinters finds all printers.
+func (c *Client) ListPrinters(ctx context.Context) (*Printers, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Printers
+	endpoint := prefix + "/printers"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPrinters: %w", err)
+	}
+	return &result, nil
+}

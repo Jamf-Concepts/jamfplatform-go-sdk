@@ -64,3 +64,14 @@ func (c *Client) GetPatchExternalSourceByName(ctx context.Context, name string) 
 	}
 	return &result, nil
 }
+
+// ListPatchExternalSources finds all patch external sources.
+func (c *Client) ListPatchExternalSources(ctx context.Context) (*PatchExternalSources, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchExternalSources
+	endpoint := prefix + "/patchexternalsources"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatchExternalSources: %w", err)
+	}
+	return &result, nil
+}

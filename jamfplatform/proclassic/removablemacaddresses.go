@@ -84,3 +84,14 @@ func (c *Client) DeleteRemovableMacAddressByName(ctx context.Context, name strin
 	}
 	return nil
 }
+
+// ListRemovableMacAddresses finds all removable Mac addresses.
+func (c *Client) ListRemovableMacAddresses(ctx context.Context) (*RemovableMacAddresses, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result RemovableMacAddresses
+	endpoint := prefix + "/removablemacaddresses"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListRemovableMacAddresses: %w", err)
+	}
+	return &result, nil
+}

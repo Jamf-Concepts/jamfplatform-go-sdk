@@ -84,3 +84,14 @@ func (c *Client) DeleteUserExtensionAttributeByName(ctx context.Context, name st
 	}
 	return nil
 }
+
+// ListUserExtensionAttributes finds all user extension attributes.
+func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensionAttributes, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result UserExtensionAttributes
+	endpoint := prefix + "/userextensionattributes"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListUserExtensionAttributes: %w", err)
+	}
+	return &result, nil
+}

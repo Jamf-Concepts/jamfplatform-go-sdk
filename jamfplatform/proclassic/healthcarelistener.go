@@ -32,3 +32,14 @@ func (c *Client) UpdateHealthcareListenerByID(ctx context.Context, id string, re
 	}
 	return nil
 }
+
+// ListHealthcareListeners find all Healthcare Listeners.
+func (c *Client) ListHealthcareListeners(ctx context.Context) (*HealthcareListeners, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result HealthcareListeners
+	endpoint := prefix + "/healthcarelistener"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListHealthcareListeners: %w", err)
+	}
+	return &result, nil
+}

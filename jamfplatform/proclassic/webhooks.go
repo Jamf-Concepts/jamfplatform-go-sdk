@@ -84,3 +84,14 @@ func (c *Client) DeleteWebhookByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListWebhooks finds all webhooks.
+func (c *Client) ListWebhooks(ctx context.Context) (*Webhooks, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Webhooks
+	endpoint := prefix + "/webhooks"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListWebhooks: %w", err)
+	}
+	return &result, nil
+}

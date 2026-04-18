@@ -88,3 +88,33 @@ func TestGetMobileDeviceCommandByName_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestListMobileDeviceCommands(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevicecommands", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mobile_device_commands></mobile_device_commands>")
+	})
+
+	result, err := c.ListMobileDeviceCommands(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestListMobileDeviceCommands_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevicecommands", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.ListMobileDeviceCommands(context.Background())
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}

@@ -53,3 +53,14 @@ func (c *Client) DeleteJsonWebTokenConfigurationByID(ctx context.Context, id str
 	}
 	return nil
 }
+
+// ListJsonWebTokenConfigurations finds all JSON Web Token configurations.
+func (c *Client) ListJsonWebTokenConfigurations(ctx context.Context) (*JsonWebTokenConfigurations, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result JsonWebTokenConfigurations
+	endpoint := prefix + "/jsonwebtokenconfigurations"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListJsonWebTokenConfigurations: %w", err)
+	}
+	return &result, nil
+}

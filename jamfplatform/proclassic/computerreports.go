@@ -33,3 +33,14 @@ func (c *Client) GetComputerReportByName(ctx context.Context, name string) (*Com
 	}
 	return &result, nil
 }
+
+// ListComputerReports finds all computer reports.
+func (c *Client) ListComputerReports(ctx context.Context) (*ComputerReports, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerReports
+	endpoint := prefix + "/computerreports"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListComputerReports: %w", err)
+	}
+	return &result, nil
+}

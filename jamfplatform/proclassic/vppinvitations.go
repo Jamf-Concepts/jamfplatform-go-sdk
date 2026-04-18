@@ -53,3 +53,14 @@ func (c *Client) DeleteVPPInvitationByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// ListVPPInvitations finds all VPP Invitations.
+func (c *Client) ListVPPInvitations(ctx context.Context) (*VppInvitations, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result VppInvitations
+	endpoint := prefix + "/vppinvitations"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListVPPInvitations: %w", err)
+	}
+	return &result, nil
+}

@@ -396,14 +396,22 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 			continue
 		}
 
-		// Top-level array → type alias `type Foo = []FooItem`. Classic's
-		// list schemas (buildings, scripts, etc.) are modelled this way;
-		// the items schema is often inline, so we resolve to a Go type via
-		// schemaRefToGoType, which follows $refs and falls back to a hoisted
-		// nested type for inline object items. Without this branch the
-		// array schema silently drops, leaving methods that reference the
-		// name to fail at compile.
+		// Top-level array → type emission strategy depends on item shape.
+		// For XML specs (Classic) the wire shape is `<root><size>N</size>
+		// <resource>...</resource>*</root>`, modelled in Swagger 2.0 as
+		// `type: array, items: {properties: {size, resource}}`. A raw
+		// Go slice alias can't decode this — Go's xml.Unmarshal requires
+		// a struct root to bind the wrapping element. Detect the {size,
+		// single-ref} pattern and emit a wrapper struct that flattens
+		// the item into a sibling `[]Resource` slice. Non-matching
+		// arrays still get the alias treatment.
 		if schema.Type.Is("array") {
+			if format == "xml" {
+				if wrapper, ok := classicListWrapper(name, specName, schema, doc); ok {
+					types = append(types, wrapper)
+					continue
+				}
+			}
 			itemType := "any"
 			if schema.Items != nil {
 				itemType = schemaRefToGoType(schema.Items)
@@ -461,6 +469,85 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 	return types
 }
 
+// classicListWrapper detects the Jamf Classic list schema shape and
+// returns a GoType representing a proper wrapper struct. The pattern is
+// `type: array, items: {properties: {size, <resource>}}` where <resource>
+// is a single named property (typically a $ref to the resource schema or
+// a simple object). Returns (GoType, true) when the pattern matches;
+// otherwise (GoType{}, false) so the caller falls back to the alias
+// path.
+//
+// Emits roughly:
+//
+//	type Buildings struct {
+//	    XMLName  xml.Name
+//	    Size     *int        `xml:"size,omitempty"`
+//	    Items    []Building  `xml:"building"`
+//	}
+//
+// Tenants return the top-level <buildings> element with any number of
+// <size> and <building> children at the same level, not nested under
+// an intermediate wrapper. Flattening the {size, building} item pair
+// into sibling fields on the wrapper matches the actual wire shape,
+// where a naive []Item slice decodes to sparse pairs.
+func classicListWrapper(goName, specName string, schema *openapi3.Schema, doc *openapi3.T) (GoType, bool) {
+	if schema.Items == nil {
+		return GoType{}, false
+	}
+	itemsVal := schema.Items.Value
+	if itemsVal == nil || len(itemsVal.Properties) == 0 {
+		return GoType{}, false
+	}
+	var sizeProp *openapi3.SchemaRef
+	var resourceName string
+	var resourceProp *openapi3.SchemaRef
+	for name, prop := range itemsVal.Properties {
+		if name == "size" {
+			sizeProp = prop
+			continue
+		}
+		if resourceName != "" {
+			// More than one non-size property — not the Classic pattern.
+			return GoType{}, false
+		}
+		resourceName = name
+		resourceProp = prop
+	}
+	if sizeProp == nil || resourceName == "" || resourceProp == nil {
+		return GoType{}, false
+	}
+	sizeGo := "*int"
+	if sizeProp.Ref != "" {
+		sizeGo = "*" + refName(sizeProp)
+	}
+	resourceGo := refName(resourceProp)
+	wrapper := GoType{
+		Name:    goName,
+		XMLName: specName,
+		Comment: fmt.Sprintf("%s wraps a Jamf Classic list response with a top-level size count and a flat slice of %s.", goName, resourceGo),
+		Fields: []GoField{
+			{Name: "Size", Type: sizeGo, JSONTag: "size,omitempty"},
+			{Name: exportedGoName(plural(resourceName)), Type: "[]" + resourceGo, JSONTag: resourceName},
+		},
+	}
+	_ = doc
+	return wrapper, true
+}
+
+// plural returns a best-effort plural form for the items-field identifier
+// in a Classic list wrapper. The resource element name on the wire is
+// singular (e.g. `<building>`) while the Go field holding the slice reads
+// more naturally as plural (e.g. `Buildings`).
+func plural(singular string) string {
+	switch {
+	case strings.HasSuffix(singular, "y") && len(singular) > 1 && !strings.ContainsAny(singular[len(singular)-2:len(singular)-1], "aeiou"):
+		return singular[:len(singular)-1] + "ies"
+	case strings.HasSuffix(singular, "s"), strings.HasSuffix(singular, "sh"), strings.HasSuffix(singular, "ch"), strings.HasSuffix(singular, "x"):
+		return singular + "es"
+	}
+	return singular + "s"
+}
+
 // addTopLevelIDsForClassic injects a top-level `ID *int` field on Classic
 // types whose id lives inside a nested General sub-object. Classic servers
 // return the new record's id at the top level of the create-response body
@@ -476,10 +563,17 @@ func addTopLevelIDsForClassic(types []GoType) {
 		if len(t.Fields) == 0 || t.AliasTarget != "" || t.IsRawJSON {
 			continue
 		}
-		var hasSubObject, hasTopID bool
+		var hasSubObject, hasTopID, hasSlice bool
 		for _, f := range t.Fields {
 			if f.Name == "ID" {
 				hasTopID = true
+			}
+			// Slice-typed fields signal a list wrapper (Classic's list
+			// response pattern) rather than a single resource. List
+			// wrappers carry no id of their own — the caller reads ids
+			// from the element structs.
+			if strings.HasPrefix(f.Type, "[]") {
+				hasSlice = true
 			}
 			// Any pointer-to-struct field — i.e. a nested sub-object like
 			// General, Connection, Scope — is a signal the server probably
@@ -492,7 +586,7 @@ func addTopLevelIDsForClassic(types []GoType) {
 				hasSubObject = true
 			}
 		}
-		if !hasSubObject || hasTopID {
+		if !hasSubObject || hasTopID || hasSlice {
 			continue
 		}
 		t.Fields = append([]GoField{{

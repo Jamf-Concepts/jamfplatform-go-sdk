@@ -84,3 +84,14 @@ func (c *Client) DeleteLicensedSoftwareByName(ctx context.Context, name string) 
 	}
 	return nil
 }
+
+// ListLicensedSoftware finds all licensed software.
+func (c *Client) ListLicensedSoftware(ctx context.Context) (*LicensedSoftwareAll, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LicensedSoftwareAll
+	endpoint := prefix + "/licensedsoftware"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListLicensedSoftware: %w", err)
+	}
+	return &result, nil
+}

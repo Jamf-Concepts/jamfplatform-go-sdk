@@ -53,3 +53,14 @@ func (c *Client) DeleteVPPAssignmentByID(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// ListVPPAssignments finds all VPP Assignments.
+func (c *Client) ListVPPAssignments(ctx context.Context) (*VppAssignments, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result VppAssignments
+	endpoint := prefix + "/vppassignments"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListVPPAssignments: %w", err)
+	}
+	return &result, nil
+}

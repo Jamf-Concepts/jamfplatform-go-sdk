@@ -43,3 +43,14 @@ func (c *Client) DeleteMobileDeviceInvitationByID(ctx context.Context, id string
 	}
 	return nil
 }
+
+// ListMobileDeviceInvitations finds all mobile device invitations.
+func (c *Client) ListMobileDeviceInvitations(ctx context.Context) (*MobileDeviceInvitations, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceInvitations
+	endpoint := prefix + "/mobiledeviceinvitations"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMobileDeviceInvitations: %w", err)
+	}
+	return &result, nil
+}

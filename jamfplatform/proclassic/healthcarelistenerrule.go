@@ -43,3 +43,14 @@ func (c *Client) UpdateHealthcareListenerRuleByID(ctx context.Context, id string
 	}
 	return nil
 }
+
+// ListHealthcareListenerRules find all Healthcare Listener rules.
+func (c *Client) ListHealthcareListenerRules(ctx context.Context) (*HealthcareListenerRules, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result HealthcareListenerRules
+	endpoint := prefix + "/healthcarelistenerrule"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListHealthcareListenerRules: %w", err)
+	}
+	return &result, nil
+}

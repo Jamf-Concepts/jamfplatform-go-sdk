@@ -84,3 +84,14 @@ func (c *Client) DeleteLDAPServerByName(ctx context.Context, name string) error 
 	}
 	return nil
 }
+
+// ListLDAPServers finds all LDAP servers.
+func (c *Client) ListLDAPServers(ctx context.Context) (*LdapServers, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LdapServers
+	endpoint := prefix + "/ldapservers"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListLDAPServers: %w", err)
+	}
+	return &result, nil
+}

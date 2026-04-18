@@ -84,3 +84,14 @@ func (c *Client) DeleteOSXConfigurationProfileByName(ctx context.Context, name s
 	}
 	return nil
 }
+
+// ListOSXConfigurationProfiles finds all OS X configuration profiles.
+func (c *Client) ListOSXConfigurationProfiles(ctx context.Context) (*OsXConfigurationProfiles, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result OsXConfigurationProfiles
+	endpoint := prefix + "/osxconfigurationprofiles"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListOSXConfigurationProfiles: %w", err)
+	}
+	return &result, nil
+}

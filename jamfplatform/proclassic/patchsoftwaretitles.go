@@ -61,3 +61,16 @@ func (c *Client) DeletePatchSoftwareTitleByID(ctx context.Context, id string) er
 	}
 	return nil
 }
+
+// ListPatchSoftwareTitles finds all patch software titles. (Deprecated) Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations".
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) ListPatchSoftwareTitles(ctx context.Context) (*PatchSoftwareTitles, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchSoftwareTitles
+	endpoint := prefix + "/patchsoftwaretitles"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatchSoftwareTitles: %w", err)
+	}
+	return &result, nil
+}

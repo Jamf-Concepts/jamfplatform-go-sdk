@@ -43,3 +43,14 @@ func (c *Client) DeleteComputerInvitationByID(ctx context.Context, id string) er
 	}
 	return nil
 }
+
+// ListComputerInvitations finds all computer invitations.
+func (c *Client) ListComputerInvitations(ctx context.Context) (*ComputerInvitations, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerInvitations
+	endpoint := prefix + "/computerinvitations"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListComputerInvitations: %w", err)
+	}
+	return &result, nil
+}

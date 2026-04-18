@@ -84,3 +84,14 @@ func (c *Client) DeleteBuildingByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListBuildings finds all buildings.
+func (c *Client) ListBuildings(ctx context.Context) (*Buildings, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Buildings
+	endpoint := prefix + "/buildings"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListBuildings: %w", err)
+	}
+	return &result, nil
+}

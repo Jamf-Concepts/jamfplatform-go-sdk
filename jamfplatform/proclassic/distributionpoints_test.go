@@ -148,3 +148,33 @@ func TestDeleteDistributionPointByName(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestListDistributionPoints(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/distributionpoints", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<distribution_points></distribution_points>")
+	})
+
+	result, err := c.ListDistributionPoints(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestListDistributionPoints_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/distributionpoints", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.ListDistributionPoints(context.Background())
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}

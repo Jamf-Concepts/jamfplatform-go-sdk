@@ -84,3 +84,14 @@ func (c *Client) DeleteDistributionPointByName(ctx context.Context, name string)
 	}
 	return nil
 }
+
+// ListDistributionPoints finds all distribution points.
+func (c *Client) ListDistributionPoints(ctx context.Context) (*DistributionPoints, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result DistributionPoints
+	endpoint := prefix + "/distributionpoints"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListDistributionPoints: %w", err)
+	}
+	return &result, nil
+}

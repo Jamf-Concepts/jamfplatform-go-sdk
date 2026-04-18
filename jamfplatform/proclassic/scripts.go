@@ -84,3 +84,14 @@ func (c *Client) DeleteScriptByName(ctx context.Context, name string) error {
 	}
 	return nil
 }
+
+// ListScripts finds all scripts.
+func (c *Client) ListScripts(ctx context.Context) (*Scripts, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Scripts
+	endpoint := prefix + "/scripts"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListScripts: %w", err)
+	}
+	return &result, nil
+}

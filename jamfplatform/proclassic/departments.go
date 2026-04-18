@@ -84,3 +84,14 @@ func (c *Client) DeleteDepartmentByName(ctx context.Context, name string) error 
 	}
 	return nil
 }
+
+// ListDepartments finds all departments.
+func (c *Client) ListDepartments(ctx context.Context) (*Departments, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Departments
+	endpoint := prefix + "/departments"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListDepartments: %w", err)
+	}
+	return &result, nil
+}
