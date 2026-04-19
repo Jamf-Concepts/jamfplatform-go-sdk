@@ -18132,6 +18132,18 @@
         ],
         "type": "object"
       },
+      "SmtpServerTest": {
+        "properties": {
+          "recipientEmail": {
+            "example": "exampleEmail@example.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "recipientEmail"
+        ],
+        "type": "object"
+      },
       "SmtpServerV2": {
         "properties": {
           "authenticationType": {
@@ -22371,6 +22383,45 @@
         ]
       }
     },
+    "/v1/buildings/delete-multiple": {
+      "post": {
+        "description": "multiple many Buildings by their ids",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ids"
+              }
+            }
+          },
+          "description": "ids of the building to be deleted",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "All building ids passed in request sucessfully deleted."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Request processed.  Returns ids and error codes of any buildings unable to be deleted.  Expected error codes: INVALID_ID - id does not exist SYSTEM_EXCEPTION - a system exception occurred trying to delete the building."
+          }
+        },
+        "summary": "Delete multiple Buildings by their ids\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Delete Buildings"
+        ]
+      }
+    },
     "/v1/buildings/export": {
       "post": {
         "description": "Export Buildings collection\n",
@@ -22586,6 +22637,260 @@
         ],
         "x-required-privileges": [
           "Update Buildings"
+        ]
+      }
+    },
+    "/v1/buildings/{id}/history": {
+      "get": {
+        "description": "Gets specified Building history object\n",
+        "parameters": [
+          {
+            "description": "instance id of building history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of building history were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified building object does not exist."
+          }
+        },
+        "summary": "Get specified Building History object\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-required-privileges": [
+          "Read Buildings"
+        ]
+      },
+      "post": {
+        "description": "Adds specified Building history object notes\n",
+        "parameters": [
+          {
+            "description": "instance id of building history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes of building history were added"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified building object does not exist."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Building history can not be saved"
+          }
+        },
+        "summary": "Add specified Building history object notes\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-required-privileges": [
+          "Update Buildings"
+        ]
+      }
+    },
+    "/v1/buildings/{id}/history/export": {
+      "post": {
+        "description": "Export history object collection in specified format for specified Buildings\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/export-fields"
+          },
+          {
+            "$ref": "#/components/parameters/export-labels"
+          },
+          {
+            "description": "instance id of buildings",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportParameters"
+              }
+            }
+          },
+          "description": "Optional. Override query parameters since they can make URI exceed 2,000 character limit."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "id,username,date,note,details\n1,admin,2019-02-04 21:09:31,Buildings update,Some details\n",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "Export successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export fields specified incorrectly - non-existing column or duplicate on the list."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export currently unavailable, all export-related resources are in use. Try again later."
+          }
+        },
+        "summary": "Export history object collection in specified format for specified Buildings\n",
+        "tags": [
+          "buildings"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Buildings"
         ]
       }
     },
@@ -33388,6 +33693,142 @@
         ]
       }
     },
+    "/v1/packages/delete-multiple": {
+      "post": {
+        "description": "IDs of the packages to be deleted",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ids"
+              }
+            }
+          },
+          "description": "ids of the package to be deleted",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "All specified packages deleted successfully"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Returns error codes and IDs for any packages that were unable to be deleted. Possible error codes include INVALID_ID (Package ID does not exist) and SYSTEM_EXCEPTION (A system exception occurred while attempting to delete the package)."
+          }
+        },
+        "summary": "Delete multiple packages at once",
+        "tags": [
+          "packages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Delete Packages"
+        ]
+      }
+    },
+    "/v1/packages/export": {
+      "post": {
+        "description": "Export Packages collection\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/export-fields"
+          },
+          {
+            "$ref": "#/components/parameters/export-labels"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorts results by one or more criteria, following the format property:asc/desc. Default sort is ID:asc. If using multiple criteria, separate with commas.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be combined with paging and sorting. Default filter is an empty query and returns all results from the requested page.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportParameters"
+              }
+            }
+          },
+          "description": "Optional. Can be used to override query parameters so that the URI does not exceed the 2,000 character limit."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "id,packageName\n1,Chrome\n2,Firefox\n",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "Export successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Could not export. List may contain a non-existing column or a duplicate."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export currently unavailable. All export-related resources are in use. Try again later."
+          }
+        },
+        "summary": "Export Packages collection\n",
+        "tags": [
+          "packages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Packages"
+        ]
+      }
+    },
     "/v1/packages/{id}": {
       "delete": {
         "description": "Removes specified package\n",
@@ -33506,6 +33947,387 @@
         ],
         "x-required-privileges": [
           "Update Packages"
+        ]
+      }
+    },
+    "/v1/packages/{id}/history": {
+      "get": {
+        "description": "Gets specified Package history object\n",
+        "parameters": [
+          {
+            "description": "Instance ID of package history",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorts results by one or more criteria, following the format property:asc/desc. Default sort is ID:asc. If using multiple criteria, separate with commas.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be combined with paging and sorting. Default filter is an empty query and returns all results from the requested page.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of package history were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified package history object could not be found"
+          }
+        },
+        "summary": "Get specified Package History object\n",
+        "tags": [
+          "packages"
+        ],
+        "x-required-privileges": [
+          "Read Packages"
+        ]
+      },
+      "post": {
+        "description": "Adds specified Package history object notes\n",
+        "parameters": [
+          {
+            "description": "Instance ID of package history",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History note to be created",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Package history note created successfully"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Package history note could not be found"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Package history note could not be saved"
+          }
+        },
+        "summary": "Add specified Package history object notes\n",
+        "tags": [
+          "packages"
+        ],
+        "x-required-privileges": [
+          "Update Packages"
+        ]
+      }
+    },
+    "/v1/packages/{id}/history/export": {
+      "post": {
+        "description": "Export history object collection in specified format for specified Packages\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/export-fields"
+          },
+          {
+            "$ref": "#/components/parameters/export-labels"
+          },
+          {
+            "description": "Instance ID of package history note",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorts results by one or more criteria, following the format property:asc/desc. Default sort is ID:asc. If using multiple criteria, separate with commas.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be combined with paging and sorting. Default filter is an empty query and returns all results from the requested page.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportParameters"
+              }
+            }
+          },
+          "description": "Optional. Can be used to override query parameters so that the URI does not exceed the 2,000 character limit."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "id,username,date,note,details\n1,admin,2019-02-04 21:09:31,Packages update,Some details\n",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "Export successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Could not export. List may contain a non-existing column or a duplicate."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export currently unavailable. All export-related resources are in use. Try again later."
+          }
+        },
+        "summary": "Export history object collection in specified format for specified Packages\n",
+        "tags": [
+          "packages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Packages"
+        ]
+      }
+    },
+    "/v1/packages/{id}/manifest": {
+      "delete": {
+        "description": "Delete the manifest file for a specified package\n",
+        "parameters": [
+          {
+            "description": "Id of the package to delete manifest from",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Package manifest deleted successfully"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Package with that id does not exist"
+          }
+        },
+        "summary": "Delete the manifest for a specified package\n",
+        "tags": [
+          "packages"
+        ],
+        "x-required-privileges": [
+          "Update Packages",
+          "Read Packages"
+        ]
+      },
+      "post": {
+        "description": "Add a manifest to a package",
+        "parameters": [
+          {
+            "description": "Id of the package the manifest should be assigned to",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The manifest file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Package with that id does not exist"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          }
+        },
+        "summary": "Add a manifest to a package\n",
+        "tags": [
+          "packages"
+        ],
+        "x-required-privileges": [
+          "Update Packages",
+          "Read Packages"
         ]
       }
     },
@@ -37275,6 +38097,160 @@
         ],
         "x-required-privileges": [
           "Read Sites"
+        ]
+      }
+    },
+    "/v1/smtp-server/history": {
+      "get": {
+        "description": "Get specified SMTP Server history object\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,username:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "example": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResultsV1"
+                }
+              }
+            },
+            "description": "Details of SMTP Server history were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified SMTP Server history object does not exist."
+          }
+        },
+        "summary": "Get specified SMTP Server history object\n",
+        "tags": [
+          "smtp-server"
+        ],
+        "x-required-privileges": [
+          "Read SMTP Server"
+        ]
+      },
+      "post": {
+        "description": "Adds SMTP Server history object notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of SMTP Server history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "SMTP Server history cannot be saved"
+          }
+        },
+        "summary": "Add SMTP Server history object notes\n",
+        "tags": [
+          "smtp-server"
+        ],
+        "x-required-privileges": [
+          "Update SMTP Server"
+        ]
+      }
+    },
+    "/v1/smtp-server/test": {
+      "post": {
+        "description": "Test functionality of an SMTP Server",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmtpServerTest"
+              }
+            }
+          },
+          "description": "Recipient email to test SMTP Server",
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Test functionality of an SMTP Server",
+        "tags": [
+          "smtp-server"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read SMTP Server"
         ]
       }
     },

@@ -5433,6 +5433,11 @@ type SmtpSenderSettings struct {
 	EmailAddress string  `json:"emailAddress"`
 }
 
+// SmtpServerTest represents a smtp server test.
+type SmtpServerTest struct {
+	RecipientEmail string `json:"recipientEmail"`
+}
+
 // SmtpServerV2 represents a smtp server v2.
 type SmtpServerV2 struct {
 	AuthenticationType    string                     `json:"authenticationType"`

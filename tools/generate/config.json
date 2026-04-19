@@ -791,7 +791,24 @@
         {"op": "PUT /v1/app-request/form-input-fields/{id}", "name": "UpdateAppRequestFormInputFieldV1"},
         {"op": "DELETE /v1/app-request/form-input-fields/{id}", "name": "DeleteAppRequestFormInputFieldV1", "expectedStatus": 204},
         {"op": "GET /v1/app-request/settings", "name": "GetAppRequestSettingsV1"},
-        {"op": "PUT /v1/app-request/settings", "name": "UpdateAppRequestSettingsV1"}
+        {"op": "PUT /v1/app-request/settings", "name": "UpdateAppRequestSettingsV1"},
+
+        {"op": "POST /v1/packages/delete-multiple", "name": "DeleteMultiplePackagesV1", "expectedStatus": 204},
+        {"op": "POST /v1/packages/export", "name": "ExportPackagesV1", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]},
+        {"op": "GET /v1/packages/{id}/history", "name": "ListPackageHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/packages/{id}/history", "name": "CreatePackageHistoryNoteV1", "expectedStatus": 201},
+        {"op": "POST /v1/packages/{id}/history/export", "name": "ExportPackageHistoryV1", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]},
+        {"op": "POST /v1/packages/{id}/manifest", "name": "UploadPackageManifestV1", "expectedStatus": 201},
+        {"op": "DELETE /v1/packages/{id}/manifest", "name": "DeletePackageManifestV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/smtp-server/history", "name": "ListSmtpServerHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/smtp-server/history", "name": "CreateSmtpServerHistoryNoteV1", "expectedStatus": 201},
+        {"op": "POST /v1/smtp-server/test", "name": "TestSmtpServerV1", "expectedStatus": 202},
+
+        {"op": "GET /v1/buildings/{id}/history", "name": "ListBuildingHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/buildings/delete-multiple", "name": "DeleteMultipleBuildingsV1", "expectedStatus": 204},
+        {"op": "POST /v1/buildings/{id}/history", "name": "CreateBuildingHistoryNoteV1", "expectedStatus": 200},
+        {"op": "POST /v1/buildings/{id}/history/export", "name": "ExportBuildingHistoryV1", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]}
       ]
     },
     {

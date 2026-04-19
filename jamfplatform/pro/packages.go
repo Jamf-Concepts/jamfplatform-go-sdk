@@ -103,3 +103,132 @@ func (c *Client) UploadPackageV1(ctx context.Context, id string, fileFilename st
 	}
 	return &result, nil
 }
+
+// DeleteMultiplePackagesV1 delete multiple packages at once.
+func (c *Client) DeleteMultiplePackagesV1(ctx context.Context, request *Ids) error {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	endpoint := prefix + "/packages/delete-multiple"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteMultiplePackagesV1: %w", err)
+	}
+	return nil
+}
+
+// ExportPackagesV1 export Packages collection.
+func (c *Client) ExportPackagesV1(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result []byte
+	endpoint := prefix + "/packages/export"
+	params := url.Values{}
+	if len(exportFields) > 0 {
+		params.Set("export-fields", strings.Join(exportFields, ","))
+	}
+	if len(exportLabels) > 0 {
+		params.Set("export-labels", strings.Join(exportLabels, ","))
+	}
+	if len(sort) > 0 {
+		params.Set("sort", strings.Join(sort, ","))
+	}
+	if filter != "" {
+		params.Set("filter", filter)
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("ExportPackagesV1: %w", err)
+	}
+	return result, nil
+}
+
+// ListPackageHistoryV1 get specified Package History object.
+func (c *Client) ListPackageHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := fmt.Sprintf("%s/packages/%s/history", prefix, url.PathEscape(id))
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int             `json:"totalCount"`
+			Results    []ObjectHistory `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
+// CreatePackageHistoryNoteV1 add specified Package history object notes.
+func (c *Client) CreatePackageHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result ObjectHistory
+	endpoint := fmt.Sprintf("%s/packages/%s/history", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreatePackageHistoryNoteV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// ExportPackageHistoryV1 export history object collection in specified format for specified Packages.
+func (c *Client) ExportPackageHistoryV1(ctx context.Context, id string, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result []byte
+	endpoint := fmt.Sprintf("%s/packages/%s/history/export", prefix, url.PathEscape(id))
+	params := url.Values{}
+	if len(exportFields) > 0 {
+		params.Set("export-fields", strings.Join(exportFields, ","))
+	}
+	if len(exportLabels) > 0 {
+		params.Set("export-labels", strings.Join(exportLabels, ","))
+	}
+	if len(sort) > 0 {
+		params.Set("sort", strings.Join(sort, ","))
+	}
+	if filter != "" {
+		params.Set("filter", filter)
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("ExportPackageHistoryV1(%s): %w", id, err)
+	}
+	return result, nil
+}
+
+// UploadPackageManifestV1 add a manifest to a package.
+func (c *Client) UploadPackageManifestV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*Package, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result Package
+	endpoint := fmt.Sprintf("%s/packages/%s/manifest", prefix, url.PathEscape(id))
+	parts := []client.MultipartField{
+		{Name: "file", Filename: fileFilename, Content: file},
+	}
+	if err := c.transport.DoMultipart(ctx, http.MethodPost, endpoint, parts, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("UploadPackageManifestV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// DeletePackageManifestV1 delete the manifest for a specified package.
+func (c *Client) DeletePackageManifestV1(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	endpoint := fmt.Sprintf("%s/packages/%s/manifest", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeletePackageManifestV1(%s): %w", id, err)
+	}
+	return nil
+}
