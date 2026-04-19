@@ -1130,11 +1130,13 @@ func TestAcceptance_Classic_MobileDeviceApplicationCRUD(t *testing.T) {
 	t.Logf("created mobile-device-app id=%d; delete is async-best-effort on this tenant", id)
 }
 
-// TestAcceptance_Classic_EbookCRUD create+read only. The tenant exhibits
-// the same async-DELETE quirk ebook creates are visible to subsequent
-// reads only after an index catches up; DELETE issued inline returns
-// HTTP 400 with an id-echo body. Test asserts the successful round-trip
-// and leaves cleanup as best-effort.
+// TestAcceptance_Classic_EbookCRUD exercises the ebook create + read
+// lifecycle. The Classic server on this tenant has a known DELETE
+// /ebooks/id/{id} quirk — it returns HTTP 400 with an id-echo body
+// (`<ebook><id>N</id></ebook>`) and the record isn't removed by the
+// by-id call alone. A follow-up DELETE /ebooks/name/{name} commits
+// the removal. Cleanup issues both so the tenant stays clean between
+// runs.
 func TestAcceptance_Classic_EbookCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -1155,7 +1157,8 @@ func TestAcceptance_Classic_EbookCRUD(t *testing.T) {
 	}
 	id := *created.ID
 	cleanupDelete(t, "DeleteEbookByID", func() error { return pc.DeleteEbookByID(ctx, intToStr(id)) })
-	t.Logf("created ebook id=%d; delete is async-best-effort on this tenant", id)
+	cleanupDelete(t, "DeleteEbookByName", func() error { return pc.DeleteEbookByName(ctx, name) })
+	t.Logf("created ebook id=%d; two-step cleanup (by-id 400-echo, by-name) queued", id)
 }
 
 func TestAcceptance_Classic_ClassCRUD(t *testing.T) {
