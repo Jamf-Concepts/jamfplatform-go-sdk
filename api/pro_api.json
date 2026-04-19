@@ -3268,6 +3268,28 @@
         ],
         "type": "object"
       },
+      "CloudResponse": {
+        "properties": {
+          "cloudInstance": {
+            "example": true,
+            "type": "boolean"
+          },
+          "govCloudInstance": {
+            "example": true,
+            "type": "boolean"
+          },
+          "managedServiceProviderInstance": {
+            "description": "Information whether this instance is managed by managed service provider",
+            "example": true,
+            "type": "boolean"
+          },
+          "rampInstance": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "ComplianceVendorDeviceInformation": {
         "description": "Additional, compliance vendor specific device details.",
         "properties": {
@@ -6725,6 +6747,30 @@
         },
         "type": "object"
       },
+      "Country": {
+        "properties": {
+          "code": {
+            "example": "US",
+            "type": "string"
+          },
+          "name": {
+            "example": "United States",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CountryCodes": {
+        "properties": {
+          "countryCodes": {
+            "items": {
+              "$ref": "#/components/schemas/Country"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "CreatePathV2": {
         "properties": {
           "path": {
@@ -8054,6 +8100,21 @@
           "tokenFileName": {
             "description": "Optional name of the token to be saved, if no name is provided one will be auto-generated",
             "example": "Acme MDM Token",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DeviceGroup": {
+        "properties": {
+          "id": {
+            "description": "Group Platform ID",
+            "example": "699bc5b1-efb7-431a-b18f-b2ec5c435631",
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "example": "Test Group",
             "type": "string"
           }
         },
@@ -10393,6 +10454,69 @@
         ],
         "type": "object"
       },
+      "HealthStatus": {
+        "properties": {
+          "api": {
+            "$ref": "#/components/schemas/HealthStatusStats"
+          },
+          "default": {
+            "$ref": "#/components/schemas/HealthStatusStats"
+          },
+          "device": {
+            "$ref": "#/components/schemas/HealthStatusStats"
+          },
+          "enrollment": {
+            "$ref": "#/components/schemas/HealthStatusStats"
+          },
+          "ui": {
+            "$ref": "#/components/schemas/HealthStatusStats"
+          }
+        },
+        "required": [
+          "api",
+          "default",
+          "device",
+          "enrollment",
+          "ui"
+        ],
+        "type": "object"
+      },
+      "HealthStatusStats": {
+        "properties": {
+          "fifteenMinutes": {
+            "description": "Percentage of accepted requests out of total requests for the last 15 minutes",
+            "example": 0.75,
+            "readOnly": true,
+            "type": "number"
+          },
+          "fiveMinutes": {
+            "description": "Percentage of accepted requests out of total requests for the last 5 minutes",
+            "example": 0.75,
+            "readOnly": true,
+            "type": "number"
+          },
+          "oneMinute": {
+            "description": "Percentage of accepted requests out of total requests for the last 1 minute",
+            "example": 0.75,
+            "readOnly": true,
+            "type": "number"
+          },
+          "thirtyMinutes": {
+            "description": "Percentage of accepted requests out of total requests for the last 30 minutes",
+            "example": 0.75,
+            "readOnly": true,
+            "type": "number"
+          },
+          "thirtySeconds": {
+            "description": "Percentage of accepted requests out of total requests for the last 30 seconds",
+            "example": 0.75,
+            "readOnly": true,
+            "type": "number"
+          }
+        },
+        "readOnly": true,
+        "type": "object"
+      },
       "HistorySearchResults": {
         "properties": {
           "results": {
@@ -11437,6 +11561,90 @@
         },
         "type": "object"
       },
+      "JamfApplicationResponse": {
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/JamfPackageResponse"
+            },
+            "type": "array"
+          },
+          "displayName": {
+            "example": "Jamf Connect",
+            "type": "string"
+          },
+          "releaseHistoryUrl": {
+            "example": "https://docs.jamf.com/jamf-connect/administrator-guide/Release_History.html",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "JamfPackageResponse": {
+        "properties": {
+          "created": {
+            "example": "1970-01-01T00:00:00Z",
+            "type": "string"
+          },
+          "filename": {
+            "example": "JamfProtect-1.2.2.pkg",
+            "type": "string"
+          },
+          "id": {
+            "example": "B84F9904-868B-4862-A8F5-33706AADED71",
+            "type": "string"
+          },
+          "url": {
+            "example": "https://example.jamf.com/path/to/JamfProtect-1.2.2.pkg",
+            "type": "string"
+          },
+          "version": {
+            "example": "1.2.2",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "JamfProInformationV2": {
+        "properties": {
+          "byodEnabled": {
+            "default": false,
+            "deprecated": true,
+            "description": "**Deprecated as of 11.25.** This field always returns false.\n",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "cloudDeploymentsEnabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "depAccountEnabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "patchEnabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "smtpEnabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "ssoSamlEnabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "userMigrationEnabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "vppTokenEnabled": {
+            "example": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "JamfProServerUrl": {
         "properties": {
           "url": {
@@ -11447,6 +11655,15 @@
         "required": [
           "url"
         ],
+        "type": "object"
+      },
+      "JamfProVersion": {
+        "properties": {
+          "version": {
+            "example": "10.9.0",
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "JamfProtectPlan": {
@@ -12013,6 +12230,19 @@
           "totalCount": {
             "example": 13,
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "Locale": {
+        "properties": {
+          "description": {
+            "example": "English (United States)",
+            "type": "string"
+          },
+          "identifier": {
+            "example": "en_US",
+            "type": "string"
           }
         },
         "type": "object"
@@ -13679,6 +13909,23 @@
             "items": {
               "example": "EA Value",
               "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDeviceExtensionAttributeResults": {
+        "properties": {
+          "extensionAttributes": {
+            "items": {
+              "properties": {
+                "name": {
+                  "example": "extAttribute1",
+                  "type": "string"
+                }
+              },
+              "type": "object"
             },
             "type": "array"
           }
@@ -19834,6 +20081,23 @@
         },
         "type": "object"
       },
+      "StaticUserGroup": {
+        "properties": {
+          "description": {
+            "example": "A group containing all grade school teachers",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Grade School Teachers",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "StatusItem": {
         "properties": {
           "key": {
@@ -20063,6 +20327,34 @@
           },
           "endTime": {
             "example": "15:45:00",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TimeZone": {
+        "properties": {
+          "displayName": {
+            "example": "Chicago - CT (-0500)",
+            "type": "string"
+          },
+          "region": {
+            "enum": [
+              "Africa",
+              "America",
+              "Asia",
+              "Atlantic",
+              "Australia",
+              "Europe",
+              "Indian",
+              "Pacific",
+              "None"
+            ],
+            "example": "America",
+            "type": "string"
+          },
+          "zoneId": {
+            "example": "America/Chicago",
             "type": "string"
           }
         },
@@ -21328,6 +21620,43 @@
   },
   "openapi": "3.0.1",
   "paths": {
+    "/devices/extensionAttributes": {
+      "get": {
+        "description": "Gets Mobile Device Extension Attribute values placed in select parameter.",
+        "parameters": [
+          {
+            "description": "Acceptable values currently include:\n* name\n",
+            "explode": true,
+            "in": "query",
+            "name": "select",
+            "schema": {
+              "default": "name",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileDeviceExtensionAttributeResults"
+                }
+              }
+            },
+            "description": "Successful response - Extension Attributes retrieved"
+          }
+        },
+        "summary": "Get Mobile Device Extension Attribute values placed in select paramter\n",
+        "tags": [
+          "mobile-device-extension-attributes-preview"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device Extension Attributes"
+        ]
+      }
+    },
     "/ldap/groups": {
       "get": {
         "description": "Retrieves the configured access groups that contain the text in the searchParam.",
@@ -23647,6 +23976,28 @@
         "x-required-privileges": [
           "Update App Request Settings"
         ]
+      }
+    },
+    "/v1/app-store-country-codes": {
+      "get": {
+        "description": "Returns a list of countries and the associated codes that can be use for the App Store locale\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryCodes"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Return a list of Countries and the associated Codes\n",
+        "tags": [
+          "app-store-country-codes-preview"
+        ],
+        "x-authentication-required": false
       }
     },
     "/v1/auth": {
@@ -26123,6 +26474,28 @@
         "x-required-privileges": [
           "Read LDAP Servers"
         ]
+      }
+    },
+    "/v1/cloud-information": {
+      "get": {
+        "description": "Retrieve information related to cloud setup.\nRetrieves information related to cloud setup. Provides details about cloud instance configuration.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CloudResponse"
+                }
+              }
+            },
+            "description": "Result of verification for being cloud-based instance"
+          }
+        },
+        "summary": "Retrieve information related to cloud setup.\n",
+        "tags": [
+          "cloud-information"
+        ],
+        "x-authentication-required": false
       }
     },
     "/v1/computer-extension-attributes": {
@@ -28725,6 +29098,72 @@
         ]
       }
     },
+    "/v1/devices/{id}/groups": {
+      "get": {
+        "description": "Returns a list of groups that the specified device belongs to.",
+        "parameters": [
+          {
+            "description": "Device Platform ID",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": "699bc5b1-efb7-431a-b18f-b2ec5c435631",
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DeviceGroup"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified device object does not exist."
+          }
+        },
+        "summary": "Return a list of groups for a device\n",
+        "tags": [
+          "devices"
+        ],
+        "x-required-privileges": [
+          "Read Static Computer Groups",
+          "Read Smart Computer Groups",
+          "Read Static Mobile Device Groups",
+          "Read Smart Mobile Device Groups",
+          "Read Mobile Devices",
+          "Read Computers"
+        ]
+      }
+    },
     "/v1/distribution-points": {
       "get": {
         "description": "Finds all Distribution Points",
@@ -31086,6 +31525,46 @@
         ]
       }
     },
+    "/v1/health-check": {
+      "get": {
+        "description": "Get Jamf Pro API status. Which response codes might be returned in error states will depend on the specific state encountered.",
+        "responses": {
+          "204": {
+            "description": "The Jamf Pro API is working properly."
+          }
+        },
+        "summary": "Get Jamf Pro API status",
+        "tags": [
+          "health-check"
+        ],
+        "x-authentication-required": false
+      }
+    },
+    "/v1/health-status": {
+      "get": {
+        "description": "Returns metrics representing the request acceptance ratio for each concurrency group and time window on this Jamf Pro node. The acceptance ratio is a decimal value between 0 and 1, where 1 means all requests were accepted and 0 means all were denied. Health status metrics are only available in Jamf Cloud. This API will return a 404 if the Jamf Pro node does not support health status metrics.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "description": "This Jamf Pro node does not support health status metrics."
+          }
+        },
+        "summary": "Retrieve request acceptance ratios for this Jamf Pro node",
+        "tags": [
+          "health-check"
+        ],
+        "x-authentication-required": true
+      }
+    },
     "/v1/icon": {
       "post": {
         "description": "Uploads an icon",
@@ -31642,6 +32121,57 @@
         ]
       }
     },
+    "/v1/jamf-package": {
+      "get": {
+        "description": "Get the packages for a given Jamf application.",
+        "parameters": [
+          {
+            "description": "The Jamf Application key. The only supported values are protect and connect.",
+            "example": "protect",
+            "explode": true,
+            "in": "query",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/JamfPackageResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List of packages for the given application."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid Content. It is possible that there is no application with the given application id. Or Cloud Services Connection has not been established."
+          }
+        },
+        "summary": "Get the packages for a given Jamf application\n",
+        "tags": [
+          "jamf-package"
+        ],
+        "x-required-privileges": [
+          "Jamf Packages Action"
+        ]
+      }
+    },
     "/v1/jamf-pro-server-url": {
       "get": {
         "description": "Get Jamf Pro Server URL settings",
@@ -31809,6 +32339,28 @@
         "x-required-privileges": [
           "Update JSS URL"
         ]
+      }
+    },
+    "/v1/jamf-pro-version": {
+      "get": {
+        "description": "Returns information about the Jamf Pro including the current version.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JamfProVersion"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Return information about the Jamf Pro including the current version\n",
+        "tags": [
+          "jamf-pro-version"
+        ],
+        "x-authentication-required": true
       }
     },
     "/v1/jamf-protect": {
@@ -32457,6 +33009,31 @@
         "x-required-privileges": [
           "Read LDAP Servers"
         ]
+      }
+    },
+    "/v1/locales": {
+      "get": {
+        "description": "Returns locales that can be used in other features.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Locale"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Return locales that can be used in other features\n",
+        "tags": [
+          "locales-preview"
+        ],
+        "x-authentication-required": false
       }
     },
     "/v1/log-flushing": {
@@ -40517,6 +41094,80 @@
         ]
       }
     },
+    "/v1/static-user-groups": {
+      "get": {
+        "description": "Returns a list of all static user groups.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StaticUserGroup"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Return a list of all Static User Groups\n",
+        "tags": [
+          "static-user-groups-preview"
+        ],
+        "x-required-privileges": [
+          "Read Static User Groups"
+        ]
+      }
+    },
+    "/v1/static-user-groups/{id}": {
+      "get": {
+        "description": "Returns a specific static user group by id.\n",
+        "parameters": [
+          {
+            "description": "Instance id of static user group record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaticUserGroup"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified static user group object does not exist."
+          }
+        },
+        "summary": "Return a specific Static User Group by id\n",
+        "tags": [
+          "static-user-groups-preview"
+        ],
+        "x-required-privileges": [
+          "Read Static User Groups"
+        ]
+      }
+    },
     "/v1/supervision-identities": {
       "get": {
         "description": "Search for sorted and paged supervision identities",
@@ -40998,6 +41649,31 @@
         "x-required-privileges": [
           "Update Teacher App Settings"
         ]
+      }
+    },
+    "/v1/time-zones": {
+      "get": {
+        "description": "Returns information about the currently supported time zones\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TimeZone"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Return information about the currently supported Time Zones\n",
+        "tags": [
+          "time-zones-preview"
+        ],
+        "x-authentication-required": false
       }
     },
     "/v1/user/change-password": {
@@ -45390,6 +46066,76 @@
         "x-required-privileges": [
           "Update Inventory Preload Records"
         ]
+      }
+    },
+    "/v2/jamf-package": {
+      "get": {
+        "description": "Get the packages for a given Jamf application.",
+        "parameters": [
+          {
+            "description": "The Jamf Application key. The only supported values are protect and connect.",
+            "example": "protect",
+            "explode": true,
+            "in": "query",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JamfApplicationResponse"
+                }
+              }
+            },
+            "description": "Properties for the given application."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid Content. It is possible that there is no application with the given application id. Or Cloud Services Connection has not been established."
+          }
+        },
+        "summary": "Get the packages for a given Jamf application\n",
+        "tags": [
+          "jamf-package"
+        ],
+        "x-required-privileges": [
+          "Jamf Packages Action"
+        ]
+      }
+    },
+    "/v2/jamf-pro-information": {
+      "get": {
+        "description": "Get basic information about the Jamf Pro Server\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JamfProInformationV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get basic information about the Jamf Pro Server\n",
+        "tags": [
+          "jamf-pro-information"
+        ],
+        "x-authentication-required": true
       }
     },
     "/v2/jamf-remote-assist/session": {

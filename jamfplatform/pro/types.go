@@ -867,6 +867,14 @@ type CloudLdapServerUpdate struct {
 	UseWildcards                             bool                   `json:"useWildcards"`
 }
 
+// CloudResponse represents a cloud response.
+type CloudResponse struct {
+	CloudInstance                  bool `json:"cloudInstance"`
+	GovCloudInstance               bool `json:"govCloudInstance"`
+	ManagedServiceProviderInstance bool `json:"managedServiceProviderInstance"`
+	RampInstance                   bool `json:"rampInstance"`
+}
+
 // ComplianceVendorDeviceInformation Additional, compliance vendor specific device details.
 type ComplianceVendorDeviceInformation struct {
 	DeviceIds []string `json:"deviceIds"`
@@ -1764,6 +1772,17 @@ type ConfigurationSearchResults struct {
 	TotalCount int                      `json:"totalCount"`
 }
 
+// Country represents a country.
+type Country struct {
+	Code string `json:"code"`
+	Name string `json:"name"`
+}
+
+// CountryCodes represents a country codes.
+type CountryCodes struct {
+	CountryCodes []Country `json:"countryCodes"`
+}
+
 // CreatePathV2 represents a create path v2.
 type CreatePathV2 struct {
 	Path  string `json:"path"`
@@ -2110,6 +2129,12 @@ type DeviceEnrollmentPrestageV3 struct {
 type DeviceEnrollmentToken struct {
 	EncodedToken  *[]byte `json:"encodedToken,omitempty"`
 	TokenFileName *string `json:"tokenFileName,omitempty"`
+}
+
+// DeviceGroup represents a device group.
+type DeviceGroup struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // DeviceInformationCommand represents a device information command.
@@ -2887,6 +2912,24 @@ type GsxTestResponse struct {
 	Response string `json:"response"`
 }
 
+// HealthStatus represents a health status.
+type HealthStatus struct {
+	Api        *HealthStatusStats `json:"api,omitempty"`
+	Default    *HealthStatusStats `json:"default,omitempty"`
+	Device     *HealthStatusStats `json:"device,omitempty"`
+	Enrollment *HealthStatusStats `json:"enrollment,omitempty"`
+	Ui         *HealthStatusStats `json:"ui,omitempty"`
+}
+
+// HealthStatusStats represents a health status stats.
+type HealthStatusStats struct {
+	FifteenMinutes float64 `json:"fifteenMinutes"`
+	FiveMinutes    float64 `json:"fiveMinutes"`
+	OneMinute      float64 `json:"oneMinute"`
+	ThirtyMinutes  float64 `json:"thirtyMinutes"`
+	ThirtySeconds  float64 `json:"thirtySeconds"`
+}
+
 // HistorySearchResults represents a history search results.
 type HistorySearchResults struct {
 	Results    []ObjectHistory `json:"results"`
@@ -3171,9 +3214,42 @@ type IosBrandingSearchResults struct {
 	TotalCount int                        `json:"totalCount"`
 }
 
+// JamfApplicationResponse represents a jamf application response.
+type JamfApplicationResponse struct {
+	Artifacts         []JamfPackageResponse `json:"artifacts"`
+	DisplayName       string                `json:"displayName"`
+	ReleaseHistoryURL string                `json:"releaseHistoryUrl"`
+}
+
+// JamfPackageResponse represents a jamf package response.
+type JamfPackageResponse struct {
+	Created  string `json:"created"`
+	Filename string `json:"filename"`
+	ID       string `json:"id"`
+	URL      string `json:"url"`
+	Version  string `json:"version"`
+}
+
+// JamfProInformationV2 represents a jamf pro information v2.
+type JamfProInformationV2 struct {
+	ByodEnabled             bool `json:"byodEnabled"`
+	CloudDeploymentsEnabled bool `json:"cloudDeploymentsEnabled"`
+	DepAccountEnabled       bool `json:"depAccountEnabled"`
+	PatchEnabled            bool `json:"patchEnabled"`
+	SmtpEnabled             bool `json:"smtpEnabled"`
+	SsoSamlEnabled          bool `json:"ssoSamlEnabled"`
+	UserMigrationEnabled    bool `json:"userMigrationEnabled"`
+	VppTokenEnabled         bool `json:"vppTokenEnabled"`
+}
+
 // JamfProServerURL represents a jamf pro server u r l.
 type JamfProServerURL struct {
 	URL string `json:"url"`
+}
+
+// JamfProVersion represents a jamf pro version.
+type JamfProVersion struct {
+	Version string `json:"version"`
 }
 
 // JamfProtectPlan represents a jamf protect plan.
@@ -3366,6 +3442,12 @@ type LinkedConnectProfile struct {
 type LinkedConnectProfileSearchResults struct {
 	Results    []LinkedConnectProfile `json:"results"`
 	TotalCount int                    `json:"totalCount"`
+}
+
+// Locale represents a locale.
+type Locale struct {
+	Description string `json:"description"`
+	Identifier  string `json:"identifier"`
 }
 
 // LocationInformationV2 represents a location information v2.
@@ -3838,6 +3920,16 @@ type MobileDeviceExtensionAttribute struct {
 	Name                                string   `json:"name"`
 	Type                                string   `json:"type"`
 	Value                               []string `json:"value"`
+}
+
+// MobileDeviceExtensionAttributeResults represents a mobile device extension attribute results.
+type MobileDeviceExtensionAttributeResults struct {
+	ExtensionAttributes []MobileDeviceExtensionAttributeResultsExtensionAttributesItem `json:"extensionAttributes"`
+}
+
+// MobileDeviceExtensionAttributeResultsExtensionAttributesItem represents a mobile device extension attribute results extension attributes item.
+type MobileDeviceExtensionAttributeResultsExtensionAttributesItem struct {
+	Name string `json:"name"`
 }
 
 // MobileDeviceExtensionAttributeSearchResults represents a mobile device extension attribute search results.
@@ -5869,6 +5961,13 @@ type StaticGroupSearchResults struct {
 	TotalCount int           `json:"totalCount"`
 }
 
+// StaticUserGroup represents a static user group.
+type StaticUserGroup struct {
+	Description string `json:"description"`
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+}
+
 // StatusItem represents a status item.
 type StatusItem struct {
 	Key            string `json:"key"`
@@ -5953,6 +6052,13 @@ type TeacherSettingsResponse struct {
 type TimeFrame struct {
 	BeginTime *string `json:"beginTime,omitempty"`
 	EndTime   *string `json:"endTime,omitempty"`
+}
+
+// TimeZone represents a time zone.
+type TimeZone struct {
+	DisplayName string `json:"displayName"`
+	Region      string `json:"region"`
+	ZoneID      string `json:"zoneId"`
 }
 
 // TvOsDetails will be populated if the type is appleTv.

@@ -854,7 +854,22 @@
         {"op": "POST /v1/dashboard/toggle", "name": "ToggleDashboardObjectV1", "expectedStatus": 202},
 
         {"op": "GET /v3/account-preferences", "name": "GetAccountPreferencesV3"},
-        {"op": "PATCH /v3/account-preferences", "name": "UpdateAccountPreferencesV3", "expectedStatus": 204}
+        {"op": "PATCH /v3/account-preferences", "name": "UpdateAccountPreferencesV3", "expectedStatus": 204},
+
+        {"op": "GET /v1/health-check", "name": "HealthCheckV1", "expectedStatus": 204},
+        {"op": "GET /v1/health-status", "name": "GetHealthStatusV1"},
+        {"op": "GET /v1/jamf-pro-version", "name": "GetJamfProVersionV1"},
+        {"op": "GET /v2/jamf-pro-information", "name": "GetJamfProInformationV2"},
+        {"op": "GET /v1/locales", "name": "ListLocalesV1"},
+        {"op": "GET /v1/time-zones", "name": "ListTimeZonesV1"},
+        {"op": "GET /v1/cloud-information", "name": "GetCloudInformationV1"},
+        {"op": "GET /v1/app-store-country-codes", "name": "ListAppStoreCountryCodesV1"},
+        {"op": "GET /v1/jamf-package", "name": "ListJamfPackagesV1", "params": ["application"]},
+        {"op": "GET /v2/jamf-package", "name": "GetJamfPackageV2", "params": ["application"]},
+        {"op": "GET /v1/static-user-groups", "name": "ListStaticUserGroupsV1"},
+        {"op": "GET /v1/static-user-groups/{id}", "name": "GetStaticUserGroupV1"},
+        {"op": "GET /devices/extensionAttributes", "name": "ListDeviceExtensionAttributesPreview", "params": ["select:string:selectAttr"]},
+        {"op": "GET /v1/devices/{id}/groups", "name": "GetDeviceGroupsForDeviceV1"}
       ]
     },
     {
