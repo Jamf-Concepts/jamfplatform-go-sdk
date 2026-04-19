@@ -134,7 +134,7 @@ func TestAcceptance_Pro_ExportBuildings(t *testing.T) {
 	}
 	cleanupDelete(t, "DeleteBuildingV1", func() error { return p.DeleteBuildingV1(ctx, created.ID) })
 
-	csv, err := p.ExportBuildingsV1(ctx, nil)
+	csv, err := p.ExportBuildingsV1(ctx, nil, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ExportBuildingsV1: %v", err)

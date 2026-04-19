@@ -90,10 +90,20 @@ func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
 }
 
 // ExportBuildingsV1 export Buildings collection.
-func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameters) ([]byte, error) {
+func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameters, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/buildings/export"
+	params := url.Values{}
+	if len(sort) > 0 {
+		params.Set("sort", strings.Join(sort, ","))
+	}
+	if filter != "" {
+		params.Set("filter", filter)
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("ExportBuildingsV1: %w", err)
 	}

@@ -50,7 +50,7 @@ func TestRestartDevice(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusCreated, []map[string]any{{"id": "test-id"}})
+		writeJSON(t, w, http.StatusCreated, []map[string]any{{}})
 	})
 
 	result, err := c.RestartDevice(context.Background(), "test-id")
@@ -68,7 +68,7 @@ func TestShutdownDevice(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusCreated, []map[string]any{{"id": "test-id"}})
+		writeJSON(t, w, http.StatusCreated, []map[string]any{{}})
 	})
 
 	result, err := c.ShutdownDevice(context.Background(), "test-id")
@@ -86,7 +86,7 @@ func TestUnmanageDevice(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusCreated, []map[string]any{{"id": "test-id"}})
+		writeJSON(t, w, http.StatusCreated, []map[string]any{{}})
 	})
 
 	result, err := c.UnmanageDevice(context.Background(), "test-id")

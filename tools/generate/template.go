@@ -76,9 +76,14 @@ var funcMap = template.FuncMap{
 		}
 		args := make([]string, len(m.QueryParams))
 		for i, qp := range m.QueryParams {
-			if qp.Type == "[]string" {
+			switch qp.Type {
+			case "[]string":
 				args[i] = "nil"
-			} else {
+			case "bool":
+				args[i] = "false"
+			case "int", "int64":
+				args[i] = "0"
+			default:
 				args[i] = `""`
 			}
 		}
@@ -246,6 +251,18 @@ type {{ .Name }} = string
 	if len({{ .Go }}) > 0 {
 		params.Set("{{ .Spec }}", strings.Join({{ .Go }}, ","))
 	}
+{{- else if eq .Type "bool" }}
+	if {{ .Go }} {
+		params.Set("{{ .Spec }}", "true")
+	}
+{{- else if eq .Type "int" }}
+	if {{ .Go }} != 0 {
+		params.Set("{{ .Spec }}", strconv.Itoa({{ .Go }}))
+	}
+{{- else if eq .Type "int64" }}
+	if {{ .Go }} != 0 {
+		params.Set("{{ .Spec }}", strconv.FormatInt({{ .Go }}, 10))
+	}
 {{- else }}
 	if {{ .Go }} != "" {
 		params.Set("{{ .Spec }}", {{ .Go }})
@@ -283,13 +300,14 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "create" }}
 // {{ .Comment }}
 {{- if .ReturnsSlice }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}) ({{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
 {{- else }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}) (*{{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
+{{- template "buildQueryParams" . }}
 {{- if .ContentType }}
 	if err := c.transport.DoWithContentType(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, &result); err != nil {
 {{- else }}
@@ -308,13 +326,14 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "actionWithResponse" }}
 // {{ .Comment }}
 {{- if .ReturnsSlice }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}) ({{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
 {{- else }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}) (*{{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
+{{- template "buildQueryParams" . }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, &result); err != nil {
 		return nil, fmt.Errorf({{ errWrap . }})
 	}
@@ -328,9 +347,10 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 
 {{- define "update" }}
 // {{ .Comment }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}) error {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
+{{- template "buildQueryParams" . }}
 {{- if .ContentType }}
 	if err := c.transport.DoWithContentType(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, nil); err != nil {
 {{- else }}
@@ -344,9 +364,10 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 
 {{- define "action" }}
 // {{ .Comment }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}) error {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
+{{- template "buildQueryParams" . }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, nil); err != nil {
 		return fmt.Errorf({{ errWrap . }})
 	}
@@ -623,7 +644,7 @@ func Test<% .Name %>(t *testing.T) {
 <%- end %>
 	})
 
-	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %>, &<% .RequestType %>{})
+	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %>, &<% .RequestType %>{}<% testExtraArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -643,7 +664,7 @@ func Test<% .Name %>(t *testing.T) {
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 	})
 
-	err := c.<% .Name %>(context.Background()<% testCallArgs . %>, &<% .RequestType %>{})
+	err := c.<% .Name %>(context.Background()<% testCallArgs . %>, &<% .RequestType %>{}<% testExtraArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -660,7 +681,7 @@ func Test<% .Name %>(t *testing.T) {
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 	})
 
-	err := c.<% .Name %>(context.Background()<% testCallArgs . %>)
+	err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -766,10 +787,10 @@ func Test<% .Name %>(t *testing.T) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
 		}
-		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{"id": "test-id"}})
+		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 	})
 
-	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %>)
+	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}

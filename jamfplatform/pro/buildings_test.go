@@ -127,7 +127,7 @@ func TestExportBuildingsV1(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 	})
 
-	result, err := c.ExportBuildingsV1(context.Background(), &ExportParameters{})
+	result, err := c.ExportBuildingsV1(context.Background(), &ExportParameters{}, nil, "")
 	if err != nil {
 		t.Fatal(err)
 	}
