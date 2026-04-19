@@ -10592,6 +10592,342 @@
         },
         "type": "object"
       },
+      "LapsAccountManagementHistory": {
+        "properties": {
+          "eventTime": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "eventType": {
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "VIEWED",
+              "ERROR",
+              "INVALID"
+            ],
+            "example": "VIEWED",
+            "type": "string"
+          },
+          "userSource": {
+            "enum": [
+              "MDM",
+              "JMF"
+            ],
+            "example": "MDM",
+            "type": "string"
+          },
+          "username": {
+            "example": "username",
+            "type": "string"
+          },
+          "viewedBy": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsAccountManagementHistoryResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsAccountManagementHistory"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsAuditV2": {
+        "properties": {
+          "dateSeen": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "viewedBy": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsHistory": {
+        "properties": {
+          "createdDate": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "dateLastSeen": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "expirationTime": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "rotationStatus": {
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "VIEWED",
+              "ERROR",
+              "INVALID"
+            ],
+            "example": "PENDING",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsHistoryResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsHistory"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPasswordAndAuditsV2": {
+        "properties": {
+          "audits": {
+            "items": {
+              "$ref": "#/components/schemas/LapsAuditV2"
+            },
+            "type": "array"
+          },
+          "dateLastSeen": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "expirationTime": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "password": {
+            "example": "jamf12345",
+            "format": "password",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPasswordAuditsResultsV2": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsPasswordAndAuditsV2"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPasswordResponseV2": {
+        "properties": {
+          "password": {
+            "example": "jamf12345",
+            "format": "password",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPendingRotation": {
+        "properties": {
+          "createdDate": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lapsUser": {
+            "$ref": "#/components/schemas/LapsUserV2"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPendingRotationResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsPendingRotation"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsSettingsRequestV2": {
+        "properties": {
+          "autoDeployEnabled": {
+            "description": "When enabled, all appropriate computers will have the SetAutoAdminPassword command sent to them automatically.",
+            "example": false,
+            "type": "boolean"
+          },
+          "autoRotateEnabled": {
+            "description": "When enabled, all appropriate computers will automatically have their password expired and rotated after the configured autoRotateExpirationTime",
+            "example": false,
+            "type": "boolean"
+          },
+          "autoRotateExpirationTime": {
+            "description": "The amount of time in seconds that the local admin password will be rotated automatically if it is never viewed.",
+            "example": 7776000,
+            "type": "integer"
+          },
+          "passwordRotationTime": {
+            "description": "The amount of time in seconds that the local admin password will be rotated after viewing.",
+            "example": 3600,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "autoDeployEnabled",
+          "autoRotateEnabled",
+          "autoRotateExpirationTime",
+          "passwordRotationTime"
+        ],
+        "type": "object"
+      },
+      "LapsSettingsResponseV2": {
+        "properties": {
+          "autoDeployEnabled": {
+            "description": "When enabled, all appropriate computers will have the SetAutoAdminPassword command sent to them automatically.",
+            "example": false,
+            "type": "boolean"
+          },
+          "autoRotateEnabled": {
+            "description": "When enabled, all appropriate computers will automatically have their password expired and rotated after the configured autoRotateExpirationTime",
+            "example": false,
+            "type": "boolean"
+          },
+          "autoRotateExpirationTime": {
+            "description": "The amount of time in seconds that the local admin password will be rotated automatically if it is never viewed.",
+            "example": 7776000,
+            "type": "integer"
+          },
+          "passwordRotationTime": {
+            "description": "The amount of time in seconds that the local admin password will be rotated after viewing.",
+            "example": 3600,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserPasswordRequestV2": {
+        "properties": {
+          "lapsUserPasswordList": {
+            "items": {
+              "$ref": "#/components/schemas/LapsUserPasswordV2"
+            },
+            "minLength": 1,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserPasswordResponseV2": {
+        "properties": {
+          "lapsUserPasswordList": {
+            "items": {
+              "$ref": "#/components/schemas/LapsUserPasswordV2"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserPasswordV2": {
+        "properties": {
+          "password": {
+            "example": "jamf1234",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "username": {
+            "example": "username",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserResultsV2": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsUserV2"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserV2": {
+        "properties": {
+          "clientManagementId": {
+            "example": "2db90ebf-ce9c-4078-b508-034c8ee3a060",
+            "type": "string"
+          },
+          "guid": {
+            "example": "602F96A6-7BC4-43CD-95F2-1DD3B8BC0AF3",
+            "type": "string"
+          },
+          "userSource": {
+            "enum": [
+              "MDM",
+              "JMF"
+            ],
+            "example": "MDM",
+            "type": "string"
+          },
+          "username": {
+            "example": "admin",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "LdapConfigurationRequest": {
         "description": "A Cloud Identity Provider LDAP configuration for requests",
         "properties": {
@@ -18058,6 +18394,98 @@
             "type": "object"
           }
         ]
+      },
+      "SupervisionIdentity": {
+        "properties": {
+          "commonName": {
+            "example": "Jamf Identity - Supervision Identity",
+            "type": "string"
+          },
+          "displayName": {
+            "example": "Supervision Identity",
+            "type": "string"
+          },
+          "expirationDate": {
+            "example": "2000-10-31",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "SupervisionIdentityCertificateUpload": {
+        "properties": {
+          "certificateData": {
+            "description": "The base 64 encoded supervision identity certificate data",
+            "example": "VTI5dFpTQnlZVzVrYjIwZ1ltbDBJRzltSUhSbGVIUWdkRzhnZFhObElHRnVaQ0J6WldVZ2FXWWdZVzU1YjI1bElHRmpkSFZoYkd4NUlIUnlhV1Z6SUhSdklHUmxZMjlrWlNCcGRBPT0=",
+            "format": "byte",
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string"
+          },
+          "displayName": {
+            "example": "Supervision Identity",
+            "type": "string"
+          },
+          "password": {
+            "example": "jamf1234",
+            "format": "password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "displayName",
+          "password"
+        ],
+        "type": "object"
+      },
+      "SupervisionIdentityCreate": {
+        "properties": {
+          "displayName": {
+            "example": "Supervision Identity",
+            "type": "string"
+          },
+          "password": {
+            "example": "jamf1234",
+            "format": "password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "displayName",
+          "password"
+        ],
+        "type": "object"
+      },
+      "SupervisionIdentitySearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SupervisionIdentity"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "SupervisionIdentityUpdate": {
+        "properties": {
+          "displayName": {
+            "example": "Supervision Identity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "displayName"
+        ],
+        "type": "object"
       },
       "TeacherFeatures": {
         "properties": {
@@ -35013,6 +35441,341 @@
         ]
       }
     },
+    "/v1/supervision-identities": {
+      "get": {
+        "description": "Search for sorted and paged supervision identities",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/pagesize"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "id:asc",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupervisionIdentitySearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Search for sorted and paged Supervision Identities\n",
+        "tags": [
+          "supervision-identities-preview"
+        ],
+        "x-required-privileges": [
+          "Read Apple Configurator Enrollment"
+        ]
+      },
+      "post": {
+        "description": "Creates a Supervision Identity for the supplied information",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupervisionIdentityCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupervisionIdentity"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Something went wrong"
+          }
+        },
+        "summary": "Create a Supervision Identity for the supplied information\n",
+        "tags": [
+          "supervision-identities-preview"
+        ],
+        "x-required-privileges": [
+          "Update Apple Configurator Enrollment"
+        ]
+      }
+    },
+    "/v1/supervision-identities/upload": {
+      "post": {
+        "description": "Uploads the Supervision Identity .p12 file",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupervisionIdentityCertificateUpload"
+              }
+            }
+          },
+          "description": "The base 64 encoded .p12 file alone with other needed information",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupervisionIdentity"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Something went wrong"
+          }
+        },
+        "summary": "Upload the Supervision Identity .p12 file\n",
+        "tags": [
+          "supervision-identities-preview"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Apple Configurator Enrollment"
+        ]
+      }
+    },
+    "/v1/supervision-identities/{id}": {
+      "delete": {
+        "description": "Deletes a Supervision Identity with the supplied id",
+        "parameters": [
+          {
+            "description": "Supervision Identity identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Supervision Identity with that id does not exist"
+          }
+        },
+        "summary": "Delete a Supervision Identity with the supplied id\n",
+        "tags": [
+          "supervision-identities-preview"
+        ],
+        "x-required-privileges": [
+          "Update Apple Configurator Enrollment"
+        ]
+      },
+      "get": {
+        "description": "Retrieves a Supervision Identity with the supplied id",
+        "parameters": [
+          {
+            "description": "Supervision Identity identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupervisionIdentity"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Supervision Identity with that id does not exist"
+          }
+        },
+        "summary": "Retrieve a Supervision Identity with the supplied id\n",
+        "tags": [
+          "supervision-identities-preview"
+        ],
+        "x-required-privileges": [
+          "Read Apple Configurator Enrollment"
+        ]
+      },
+      "put": {
+        "description": "Updates a Supervision Identity with the supplied information",
+        "parameters": [
+          {
+            "description": "Supervision Identity identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupervisionIdentityUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupervisionIdentity"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Supervision Identity with that id does not exist"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Something went wrong"
+          }
+        },
+        "summary": "Update a Supervision Identity with the supplied information\n",
+        "tags": [
+          "supervision-identities-preview"
+        ],
+        "x-required-privileges": [
+          "Update Apple Configurator Enrollment"
+        ]
+      }
+    },
+    "/v1/supervision-identities/{id}/download": {
+      "get": {
+        "description": "Download the Supervision Identity .p12 file",
+        "parameters": [
+          {
+            "description": "Supervision Identity identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "summary": "Download the Supervision Identity .p12 file\n",
+        "tags": [
+          "supervision-identities-preview"
+        ],
+        "x-required-privileges": [
+          "Read Apple Configurator Enrollment"
+        ]
+      }
+    },
     "/v1/teacher-app": {
       "get": {
         "description": "Get the Jamf Teacher settings that you have access to see.",
@@ -39573,6 +40336,740 @@
         ],
         "x-required-privileges": [
           "Read Remote Assist"
+        ]
+      }
+    },
+    "/v2/local-admin-password/pending-rotations": {
+      "get": {
+        "description": "Return information about all devices and usernames currently in the state of a pending LAPS rotation",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPendingRotationResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get a list of the current devices and usernames with pending LAPS rotations",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "View Local Admin Password"
+        ]
+      }
+    },
+    "/v2/local-admin-password/settings": {
+      "get": {
+        "description": "Return information about the current LAPS settings.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsSettingsResponseV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get the current LAPS settings.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "Update Local Admin Password Settings"
+        ]
+      },
+      "put": {
+        "description": "Update settings for LAPS.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LapsSettingsRequestV2"
+              }
+            }
+          },
+          "description": "LAPS settings to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsSettingsResponseV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Update settings for LAPS.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "Update Local Admin Password Settings"
+        ]
+      }
+    },
+    "/v2/local-admin-password/{clientManagementId}/account/{username}/audit": {
+      "get": {
+        "description": "Get the full history of all local admin passwords for a specific username on a target device. History will include password, who viewed the password and when it was viewed. Get audit history by using the client management id and username as the path parameters. If multiple accounts with the same username exist, the MDM source will be selected by default.",
+        "parameters": [
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name to view audit information for",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPasswordAuditsResultsV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get LAPS password viewed history.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/local-admin-password/{clientManagementId}/account/{username}/history": {
+      "get": {
+        "description": "Get the full history of all for a specific username on a target device. History will include date created, date last seen, expiration time, and rotational status. Get audit history by using the client management id and username as the path parameters.",
+        "parameters": [
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name to view history for",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsHistoryResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get LAPS historical records for target device and username.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/local-admin-password/{clientManagementId}/account/{username}/password": {
+      "get": {
+        "description": "Get current LAPS password for specified client by using the client management id and username as the path parameters. Once the password is viewed it will be rotated out with a new password based on the rotation time settings. If multiple accounts with the same username exist, the MDM source will be selected by default.",
+        "parameters": [
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name for the account",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPasswordResponseV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get current LAPS password for specified username on a client.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "View Local Admin Password"
+        ]
+      }
+    },
+    "/v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/audit": {
+      "get": {
+        "description": "Get the full history of all local admin passwords for a specific user guid on a target device. History will include password, who viewed the password and when it was viewed. Get audit history by using the client management id, username, and user guid as the path parameters.",
+        "parameters": [
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name to view audit information for",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user guid to view audit information for",
+            "explode": false,
+            "in": "path",
+            "name": "guid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPasswordAuditsResultsV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get LAPS password viewed history.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/history": {
+      "get": {
+        "description": "Get the full history of all for a specific user guid on a target device. History will include date created, date last seen, expiration time, and rotational status. Get audit history by using the client management id, username, and user guid as the path parameters.",
+        "parameters": [
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name to view history for",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user guid to view history for",
+            "explode": false,
+            "in": "path",
+            "name": "guid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsHistoryResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get LAPS historical records for target device and user guid.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/password": {
+      "get": {
+        "description": "Get current LAPS password for specified client by using the client management id, username, and user guid as the path parameters. Once the password is viewed it will be rotated out with a new password based on the rotation time settings.",
+        "parameters": [
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name for the account",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user guid for the account",
+            "explode": false,
+            "in": "path",
+            "name": "guid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPasswordResponseV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get current LAPS password for specified user guid on a client.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "View Local Admin Password"
+        ]
+      }
+    },
+    "/v2/local-admin-password/{clientManagementId}/accounts": {
+      "get": {
+        "description": "Get a full list of admin accounts that are LAPS capable. Capable accounts are returned in the AutoSetupAdminAccounts from QueryResponses.",
+        "parameters": [
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsUserResultsV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get the LAPS capable admin accounts for a device.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "View Local Admin Password"
+        ]
+      }
+    },
+    "/v2/local-admin-password/{clientManagementId}/history": {
+      "get": {
+        "description": "Get the full history of all local admin passwords for all accounts for a specific management ID. History will include password, who viewed the password and when it was viewed. This will include rotation history as well.",
+        "parameters": [
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsAccountManagementHistoryResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "summary": "Get LAPS password viewed history, and rotation history.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/local-admin-password/{clientManagementId}/set-password": {
+      "put": {
+        "description": "Set the LAPS password for a device. This will set the password for all LAPS capable accounts.",
+        "parameters": [
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LapsUserPasswordRequestV2"
+              }
+            }
+          },
+          "description": "LAPS password to set",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsUserPasswordResponseV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to update passwords"
+          }
+        },
+        "summary": "Set the LAPS password for a device.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-required-privileges": [
+          "Send Local Admin Password Command"
         ]
       }
     },

@@ -2962,6 +2962,121 @@ type LanguageCode struct {
 	Value string `json:"value"`
 }
 
+// LapsAccountManagementHistory represents a laps account management history.
+type LapsAccountManagementHistory struct {
+	EventTime  *time.Time `json:"eventTime,omitempty"`
+	EventType  string     `json:"eventType"`
+	UserSource string     `json:"userSource"`
+	Username   string     `json:"username"`
+	ViewedBy   *string    `json:"viewedBy,omitempty"`
+}
+
+// LapsAccountManagementHistoryResponse represents a laps account management history response.
+type LapsAccountManagementHistoryResponse struct {
+	Results    []LapsAccountManagementHistory `json:"results"`
+	TotalCount int                            `json:"totalCount"`
+}
+
+// LapsAuditV2 represents a laps audit v2.
+type LapsAuditV2 struct {
+	DateSeen *time.Time `json:"dateSeen,omitempty"`
+	ViewedBy *string    `json:"viewedBy,omitempty"`
+}
+
+// LapsHistory represents a laps history.
+type LapsHistory struct {
+	CreatedDate    *time.Time `json:"createdDate,omitempty"`
+	DateLastSeen   *time.Time `json:"dateLastSeen,omitempty"`
+	ExpirationTime *time.Time `json:"expirationTime,omitempty"`
+	RotationStatus string     `json:"rotationStatus"`
+}
+
+// LapsHistoryResponse represents a laps history response.
+type LapsHistoryResponse struct {
+	Results    []LapsHistory `json:"results"`
+	TotalCount int           `json:"totalCount"`
+}
+
+// LapsPasswordAndAuditsV2 represents a laps password and audits v2.
+type LapsPasswordAndAuditsV2 struct {
+	Audits         []LapsAuditV2 `json:"audits"`
+	DateLastSeen   *time.Time    `json:"dateLastSeen,omitempty"`
+	ExpirationTime *time.Time    `json:"expirationTime,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+}
+
+// LapsPasswordAuditsResultsV2 represents a laps password audits results v2.
+type LapsPasswordAuditsResultsV2 struct {
+	Results    []LapsPasswordAndAuditsV2 `json:"results"`
+	TotalCount int                       `json:"totalCount"`
+}
+
+// LapsPasswordResponseV2 represents a laps password response v2.
+type LapsPasswordResponseV2 struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+}
+
+// LapsPendingRotation represents a laps pending rotation.
+type LapsPendingRotation struct {
+	CreatedDate *time.Time  `json:"createdDate,omitempty"`
+	LapsUser    *LapsUserV2 `json:"lapsUser,omitempty"`
+}
+
+// LapsPendingRotationResponse represents a laps pending rotation response.
+type LapsPendingRotationResponse struct {
+	Results    []LapsPendingRotation `json:"results"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+// LapsSettingsRequestV2 represents a laps settings request v2.
+type LapsSettingsRequestV2 struct {
+	AutoDeployEnabled        bool `json:"autoDeployEnabled"`
+	AutoRotateEnabled        bool `json:"autoRotateEnabled"`
+	AutoRotateExpirationTime int  `json:"autoRotateExpirationTime"`
+	PasswordRotationTime     int  `json:"passwordRotationTime"`
+}
+
+// LapsSettingsResponseV2 represents a laps settings response v2.
+type LapsSettingsResponseV2 struct {
+	AutoDeployEnabled        bool `json:"autoDeployEnabled"`
+	AutoRotateEnabled        bool `json:"autoRotateEnabled"`
+	AutoRotateExpirationTime int  `json:"autoRotateExpirationTime"`
+	PasswordRotationTime     int  `json:"passwordRotationTime"`
+}
+
+// LapsUserPasswordRequestV2 represents a laps user password request v2.
+type LapsUserPasswordRequestV2 struct {
+	LapsUserPasswordList *[]LapsUserPasswordV2 `json:"lapsUserPasswordList,omitempty"`
+}
+
+// LapsUserPasswordResponseV2 represents a laps user password response v2.
+type LapsUserPasswordResponseV2 struct {
+	LapsUserPasswordList []LapsUserPasswordV2 `json:"lapsUserPasswordList"`
+}
+
+// LapsUserPasswordV2 represents a laps user password v2.
+type LapsUserPasswordV2 struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password *string `json:"password,omitempty"`
+	Username *string `json:"username,omitempty"`
+}
+
+// LapsUserResultsV2 represents a laps user results v2.
+type LapsUserResultsV2 struct {
+	Results    []LapsUserV2 `json:"results"`
+	TotalCount int          `json:"totalCount"`
+}
+
+// LapsUserV2 represents a laps user v2.
+type LapsUserV2 struct {
+	ClientManagementID string `json:"clientManagementId"`
+	Guid               string `json:"guid"`
+	UserSource         string `json:"userSource"`
+	Username           string `json:"username"`
+}
+
 // LdapConfigurationRequest A Cloud Identity Provider LDAP configuration for requests.
 type LdapConfigurationRequest struct {
 	CloudIDPCommon CloudIDPCommonRequest     `json:"cloudIdPCommon"`
@@ -5382,6 +5497,40 @@ type StatusItems struct {
 // StopMirroringCommand represents a stop mirroring command.
 type StopMirroringCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
+}
+
+// SupervisionIdentity represents a supervision identity.
+type SupervisionIdentity struct {
+	CommonName     string `json:"commonName"`
+	DisplayName    string `json:"displayName"`
+	ExpirationDate string `json:"expirationDate"`
+	ID             int    `json:"id"`
+}
+
+// SupervisionIdentityCertificateUpload represents a supervision identity certificate upload.
+type SupervisionIdentityCertificateUpload struct {
+	CertificateData *[]byte `json:"certificateData,omitempty"`
+	DisplayName     string  `json:"displayName"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+}
+
+// SupervisionIdentityCreate represents a supervision identity create.
+type SupervisionIdentityCreate struct {
+	DisplayName string `json:"displayName"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+}
+
+// SupervisionIdentitySearchResults represents a supervision identity search results.
+type SupervisionIdentitySearchResults struct {
+	Results    []SupervisionIdentity `json:"results"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+// SupervisionIdentityUpdate represents a supervision identity update.
+type SupervisionIdentityUpdate struct {
+	DisplayName string `json:"displayName"`
 }
 
 // TeacherFeatures represents a teacher features.

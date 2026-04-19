@@ -729,7 +729,28 @@
         {"op": "POST /v1/pki/venafi/{id}/jamf-public-key/regenerate", "name": "RegenerateVenafiJamfPublicKeyV1", "expectedStatus": 204},
         {"op": "GET /v1/pki/venafi/{id}/proxy-trust-store", "name": "GetVenafiProxyTrustStoreV1"},
         {"op": "POST /v1/pki/venafi/{id}/proxy-trust-store", "name": "UploadVenafiProxyTrustStoreV1", "expectedStatus": 204},
-        {"op": "DELETE /v1/pki/venafi/{id}/proxy-trust-store", "name": "DeleteVenafiProxyTrustStoreV1", "expectedStatus": 204}
+        {"op": "DELETE /v1/pki/venafi/{id}/proxy-trust-store", "name": "DeleteVenafiProxyTrustStoreV1", "expectedStatus": 204},
+
+        {"op": "GET /v2/local-admin-password/pending-rotations", "name": "GetLAPSPendingRotationsV2"},
+        {"op": "GET /v2/local-admin-password/settings", "name": "GetLAPSSettingsV2"},
+        {"op": "PUT /v2/local-admin-password/settings", "name": "UpdateLAPSSettingsV2"},
+        {"op": "GET /v2/local-admin-password/{clientManagementId}/accounts", "name": "ListLAPSAccountsV2", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v2/local-admin-password/{clientManagementId}/history", "name": "ListLAPSHistoryV2", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/audit", "name": "GetLAPSAccountAuditV2", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/history", "name": "GetLAPSAccountHistoryV2", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/password", "name": "GetLAPSAccountPasswordV2", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/audit", "name": "GetLAPSAccountGuidAuditV2", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/history", "name": "GetLAPSAccountGuidHistoryV2", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/password", "name": "GetLAPSAccountGuidPasswordV2", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "PUT /v2/local-admin-password/{clientManagementId}/set-password", "name": "SetLAPSPasswordV2", "pathNames": {"clientManagementId": "clientManagementID"}},
+
+        {"op": "GET /v1/supervision-identities", "name": "ListSupervisionIdentitiesV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "POST /v1/supervision-identities", "name": "CreateSupervisionIdentityV1", "expectedStatus": 200},
+        {"op": "GET /v1/supervision-identities/{id}", "name": "GetSupervisionIdentityV1"},
+        {"op": "PUT /v1/supervision-identities/{id}", "name": "UpdateSupervisionIdentityV1"},
+        {"op": "DELETE /v1/supervision-identities/{id}", "name": "DeleteSupervisionIdentityV1", "expectedStatus": 204},
+        {"op": "GET /v1/supervision-identities/{id}/download", "name": "DownloadSupervisionIdentityV1"},
+        {"op": "POST /v1/supervision-identities/upload", "name": "UploadSupervisionIdentityV1", "expectedStatus": 201}
       ]
     },
     {
