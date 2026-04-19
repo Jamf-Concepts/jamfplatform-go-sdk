@@ -553,27 +553,32 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 	return nil
 }
 
-// emitMethodsByTag buckets methods by their first OpenAPI tag and emits one
-// source + test file per tag. Operations without a tag error out — untagged
-// ops in splitByTag mode signal a spec bug the curator should see.
+// emitMethodsByTag buckets methods by the filename their first OpenAPI tag
+// maps to (post tagToFileBase normalization) and emits one source + test
+// file per distinct filename. Operations without a tag error out —
+// untagged ops in splitByTag mode signal a spec bug the curator should
+// see. Bucketing by final filename (not raw tag) means two tags that
+// normalize to the same base — e.g. `foo` + `foo-preview` after the
+// -preview strip — merge into one file instead of the second overwriting
+// the first.
 func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, methods []GoMethod) error {
 	buckets := make(map[string][]GoMethod)
 	for _, m := range methods {
 		if m.Tag == "" {
 			return fmt.Errorf("spec %s: operation %s has no OpenAPI tag but splitByTag is enabled", spec.File, m.Name)
 		}
-		buckets[m.Tag] = append(buckets[m.Tag], m)
+		base := tagToFileBase(m.Tag)
+		buckets[base] = append(buckets[base], m)
 	}
 
-	tags := make([]string, 0, len(buckets))
-	for t := range buckets {
-		tags = append(tags, t)
+	bases := make([]string, 0, len(buckets))
+	for b := range buckets {
+		bases = append(bases, b)
 	}
-	sort.Strings(tags)
+	sort.Strings(bases)
 
-	for _, tag := range tags {
-		base := tagToFileBase(tag)
-		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: spec.Format, Methods: buckets[tag]}
+	for _, base := range bases {
+		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: spec.Format, Methods: buckets[base]}
 		if err := emitTemplated(sourceTmpl, mf, filepath.Join(pkgDir, base+".go")); err != nil {
 			return err
 		}
