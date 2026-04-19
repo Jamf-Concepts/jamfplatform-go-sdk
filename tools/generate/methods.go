@@ -320,7 +320,11 @@ func categorize(m GoMethod) string {
 // Spec helpers
 // ---------------------------------------------------------------------------
 
-var pathParamRe = regexp.MustCompile(`\{(\w+)\}`)
+// pathParamRe matches OpenAPI path parameter placeholders. Allows
+// hyphens (e.g. {panel-id}) as well as the usual alphanumerics — the
+// Jamf Pro spec uses kebab-case segment names in a handful of places
+// (enrollment-customization panels).
+var pathParamRe = regexp.MustCompile(`\{([\w-]+)\}`)
 var versionPrefixRe = regexp.MustCompile(`^/v\d+`)
 
 func extractPathParams(path string, overrides map[string]string) []GoPathParam {

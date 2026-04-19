@@ -66,6 +66,21 @@ func exportedGoName(name string) string {
 }
 
 func toLowerCamelCase(s string) string {
+	// kebab-case → lowerCamel: "panel-id" → "panelId", "some-thing" → "someThing".
+	// Required because Go identifiers cannot contain hyphens; Jamf Pro spec
+	// uses kebab-case for a handful of path-param names.
+	if strings.Contains(s, "-") {
+		parts := strings.Split(s, "-")
+		var out strings.Builder
+		out.WriteString(parts[0])
+		for _, p := range parts[1:] {
+			if p == "" {
+				continue
+			}
+			out.WriteString(strings.ToUpper(p[:1]) + p[1:])
+		}
+		s = out.String()
+	}
 	if s == "id" {
 		return "id"
 	}

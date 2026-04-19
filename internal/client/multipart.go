@@ -9,8 +9,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
+	"path/filepath"
+	"strings"
 )
 
 // MultipartField represents one part of a multipart/form-data request body.
@@ -37,9 +41,29 @@ func (c *Transport) DoMultipart(ctx context.Context, method, path string, fields
 	w := multipart.NewWriter(&buf)
 	for _, f := range fields {
 		if f.Filename != "" {
-			part, err := w.CreateFormFile(f.Name, f.Filename)
+			// CreateFormFile hardcodes Content-Type: application/octet-stream,
+			// which Jamf's enrollment-customization image-upload endpoint
+			// rejects with 400 "Bad Request". Sniff the MIME type from the
+			// filename extension instead — PNG fixture → image/png — so
+			// the server's content-type validation is satisfied. Fall back
+			// to octet-stream if the extension is unknown.
+			h := make(textproto.MIMEHeader)
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name=%q; filename=%q`, f.Name, f.Filename))
+			ct := mime.TypeByExtension(filepath.Ext(f.Filename))
+			if ct == "" {
+				ct = "application/octet-stream"
+			}
+			// mime.TypeByExtension appends "; charset=utf-8" for text/*;
+			// strip it — the server's own content-type validator may be
+			// literal about values, and the boundary shouldn't carry a
+			// charset parameter on binary uploads.
+			if semi := strings.Index(ct, ";"); semi >= 0 {
+				ct = strings.TrimSpace(ct[:semi])
+			}
+			h.Set("Content-Type", ct)
+			part, err := w.CreatePart(h)
 			if err != nil {
-				return fmt.Errorf("multipart CreateFormFile(%q): %w", f.Name, err)
+				return fmt.Errorf("multipart CreatePart(%q): %w", f.Name, err)
 			}
 			if f.Content != nil {
 				if _, err := io.Copy(part, f.Content); err != nil {
