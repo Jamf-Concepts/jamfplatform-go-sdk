@@ -126,9 +126,14 @@ func TestAcceptance_Pro_Computer_StaticGroupCRUD(t *testing.T) {
 	name := "sdk-acc-static-cg-" + runSuffix()
 	desc := "SDK acceptance test fixture"
 
+	// assignments must be a non-null array — server NPEs on null (same
+	// pattern as popupMenuChoices on CEA create). Sending [] instead of
+	// omitting lets the server iterate safely.
+	assignments := []string{}
 	created, err := p.CreateStaticComputerGroupV2(ctx, &pro.StaticComputerGroupAssignment{
 		Name:        name,
 		Description: &desc,
+		Assignments: &assignments,
 	}, false)
 	if err != nil {
 		skipOnServerError(t, err)
@@ -149,11 +154,13 @@ func TestAcceptance_Pro_Computer_StaticGroupCRUD(t *testing.T) {
 		t.Errorf("Name = %q, want %q", got.Name, name)
 	}
 
-	// Update description (no computer assignments available on this tenant fixture-free).
+	// Update description. Assignments explicitly empty — same NPE guard
+	// as create (server iterates null).
 	newDesc := desc + " (updated)"
 	update := &pro.StaticComputerGroupAssignment{
 		Name:        got.Name,
 		Description: &newDesc,
+		Assignments: &assignments,
 	}
 	if _, err := p.UpdateStaticComputerGroupV2(ctx, created.ID, update); err != nil {
 		skipOnServerError(t, err)
