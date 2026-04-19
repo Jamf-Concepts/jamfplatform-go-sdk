@@ -1337,13 +1337,52 @@ func TestAcceptance_Classic_ComputerInvitationCRUD(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
 }
 
-// TestAcceptance_Classic_MobileDeviceInvitationCRUD is skipped: the
-// Classic spec types `invitation` as integer, but the server returns a
-// 39-digit code that overflows int64. Fixing this needs a spec patch
-// (invitation → string) or generator-level type override. Endpoint
-// shape is covered by unit tests.
+// TestAcceptance_Classic_MobileDeviceInvitationCRUD exercises the
+// mobile_device_invitation CRUD lifecycle. The 39-digit `invitation`
+// code the server returns is carried as *BigInt via the fieldTypeOverrides
+// entry `*.invitation: *BigInt`, so the response decodes without int64
+// overflow.
 func TestAcceptance_Classic_MobileDeviceInvitationCRUD(t *testing.T) {
-	t.Skip("spec types `invitation` as int; server returns a 39-digit code that overflows int64")
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	created, err := pc.CreateMobileDeviceInvitationByID(ctx, "0", &proclassic.MobileDeviceInvitationPost{
+		InvitationType: classicStrPtr("USER_INITIATED_URL"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("forbidden on this tenant: %v", err)
+		}
+		t.Fatalf("CreateMobileDeviceInvitationByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	t.Cleanup(func() { _ = pc.DeleteMobileDeviceInvitationByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetMobileDeviceInvitationByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceInvitationByID(%d): %v", id, err)
+	}
+	if got == nil || got.Invitation == nil {
+		t.Fatalf("expected Invitation populated, got %+v", got)
+	}
+	t.Logf("MobileDeviceInvitation id=%d invitation=%s", id, got.Invitation.String())
+
+	if err := pc.DeleteMobileDeviceInvitationByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetMobileDeviceInvitationByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
 }
 
 func TestAcceptance_Classic_MobileDeviceEnrollmentProfileCRUD(t *testing.T) {
