@@ -1892,12 +1892,28 @@ func TestAcceptance_Classic_VPPInvitationCRUD(t *testing.T) {
 }
 
 func TestAcceptance_Classic_GetComputerHistoryByID(t *testing.T) {
+	c := accClient(t)
+	pc := proclassic.New(c)
+	ctx := context.Background()
+
 	id := os.Getenv("JAMFPLATFORM_CLASSIC_COMPUTER_ID")
 	if id == "" {
-		id = "4"
-	} // fallback to known computer id in this tenant
-	c := accClient(t)
-	h, err := proclassic.New(c).GetComputerHistoryByID(context.Background(), id)
+		list, err := pc.ListComputers(ctx)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("ListComputers: %v", err)
+		}
+		if list == nil || len(list.Computers) == 0 {
+			t.Skip("tenant has no computers; set JAMFPLATFORM_CLASSIC_COMPUTER_ID to override")
+		}
+		first := list.Computers[0]
+		if first.ID == nil {
+			t.Fatalf("first computer has no ID: %+v", first)
+		}
+		id = intToStr(*first.ID)
+	}
+
+	h, err := pc.GetComputerHistoryByID(ctx, id)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Skipf("GetComputerHistoryByID(%s): %v", id, err)

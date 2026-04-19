@@ -1704,6 +1704,22 @@ type DependencyObjectResultsResultsItem struct {
 	ObjectID         int    `json:"objectId"`
 }
 
+// DeploymentTask represents a deployment task.
+type DeploymentTask struct {
+	ComputerID   string     `json:"computerId"`
+	ComputerName string     `json:"computerName"`
+	ID           string     `json:"id"`
+	Status       string     `json:"status"`
+	Updated      *time.Time `json:"updated,omitempty"`
+	Version      string     `json:"version"`
+}
+
+// DeploymentTaskSearchResults represents a deployment task search results.
+type DeploymentTaskSearchResults struct {
+	Results    []DeploymentTask `json:"results"`
+	TotalCount int              `json:"totalCount"`
+}
+
 // DetailsV2 will be populated if the type is ios or visionos.
 type DetailsV2 struct {
 	Applications                []MobileDeviceApplication          `json:"applications"`
@@ -2277,6 +2293,13 @@ type FileAttachmentV3 struct {
 	Name string `json:"name"`
 }
 
+// FileTransferItem represents a file transfer item.
+type FileTransferItem struct {
+	FilePath          string     `json:"filePath"`
+	FileTransferType  string     `json:"fileTransferType"`
+	TransferTimestamp *time.Time `json:"transferTimestamp,omitempty"`
+}
+
 // GetComputerPrestageV3 represents a get computer prestage v3.
 type GetComputerPrestageV3 struct {
 	AccountSettings                    *AccountSettingsResponse         `json:"accountSettings,omitempty"`
@@ -2764,6 +2787,19 @@ type InventoryPreloadRecordV2 struct {
 	WarrantyExpiration  *string                               `json:"warrantyExpiration,omitempty"`
 }
 
+// JamfProtectPlan represents a jamf protect plan.
+type JamfProtectPlan struct {
+	Description      string `json:"description"`
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	ProfileID        int    `json:"profileId"`
+	ProfileName      string `json:"profileName"`
+	ProfileVersion   int    `json:"profileVersion"`
+	ScopeDescription string `json:"scopeDescription"`
+	SiteID           string `json:"siteId"`
+	UUID             string `json:"uuid"`
+}
+
 // LanguageCode represents a language code.
 type LanguageCode struct {
 	Name  string `json:"name"`
@@ -2810,6 +2846,22 @@ type LdapGroupSearchResults struct {
 type LdapServer struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+}
+
+// LinkedConnectProfile represents a linked connect profile.
+type LinkedConnectProfile struct {
+	AutoDeploymentType      *string `json:"autoDeploymentType,omitempty"`
+	ProfileID               *int    `json:"profileId"`
+	ProfileName             *string `json:"profileName,omitempty"`
+	ProfileScopeDescription *string `json:"profileScopeDescription,omitempty"`
+	UUID                    *string `json:"uuid,omitempty"`
+	Version                 *string `json:"version,omitempty"`
+}
+
+// LinkedConnectProfileSearchResults represents a linked connect profile search results.
+type LinkedConnectProfileSearchResults struct {
+	Results    []LinkedConnectProfile `json:"results"`
+	TotalCount int                    `json:"totalCount"`
 }
 
 // LocationInformationV2 represents a location information v2.
@@ -4234,6 +4286,12 @@ type PlanGroupPost struct {
 	ObjectType string `json:"objectType"`
 }
 
+// PlanSearchResults represents a plan search results.
+type PlanSearchResults struct {
+	Results    []JamfProtectPlan `json:"results"`
+	TotalCount int               `json:"totalCount"`
+}
+
 // PlanStatus represents a plan status.
 type PlanStatus struct {
 	ErrorReasons *[]string `json:"errorReasons,omitempty"`
@@ -4393,6 +4451,32 @@ type ProcessTextsSearchResults struct {
 type ProfileListCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
 	ManagedOnly *bool          `json:"managedOnly,omitempty"`
+}
+
+// ProtectRegistrationRequest Create an API Client in the Jamf Protect web console to obtain these values.
+type ProtectRegistrationRequest struct {
+	ClientID string `json:"clientId"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password   string `json:"password"`
+	ProtectURL string `json:"protectUrl"`
+}
+
+// ProtectSettingsResponse represents a protect settings response.
+type ProtectSettingsResponse struct {
+	ApiClientID      string `json:"apiClientId"`
+	ApiClientName    string `json:"apiClientName"`
+	AutoInstall      bool   `json:"autoInstall"`
+	ID               string `json:"id"`
+	LastSyncTime     string `json:"lastSyncTime"`
+	PlatformPlanSync bool   `json:"platformPlanSync"`
+	ProtectURL       string `json:"protectUrl"`
+	RegistrationID   string `json:"registrationId"`
+	SyncStatus       string `json:"syncStatus"`
+}
+
+// ProtectUpdatableSettingsRequest represents a protect updatable settings request.
+type ProtectUpdatableSettingsRequest struct {
+	AutoInstall *bool `json:"autoInstall,omitempty"`
 }
 
 // ProvisioningProfileListCommand represents a provisioning profile list command.
@@ -4657,6 +4741,44 @@ type SecurityV2 struct {
 
 // ServiceDiscoveryVersion represents a service discovery version value.
 type ServiceDiscoveryVersion = string
+
+// SessionHistoryItem represents a session history item.
+type SessionHistoryItem struct {
+	Comment                 string     `json:"comment"`
+	DeviceID                string     `json:"deviceId"`
+	SessionAdminID          string     `json:"sessionAdminId"`
+	SessionEndedTimestamp   *time.Time `json:"sessionEndedTimestamp,omitempty"`
+	SessionID               string     `json:"sessionId"`
+	SessionStartedTimestamp *time.Time `json:"sessionStartedTimestamp,omitempty"`
+	SessionType             string     `json:"sessionType"`
+	StatusType              string     `json:"statusType"`
+	TenantID                string     `json:"tenantId"`
+}
+
+// SessionHistoryItemDetails represents a session history item details.
+type SessionHistoryItemDetails struct {
+	FileTransferItemList []FileTransferItem `json:"fileTransferItemList"`
+}
+
+// SessionHistoryItemWithDetails represents a session history item with details.
+type SessionHistoryItemWithDetails struct {
+	Comment                 string                     `json:"comment"`
+	Details                 *SessionHistoryItemDetails `json:"details,omitempty"`
+	DeviceID                string                     `json:"deviceId"`
+	SessionAdminID          string                     `json:"sessionAdminId"`
+	SessionEndedTimestamp   *time.Time                 `json:"sessionEndedTimestamp,omitempty"`
+	SessionID               string                     `json:"sessionId"`
+	SessionStartedTimestamp *time.Time                 `json:"sessionStartedTimestamp,omitempty"`
+	SessionType             string                     `json:"sessionType"`
+	StatusType              string                     `json:"statusType"`
+	TenantID                string                     `json:"tenantId"`
+}
+
+// SessionHistorySearchResults represents a session history search results.
+type SessionHistorySearchResults struct {
+	Results    []SessionHistoryItem `json:"results"`
+	TotalCount int                  `json:"totalCount"`
+}
 
 // SetAutoAdminPasswordCommand represents a set auto admin password command.
 type SetAutoAdminPasswordCommand struct {

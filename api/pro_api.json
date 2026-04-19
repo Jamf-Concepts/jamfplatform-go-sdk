@@ -6441,6 +6441,65 @@
         },
         "type": "object"
       },
+      "DeploymentTask": {
+        "properties": {
+          "computerId": {
+            "example": "111",
+            "readOnly": true,
+            "type": "string"
+          },
+          "computerName": {
+            "example": "Polka dot Stratocaster",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "82",
+            "readOnly": true,
+            "type": "string"
+          },
+          "status": {
+            "description": "Status of this Jamf Connect deployment task. \"Command\" below refers to an `InstallEnterpriseApplication` command. Tasks that are not finished (i.e., `COMPLETE` or `GAVE_UP`) are evaluated once every thirty minutes, so the status value for a device may lag behind a successful Jamf Connect package install up to thirty minutes. * `COMMAND_QUEUED` - command has been queued * `NO_COMMAND` - command has not yet been queued * `PENDING_MANIFEST` - task is waiting to obtain a valid package manifest before a command can be queued * `COMPLETE` - command has been completed successfully * `GAVE_UP` - the command failed with an error or the device did not process it in a reasonable amount of time * `UNKNOWN` - unknown; tasks in this state will be evaluated\n",
+            "enum": [
+              "COMMAND_QUEUED",
+              "NO_COMMAND",
+              "PENDING_MANIFEST",
+              "COMPLETE",
+              "GAVE_UP",
+              "UNKNOWN"
+            ],
+            "example": "COMPLETE",
+            "type": "string"
+          },
+          "updated": {
+            "example": "2021-05-07T21:20:34.35Z",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "version": {
+            "example": "2.3.4",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DeploymentTaskSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/DeploymentTask"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 13,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "DetailsV2": {
         "description": "will be populated if the type is ios or visionos.",
         "properties": {
@@ -8536,6 +8595,28 @@
         },
         "type": "object"
       },
+      "FileTransferItem": {
+        "properties": {
+          "filePath": {
+            "example": "/SomeFilePath/ToFile.xml",
+            "type": "string"
+          },
+          "fileTransferType": {
+            "enum": [
+              "DOWNLOAD",
+              "UPLOAD"
+            ],
+            "example": "DOWNLOAD",
+            "type": "string"
+          },
+          "transferTimestamp": {
+            "example": "2023-11-07T10:25:27.49Z",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "GetComputerPrestageV3": {
         "allOf": [
           {
@@ -9918,6 +9999,56 @@
         ],
         "type": "object"
       },
+      "JamfProtectPlan": {
+        "properties": {
+          "description": {
+            "example": "Plan for the majority of the company's computers",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "d265dfd3-8fde-4bf2-aa56-b167c8b68069",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "Main Plan",
+            "readOnly": true,
+            "type": "string"
+          },
+          "profileId": {
+            "example": 12,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "profileName": {
+            "example": "Main Plan (Jamf Protect)",
+            "readOnly": true,
+            "type": "string"
+          },
+          "profileVersion": {
+            "example": 1,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "scopeDescription": {
+            "example": "All Computers",
+            "readOnly": true,
+            "type": "string"
+          },
+          "siteId": {
+            "example": "-1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "uuid": {
+            "example": "b999dfd3-8fde-4bf2-aa56-b167c8b68071",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "LanguageCode": {
         "properties": {
           "name": {
@@ -10040,6 +10171,62 @@
           "name": {
             "example": "Server name",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LinkedConnectProfile": {
+        "properties": {
+          "autoDeploymentType": {
+            "default": "NONE",
+            "description": "Determines how the server will behave regarding application updates and installs on the devices that have the configuration profile installed. * `PATCH_UPDATES` - Server handles initial installation of the application and any patch updates. * `MINOR_AND_PATCH_UPDATES` - Server handles initial installation of the application and any patch and minor updates. * `INITIAL_INSTALLATION_ONLY` - Server only handles initial installation of the application. Updates will have to be done manually. * `NONE` - Server does not handle any installations or updates for the application. Version is ignored for this type.\n",
+            "enum": [
+              "PATCH_UPDATES",
+              "MINOR_AND_PATCH_UPDATES",
+              "INITIAL_INSTALLATION_ONLY",
+              "NONE"
+            ],
+            "type": "string"
+          },
+          "profileId": {
+            "example": "d265dfd3-8fde-4bf2-aa56-b167c8b68069",
+            "readOnly": true,
+            "type": "string"
+          },
+          "profileName": {
+            "example": "Best Plans of Mice",
+            "readOnly": true,
+            "type": "string"
+          },
+          "profileScopeDescription": {
+            "example": "Plan for all of the mouse computers at our org",
+            "readOnly": true,
+            "type": "string"
+          },
+          "uuid": {
+            "example": "d265dfd3-8fde-4bf2-aa56-b167c8b68069",
+            "readOnly": true,
+            "type": "string"
+          },
+          "version": {
+            "description": "Must be a valid Jamf Connect version 2.3.0 or higher. Versions are listed here `https://www.jamf.com/resources/product-documentation/jamf-connect-administrators-guide/`",
+            "example": "2.3.0",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LinkedConnectProfileSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LinkedConnectProfile"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 13,
+            "type": "integer"
           }
         },
         "type": "object"
@@ -14438,6 +14625,21 @@
         ],
         "type": "object"
       },
+      "PlanSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/JamfProtectPlan"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "PlanStatus": {
         "properties": {
           "errorReasons": {
@@ -14911,6 +15113,92 @@
             "type": "object"
           }
         ]
+      },
+      "ProtectRegistrationRequest": {
+        "description": "Create an API Client in the Jamf Protect web console to obtain these values.",
+        "properties": {
+          "clientId": {
+            "example": "uzPJXlArmzTAmPRQtZEnQ2OFtNw8qQV",
+            "type": "string"
+          },
+          "password": {
+            "example": "7fyP6BphUUQ5B_zoLrkYhM5j1HTcf-4PxshettZbK0ZcnzV57gyHwF23U3F96F",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "protectUrl": {
+            "example": "https://examplejamfprotect.jamfcloud.com/graphql",
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientId",
+          "password",
+          "protectUrl"
+        ],
+        "type": "object"
+      },
+      "ProtectSettingsResponse": {
+        "properties": {
+          "apiClientId": {
+            "example": "esgzYzYBqN7wCImwyusbQcXob2qalGMN",
+            "type": "string"
+          },
+          "apiClientName": {
+            "description": "display name used when creating the API Client in the Jamf Protect web console",
+            "example": "Jamf Pro integration",
+            "type": "string"
+          },
+          "autoInstall": {
+            "description": "determines whether the Jamf Protect agent will be automatically installed on client computers",
+            "example": true,
+            "type": "boolean"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "lastSyncTime": {
+            "example": "2003-01-05T18:00:14.885Z",
+            "type": "string"
+          },
+          "platformPlanSync": {
+            "description": "determines whether Protect Platform Plan syncing is enabled",
+            "example": true,
+            "type": "boolean"
+          },
+          "protectUrl": {
+            "example": "https://examplejamfprotect.jamfcloud.com/graphql",
+            "type": "string"
+          },
+          "registrationId": {
+            "description": "ID used when making requests to identify this particular Protect registration.",
+            "example": "6f250316-2cfb-4521-8cb7-bfaf46497bc5",
+            "type": "string"
+          },
+          "syncStatus": {
+            "enum": [
+              "IN_PROGRESS",
+              "COMPLETED",
+              "ERROR",
+              "UNKNOWN"
+            ],
+            "example": "COMPLETED",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProtectUpdatableSettingsRequest": {
+        "properties": {
+          "autoInstall": {
+            "description": "determines whether the Jamf Protect agent will be automatically installed on client computers",
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
       },
       "ProvisioningProfileListCommand": {
         "allOf": [
@@ -15545,6 +15833,143 @@
         ],
         "example": "mdm-byod",
         "type": "string"
+      },
+      "SessionHistoryItem": {
+        "properties": {
+          "comment": {
+            "example": "Example comment",
+            "type": "string"
+          },
+          "deviceId": {
+            "example": "aeafd2ff95c7e0b937a8dbf3121a8dcab7a70161cd4493af038fa9c784b61866",
+            "type": "string"
+          },
+          "sessionAdminId": {
+            "example": "sessionAdminId1",
+            "type": "string"
+          },
+          "sessionEndedTimestamp": {
+            "example": "2023-11-07T10:25:27.49Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "sessionId": {
+            "example": "c4087bc8-cb48-4452-9bec-a3c50088a485",
+            "type": "string"
+          },
+          "sessionStartedTimestamp": {
+            "example": "2023-11-07T10:25:27.49Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "sessionType": {
+            "enum": [
+              "ATTENDED",
+              "UNATTENDED"
+            ],
+            "example": "ATTENDED",
+            "type": "string"
+          },
+          "statusType": {
+            "enum": [
+              "STARTED",
+              "FINISHED",
+              "ERROR"
+            ],
+            "example": "STARTED",
+            "type": "string"
+          },
+          "tenantId": {
+            "example": "ee5d0ffae49e675d32ba5bdb2ce25182e958b979afc8d210c924d725bbf45f8b",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SessionHistoryItemDetails": {
+        "properties": {
+          "fileTransferItemList": {
+            "items": {
+              "$ref": "#/components/schemas/FileTransferItem"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "SessionHistoryItemWithDetails": {
+        "properties": {
+          "comment": {
+            "example": "Example comment",
+            "type": "string"
+          },
+          "details": {
+            "$ref": "#/components/schemas/SessionHistoryItemDetails"
+          },
+          "deviceId": {
+            "example": "aeafd2ff95c7e0b937a8dbf3121a8dcab7a70161cd4493af038fa9c784b61866",
+            "type": "string"
+          },
+          "sessionAdminId": {
+            "example": "sessionAdminId1",
+            "type": "string"
+          },
+          "sessionEndedTimestamp": {
+            "example": "2023-11-07T10:25:27.49Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "sessionId": {
+            "example": "c4087bc8-cb48-4452-9bec-a3c50088a485",
+            "type": "string"
+          },
+          "sessionStartedTimestamp": {
+            "example": "2023-11-07T10:25:27.49Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "sessionType": {
+            "enum": [
+              "ATTENDED",
+              "UNATTENDED"
+            ],
+            "example": "ATTENDED",
+            "type": "string"
+          },
+          "statusType": {
+            "enum": [
+              "STARTED",
+              "FINISHED",
+              "ERROR"
+            ],
+            "example": "STARTED",
+            "type": "string"
+          },
+          "tenantId": {
+            "example": "ee5d0ffae49e675d32ba5bdb2ce25182e958b979afc8d210c924d725bbf45f8b",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SessionHistorySearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SessionHistoryItem"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 100,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "results",
+          "totalCount"
+        ],
+        "type": "object"
       },
       "SetAutoAdminPasswordCommand": {
         "allOf": [
@@ -25482,6 +25907,825 @@
         "x-authentication-required": true
       }
     },
+    "/v1/jamf-connect": {
+      "get": {
+        "description": "Get the Jamf Connect settings that you have access to see.",
+        "responses": {
+          "204": {
+            "description": "Success, no content."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Cloud Services Connection has not been established."
+          }
+        },
+        "summary": "Get the Jamf Connect settings that you have access to see\n",
+        "tags": [
+          "jamf-connect"
+        ],
+        "x-required-privileges": [
+          "Read Jamf Connect Settings",
+          "Read Jamf Connect Deployments"
+        ]
+      }
+    },
+    "/v1/jamf-connect/config-profiles": {
+      "get": {
+        "description": "Search for config profiles linked to Jamf Connect",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedConnectProfileSearchResults"
+                }
+              }
+            },
+            "description": "Success."
+          }
+        },
+        "summary": "Search for config profiles linked to Jamf Connect\n",
+        "tags": [
+          "jamf-connect"
+        ],
+        "x-required-privileges": [
+          "Read Jamf Connect Deployments"
+        ]
+      }
+    },
+    "/v1/jamf-connect/config-profiles/{id}": {
+      "put": {
+        "description": "Update the way the Jamf Connect app gets updated on computers within scope of the associated configuration profile.",
+        "parameters": [
+          {
+            "description": "the UUID of the profile to update",
+            "example": "24a7bb2a-9871-4895-9009-d1be07ed31b1",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkedConnectProfile"
+              }
+            }
+          },
+          "description": "Updatable Jamf Connect Settings"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedConnectProfile"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Update the way the Jamf Connect app gets updated on computers within scope of the associated configuration profile.\n",
+        "tags": [
+          "jamf-connect"
+        ],
+        "x-required-privileges": [
+          "Update Jamf Connect Deployments"
+        ]
+      }
+    },
+    "/v1/jamf-connect/deployments/{id}/tasks": {
+      "get": {
+        "description": "Search for config profiles linked to Jamf Connect",
+        "parameters": [
+          {
+            "description": "the UUID of the Jamf Connect deployment",
+            "example": "24a7bb2a-9871-4895-9009-d1be07ed31b1",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeploymentTaskSearchResults"
+                }
+              }
+            },
+            "description": "Success."
+          }
+        },
+        "summary": "Search for deployment tasks for a config profile linked to Jamf Connect\n",
+        "tags": [
+          "jamf-connect"
+        ],
+        "x-required-privileges": [
+          "Read Jamf Connect Deployments"
+        ]
+      }
+    },
+    "/v1/jamf-connect/deployments/{id}/tasks/retry": {
+      "post": {
+        "description": "Request a retry of Connect install tasks\n",
+        "parameters": [
+          {
+            "description": "the UUID of the deployment associated with the retry",
+            "example": "24a7bb2a-9871-4895-9009-d1be07ed31b1",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ids"
+              }
+            }
+          },
+          "description": "task IDs to retry",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Success, no content."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Cloud Services Connection has not been established."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Connect tasks to retry failed"
+          }
+        },
+        "summary": "Request a retry of Connect install tasks\n",
+        "tags": [
+          "jamf-connect"
+        ],
+        "x-required-privileges": [
+          "Jamf Connect Deployment Retry"
+        ]
+      }
+    },
+    "/v1/jamf-connect/history": {
+      "get": {
+        "description": "Get Jamf Connect history\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Jamf Connect history were found"
+          }
+        },
+        "summary": "Get Jamf Connect history\n",
+        "tags": [
+          "jamf-connect"
+        ],
+        "x-required-privileges": [
+          "Read Jamf Connect Settings"
+        ]
+      },
+      "post": {
+        "description": "Add Jamf Connect history notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes to Jamf Connect history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Connect history can not be saved"
+          }
+        },
+        "summary": "Add Jamf Connect history notes\n",
+        "tags": [
+          "jamf-connect"
+        ],
+        "x-required-privileges": [
+          "Update Jamf Connect Settings"
+        ]
+      }
+    },
+    "/v1/jamf-protect": {
+      "delete": {
+        "description": "Deletes an existing Jamf Protect API registration if present. Jamf Protect API integration will be disabled.",
+        "responses": {
+          "204": {
+            "description": "Success, No Content"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Cloud Services Connection has not been established."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Error Deleting registration"
+          }
+        },
+        "summary": "Delete Jamf Protect API registration.",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-required-privileges": [
+          "Update Jamf Protect Settings"
+        ]
+      },
+      "get": {
+        "description": "Jamf Protect integration settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectSettingsResponse"
+                }
+              }
+            },
+            "description": "Success."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Cloud Services Connection has not been established."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Protect Integration has not been configured."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Pro is not able to establish contact with the Protect API via the SOUP CSA client."
+          }
+        },
+        "summary": "Jamf Protect integration settings",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-required-privileges": [
+          "Read Jamf Protect Settings",
+          "Read Jamf Protect Deployments"
+        ]
+      },
+      "put": {
+        "description": "Jamf Protect integration settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProtectUpdatableSettingsRequest"
+              }
+            }
+          },
+          "description": "Updatable Jamf Protect Settings",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectSettingsResponse"
+                }
+              }
+            },
+            "description": "Success."
+          }
+        },
+        "summary": "Jamf Protect integration settings",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-required-privileges": [
+          "Update Jamf Protect Settings"
+        ]
+      }
+    },
+    "/v1/jamf-protect/deployments/{id}/tasks": {
+      "get": {
+        "description": "Search for config profiles linked to Jamf Protect",
+        "parameters": [
+          {
+            "description": "the UUID of the Jamf Protect deployment",
+            "example": "24a7bb2a-9871-4895-9009-d1be07ed31b1",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeploymentTaskSearchResults"
+                }
+              }
+            },
+            "description": "Success."
+          }
+        },
+        "summary": "Search for deployment tasks for a config profile linked to Jamf Protect\n",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-required-privileges": [
+          "Read Jamf Protect Deployments"
+        ]
+      }
+    },
+    "/v1/jamf-protect/deployments/{id}/tasks/retry": {
+      "post": {
+        "description": "Request a retry of Protect install tasks\n",
+        "parameters": [
+          {
+            "description": "the UUID of the deployment associated with the retry",
+            "example": "24a7bb2a-9871-4895-9009-d1be07ed31b1",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ids"
+              }
+            }
+          },
+          "description": "task IDs to retry",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Success, no content."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Cloud Services Connection has not been established."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Protect tasks to retry failed"
+          }
+        },
+        "summary": "Request a retry of Protect install tasks\n",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Jamf Protect Deployment Retry"
+        ]
+      }
+    },
+    "/v1/jamf-protect/history": {
+      "get": {
+        "description": "Get Jamf Protect history\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Jamf Protect history were found"
+          }
+        },
+        "summary": "Get Jamf Protect history\n",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-required-privileges": [
+          "Read Jamf Protect Settings"
+        ]
+      },
+      "post": {
+        "description": "Add Jamf Protect history notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes to Jamf Protect history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Protect history can not be saved"
+          }
+        },
+        "summary": "Add Jamf Protect history notes\n",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-required-privileges": [
+          "Update Jamf Protect Settings"
+        ]
+      }
+    },
+    "/v1/jamf-protect/plans": {
+      "get": {
+        "description": "Get all of the previously synced Jamf Protect Plans with information about their associated configuration profile",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanSearchResults"
+                }
+              }
+            },
+            "description": "Success."
+          }
+        },
+        "summary": "Get all of the previously synced Jamf Protect Plans with information about their associated configuration profile",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-required-privileges": [
+          "Read Jamf Protect Deployments"
+        ]
+      }
+    },
+    "/v1/jamf-protect/plans/sync": {
+      "post": {
+        "description": "Sync Plans with Jamf Protect. Configuration profiles associated with new plans will be imported to Jamf Pro.",
+        "responses": {
+          "204": {
+            "description": "Success."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Cloud Services Connection has not been established."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Protect API credentials have not been configured."
+          }
+        },
+        "summary": "Sync Plans with Jamf Protect",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Jamf Protect Settings"
+        ]
+      }
+    },
+    "/v1/jamf-protect/register": {
+      "post": {
+        "description": "Register a Jamf Protect API configuration with Jamf Pro",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProtectRegistrationRequest"
+              }
+            }
+          },
+          "description": "Jamf Protect API connection information",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectSettingsResponse"
+                }
+              }
+            },
+            "description": "Successful registration."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Cloud Services Connection has not been established."
+          }
+        },
+        "summary": "Register a Jamf Protect API configuration with Jamf Pro",
+        "tags": [
+          "jamf-protect"
+        ],
+        "x-required-privileges": [
+          "Update Jamf Protect Settings"
+        ]
+      }
+    },
+    "/v1/jamf-remote-assist/session": {
+      "get": {
+        "description": "Returns tenants sessions history.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SessionHistoryItem"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Up to 100 latest session history items"
+          }
+        },
+        "summary": "Gets session history items.\n",
+        "tags": [
+          "jamf-remote-assist"
+        ],
+        "x-required-privileges": [
+          "Read Remote Assist"
+        ]
+      }
+    },
+    "/v1/jamf-remote-assist/session/{id}": {
+      "get": {
+        "description": "Returns tenants session history for specific session.\n",
+        "parameters": [
+          {
+            "description": "instance id of session",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionHistoryItemWithDetails"
+                }
+              }
+            },
+            "description": "Single session history item"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Session with given id does not exist"
+          }
+        },
+        "summary": "Gets single session history item.\n",
+        "tags": [
+          "jamf-remote-assist"
+        ],
+        "x-required-privileges": [
+          "Read Remote Assist"
+        ]
+      }
+    },
     "/v1/ldap-keystore/verify": {
       "post": {
         "description": "Validate keystore for Cloud Identity Provider secure connection",
@@ -34633,6 +35877,168 @@
         ],
         "x-required-privileges": [
           "Update Inventory Preload Records"
+        ]
+      }
+    },
+    "/v2/jamf-remote-assist/session": {
+      "get": {
+        "description": "Returns tenants sessions history.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is sessionId:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=sessionId:desc,deviceId:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "sessionId:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter session history items collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: sessionId, deviceId, sessionAdminId. This param can be combined with paging and sorting. Example: sessionAdminId==\"*Andrzej*\"",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionHistorySearchResults"
+                }
+              }
+            },
+            "description": "Up to 100 latest session history items"
+          }
+        },
+        "summary": "Gets session history items.\n",
+        "tags": [
+          "jamf-remote-assist"
+        ],
+        "x-required-privileges": [
+          "Read Remote Assist"
+        ]
+      }
+    },
+    "/v2/jamf-remote-assist/session/export": {
+      "post": {
+        "description": "Export Jamf Remote Assist sessions history\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportParameters"
+              }
+            }
+          },
+          "description": "Optional. Override query parameters since they can make URI exceed 2,000 character limit."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "sessionId,deviceId\nc4087bc8-cb48-4452-9bec-a3c50088a485,aeafd2ff95c7e0b937a8dbf3121a8dcab7a70161cd4493af038fa9c784b61866\nc4087bc8-cb48-4452-9bec-a3c50088a486,aeafd2ff95c7e0b937a8dbf3121a8dcab7a70161cd4493af038fa9c784b61867\nc4087bc8-cb48-4452-9bec-a3c50088a487,aeafd2ff95c7e0b937a8dbf3121a8dcab7a70161cd4493af038fa9c784b61868\n",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "Export successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export fields specified incorrectly - non-existing column or duplicate on the list."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export currently unavailable, all export-related resources are in use. Try again later."
+          }
+        },
+        "summary": "Export Jamf Remote Assist sessions history\n",
+        "tags": [
+          "jamf-remote-assist"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Remote Assist"
+        ]
+      }
+    },
+    "/v2/jamf-remote-assist/session/{id}": {
+      "get": {
+        "description": "Returns tenants session history for specific session.\n",
+        "parameters": [
+          {
+            "description": "instance id of session",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionHistoryItemWithDetails"
+                }
+              }
+            },
+            "description": "Single session history item"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Session with given id does not exist"
+          }
+        },
+        "summary": "Gets single session history item.\n",
+        "tags": [
+          "jamf-remote-assist"
+        ],
+        "x-required-privileges": [
+          "Read Remote Assist"
         ]
       }
     },

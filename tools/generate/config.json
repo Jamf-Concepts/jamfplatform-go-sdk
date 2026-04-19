@@ -114,7 +114,8 @@
       "skipDeprecated": true,
       "specFile": "pro_api.json",
       "fieldTypeOverrides": {
-        "managed_software_update_plan_toggle_status.elapsedTime": "*float64"
+        "managed_software_update_plan_toggle_status.elapsedTime": "*float64",
+        "linked_connect_profile.profileId": "*int"
       },
       "excludePaths": [
         "POST /v1/auth/token",
@@ -627,7 +628,32 @@
         {"op": "PUT /v1/volume-purchasing-subscriptions/{id}", "name": "UpdateVolumePurchasingSubscriptionV1"},
         {"op": "DELETE /v1/volume-purchasing-subscriptions/{id}", "name": "DeleteVolumePurchasingSubscriptionV1", "expectedStatus": 204},
         {"op": "GET /v1/volume-purchasing-subscriptions/{id}/history", "name": "ListVolumePurchasingSubscriptionHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
-        {"op": "POST /v1/volume-purchasing-subscriptions/{id}/history", "name": "CreateVolumePurchasingSubscriptionHistoryNoteV1"}
+        {"op": "POST /v1/volume-purchasing-subscriptions/{id}/history", "name": "CreateVolumePurchasingSubscriptionHistoryNoteV1"},
+
+        {"op": "GET /v1/jamf-connect", "name": "GetJamfConnectSettingsV1", "expectedStatus": 204},
+        {"op": "GET /v1/jamf-connect/config-profiles", "name": "ListJamfConnectConfigProfilesV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "PUT /v1/jamf-connect/config-profiles/{id}", "name": "UpdateJamfConnectConfigProfileV1"},
+        {"op": "GET /v1/jamf-connect/deployments/{id}/tasks", "name": "ListJamfConnectDeploymentTasksV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/jamf-connect/deployments/{id}/tasks/retry", "name": "RetryJamfConnectDeploymentTasksV1", "expectedStatus": 204},
+        {"op": "GET /v1/jamf-connect/history", "name": "ListJamfConnectHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/jamf-connect/history", "name": "CreateJamfConnectHistoryNoteV1"},
+
+        {"op": "GET /v1/jamf-protect", "name": "GetJamfProtectSettingsV1"},
+        {"op": "PUT /v1/jamf-protect", "name": "UpdateJamfProtectSettingsV1"},
+        {"op": "DELETE /v1/jamf-protect", "name": "UnregisterJamfProtectV1", "expectedStatus": 204},
+        {"op": "GET /v1/jamf-protect/deployments/{id}/tasks", "name": "ListJamfProtectDeploymentTasksV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/jamf-protect/deployments/{id}/tasks/retry", "name": "RetryJamfProtectDeploymentTasksV1", "expectedStatus": 204},
+        {"op": "GET /v1/jamf-protect/history", "name": "ListJamfProtectHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/jamf-protect/history", "name": "CreateJamfProtectHistoryNoteV1"},
+        {"op": "GET /v1/jamf-protect/plans", "name": "ListJamfProtectPlansV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/jamf-protect/plans/sync", "name": "SyncJamfProtectPlansV1", "expectedStatus": 204},
+        {"op": "POST /v1/jamf-protect/register", "name": "RegisterJamfProtectV1"},
+
+        {"op": "GET /v1/jamf-remote-assist/session", "name": "ListJamfRemoteAssistSessionsV1"},
+        {"op": "GET /v1/jamf-remote-assist/session/{id}", "name": "GetJamfRemoteAssistSessionV1"},
+        {"op": "GET /v2/jamf-remote-assist/session", "name": "ListJamfRemoteAssistSessionsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v2/jamf-remote-assist/session/export", "name": "ExportJamfRemoteAssistSessionsV2"},
+        {"op": "GET /v2/jamf-remote-assist/session/{id}", "name": "GetJamfRemoteAssistSessionV2"}
       ]
     },
     {

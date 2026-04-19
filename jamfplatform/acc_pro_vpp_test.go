@@ -19,10 +19,10 @@ import (
 // Batch 11 — volume-purchasing-locations + volume-purchasing-
 // subscriptions. Requires JAMFPLATFORM_VPP_TOKEN (base64 serviceToken
 // from Apple Business Manager). Destructive ops (reclaim,
-// revoke-licenses) run against the tenant-supplied "sdk-acc test"
-// location id when JAMFPLATFORM_VPP_TEST_LOCATION_ID is set; otherwise
-// they skip — they rip licenses back from real assigned devices on
-// whatever location the env var points at.
+// revoke-licenses) are exercised against a self-created throwaway
+// location registered from the env token — the location has no
+// assignees so reclaim/revoke are API-level no-ops, but the endpoints
+// get plumbing coverage without touching any productive VPP state.
 
 func vppToken(t *testing.T) string {
 	t.Helper()
@@ -110,6 +110,24 @@ func TestAcceptance_Pro_Vpp_LocationCRUDV1(t *testing.T) {
 		t.Logf("VPP location %s history: %d entries", id, len(hist))
 	}
 
+	// Reclaim + revoke-licenses against the throwaway location. No
+	// assignees so these are no-ops server-side, but we prove the
+	// plumbing. Running them here (rather than against a pre-existing
+	// location the tenant cares about) keeps the destructive paths
+	// isolated to state we own.
+	if err := p.ReclaimVolumePurchasingLocationLicensesV1(ctx, id); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("ReclaimVolumePurchasingLocationLicensesV1(%s): %v", id, err)
+	} else {
+		t.Logf("Reclaim triggered on VPP location %s", id)
+	}
+	if err := p.RevokeVolumePurchasingLocationLicensesV1(ctx, id); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("RevokeVolumePurchasingLocationLicensesV1(%s): %v", id, err)
+	} else {
+		t.Logf("Revoke-licenses triggered on VPP location %s", id)
+	}
+
 	if err := p.DeleteVolumePurchasingLocationV1(ctx, id); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("DeleteVolumePurchasingLocationV1(%s): %v", id, err)
@@ -123,42 +141,6 @@ func TestAcceptance_Pro_Vpp_LocationCRUDV1(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
 		t.Fatalf("GetVolumePurchasingLocationV1(%s) after delete: want 404, got %v", id, err)
 	}
-}
-
-// TestAcceptance_Pro_Vpp_ReclaimLocationV1 triggers the content-reclaim
-// flow on the sdk-acc test VPP location the user designates via
-// JAMFPLATFORM_VPP_TEST_LOCATION_ID. Reclaim pulls back licenses from
-// every assignee the location owns — destructive against productive
-// assignments, so the env-var gate is non-negotiable.
-func TestAcceptance_Pro_Vpp_ReclaimLocationV1(t *testing.T) {
-	id := os.Getenv("JAMFPLATFORM_VPP_TEST_LOCATION_ID")
-	if id == "" {
-		t.Skip("JAMFPLATFORM_VPP_TEST_LOCATION_ID not set — reclaim pulls licenses back from devices")
-	}
-
-	c := accClient(t)
-	if err := pro.New(c).ReclaimVolumePurchasingLocationLicensesV1(context.Background(), id); err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ReclaimVolumePurchasingLocationLicensesV1(%s): %v", id, err)
-	}
-	t.Logf("Reclaim triggered on VPP location %s", id)
-}
-
-// TestAcceptance_Pro_Vpp_RevokeLocationLicensesV1 revokes all active
-// licenses for the test location. Also gated behind the test-location
-// env var.
-func TestAcceptance_Pro_Vpp_RevokeLocationLicensesV1(t *testing.T) {
-	id := os.Getenv("JAMFPLATFORM_VPP_TEST_LOCATION_ID")
-	if id == "" {
-		t.Skip("JAMFPLATFORM_VPP_TEST_LOCATION_ID not set — revoke-licenses pulls all active licenses")
-	}
-
-	c := accClient(t)
-	if err := pro.New(c).RevokeVolumePurchasingLocationLicensesV1(context.Background(), id); err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("RevokeVolumePurchasingLocationLicensesV1(%s): %v", id, err)
-	}
-	t.Logf("Revoke-licenses triggered on VPP location %s", id)
 }
 
 // --- volume-purchasing-subscriptions ----------------------------------
