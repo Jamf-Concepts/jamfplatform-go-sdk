@@ -1131,12 +1131,12 @@ func TestAcceptance_Classic_MobileDeviceApplicationCRUD(t *testing.T) {
 }
 
 // TestAcceptance_Classic_EbookCRUD exercises the ebook create + read
-// lifecycle. The Classic server on this tenant has a known DELETE
-// /ebooks/id/{id} quirk — it returns HTTP 400 with an id-echo body
-// (`<ebook><id>N</id></ebook>`) and the record isn't removed by the
-// by-id call alone. A follow-up DELETE /ebooks/name/{name} commits
-// the removal. Cleanup issues both so the tenant stays clean between
-// runs.
+// lifecycle. The Classic server on this tenant has a misreported
+// DELETE /ebooks/{by-id,by-name} response — returns HTTP 400 with an
+// id-echo body (`<ebook><id>N</id></ebook>`) but the record IS removed
+// server-side. ListEbooks is eventually-consistent and can briefly
+// continue to include the removed record. Cleanup issues both by-id
+// and by-name deletes so the tenant settles to clean between runs.
 func TestAcceptance_Classic_EbookCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
