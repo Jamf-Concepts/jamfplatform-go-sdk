@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -18,6 +19,7 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/compliancebenchmarks"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devicegroups"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
 )
 
 // runSuffix computes a unique suffix (epoch timestamp) once for the entire test run.
@@ -156,6 +158,36 @@ func cleanupSmartGroupFixture() {
 	}
 	if c, err := initAcceptanceClient(); err == nil {
 		_ = devicegroups.New(c).DeleteDeviceGroup(context.Background(), smartGroupID)
+	}
+}
+
+// sweepOrphanProComputerGroups reaps sdk-acc-* smart/static computer groups
+// visible via the Pro API. Backstop for a tenant-side API inconsistency:
+// groups created via /api/device-groups/v1 (devicegroups package) return a
+// UUID at create time, but DELETE of that UUID may 404 immediately after —
+// the record persists under /api/pro/v2/computer-groups with a distinct
+// numeric id. Flagged to the API team; until it's fixed, this sweep keeps
+// the tenant clean between runs.
+func sweepOrphanProComputerGroups() {
+	c, err := initAcceptanceClient()
+	if err != nil {
+		return
+	}
+	ctx := context.Background()
+	p := pro.New(c)
+	if smart, err := p.ListSmartComputerGroupsV2(ctx, nil, ""); err == nil {
+		for _, g := range smart {
+			if strings.HasPrefix(g.Name, "sdk-acc-") {
+				_ = p.DeleteSmartComputerGroupV2(ctx, g.ID)
+			}
+		}
+	}
+	if static, err := p.ListStaticComputerGroupsV2(ctx, nil, ""); err == nil {
+		for _, g := range static {
+			if strings.HasPrefix(g.Name, "sdk-acc-") {
+				_ = p.DeleteStaticComputerGroupV2(ctx, g.ID)
+			}
+		}
 	}
 }
 

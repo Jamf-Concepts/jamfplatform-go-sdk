@@ -13,5 +13,6 @@ import (
 func TestMain(m *testing.M) {
 	code := m.Run()
 	cleanupSmartGroupFixture()
+	sweepOrphanProComputerGroups()
 	os.Exit(code)
 }
