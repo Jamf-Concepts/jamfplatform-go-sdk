@@ -2095,6 +2095,15 @@ type DistributionPointSearchResults struct {
 	TotalCount int                 `json:"totalCount"`
 }
 
+// DockItem represents a dock item.
+type DockItem struct {
+	Contents *string `json:"contents,omitempty"`
+	ID       *string `json:"id,omitempty"`
+	Name     string  `json:"name"`
+	Path     string  `json:"path"`
+	Type     string  `json:"type"`
+}
+
 // DssDeclaration represents a dss declaration.
 type DssDeclaration struct {
 	Group       *string `json:"group,omitempty"`
@@ -2106,6 +2115,70 @@ type DssDeclaration struct {
 // DssDeclarations represents a dss declarations.
 type DssDeclarations struct {
 	Declarations []DssDeclaration `json:"declarations"`
+}
+
+// Ebook represents a ebook.
+type Ebook struct {
+	Author               string `json:"author"`
+	CategoryID           string `json:"categoryId"`
+	DeployAsManaged      bool   `json:"deployAsManaged"`
+	Free                 bool   `json:"free"`
+	ID                   string `json:"id"`
+	InstallAutomatically bool   `json:"installAutomatically"`
+	Kind                 string `json:"kind"`
+	Name                 string `json:"name"`
+	SiteID               string `json:"siteId"`
+	URL                  string `json:"url"`
+	Version              string `json:"version"`
+}
+
+// EbookExclusions represents a ebook exclusions.
+type EbookExclusions struct {
+	BuildingIds          []string          `json:"buildingIds"`
+	ComputerGroupIds     []string          `json:"computerGroupIds"`
+	ComputerIds          []string          `json:"computerIds"`
+	DepartmentIds        []string          `json:"departmentIds"`
+	Limitations          *EbookLimitations `json:"limitations,omitempty"`
+	MobileDeviceGroupIds []string          `json:"mobileDeviceGroupIds"`
+	MobileDeviceIds      []string          `json:"mobileDeviceIds"`
+	UserGroupIds         []string          `json:"userGroupIds"`
+	UserIds              []string          `json:"userIds"`
+}
+
+// EbookLimitations represents a ebook limitations.
+type EbookLimitations struct {
+	NetworkSegments []string                    `json:"networkSegments"`
+	UserGroups      []string                    `json:"userGroups"`
+	Users           []EbookLimitationsUsersItem `json:"users"`
+}
+
+// EbookLimitationsUsersItem represents a ebook limitations users item.
+type EbookLimitationsUsersItem struct {
+	Name string `json:"name"`
+}
+
+// EbookScope represents a ebook scope.
+type EbookScope struct {
+	AllComputers         bool              `json:"allComputers"`
+	AllMobileDevices     bool              `json:"allMobileDevices"`
+	AllUsers             bool              `json:"allUsers"`
+	BuildingIds          []string          `json:"buildingIds"`
+	ClassroomIds         []string          `json:"classroomIds"`
+	ComputerGroupIds     []string          `json:"computerGroupIds"`
+	ComputerIds          []string          `json:"computerIds"`
+	DepartmentIds        []string          `json:"departmentIds"`
+	Exclusions           *EbookExclusions  `json:"exclusions,omitempty"`
+	Limitations          *EbookLimitations `json:"limitations,omitempty"`
+	MobileDeviceGroupIds []string          `json:"mobileDeviceGroupIds"`
+	MobileDeviceIds      []string          `json:"mobileDeviceIds"`
+	UserGroupIds         []string          `json:"userGroupIds"`
+	UserIds              []string          `json:"userIds"`
+}
+
+// EbookSearchResults represents a ebook search results.
+type EbookSearchResults struct {
+	Results    []Ebook `json:"results"`
+	TotalCount int     `json:"totalCount"`
 }
 
 // EnableLostModeCommand represents a enable lost mode command.
@@ -3212,6 +3285,21 @@ type LocationV2 struct {
 	RealName     *string `json:"realName,omitempty"`
 	Room         *string `json:"room,omitempty"`
 	Username     *string `json:"username,omitempty"`
+}
+
+// LogFlushingTaskV1 represents a log flushing task v1.
+type LogFlushingTaskV1 struct {
+	ID                  *string `json:"id,omitempty"`
+	Qualifier           string  `json:"qualifier"`
+	RetentionPeriod     int     `json:"retentionPeriod"`
+	RetentionPeriodUnit string  `json:"retentionPeriodUnit"`
+	State               *string `json:"state,omitempty"`
+}
+
+// LogFlushingV1 represents a log flushing v1.
+type LogFlushingV1 struct {
+	HourOfDay         int                 `json:"hourOfDay"`
+	RetentionPolicies []RetentionPolicyV1 `json:"retentionPolicies"`
 }
 
 // LogOutUserCommand represents a log out user command.
@@ -5062,6 +5150,14 @@ type RestartDeviceCommand struct {
 	RebuildKernelCache bool           `json:"rebuildKernelCache"`
 }
 
+// RetentionPolicyV1 represents a retention policy v1.
+type RetentionPolicyV1 struct {
+	DisplayName         string `json:"displayName"`
+	Qualifier           string `json:"qualifier"`
+	RetentionPeriod     int    `json:"retentionPeriod"`
+	RetentionPeriodUnit string `json:"retentionPeriodUnit"`
+}
+
 // ReturnToService The configuration settings for Return to Service.
 type ReturnToService struct {
 	BootstrapToken  *string `json:"bootstrapToken,omitempty"`
@@ -5111,6 +5207,32 @@ type SamlSettings struct {
 	UserAttributeEnabled    *bool   `json:"userAttributeEnabled,omitempty"`
 	UserAttributeName       *string `json:"userAttributeName,omitempty"`
 	UserMapping             *string `json:"userMapping,omitempty"`
+}
+
+// SchedulerJob represents a scheduler job.
+type SchedulerJob struct {
+	Results    []SchedulerTrigger `json:"results"`
+	TotalCount int                `json:"totalCount"`
+}
+
+// SchedulerJobs represents a scheduler jobs.
+type SchedulerJobs struct {
+	JobKeys []string `json:"jobKeys"`
+}
+
+// SchedulerSummary represents a scheduler summary.
+type SchedulerSummary struct {
+	NumberOfExecutedJobs  int  `json:"numberOfExecutedJobs"`
+	NumberOfExecutingJobs int  `json:"numberOfExecutingJobs"`
+	NumberOfPendingJobs   int  `json:"numberOfPendingJobs"`
+	Started               bool `json:"started"`
+}
+
+// SchedulerTrigger represents a scheduler trigger.
+type SchedulerTrigger struct {
+	NextFireTime     *time.Time `json:"nextFireTime,omitempty"`
+	PreviousFireTime *time.Time `json:"previousFireTime,omitempty"`
+	TriggerKey       string     `json:"triggerKey"`
 }
 
 // Script represents a script.
@@ -5304,6 +5426,11 @@ type SiteObject struct {
 	ObjectID   string `json:"objectId"`
 	ObjectType string `json:"objectType"`
 	SiteID     string `json:"siteId"`
+}
+
+// SlasaAcceptance represents a slasa acceptance.
+type SlasaAcceptance struct {
+	SlasaAcceptanceStatus string `json:"slasaAcceptanceStatus"`
 }
 
 // SmartComputerGroupSearch represents a smart computer group search.

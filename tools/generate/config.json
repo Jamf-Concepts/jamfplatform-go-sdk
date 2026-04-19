@@ -808,7 +808,29 @@
         {"op": "GET /v1/buildings/{id}/history", "name": "ListBuildingHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v1/buildings/delete-multiple", "name": "DeleteMultipleBuildingsV1", "expectedStatus": 204},
         {"op": "POST /v1/buildings/{id}/history", "name": "CreateBuildingHistoryNoteV1", "expectedStatus": 200},
-        {"op": "POST /v1/buildings/{id}/history/export", "name": "ExportBuildingHistoryV1", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]}
+        {"op": "POST /v1/buildings/{id}/history/export", "name": "ExportBuildingHistoryV1", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]},
+
+        {"op": "POST /v1/dock-items", "name": "CreateDockItemV1", "expectedStatus": 201},
+        {"op": "GET /v1/dock-items/{id}", "name": "GetDockItemV1"},
+        {"op": "PUT /v1/dock-items/{id}", "name": "UpdateDockItemV1"},
+        {"op": "DELETE /v1/dock-items/{id}", "name": "DeleteDockItemV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/log-flushing", "name": "GetLogFlushingV1"},
+        {"op": "GET /v1/log-flushing/task", "name": "ListLogFlushingTasksV1"},
+        {"op": "POST /v1/log-flushing/task", "name": "CreateLogFlushingTaskV1", "expectedStatus": 202},
+        {"op": "GET /v1/log-flushing/task/{id}", "name": "GetLogFlushingTaskV1"},
+        {"op": "DELETE /v1/log-flushing/task/{id}", "name": "DeleteLogFlushingTaskV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/scheduler/jobs", "name": "GetSchedulerJobsV1"},
+        {"op": "GET /v1/scheduler/jobs/{jobKey}/triggers", "name": "GetSchedulerJobTriggersV1", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/scheduler/summary", "name": "GetSchedulerSummaryV1"},
+
+        {"op": "GET /v1/ebooks", "name": "ListEbooksV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v1/ebooks/{id}", "name": "GetEbookV1"},
+        {"op": "GET /v1/ebooks/{id}/scope", "name": "GetEbookScopeV1"},
+
+        {"op": "GET /v1/slasa", "name": "GetSlasaAcceptanceV1"},
+        {"op": "POST /v1/slasa", "name": "AcceptSlasaV1", "expectedStatus": 204}
       ]
     },
     {

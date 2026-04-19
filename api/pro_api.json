@@ -7909,6 +7909,44 @@
         },
         "type": "object"
       },
+      "DockItem": {
+        "properties": {
+          "contents": {
+            "example": "\u003cdict\u003e\u003ckey\u003eGUID\u003c/key\u003e\u003cinteger\u003e-91117049\u003c/integer\u003e\u003ckey\u003etile-data\u003c/key\u003e\u003cdict\u003e\u003ckey\u003efile-data\u003c/key\u003e\u003cdict\u003e\u003ckey\u003e_CFURLString\u003c/key\u003e\u003cstring\u003efile://localhost/Applications/iTunes.app\u003c/string\u003e\u003ckey\u003e_CFURLStringType\u003c/key\u003e\u003cinteger\u003e15\u003c/integer\u003e\u003c/dict\u003e\u003ckey\u003efile-label\u003c/key\u003e\u003cstring\u003eMyDockItem2\u003c/string\u003e\u003c/dict\u003e\u003ckey\u003etile-type\u003c/key\u003e\u003cstring\u003edirectory-tile\u003c/string\u003e\u003c/dict\u003e",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minimum": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "DockItem Name",
+            "type": "string"
+          },
+          "path": {
+            "example": "file://localhost/Applications/iTunes.app",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "APP",
+              "FILE",
+              "FOLDER"
+            ],
+            "example": "FILE",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "type"
+        ],
+        "type": "object"
+      },
       "DssDeclaration": {
         "properties": {
           "group": {
@@ -7948,6 +7986,259 @@
               "$ref": "#/components/schemas/DssDeclaration"
             },
             "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "Ebook": {
+        "properties": {
+          "author": {
+            "example": "IT Bob",
+            "type": "string"
+          },
+          "categoryId": {
+            "example": "-1",
+            "type": "string"
+          },
+          "deployAsManaged": {
+            "description": "If true, it will be automatically installed",
+            "example": false,
+            "type": "boolean"
+          },
+          "free": {
+            "example": true,
+            "type": "boolean"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "installAutomatically": {
+            "example": false,
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "UNKNOWN",
+              "PDF",
+              "EPUB",
+              "IBOOKS"
+            ],
+            "example": "IBOOKS",
+            "type": "string"
+          },
+          "name": {
+            "example": "The Neverending API",
+            "type": "string"
+          },
+          "siteId": {
+            "example": "-1",
+            "type": "string"
+          },
+          "url": {
+            "example": "https://jamf.com/ibooks/the_neverending_api.just_kidding",
+            "type": "string"
+          },
+          "version": {
+            "example": "10.9.0",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "EbookExclusions": {
+        "properties": {
+          "buildingIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "computerGroupIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "computerIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "departmentIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "limitations": {
+            "$ref": "#/components/schemas/EbookLimitations"
+          },
+          "mobileDeviceGroupIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "mobileDeviceIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "userGroupIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "userIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "EbookLimitations": {
+        "properties": {
+          "networkSegments": {
+            "items": {
+              "example": "1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "userGroups": {
+            "items": {
+              "example": "1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "users": {
+            "items": {
+              "properties": {
+                "name": {
+                  "example": "admin",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "EbookScope": {
+        "properties": {
+          "allComputers": {
+            "example": false,
+            "type": "boolean"
+          },
+          "allMobileDevices": {
+            "example": false,
+            "type": "boolean"
+          },
+          "allUsers": {
+            "example": false,
+            "type": "boolean"
+          },
+          "buildingIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "classroomIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "computerGroupIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "computerIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "departmentIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "exclusions": {
+            "$ref": "#/components/schemas/EbookExclusions"
+          },
+          "limitations": {
+            "$ref": "#/components/schemas/EbookLimitations"
+          },
+          "mobileDeviceGroupIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "mobileDeviceIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "userGroupIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "userIds": {
+            "items": {
+              "example": "-1",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "EbookSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/Ebook"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
           }
         },
         "type": "object"
@@ -11373,6 +11664,60 @@
           "username": {
             "example": "admin",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LogFlushingTaskV1": {
+        "properties": {
+          "id": {
+            "description": "The unique identifier of the log flushing task",
+            "example": "8c47858a-0029-450b-8720-cf5ae4bc27c7",
+            "readOnly": true,
+            "type": "string"
+          },
+          "qualifier": {
+            "description": "The qualifier of the retention policy",
+            "example": "policy",
+            "type": "string"
+          },
+          "retentionPeriod": {
+            "description": "The period beyond which data will be flushed",
+            "example": 3,
+            "type": "integer"
+          },
+          "retentionPeriodUnit": {
+            "description": "The unit of the retention period (eg: DAY, WEEK, MONTH, YEAR)",
+            "example": "MONTH",
+            "type": "string"
+          },
+          "state": {
+            "description": "The state of the task (eg: RUNNING, SUCCESS, FAILED, CANCELLED)",
+            "example": "SUCCESS",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "qualifier",
+          "retentionPeriod",
+          "retentionPeriodUnit"
+        ],
+        "type": "object"
+      },
+      "LogFlushingV1": {
+        "properties": {
+          "hourOfDay": {
+            "default": 0,
+            "maximum": 23,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "retentionPolicies": {
+            "items": {
+              "$ref": "#/components/schemas/RetentionPolicyV1"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -16817,6 +17162,30 @@
           }
         ]
       },
+      "RetentionPolicyV1": {
+        "properties": {
+          "displayName": {
+            "example": "Policy Logs",
+            "readOnly": true,
+            "type": "string"
+          },
+          "qualifier": {
+            "example": "policy",
+            "readOnly": true,
+            "type": "string"
+          },
+          "retentionPeriod": {
+            "example": 3,
+            "type": "integer"
+          },
+          "retentionPeriodUnit": {
+            "description": "The unit of the retention period (eg: DAY, WEEK, MONTH, YEAR)",
+            "example": "MONTH",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ReturnToService": {
         "description": "The configuration settings for Return to Service.",
         "properties": {
@@ -16993,6 +17362,77 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "SchedulerJob": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SchedulerTrigger"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "readOnly": true,
+        "type": "object"
+      },
+      "SchedulerJobs": {
+        "properties": {
+          "jobKeys": {
+            "items": {
+              "example": "EXAMPLE_JOB",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "readOnly": true,
+        "type": "object"
+      },
+      "SchedulerSummary": {
+        "properties": {
+          "numberOfExecutedJobs": {
+            "example": 1,
+            "type": "integer"
+          },
+          "numberOfExecutingJobs": {
+            "example": 1,
+            "type": "integer"
+          },
+          "numberOfPendingJobs": {
+            "example": 1,
+            "type": "integer"
+          },
+          "started": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "readOnly": true,
+        "type": "object"
+      },
+      "SchedulerTrigger": {
+        "properties": {
+          "nextFireTime": {
+            "example": "2023-08-21T21:30:34.35Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "previousFireTime": {
+            "example": "2023-08-21T21:20:34.35Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "triggerKey": {
+            "example": "EXAMPLE_TRIGGER",
+            "type": "string"
+          }
+        },
+        "readOnly": true,
         "type": "object"
       },
       "Script": {
@@ -17701,6 +18141,19 @@
           "objectType",
           "siteId"
         ],
+        "type": "object"
+      },
+      "SlasaAcceptance": {
+        "properties": {
+          "slasaAcceptanceStatus": {
+            "enum": [
+              "ACCEPTED",
+              "NOT_ACCEPTED"
+            ],
+            "example": "ACCEPTED",
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "SmartComputerGroupSearch": {
@@ -27704,6 +28157,202 @@
         ]
       }
     },
+    "/v1/dock-items": {
+      "post": {
+        "description": "Creates a DockItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DockItem"
+              }
+            }
+          },
+          "description": "new DockItem to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "DockItem created successfully"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Duplicate"
+          }
+        },
+        "summary": "Create a DockItem\n",
+        "tags": [
+          "dock-items"
+        ],
+        "x-required-privileges": [
+          "Create Dock Items"
+        ]
+      }
+    },
+    "/v1/dock-items/{id}": {
+      "delete": {
+        "description": "Deletes a dockItem at the specified id",
+        "parameters": [
+          {
+            "description": "DockItem object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "DockItem with that id does not exist"
+          }
+        },
+        "summary": "Delete a DockItem at the specified id\n",
+        "tags": [
+          "dock-items"
+        ],
+        "x-required-privileges": [
+          "Delete Dock Items"
+        ]
+      },
+      "get": {
+        "description": "Retrieves a full dockItem object",
+        "parameters": [
+          {
+            "description": "DockItem object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DockItem"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Dockitem with that ID does not exist"
+          }
+        },
+        "summary": "Retrieve a full dockItem object\n",
+        "tags": [
+          "dock-items"
+        ],
+        "x-required-privileges": [
+          "Read Dock Items"
+        ]
+      },
+      "put": {
+        "description": "Replaces the dockItem at the id with the supplied information",
+        "parameters": [
+          {
+            "description": "DockItem object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DockItem"
+              }
+            }
+          },
+          "description": "new dockItem to upload to existing id. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "DockItem at id was updated"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "DockItem with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Duplicate"
+          }
+        },
+        "summary": "Replace the dockItem at the id with the supplied information\n",
+        "tags": [
+          "dock-items"
+        ],
+        "x-required-privileges": [
+          "Update Dock Items"
+        ]
+      }
+    },
     "/v1/dss-declarations/{declarationId}": {
       "get": {
         "description": "Retrieves a stored declaration based on the provided declaration id",
@@ -27770,6 +28419,148 @@
         "x-required-privileges": [
           "Read Mobile Devices",
           "Read Computers"
+        ]
+      }
+    },
+    "/v1/ebooks": {
+      "get": {
+        "description": "Gets ebook object",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "name:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EbookSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get Ebook object\n",
+        "tags": [
+          "ebooks"
+        ],
+        "x-required-privileges": [
+          "Read eBooks"
+        ]
+      }
+    },
+    "/v1/ebooks/{id}": {
+      "get": {
+        "description": "Gets specified Ebook object\n",
+        "parameters": [
+          {
+            "description": "instance id of ebook record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ebook"
+                }
+              }
+            },
+            "description": "Details about ebook were found for given id"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified ebook object does not exist."
+          }
+        },
+        "summary": "Get specified Ebook object\n",
+        "tags": [
+          "ebooks"
+        ],
+        "x-required-privileges": [
+          "Read eBooks"
+        ]
+      }
+    },
+    "/v1/ebooks/{id}/scope": {
+      "get": {
+        "description": "Gets specified scope of Ebook object\n",
+        "parameters": [
+          {
+            "description": "instance id of ebook record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EbookScope"
+                }
+              }
+            },
+            "description": "Details of scope for ebook were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified scope for ebook object does not exist."
+          }
+        },
+        "summary": "Get specified scope of Ebook object\n",
+        "tags": [
+          "ebooks"
+        ],
+        "x-required-privileges": [
+          "Read eBooks"
         ]
       }
     },
@@ -30633,6 +31424,168 @@
           "Read LDAP Servers"
         ]
       }
+    },
+    "/v1/log-flushing": {
+      "get": {
+        "description": "Get all log flushing and retention policy settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogFlushingV1"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Get log flushing settings",
+        "tags": [
+          "log-flushing"
+        ],
+        "x-required-privileges": [
+          "Read Retention Policy"
+        ]
+      }
+    },
+    "/v1/log-flushing/task": {
+      "get": {
+        "description": "Get a list of all log flushing tasks and their statuses",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LogFlushingTaskV1"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Get log flushing tasks",
+        "tags": [
+          "log-flushing"
+        ],
+        "x-required-privileges": [
+          "Read Retention Policy"
+        ]
+      },
+      "post": {
+        "description": "Queue a log flushing task",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogFlushingTaskV1"
+              }
+            }
+          },
+          "description": "The manual log flushing settings"
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "The log flushing request was queued"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "The request was rejected, typically because the service is stopping or stopped"
+          }
+        },
+        "summary": "Queue a log flushing task",
+        "tags": [
+          "log-flushing"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Retention Policy"
+        ]
+      }
+    },
+    "/v1/log-flushing/task/{id}": {
+      "delete": {
+        "description": "Cancels a log flushing task by ID",
+        "responses": {
+          "204": {
+            "description": "Log flushing task successfully canceled"
+          },
+          "404": {
+            "description": "Log flushing task not found"
+          },
+          "410": {
+            "description": "Log flushing task already completed and is pending removal"
+          }
+        },
+        "summary": "Cancels a log flushing task",
+        "tags": [
+          "log-flushing"
+        ],
+        "x-required-privileges": [
+          "Update Retention Policy"
+        ]
+      },
+      "get": {
+        "description": "Get the log flushing task by the specified ID",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogFlushingTaskV1"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Get log flushing task",
+        "tags": [
+          "log-flushing"
+        ],
+        "x-required-privileges": [
+          "Read Retention Policy"
+        ]
+      },
+      "parameters": [
+        {
+          "description": "The identifier of the log flushing task",
+          "explode": false,
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "style": "simple"
+        }
+      ]
     },
     "/v1/login-customization": {
       "get": {
@@ -36833,6 +37786,118 @@
         ]
       }
     },
+    "/v1/scheduler/jobs": {
+      "get": {
+        "description": "Retrieves the names of all Jamf Pro Scheduler jobs",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulerJobs"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Retrieve all Jamf Pro Scheduler jobs",
+        "tags": [
+          "scheduler"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/scheduler/jobs/{jobKey}/triggers": {
+      "get": {
+        "description": "Retrieves all triggers for a Jamf Pro Scheduler job",
+        "parameters": [
+          {
+            "description": "Jamf Pro Scheduler Job Key",
+            "explode": false,
+            "in": "path",
+            "name": "jobKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorts results by one or more criteria, following the format property:asc/desc. Default sort is nextFireTime:asc. If using multiple criteria, separate with commas.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "nextFireTime:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter the Jamf Pro Scheduler triggers collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: triggerKey, previousFireTime, nextFireTime.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulerJob"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Retrieve all triggers for a Jamf Pro Scheduler job",
+        "tags": [
+          "scheduler"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/scheduler/summary": {
+      "get": {
+        "description": "Retrieves a summary of the Jamf Pro Scheduler",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulerSummary"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Retrieve a summary of the Jamf Pro Scheduler",
+        "tags": [
+          "scheduler"
+        ],
+        "x-authentication-required": true
+      }
+    },
     "/v1/scripts": {
       "get": {
         "description": "Search for sorted and paged scripts",
@@ -38097,6 +39162,45 @@
         ],
         "x-required-privileges": [
           "Read Sites"
+        ]
+      }
+    },
+    "/v1/slasa": {
+      "get": {
+        "description": "Get if SLASA has been accepted or not",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlasaAcceptance"
+                }
+              }
+            },
+            "description": "Whether SLASA has been accepted or not"
+          }
+        },
+        "summary": "Get the status of SLASA",
+        "tags": [
+          "slasa"
+        ],
+        "x-authentication-required": false
+      },
+      "post": {
+        "description": "Accept the SLASA for Jamf Pro.",
+        "responses": {
+          "204": {
+            "description": "SLASA has been accepted"
+          }
+        },
+        "summary": "Accept the SLASA",
+        "tags": [
+          "slasa"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Activation Code",
+          "View JSS Information"
         ]
       }
     },
