@@ -91,7 +91,7 @@ func TestCreateParentAppHistoryNoteV1(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusCreated, map[string]any{})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.CreateParentAppHistoryNoteV1(context.Background(), &ObjectHistoryNote{})

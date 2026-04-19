@@ -73,7 +73,7 @@ func (c *Client) CreateParentAppHistoryNoteV1(ctx context.Context, request *Obje
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := prefix + "/parent-app/history"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("CreateParentAppHistoryNoteV1: %w", err)
 	}
 	return &result, nil

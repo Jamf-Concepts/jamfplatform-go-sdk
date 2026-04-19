@@ -688,7 +688,7 @@
         {"op": "GET /v1/parent-app", "name": "GetParentAppSettingsV1"},
         {"op": "PUT /v1/parent-app", "name": "UpdateParentAppSettingsV1"},
         {"op": "GET /v1/parent-app/history", "name": "ListParentAppHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
-        {"op": "POST /v1/parent-app/history", "name": "CreateParentAppHistoryNoteV1", "expectedStatus": 201},
+        {"op": "POST /v1/parent-app/history", "name": "CreateParentAppHistoryNoteV1", "expectedStatus": 200},
 
         {"op": "GET /v1/teacher-app", "name": "GetTeacherAppSettingsV1"},
         {"op": "PUT /v1/teacher-app", "name": "UpdateTeacherAppSettingsV1"},
