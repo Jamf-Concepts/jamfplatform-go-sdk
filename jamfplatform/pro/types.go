@@ -10,6 +10,42 @@ import (
 	"time"
 )
 
+// AccountSettingsRequest represents a account settings request.
+type AccountSettingsRequest struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	AdminPassword                           *string `json:"adminPassword,omitempty"`
+	AdminUsername                           *string `json:"adminUsername,omitempty"`
+	HiddenAdminAccount                      *bool   `json:"hiddenAdminAccount,omitempty"`
+	ID                                      *string `json:"id,omitempty"`
+	LocalAdminAccountEnabled                *bool   `json:"localAdminAccountEnabled,omitempty"`
+	LocalUserManaged                        *bool   `json:"localUserManaged,omitempty"`
+	PayloadConfigured                       *bool   `json:"payloadConfigured,omitempty"`
+	PrefillAccountFullName                  *string `json:"prefillAccountFullName,omitempty"`
+	PrefillAccountUserName                  *string `json:"prefillAccountUserName,omitempty"`
+	PrefillPrimaryAccountInfoFeatureEnabled *bool   `json:"prefillPrimaryAccountInfoFeatureEnabled,omitempty"`
+	PrefillType                             *string `json:"prefillType,omitempty"`
+	PreventPrefillInfoFromModification      *bool   `json:"preventPrefillInfoFromModification,omitempty"`
+	UserAccountType                         *string `json:"userAccountType,omitempty"`
+	VersionLock                             *int    `json:"versionLock,omitempty"`
+}
+
+// AccountSettingsResponse represents a account settings response.
+type AccountSettingsResponse struct {
+	AdminUsername                           string `json:"adminUsername"`
+	HiddenAdminAccount                      bool   `json:"hiddenAdminAccount"`
+	ID                                      string `json:"id"`
+	LocalAdminAccountEnabled                bool   `json:"localAdminAccountEnabled"`
+	LocalUserManaged                        bool   `json:"localUserManaged"`
+	PayloadConfigured                       bool   `json:"payloadConfigured"`
+	PrefillAccountFullName                  string `json:"prefillAccountFullName"`
+	PrefillAccountUserName                  string `json:"prefillAccountUserName"`
+	PrefillPrimaryAccountInfoFeatureEnabled bool   `json:"prefillPrimaryAccountInfoFeatureEnabled"`
+	PrefillType                             string `json:"prefillType"`
+	PreventPrefillInfoFromModification      bool   `json:"preventPrefillInfoFromModification"`
+	UserAccountType                         string `json:"userAccountType"`
+	VersionLock                             int    `json:"versionLock"`
+}
+
 // AdvancedSearch represents a advanced search.
 type AdvancedSearch struct {
 	Criteria      *[]SmartSearchCriterion `json:"criteria,omitempty"`
@@ -63,6 +99,16 @@ type ApiErrorCause struct {
 type AppPath struct {
 	ID   string `json:"id"`
 	Path string `json:"path"`
+}
+
+// AssignRemoveProfileResponseSyncState represents a assign remove profile response sync state.
+type AssignRemoveProfileResponseSyncState struct {
+	FailureCount int    `json:"failureCount"`
+	ID           int    `json:"id"`
+	ProfileUUID  string `json:"profileUUID"`
+	SerialNumber string `json:"serialNumber"`
+	SyncStatus   string `json:"syncStatus"`
+	Timestamp    int    `json:"timestamp"`
 }
 
 // Assignment represents a assignment.
@@ -795,6 +841,54 @@ type ComputerPartitionEncryption struct {
 // ComputerPartitionFileVault2State represents a computer partition file vault2 state value.
 type ComputerPartitionFileVault2State = string
 
+// ComputerPrestageSearchResultsV3 represents a computer prestage search results v3.
+type ComputerPrestageSearchResultsV3 struct {
+	Results    []GetComputerPrestageV3 `json:"results"`
+	TotalCount int                     `json:"totalCount"`
+}
+
+// ComputerPrestageV3 represents a computer prestage v3.
+type ComputerPrestageV3 struct {
+	AnchorCertificates                 []string                         `json:"anchorCertificates"`
+	AuthURL                            *string                          `json:"authUrl,omitempty"`
+	AuthenticationPrompt               string                           `json:"authenticationPrompt"`
+	AutoAdvanceSetup                   bool                             `json:"autoAdvanceSetup"`
+	CustomPackageDistributionPointID   string                           `json:"customPackageDistributionPointId"`
+	CustomPackageIds                   []string                         `json:"customPackageIds"`
+	DefaultPrestage                    bool                             `json:"defaultPrestage"`
+	Department                         string                           `json:"department"`
+	DeviceEnrollmentProgramInstanceID  string                           `json:"deviceEnrollmentProgramInstanceId"`
+	DisplayName                        string                           `json:"displayName"`
+	EnableDeviceBasedActivationLock    bool                             `json:"enableDeviceBasedActivationLock"`
+	EnableRecoveryLock                 bool                             `json:"enableRecoveryLock"`
+	EnrollmentCustomizationID          string                           `json:"enrollmentCustomizationId"`
+	EnrollmentSiteID                   string                           `json:"enrollmentSiteId"`
+	InstallProfilesDuringSetup         bool                             `json:"installProfilesDuringSetup"`
+	KeepExistingLocationInformation    bool                             `json:"keepExistingLocationInformation"`
+	KeepExistingSiteMembership         bool                             `json:"keepExistingSiteMembership"`
+	Language                           string                           `json:"language"`
+	LocationInformation                *LocationInformationV2           `json:"locationInformation,omitempty"`
+	Mandatory                          bool                             `json:"mandatory"`
+	ManifestURL                        *string                          `json:"manifestUrl,omitempty"`
+	MDMRemovable                       bool                             `json:"mdmRemovable"`
+	MinimumOsSpecificVersion           string                           `json:"minimumOsSpecificVersion"`
+	PlatformSsoAppBundleID             string                           `json:"platformSsoAppBundleId"`
+	PrestageInstalledProfileIds        []string                         `json:"prestageInstalledProfileIds"`
+	PrestageMinimumOsTargetVersionType string                           `json:"prestageMinimumOsTargetVersionType"`
+	PreventActivationLock              bool                             `json:"preventActivationLock"`
+	ProfileURL                         *string                          `json:"profileUrl,omitempty"`
+	PssoConfigProfileID                *string                          `json:"pssoConfigProfileId,omitempty"`
+	PssoEnabled                        bool                             `json:"pssoEnabled"`
+	PurchasingInformation              *PrestagePurchasingInformationV2 `json:"purchasingInformation,omitempty"`
+	RecoveryLockPasswordType           string                           `json:"recoveryLockPasswordType"`
+	Region                             string                           `json:"region"`
+	RequireAuthentication              bool                             `json:"requireAuthentication"`
+	RotateRecoveryLockPassword         bool                             `json:"rotateRecoveryLockPassword"`
+	SkipSetupItems                     map[string]bool                  `json:"skipSetupItems"`
+	SupportEmailAddress                string                           `json:"supportEmailAddress"`
+	SupportPhoneNumber                 string                           `json:"supportPhoneNumber"`
+}
+
 // ComputerPrinter represents a computer printer.
 type ComputerPrinter struct {
 	Location string `json:"location"`
@@ -1028,6 +1122,128 @@ type DetailsV2 struct {
 	UnlockToken                 string                             `json:"unlockToken"`
 }
 
+// DeviceEnrollmentDevice represents a device enrollment device.
+type DeviceEnrollmentDevice struct {
+	AssetTag                          string                                `json:"assetTag"`
+	Color                             string                                `json:"color"`
+	Description                       string                                `json:"description"`
+	DeviceAssignedDate                string                                `json:"deviceAssignedDate"`
+	DeviceEnrollmentProgramInstanceID string                                `json:"deviceEnrollmentProgramInstanceId"`
+	ID                                string                                `json:"id"`
+	Model                             string                                `json:"model"`
+	PrestageID                        string                                `json:"prestageId"`
+	ProfileAssignTime                 string                                `json:"profileAssignTime"`
+	ProfilePushTime                   string                                `json:"profilePushTime"`
+	ProfileStatus                     string                                `json:"profileStatus"`
+	SerialNumber                      string                                `json:"serialNumber"`
+	SyncState                         *AssignRemoveProfileResponseSyncState `json:"syncState,omitempty"`
+}
+
+// DeviceEnrollmentDeviceSearchResults represents a device enrollment device search results.
+type DeviceEnrollmentDeviceSearchResults struct {
+	Results    []DeviceEnrollmentDevice `json:"results"`
+	TotalCount int                      `json:"totalCount"`
+}
+
+// DeviceEnrollmentDisownBody represents a device enrollment disown body.
+type DeviceEnrollmentDisownBody struct {
+	Devices *[]string `json:"devices,omitempty"`
+}
+
+// DeviceEnrollmentDisownResponse represents a device enrollment disown response.
+type DeviceEnrollmentDisownResponse struct {
+	Devices map[string]string `json:"devices"`
+}
+
+// DeviceEnrollmentInstance represents a device enrollment instance.
+type DeviceEnrollmentInstance struct {
+	AdminID               *string `json:"adminId,omitempty"`
+	ID                    *string `json:"id,omitempty"`
+	Name                  string  `json:"name"`
+	OrgAddress            *string `json:"orgAddress,omitempty"`
+	OrgEmail              *string `json:"orgEmail,omitempty"`
+	OrgName               *string `json:"orgName,omitempty"`
+	OrgPhone              *string `json:"orgPhone,omitempty"`
+	ServerName            *string `json:"serverName,omitempty"`
+	ServerUUID            *string `json:"serverUuid,omitempty"`
+	SiteID                *string `json:"siteId,omitempty"`
+	SupervisionIdentityID *string `json:"supervisionIdentityId,omitempty"`
+	TokenExpirationDate   *string `json:"tokenExpirationDate,omitempty"`
+}
+
+// DeviceEnrollmentInstanceSearchResults represents a device enrollment instance search results.
+type DeviceEnrollmentInstanceSearchResults struct {
+	Results    []DeviceEnrollmentInstance `json:"results"`
+	TotalCount int                        `json:"totalCount"`
+}
+
+// DeviceEnrollmentInstanceSyncStatus represents a device enrollment instance sync status.
+type DeviceEnrollmentInstanceSyncStatus struct {
+	InstanceID string `json:"instanceId"`
+	SyncState  string `json:"syncState"`
+	Timestamp  string `json:"timestamp"`
+}
+
+// DeviceEnrollmentPrestageV2 represents a device enrollment prestage v2.
+type DeviceEnrollmentPrestageV2 struct {
+	AnchorCertificates                *[]string                       `json:"anchorCertificates,omitempty"`
+	AuthenticationPrompt              string                          `json:"authenticationPrompt"`
+	AutoAdvanceSetup                  bool                            `json:"autoAdvanceSetup"`
+	DefaultPrestage                   bool                            `json:"defaultPrestage"`
+	Department                        string                          `json:"department"`
+	DeviceEnrollmentProgramInstanceID string                          `json:"deviceEnrollmentProgramInstanceId"`
+	DisplayName                       string                          `json:"displayName"`
+	EnableDeviceBasedActivationLock   bool                            `json:"enableDeviceBasedActivationLock"`
+	EnrollmentCustomizationID         *string                         `json:"enrollmentCustomizationId,omitempty"`
+	EnrollmentSiteID                  string                          `json:"enrollmentSiteId"`
+	KeepExistingLocationInformation   bool                            `json:"keepExistingLocationInformation"`
+	KeepExistingSiteMembership        bool                            `json:"keepExistingSiteMembership"`
+	Language                          *string                         `json:"language,omitempty"`
+	LocationInformation               LocationInformationV2           `json:"locationInformation"`
+	Mandatory                         bool                            `json:"mandatory"`
+	MDMRemovable                      bool                            `json:"mdmRemovable"`
+	PreventActivationLock             bool                            `json:"preventActivationLock"`
+	PurchasingInformation             PrestagePurchasingInformationV2 `json:"purchasingInformation"`
+	Region                            *string                         `json:"region,omitempty"`
+	RequireAuthentication             bool                            `json:"requireAuthentication"`
+	SkipSetupItems                    *map[string]bool                `json:"skipSetupItems,omitempty"`
+	SupportEmailAddress               string                          `json:"supportEmailAddress"`
+	SupportPhoneNumber                string                          `json:"supportPhoneNumber"`
+}
+
+// DeviceEnrollmentPrestageV3 represents a device enrollment prestage v3.
+type DeviceEnrollmentPrestageV3 struct {
+	AnchorCertificates                *[]string                       `json:"anchorCertificates,omitempty"`
+	AuthenticationPrompt              string                          `json:"authenticationPrompt"`
+	AutoAdvanceSetup                  bool                            `json:"autoAdvanceSetup"`
+	DefaultPrestage                   bool                            `json:"defaultPrestage"`
+	Department                        string                          `json:"department"`
+	DeviceEnrollmentProgramInstanceID string                          `json:"deviceEnrollmentProgramInstanceId"`
+	DisplayName                       string                          `json:"displayName"`
+	EnableDeviceBasedActivationLock   bool                            `json:"enableDeviceBasedActivationLock"`
+	EnrollmentCustomizationID         *string                         `json:"enrollmentCustomizationId,omitempty"`
+	EnrollmentSiteID                  string                          `json:"enrollmentSiteId"`
+	KeepExistingLocationInformation   bool                            `json:"keepExistingLocationInformation"`
+	KeepExistingSiteMembership        bool                            `json:"keepExistingSiteMembership"`
+	Language                          *string                         `json:"language,omitempty"`
+	LocationInformation               LocationInformationV3           `json:"locationInformation"`
+	Mandatory                         bool                            `json:"mandatory"`
+	MDMRemovable                      bool                            `json:"mdmRemovable"`
+	PreventActivationLock             bool                            `json:"preventActivationLock"`
+	PurchasingInformation             PrestagePurchasingInformationV3 `json:"purchasingInformation"`
+	Region                            *string                         `json:"region,omitempty"`
+	RequireAuthentication             bool                            `json:"requireAuthentication"`
+	SkipSetupItems                    *map[string]bool                `json:"skipSetupItems,omitempty"`
+	SupportEmailAddress               string                          `json:"supportEmailAddress"`
+	SupportPhoneNumber                string                          `json:"supportPhoneNumber"`
+}
+
+// DeviceEnrollmentToken represents a device enrollment token.
+type DeviceEnrollmentToken struct {
+	EncodedToken  *[]byte `json:"encodedToken,omitempty"`
+	TokenFileName *string `json:"tokenFileName,omitempty"`
+}
+
 // EnrollmentMethod represents a enrollment method.
 type EnrollmentMethod struct {
 	ID         string `json:"id"`
@@ -1102,6 +1318,114 @@ type ExtensionAttributes struct {
 	Description *string `json:"description,omitempty"`
 	ID          *string `json:"id,omitempty"`
 	Name        string  `json:"name"`
+}
+
+// FileAttachmentV3 represents a file attachment v3.
+type FileAttachmentV3 struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// GetComputerPrestageV3 represents a get computer prestage v3.
+type GetComputerPrestageV3 struct {
+	AccountSettings                    *AccountSettingsResponse         `json:"accountSettings,omitempty"`
+	AnchorCertificates                 []string                         `json:"anchorCertificates"`
+	AuthURL                            *string                          `json:"authUrl,omitempty"`
+	AuthenticationPrompt               string                           `json:"authenticationPrompt"`
+	AutoAdvanceSetup                   bool                             `json:"autoAdvanceSetup"`
+	CustomPackageDistributionPointID   string                           `json:"customPackageDistributionPointId"`
+	CustomPackageIds                   []string                         `json:"customPackageIds"`
+	DefaultPrestage                    bool                             `json:"defaultPrestage"`
+	Department                         string                           `json:"department"`
+	DeviceEnrollmentProgramInstanceID  string                           `json:"deviceEnrollmentProgramInstanceId"`
+	DisplayName                        string                           `json:"displayName"`
+	EnableDeviceBasedActivationLock    bool                             `json:"enableDeviceBasedActivationLock"`
+	EnableRecoveryLock                 bool                             `json:"enableRecoveryLock"`
+	EnrollmentCustomizationID          string                           `json:"enrollmentCustomizationId"`
+	EnrollmentSiteID                   string                           `json:"enrollmentSiteId"`
+	ID                                 string                           `json:"id"`
+	InstallProfilesDuringSetup         bool                             `json:"installProfilesDuringSetup"`
+	KeepExistingLocationInformation    bool                             `json:"keepExistingLocationInformation"`
+	KeepExistingSiteMembership         bool                             `json:"keepExistingSiteMembership"`
+	Language                           string                           `json:"language"`
+	LocationInformation                *LocationInformationV2           `json:"locationInformation,omitempty"`
+	Mandatory                          bool                             `json:"mandatory"`
+	ManifestURL                        *string                          `json:"manifestUrl,omitempty"`
+	MDMRemovable                       bool                             `json:"mdmRemovable"`
+	MinimumOsSpecificVersion           string                           `json:"minimumOsSpecificVersion"`
+	PlatformSsoAppBundleID             string                           `json:"platformSsoAppBundleId"`
+	PrestageInstalledProfileIds        []string                         `json:"prestageInstalledProfileIds"`
+	PrestageMinimumOsTargetVersionType string                           `json:"prestageMinimumOsTargetVersionType"`
+	PreventActivationLock              bool                             `json:"preventActivationLock"`
+	ProfileURL                         *string                          `json:"profileUrl,omitempty"`
+	ProfileUUID                        string                           `json:"profileUuid"`
+	PssoConfigProfileID                *string                          `json:"pssoConfigProfileId,omitempty"`
+	PssoEnabled                        bool                             `json:"pssoEnabled"`
+	PurchasingInformation              *PrestagePurchasingInformationV2 `json:"purchasingInformation,omitempty"`
+	RecoveryLockPasswordType           string                           `json:"recoveryLockPasswordType"`
+	Region                             string                           `json:"region"`
+	RequireAuthentication              bool                             `json:"requireAuthentication"`
+	RotateRecoveryLockPassword         bool                             `json:"rotateRecoveryLockPassword"`
+	SiteID                             string                           `json:"siteId"`
+	SkipSetupItems                     map[string]bool                  `json:"skipSetupItems"`
+	SupportEmailAddress                string                           `json:"supportEmailAddress"`
+	SupportPhoneNumber                 string                           `json:"supportPhoneNumber"`
+	VersionLock                        int                              `json:"versionLock"`
+}
+
+// GetMobileDevicePrestageV3 represents a get mobile device prestage v3.
+type GetMobileDevicePrestageV3 struct {
+	AllowPairing                           bool                             `json:"allowPairing"`
+	AnchorCertificates                     []string                         `json:"anchorCertificates"`
+	AuthenticationPrompt                   string                           `json:"authenticationPrompt"`
+	AutoAdvanceSetup                       bool                             `json:"autoAdvanceSetup"`
+	ConfigureDeviceBeforeSetupAssistant    bool                             `json:"configureDeviceBeforeSetupAssistant"`
+	DefaultPrestage                        bool                             `json:"defaultPrestage"`
+	Department                             string                           `json:"department"`
+	DeviceEnrollmentProgramInstanceID      string                           `json:"deviceEnrollmentProgramInstanceId"`
+	DisplayName                            string                           `json:"displayName"`
+	DoNotUseProfileFromBackup              bool                             `json:"doNotUseProfileFromBackup"`
+	EnableDeviceBasedActivationLock        bool                             `json:"enableDeviceBasedActivationLock"`
+	EnforceTemporarySessionTimeout         bool                             `json:"enforceTemporarySessionTimeout"`
+	EnforceUserSessionTimeout              bool                             `json:"enforceUserSessionTimeout"`
+	EnrollmentCustomizationID              string                           `json:"enrollmentCustomizationId"`
+	EnrollmentSiteID                       string                           `json:"enrollmentSiteId"`
+	ID                                     string                           `json:"id"`
+	InstallAppsDuringEnrollment            bool                             `json:"installAppsDuringEnrollment"`
+	KeepExistingLocationInformation        bool                             `json:"keepExistingLocationInformation"`
+	KeepExistingSiteMembership             bool                             `json:"keepExistingSiteMembership"`
+	Language                               string                           `json:"language"`
+	LocationInformation                    *LocationInformationV3           `json:"locationInformation,omitempty"`
+	Mandatory                              bool                             `json:"mandatory"`
+	MaximumSharedAccounts                  int                              `json:"maximumSharedAccounts"`
+	MDMRemovable                           bool                             `json:"mdmRemovable"`
+	MinimumOsSpecificVersionIos            string                           `json:"minimumOsSpecificVersionIos"`
+	MinimumOsSpecificVersionIpad           string                           `json:"minimumOsSpecificVersionIpad"`
+	MultiUser                              bool                             `json:"multiUser"`
+	Names                                  *MobileDevicePrestageNamesV3     `json:"names,omitempty"`
+	PreserveManagedApps                    bool                             `json:"preserveManagedApps"`
+	PrestageMinimumOsTargetVersionTypeIos  string                           `json:"prestageMinimumOsTargetVersionTypeIos"`
+	PrestageMinimumOsTargetVersionTypeIpad string                           `json:"prestageMinimumOsTargetVersionTypeIpad"`
+	PreventActivationLock                  bool                             `json:"preventActivationLock"`
+	ProfileUUID                            string                           `json:"profileUuid"`
+	PurchasingInformation                  *PrestagePurchasingInformationV3 `json:"purchasingInformation,omitempty"`
+	Region                                 string                           `json:"region"`
+	RequireAuthentication                  bool                             `json:"requireAuthentication"`
+	RtsConfigProfileID                     string                           `json:"rtsConfigProfileId"`
+	RtsEnabled                             bool                             `json:"rtsEnabled"`
+	SendTimezone                           bool                             `json:"sendTimezone"`
+	SiteID                                 string                           `json:"siteId"`
+	SkipSetupItems                         map[string]bool                  `json:"skipSetupItems"`
+	StorageQuotaSizeMegabytes              int                              `json:"storageQuotaSizeMegabytes"`
+	Supervised                             bool                             `json:"supervised"`
+	SupportEmailAddress                    string                           `json:"supportEmailAddress"`
+	SupportPhoneNumber                     string                           `json:"supportPhoneNumber"`
+	TemporarySessionOnly                   bool                             `json:"temporarySessionOnly"`
+	TemporarySessionTimeout                int                              `json:"temporarySessionTimeout"`
+	Timezone                               string                           `json:"timezone"`
+	UseStorageQuotaSize                    bool                             `json:"useStorageQuotaSize"`
+	UserSessionTimeout                     int                              `json:"userSessionTimeout"`
+	VersionLock                            int                              `json:"versionLock"`
 }
 
 // GroupDtoV1 represents a group dto v1.
@@ -1386,6 +1710,34 @@ type InventoryPreloadRecordV2 struct {
 	Username            *string                               `json:"username,omitempty"`
 	Vendor              *string                               `json:"vendor,omitempty"`
 	WarrantyExpiration  *string                               `json:"warrantyExpiration,omitempty"`
+}
+
+// LocationInformationV2 represents a location information v2.
+type LocationInformationV2 struct {
+	BuildingID   string `json:"buildingId"`
+	DepartmentID string `json:"departmentId"`
+	Email        string `json:"email"`
+	ID           string `json:"id"`
+	Phone        string `json:"phone"`
+	Position     string `json:"position"`
+	Realname     string `json:"realname"`
+	Room         string `json:"room"`
+	Username     string `json:"username"`
+	VersionLock  int    `json:"versionLock"`
+}
+
+// LocationInformationV3 represents a location information v3.
+type LocationInformationV3 struct {
+	BuildingID   string `json:"buildingId"`
+	DepartmentID string `json:"departmentId"`
+	Email        string `json:"email"`
+	ID           string `json:"id"`
+	Phone        string `json:"phone"`
+	Position     string `json:"position"`
+	Realname     string `json:"realname"`
+	Room         string `json:"room"`
+	Username     string `json:"username"`
+	VersionLock  int    `json:"versionLock"`
 }
 
 // LocationV2 represents a location v2.
@@ -1753,6 +2105,81 @@ type MobileDeviceNetwork struct {
 	PreferredVoiceNumber     string `json:"preferredVoiceNumber"`
 	Roaming                  bool   `json:"roaming"`
 	VoiceRoamingEnabled      bool   `json:"voiceRoamingEnabled"`
+}
+
+// MobileDevicePrestageNameV3 represents a mobile device prestage name v3.
+type MobileDevicePrestageNameV3 struct {
+	DeviceName *string `json:"deviceName,omitempty"`
+	ID         *string `json:"id,omitempty"`
+	Used       *bool   `json:"used,omitempty"`
+}
+
+// MobileDevicePrestageNamesV3 represents a mobile device prestage names v3.
+type MobileDevicePrestageNamesV3 struct {
+	AssignNamesUsing       *string                       `json:"assignNamesUsing,omitempty"`
+	DeviceNamePrefix       *string                       `json:"deviceNamePrefix,omitempty"`
+	DeviceNameSuffix       *string                       `json:"deviceNameSuffix,omitempty"`
+	DeviceNamingConfigured *bool                         `json:"deviceNamingConfigured,omitempty"`
+	ManageNames            *bool                         `json:"manageNames,omitempty"`
+	PrestageDeviceNames    *[]MobileDevicePrestageNameV3 `json:"prestageDeviceNames,omitempty"`
+	SingleDeviceName       *string                       `json:"singleDeviceName,omitempty"`
+}
+
+// MobileDevicePrestageSearchResultsV3 represents a mobile device prestage search results v3.
+type MobileDevicePrestageSearchResultsV3 struct {
+	Results    []GetMobileDevicePrestageV3 `json:"results"`
+	TotalCount int                         `json:"totalCount"`
+}
+
+// MobileDevicePrestageV3 represents a mobile device prestage v3.
+type MobileDevicePrestageV3 struct {
+	AllowPairing                           bool                             `json:"allowPairing"`
+	AnchorCertificates                     []string                         `json:"anchorCertificates"`
+	AuthenticationPrompt                   string                           `json:"authenticationPrompt"`
+	AutoAdvanceSetup                       bool                             `json:"autoAdvanceSetup"`
+	ConfigureDeviceBeforeSetupAssistant    bool                             `json:"configureDeviceBeforeSetupAssistant"`
+	DefaultPrestage                        bool                             `json:"defaultPrestage"`
+	Department                             string                           `json:"department"`
+	DeviceEnrollmentProgramInstanceID      string                           `json:"deviceEnrollmentProgramInstanceId"`
+	DisplayName                            string                           `json:"displayName"`
+	DoNotUseProfileFromBackup              bool                             `json:"doNotUseProfileFromBackup"`
+	EnableDeviceBasedActivationLock        bool                             `json:"enableDeviceBasedActivationLock"`
+	EnforceTemporarySessionTimeout         bool                             `json:"enforceTemporarySessionTimeout"`
+	EnforceUserSessionTimeout              bool                             `json:"enforceUserSessionTimeout"`
+	EnrollmentCustomizationID              string                           `json:"enrollmentCustomizationId"`
+	EnrollmentSiteID                       string                           `json:"enrollmentSiteId"`
+	InstallAppsDuringEnrollment            bool                             `json:"installAppsDuringEnrollment"`
+	KeepExistingLocationInformation        bool                             `json:"keepExistingLocationInformation"`
+	KeepExistingSiteMembership             bool                             `json:"keepExistingSiteMembership"`
+	Language                               string                           `json:"language"`
+	LocationInformation                    *LocationInformationV3           `json:"locationInformation,omitempty"`
+	Mandatory                              bool                             `json:"mandatory"`
+	MaximumSharedAccounts                  int                              `json:"maximumSharedAccounts"`
+	MDMRemovable                           bool                             `json:"mdmRemovable"`
+	MinimumOsSpecificVersionIos            string                           `json:"minimumOsSpecificVersionIos"`
+	MinimumOsSpecificVersionIpad           string                           `json:"minimumOsSpecificVersionIpad"`
+	MultiUser                              bool                             `json:"multiUser"`
+	Names                                  *MobileDevicePrestageNamesV3     `json:"names,omitempty"`
+	PreserveManagedApps                    bool                             `json:"preserveManagedApps"`
+	PrestageMinimumOsTargetVersionTypeIos  string                           `json:"prestageMinimumOsTargetVersionTypeIos"`
+	PrestageMinimumOsTargetVersionTypeIpad string                           `json:"prestageMinimumOsTargetVersionTypeIpad"`
+	PreventActivationLock                  bool                             `json:"preventActivationLock"`
+	PurchasingInformation                  *PrestagePurchasingInformationV3 `json:"purchasingInformation,omitempty"`
+	Region                                 string                           `json:"region"`
+	RequireAuthentication                  bool                             `json:"requireAuthentication"`
+	RtsConfigProfileID                     string                           `json:"rtsConfigProfileId"`
+	RtsEnabled                             bool                             `json:"rtsEnabled"`
+	SendTimezone                           bool                             `json:"sendTimezone"`
+	SkipSetupItems                         map[string]bool                  `json:"skipSetupItems"`
+	StorageQuotaSizeMegabytes              int                              `json:"storageQuotaSizeMegabytes"`
+	Supervised                             bool                             `json:"supervised"`
+	SupportEmailAddress                    string                           `json:"supportEmailAddress"`
+	SupportPhoneNumber                     string                           `json:"supportPhoneNumber"`
+	TemporarySessionOnly                   bool                             `json:"temporarySessionOnly"`
+	TemporarySessionTimeout                int                              `json:"temporarySessionTimeout"`
+	Timezone                               string                           `json:"timezone"`
+	UseStorageQuotaSize                    bool                             `json:"useStorageQuotaSize"`
+	UserSessionTimeout                     int                              `json:"userSessionTimeout"`
 }
 
 // MobileDeviceProfile represents a mobile device profile.
@@ -2371,6 +2798,126 @@ type PolicyPropertiesV1 struct {
 	PoliciesRequireNetworkStateChange *bool `json:"policiesRequireNetworkStateChange,omitempty"`
 }
 
+// PostComputerPrestageV3 represents a post computer prestage v3.
+type PostComputerPrestageV3 struct {
+	AccountSettings                    *AccountSettingsRequest          `json:"accountSettings,omitempty"`
+	AnchorCertificates                 []string                         `json:"anchorCertificates"`
+	AuthURL                            *string                          `json:"authUrl,omitempty"`
+	AuthenticationPrompt               string                           `json:"authenticationPrompt"`
+	AutoAdvanceSetup                   bool                             `json:"autoAdvanceSetup"`
+	CustomPackageDistributionPointID   string                           `json:"customPackageDistributionPointId"`
+	CustomPackageIds                   []string                         `json:"customPackageIds"`
+	DefaultPrestage                    bool                             `json:"defaultPrestage"`
+	Department                         string                           `json:"department"`
+	DeviceEnrollmentProgramInstanceID  string                           `json:"deviceEnrollmentProgramInstanceId"`
+	DisplayName                        string                           `json:"displayName"`
+	EnableDeviceBasedActivationLock    bool                             `json:"enableDeviceBasedActivationLock"`
+	EnableRecoveryLock                 bool                             `json:"enableRecoveryLock"`
+	EnrollmentCustomizationID          string                           `json:"enrollmentCustomizationId"`
+	EnrollmentSiteID                   string                           `json:"enrollmentSiteId"`
+	InstallProfilesDuringSetup         bool                             `json:"installProfilesDuringSetup"`
+	KeepExistingLocationInformation    bool                             `json:"keepExistingLocationInformation"`
+	KeepExistingSiteMembership         bool                             `json:"keepExistingSiteMembership"`
+	Language                           string                           `json:"language"`
+	LocationInformation                *LocationInformationV2           `json:"locationInformation,omitempty"`
+	Mandatory                          bool                             `json:"mandatory"`
+	ManifestURL                        *string                          `json:"manifestUrl,omitempty"`
+	MDMRemovable                       bool                             `json:"mdmRemovable"`
+	MinimumOsSpecificVersion           string                           `json:"minimumOsSpecificVersion"`
+	PlatformSsoAppBundleID             string                           `json:"platformSsoAppBundleId"`
+	PrestageInstalledProfileIds        []string                         `json:"prestageInstalledProfileIds"`
+	PrestageMinimumOsTargetVersionType string                           `json:"prestageMinimumOsTargetVersionType"`
+	PreventActivationLock              bool                             `json:"preventActivationLock"`
+	ProfileURL                         *string                          `json:"profileUrl,omitempty"`
+	PssoConfigProfileID                *string                          `json:"pssoConfigProfileId,omitempty"`
+	PssoEnabled                        bool                             `json:"pssoEnabled"`
+	PurchasingInformation              *PrestagePurchasingInformationV2 `json:"purchasingInformation,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	RecoveryLockPassword       string          `json:"recoveryLockPassword"`
+	RecoveryLockPasswordType   string          `json:"recoveryLockPasswordType"`
+	Region                     string          `json:"region"`
+	RequireAuthentication      bool            `json:"requireAuthentication"`
+	RotateRecoveryLockPassword bool            `json:"rotateRecoveryLockPassword"`
+	SkipSetupItems             map[string]bool `json:"skipSetupItems"`
+	SupportEmailAddress        string          `json:"supportEmailAddress"`
+	SupportPhoneNumber         string          `json:"supportPhoneNumber"`
+}
+
+// PrestageFileAttachmentV3 represents a prestage file attachment v3.
+type PrestageFileAttachmentV3 struct {
+	FileType string `json:"fileType"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+}
+
+// PrestagePurchasingInformationV2 represents a prestage purchasing information v2.
+type PrestagePurchasingInformationV2 struct {
+	AppleCareID       string `json:"appleCareId"`
+	ID                string `json:"id"`
+	LeaseDate         string `json:"leaseDate"`
+	Leased            bool   `json:"leased"`
+	LifeExpectancy    int    `json:"lifeExpectancy"`
+	PoDate            string `json:"poDate"`
+	PoNumber          string `json:"poNumber"`
+	PurchasePrice     string `json:"purchasePrice"`
+	Purchased         bool   `json:"purchased"`
+	PurchasingAccount string `json:"purchasingAccount"`
+	PurchasingContact string `json:"purchasingContact"`
+	Vendor            string `json:"vendor"`
+	VersionLock       int    `json:"versionLock"`
+	WarrantyDate      string `json:"warrantyDate"`
+}
+
+// PrestagePurchasingInformationV3 represents a prestage purchasing information v3.
+type PrestagePurchasingInformationV3 struct {
+	AppleCareID       string `json:"appleCareId"`
+	ID                string `json:"id"`
+	LeaseDate         string `json:"leaseDate"`
+	Leased            bool   `json:"leased"`
+	LifeExpectancy    int    `json:"lifeExpectancy"`
+	PoDate            string `json:"poDate"`
+	PoNumber          string `json:"poNumber"`
+	PurchasePrice     string `json:"purchasePrice"`
+	Purchased         bool   `json:"purchased"`
+	PurchasingAccount string `json:"purchasingAccount"`
+	PurchasingContact string `json:"purchasingContact"`
+	Vendor            string `json:"vendor"`
+	VersionLock       int    `json:"versionLock"`
+	WarrantyDate      string `json:"warrantyDate"`
+}
+
+// PrestageScopeAssignmentV2 represents a prestage scope assignment v2.
+type PrestageScopeAssignmentV2 struct {
+	AssignmentDate *time.Time `json:"assignmentDate,omitempty"`
+	SerialNumber   string     `json:"serialNumber"`
+	UserAssigned   string     `json:"userAssigned"`
+}
+
+// PrestageScopeResponseV2 represents a prestage scope response v2.
+type PrestageScopeResponseV2 struct {
+	Assignments []PrestageScopeAssignmentV2 `json:"assignments"`
+	PrestageID  string                      `json:"prestageId"`
+	VersionLock int                         `json:"versionLock"`
+}
+
+// PrestageScopeUpdate represents a prestage scope update.
+type PrestageScopeUpdate struct {
+	SerialNumbers []string `json:"serialNumbers"`
+	VersionLock   int      `json:"versionLock"`
+}
+
+// PrestageScopeV2 represents a prestage scope v2.
+type PrestageScopeV2 struct {
+	SerialsByPrestageID map[string]string `json:"serialsByPrestageId"`
+}
+
+// PrestageSyncStatusV2 represents a prestage sync status v2.
+type PrestageSyncStatusV2 struct {
+	PrestageID string `json:"prestageId"`
+	SyncState  string `json:"syncState"`
+	Timestamp  string `json:"timestamp"`
+}
+
 // PurchasingV2 represents a purchasing v2.
 type PurchasingV2 struct {
 	AppleCareID         *string    `json:"appleCareId,omitempty"`
@@ -2385,6 +2932,104 @@ type PurchasingV2 struct {
 	PurchasingContact   *string    `json:"purchasingContact,omitempty"`
 	Vendor              *string    `json:"vendor,omitempty"`
 	WarrantyExpiresDate *time.Time `json:"warrantyExpiresDate,omitempty"`
+}
+
+// PutComputerPrestageV3 represents a put computer prestage v3.
+type PutComputerPrestageV3 struct {
+	AccountSettings                    *AccountSettingsRequest          `json:"accountSettings,omitempty"`
+	AnchorCertificates                 []string                         `json:"anchorCertificates"`
+	AuthURL                            *string                          `json:"authUrl,omitempty"`
+	AuthenticationPrompt               string                           `json:"authenticationPrompt"`
+	AutoAdvanceSetup                   bool                             `json:"autoAdvanceSetup"`
+	CustomPackageDistributionPointID   string                           `json:"customPackageDistributionPointId"`
+	CustomPackageIds                   []string                         `json:"customPackageIds"`
+	DefaultPrestage                    bool                             `json:"defaultPrestage"`
+	Department                         string                           `json:"department"`
+	DeviceEnrollmentProgramInstanceID  string                           `json:"deviceEnrollmentProgramInstanceId"`
+	DisplayName                        string                           `json:"displayName"`
+	EnableDeviceBasedActivationLock    bool                             `json:"enableDeviceBasedActivationLock"`
+	EnableRecoveryLock                 bool                             `json:"enableRecoveryLock"`
+	EnrollmentCustomizationID          string                           `json:"enrollmentCustomizationId"`
+	EnrollmentSiteID                   string                           `json:"enrollmentSiteId"`
+	InstallProfilesDuringSetup         bool                             `json:"installProfilesDuringSetup"`
+	KeepExistingLocationInformation    bool                             `json:"keepExistingLocationInformation"`
+	KeepExistingSiteMembership         bool                             `json:"keepExistingSiteMembership"`
+	Language                           string                           `json:"language"`
+	LocationInformation                *LocationInformationV2           `json:"locationInformation,omitempty"`
+	Mandatory                          bool                             `json:"mandatory"`
+	ManifestURL                        *string                          `json:"manifestUrl,omitempty"`
+	MDMRemovable                       bool                             `json:"mdmRemovable"`
+	MinimumOsSpecificVersion           string                           `json:"minimumOsSpecificVersion"`
+	PlatformSsoAppBundleID             string                           `json:"platformSsoAppBundleId"`
+	PrestageInstalledProfileIds        []string                         `json:"prestageInstalledProfileIds"`
+	PrestageMinimumOsTargetVersionType string                           `json:"prestageMinimumOsTargetVersionType"`
+	PreventActivationLock              bool                             `json:"preventActivationLock"`
+	ProfileURL                         *string                          `json:"profileUrl,omitempty"`
+	PssoConfigProfileID                *string                          `json:"pssoConfigProfileId,omitempty"`
+	PssoEnabled                        bool                             `json:"pssoEnabled"`
+	PurchasingInformation              *PrestagePurchasingInformationV2 `json:"purchasingInformation,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	RecoveryLockPassword       string          `json:"recoveryLockPassword"`
+	RecoveryLockPasswordType   string          `json:"recoveryLockPasswordType"`
+	Region                     string          `json:"region"`
+	RequireAuthentication      bool            `json:"requireAuthentication"`
+	RotateRecoveryLockPassword bool            `json:"rotateRecoveryLockPassword"`
+	SkipSetupItems             map[string]bool `json:"skipSetupItems"`
+	SupportEmailAddress        string          `json:"supportEmailAddress"`
+	SupportPhoneNumber         string          `json:"supportPhoneNumber"`
+	VersionLock                int             `json:"versionLock"`
+}
+
+// PutMobileDevicePrestageV3 represents a put mobile device prestage v3.
+type PutMobileDevicePrestageV3 struct {
+	AllowPairing                           bool                             `json:"allowPairing"`
+	AnchorCertificates                     []string                         `json:"anchorCertificates"`
+	AuthenticationPrompt                   string                           `json:"authenticationPrompt"`
+	AutoAdvanceSetup                       bool                             `json:"autoAdvanceSetup"`
+	ConfigureDeviceBeforeSetupAssistant    bool                             `json:"configureDeviceBeforeSetupAssistant"`
+	DefaultPrestage                        bool                             `json:"defaultPrestage"`
+	Department                             string                           `json:"department"`
+	DeviceEnrollmentProgramInstanceID      string                           `json:"deviceEnrollmentProgramInstanceId"`
+	DisplayName                            string                           `json:"displayName"`
+	DoNotUseProfileFromBackup              bool                             `json:"doNotUseProfileFromBackup"`
+	EnableDeviceBasedActivationLock        bool                             `json:"enableDeviceBasedActivationLock"`
+	EnforceTemporarySessionTimeout         bool                             `json:"enforceTemporarySessionTimeout"`
+	EnforceUserSessionTimeout              bool                             `json:"enforceUserSessionTimeout"`
+	EnrollmentCustomizationID              string                           `json:"enrollmentCustomizationId"`
+	EnrollmentSiteID                       string                           `json:"enrollmentSiteId"`
+	InstallAppsDuringEnrollment            bool                             `json:"installAppsDuringEnrollment"`
+	KeepExistingLocationInformation        bool                             `json:"keepExistingLocationInformation"`
+	KeepExistingSiteMembership             bool                             `json:"keepExistingSiteMembership"`
+	Language                               string                           `json:"language"`
+	LocationInformation                    *LocationInformationV3           `json:"locationInformation,omitempty"`
+	Mandatory                              bool                             `json:"mandatory"`
+	MaximumSharedAccounts                  int                              `json:"maximumSharedAccounts"`
+	MDMRemovable                           bool                             `json:"mdmRemovable"`
+	MinimumOsSpecificVersionIos            string                           `json:"minimumOsSpecificVersionIos"`
+	MinimumOsSpecificVersionIpad           string                           `json:"minimumOsSpecificVersionIpad"`
+	MultiUser                              bool                             `json:"multiUser"`
+	Names                                  *MobileDevicePrestageNamesV3     `json:"names,omitempty"`
+	PreserveManagedApps                    bool                             `json:"preserveManagedApps"`
+	PrestageMinimumOsTargetVersionTypeIos  string                           `json:"prestageMinimumOsTargetVersionTypeIos"`
+	PrestageMinimumOsTargetVersionTypeIpad string                           `json:"prestageMinimumOsTargetVersionTypeIpad"`
+	PreventActivationLock                  bool                             `json:"preventActivationLock"`
+	PurchasingInformation                  *PrestagePurchasingInformationV3 `json:"purchasingInformation,omitempty"`
+	Region                                 string                           `json:"region"`
+	RequireAuthentication                  bool                             `json:"requireAuthentication"`
+	RtsConfigProfileID                     string                           `json:"rtsConfigProfileId"`
+	RtsEnabled                             bool                             `json:"rtsEnabled"`
+	SendTimezone                           bool                             `json:"sendTimezone"`
+	SkipSetupItems                         map[string]bool                  `json:"skipSetupItems"`
+	StorageQuotaSizeMegabytes              int                              `json:"storageQuotaSizeMegabytes"`
+	Supervised                             bool                             `json:"supervised"`
+	SupportEmailAddress                    string                           `json:"supportEmailAddress"`
+	SupportPhoneNumber                     string                           `json:"supportPhoneNumber"`
+	TemporarySessionOnly                   bool                             `json:"temporarySessionOnly"`
+	TemporarySessionTimeout                int                              `json:"temporarySessionTimeout"`
+	Timezone                               string                           `json:"timezone"`
+	UseStorageQuotaSize                    bool                             `json:"useStorageQuotaSize"`
+	UserSessionTimeout                     int                              `json:"userSessionTimeout"`
+	VersionLock                            int                              `json:"versionLock"`
 }
 
 // RemoveComputerMDMProfileResponse represents a remove computer m d m profile response.

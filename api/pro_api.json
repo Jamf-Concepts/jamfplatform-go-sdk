@@ -98,6 +98,163 @@
       }
     },
     "schemas": {
+      "AccountSettingsRequest": {
+        "properties": {
+          "adminPassword": {
+            "default": "",
+            "example": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "adminUsername": {
+            "default": "",
+            "example": "admin",
+            "type": "string"
+          },
+          "hiddenAdminAccount": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "id": {
+            "description": "id of Account Settings",
+            "example": "1",
+            "type": "string"
+          },
+          "localAdminAccountEnabled": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "localUserManaged": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "payloadConfigured": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "prefillAccountFullName": {
+            "default": "",
+            "example": "TestUser FullName",
+            "type": "string"
+          },
+          "prefillAccountUserName": {
+            "default": "",
+            "example": "UserName",
+            "type": "string"
+          },
+          "prefillPrimaryAccountInfoFeatureEnabled": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "prefillType": {
+            "default": "CUSTOM",
+            "description": "Values accepted are only CUSTOM and DEVICE_OWNER",
+            "example": "DEVICE_OWNER",
+            "type": "string"
+          },
+          "preventPrefillInfoFromModification": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "userAccountType": {
+            "default": "STANDARD",
+            "enum": [
+              "ADMINISTRATOR",
+              "STANDARD",
+              "SKIP"
+            ],
+            "type": "string"
+          },
+          "versionLock": {
+            "default": 0,
+            "example": 4,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "AccountSettingsResponse": {
+        "properties": {
+          "adminUsername": {
+            "default": "",
+            "example": "admin",
+            "type": "string"
+          },
+          "hiddenAdminAccount": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "id": {
+            "description": "id of Account Settings",
+            "example": "1",
+            "type": "string"
+          },
+          "localAdminAccountEnabled": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "localUserManaged": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "payloadConfigured": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "prefillAccountFullName": {
+            "default": "",
+            "example": "TestUser FullName",
+            "type": "string"
+          },
+          "prefillAccountUserName": {
+            "default": "",
+            "example": "UserName",
+            "type": "string"
+          },
+          "prefillPrimaryAccountInfoFeatureEnabled": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "prefillType": {
+            "default": "CUSTOM",
+            "description": "Values accepted are only CUSTOM and DEVICE_OWNER",
+            "example": "DEVICE_OWNER",
+            "type": "string"
+          },
+          "preventPrefillInfoFromModification": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "userAccountType": {
+            "default": "STANDARD",
+            "enum": [
+              "ADMINISTRATOR",
+              "STANDARD",
+              "SKIP"
+            ],
+            "type": "string"
+          },
+          "versionLock": {
+            "default": 0,
+            "example": 4,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "AdvancedSearch": {
         "properties": {
           "criteria": {
@@ -284,6 +441,35 @@
           "id",
           "path"
         ],
+        "type": "object"
+      },
+      "AssignRemoveProfileResponseSyncState": {
+        "properties": {
+          "failureCount": {
+            "example": 0,
+            "type": "integer"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "profileUUID": {
+            "example": "9164E5F7C74C2A4C4BE90BB15E549F14",
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "R7QFDE2YCFN4",
+            "type": "string"
+          },
+          "syncStatus": {
+            "example": "ASSIGN_SUCCESS",
+            "type": "string"
+          },
+          "timestamp": {
+            "example": 1583855813080,
+            "type": "integer"
+          }
+        },
         "type": "object"
       },
       "Assignment": {
@@ -3131,6 +3317,128 @@
         "example": "ENCRYPTING",
         "type": "string"
       },
+      "ComputerPrestageSearchResultsV3": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/GetComputerPrestageV3"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPrestageV3": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeviceEnrollmentPrestageV2"
+          },
+          {
+            "properties": {
+              "authUrl": {
+                "description": "The URL to the identity provider (IdP) for authentication for the Platform SSO (PSSO) application 403 workflow. This URL is used in conjunction with PSSO to facilitate single sign-on for users during the device setup process.",
+                "example": "https://idp.example.com/authenticate",
+                "nullable": true,
+                "type": "string"
+              },
+              "customPackageDistributionPointId": {
+                "example": "1",
+                "type": "string"
+              },
+              "customPackageIds": {
+                "items": {
+                  "example": "1",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "enableRecoveryLock": {
+                "example": true,
+                "type": "boolean"
+              },
+              "installProfilesDuringSetup": {
+                "example": true,
+                "type": "boolean"
+              },
+              "manifestUrl": {
+                "description": "The URL to the manifest file for the Platform SSO (PSSO) application 403 workflow. This URL is used when deploying the PSSO app to devices during the setup process.",
+                "example": "https://mdmserver.example.com/psso-app.plist",
+                "nullable": true,
+                "type": "string"
+              },
+              "minimumOsSpecificVersion": {
+                "example": "17.1",
+                "type": "string"
+              },
+              "platformSsoAppBundleId": {
+                "description": "The bundle identifier for the Platform SSO (PSSO) application unattended workflow. This identifier is used to specify which PSSO app should be deployed to devices during the setup process.",
+                "example": "com.okta.mobile",
+                "type": "string"
+              },
+              "prestageInstalledProfileIds": {
+                "items": {
+                  "example": "1",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "prestageMinimumOsTargetVersionType": {
+                "enum": [
+                  "NO_ENFORCEMENT",
+                  "MINIMUM_OS_LATEST_VERSION",
+                  "MINIMUM_OS_LATEST_MAJOR_VERSION",
+                  "MINIMUM_OS_LATEST_MINOR_VERSION",
+                  "MINIMUM_OS_SPECIFIC_VERSION"
+                ],
+                "example": "MINIMUM_OS_LATEST_VERSION",
+                "type": "string"
+              },
+              "profileUrl": {
+                "description": "The URL to the configuration profile for the Platform SSO (PSSO) application 403 workflow. This URL is used when deploying the PSSO app to devices during the setup process. Users should use either profileUrl or populate pssoConfigProfileId, but not both.",
+                "example": "https://mdmserver.example.com/psso.mobileconfig",
+                "nullable": true,
+                "type": "string"
+              },
+              "pssoConfigProfileId": {
+                "description": "The identifier for the configuration profile associated with the Platform SSO (PSSO) application 403 workflow. This ID is used to specify which configuration profile should be applied to devices during the setup process when PSSO is enabled. Users should use either pssoConfigProfileId or populate profileUrl, but not both.",
+                "example": "1",
+                "nullable": true,
+                "type": "string"
+              },
+              "pssoEnabled": {
+                "default": false,
+                "description": "Indicates whether Platform SSO (PSSO) is enabled for this computer prestage, regardless of unattended or 403 workflows. When enabled, the PSSO application will be deployed to devices during the setup process to facilitate single sign-on (SSO) for users.",
+                "example": true,
+                "type": "boolean"
+              },
+              "recoveryLockPasswordType": {
+                "enum": [
+                  "MANUAL",
+                  "RANDOM"
+                ],
+                "example": "MANUAL",
+                "type": "string"
+              },
+              "rotateRecoveryLockPassword": {
+                "example": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "customPackageDistributionPointId",
+              "customPackageIds",
+              "installProfilesDuringSetup",
+              "prestageInstalledProfileIds"
+            ],
+            "type": "object"
+          }
+        ]
+      },
       "ComputerPrinter": {
         "properties": {
           "location": {
@@ -4013,6 +4321,480 @@
         },
         "type": "object"
       },
+      "DeviceEnrollmentDevice": {
+        "properties": {
+          "assetTag": {
+            "example": "ACME-1234",
+            "type": "string"
+          },
+          "color": {
+            "example": "BLACK",
+            "type": "string"
+          },
+          "description": {
+            "example": "MBP 15.4",
+            "type": "string"
+          },
+          "deviceAssignedDate": {
+            "example": "2000-10-30T18:00:00-00:00",
+            "type": "string"
+          },
+          "deviceEnrollmentProgramInstanceId": {
+            "example": "1",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "model": {
+            "example": "Macbook Pro 15 Retina",
+            "type": "string"
+          },
+          "prestageId": {
+            "example": "1",
+            "type": "string"
+          },
+          "profileAssignTime": {
+            "example": "2000-10-30T18:00:00-00:00",
+            "type": "string"
+          },
+          "profilePushTime": {
+            "example": "2000-10-30T18:00:00-00:00",
+            "type": "string"
+          },
+          "profileStatus": {
+            "enum": [
+              "EMPTY",
+              "ASSIGNED",
+              "PUSHED",
+              "REMOVED"
+            ],
+            "example": "ASSIGNED",
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "R7QFDE2YCFN4",
+            "type": "string"
+          },
+          "syncState": {
+            "$ref": "#/components/schemas/AssignRemoveProfileResponseSyncState"
+          }
+        },
+        "type": "object"
+      },
+      "DeviceEnrollmentDeviceSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/DeviceEnrollmentDevice"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "DeviceEnrollmentDisownBody": {
+        "properties": {
+          "devices": {
+            "example": [
+              "1a2s3d4f5g",
+              "0o9i8u7y6t"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "DeviceEnrollmentDisownResponse": {
+        "properties": {
+          "devices": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "0o9i8u7y6t": "FAILED",
+              "a2s3d4f5": "SUCCESS"
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "DeviceEnrollmentInstance": {
+        "properties": {
+          "adminId": {
+            "example": "admin1234",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "Example Device Enrollment Instance",
+            "type": "string"
+          },
+          "orgAddress": {
+            "example": "124 Conch Street, Bikini Bottom, Pacific Ocean",
+            "readOnly": true,
+            "type": "string"
+          },
+          "orgEmail": {
+            "example": "admin@test.com",
+            "readOnly": true,
+            "type": "string"
+          },
+          "orgName": {
+            "example": "Acme Enterprises",
+            "readOnly": true,
+            "type": "string"
+          },
+          "orgPhone": {
+            "example": "555-0123",
+            "readOnly": true,
+            "type": "string"
+          },
+          "serverName": {
+            "example": "Acme ASM",
+            "readOnly": true,
+            "type": "string"
+          },
+          "serverUuid": {
+            "example": "BASD08C11F3C455",
+            "readOnly": true,
+            "type": "string"
+          },
+          "siteId": {
+            "example": "-1",
+            "type": "string"
+          },
+          "supervisionIdentityId": {
+            "example": "1",
+            "type": "string"
+          },
+          "tokenExpirationDate": {
+            "example": "2000-10-30",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "DeviceEnrollmentInstanceSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/DeviceEnrollmentInstance"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "DeviceEnrollmentInstanceSyncStatus": {
+        "properties": {
+          "instanceId": {
+            "example": "1",
+            "type": "string"
+          },
+          "syncState": {
+            "example": "CONNECTION_ERROR",
+            "type": "string"
+          },
+          "timestamp": {
+            "example": "2019-04-17T14:08:06.706+0000",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DeviceEnrollmentPrestageV2": {
+        "properties": {
+          "anchorCertificates": {
+            "description": "The Base64 encoded PEM Certificate",
+            "items": {
+              "example": "xNE5HRgotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "authenticationPrompt": {
+            "example": "LDAP authentication prompt",
+            "type": "string"
+          },
+          "autoAdvanceSetup": {
+            "example": true,
+            "type": "boolean"
+          },
+          "defaultPrestage": {
+            "example": false,
+            "type": "boolean"
+          },
+          "department": {
+            "example": "Oxbow",
+            "type": "string"
+          },
+          "deviceEnrollmentProgramInstanceId": {
+            "example": "5",
+            "type": "string"
+          },
+          "displayName": {
+            "example": "Example Mobile Prestage Name",
+            "type": "string"
+          },
+          "enableDeviceBasedActivationLock": {
+            "example": true,
+            "type": "boolean"
+          },
+          "enrollmentCustomizationId": {
+            "example": "2",
+            "type": "string"
+          },
+          "enrollmentSiteId": {
+            "example": "-1",
+            "type": "string"
+          },
+          "keepExistingLocationInformation": {
+            "example": true,
+            "type": "boolean"
+          },
+          "keepExistingSiteMembership": {
+            "example": true,
+            "type": "boolean"
+          },
+          "language": {
+            "example": "en",
+            "type": "string"
+          },
+          "locationInformation": {
+            "$ref": "#/components/schemas/LocationInformationV2"
+          },
+          "mandatory": {
+            "example": false,
+            "type": "boolean"
+          },
+          "mdmRemovable": {
+            "example": true,
+            "type": "boolean"
+          },
+          "preventActivationLock": {
+            "example": true,
+            "type": "boolean"
+          },
+          "purchasingInformation": {
+            "$ref": "#/components/schemas/PrestagePurchasingInformationV2"
+          },
+          "region": {
+            "example": "US",
+            "type": "string"
+          },
+          "requireAuthentication": {
+            "example": true,
+            "type": "boolean"
+          },
+          "skipSetupItems": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "example": {
+              "Location": true,
+              "Privacy": false
+            },
+            "type": "object"
+          },
+          "supportEmailAddress": {
+            "example": "example@example.com",
+            "type": "string"
+          },
+          "supportPhoneNumber": {
+            "example": "5555555555",
+            "type": "string"
+          }
+        },
+        "required": [
+          "authenticationPrompt",
+          "autoAdvanceSetup",
+          "defaultPrestage",
+          "department",
+          "deviceEnrollmentProgramInstanceId",
+          "displayName",
+          "enableDeviceBasedActivationLock",
+          "enrollmentSiteId",
+          "keepExistingLocationInformation",
+          "keepExistingSiteMembership",
+          "locationInformation",
+          "mandatory",
+          "mdmRemovable",
+          "preventActivationLock",
+          "purchasingInformation",
+          "requireAuthentication",
+          "supportEmailAddress",
+          "supportPhoneNumber"
+        ],
+        "type": "object"
+      },
+      "DeviceEnrollmentPrestageV3": {
+        "properties": {
+          "anchorCertificates": {
+            "description": "The Base64 encoded PEM Certificate",
+            "items": {
+              "example": "xNE5HRgotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "authenticationPrompt": {
+            "example": "LDAP authentication prompt",
+            "type": "string"
+          },
+          "autoAdvanceSetup": {
+            "example": true,
+            "type": "boolean"
+          },
+          "defaultPrestage": {
+            "example": false,
+            "type": "boolean"
+          },
+          "department": {
+            "example": "Oxbow",
+            "type": "string"
+          },
+          "deviceEnrollmentProgramInstanceId": {
+            "example": "5",
+            "type": "string"
+          },
+          "displayName": {
+            "example": "Example Mobile Prestage Name",
+            "type": "string"
+          },
+          "enableDeviceBasedActivationLock": {
+            "example": true,
+            "type": "boolean"
+          },
+          "enrollmentCustomizationId": {
+            "example": "2",
+            "type": "string"
+          },
+          "enrollmentSiteId": {
+            "example": "-1",
+            "type": "string"
+          },
+          "keepExistingLocationInformation": {
+            "example": true,
+            "type": "boolean"
+          },
+          "keepExistingSiteMembership": {
+            "example": true,
+            "type": "boolean"
+          },
+          "language": {
+            "example": "en",
+            "type": "string"
+          },
+          "locationInformation": {
+            "$ref": "#/components/schemas/LocationInformationV3"
+          },
+          "mandatory": {
+            "example": false,
+            "type": "boolean"
+          },
+          "mdmRemovable": {
+            "example": true,
+            "type": "boolean"
+          },
+          "preventActivationLock": {
+            "example": true,
+            "type": "boolean"
+          },
+          "purchasingInformation": {
+            "$ref": "#/components/schemas/PrestagePurchasingInformationV3"
+          },
+          "region": {
+            "example": "US",
+            "type": "string"
+          },
+          "requireAuthentication": {
+            "example": true,
+            "type": "boolean"
+          },
+          "skipSetupItems": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "example": {
+              "Location": true,
+              "Privacy": false
+            },
+            "type": "object"
+          },
+          "supportEmailAddress": {
+            "example": "example@example.com",
+            "type": "string"
+          },
+          "supportPhoneNumber": {
+            "example": "5555555555",
+            "type": "string"
+          }
+        },
+        "required": [
+          "authenticationPrompt",
+          "autoAdvanceSetup",
+          "defaultPrestage",
+          "department",
+          "deviceEnrollmentProgramInstanceId",
+          "displayName",
+          "enableDeviceBasedActivationLock",
+          "enrollmentSiteId",
+          "keepExistingLocationInformation",
+          "keepExistingSiteMembership",
+          "locationInformation",
+          "mandatory",
+          "mdmRemovable",
+          "preventActivationLock",
+          "purchasingInformation",
+          "requireAuthentication",
+          "supportEmailAddress",
+          "supportPhoneNumber"
+        ],
+        "type": "object"
+      },
+      "DeviceEnrollmentToken": {
+        "properties": {
+          "encodedToken": {
+            "description": "The base 64 encoded token",
+            "example": "VTI5dFpTQnlZVzVrYjIwZ1ltbDBJRzltSUhSbGVIUWdkRzhnZFhObElHRnVaQ0J6WldVZ2FXWWdZVzU1YjI1bElHRmpkSFZoYkd4NUlIUnlhV1Z6SUhSdklHUmxZMjlrWlNCcGRBPT0=",
+            "format": "byte",
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string"
+          },
+          "tokenFileName": {
+            "description": "Optional name of the token to be saved, if no name is provided one will be auto-generated",
+            "example": "Acme MDM Token",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "EnrollmentMethod": {
         "properties": {
           "id": {
@@ -4269,6 +5051,81 @@
           "name"
         ],
         "type": "object"
+      },
+      "FileAttachmentV3": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "receipt.pdf",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GetComputerPrestageV3": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ComputerPrestageV3"
+          },
+          {
+            "properties": {
+              "accountSettings": {
+                "$ref": "#/components/schemas/AccountSettingsResponse"
+              },
+              "id": {
+                "example": "1",
+                "minLength": 1,
+                "readOnly": true,
+                "type": "string"
+              },
+              "profileUuid": {
+                "example": "29d-a8d8f-b8sdjndf-dsa9",
+                "type": "string"
+              },
+              "siteId": {
+                "example": "5",
+                "type": "string"
+              },
+              "versionLock": {
+                "example": 0,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GetMobileDevicePrestageV3": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDevicePrestageV3"
+          },
+          {
+            "properties": {
+              "id": {
+                "example": "1",
+                "type": "string"
+              },
+              "profileUuid": {
+                "example": "29d-a8d8f-b8sdjndf-dsa9",
+                "type": "string"
+              },
+              "siteId": {
+                "example": "5",
+                "type": "string"
+              },
+              "versionLock": {
+                "example": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        ]
       },
       "GroupDtoV1": {
         "properties": {
@@ -5289,6 +6146,120 @@
         "required": [
           "deviceType",
           "serialNumber"
+        ],
+        "type": "object"
+      },
+      "LocationInformationV2": {
+        "properties": {
+          "buildingId": {
+            "example": "1",
+            "type": "string"
+          },
+          "departmentId": {
+            "example": "1",
+            "type": "string"
+          },
+          "email": {
+            "example": "test@jamf.com",
+            "type": "string"
+          },
+          "id": {
+            "example": "-1",
+            "type": "string"
+          },
+          "phone": {
+            "example": "123-456-7890",
+            "type": "string"
+          },
+          "position": {
+            "example": "postion",
+            "type": "string"
+          },
+          "realname": {
+            "example": "realName",
+            "type": "string"
+          },
+          "room": {
+            "example": "room",
+            "type": "string"
+          },
+          "username": {
+            "example": "name",
+            "type": "string"
+          },
+          "versionLock": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "buildingId",
+          "departmentId",
+          "email",
+          "id",
+          "phone",
+          "position",
+          "realname",
+          "room",
+          "username",
+          "versionLock"
+        ],
+        "type": "object"
+      },
+      "LocationInformationV3": {
+        "properties": {
+          "buildingId": {
+            "example": "1",
+            "type": "string"
+          },
+          "departmentId": {
+            "example": "1",
+            "type": "string"
+          },
+          "email": {
+            "example": "test@jamf.com",
+            "type": "string"
+          },
+          "id": {
+            "example": "-1",
+            "type": "string"
+          },
+          "phone": {
+            "example": "123-456-7890",
+            "type": "string"
+          },
+          "position": {
+            "example": "postion",
+            "type": "string"
+          },
+          "realname": {
+            "example": "realName",
+            "type": "string"
+          },
+          "room": {
+            "example": "room",
+            "type": "string"
+          },
+          "username": {
+            "example": "name",
+            "type": "string"
+          },
+          "versionLock": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "buildingId",
+          "departmentId",
+          "email",
+          "id",
+          "phone",
+          "position",
+          "realname",
+          "room",
+          "username",
+          "versionLock"
         ],
         "type": "object"
       },
@@ -6375,6 +7346,209 @@
           }
         },
         "type": "object"
+      },
+      "MobileDevicePrestageNameV3": {
+        "properties": {
+          "deviceName": {
+            "example": "iPad",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "used": {
+            "example": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDevicePrestageNamesV3": {
+        "properties": {
+          "assignNamesUsing": {
+            "example": "List of Names",
+            "type": "string"
+          },
+          "deviceNamePrefix": {
+            "example": "prefix",
+            "type": "string"
+          },
+          "deviceNameSuffix": {
+            "example": "suffix",
+            "type": "string"
+          },
+          "deviceNamingConfigured": {
+            "example": true,
+            "type": "boolean"
+          },
+          "manageNames": {
+            "example": true,
+            "type": "boolean"
+          },
+          "prestageDeviceNames": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDevicePrestageNameV3"
+            },
+            "type": "array"
+          },
+          "singleDeviceName": {
+            "example": "name",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDevicePrestageSearchResultsV3": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/GetMobileDevicePrestageV3"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDevicePrestageV3": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeviceEnrollmentPrestageV3"
+          },
+          {
+            "properties": {
+              "allowPairing": {
+                "example": true,
+                "type": "boolean"
+              },
+              "configureDeviceBeforeSetupAssistant": {
+                "example": true,
+                "type": "boolean"
+              },
+              "doNotUseProfileFromBackup": {
+                "description": "If true, the device does not use the profile when it restores a backup. Default is false. Available in iOS 26 and later, and visionOS 26 and later; otherwise ignored by devices.",
+                "example": true,
+                "type": "boolean"
+              },
+              "enforceTemporarySessionTimeout": {
+                "example": false,
+                "type": "boolean"
+              },
+              "enforceUserSessionTimeout": {
+                "example": false,
+                "type": "boolean"
+              },
+              "installAppsDuringEnrollment": {
+                "description": "Controls whether apps are installed during the enrollment process.",
+                "example": true,
+                "type": "boolean"
+              },
+              "maximumSharedAccounts": {
+                "example": 10,
+                "type": "integer"
+              },
+              "minimumOsSpecificVersionIos": {
+                "example": "17.1",
+                "type": "string"
+              },
+              "minimumOsSpecificVersionIpad": {
+                "example": "17.1",
+                "type": "string"
+              },
+              "multiUser": {
+                "example": true,
+                "type": "boolean"
+              },
+              "names": {
+                "$ref": "#/components/schemas/MobileDevicePrestageNamesV3"
+              },
+              "preserveManagedApps": {
+                "description": "Controls whether managed apps are preserved during Return to Service operations.",
+                "example": false,
+                "type": "boolean"
+              },
+              "prestageMinimumOsTargetVersionTypeIos": {
+                "enum": [
+                  "NO_ENFORCEMENT",
+                  "MINIMUM_OS_LATEST_VERSION",
+                  "MINIMUM_OS_LATEST_MAJOR_VERSION",
+                  "MINIMUM_OS_LATEST_MINOR_VERSION",
+                  "MINIMUM_OS_SPECIFIC_VERSION"
+                ],
+                "example": "MINIMUM_OS_LATEST_VERSION",
+                "type": "string"
+              },
+              "prestageMinimumOsTargetVersionTypeIpad": {
+                "enum": [
+                  "NO_ENFORCEMENT",
+                  "MINIMUM_OS_LATEST_VERSION",
+                  "MINIMUM_OS_LATEST_MAJOR_VERSION",
+                  "MINIMUM_OS_LATEST_MINOR_VERSION",
+                  "MINIMUM_OS_SPECIFIC_VERSION"
+                ],
+                "example": "MINIMUM_OS_LATEST_VERSION",
+                "type": "string"
+              },
+              "rtsConfigProfileId": {
+                "example": "1",
+                "type": "string"
+              },
+              "rtsEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "sendTimezone": {
+                "example": true,
+                "type": "boolean"
+              },
+              "storageQuotaSizeMegabytes": {
+                "example": 4096,
+                "type": "integer"
+              },
+              "supervised": {
+                "example": true,
+                "type": "boolean"
+              },
+              "temporarySessionOnly": {
+                "example": false,
+                "type": "boolean"
+              },
+              "temporarySessionTimeout": {
+                "example": 30,
+                "type": "integer"
+              },
+              "timezone": {
+                "example": "America/Chicago",
+                "type": "string"
+              },
+              "useStorageQuotaSize": {
+                "example": true,
+                "type": "boolean"
+              },
+              "userSessionTimeout": {
+                "example": 30,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "allowPairing",
+              "configureDeviceBeforeSetupAssistant",
+              "maximumSharedAccounts",
+              "multiUser",
+              "sendTimezone",
+              "storageQuotaSizeMegabytes",
+              "supervised",
+              "timezone",
+              "useStorageQuotaSize"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "MobileDeviceProfile": {
         "properties": {
@@ -8064,6 +9238,291 @@
         },
         "type": "object"
       },
+      "PostComputerPrestageV3": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ComputerPrestageV3"
+          },
+          {
+            "properties": {
+              "accountSettings": {
+                "$ref": "#/components/schemas/AccountSettingsRequest"
+              },
+              "recoveryLockPassword": {
+                "example": "password123",
+                "format": "password",
+                "minLength": 1,
+                "type": "string",
+                "writeOnly": true
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "PrestageFileAttachmentV3": {
+        "properties": {
+          "fileType": {
+            "example": "pdf",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "receipt.pdf",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PrestagePurchasingInformationV2": {
+        "properties": {
+          "appleCareId": {
+            "example": "abcd",
+            "type": "string"
+          },
+          "id": {
+            "example": "-1",
+            "type": "string"
+          },
+          "leaseDate": {
+            "example": "2019-01-01",
+            "type": "string"
+          },
+          "leased": {
+            "example": true,
+            "type": "boolean"
+          },
+          "lifeExpectancy": {
+            "example": 5,
+            "type": "integer"
+          },
+          "poDate": {
+            "example": "2019-01-01",
+            "type": "string"
+          },
+          "poNumber": {
+            "example": "53-1",
+            "type": "string"
+          },
+          "purchasePrice": {
+            "example": "$500",
+            "type": "string"
+          },
+          "purchased": {
+            "example": true,
+            "type": "boolean"
+          },
+          "purchasingAccount": {
+            "example": "admin",
+            "type": "string"
+          },
+          "purchasingContact": {
+            "example": "true",
+            "type": "string"
+          },
+          "vendor": {
+            "example": "Example Vendor",
+            "type": "string"
+          },
+          "versionLock": {
+            "example": 1,
+            "type": "integer"
+          },
+          "warrantyDate": {
+            "example": "2019-01-01",
+            "type": "string"
+          }
+        },
+        "required": [
+          "appleCareId",
+          "id",
+          "leaseDate",
+          "leased",
+          "lifeExpectancy",
+          "poDate",
+          "poNumber",
+          "purchasePrice",
+          "purchased",
+          "purchasingAccount",
+          "purchasingContact",
+          "vendor",
+          "versionLock",
+          "warrantyDate"
+        ],
+        "type": "object"
+      },
+      "PrestagePurchasingInformationV3": {
+        "properties": {
+          "appleCareId": {
+            "example": "abcd",
+            "type": "string"
+          },
+          "id": {
+            "example": "-1",
+            "type": "string"
+          },
+          "leaseDate": {
+            "example": "2019-01-01",
+            "type": "string"
+          },
+          "leased": {
+            "example": true,
+            "type": "boolean"
+          },
+          "lifeExpectancy": {
+            "example": 5,
+            "type": "integer"
+          },
+          "poDate": {
+            "example": "2019-01-01",
+            "type": "string"
+          },
+          "poNumber": {
+            "example": "53-1",
+            "type": "string"
+          },
+          "purchasePrice": {
+            "example": "$500",
+            "type": "string"
+          },
+          "purchased": {
+            "example": true,
+            "type": "boolean"
+          },
+          "purchasingAccount": {
+            "example": "admin",
+            "type": "string"
+          },
+          "purchasingContact": {
+            "example": "true",
+            "type": "string"
+          },
+          "vendor": {
+            "example": "Example Vendor",
+            "type": "string"
+          },
+          "versionLock": {
+            "example": 1,
+            "type": "integer"
+          },
+          "warrantyDate": {
+            "example": "2019-01-01",
+            "type": "string"
+          }
+        },
+        "required": [
+          "appleCareId",
+          "id",
+          "leaseDate",
+          "leased",
+          "lifeExpectancy",
+          "poDate",
+          "poNumber",
+          "purchasePrice",
+          "purchased",
+          "purchasingAccount",
+          "purchasingContact",
+          "vendor",
+          "versionLock",
+          "warrantyDate"
+        ],
+        "type": "object"
+      },
+      "PrestageScopeAssignmentV2": {
+        "properties": {
+          "assignmentDate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "XYZ",
+            "type": "string"
+          },
+          "userAssigned": {
+            "example": "admin",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PrestageScopeResponseV2": {
+        "properties": {
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/PrestageScopeAssignmentV2"
+            },
+            "type": "array"
+          },
+          "prestageId": {
+            "example": "1",
+            "type": "string"
+          },
+          "versionLock": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PrestageScopeUpdate": {
+        "properties": {
+          "serialNumbers": {
+            "example": [
+              "DMQVGC0DHLF0",
+              "C02L29ECF8J1"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "versionLock": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "serialNumbers",
+          "versionLock"
+        ],
+        "type": "object"
+      },
+      "PrestageScopeV2": {
+        "properties": {
+          "serialsByPrestageId": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "ABCD": 1,
+              "XYZ": 12
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "PrestageSyncStatusV2": {
+        "properties": {
+          "prestageId": {
+            "example": "1",
+            "type": "string"
+          },
+          "syncState": {
+            "example": "CONNECTION_ERROR",
+            "type": "string"
+          },
+          "timestamp": {
+            "example": "2019-04-17T14:08:06.706+0000",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "PurchasingV2": {
         "properties": {
           "appleCareId": {
@@ -8119,6 +9578,49 @@
           }
         },
         "type": "object"
+      },
+      "PutComputerPrestageV3": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ComputerPrestageV3"
+          },
+          {
+            "properties": {
+              "accountSettings": {
+                "$ref": "#/components/schemas/AccountSettingsRequest"
+              },
+              "recoveryLockPassword": {
+                "example": "password123",
+                "format": "password",
+                "minLength": 1,
+                "type": "string",
+                "writeOnly": true
+              },
+              "versionLock": {
+                "example": 0,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "PutMobileDevicePrestageV3": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDevicePrestageV3"
+          },
+          {
+            "properties": {
+              "versionLock": {
+                "example": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        ]
       },
       "RemoveComputerMdmProfileResponse": {
         "properties": {
@@ -11772,6 +13274,658 @@
         ]
       }
     },
+    "/v1/device-enrollments": {
+      "get": {
+        "description": "Search for sorted and paged device enrollment instances",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceEnrollmentInstanceSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Read all sorted and paged Device Enrollment instances\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Read Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/public-key": {
+      "get": {
+        "description": "Retrieve the Jamf Pro device enrollment public key",
+        "responses": {
+          "200": {
+            "content": {
+              "application/x-pem-file": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "summary": "Retrieve the Jamf Pro Device Enrollment public key\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Read Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/syncs": {
+      "get": {
+        "description": "Get all instance sync states for all instances",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DeviceEnrollmentInstanceSyncStatus"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get all instance sync states for all Device Enrollment Instances\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Read Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/upload-token": {
+      "post": {
+        "description": "Creates a device enrollment instance with the supplied token.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceEnrollmentToken"
+              }
+            }
+          },
+          "description": "The downloaded token base 64 encoded from the MDM server to be used to create a new Device Enrollment Instance.",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Device Enrollment Instance was created"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Something went wrong"
+          }
+        },
+        "summary": "Create a Device Enrollment Instance with the supplied Token\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Create Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/{id}": {
+      "delete": {
+        "description": "Deletes a Device Enrollment Instance with the supplied id",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Device Enrollment Instance with that id does not exist"
+          }
+        },
+        "summary": "Delete a Device Enrollment Instance with the supplied id\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Delete Device Enrollment Program Instances"
+        ]
+      },
+      "get": {
+        "description": "Retrieves a Device Enrollment Instance with the supplied id",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceEnrollmentInstance"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Device Enrollment Instance with that id does not exist"
+          }
+        },
+        "summary": "Retrieve a Device Enrollment Instance with the supplied id\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Read Device Enrollment Program Instances"
+        ]
+      },
+      "put": {
+        "description": "Updates a Device Enrollment Instance with the supplied id",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceEnrollmentInstance"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceEnrollmentInstance"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Device Enrollment Instance with that id does not exist"
+          }
+        },
+        "summary": "Update a Device Enrollment Instance with the supplied id\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Update Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/{id}/devices": {
+      "get": {
+        "description": "Retrieves a list of devices assigned to the supplied id",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceEnrollmentDeviceSearchResults"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Retrieve a list of Devices assigned to the supplied id\n",
+        "tags": [
+          "device-enrollments-devices"
+        ],
+        "x-required-privileges": [
+          "Read Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/{id}/disown": {
+      "post": {
+        "description": "Disowns devices from the given device enrollment instance",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceEnrollmentDisownBody"
+              }
+            }
+          },
+          "description": "List of device serial numbers to disown"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceEnrollmentDisownResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "description": "Could not find device enrollment program instance for given id"
+          },
+          "500": {
+            "description": "Something went wrong."
+          }
+        },
+        "summary": "Disown devices from the given Device Enrollment Instance\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/{id}/history": {
+      "get": {
+        "description": "Gets sorted and paged device enrollment history objects",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property,asc/desc. Default sort order is descending. Multiple sort criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort' query param is duplicated for each sort criterion, e.g., ...\u0026sort=name%2Casc\u0026sort=date%2Cdesc",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default search is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: search=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of device enrollment history were found"
+          }
+        },
+        "summary": "Get sorted and paged Device Enrollment history objects\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Read Device Enrollment Program Instances"
+        ]
+      },
+      "post": {
+        "description": "Adds device enrollment history object notes",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of device enrollment history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Device enrollment history can not be saved"
+          }
+        },
+        "summary": "Add Device Enrollment history object notes\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Update Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/{id}/syncs": {
+      "get": {
+        "description": "Get all instance sync states for a single instance",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DeviceEnrollmentInstanceSyncStatus"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get all instance sync states for a single Device Enrollment Instance\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Read Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/{id}/syncs/latest": {
+      "get": {
+        "description": "Get the latest sync state for a single instance",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceEnrollmentInstanceSyncStatus"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get the latest sync state for a single Device Enrollment Instance\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-required-privileges": [
+          "Read Device Enrollment Program Instances"
+        ]
+      }
+    },
+    "/v1/device-enrollments/{id}/upload-token": {
+      "put": {
+        "description": "Updates a device enrollment instance with the supplied token.",
+        "parameters": [
+          {
+            "description": "Device Enrollment Instance identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceEnrollmentToken"
+              }
+            }
+          },
+          "description": "The downloaded token base 64 encoded from the MDM server to be used to create a new Device Enrollment Instance.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceEnrollmentInstance"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Device Enrollment Instance with that id does not exist"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Something went wrong"
+          }
+        },
+        "summary": "Update a Device Enrollment Instance with the supplied Token\n",
+        "tags": [
+          "device-enrollments"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Device Enrollment Program Instances"
+        ]
+      }
+    },
     "/v1/groups": {
       "get": {
         "description": "Returns group information for all Mobile Device and Computer groups. The type of groups returned will be dependent upon the corresponding group type READ privileges. Results can be sorted by name, description, group type, or isSmart. Default sorting is by group name in ascending order.",
@@ -15245,6 +17399,310 @@
         ]
       }
     },
+    "/v2/computer-prestages/scope": {
+      "get": {
+        "description": "Get all device scope for all computer prestages",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get all device Scope for all Computer Prestages\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Computer PreStage Enrollments"
+        ]
+      }
+    },
+    "/v2/computer-prestages/{id}/scope": {
+      "get": {
+        "description": "Get device scope for a specific computer prestage",
+        "parameters": [
+          {
+            "description": "Computer Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeResponseV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Computer Prestage with that id does not exist"
+          }
+        },
+        "summary": "Get device Scope for a specific Computer Prestage\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Computer PreStage Enrollments"
+        ]
+      },
+      "post": {
+        "description": "Add device scope for a specific computer prestage",
+        "parameters": [
+          {
+            "description": "Computer Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrestageScopeUpdate"
+              }
+            }
+          },
+          "description": "Serial Numbers to scope",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeResponseV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "One or more serial numbers are not valid"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Computer Prestage with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Optimistic Lock Error - The prestage you are trying to update has been updated by another process"
+          }
+        },
+        "summary": "Add device Scope for a specific Computer Prestage\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Computer PreStage Enrollments"
+        ]
+      },
+      "put": {
+        "description": "Replace device scope for a specific computer prestage",
+        "parameters": [
+          {
+            "description": "Computer Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrestageScopeUpdate"
+              }
+            }
+          },
+          "description": "Serial Numbers to scope",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeResponseV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "One or more serial numbers are not valid"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Computer Prestage with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Optimistic Lock Error - The prestage you are trying to update has been updated by another process"
+          }
+        },
+        "summary": "Replace device Scope for a specific Computer Prestage\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-required-privileges": [
+          "Update Computer PreStage Enrollments"
+        ]
+      }
+    },
+    "/v2/computer-prestages/{id}/scope/delete-multiple": {
+      "post": {
+        "description": "Remove device scope for a specific computer prestage",
+        "parameters": [
+          {
+            "description": "Computer Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrestageScopeUpdate"
+              }
+            }
+          },
+          "description": "Serial Numbers to remove from scope",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeResponseV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "One or more serial numbers are not valid"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Computer Prestage with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Optimistic Lock Error - The prestage you are trying to update has been updated by another process"
+          }
+        },
+        "summary": "Remove device Scope for a specific Computer Prestage\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Computer PreStage Enrollments"
+        ]
+      }
+    },
     "/v2/inventory-preload/csv": {
       "get": {
         "description": "Returns all Inventory Preload records as a CSV file.",
@@ -15898,6 +18356,413 @@
         ],
         "x-required-privileges": [
           "Update Inventory Preload Records"
+        ]
+      }
+    },
+    "/v2/mobile-device-prestages/scope": {
+      "get": {
+        "description": "Get all device scope for all mobile device prestages",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get all Device Scope for all Mobile Device Prestages\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device PreStage Enrollments"
+        ]
+      }
+    },
+    "/v2/mobile-device-prestages/syncs": {
+      "get": {
+        "description": "Get all prestage sync states for all prestages",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PrestageSyncStatusV2"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get all Prestage sync States for all prestages\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device PreStage Enrollments"
+        ]
+      }
+    },
+    "/v2/mobile-device-prestages/{id}/scope": {
+      "get": {
+        "description": "Get device scope for a specific mobile device prestage",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeResponseV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          }
+        },
+        "summary": "Get Device Scope for a specific Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device PreStage Enrollments"
+        ]
+      },
+      "post": {
+        "description": "Add device scope for a specific mobile device prestage",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrestageScopeUpdate"
+              }
+            }
+          },
+          "description": "Serial Numbers to scope",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeResponseV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "One or more serial numbers are not valid"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Optimistic Lock Error - The prestage you are trying to update has been updated by another process"
+          }
+        },
+        "summary": "Add Device Scope for a specific Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Mobile Device PreStage Enrollments"
+        ]
+      },
+      "put": {
+        "description": "Replace device scope for a specific mobile device prestage",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrestageScopeUpdate"
+              }
+            }
+          },
+          "description": "Serial Numbers to scope",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeResponseV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "One or more serial numbers are not valid"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Optimistic Lock Error - The prestage you are trying to update has been updated by another process"
+          }
+        },
+        "summary": "Replace Device Scope for a specific Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Update Mobile Device PreStage Enrollments"
+        ]
+      }
+    },
+    "/v2/mobile-device-prestages/{id}/scope/delete-multiple": {
+      "post": {
+        "description": "Remove device scope for a specific mobile device prestage",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrestageScopeUpdate"
+              }
+            }
+          },
+          "description": "Serial Numbers to remove from scope",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageScopeResponseV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "One or more serial numbers are not valid"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Optimistic Lock Error - The prestage you are trying to update has been updated by another process"
+          }
+        },
+        "summary": "Remove Device Scope for a specific Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Mobile Device PreStage Enrollments"
+        ]
+      }
+    },
+    "/v2/mobile-device-prestages/{id}/syncs": {
+      "get": {
+        "description": "Get all prestage sync states for a single prestage",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PrestageSyncStatusV2"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get all prestage sync states for a single prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device PreStage Enrollments"
+        ]
+      }
+    },
+    "/v2/mobile-device-prestages/{id}/syncs/latest": {
+      "get": {
+        "description": "Get the latest sync state for a single prestage",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageSyncStatusV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get the latest Sync State for a single Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device PreStage Enrollments"
         ]
       }
     },
@@ -17975,6 +20840,248 @@
         ]
       }
     },
+    "/v3/computer-prestages": {
+      "get": {
+        "description": "Gets sorted and paged computer prestages",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerPrestageSearchResultsV3"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get sorted and paged Computer Prestages\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Computer PreStage Enrollments"
+        ]
+      },
+      "post": {
+        "description": "Create a computer prestage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostComputerPrestageV3"
+              }
+            }
+          },
+          "description": "Computer Prestage to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Computer Prestage was created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Create a Computer Prestage\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-required-privileges": [
+          "Create Computer PreStage Enrollments"
+        ]
+      }
+    },
+    "/v3/computer-prestages/{id}": {
+      "delete": {
+        "description": "Deletes a Computer Prestage with the supplied id",
+        "parameters": [
+          {
+            "description": "Computer Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "summary": "Delete a Computer Prestage with the supplied id\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-required-privileges": [
+          "Delete Computer PreStage Enrollments"
+        ]
+      },
+      "get": {
+        "description": "Retrieves a Computer Prestage with the supplied id",
+        "parameters": [
+          {
+            "description": "Computer Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetComputerPrestageV3"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Computer Prestage with that id does not exist"
+          }
+        },
+        "summary": "Retrieve a Computer Prestage with the supplied id\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Computer PreStage Enrollments"
+        ]
+      },
+      "put": {
+        "description": "Updates a Computer Prestage",
+        "parameters": [
+          {
+            "description": "Computer Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutComputerPrestageV3"
+              }
+            }
+          },
+          "description": "Computer Prestage to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetComputerPrestageV3"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Computer Prestage with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "The Computer Prestage was modified by another process. Read the Computer Prestage again for updated changes."
+          }
+        },
+        "summary": "Update a Computer Prestage\n",
+        "tags": [
+          "computer-prestages"
+        ],
+        "x-required-privileges": [
+          "Update Computer PreStage Enrollments"
+        ]
+      }
+    },
     "/v3/computers-inventory": {
       "get": {
         "description": "Return paginated Computer Inventory records",
@@ -18630,6 +21737,508 @@
         ],
         "x-required-privileges": [
           "View Recovery Lock"
+        ]
+      }
+    },
+    "/v3/mobile-device-prestages": {
+      "get": {
+        "description": "Gets sorted and paged mobile device prestages",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileDevicePrestageSearchResultsV3"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get sorted and paged Mobile Device Prestages\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device PreStage Enrollments"
+        ]
+      },
+      "post": {
+        "description": "Create a mobile device prestage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MobileDevicePrestageV3"
+              }
+            }
+          },
+          "description": "Mobile Device Prestage to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage was created"
+          }
+        },
+        "summary": "Create a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Create Mobile Device PreStage Enrollments"
+        ]
+      }
+    },
+    "/v3/mobile-device-prestages/{id}": {
+      "delete": {
+        "description": "Deletes a Mobile Device Prestage with the supplied id",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "summary": "Delete a Mobile Device Prestage with the supplied id\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Delete Mobile Device PreStage Enrollments"
+        ]
+      },
+      "get": {
+        "description": "Retrieves a Mobile Device Prestage with the supplied id",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMobileDevicePrestageV3"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          }
+        },
+        "summary": "Retrieve a Mobile Device Prestage with the supplied id\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device PreStage Enrollments"
+        ]
+      },
+      "put": {
+        "description": "Updates a Mobile Device Prestage",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutMobileDevicePrestageV3"
+              }
+            }
+          },
+          "description": "Mobile Device Prestage to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMobileDevicePrestageV3"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "The Mobile Device Prestage was modified by another process. Read the Mobile Device Prestage again for updated changes."
+          }
+        },
+        "summary": "Update a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Update Mobile Device PreStage Enrollments"
+        ]
+      }
+    },
+    "/v3/mobile-device-prestages/{id}/attachments": {
+      "get": {
+        "description": "Get attachments for a Mobile Device Prestage",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FileAttachmentV3"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          }
+        },
+        "summary": "Get attachments for a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device PreStage Enrollments"
+        ]
+      },
+      "post": {
+        "description": "Add an attachment to a Mobile Device prestage",
+        "parameters": [
+          {
+            "description": "Identifier of the Mobile Device Prestage the attachment should be assigned to",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageFileAttachmentV3"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          }
+        },
+        "summary": "Add an attachment to a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Create Mobile Device PreStage Enrollments"
+        ]
+      }
+    },
+    "/v3/mobile-device-prestages/{id}/attachments/delete-multiple": {
+      "post": {
+        "description": "Remove an attachment for a Mobile Device Prestage",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ids"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "summary": "Remove an attachment for a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Delete Mobile Device PreStage Enrollments"
+        ]
+      }
+    },
+    "/v3/mobile-device-prestages/{id}/history": {
+      "get": {
+        "description": "Gets sorted and paged mobile device prestage history objects",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property,asc/desc. Default sort order is descending. Multiple sort criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort' query param is duplicated for each sort criterion, e.g., ...\u0026sort=name%2Casc\u0026sort=date%2Cdesc",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of mobile device prestage history were found"
+          }
+        },
+        "summary": "Get sorted and paged Mobile Device Prestage history objects\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Read Mobile Device PreStage Enrollments"
+        ]
+      },
+      "post": {
+        "description": "Adds mobile device prestage history object notes",
+        "parameters": [
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of mobile deivce prestage history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile device prestage history can not be saved"
+          }
+        },
+        "summary": "Add Mobile Device Prestage history object notes\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-required-privileges": [
+          "Update Mobile Device PreStage Enrollments"
         ]
       }
     }
