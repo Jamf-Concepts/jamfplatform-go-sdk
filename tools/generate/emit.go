@@ -199,6 +199,7 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 		return fmt.Errorf("loading spec: %w", err)
 	}
 
+	applySchemaAdditions(doc, spec.SchemaAdditions)
 	hoistInlineObjects(doc)
 
 	if spec.SkipDeprecated {
@@ -305,6 +306,7 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	for _, ls := range specs {
 		doc, err := loadSpec(ls.specPath, allowedOpsSet(ls.spec))
 		if err == nil {
+			applySchemaAdditions(doc, ls.spec.SchemaAdditions)
 			hoistInlineObjects(doc)
 		}
 		if err != nil {

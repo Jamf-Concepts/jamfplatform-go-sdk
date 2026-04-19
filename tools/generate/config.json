@@ -151,6 +151,11 @@
         "*.date_sent_epoch": "*BigInt",
         "*.notification": "*NotificationValue"
       },
+      "schemaAdditions": {
+        "account": {
+          "password": "string:password"
+        }
+      },
       "operations": [
         {"op": "GET /computers/id/{id}", "name": "GetComputerByID", "responseType": "computer", "pathNames": {"id": "id"}},
         {"op": "GET /computers/name/{name}", "name": "GetComputerByName", "responseType": "computer"},
@@ -347,11 +352,6 @@
         {"op": "PUT /diskencryptionconfigurations/id/{id}", "name": "UpdateDiskEncryptionConfigurationByID", "requestType": "disk_encryption_configuration", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "DELETE /diskencryptionconfigurations/id/{id}", "name": "DeleteDiskEncryptionConfigurationByID", "pathNames": {"id": "id"}},
 
-        {"op": "GET /byoprofiles/id/{id}", "name": "GetBYOProfileByID", "responseType": "byoprofile", "pathNames": {"id": "id"}},
-        {"op": "POST /byoprofiles/id/{id}", "name": "CreateBYOProfileByID", "requestType": "byoprofile", "responseType": "byoprofile", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "PUT /byoprofiles/id/{id}", "name": "UpdateBYOProfileByID", "requestType": "byoprofile", "pathNames": {"id": "id"}, "expectedStatus": 201},
-        {"op": "DELETE /byoprofiles/id/{id}", "name": "DeleteBYOProfileByID", "pathNames": {"id": "id"}},
-
         {"op": "GET /ibeacons/id/{id}", "name": "GetIBeaconByID", "responseType": "ibeacon", "pathNames": {"id": "id"}},
         {"op": "POST /ibeacons/id/{id}", "name": "CreateIBeaconByID", "requestType": "ibeacon", "responseType": "ibeacon", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /ibeacons/id/{id}", "name": "UpdateIBeaconByID", "requestType": "ibeacon", "pathNames": {"id": "id"}, "expectedStatus": 201},
@@ -392,7 +392,7 @@
         {"op": "DELETE /accounts/groupid/{id}", "name": "DeleteAccountGroupByID", "pathNames": {"id": "id"}},
 
         {"op": "GET /computerinvitations/id/{id}", "name": "GetComputerInvitationByID", "responseType": "computer_invitation", "pathNames": {"id": "id"}},
-        {"op": "POST /computerinvitations/id/{id}", "name": "CreateComputerInvitationByID", "requestType": "computer_invitation", "responseType": "computer_invitation", "pathNames": {"id": "id"}, "expectedStatus": 201},
+        {"op": "POST /computerinvitations/id/{id}", "name": "CreateComputerInvitationByID", "requestType": "computer_invitation", "responseType": "computer_invitation", "pathNames": {"id": "id"}, "expectedStatus": 200},
         {"op": "DELETE /computerinvitations/id/{id}", "name": "DeleteComputerInvitationByID", "pathNames": {"id": "id"}},
 
         {"op": "GET /mobiledeviceinvitations/id/{id}", "name": "GetMobileDeviceInvitationByID", "responseType": "mobile_device_invitation", "pathNames": {"id": "id"}},
@@ -449,8 +449,6 @@
 
         {"op": "GET /computerinventorycollection", "name": "GetComputerInventoryCollection", "responseType": "computer_inventory_collection"},
         {"op": "PUT /computerinventorycollection", "name": "UpdateComputerInventoryCollection", "requestType": "computer_inventory_collection", "expectedStatus": 201},
-
-        {"op": "GET /jssuser", "name": "GetJSSUser", "responseType": "jss_user"},
 
         {"op": "GET /computermanagement/id/{id}", "name": "GetComputerManagementByID", "responseType": "computer_management", "pathNames": {"id": "id"}},
         {"op": "GET /computermanagement/name/{name}", "name": "GetComputerManagementByName", "responseType": "computer_management"},
@@ -607,10 +605,6 @@
         {"op": "PUT /userextensionattributes/name/{name}", "name": "UpdateUserExtensionAttributeByName", "requestType": "user_extension_attribute", "expectedStatus": 201},
         {"op": "DELETE /userextensionattributes/name/{name}", "name": "DeleteUserExtensionAttributeByName"},
 
-        {"op": "GET /byoprofiles/name/{name}", "name": "GetBYOProfileByName", "responseType": "byoprofile"},
-        {"op": "PUT /byoprofiles/name/{name}", "name": "UpdateBYOProfileByName", "requestType": "byoprofile", "expectedStatus": 201},
-        {"op": "DELETE /byoprofiles/name/{name}", "name": "DeleteBYOProfileByName"},
-
         {"op": "GET /osxconfigurationprofiles/name/{name}", "name": "GetOSXConfigurationProfileByName", "responseType": "os_x_configuration_profile"},
         {"op": "PUT /osxconfigurationprofiles/name/{name}", "name": "UpdateOSXConfigurationProfileByName", "requestType": "os_x_configuration_profile", "expectedStatus": 201},
         {"op": "DELETE /osxconfigurationprofiles/name/{name}", "name": "DeleteOSXConfigurationProfileByName"},
@@ -692,7 +686,6 @@
         {"op": "GET /advancedusersearches", "name": "ListAdvancedUserSearches", "responseType": "advanced_user_searches"},
         {"op": "GET /accounts", "name": "ListAccounts", "responseType": "accounts"},
         {"op": "GET /allowedfileextensions", "name": "ListAllowedFileExtensions", "responseType": "allowed_file_extensions"},
-        {"op": "GET /byoprofiles", "name": "ListBYOProfiles", "responseType": "byoprofiles"},
         {"op": "GET /computerinvitations", "name": "ListComputerInvitations", "responseType": "computer_invitations"},
         {"op": "GET /computerreports", "name": "ListComputerReports", "responseType": "computer_reports"},
         {"op": "GET /directorybindings", "name": "ListDirectoryBindings", "responseType": "directory_bindings"},

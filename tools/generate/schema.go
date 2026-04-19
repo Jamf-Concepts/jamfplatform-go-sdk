@@ -11,6 +11,44 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
+// applySchemaAdditions injects missing property declarations into named
+// component schemas. Used for specs that omit fields the server actually
+// accepts (e.g. Classic's `account` schema has no `password` property
+// even though creating a user requires one on the wire). Runs after
+// openapi2conv + before hoistInlineObjects so hoisting still sees the
+// injected properties. openapi_type supports plain scalar names
+// ("string", "integer", "boolean") and the extended form
+// "string:password" which sets format=password + writeOnly=true so the
+// field comment notes the security sensitivity.
+func applySchemaAdditions(doc *openapi3.T, additions map[string]map[string]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(additions) == 0 {
+		return
+	}
+	for schemaName, props := range additions {
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			continue
+		}
+		schema := ref.Value
+		if schema.Properties == nil {
+			schema.Properties = openapi3.Schemas{}
+		}
+		for propName, openapiType := range props {
+			if _, exists := schema.Properties[propName]; exists {
+				continue
+			}
+			parts := strings.SplitN(openapiType, ":", 2)
+			baseType := parts[0]
+			propSchema := &openapi3.Schema{Type: &openapi3.Types{baseType}}
+			if len(parts) == 2 && parts[1] == "password" {
+				propSchema.Format = "password"
+				propSchema.WriteOnly = true
+			}
+			schema.Properties[propName] = &openapi3.SchemaRef{Value: propSchema}
+		}
+	}
+}
+
 // hoistInlineObjects promotes every inline object-with-properties found in
 // component schemas to its own named top-level schema and replaces the
 // property with a $ref. Specs that model deeply-nested XML resources

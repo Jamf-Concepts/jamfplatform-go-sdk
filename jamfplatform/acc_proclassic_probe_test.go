@@ -96,18 +96,6 @@ func TestAcceptance_Classic_Probe_GetAllowedFileExtensionByExtension(t *testing.
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetBYOProfileByName(t *testing.T) {
-	c := accClient(t)
-	if _, err := proclassic.New(c).GetBYOProfileByName(context.Background(), "sdk-probe-nonexistent-xyz"); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return // endpoint responded (404/other); plumbing verified
-		}
-		t.Fatalf("GetBYOProfileByName transport error: %v", err)
-	}
-}
-
 func TestAcceptance_Classic_Probe_GetBuildingByName(t *testing.T) {
 	c := accClient(t)
 	if _, err := proclassic.New(c).GetBuildingByName(context.Background(), "sdk-probe-nonexistent-xyz"); err != nil {
@@ -168,16 +156,44 @@ func TestAcceptance_Classic_Probe_GetComputerCommandByName(t *testing.T) {
 	}
 }
 
+// TestAcceptance_Classic_Probe_GetComputerCommandByUUID lists existing
+// computer commands and fetches the first by UUID. The endpoint 500s on
+// a bogus UUID (no 404 fallback), so the probe needs a real one to
+// exercise the success path. Skips cleanly when the tenant has no
+// command history.
 func TestAcceptance_Classic_Probe_GetComputerCommandByUUID(t *testing.T) {
 	c := accClient(t)
-	if _, err := proclassic.New(c).GetComputerCommandByUUID(context.Background(), "sdk-probe-nonexistent-xyz"); err != nil {
+	pc := proclassic.New(c)
+	ctx := context.Background()
+
+	list, err := pc.ListComputerCommands(ctx)
+	if err != nil {
 		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return // endpoint responded (404/other); plumbing verified
-		}
-		t.Fatalf("GetComputerCommandByUUID transport error: %v", err)
+		t.Fatalf("ListComputerCommands: %v", err)
 	}
+	if list == nil || len(list.ComputerCommands) == 0 {
+		t.Skip("tenant has no computer command history")
+	}
+	var uuid string
+	for _, cc := range list.ComputerCommands {
+		if cc.UUID != nil && *cc.UUID != "" {
+			uuid = *cc.UUID
+			break
+		}
+	}
+	if uuid == "" {
+		t.Skip("no computer command with a UUID available")
+	}
+
+	cmd, err := pc.GetComputerCommandByUUID(ctx, uuid)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerCommandByUUID(%s): %v", uuid, err)
+	}
+	if cmd == nil {
+		t.Fatalf("expected non-nil command for uuid=%s", uuid)
+	}
+	t.Logf("fetched computer command uuid=%s", uuid)
 }
 
 func TestAcceptance_Classic_Probe_GetComputerExtensionAttributeByName(t *testing.T) {

@@ -92,18 +92,6 @@ func TestAcceptance_Classic_ProbeDelete_DeleteAdvancedUserSearchByName(t *testin
 	}
 }
 
-func TestAcceptance_Classic_ProbeDelete_DeleteBYOProfileByName(t *testing.T) {
-	c := accClient(t)
-	if err := proclassic.New(c).DeleteBYOProfileByName(context.Background(), "sdk-probe-delete-nonexistent"); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return // endpoint responded; plumbing verified
-		}
-		t.Fatalf("DeleteBYOProfileByName transport error: %v", err)
-	}
-}
-
 func TestAcceptance_Classic_ProbeDelete_DeleteBuildingByName(t *testing.T) {
 	c := accClient(t)
 	if err := proclassic.New(c).DeleteBuildingByName(context.Background(), "sdk-probe-delete-nonexistent"); err != nil {

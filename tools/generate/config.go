@@ -31,7 +31,8 @@ type SpecDef struct {
 	Operations     []OperationDef    `json:"operations"`
 	ExcludePaths   []string          `json:"excludePaths,omitempty"`   // "METHOD /path" entries the generator must refuse to include
 	SkipDeprecated bool              `json:"skipDeprecated,omitempty"` // omit operations marked deprecated in the spec
-	FieldTypeOverrides map[string]string `json:"fieldTypeOverrides,omitempty"` // "schema_name.property_name" -> Go type, used to correct spec bugs (e.g. `integer` fields where the server actually returns a non-int64 string). Applied per-spec so upstream spec updates don't get silently overwritten.
+	FieldTypeOverrides map[string]string            `json:"fieldTypeOverrides,omitempty"` // "schema_name.property_name" -> Go type, used to correct spec bugs (e.g. `integer` fields where the server actually returns a non-int64 string). Applied per-spec so upstream spec updates don't get silently overwritten.
+	SchemaAdditions    map[string]map[string]string `json:"schemaAdditions,omitempty"`    // "schema_name" -> { "property_name": "openapi_type" }, inject missing properties into a spec schema. Used when the spec omits a field the server accepts but we need to send (e.g. Classic's account schema has no `password` property). openapi_type is one of "string", "integer", "boolean", "string:password" (writeOnly string).
 }
 
 // baseName derives a Go file base name from the spec file path.

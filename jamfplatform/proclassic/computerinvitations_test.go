@@ -47,7 +47,7 @@ func TestCreateComputerInvitationByID(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeXML(t, w, http.StatusCreated, "<computer_invitation></computer_invitation>")
+		writeXML(t, w, http.StatusOK, "<computer_invitation></computer_invitation>")
 	})
 
 	result, err := c.CreateComputerInvitationByID(context.Background(), "test-id", &ComputerInvitation{})

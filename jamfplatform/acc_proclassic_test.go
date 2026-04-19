@@ -1239,30 +1239,6 @@ func TestAcceptance_Classic_DiskEncryptionConfigurationCRUD(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
 }
 
-func TestAcceptance_Classic_BYOProfileCRUD(t *testing.T) {
-	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
-	name := "sdk-acc-byo-" + runSuffix()
-	enabled := true
-	created, err := pc.CreateBYOProfileByID(ctx, "0", &proclassic.Byoprofile{
-		General: &proclassic.ByoprofileGeneral{Name: classicStrPtr(name), Enabled: &enabled},
-	})
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("CreateBYOProfileByID forbidden on this tenant/credentials: %v", err)
-		}
-		t.Fatalf("CreateBYOProfileByID: %v", err)
-	}
-	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
-	id := *created.ID
-	cleanupDelete(t, "DeleteBYOProfileByID", func() error { return pc.DeleteBYOProfileByID(ctx, intToStr(id)) })
-	if err := pc.DeleteBYOProfileByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
-	_, err = pc.GetBYOProfileByID(ctx, intToStr(id))
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
-}
-
 func TestAcceptance_Classic_IBeaconCRUD(t *testing.T) {
 	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
 	name := "sdk-acc-ibeacon-" + runSuffix()
@@ -1355,13 +1331,56 @@ func TestAcceptance_Classic_WebhookCRUD(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
 }
 
-// TestAcceptance_Classic_AccountUserCRUD is skipped: the Classic account
-// schema in v11.20.0 omits the `password` field the server requires on
-// create — the generated Account struct therefore can't send a valid
-// create payload. Endpoint shape is covered by unit tests; restoring
-// live CRUD needs a spec patch or a generator-level extra-field hook.
+// TestAcceptance_Classic_AccountUserCRUD exercises the /accounts/userid
+// CRUD lifecycle. The Classic spec omits the `password` field the
+// server requires on create; the SDK generator injects it via the
+// schemaAdditions hook in config.json so we can send a valid payload.
 func TestAcceptance_Classic_AccountUserCRUD(t *testing.T) {
-	t.Skip("spec omits required account password field; generated struct can't send a valid create payload")
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-user-" + runSuffix()
+	created, err := pc.CreateAccountByUserID(ctx, "0", &proclassic.Account{
+		Name:         classicStrPtr(name),
+		FullName:     classicStrPtr("SDK Acceptance User"),
+		Email:        classicStrPtr(name + "@sdk.test"),
+		Password:     classicStrPtr("SDK-acc-pw-" + runSuffix() + "!"),
+		AccessLevel:  classicStrPtr("Full Access"),
+		PrivilegeSet: classicStrPtr("Administrator"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("forbidden on this tenant: %v", err)
+		}
+		t.Fatalf("CreateAccountByUserID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteAccountByUserID", func() error { return pc.DeleteAccountByUserID(ctx, intToStr(id)) })
+
+	got, err := pc.GetAccountByUserID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetAccountByUserID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("Name = %v, want %q", got.Name, name)
+	}
+
+	if err := pc.DeleteAccountByUserID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetAccountByUserID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
 }
 
 func TestAcceptance_Classic_AccountGroupCRUD(t *testing.T) {
@@ -1389,25 +1408,58 @@ func TestAcceptance_Classic_AccountGroupCRUD(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
 }
 
+// TestAcceptance_Classic_ComputerInvitationCRUD exercises the
+// /computerinvitations CRUD lifecycle. Classic 500s on create unless
+// SshUsername + SshPassword are both set — the server uses those creds
+// to SSH into the target computer to complete enrollment, and rejects
+// any attempt that doesn't carry them. InvitationType=USER_INITIATED_URL
+// keeps the invitation from trying to send an actual email. The 39-digit
+// invitation code the server returns rides on *BigInt.
 func TestAcceptance_Classic_ComputerInvitationCRUD(t *testing.T) {
-	c := accClient(t); ctx := context.Background(); pc := proclassic.New(c)
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
 	createAccount := false
 	created, err := pc.CreateComputerInvitationByID(ctx, "0", &proclassic.ComputerInvitation{
+		InvitationType:              classicStrPtr("USER_INITIATED_URL"),
+		SshUsername:                 classicStrPtr("sdk-acc"),
+		SshPassword:                 classicStrPtr("sdk-acc-pw"),
 		CreateAccountIfDoesNotExist: &createAccount,
 	})
 	if err != nil {
 		skipOnServerError(t, err)
 		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) { t.Skipf("forbidden: %v", err) }
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("forbidden: %v", err)
+		}
 		t.Fatalf("CreateComputerInvitationByID: %v", err)
 	}
-	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
 	id := *created.ID
 	cleanupDelete(t, "DeleteComputerInvitationByID", func() error { return pc.DeleteComputerInvitationByID(ctx, intToStr(id)) })
-	if err := pc.DeleteComputerInvitationByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
+
+	got, err := pc.GetComputerInvitationByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerInvitationByID(%d): %v", id, err)
+	}
+	if got == nil || got.Invitation == nil {
+		t.Fatalf("expected Invitation populated, got %+v", got)
+	}
+	t.Logf("ComputerInvitation id=%d invitation=%s", id, got.Invitation.String())
+
+	if err := pc.DeleteComputerInvitationByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
 	_, err = pc.GetComputerInvitationByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
 }
 
 // TestAcceptance_Classic_MobileDeviceInvitationCRUD exercises the
@@ -1567,13 +1619,6 @@ func TestAcceptance_Classic_GetComputerInventoryCollection(t *testing.T) {
 	ic, err := proclassic.New(c).GetComputerInventoryCollection(context.Background())
 	if err != nil { skipOnServerError(t, err); t.Fatalf("GetComputerInventoryCollection: %v", err) }
 	if ic == nil { t.Fatal("nil") }
-}
-
-func TestAcceptance_Classic_GetJSSUser(t *testing.T) {
-	c := accClient(t)
-	u, err := proclassic.New(c).GetJSSUser(context.Background())
-	if err != nil { skipOnServerError(t, err); t.Fatalf("GetJSSUser: %v", err) }
-	if u == nil { t.Fatal("nil JSSUser") }
 }
 
 func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {

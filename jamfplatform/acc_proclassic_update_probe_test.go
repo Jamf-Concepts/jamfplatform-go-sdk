@@ -115,30 +115,6 @@ func TestAcceptance_Classic_ProbeUpdate_UpdateAdvancedUserSearchByID(t *testing.
 	}
 }
 
-func TestAcceptance_Classic_ProbeUpdate_UpdateBYOProfileByID(t *testing.T) {
-	c := accClient(t)
-	if err := proclassic.New(c).UpdateBYOProfileByID(context.Background(), "999999999", &proclassic.Byoprofile{}); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("UpdateBYOProfileByID transport error: %v", err)
-	}
-}
-
-func TestAcceptance_Classic_ProbeUpdate_UpdateBYOProfileByName(t *testing.T) {
-	c := accClient(t)
-	if err := proclassic.New(c).UpdateBYOProfileByName(context.Background(), "sdk-probe-update-nonexistent", &proclassic.Byoprofile{}); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("UpdateBYOProfileByName transport error: %v", err)
-	}
-}
-
 func TestAcceptance_Classic_ProbeUpdate_UpdateBuildingByName(t *testing.T) {
 	c := accClient(t)
 	if err := proclassic.New(c).UpdateBuildingByName(context.Background(), "sdk-probe-update-nonexistent", &proclassic.Building{}); err != nil {

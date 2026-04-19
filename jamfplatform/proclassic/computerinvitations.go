@@ -28,7 +28,7 @@ func (c *Client) CreateComputerInvitationByID(ctx context.Context, id string, re
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerInvitation
 	endpoint := fmt.Sprintf("%s/computerinvitations/id/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("CreateComputerInvitationByID(%s): %w", id, err)
 	}
 	return &result, nil

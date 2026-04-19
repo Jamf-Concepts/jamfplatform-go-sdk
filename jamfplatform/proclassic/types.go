@@ -20,9 +20,11 @@ type Account struct {
 	ID                  *int               `xml:"id,omitempty"`
 	LdapServer          *AccountLdapServer `xml:"ldap_server,omitempty"`
 	Name                *string            `xml:"name,omitempty"`
-	PrivilegeSet        *string            `xml:"privilege_set,omitempty"`
-	Privileges          *AccountPrivileges `xml:"privileges,omitempty"`
-	Site                *SiteObject        `xml:"site,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password     *string            `xml:"password,omitempty"`
+	PrivilegeSet *string            `xml:"privilege_set,omitempty"`
+	Privileges   *AccountPrivileges `xml:"privileges,omitempty"`
+	Site         *SiteObject        `xml:"site,omitempty"`
 }
 
 // MarshalXML forces the Account root element name to the wire value
@@ -888,90 +890,6 @@ type BuildingsItem struct {
 func (t BuildingsItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "building"}
 	type shadow BuildingsItem
-	return e.EncodeElement(shadow(t), start)
-}
-
-// Byoprofile represents a byoprofile.
-type Byoprofile struct {
-	XMLName xml.Name
-	ID      *int               `xml:"id,omitempty"`
-	General *ByoprofileGeneral `xml:"general,omitempty"`
-}
-
-// MarshalXML forces the Byoprofile root element name to the wire value
-// declared by the spec (<byoprofile>) regardless of what XMLName.Local
-// holds. Classic resources are frequently decoded from polymorphic wire
-// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
-// stashing the incoming root name in XMLName is useful context but must
-// not leak back into writes. The shadow type suppresses re-entry into
-// this method during encoding.
-func (t Byoprofile) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "byoprofile"}
-	type shadow Byoprofile
-	return e.EncodeElement(shadow(t), start)
-}
-
-// ByoprofileGeneral represents a byoprofile general.
-type ByoprofileGeneral struct {
-	XMLName     xml.Name
-	Description *string     `xml:"description,omitempty"`
-	Enabled     *bool       `xml:"enabled,omitempty"`
-	ID          *int        `xml:"id,omitempty"`
-	Name        *string     `xml:"name,omitempty"`
-	Site        *SiteObject `xml:"site,omitempty"`
-}
-
-// MarshalXML forces the ByoprofileGeneral root element name to the wire value
-// declared by the spec (<general>) regardless of what XMLName.Local
-// holds. Classic resources are frequently decoded from polymorphic wire
-// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
-// stashing the incoming root name in XMLName is useful context but must
-// not leak back into writes. The shadow type suppresses re-entry into
-// this method during encoding.
-func (t ByoprofileGeneral) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "general"}
-	type shadow ByoprofileGeneral
-	return e.EncodeElement(shadow(t), start)
-}
-
-// Byoprofiles wraps a Jamf Classic list response with a flat slice of IDName.
-type Byoprofiles struct {
-	XMLName     xml.Name
-	Size        *Size    `xml:"size,omitempty"`
-	Byoprofiles []IDName `xml:"byoprofile"`
-}
-
-// MarshalXML forces the Byoprofiles root element name to the wire value
-// declared by the spec (<byoprofiles>) regardless of what XMLName.Local
-// holds. Classic resources are frequently decoded from polymorphic wire
-// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
-// stashing the incoming root name in XMLName is useful context but must
-// not leak back into writes. The shadow type suppresses re-entry into
-// this method during encoding.
-func (t Byoprofiles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "byoprofiles"}
-	type shadow Byoprofiles
-	return e.EncodeElement(shadow(t), start)
-}
-
-// ByoprofilesItem represents a byoprofiles item.
-type ByoprofilesItem struct {
-	XMLName    xml.Name
-	ID         *int    `xml:"id,omitempty"`
-	Byoprofile *IDName `xml:"byoprofile,omitempty"`
-	Size       *Size   `xml:"size,omitempty"`
-}
-
-// MarshalXML forces the ByoprofilesItem root element name to the wire value
-// declared by the spec (<byoprofile>) regardless of what XMLName.Local
-// holds. Classic resources are frequently decoded from polymorphic wire
-// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
-// stashing the incoming root name in XMLName is useful context but must
-// not leak back into writes. The shadow type suppresses re-entry into
-// this method during encoding.
-func (t ByoprofilesItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "byoprofile"}
-	type shadow ByoprofilesItem
 	return e.EncodeElement(shadow(t), start)
 }
 
@@ -4398,29 +4316,6 @@ type JsonWebTokenConfigurationsItem struct {
 func (t JsonWebTokenConfigurationsItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "json_web_token_configuration"}
 	type shadow JsonWebTokenConfigurationsItem
-	return e.EncodeElement(shadow(t), start)
-}
-
-// JssUser represents a jss user.
-type JssUser struct {
-	XMLName     xml.Name
-	Institution *string `xml:"institution,omitempty"`
-	LicenseType *string `xml:"license_type,omitempty"`
-	Privileges  []any   `xml:"privileges"`
-	Product     *string `xml:"product,omitempty"`
-	Version     *string `xml:"version,omitempty"`
-}
-
-// MarshalXML forces the JssUser root element name to the wire value
-// declared by the spec (<user>) regardless of what XMLName.Local
-// holds. Classic resources are frequently decoded from polymorphic wire
-// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
-// stashing the incoming root name in XMLName is useful context but must
-// not leak back into writes. The shadow type suppresses re-entry into
-// this method during encoding.
-func (t JssUser) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "user"}
-	type shadow JssUser
 	return e.EncodeElement(shadow(t), start)
 }
 

@@ -80,18 +80,6 @@ func TestAcceptance_Classic_ListAllowedFileExtensions(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_ListBYOProfiles(t *testing.T) {
-	c := accClient(t)
-	if _, err := proclassic.New(c).ListBYOProfiles(context.Background()); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("ListBYOProfiles forbidden on this tenant/credentials: %v", err)
-		}
-		t.Fatalf("ListBYOProfiles: %v", err)
-	}
-}
-
 func TestAcceptance_Classic_ListBuildings(t *testing.T) {
 	c := accClient(t)
 	if _, err := proclassic.New(c).ListBuildings(context.Background()); err != nil {
