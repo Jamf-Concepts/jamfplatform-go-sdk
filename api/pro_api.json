@@ -268,6 +268,24 @@
         ],
         "type": "object"
       },
+      "AppPath": {
+        "properties": {
+          "id": {
+            "description": "A \"-1\" id indicates a built-in path that cannot be deleted or modified.",
+            "example": "1",
+            "type": "string"
+          },
+          "path": {
+            "example": "/Example/Path/To/App/",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path"
+        ],
+        "type": "object"
+      },
       "Assignment": {
         "properties": {
           "mobileDeviceId": {
@@ -443,6 +461,963 @@
         ],
         "type": "object"
       },
+      "ComputerApplicationCreate": {
+        "properties": {
+          "name": {
+            "example": "Microsoft Word",
+            "nullable": true,
+            "type": "string"
+          },
+          "path": {
+            "example": "/usr/local/app",
+            "nullable": true,
+            "type": "string"
+          },
+          "version": {
+            "example": "1.0.0",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerApplicationV3": {
+        "properties": {
+          "bundleId": {
+            "example": "1",
+            "type": "string"
+          },
+          "cfBundleShortVersionString": {
+            "example": "1.0.0",
+            "type": "string"
+          },
+          "cfBundleVersion": {
+            "example": "1.0.0",
+            "type": "string"
+          },
+          "externalVersionId": {
+            "description": "The app's external version ID. It can be used in the iTunes Search API to decide if the app needs to be updated",
+            "example": "1",
+            "type": "string"
+          },
+          "macAppStore": {
+            "example": true,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Microsoft Word",
+            "type": "string"
+          },
+          "path": {
+            "example": "/usr/local/app",
+            "type": "string"
+          },
+          "sizeMegabytes": {
+            "example": 25,
+            "type": "integer"
+          },
+          "updateAvailable": {
+            "example": false,
+            "type": "boolean"
+          },
+          "version": {
+            "example": "1.0.0",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerAttachment": {
+        "properties": {
+          "fileType": {
+            "example": "application/pdf",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "Attachment.pdf",
+            "type": "string"
+          },
+          "sizeBytes": {
+            "description": "File size in bytes",
+            "example": 1024,
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerCertificate": {
+        "properties": {
+          "certificateStatus": {
+            "enum": [
+              "EXPIRING",
+              "EXPIRED",
+              "REVOKED",
+              "PENDING_REVOKE",
+              "ISSUED"
+            ],
+            "example": "ISSUED",
+            "type": "string"
+          },
+          "commonName": {
+            "example": "jamf.com",
+            "type": "string"
+          },
+          "expirationDate": {
+            "example": "2030-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "identity": {
+            "example": true,
+            "type": "boolean"
+          },
+          "issuedDate": {
+            "example": "2022-05-23T14:54:10Z",
+            "type": "string"
+          },
+          "lifecycleStatus": {
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "example": "ACTIVE",
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "40f3d9fb",
+            "type": "string"
+          },
+          "sha1Fingerprint": {
+            "example": "ed361458724d06082b2314acdb82e1f586f085f5",
+            "type": "string"
+          },
+          "subjectName": {
+            "example": "CN=jamf.com",
+            "type": "string"
+          },
+          "username": {
+            "example": "test",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerCertificateCreate": {
+        "properties": {
+          "commonName": {
+            "example": "jamf.com",
+            "nullable": true,
+            "type": "string"
+          },
+          "identity": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "username": {
+            "example": "test",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerConfigurationProfile": {
+        "properties": {
+          "displayName": {
+            "example": "Displayed profile",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "lastInstalled": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "profileIdentifier": {
+            "example": "0ae590fe-9b30-11ea-bb37-0242ac130002",
+            "readOnly": true,
+            "type": "string"
+          },
+          "removable": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "username": {
+            "example": "username",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerConfigurationProfileCreate": {
+        "properties": {
+          "displayName": {
+            "example": "Displayed profile",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastInstalled": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "profileIdentifier": {
+            "example": "0ae590fe-9b30-11ea-bb37-0242ac130002",
+            "nullable": true,
+            "type": "string"
+          },
+          "removable": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "username": {
+            "example": "username",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCaching": {
+        "properties": {
+          "activated": {
+            "example": false,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "active": {
+            "example": false,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "actualCacheBytesUsed": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerContentCachingAlert"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "cacheBytesFree": {
+            "example": 23353884672,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "cacheBytesLimit": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "cacheBytesUsed": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "cacheDetails": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerContentCachingCacheDetail"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "cacheStatus": {
+            "example": "OK",
+            "readOnly": true,
+            "type": "string"
+          },
+          "computerContentCachingInformationId": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "dataMigrationCompleted": {
+            "example": false,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "dataMigrationError": {
+            "$ref": "#/components/schemas/ComputerContentCachingDataMigrationError"
+          },
+          "dataMigrationProgressPercentage": {
+            "example": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "maxCachePressureLast1HourPercentage": {
+            "example": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "parents": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerContentCachingParent"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "personalCacheBytesFree": {
+            "example": 23353884672,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "personalCacheBytesLimit": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "personalCacheBytesUsed": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "port": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "publicAddress": {
+            "example": "SomeAddress",
+            "readOnly": true,
+            "type": "string"
+          },
+          "registrationError": {
+            "example": "NOT_ACTIVATED",
+            "readOnly": true,
+            "type": "string"
+          },
+          "registrationResponseCode": {
+            "example": 403,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "registrationStarted": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "registrationStatus": {
+            "enum": [
+              "CONTENT_CACHING_FAILED",
+              "CONTENT_CACHING_PENDING",
+              "CONTENT_CACHING_SUCCEEDED"
+            ],
+            "example": "CONTENT_CACHING_FAILED",
+            "readOnly": true,
+            "type": "string"
+          },
+          "restrictedMedia": {
+            "example": false,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "serverGuid": {
+            "example": "CD1E1291-4AF9-4468-B5D5-0F780C13DB2F",
+            "readOnly": true,
+            "type": "string"
+          },
+          "startupStatus": {
+            "example": "FAILED",
+            "readOnly": true,
+            "type": "string"
+          },
+          "tetheratorStatus": {
+            "enum": [
+              "CONTENT_CACHING_UNKNOWN",
+              "CONTENT_CACHING_DISABLED",
+              "CONTENT_CACHING_ENABLED"
+            ],
+            "example": "CONTENT_CACHING_DISABLED",
+            "readOnly": true,
+            "type": "string"
+          },
+          "totalBytesAreSince": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "totalBytesDropped": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "totalBytesImported": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "totalBytesReturnedToChildren": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "totalBytesReturnedToClients": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "totalBytesReturnedToPeers": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "totalBytesStoredFromOrigin": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "totalBytesStoredFromParents": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "totalBytesStoredFromPeers": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCachingAlert": {
+        "properties": {
+          "cacheBytesLimit": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "className": {
+            "example": "SomeClass",
+            "readOnly": true,
+            "type": "string"
+          },
+          "pathPreventingAccess": {
+            "example": "/some/path",
+            "readOnly": true,
+            "type": "string"
+          },
+          "postDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "reservedVolumeBytes": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "resource": {
+            "example": "SomeResource",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCachingCacheDetail": {
+        "properties": {
+          "categoryName": {
+            "example": "SomeCategory",
+            "readOnly": true,
+            "type": "string"
+          },
+          "computerContentCachingCacheDetailsId": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "diskSpaceBytesUsed": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCachingDataMigrationError": {
+        "properties": {
+          "code": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "domain": {
+            "example": "SomeDomain",
+            "readOnly": true,
+            "type": "string"
+          },
+          "userInfo": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerContentCachingDataMigrationErrorUserInfo"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCachingDataMigrationErrorUserInfo": {
+        "properties": {
+          "key": {
+            "example": "foo",
+            "readOnly": true,
+            "type": "string"
+          },
+          "value": {
+            "example": "bar",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCachingParent": {
+        "properties": {
+          "address": {
+            "example": "SomeAddress",
+            "readOnly": true,
+            "type": "string"
+          },
+          "alerts": {
+            "$ref": "#/components/schemas/ComputerContentCachingParentAlert"
+          },
+          "contentCachingParentId": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "details": {
+            "$ref": "#/components/schemas/ComputerContentCachingParentDetails"
+          },
+          "guid": {
+            "example": "CD1E1291-4AF9-4468-B5D5-0F780C13DB2F",
+            "readOnly": true,
+            "type": "string"
+          },
+          "healthy": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "port": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "version": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCachingParentAlert": {
+        "properties": {
+          "addresses": {
+            "example": [],
+            "items": {
+              "type": "string"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "className": {
+            "example": "SomeClass",
+            "readOnly": true,
+            "type": "string"
+          },
+          "contentCachingParentAlertId": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "postDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCachingParentCapabilities": {
+        "properties": {
+          "contentCachingParentCapabilitiesId": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "imports": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "namespaces": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "personalContent": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "prioritization": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "queryParameters": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "sharedContent": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCachingParentDetails": {
+        "properties": {
+          "acPower": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "cacheSizeBytes": {
+            "example": 0,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "capabilities": {
+            "$ref": "#/components/schemas/ComputerContentCachingParentCapabilities"
+          },
+          "contentCachingParentDetailsId": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "localNetwork": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerContentCachingParentLocalNetwork"
+            },
+            "type": "array"
+          },
+          "portable": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerContentCachingParentLocalNetwork": {
+        "properties": {
+          "contentCachingParentLocalNetworkId": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "speed": {
+            "example": 5000,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "wired": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerDisk": {
+        "properties": {
+          "device": {
+            "example": "disk0",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "170",
+            "readOnly": true,
+            "type": "string"
+          },
+          "model": {
+            "example": "APPLE HDD TOSHIBA MK5065GSXF",
+            "readOnly": true,
+            "type": "string"
+          },
+          "partitions": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPartition"
+            },
+            "type": "array"
+          },
+          "revision": {
+            "example": "5",
+            "readOnly": true,
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "a8598f013366",
+            "readOnly": true,
+            "type": "string"
+          },
+          "sizeMegabytes": {
+            "description": "Disk Size in MB.",
+            "example": 262144,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "smartStatus": {
+            "description": "S.M.A.R.T Status",
+            "example": "OK",
+            "readOnly": true,
+            "type": "string"
+          },
+          "type": {
+            "description": "Connection type attribute.",
+            "example": "false",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerDiskCreate": {
+        "properties": {
+          "device": {
+            "example": "disk0",
+            "nullable": true,
+            "type": "string"
+          },
+          "model": {
+            "example": "APPLE HDD TOSHIBA MK5065GSXF",
+            "nullable": true,
+            "type": "string"
+          },
+          "partitions": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPartitionCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "revision": {
+            "example": "5",
+            "nullable": true,
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "a8598f013366",
+            "nullable": true,
+            "type": "string"
+          },
+          "sizeMegabytes": {
+            "description": "Disk Size in MB.",
+            "example": 262144,
+            "format": "int64",
+            "nullable": true,
+            "type": "integer"
+          },
+          "smartStatus": {
+            "description": "S.M.A.R.T Status",
+            "example": "OK",
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "description": "Connection type attribute.",
+            "example": "false",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerDiskEncryption": {
+        "properties": {
+          "bootPartitionEncryptionDetails": {
+            "$ref": "#/components/schemas/ComputerPartitionEncryption"
+          },
+          "diskEncryptionConfigurationName": {
+            "example": "Test configuration",
+            "type": "string"
+          },
+          "fileVault2EligibilityMessage": {
+            "example": "Not a boot partition",
+            "type": "string"
+          },
+          "fileVault2Enabled": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "fileVault2EnabledUserNames": {
+            "example": [
+              "admin"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "individualRecoveryKeyValidityStatus": {
+            "enum": [
+              "VALID",
+              "INVALID",
+              "UNKNOWN",
+              "NOT_APPLICABLE"
+            ],
+            "example": "VALID",
+            "type": "string"
+          },
+          "institutionalRecoveryKeyPresent": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerExtensionAttribute": {
+        "properties": {
+          "dataType": {
+            "description": "A data type of extension attribute.",
+            "enum": [
+              "STRING",
+              "INTEGER",
+              "DATE_TIME"
+            ],
+            "example": "STRING",
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "definitionId": {
+            "description": "An identifier of extension attribute definition.",
+            "example": "23",
+            "type": "string"
+          },
+          "description": {
+            "description": "An additional explanation of exact attribute meaning, possible values, etc.",
+            "example": "Some Attribute defines how much Foo impacts Bar.",
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "enabled": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "inputType": {
+            "description": "The input method. `text` is most common and means simply free text, `popup` i a closed list of values from\nwhich one or many can be selected and `script` value is calculated and can never be set directly.\n",
+            "enum": [
+              "TEXT",
+              "POPUP",
+              "SCRIPT",
+              "LDAP"
+            ],
+            "example": "TEXT",
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "multiValue": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "name": {
+            "description": "A human-readable name by which attribute can be referred to.",
+            "example": "Some Attribute",
+            "readOnly": true,
+            "type": "string"
+          },
+          "options": {
+            "description": "A closed list of possible values (applies to `popup` input type).\n",
+            "example": [
+              "foo",
+              "bar"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "readOnly": true,
+            "type": "array"
+          },
+          "values": {
+            "description": "A value of extension attribute, in some rare cases there may be multiple values present, hence the array.\n",
+            "example": [
+              "foo",
+              "bar"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ComputerExtensionAttributeSearchResults": {
         "properties": {
           "results": {
@@ -571,6 +1546,294 @@
           }
         ]
       },
+      "ComputerGeneral": {
+        "properties": {
+          "assetTag": {
+            "example": "304822",
+            "type": "string"
+          },
+          "barcode1": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "barcode2": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "declarativeDeviceManagementEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "distributionPoint": {
+            "example": "distribution point name",
+            "type": "string"
+          },
+          "enrolledViaAutomatedDeviceEnrollment": {
+            "example": true,
+            "type": "boolean"
+          },
+          "enrollmentMethod": {
+            "$ref": "#/components/schemas/EnrollmentMethod"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "initialEntryDate": {
+            "example": "2018-10-31",
+            "format": "date",
+            "type": "string"
+          },
+          "itunesStoreAccountActive": {
+            "example": true,
+            "type": "boolean"
+          },
+          "jamfBinaryVersion": {
+            "example": "9.27",
+            "type": "string"
+          },
+          "lastCloudBackupDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastContactTime": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastEnrolledDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastIpAddress": {
+            "example": "247.185.82.186",
+            "type": "string"
+          },
+          "lastLoggedInUsernameBinary": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastLoggedInUsernameBinaryTimestamp": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastLoggedInUsernameSelfService": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastLoggedInUsernameSelfServiceTimestamp": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastReportedIp": {
+            "deprecated": true,
+            "description": "Last reported IPv4 address (Deprecated. Use lastReportedIpV4 instead.)",
+            "example": "247.185.82.186",
+            "type": "string"
+          },
+          "lastReportedIpV4": {
+            "description": "Last reported IPv4 address",
+            "example": "247.185.82.186",
+            "type": "string"
+          },
+          "lastReportedIpV6": {
+            "example": "2001:0db8:85a3:0000:0000:8a2e:0370:7335",
+            "type": "string"
+          },
+          "managementId": {
+            "example": "73226fb6-61df-4c10-9552-eb9bc353d507",
+            "readOnly": true,
+            "type": "string"
+          },
+          "mdmCapable": {
+            "$ref": "#/components/schemas/ComputerMdmCapability"
+          },
+          "mdmProfileExpiration": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "example": "Boalime",
+            "minLength": 1,
+            "type": "string"
+          },
+          "platform": {
+            "example": "Mac",
+            "type": "string"
+          },
+          "remoteManagement": {
+            "$ref": "#/components/schemas/ComputerRemoteManagement"
+          },
+          "reportDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/V1Site"
+          },
+          "supervised": {
+            "example": true,
+            "type": "boolean"
+          },
+          "userApprovedMdm": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerGeneralCreate": {
+        "properties": {
+          "assetTag": {
+            "example": "304822",
+            "type": "string"
+          },
+          "barcode1": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "barcode2": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "declarativeDeviceManagementEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "distributionPointId": {
+            "example": "1",
+            "type": "string"
+          },
+          "enrolledViaAutomatedDeviceEnrollment": {
+            "example": true,
+            "type": "boolean"
+          },
+          "itunesStoreAccountActive": {
+            "example": true,
+            "type": "boolean"
+          },
+          "jamfBinaryVersion": {
+            "example": "9.27",
+            "type": "string"
+          },
+          "lastCloudBackupDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastContactTime": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastEnrolledDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastIpAddress": {
+            "example": "247.185.82.186",
+            "type": "string"
+          },
+          "lastReportedIp": {
+            "example": "247.185.82.186",
+            "type": "string"
+          },
+          "mdmCapable": {
+            "example": true,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Boalime",
+            "minLength": 1,
+            "type": "string"
+          },
+          "platform": {
+            "enum": [
+              "WINDOWS",
+              "MAC",
+              "NONE"
+            ],
+            "example": "MAC",
+            "type": "string"
+          },
+          "remoteManagement": {
+            "$ref": "#/components/schemas/ComputerRemoteManagementCreate"
+          },
+          "reportDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "type": "string"
+          },
+          "supervised": {
+            "example": true,
+            "type": "boolean"
+          },
+          "userApprovedMdm": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "ComputerGeneralUpdate": {
+        "properties": {
+          "assetTag": {
+            "example": "304822",
+            "type": "string"
+          },
+          "barcode1": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "barcode2": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "lastIpAddress": {
+            "example": "247.185.82.186",
+            "type": "string"
+          },
+          "managed": {
+            "example": true,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Boalime",
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ComputerGroup": {
         "properties": {
           "description": {
@@ -593,6 +1856,1892 @@
         },
         "type": "object"
       },
+      "ComputerHardware": {
+        "properties": {
+          "altMacAddress": {
+            "example": "82:45:58:44:dc:01",
+            "type": "string"
+          },
+          "altNetworkAdapterType": {
+            "example": "Bar",
+            "type": "string"
+          },
+          "appleSilicon": {
+            "example": false,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "batteryCapacityPercent": {
+            "description": "Remaining percentage of battery power.",
+            "example": 85,
+            "maximum": 100,
+            "minimum": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "batteryHealth": {
+            "default": "UNKNOWN",
+            "description": "- NON_GENUINE: The battery isn’t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldn’t determine battery health information.\n- UNSUPPORTED: The device doesn’t support battery health reporting.\n",
+            "enum": [
+              "NON_GENUINE",
+              "NORMAL",
+              "SERVICE_RECOMMENDED",
+              "UNKNOWN",
+              "UNSUPPORTED"
+            ],
+            "readOnly": true,
+            "type": "string"
+          },
+          "bleCapable": {
+            "example": false,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "bootRom": {
+            "example": "MBP91.00D3.B08",
+            "readOnly": true,
+            "type": "string"
+          },
+          "busSpeedMhz": {
+            "example": 2133,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "cacheSizeKilobytes": {
+            "description": "Cache Size in KB.",
+            "example": 3072,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "coreCount": {
+            "example": 2,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "macAddress": {
+            "example": "6A:2C:4B:B7:65:B5",
+            "type": "string"
+          },
+          "make": {
+            "example": "Apple",
+            "readOnly": true,
+            "type": "string"
+          },
+          "model": {
+            "example": "13-inch MacBook Pro (Mid 2012)",
+            "readOnly": true,
+            "type": "string"
+          },
+          "modelIdentifier": {
+            "example": "MacBookPro9,2",
+            "readOnly": true,
+            "type": "string"
+          },
+          "networkAdapterType": {
+            "example": "Foo",
+            "type": "string"
+          },
+          "nicSpeed": {
+            "example": "N/A",
+            "readOnly": true,
+            "type": "string"
+          },
+          "openRamSlots": {
+            "description": "Available RAM slots.",
+            "example": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "opticalDrive": {
+            "example": "MATSHITA DVD-R UJ-8A8",
+            "readOnly": true,
+            "type": "string"
+          },
+          "processorArchitecture": {
+            "example": "i386",
+            "readOnly": true,
+            "type": "string"
+          },
+          "processorCount": {
+            "example": 2,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "processorSpeedMhz": {
+            "description": "Processor Speed in MHz.",
+            "example": 2100,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "processorType": {
+            "example": "Intel Core i5",
+            "readOnly": true,
+            "type": "string"
+          },
+          "provisioningUdid": {
+            "example": "00000AAA888-IH866799UUJD991",
+            "readOnly": true,
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "C02ZC2QYLVDL",
+            "readOnly": true,
+            "type": "string"
+          },
+          "smcVersion": {
+            "example": "2.2f38",
+            "readOnly": true,
+            "type": "string"
+          },
+          "supportsIosAppInstalls": {
+            "example": false,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "totalRamMegabytes": {
+            "description": "Total RAM Size in MB.",
+            "example": 4096,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerHardwareCreate": {
+        "properties": {
+          "altMacAddress": {
+            "example": "82:45:58:44:dc:01",
+            "type": "string"
+          },
+          "altNetworkAdapterType": {
+            "example": "Bar",
+            "type": "string"
+          },
+          "appleSilicon": {
+            "example": false,
+            "type": "boolean"
+          },
+          "batteryCapacityPercent": {
+            "description": "Remaining percentage of battery power.",
+            "example": 85,
+            "maximum": 100,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "batteryHealth": {
+            "default": "UNKNOWN",
+            "description": "- NON_GENUINE: The battery isn’t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldn’t determine battery health information.\n- UNSUPPORTED: The device doesn’t support battery health reporting.\n",
+            "enum": [
+              "NON_GENUINE",
+              "NORMAL",
+              "SERVICE_RECOMMENDED",
+              "UNKNOWN",
+              "UNSUPPORTED"
+            ],
+            "type": "string"
+          },
+          "bleCapable": {
+            "example": false,
+            "type": "boolean"
+          },
+          "bootRom": {
+            "example": "MBP91.00D3.B08",
+            "type": "string"
+          },
+          "busSpeedMhz": {
+            "example": 2133,
+            "format": "int64",
+            "type": "integer"
+          },
+          "cacheSizeKilobytes": {
+            "description": "Cache Size in KB.",
+            "example": 3072,
+            "format": "int64",
+            "type": "integer"
+          },
+          "coreCount": {
+            "example": 2,
+            "type": "integer"
+          },
+          "macAddress": {
+            "example": "6A:2C:4B:B7:65:B5",
+            "type": "string"
+          },
+          "make": {
+            "example": "Apple",
+            "type": "string"
+          },
+          "model": {
+            "example": "13-inch MacBook Pro (Mid 2012)",
+            "type": "string"
+          },
+          "modelIdentifier": {
+            "example": "MacBookPro9,2",
+            "type": "string"
+          },
+          "networkAdapterType": {
+            "example": "Foo",
+            "type": "string"
+          },
+          "nicSpeed": {
+            "example": "N/A",
+            "type": "string"
+          },
+          "openRamSlots": {
+            "description": "Available RAM slots.",
+            "example": 0,
+            "type": "integer"
+          },
+          "opticalDrive": {
+            "example": "MATSHITA DVD-R UJ-8A8",
+            "type": "string"
+          },
+          "processorArchitecture": {
+            "example": "i386",
+            "type": "string"
+          },
+          "processorCount": {
+            "example": 2,
+            "type": "integer"
+          },
+          "processorSpeedMhz": {
+            "description": "Processor Speed in MHz.",
+            "example": 2100,
+            "format": "int64",
+            "type": "integer"
+          },
+          "processorType": {
+            "example": "Intel Core i5",
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "C02ZC2QYLVDL",
+            "type": "string"
+          },
+          "smcVersion": {
+            "example": "2.2f38",
+            "type": "string"
+          },
+          "supportsIosAppInstalls": {
+            "example": false,
+            "type": "boolean"
+          },
+          "totalRamMegabytes": {
+            "description": "Total RAM Size in MB.",
+            "example": 4096,
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerHardwareUpdate": {
+        "properties": {
+          "altMacAddress": {
+            "example": "82:45:58:44:dc:01",
+            "type": "string"
+          },
+          "altNetworkAdapterType": {
+            "example": "Bar",
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "macAddress": {
+            "example": "6A:2C:4B:B7:65:B5",
+            "type": "string"
+          },
+          "networkAdapterType": {
+            "example": "Foo",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerIbeacon": {
+        "properties": {
+          "name": {
+            "example": "room A",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryCollectionPreferencesV2": {
+        "properties": {
+          "allowChangingUserAndLocation": {
+            "default": true,
+            "example": true,
+            "type": "boolean"
+          },
+          "calculateSizes": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "collectSyncedMobileDeviceInfo": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "collectUnmanagedCertificates": {
+            "default": true,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeAccounts": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeHiddenAccounts": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includePackages": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includePrinters": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeServices": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeSoftwareId": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeSoftwareUpdates": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "monitorApplicationUsage": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "monitorBeacons": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "updateLdapInfoOnComputerInventorySubmissions": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "useUnixUserPaths": {
+            "default": true,
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryCollectionSettingsV2": {
+        "properties": {
+          "applicationPaths": {
+            "items": {
+              "$ref": "#/components/schemas/AppPath"
+            },
+            "type": "array"
+          },
+          "computerInventoryCollectionPreferences": {
+            "$ref": "#/components/schemas/ComputerInventoryCollectionPreferencesV2"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryCreateRequestV2": {
+        "properties": {
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerApplicationCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerCertificateCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "configurationProfiles": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerConfigurationProfileCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "general": {
+            "$ref": "#/components/schemas/ComputerGeneralCreate"
+          },
+          "hardware": {
+            "$ref": "#/components/schemas/ComputerHardwareCreate"
+          },
+          "localUserAccounts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLocalUserAccountCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "operatingSystem": {
+            "$ref": "#/components/schemas/ComputerOperatingSystemCreate"
+          },
+          "packageReceipts": {
+            "$ref": "#/components/schemas/ComputerPackageReceiptsCreate"
+          },
+          "printers": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPrinterCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/ComputerPurchaseCreate"
+          },
+          "security": {
+            "$ref": "#/components/schemas/ComputerSecurityCreate"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerServiceCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "softwareUpdates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerSoftwareUpdateCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/ComputerStorageCreate"
+          },
+          "udid": {
+            "example": "45436edf-864e-4364-982a-330b01d39e65",
+            "nullable": true,
+            "type": "string"
+          },
+          "userAndLocation": {
+            "$ref": "#/components/schemas/ComputerUserAndLocationCreate"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryDeviceLockPinResponse": {
+        "properties": {
+          "pin": {
+            "example": "123456",
+            "maxLength": 6,
+            "minLength": 6,
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryFileVault": {
+        "properties": {
+          "bootPartitionEncryptionDetails": {
+            "$ref": "#/components/schemas/ComputerPartitionEncryption"
+          },
+          "computerId": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "diskEncryptionConfigurationName": {
+            "example": "Test configuration",
+            "type": "string"
+          },
+          "individualRecoveryKeyValidityStatus": {
+            "enum": [
+              "VALID",
+              "INVALID",
+              "UNKNOWN",
+              "NOT_APPLICABLE"
+            ],
+            "example": "VALID",
+            "type": "string"
+          },
+          "institutionalRecoveryKeyPresent": {
+            "example": true,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Boalime",
+            "type": "string"
+          },
+          "personalRecoveryKey": {
+            "example": "Z4A6-ONF8-KUHD-AVTG-C3ER-6A8G",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryFileVaultSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerInventoryFileVault"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryRecoveryLockPasswordResponse": {
+        "properties": {
+          "recoveryLockPassword": {
+            "example": "password123",
+            "format": "password",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventorySearchResultsV3": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerInventoryV3"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryUpdateRequest": {
+        "properties": {
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "general": {
+            "$ref": "#/components/schemas/ComputerGeneralUpdate"
+          },
+          "hardware": {
+            "$ref": "#/components/schemas/ComputerHardwareUpdate"
+          },
+          "operatingSystem": {
+            "$ref": "#/components/schemas/ComputerOperatingSystemUpdate"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/ComputerPurchase"
+          },
+          "udid": {
+            "example": "45436edf-864e-4364-982a-330b01d39e65",
+            "type": "string"
+          },
+          "userAndLocation": {
+            "$ref": "#/components/schemas/ComputerUserAndLocation"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryV3": {
+        "properties": {
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerApplicationV3"
+            },
+            "type": "array"
+          },
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerAttachment"
+            },
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerCertificate"
+            },
+            "type": "array"
+          },
+          "configurationProfiles": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerConfigurationProfile"
+            },
+            "type": "array"
+          },
+          "contentCaching": {
+            "$ref": "#/components/schemas/ComputerContentCaching"
+          },
+          "diskEncryption": {
+            "$ref": "#/components/schemas/ComputerDiskEncryption"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "general": {
+            "$ref": "#/components/schemas/ComputerGeneral"
+          },
+          "groupMemberships": {
+            "items": {
+              "$ref": "#/components/schemas/GroupMembership"
+            },
+            "type": "array"
+          },
+          "hardware": {
+            "$ref": "#/components/schemas/ComputerHardware"
+          },
+          "ibeacons": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerIbeacon"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "licensedSoftware": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLicensedSoftware"
+            },
+            "type": "array"
+          },
+          "localUserAccounts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLocalUserAccount"
+            },
+            "type": "array"
+          },
+          "operatingSystem": {
+            "$ref": "#/components/schemas/ComputerOperatingSystem"
+          },
+          "packageReceipts": {
+            "$ref": "#/components/schemas/ComputerPackageReceipts"
+          },
+          "printers": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPrinter"
+            },
+            "type": "array"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/ComputerPurchase"
+          },
+          "security": {
+            "$ref": "#/components/schemas/ComputerSecurity"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerService"
+            },
+            "type": "array"
+          },
+          "softwareUpdates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerSoftwareUpdate"
+            },
+            "type": "array"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/ComputerStorage"
+          },
+          "udid": {
+            "example": "123",
+            "type": "string"
+          },
+          "userAndLocation": {
+            "$ref": "#/components/schemas/ComputerUserAndLocation"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerLicensedSoftware": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "Microsoft Word",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerLocalUserAccount": {
+        "properties": {
+          "admin": {
+            "example": true,
+            "type": "boolean"
+          },
+          "azureActiveDirectoryId": {
+            "enum": [
+              "ACTIVATED",
+              "DEACTIVATED",
+              "UNRESPONSIVE",
+              "UNKNOWN"
+            ],
+            "example": "ACTIVATED",
+            "type": "string"
+          },
+          "computerAzureActiveDirectoryId": {
+            "example": "1",
+            "type": "string"
+          },
+          "fileVault2Enabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "fullName": {
+            "example": "John Jamf",
+            "type": "string"
+          },
+          "homeDirectory": {
+            "example": "/Users/jamf",
+            "type": "string"
+          },
+          "homeDirectorySizeMb": {
+            "description": "Home directory size in MB.",
+            "example": 131072,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "passwordHistoryDepth": {
+            "example": 5,
+            "type": "integer"
+          },
+          "passwordMaxAge": {
+            "example": 5,
+            "type": "integer"
+          },
+          "passwordMinComplexCharacters": {
+            "example": 5,
+            "type": "integer"
+          },
+          "passwordMinLength": {
+            "example": 4,
+            "type": "integer"
+          },
+          "passwordRequireAlphanumeric": {
+            "example": true,
+            "type": "boolean"
+          },
+          "uid": {
+            "example": "501",
+            "type": "string"
+          },
+          "userAccountType": {
+            "enum": [
+              "LOCAL",
+              "MOBILE",
+              "UNKNOWN"
+            ],
+            "example": "LOCAL",
+            "type": "string"
+          },
+          "userAzureActiveDirectoryId": {
+            "example": "1",
+            "type": "string"
+          },
+          "userGuid": {
+            "example": "844F1177-0CF5-40C6-901F-38EDD9969C1C",
+            "readOnly": true,
+            "type": "string"
+          },
+          "username": {
+            "example": "jamf",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerLocalUserAccountCreate": {
+        "properties": {
+          "admin": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "computerAzureActiveDirectoryId": {
+            "example": "1",
+            "nullable": true,
+            "type": "string"
+          },
+          "fileVault2Enabled": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "fullName": {
+            "example": "John Jamf",
+            "nullable": true,
+            "type": "string"
+          },
+          "homeDirectory": {
+            "example": "/Users/jamf",
+            "nullable": true,
+            "type": "string"
+          },
+          "homeDirectorySizeMb": {
+            "description": "Home directory size in MB.",
+            "example": 131072,
+            "format": "int64",
+            "nullable": true,
+            "type": "integer"
+          },
+          "passwordHistoryDepth": {
+            "example": 5,
+            "nullable": true,
+            "type": "integer"
+          },
+          "passwordMaxAge": {
+            "example": 5,
+            "nullable": true,
+            "type": "integer"
+          },
+          "passwordMinComplexCharacters": {
+            "example": 5,
+            "nullable": true,
+            "type": "integer"
+          },
+          "passwordMinLength": {
+            "example": 4,
+            "nullable": true,
+            "type": "integer"
+          },
+          "passwordRequireAlphanumeric": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "uid": {
+            "example": "501",
+            "nullable": true,
+            "type": "string"
+          },
+          "userAccountType": {
+            "enum": [
+              "LOCAL",
+              "MOBILE",
+              "UNKNOWN"
+            ],
+            "example": "LOCAL",
+            "nullable": true,
+            "type": "string"
+          },
+          "userAzureActiveDirectoryId": {
+            "example": "1",
+            "nullable": true,
+            "type": "string"
+          },
+          "userGuid": {
+            "example": "844F1177-0CF5-40C6-901F-38EDD9969C1C",
+            "nullable": true,
+            "type": "string"
+          },
+          "username": {
+            "example": "jamf",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerMdmCapability": {
+        "properties": {
+          "capable": {
+            "example": true,
+            "type": "boolean"
+          },
+          "capableUsers": {
+            "deprecated": true,
+            "description": "Deprecated. Use userManagementInfo instead.",
+            "example": [
+              "admin",
+              "rootadmin"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "userManagementInfo": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerUserManagementInfo"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerOperatingSystem": {
+        "properties": {
+          "activeDirectoryStatus": {
+            "example": "Not Bound",
+            "readOnly": true,
+            "type": "string"
+          },
+          "build": {
+            "example": "13A603",
+            "readOnly": true,
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "fileVault2Status": {
+            "enum": [
+              "NOT_APPLICABLE",
+              "NOT_ENCRYPTED",
+              "BOOT_ENCRYPTED",
+              "SOME_ENCRYPTED",
+              "ALL_ENCRYPTED"
+            ],
+            "example": "ALL_ENCRYPTED",
+            "type": "string"
+          },
+          "name": {
+            "example": "Mac OS X",
+            "readOnly": true,
+            "type": "string"
+          },
+          "rapidSecurityResponse": {
+            "description": "Collected for macOS 13.0 or later",
+            "example": "(a)",
+            "readOnly": true,
+            "type": "string"
+          },
+          "softwareUpdateDeviceId": {
+            "example": "J132AP",
+            "readOnly": true,
+            "type": "string"
+          },
+          "supplementalBuildVersion": {
+            "description": "Collected for macOS 13.0 or later",
+            "example": "13A953",
+            "readOnly": true,
+            "type": "string"
+          },
+          "version": {
+            "example": "10.9.5",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerOperatingSystemCreate": {
+        "properties": {
+          "activeDirectoryStatus": {
+            "example": "Not Bound",
+            "nullable": true,
+            "type": "string"
+          },
+          "build": {
+            "example": "13A603",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "Mac OS X",
+            "nullable": true,
+            "type": "string"
+          },
+          "rapidSecurityResponse": {
+            "example": "(a)",
+            "nullable": true,
+            "type": "string"
+          },
+          "softwareUpdateDeviceId": {
+            "example": "J132AP",
+            "nullable": true,
+            "type": "string"
+          },
+          "supplementalBuildVersion": {
+            "example": "13A953",
+            "nullable": true,
+            "type": "string"
+          },
+          "version": {
+            "example": "10.9.5",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerOperatingSystemUpdate": {
+        "properties": {
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPackageReceipts": {
+        "description": "All package receipts are listed by their package name",
+        "properties": {
+          "cached": {
+            "items": {
+              "example": "com.jamf.protect.JamfProtect",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "installedByInstallerSwu": {
+            "items": {
+              "example": "com.apple.pkg.Core",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "installedByJamfPro": {
+            "items": {
+              "example": "com.jamf.protect.JamfProtect",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPackageReceiptsCreate": {
+        "description": "All package receipts are listed by their package name",
+        "properties": {
+          "cached": {
+            "items": {
+              "example": "com.jamf.protect.JamfProtect",
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "installedByInstallerSwu": {
+            "items": {
+              "example": "com.apple.pkg.Core",
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "installedByJamfPro": {
+            "items": {
+              "example": "com.jamf.protect.JamfProtect",
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPartition": {
+        "properties": {
+          "availableMegabytes": {
+            "description": "Available space in MB.",
+            "example": 131072,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "fileVault2ProgressPercent": {
+            "description": "Percentage progress of current FileVault 2 operation.",
+            "example": 45,
+            "nullable": true,
+            "type": "integer"
+          },
+          "fileVault2State": {
+            "$ref": "#/components/schemas/ComputerPartitionFileVault2State"
+          },
+          "lvmManaged": {
+            "example": true,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Foo",
+            "readOnly": true,
+            "type": "string"
+          },
+          "partitionType": {
+            "enum": [
+              "BOOT",
+              "RECOVERY",
+              "OTHER"
+            ],
+            "example": "BOOT",
+            "readOnly": true,
+            "type": "string"
+          },
+          "percentUsed": {
+            "description": "Percentage of space used.",
+            "example": 25,
+            "maximum": 100,
+            "minimum": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "sizeMegabytes": {
+            "description": "Partition Size in MB.",
+            "example": 262144,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPartitionCreate": {
+        "properties": {
+          "availableMegabytes": {
+            "description": "Available space in MB.",
+            "example": 131072,
+            "format": "int64",
+            "nullable": true,
+            "type": "integer"
+          },
+          "fileVault2ProgressPercent": {
+            "description": "Percentage progress of current FileVault 2 operation.",
+            "example": 45,
+            "nullable": true,
+            "type": "integer"
+          },
+          "fileVault2State": {
+            "$ref": "#/components/schemas/ComputerPartitionFileVault2State"
+          },
+          "lvmManaged": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Foo",
+            "nullable": true,
+            "type": "string"
+          },
+          "partitionType": {
+            "enum": [
+              "BOOT",
+              "RECOVERY",
+              "OTHER"
+            ],
+            "example": "BOOT",
+            "nullable": true,
+            "type": "string"
+          },
+          "percentUsed": {
+            "description": "Percentage of space used.",
+            "example": 25,
+            "maximum": 100,
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "sizeMegabytes": {
+            "description": "Partition Size in MB.",
+            "example": 262144,
+            "format": "int64",
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPartitionEncryption": {
+        "properties": {
+          "partitionFileVault2Percent": {
+            "example": 100,
+            "type": "integer"
+          },
+          "partitionFileVault2State": {
+            "$ref": "#/components/schemas/ComputerPartitionFileVault2State"
+          },
+          "partitionName": {
+            "example": "main",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPartitionFileVault2State": {
+        "enum": [
+          "UNKNOWN",
+          "UNENCRYPTED",
+          "INELIGIBLE",
+          "DECRYPTED",
+          "DECRYPTING",
+          "ENCRYPTED",
+          "ENCRYPTING",
+          "RESTART_NEEDED",
+          "OPTIMIZING",
+          "DECRYPTING_PAUSED",
+          "ENCRYPTING_PAUSED"
+        ],
+        "example": "ENCRYPTING",
+        "type": "string"
+      },
+      "ComputerPrinter": {
+        "properties": {
+          "location": {
+            "example": "7th floor",
+            "type": "string"
+          },
+          "name": {
+            "example": "My Printer",
+            "type": "string"
+          },
+          "type": {
+            "example": "XYZ 1122",
+            "type": "string"
+          },
+          "uri": {
+            "example": "ipp://10.0.0.5",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPrinterCreate": {
+        "properties": {
+          "location": {
+            "example": "7th floor",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "My Printer",
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "example": "XYZ 1122",
+            "nullable": true,
+            "type": "string"
+          },
+          "uri": {
+            "example": "ipp://10.0.0.5",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPurchase": {
+        "properties": {
+          "appleCareId": {
+            "example": "abcd",
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "leaseDate": {
+            "example": "2019-01-01",
+            "format": "date",
+            "type": "string"
+          },
+          "leased": {
+            "example": true,
+            "type": "boolean"
+          },
+          "lifeExpectancy": {
+            "example": 5,
+            "type": "integer"
+          },
+          "poDate": {
+            "example": "2019-01-01",
+            "format": "date",
+            "type": "string"
+          },
+          "poNumber": {
+            "example": "53-1",
+            "type": "string"
+          },
+          "purchasePrice": {
+            "example": "$500",
+            "type": "string"
+          },
+          "purchased": {
+            "example": true,
+            "type": "boolean"
+          },
+          "purchasingAccount": {
+            "example": "admin",
+            "type": "string"
+          },
+          "purchasingContact": {
+            "example": "true",
+            "type": "string"
+          },
+          "vendor": {
+            "example": "Example Vendor",
+            "type": "string"
+          },
+          "warrantyDate": {
+            "example": "2019-01-01",
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPurchaseCreate": {
+        "properties": {
+          "appleCareId": {
+            "example": "abcd",
+            "nullable": true,
+            "type": "string"
+          },
+          "leaseDate": {
+            "example": "2019-01-01",
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "leased": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "lifeExpectancy": {
+            "example": 5,
+            "nullable": true,
+            "type": "integer"
+          },
+          "poDate": {
+            "example": "2019-01-01",
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "poNumber": {
+            "example": "53-1",
+            "nullable": true,
+            "type": "string"
+          },
+          "purchasePrice": {
+            "example": "$500",
+            "nullable": true,
+            "type": "string"
+          },
+          "purchased": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "purchasingAccount": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          },
+          "purchasingContact": {
+            "example": "true",
+            "nullable": true,
+            "type": "string"
+          },
+          "vendor": {
+            "example": "Example Vendor",
+            "nullable": true,
+            "type": "string"
+          },
+          "warrantyDate": {
+            "example": "2019-01-01",
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerRemoteManagement": {
+        "properties": {
+          "managed": {
+            "example": true,
+            "type": "boolean"
+          },
+          "managementUsername": {
+            "deprecated": true,
+            "description": "This field always returns null, please use /local-admin-password/ endpoint instead.",
+            "example": "rootname",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerRemoteManagementCreate": {
+        "properties": {
+          "managed": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerSectionV3": {
+        "enum": [
+          "GENERAL",
+          "DISK_ENCRYPTION",
+          "PURCHASING",
+          "APPLICATIONS",
+          "STORAGE",
+          "USER_AND_LOCATION",
+          "CONFIGURATION_PROFILES",
+          "PRINTERS",
+          "SERVICES",
+          "HARDWARE",
+          "LOCAL_USER_ACCOUNTS",
+          "CERTIFICATES",
+          "ATTACHMENTS",
+          "PACKAGE_RECEIPTS",
+          "SECURITY",
+          "OPERATING_SYSTEM",
+          "LICENSED_SOFTWARE",
+          "IBEACONS",
+          "SOFTWARE_UPDATES",
+          "EXTENSION_ATTRIBUTES",
+          "CONTENT_CACHING",
+          "GROUP_MEMBERSHIPS"
+        ],
+        "example": "general",
+        "type": "string"
+      },
+      "ComputerSecurity": {
+        "properties": {
+          "activationLockEnabled": {
+            "description": "Collected for macOS 10.15.0 or later",
+            "example": true,
+            "type": "boolean"
+          },
+          "attestationStatus": {
+            "enum": [
+              "PENDING",
+              "SUCCESS",
+              "CERTIFICATE_INVALID",
+              "DEVICE_PROPERTIES_MISMATCH",
+              "MDA_UNSUPPORTED_DUE_TO_HARDWARE",
+              "MDA_UNSUPPORTED_DUE_TO_SOFTWARE"
+            ],
+            "example": "PENDING",
+            "readOnly": true,
+            "type": "string"
+          },
+          "autoLoginDisabled": {
+            "example": false,
+            "type": "boolean"
+          },
+          "bootstrapTokenAllowed": {
+            "description": "Collected for macOS 11 or later",
+            "example": true,
+            "type": "boolean"
+          },
+          "bootstrapTokenEscrowedStatus": {
+            "description": "Collected for macOS 11 or later",
+            "enum": [
+              "ESCROWED",
+              "NOT_ESCROWED",
+              "NOT_SUPPORTED"
+            ],
+            "example": "ESCROWED",
+            "type": "string"
+          },
+          "externalBootLevel": {
+            "description": "Collected for macOS 10.15.0 or later",
+            "enum": [
+              "ALLOW_BOOTING_FROM_EXTERNAL_MEDIA",
+              "DISALLOW_BOOTING_FROM_EXTERNAL_MEDIA",
+              "NOT_SUPPORTED",
+              "UNKNOWN"
+            ],
+            "example": "ALLOW_BOOTING_FROM_EXTERNAL_MEDIA",
+            "type": "string"
+          },
+          "firewallEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "gatekeeperStatus": {
+            "enum": [
+              "NOT_COLLECTED",
+              "DISABLED",
+              "APP_STORE_AND_IDENTIFIED_DEVELOPERS",
+              "APP_STORE"
+            ],
+            "example": "APP_STORE_AND_IDENTIFIED_DEVELOPERS",
+            "type": "string"
+          },
+          "lastAttestationAttempt": {
+            "example": "1970-01-01T00:00:00Z",
+            "readOnly": true,
+            "type": "string"
+          },
+          "lastSuccessfulAttestation": {
+            "example": "1970-01-01T00:00:00Z",
+            "readOnly": true,
+            "type": "string"
+          },
+          "recoveryLockEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "remoteDesktopEnabled": {
+            "description": "Collected for macOS 10.14.4 or later",
+            "example": true,
+            "type": "boolean"
+          },
+          "secureBootLevel": {
+            "description": "Collected for macOS 10.15.0 or later",
+            "enum": [
+              "NO_SECURITY",
+              "MEDIUM_SECURITY",
+              "FULL_SECURITY",
+              "NOT_SUPPORTED",
+              "UNKNOWN"
+            ],
+            "example": "FULL_SECURITY",
+            "type": "string"
+          },
+          "sipStatus": {
+            "enum": [
+              "NOT_COLLECTED",
+              "NOT_AVAILABLE",
+              "DISABLED",
+              "ENABLED"
+            ],
+            "example": "ENABLED",
+            "type": "string"
+          },
+          "xprotectVersion": {
+            "example": "1.2.3",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerSecurityCreate": {
+        "properties": {
+          "activationLockEnabled": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "externalBootLevel": {
+            "enum": [
+              "ALLOW_BOOTING_FROM_EXTERNAL_MEDIA",
+              "DISALLOW_BOOTING_FROM_EXTERNAL_MEDIA",
+              "NOT_SUPPORTED",
+              "UNKNOWN"
+            ],
+            "example": "ALLOW_BOOTING_FROM_EXTERNAL_MEDIA",
+            "nullable": true,
+            "type": "string"
+          },
+          "firewallEnabled": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "gatekeeperStatus": {
+            "enum": [
+              "NOT_COLLECTED",
+              "DISABLED",
+              "APP_STORE_AND_IDENTIFIED_DEVELOPERS",
+              "APP_STORE"
+            ],
+            "example": "APP_STORE_AND_IDENTIFIED_DEVELOPERS",
+            "nullable": true,
+            "type": "string"
+          },
+          "recoveryLockEnabled": {
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "secureBootLevel": {
+            "enum": [
+              "NO_SECURITY",
+              "MEDIUM_SECURITY",
+              "FULL_SECURITY",
+              "NOT_SUPPORTED",
+              "UNKNOWN"
+            ],
+            "example": "FULL_SECURITY",
+            "nullable": true,
+            "type": "string"
+          },
+          "sipStatus": {
+            "enum": [
+              "NOT_COLLECTED",
+              "NOT_AVAILABLE",
+              "DISABLED",
+              "ENABLED"
+            ],
+            "example": "ENABLED",
+            "nullable": true,
+            "type": "string"
+          },
+          "xprotectVersion": {
+            "example": "1.2.3",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerService": {
+        "properties": {
+          "name": {
+            "example": "SomeService",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerServiceCreate": {
+        "properties": {
+          "name": {
+            "example": "SomeService",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerSoftwareUpdate": {
+        "properties": {
+          "name": {
+            "example": "BEdit",
+            "type": "string"
+          },
+          "packageName": {
+            "example": "com.apple.pkg.AdditionalEssentials",
+            "type": "string"
+          },
+          "version": {
+            "example": "1.15.2",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerSoftwareUpdateCreate": {
+        "properties": {
+          "name": {
+            "example": "BEdit",
+            "nullable": true,
+            "type": "string"
+          },
+          "packageName": {
+            "example": "com.apple.pkg.AdditionalEssentials",
+            "nullable": true,
+            "type": "string"
+          },
+          "version": {
+            "example": "1.15.2",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerStorage": {
+        "properties": {
+          "bootDriveAvailableSpaceMegabytes": {
+            "example": 3072,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "disks": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerDisk"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerStorageCreate": {
+        "properties": {
+          "disks": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerDiskCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerUserAndLocation": {
+        "properties": {
+          "buildingId": {
+            "example": "1",
+            "type": "string"
+          },
+          "departmentId": {
+            "example": "1",
+            "type": "string"
+          },
+          "email": {
+            "example": "email@com.pl",
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "phone": {
+            "example": "123-456-789",
+            "type": "string"
+          },
+          "position": {
+            "example": "IT Team Lead",
+            "type": "string"
+          },
+          "realname": {
+            "example": "13-inch MacBook",
+            "type": "string"
+          },
+          "room": {
+            "example": "5",
+            "type": "string"
+          },
+          "username": {
+            "example": "Madison Anderson",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerUserAndLocationCreate": {
+        "properties": {
+          "buildingId": {
+            "example": "1",
+            "nullable": true,
+            "type": "string"
+          },
+          "departmentId": {
+            "example": "1",
+            "nullable": true,
+            "type": "string"
+          },
+          "email": {
+            "example": "email@com.pl",
+            "nullable": true,
+            "type": "string"
+          },
+          "phone": {
+            "example": "123-456-789",
+            "nullable": true,
+            "type": "string"
+          },
+          "position": {
+            "example": "IT Team Lead",
+            "nullable": true,
+            "type": "string"
+          },
+          "realname": {
+            "example": "13-inch MacBook",
+            "nullable": true,
+            "type": "string"
+          },
+          "room": {
+            "example": "5",
+            "nullable": true,
+            "type": "string"
+          },
+          "username": {
+            "example": "Madison Anderson",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerUserManagementInfo": {
+        "example": [
+          {
+            "capableUser": "admin",
+            "managementId": "123e4567-e89b-42d3-a456-426614174000"
+          },
+          {
+            "capableUser": "rootadmin",
+            "managementId": "123e4567-e89b-42d3-a456-426614174001"
+          }
+        ],
+        "properties": {
+          "capableUser": {
+            "example": "admin",
+            "type": "string"
+          },
+          "managementId": {
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "type": "string"
+          }
+        },
+        "required": [
+          "capableUser",
+          "managementId"
+        ],
+        "type": "object"
+      },
       "ConfigurationProfile": {
         "properties": {
           "displayName": {
@@ -612,6 +3761,26 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "CreatePathV2": {
+        "properties": {
+          "path": {
+            "example": "/Example/Path/",
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "APP"
+            ],
+            "example": "APP",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "scope"
+        ],
         "type": "object"
       },
       "Department": {
@@ -844,6 +4013,26 @@
         },
         "type": "object"
       },
+      "EnrollmentMethod": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "objectName": {
+            "example": "user@domain.com",
+            "readOnly": true,
+            "type": "string"
+          },
+          "objectType": {
+            "example": "User-initiated - no invitation",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "EnrollmentMethodPrestage": {
         "properties": {
           "mobileDevicePrestageId": {
@@ -855,6 +4044,38 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "EraseDeviceComputerRequest": {
+        "properties": {
+          "pin": {
+            "description": "The six-character PIN for Find My.",
+            "example": "123456",
+            "maximum": 6,
+            "minimum": 6,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "EraseDeviceComputerResponse": {
+        "properties": {
+          "commandUuid": {
+            "description": "Uuid of the queued eraseDevice command",
+            "example": "1234-5678-90ab-cdef-1234567890ab",
+            "type": "string"
+          },
+          "deviceId": {
+            "description": "Id of the computer for which eraseDevice command was queued",
+            "example": "1234",
+            "type": "string"
+          }
+        },
+        "required": [
+          "commandUuid",
+          "deviceId"
+        ],
         "type": "object"
       },
       "EraseDeviceMobileDeviceRequest": {
@@ -1094,6 +4315,28 @@
         },
         "type": "object"
       },
+      "GroupMembership": {
+        "properties": {
+          "groupDescription": {
+            "example": "groupOne description",
+            "type": "string"
+          },
+          "groupId": {
+            "example": "1",
+            "type": "string"
+          },
+          "groupName": {
+            "example": "groupOne",
+            "type": "string"
+          },
+          "smartGroup": {
+            "description": "Indicates that group is smart group",
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "GroupResetRequest": {
         "properties": {
           "clearActivationLock": {
@@ -1284,6 +4527,40 @@
               "type": "string"
             },
             "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "InventoryInformation": {
+        "description": "Jamf Pro Inventory statistics object. Aggregates managed/unmanaged devices and computers counters",
+        "properties": {
+          "managedComputers": {
+            "description": "Number of managed computers in inventory.",
+            "example": 1200,
+            "minimum": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "managedDevices": {
+            "description": "Number of managed devices in inventory.",
+            "example": 1200,
+            "minimum": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "unmanagedComputers": {
+            "description": "Number of unmanaged computers in inventory.",
+            "example": 1100,
+            "minimum": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "unmanagedDevices": {
+            "description": "Number of unmanaged devices in inventory.",
+            "example": 1100,
+            "minimum": 0,
+            "readOnly": true,
+            "type": "integer"
           }
         },
         "type": "object"
@@ -1757,6 +5034,262 @@
             "type": "integer"
           }
         },
+        "type": "object"
+      },
+      "InventoryPreloadCsvValidationError": {
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/InventoryPreloadCsvValidationErrorCause"
+            },
+            "type": "array"
+          },
+          "httpStatus": {
+            "description": "HTTP status of the response",
+            "example": 400,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "InventoryPreloadCsvValidationErrorCause": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiErrorCause"
+          },
+          {
+            "properties": {
+              "deviceType": {
+                "example": "Computer",
+                "type": "string"
+              },
+              "fieldSize": {
+                "example": 60,
+                "type": "integer"
+              },
+              "line": {
+                "example": 5,
+                "type": "integer"
+              },
+              "serialNumber": {
+                "example": "R7QFDE2YCFN4",
+                "type": "string"
+              },
+              "value": {
+                "example": "abcdefghijklmnopqrstuwxyzabcdefghijklmnopqrstuwxyzabcdefghijklmnopqrstuwxyz",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "InventoryPreloadCsvValidationSuccess": {
+        "properties": {
+          "recordCount": {
+            "example": 10,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "InventoryPreloadExtensionAttribute": {
+        "properties": {
+          "name": {
+            "example": "foo",
+            "type": "string"
+          },
+          "value": {
+            "example": "42",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "InventoryPreloadExtensionAttributeColumn": {
+        "properties": {
+          "fullName": {
+            "example": "Column 1",
+            "type": "string"
+          },
+          "name": {
+            "example": "eaColumn1",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "InventoryPreloadExtensionAttributeColumnResult": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/InventoryPreloadExtensionAttributeColumn"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 10,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "InventoryPreloadRecordSearchResultsV2": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/InventoryPreloadRecordV2"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 10,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "InventoryPreloadRecordV2": {
+        "properties": {
+          "appleCareId": {
+            "example": "5678",
+            "nullable": true,
+            "type": "string"
+          },
+          "assetTag": {
+            "example": "ABCDEFG12345",
+            "nullable": true,
+            "type": "string"
+          },
+          "barCode1": {
+            "example": "123456789",
+            "nullable": true,
+            "type": "string"
+          },
+          "barCode2": {
+            "example": "123456789",
+            "nullable": true,
+            "type": "string"
+          },
+          "building": {
+            "example": "Eau Claire",
+            "nullable": true,
+            "type": "string"
+          },
+          "department": {
+            "example": "IT",
+            "nullable": true,
+            "type": "string"
+          },
+          "deviceType": {
+            "enum": [
+              "Computer",
+              "Mobile Device",
+              "Unknown"
+            ],
+            "example": "Computer",
+            "type": "string"
+          },
+          "emailAddress": {
+            "example": "ITBob@jamf.com",
+            "nullable": true,
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/InventoryPreloadExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "fullName": {
+            "example": "Name",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "leaseExpiration": {
+            "example": "2015-06-19",
+            "nullable": true,
+            "type": "string"
+          },
+          "lifeExpectancy": {
+            "example": "5 years",
+            "nullable": true,
+            "type": "string"
+          },
+          "phoneNumber": {
+            "example": "555-555-5555",
+            "nullable": true,
+            "type": "string"
+          },
+          "poDate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "nullable": true,
+            "type": "string"
+          },
+          "poNumber": {
+            "example": "8675309",
+            "nullable": true,
+            "type": "string"
+          },
+          "position": {
+            "example": "IT Team Lead",
+            "nullable": true,
+            "type": "string"
+          },
+          "purchasePrice": {
+            "example": "$399",
+            "nullable": true,
+            "type": "string"
+          },
+          "purchasingAccount": {
+            "example": "IT Budget",
+            "nullable": true,
+            "type": "string"
+          },
+          "purchasingContact": {
+            "example": "Nick in IT",
+            "nullable": true,
+            "type": "string"
+          },
+          "room": {
+            "example": "4th Floor - Quad 3",
+            "nullable": true,
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "C02L29ECF8J1",
+            "type": "string"
+          },
+          "username": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          },
+          "vendor": {
+            "example": "Apple",
+            "nullable": true,
+            "type": "string"
+          },
+          "warrantyExpiration": {
+            "example": "2012-07-21",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "deviceType",
+          "serialNumber"
+        ],
         "type": "object"
       },
       "LocationV2": {
@@ -4582,6 +8115,21 @@
           "warrantyExpiresDate": {
             "example": "2019-02-04T21:09:31.661Z",
             "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RemoveComputerMdmProfileResponse": {
+        "properties": {
+          "commandUuid": {
+            "description": "Uuid of the command queued that removes the MDM profile",
+            "example": "1234-5678-90ab-cdef-1234567890ab",
+            "type": "string"
+          },
+          "deviceId": {
+            "description": "Id of the computer whose MDM profile was removed",
+            "example": "1234",
             "type": "string"
           }
         },
@@ -7711,6 +11259,121 @@
         ]
       }
     },
+    "/v1/computer-inventory/{id}/erase": {
+      "post": {
+        "description": "Erase a computer",
+        "parameters": [
+          {
+            "description": "Id of the computer to erase",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EraseDeviceComputerRequest"
+              }
+            }
+          },
+          "description": "Options for eraseDevice command"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EraseDeviceComputerResponse"
+                }
+              }
+            },
+            "description": "Erase command was queued for this device."
+          },
+          "403": {
+            "description": "Insufficient privileges to perform this action."
+          },
+          "404": {
+            "description": "Computer not found."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to queue command."
+          }
+        },
+        "summary": "Erase a computer\n",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Send Computer Remote Wipe Command"
+        ]
+      }
+    },
+    "/v1/computer-inventory/{id}/remove-mdm-profile": {
+      "post": {
+        "description": "Remove a computer's MDM profile",
+        "parameters": [
+          {
+            "description": "Id of the computer to remove the MDM profile from",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveComputerMdmProfileResponse"
+                }
+              }
+            },
+            "description": "Command to remove the mdm profile was queued"
+          },
+          "403": {
+            "description": "Insufficient privileges to perform this action."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to queue command."
+          }
+        },
+        "summary": "Remove a computer's MDM profile\n",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Send Computer Unmanage Command"
+        ]
+      }
+    },
     "/v1/departments": {
       "get": {
         "description": "Search for Departments\n",
@@ -8479,6 +12142,28 @@
         "summary": "Upload an icon\n",
         "tags": [
           "icon"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/inventory-information": {
+      "get": {
+        "description": "Gets statistics about managed/unmanaged devices and computers in the inventory.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryInformation"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get statistics about managed/unmanaged devices and computers in the inventory\n",
+        "tags": [
+          "inventory-information"
         ],
         "x-authentication-required": true
       }
@@ -11425,6 +15110,797 @@
         ]
       }
     },
+    "/v2/computer-inventory-collection-settings": {
+      "get": {
+        "description": "Returns computer inventory settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryCollectionSettingsV2"
+                }
+              }
+            },
+            "description": "Successful response returns the computer inventory settings"
+          }
+        },
+        "summary": "Returns computer inventory settings",
+        "tags": [
+          "computer-inventory-collection-settings"
+        ],
+        "x-required-privileges": [
+          "Read Computer Inventory Collection Settings"
+        ]
+      },
+      "patch": {
+        "description": "Update computer inventory settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryCollectionSettingsV2"
+              }
+            }
+          },
+          "description": "Computer inventory settings to update",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Computer inventory settings updated"
+          }
+        },
+        "summary": "Update computer inventory settings",
+        "tags": [
+          "computer-inventory-collection-settings"
+        ],
+        "x-required-privileges": [
+          "Update Computer Inventory Collection Settings"
+        ]
+      }
+    },
+    "/v2/computer-inventory-collection-settings/custom-path": {
+      "post": {
+        "description": "Creates a custom search path to use when collecting applications.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePathV2"
+              }
+            }
+          },
+          "description": "Computer inventory settings to update",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Custom path created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid data response"
+          }
+        },
+        "summary": "Create Computer Inventory Collection Settings Custom Path",
+        "tags": [
+          "computer-inventory-collection-settings"
+        ],
+        "x-required-privileges": [
+          "Create Custom Paths"
+        ]
+      }
+    },
+    "/v2/computer-inventory-collection-settings/custom-path/{id}": {
+      "delete": {
+        "description": "Delete Custom Path from Computer Inventory Collection Settings",
+        "parameters": [
+          {
+            "description": "id of Custom Path",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Custom path deleted"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid data response"
+          }
+        },
+        "summary": "Delete Custom Path from Computer Inventory Collection Settings",
+        "tags": [
+          "computer-inventory-collection-settings"
+        ],
+        "x-required-privileges": [
+          "Delete Custom Paths"
+        ]
+      }
+    },
+    "/v2/inventory-preload/csv": {
+      "get": {
+        "description": "Returns all Inventory Preload records as a CSV file.",
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "Serial Number,Device Type,Full Name\nserial123,Computer,Test Name\n",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK",
+            "headers": {
+              "Content-Disposition": {
+                "description": "A header field named `Content-Disposition` is returned with the file name contained in its value, which is always `inventory-preload-all.csv`.\n",
+                "explode": false,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          }
+        },
+        "summary": "Download all Inventory Preload records",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Read Inventory Preload Records"
+        ]
+      },
+      "post": {
+        "description": "Create one or more new Inventory Preload records using CSV.\nA CSV template can be downloaded from /v2/inventory-preload/csv-template.\nSerial number and device type are required. All other fields are optional.\nWhen a matching serial number exists in the Inventory Preload data, the record will be overwritten with the CSV data.\nIf the CSV file contains a new username and an email address is provided, the new user is created in Jamf Pro.\nIf the CSV file contains an existing username, the following user-related fields are updated in Jamf Pro.\nFull Name,\nEmail Address,\nPhone Number,\nPosition.\nThis endpoint does not do full validation of each record in the CSV data.\nTo do full validation, use the `/v2/inventory-preload/csv-validate` endpoint first.\n",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The CSV file to upload",
+                    "example": "serial number,device type,full name\nserial123,Computer,Test Name\n",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/HrefResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadCsvValidationError"
+                }
+              }
+            },
+            "description": "Validation Failed"
+          }
+        },
+        "summary": "Create one or more new Inventory Preload records using CSV\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Create Inventory Preload Records",
+          "Update Inventory Preload Records",
+          "Create User",
+          "Update User"
+        ]
+      }
+    },
+    "/v2/inventory-preload/csv-template": {
+      "get": {
+        "description": "Retrieves the Inventory Preload CSV file template.",
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "Serial Number,Device Type,Username,Full Name,Email Address",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK",
+            "headers": {
+              "Content-Disposition": {
+                "description": "A header field named `Content-Disposition` is returned with the file name contained in its value, which is always `inventory-preload-template.csv`.\n",
+                "explode": false,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          }
+        },
+        "summary": "Download the Inventory Preload CSV template",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Read Inventory Preload Records"
+        ]
+      }
+    },
+    "/v2/inventory-preload/csv-validate": {
+      "post": {
+        "description": "Validate a given CSV file.\nSerial number and device type are required. All other fields are optional.\nA CSV template can be downloaded from `/v2/inventory-preload/csv-template`.\n",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The CSV file to upload",
+                    "example": "serial number,device type,full name\nserial123,Computer,Test Name\n",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          },
+          "description": "Inventory Preload records to be validated. A CSV template can\nbe downloaded from `/v2/inventory-preload/csv-template`.\n",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadCsvValidationSuccess"
+                }
+              }
+            },
+            "description": "Ok"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadCsvValidationError"
+                }
+              }
+            },
+            "description": "Precondition Failed"
+          }
+        },
+        "summary": "Validate a given CSV file\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Create Inventory Preload Records"
+        ]
+      }
+    },
+    "/v2/inventory-preload/ea-columns": {
+      "get": {
+        "description": "Retrieve a list of extension attribute columns currently associated\nwith inventory preload records\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadExtensionAttributeColumnResult"
+                }
+              }
+            },
+            "description": "Ok"
+          }
+        },
+        "summary": "Retrieve a list of extension attribute columns\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Read Inventory Preload Records"
+        ]
+      }
+    },
+    "/v2/inventory-preload/export": {
+      "post": {
+        "description": "Export a collection of inventory preload records\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/export-fields"
+          },
+          {
+            "$ref": "#/components/parameters/export-labels"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `id:asc`. Multiple sort criteria are supported and must be separated with\na comma. All inventory preload fields are supported, however fields added by\nextension attributes are not supported. If sorting by deviceType, use `0` for\nComputer and `1` for Mobile Device.\n\nExample: `sort=date:desc,name:asc`.\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Allowing to filter inventory preload records.\nDefault search is empty query - returning all results for the requested page.\nAll inventory preload fields are supported, however fields added by extension\nattributes are not supported. If filtering by deviceType, use `0` for Computer\nand `1` for Mobile Device.\n\nQuery in the RSQL format, allowing `==`, `!=`, `\u003e`, `\u003c`, and `=in=`.\n\nExample: `filter=categoryName==\"Category\"`\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportParameters"
+              }
+            }
+          },
+          "description": "Optional. Override query parameters since they can make URI exceed 2,000 character limit."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "Column 1,Column 2,Column 3\nserial123,data,user\nserial1234,additional data,user last\n",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "Export successful"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Unable to perform export operation."
+          }
+        },
+        "summary": "Export a collection of inventory preload records\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Inventory Preload Records"
+        ]
+      }
+    },
+    "/v2/inventory-preload/history": {
+      "get": {
+        "description": "Gets Inventory Preload history entries.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `date:desc`. Multiple sort criteria are supported and must be separated\nwith a comma.\n\nExample: `sort=date:desc,name:asc`.\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Allows filtering inventory preload history records.\nDefault search is empty query - returning all results for the requested page.\nAll inventory preload history fields are supported.\n\nQuery in the RSQL format, allowing `==`, `!=`, `\u003e`, `\u003c`, and `=in=`.\n\nExample: `filter=username==\"admin\"`\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Get Inventory Preload history entries\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Read Inventory Preload Records"
+        ]
+      },
+      "post": {
+        "description": "Adds Inventory Preload history object notes.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of Inventory Preload history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload history can not be saved"
+          }
+        },
+        "summary": "Add Inventory Preload history object notes",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Update Inventory Preload Records"
+        ]
+      }
+    },
+    "/v2/inventory-preload/records": {
+      "get": {
+        "description": "Returns all Inventory Preload records.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `id:asc`. Multiple sort criteria are supported and must be separated with\na comma. All inventory preload fields are supported, however fields added by\nextension attributes are not supported. If sorting by deviceType, use `0` for\nComputer and `1` for Mobile Device.\n\nExample: `sort=date:desc,name:asc`.\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Allowing to filter inventory preload records.\nDefault search is empty query - returning all results for the requested page.\nAll inventory preload fields are supported, however fields added by extension\nattributes are not supported. If filtering by deviceType, use `0` for Computer\nand `1` for Mobile Device.\n\nQuery in the RSQL format, allowing `==`, `!=`, `\u003e`, `\u003c`, and `=in=`.\n\nExample: `filter=categoryName==\"Category\"`\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecordSearchResultsV2"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Return all Inventory Preload records",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Read Inventory Preload Records"
+        ]
+      },
+      "post": {
+        "description": "Create a new Inventory Preload record using JSON.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryPreloadRecordV2"
+              }
+            }
+          },
+          "description": "Inventory Preload record to be created.",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Create a new Inventory Preload record using JSON",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Create Inventory Preload Records"
+        ]
+      }
+    },
+    "/v2/inventory-preload/records/delete-all": {
+      "post": {
+        "description": "Deletes all Inventory Preload records.",
+        "responses": {
+          "204": {
+            "description": "OK"
+          }
+        },
+        "summary": "Delete all Inventory Preload records\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Delete Inventory Preload Records"
+        ]
+      }
+    },
+    "/v2/inventory-preload/records/{id}": {
+      "delete": {
+        "description": "Deletes an Inventory Preload record.",
+        "parameters": [
+          {
+            "description": "Inventory Preload identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload record with specified id does not exist"
+          }
+        },
+        "summary": "Delete an Inventory Preload record\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Delete Inventory Preload Records"
+        ]
+      },
+      "get": {
+        "description": "Retrieves an Inventory Preload record.",
+        "parameters": [
+          {
+            "description": "Inventory Preload identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecordV2"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload record with specified id does not exist"
+          }
+        },
+        "summary": "Get an Inventory Preload record",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Read Inventory Preload Records"
+        ]
+      },
+      "put": {
+        "description": "Updates an Inventory Preload record.",
+        "parameters": [
+          {
+            "description": "Inventory Preload identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryPreloadRecordV2"
+              }
+            }
+          },
+          "description": "Inventory Preload record to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecordV2"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload record with specified id does not exist"
+          }
+        },
+        "summary": "Update an Inventory Preload record",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-required-privileges": [
+          "Update Inventory Preload Records"
+        ]
+      }
+    },
     "/v2/mobile-devices": {
       "get": {
         "description": "Gets Mobile Device objects.\n",
@@ -13496,6 +17972,664 @@
         ],
         "x-required-privileges": [
           "Read Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/computers-inventory": {
+      "get": {
+        "description": "Return paginated Computer Inventory records",
+        "parameters": [
+          {
+            "description": "section of computer details, if not specified, General section data is returned. Multiple section parameters are supported, e.g. section=GENERAL\u0026section=HARDWARE",
+            "explode": true,
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "default": [
+                "GENERAL"
+              ],
+              "example": [
+                "GENERAL"
+              ],
+              "items": {
+                "$ref": "#/components/schemas/ComputerSectionV3"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `general.name:asc`. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`,\n`general.mdmCertificateExpiration`, `general.platform`, `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,\n`general.mdmCertificateExpiration`, `general.platform`, `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`\n`hardware.make`, `hardware.model`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,\n`userAndLocation.realname`,\n`purchasing.lifeExpectancy`, `purchasing.warrantyDate`\n\nExample: `sort=udid:desc,general.name:asc`.\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "general.name:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter computer inventory collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`, `general.barcode2`,\n`general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`, `general.itunesStoreAccountActive`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`, `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`, `general.managementId`, `general.remoteManagement.managed`,\n`general.mdmCapable.capable`, `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`, `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`, \n`general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`, \n`general.mdmCapable.capable`, `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`, `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`, `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,\n`hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`, `hardware.modelIdentifier`, `hardware.serialNumber`,\n`hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`, `operatingSystem.fileVault2Status`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,\n`security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`, `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,\n`userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`, `userAndLocation.username`, `diskEncryption.fileVault2Enabled`,\n`purchasing.appleCareId`, `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`, `purchasing.warrantyDate`,\n\nThis param can be combined with paging and sorting.\nExample: `filter=general.name==\"Orchard\"`\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventorySearchResultsV3"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Return paginated Computer Inventory records",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "Read Computers"
+        ]
+      },
+      "post": {
+        "description": "Creates Computer Inventory record",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryCreateRequestV2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successful response - Computer Inventory record created"
+          }
+        },
+        "summary": "Create Computer Inventory record",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "Create Computers"
+        ]
+      }
+    },
+    "/v3/computers-inventory-detail/{id}": {
+      "get": {
+        "description": "Return all sections of a computer",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryV3"
+                }
+              }
+            },
+            "description": "Details of computer were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "summary": "Return all sections of a computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "Read Computers"
+        ]
+      },
+      "patch": {
+        "description": "Update specific fields on a computer, then return the updated computer object.",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Details of computer were updated"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "summary": "Update specific fields on a computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "Update Computers"
+        ]
+      }
+    },
+    "/v3/computers-inventory/filevault": {
+      "get": {
+        "description": "Return paginated FileVault information for all computers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryFileVaultSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Return paginated FileVault information for all computers",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "View Disk Encryption Recovery Key"
+        ]
+      }
+    },
+    "/v3/computers-inventory/{id}": {
+      "delete": {
+        "description": "Remove specified Computer record",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Computer record successfully removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object id does not exist."
+          }
+        },
+        "summary": "Remove specified Computer record",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "Delete Computers"
+        ]
+      },
+      "get": {
+        "description": "Return General section of a Computer",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "section of computer details, if not specified, General section data is returned. Multiple section parameters are supported, e.g. section=general\u0026section=hardware",
+            "explode": true,
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "default": [
+                "GENERAL"
+              ],
+              "example": [
+                "GENERAL"
+              ],
+              "items": {
+                "$ref": "#/components/schemas/ComputerSectionV3"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryV3"
+                }
+              }
+            },
+            "description": "Details of computer were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "summary": "Return General section of a Computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "Read Computers"
+        ]
+      }
+    },
+    "/v3/computers-inventory/{id}/attachments": {
+      "post": {
+        "description": "Upload attachment and assign to computer",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successfully uploaded attachment"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "summary": "Upload attachment and assign to computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "Update Computers"
+        ]
+      }
+    },
+    "/v3/computers-inventory/{id}/attachments/{attachmentId}": {
+      "delete": {
+        "description": "Remove attachment",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "instance id of attachment object",
+            "explode": false,
+            "in": "path",
+            "name": "attachmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Attachment successfully removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object or attachment does not exist."
+          }
+        },
+        "summary": "Remove attachment",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "Update Computers"
+        ]
+      },
+      "get": {
+        "description": "Download attachment file",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "instance id of attachment object",
+            "explode": false,
+            "in": "path",
+            "name": "attachmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "description": "Downloaded binary file, Content-Type will be dynamic, based on a file extension",
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Attachment successfully downloaded"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object or attachment does not exist."
+          }
+        },
+        "summary": "Download attachment file",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "Read Computers"
+        ]
+      }
+    },
+    "/v3/computers-inventory/{id}/filevault": {
+      "get": {
+        "description": "Return FileVault information for a specific computer",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryFileVault"
+                }
+              }
+            },
+            "description": "FileVault information for computer was found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "FileVault information for specified computer does not exist"
+          }
+        },
+        "summary": "Return FileVault information for a specific computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "View Disk Encryption Recovery Key"
+        ]
+      }
+    },
+    "/v3/computers-inventory/{id}/view-device-lock-pin": {
+      "get": {
+        "description": "Return a computer's Device Lock PIN",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryDeviceLockPinResponse"
+                }
+              }
+            },
+            "description": "Device Lock PIN"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "summary": "Return a computer's Device Lock PIN",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "View Computer Device Lock Pin"
+        ]
+      }
+    },
+    "/v3/computers-inventory/{id}/view-recovery-lock-password": {
+      "get": {
+        "description": "Return a Computers Recovery Lock Password",
+        "parameters": [
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryRecoveryLockPasswordResponse"
+                }
+              }
+            },
+            "description": "Recovery Lock Password"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "summary": "Return a Computers Recovery Lock Password",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-required-privileges": [
+          "View Recovery Lock"
         ]
       }
     }

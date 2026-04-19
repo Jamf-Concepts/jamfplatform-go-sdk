@@ -59,6 +59,12 @@ type ApiErrorCause struct {
 	ID          *string `json:"id,omitempty"`
 }
 
+// AppPath represents a app path.
+type AppPath struct {
+	ID   string `json:"id"`
+	Path string `json:"path"`
+}
+
 // Assignment represents a assignment.
 type Assignment struct {
 	MobileDeviceID *string `json:"mobileDeviceId,omitempty"`
@@ -116,6 +122,244 @@ type ChangePassword struct {
 	NewPassword string `json:"newPassword"`
 }
 
+// ComputerApplicationCreate represents a computer application create.
+type ComputerApplicationCreate struct {
+	Name    *string `json:"name,omitempty"`
+	Path    *string `json:"path,omitempty"`
+	Version *string `json:"version,omitempty"`
+}
+
+// ComputerApplicationV3 represents a computer application v3.
+type ComputerApplicationV3 struct {
+	BundleID                   string `json:"bundleId"`
+	CfBundleShortVersionString string `json:"cfBundleShortVersionString"`
+	CfBundleVersion            string `json:"cfBundleVersion"`
+	ExternalVersionID          string `json:"externalVersionId"`
+	MacAppStore                bool   `json:"macAppStore"`
+	Name                       string `json:"name"`
+	Path                       string `json:"path"`
+	SizeMegabytes              int    `json:"sizeMegabytes"`
+	UpdateAvailable            bool   `json:"updateAvailable"`
+	Version                    string `json:"version"`
+}
+
+// ComputerAttachment represents a computer attachment.
+type ComputerAttachment struct {
+	FileType  string `json:"fileType"`
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	SizeBytes int64  `json:"sizeBytes"`
+}
+
+// ComputerCertificate represents a computer certificate.
+type ComputerCertificate struct {
+	CertificateStatus string     `json:"certificateStatus"`
+	CommonName        string     `json:"commonName"`
+	ExpirationDate    *time.Time `json:"expirationDate,omitempty"`
+	Identity          bool       `json:"identity"`
+	IssuedDate        string     `json:"issuedDate"`
+	LifecycleStatus   string     `json:"lifecycleStatus"`
+	SerialNumber      string     `json:"serialNumber"`
+	Sha1Fingerprint   string     `json:"sha1Fingerprint"`
+	SubjectName       string     `json:"subjectName"`
+	Username          string     `json:"username"`
+}
+
+// ComputerCertificateCreate represents a computer certificate create.
+type ComputerCertificateCreate struct {
+	CommonName *string `json:"commonName,omitempty"`
+	Identity   *bool   `json:"identity,omitempty"`
+	Username   *string `json:"username,omitempty"`
+}
+
+// ComputerConfigurationProfile represents a computer configuration profile.
+type ComputerConfigurationProfile struct {
+	DisplayName       string     `json:"displayName"`
+	ID                string     `json:"id"`
+	LastInstalled     *time.Time `json:"lastInstalled,omitempty"`
+	ProfileIdentifier string     `json:"profileIdentifier"`
+	Removable         bool       `json:"removable"`
+	Username          string     `json:"username"`
+}
+
+// ComputerConfigurationProfileCreate represents a computer configuration profile create.
+type ComputerConfigurationProfileCreate struct {
+	DisplayName       *string    `json:"displayName,omitempty"`
+	ID                *string    `json:"id,omitempty"`
+	LastInstalled     *time.Time `json:"lastInstalled,omitempty"`
+	ProfileIdentifier *string    `json:"profileIdentifier,omitempty"`
+	Removable         *bool      `json:"removable,omitempty"`
+	Username          *string    `json:"username,omitempty"`
+}
+
+// ComputerContentCaching represents a computer content caching.
+type ComputerContentCaching struct {
+	Activated                           bool                                      `json:"activated"`
+	Active                              bool                                      `json:"active"`
+	ActualCacheBytesUsed                int64                                     `json:"actualCacheBytesUsed"`
+	Alerts                              []ComputerContentCachingAlert             `json:"alerts"`
+	CacheBytesFree                      int64                                     `json:"cacheBytesFree"`
+	CacheBytesLimit                     int64                                     `json:"cacheBytesLimit"`
+	CacheBytesUsed                      int64                                     `json:"cacheBytesUsed"`
+	CacheDetails                        []ComputerContentCachingCacheDetail       `json:"cacheDetails"`
+	CacheStatus                         string                                    `json:"cacheStatus"`
+	ComputerContentCachingInformationID string                                    `json:"computerContentCachingInformationId"`
+	DataMigrationCompleted              bool                                      `json:"dataMigrationCompleted"`
+	DataMigrationError                  *ComputerContentCachingDataMigrationError `json:"dataMigrationError,omitempty"`
+	DataMigrationProgressPercentage     int                                       `json:"dataMigrationProgressPercentage"`
+	MaxCachePressureLast1HourPercentage int                                       `json:"maxCachePressureLast1HourPercentage"`
+	Parents                             []ComputerContentCachingParent            `json:"parents"`
+	PersonalCacheBytesFree              int64                                     `json:"personalCacheBytesFree"`
+	PersonalCacheBytesLimit             int64                                     `json:"personalCacheBytesLimit"`
+	PersonalCacheBytesUsed              int64                                     `json:"personalCacheBytesUsed"`
+	Port                                int64                                     `json:"port"`
+	PublicAddress                       string                                    `json:"publicAddress"`
+	RegistrationError                   string                                    `json:"registrationError"`
+	RegistrationResponseCode            int64                                     `json:"registrationResponseCode"`
+	RegistrationStarted                 *time.Time                                `json:"registrationStarted,omitempty"`
+	RegistrationStatus                  string                                    `json:"registrationStatus"`
+	RestrictedMedia                     bool                                      `json:"restrictedMedia"`
+	ServerGuid                          string                                    `json:"serverGuid"`
+	StartupStatus                       string                                    `json:"startupStatus"`
+	TetheratorStatus                    string                                    `json:"tetheratorStatus"`
+	TotalBytesAreSince                  *time.Time                                `json:"totalBytesAreSince,omitempty"`
+	TotalBytesDropped                   int64                                     `json:"totalBytesDropped"`
+	TotalBytesImported                  int64                                     `json:"totalBytesImported"`
+	TotalBytesReturnedToChildren        int64                                     `json:"totalBytesReturnedToChildren"`
+	TotalBytesReturnedToClients         int64                                     `json:"totalBytesReturnedToClients"`
+	TotalBytesReturnedToPeers           int64                                     `json:"totalBytesReturnedToPeers"`
+	TotalBytesStoredFromOrigin          int64                                     `json:"totalBytesStoredFromOrigin"`
+	TotalBytesStoredFromParents         int64                                     `json:"totalBytesStoredFromParents"`
+	TotalBytesStoredFromPeers           int64                                     `json:"totalBytesStoredFromPeers"`
+}
+
+// ComputerContentCachingAlert represents a computer content caching alert.
+type ComputerContentCachingAlert struct {
+	CacheBytesLimit      int64      `json:"cacheBytesLimit"`
+	ClassName            string     `json:"className"`
+	PathPreventingAccess string     `json:"pathPreventingAccess"`
+	PostDate             *time.Time `json:"postDate,omitempty"`
+	ReservedVolumeBytes  int64      `json:"reservedVolumeBytes"`
+	Resource             string     `json:"resource"`
+}
+
+// ComputerContentCachingCacheDetail represents a computer content caching cache detail.
+type ComputerContentCachingCacheDetail struct {
+	CategoryName                         string `json:"categoryName"`
+	ComputerContentCachingCacheDetailsID string `json:"computerContentCachingCacheDetailsId"`
+	DiskSpaceBytesUsed                   int64  `json:"diskSpaceBytesUsed"`
+}
+
+// ComputerContentCachingDataMigrationError represents a computer content caching data migration error.
+type ComputerContentCachingDataMigrationError struct {
+	Code     int64                                              `json:"code"`
+	Domain   string                                             `json:"domain"`
+	UserInfo []ComputerContentCachingDataMigrationErrorUserInfo `json:"userInfo"`
+}
+
+// ComputerContentCachingDataMigrationErrorUserInfo represents a computer content caching data migration error user info.
+type ComputerContentCachingDataMigrationErrorUserInfo struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+// ComputerContentCachingParent represents a computer content caching parent.
+type ComputerContentCachingParent struct {
+	Address                string                               `json:"address"`
+	Alerts                 *ComputerContentCachingParentAlert   `json:"alerts,omitempty"`
+	ContentCachingParentID string                               `json:"contentCachingParentId"`
+	Details                *ComputerContentCachingParentDetails `json:"details,omitempty"`
+	Guid                   string                               `json:"guid"`
+	Healthy                bool                                 `json:"healthy"`
+	Port                   int64                                `json:"port"`
+	Version                string                               `json:"version"`
+}
+
+// ComputerContentCachingParentAlert represents a computer content caching parent alert.
+type ComputerContentCachingParentAlert struct {
+	Addresses                   []string   `json:"addresses"`
+	ClassName                   string     `json:"className"`
+	ContentCachingParentAlertID string     `json:"contentCachingParentAlertId"`
+	PostDate                    *time.Time `json:"postDate,omitempty"`
+}
+
+// ComputerContentCachingParentCapabilities represents a computer content caching parent capabilities.
+type ComputerContentCachingParentCapabilities struct {
+	ContentCachingParentCapabilitiesID string `json:"contentCachingParentCapabilitiesId"`
+	Imports                            bool   `json:"imports"`
+	Namespaces                         bool   `json:"namespaces"`
+	PersonalContent                    bool   `json:"personalContent"`
+	Prioritization                     bool   `json:"prioritization"`
+	QueryParameters                    bool   `json:"queryParameters"`
+	SharedContent                      bool   `json:"sharedContent"`
+}
+
+// ComputerContentCachingParentDetails represents a computer content caching parent details.
+type ComputerContentCachingParentDetails struct {
+	AcPower                       bool                                       `json:"acPower"`
+	CacheSizeBytes                int64                                      `json:"cacheSizeBytes"`
+	Capabilities                  *ComputerContentCachingParentCapabilities  `json:"capabilities,omitempty"`
+	ContentCachingParentDetailsID string                                     `json:"contentCachingParentDetailsId"`
+	LocalNetwork                  []ComputerContentCachingParentLocalNetwork `json:"localNetwork"`
+	Portable                      bool                                       `json:"portable"`
+}
+
+// ComputerContentCachingParentLocalNetwork represents a computer content caching parent local network.
+type ComputerContentCachingParentLocalNetwork struct {
+	ContentCachingParentLocalNetworkID string `json:"contentCachingParentLocalNetworkId"`
+	Speed                              int64  `json:"speed"`
+	Wired                              bool   `json:"wired"`
+}
+
+// ComputerDisk represents a computer disk.
+type ComputerDisk struct {
+	Device        string              `json:"device"`
+	ID            string              `json:"id"`
+	Model         string              `json:"model"`
+	Partitions    []ComputerPartition `json:"partitions"`
+	Revision      string              `json:"revision"`
+	SerialNumber  string              `json:"serialNumber"`
+	SizeMegabytes int64               `json:"sizeMegabytes"`
+	SmartStatus   string              `json:"smartStatus"`
+	Type          string              `json:"type"`
+}
+
+// ComputerDiskCreate represents a computer disk create.
+type ComputerDiskCreate struct {
+	Device        *string                    `json:"device,omitempty"`
+	Model         *string                    `json:"model,omitempty"`
+	Partitions    *[]ComputerPartitionCreate `json:"partitions,omitempty"`
+	Revision      *string                    `json:"revision,omitempty"`
+	SerialNumber  *string                    `json:"serialNumber,omitempty"`
+	SizeMegabytes *int64                     `json:"sizeMegabytes,omitempty"`
+	SmartStatus   *string                    `json:"smartStatus,omitempty"`
+	Type          *string                    `json:"type,omitempty"`
+}
+
+// ComputerDiskEncryption represents a computer disk encryption.
+type ComputerDiskEncryption struct {
+	BootPartitionEncryptionDetails      *ComputerPartitionEncryption `json:"bootPartitionEncryptionDetails,omitempty"`
+	DiskEncryptionConfigurationName     string                       `json:"diskEncryptionConfigurationName"`
+	FileVault2EligibilityMessage        string                       `json:"fileVault2EligibilityMessage"`
+	FileVault2Enabled                   bool                         `json:"fileVault2Enabled"`
+	FileVault2EnabledUserNames          []string                     `json:"fileVault2EnabledUserNames"`
+	IndividualRecoveryKeyValidityStatus string                       `json:"individualRecoveryKeyValidityStatus"`
+	InstitutionalRecoveryKeyPresent     bool                         `json:"institutionalRecoveryKeyPresent"`
+}
+
+// ComputerExtensionAttribute represents a computer extension attribute.
+type ComputerExtensionAttribute struct {
+	DataType     *string   `json:"dataType,omitempty"`
+	DefinitionID *string   `json:"definitionId,omitempty"`
+	Description  *string   `json:"description,omitempty"`
+	Enabled      *bool     `json:"enabled,omitempty"`
+	InputType    *string   `json:"inputType,omitempty"`
+	MultiValue   *bool     `json:"multiValue,omitempty"`
+	Name         *string   `json:"name,omitempty"`
+	Options      *[]string `json:"options,omitempty"`
+	Values       *[]string `json:"values,omitempty"`
+}
+
 // ComputerExtensionAttributeSearchResults represents a computer extension attribute search results.
 type ComputerExtensionAttributeSearchResults struct {
 	Results    []ComputerExtensionAttributes `json:"results"`
@@ -145,6 +389,79 @@ type ComputerExtensionAttributes struct {
 	ScriptContents                *string  `json:"scriptContents,omitempty"`
 }
 
+// ComputerGeneral represents a computer general.
+type ComputerGeneral struct {
+	AssetTag                                 string                       `json:"assetTag"`
+	Barcode1                                 string                       `json:"barcode1"`
+	Barcode2                                 string                       `json:"barcode2"`
+	DeclarativeDeviceManagementEnabled       bool                         `json:"declarativeDeviceManagementEnabled"`
+	DistributionPoint                        string                       `json:"distributionPoint"`
+	EnrolledViaAutomatedDeviceEnrollment     bool                         `json:"enrolledViaAutomatedDeviceEnrollment"`
+	EnrollmentMethod                         *EnrollmentMethod            `json:"enrollmentMethod,omitempty"`
+	ExtensionAttributes                      []ComputerExtensionAttribute `json:"extensionAttributes"`
+	InitialEntryDate                         string                       `json:"initialEntryDate"`
+	ItunesStoreAccountActive                 bool                         `json:"itunesStoreAccountActive"`
+	JamfBinaryVersion                        string                       `json:"jamfBinaryVersion"`
+	LastCloudBackupDate                      *time.Time                   `json:"lastCloudBackupDate,omitempty"`
+	LastContactTime                          *time.Time                   `json:"lastContactTime,omitempty"`
+	LastEnrolledDate                         *time.Time                   `json:"lastEnrolledDate,omitempty"`
+	LastIPAddress                            string                       `json:"lastIpAddress"`
+	LastLoggedInUsernameBinary               *string                      `json:"lastLoggedInUsernameBinary,omitempty"`
+	LastLoggedInUsernameBinaryTimestamp      *time.Time                   `json:"lastLoggedInUsernameBinaryTimestamp,omitempty"`
+	LastLoggedInUsernameSelfService          *string                      `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp *time.Time                   `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	LastReportedIp                           string                       `json:"lastReportedIp"`
+	LastReportedIPV4                         string                       `json:"lastReportedIpV4"`
+	LastReportedIPV6                         string                       `json:"lastReportedIpV6"`
+	ManagementID                             string                       `json:"managementId"`
+	MDMCapable                               *ComputerMDMCapability       `json:"mdmCapable,omitempty"`
+	MDMProfileExpiration                     *time.Time                   `json:"mdmProfileExpiration,omitempty"`
+	Name                                     string                       `json:"name"`
+	Platform                                 string                       `json:"platform"`
+	RemoteManagement                         *ComputerRemoteManagement    `json:"remoteManagement,omitempty"`
+	ReportDate                               *time.Time                   `json:"reportDate,omitempty"`
+	Site                                     *V1Site                      `json:"site,omitempty"`
+	Supervised                               bool                         `json:"supervised"`
+	UserApprovedMDM                          bool                         `json:"userApprovedMdm"`
+}
+
+// ComputerGeneralCreate represents a computer general create.
+type ComputerGeneralCreate struct {
+	AssetTag                             *string                         `json:"assetTag,omitempty"`
+	Barcode1                             *string                         `json:"barcode1,omitempty"`
+	Barcode2                             *string                         `json:"barcode2,omitempty"`
+	DeclarativeDeviceManagementEnabled   *bool                           `json:"declarativeDeviceManagementEnabled,omitempty"`
+	DistributionPointID                  *string                         `json:"distributionPointId,omitempty"`
+	EnrolledViaAutomatedDeviceEnrollment *bool                           `json:"enrolledViaAutomatedDeviceEnrollment,omitempty"`
+	ItunesStoreAccountActive             *bool                           `json:"itunesStoreAccountActive,omitempty"`
+	JamfBinaryVersion                    *string                         `json:"jamfBinaryVersion,omitempty"`
+	LastCloudBackupDate                  *time.Time                      `json:"lastCloudBackupDate,omitempty"`
+	LastContactTime                      *time.Time                      `json:"lastContactTime,omitempty"`
+	LastEnrolledDate                     *time.Time                      `json:"lastEnrolledDate,omitempty"`
+	LastIPAddress                        *string                         `json:"lastIpAddress,omitempty"`
+	LastReportedIp                       *string                         `json:"lastReportedIp,omitempty"`
+	MDMCapable                           *bool                           `json:"mdmCapable,omitempty"`
+	Name                                 string                          `json:"name"`
+	Platform                             *string                         `json:"platform,omitempty"`
+	RemoteManagement                     *ComputerRemoteManagementCreate `json:"remoteManagement,omitempty"`
+	ReportDate                           *time.Time                      `json:"reportDate,omitempty"`
+	SiteID                               *string                         `json:"siteId,omitempty"`
+	Supervised                           *bool                           `json:"supervised,omitempty"`
+	UserApprovedMDM                      *bool                           `json:"userApprovedMdm,omitempty"`
+}
+
+// ComputerGeneralUpdate represents a computer general update.
+type ComputerGeneralUpdate struct {
+	AssetTag            *string                       `json:"assetTag,omitempty"`
+	Barcode1            *string                       `json:"barcode1,omitempty"`
+	Barcode2            *string                       `json:"barcode2,omitempty"`
+	ExtensionAttributes *[]ComputerExtensionAttribute `json:"extensionAttributes,omitempty"`
+	LastIPAddress       *string                       `json:"lastIpAddress,omitempty"`
+	Managed             *bool                         `json:"managed,omitempty"`
+	Name                *string                       `json:"name,omitempty"`
+	SiteID              *string                       `json:"siteId,omitempty"`
+}
+
 // ComputerGroup represents a computer group.
 type ComputerGroup struct {
 	Description string `json:"description"`
@@ -153,12 +470,500 @@ type ComputerGroup struct {
 	SmartGroup  bool   `json:"smartGroup"`
 }
 
+// ComputerHardware represents a computer hardware.
+type ComputerHardware struct {
+	AltMacAddress          string                       `json:"altMacAddress"`
+	AltNetworkAdapterType  string                       `json:"altNetworkAdapterType"`
+	AppleSilicon           bool                         `json:"appleSilicon"`
+	BatteryCapacityPercent int                          `json:"batteryCapacityPercent"`
+	BatteryHealth          string                       `json:"batteryHealth"`
+	BleCapable             bool                         `json:"bleCapable"`
+	BootRom                string                       `json:"bootRom"`
+	BusSpeedMhz            int64                        `json:"busSpeedMhz"`
+	CacheSizeKilobytes     int64                        `json:"cacheSizeKilobytes"`
+	CoreCount              int                          `json:"coreCount"`
+	ExtensionAttributes    []ComputerExtensionAttribute `json:"extensionAttributes"`
+	MacAddress             string                       `json:"macAddress"`
+	Make                   string                       `json:"make"`
+	Model                  string                       `json:"model"`
+	ModelIdentifier        string                       `json:"modelIdentifier"`
+	NetworkAdapterType     string                       `json:"networkAdapterType"`
+	NicSpeed               string                       `json:"nicSpeed"`
+	OpenRamSlots           int                          `json:"openRamSlots"`
+	OpticalDrive           string                       `json:"opticalDrive"`
+	ProcessorArchitecture  string                       `json:"processorArchitecture"`
+	ProcessorCount         int                          `json:"processorCount"`
+	ProcessorSpeedMhz      int64                        `json:"processorSpeedMhz"`
+	ProcessorType          string                       `json:"processorType"`
+	ProvisioningUDID       string                       `json:"provisioningUdid"`
+	SerialNumber           string                       `json:"serialNumber"`
+	SmcVersion             string                       `json:"smcVersion"`
+	SupportsIosAppInstalls bool                         `json:"supportsIosAppInstalls"`
+	TotalRamMegabytes      int64                        `json:"totalRamMegabytes"`
+}
+
+// ComputerHardwareCreate represents a computer hardware create.
+type ComputerHardwareCreate struct {
+	AltMacAddress          *string `json:"altMacAddress,omitempty"`
+	AltNetworkAdapterType  *string `json:"altNetworkAdapterType,omitempty"`
+	AppleSilicon           *bool   `json:"appleSilicon,omitempty"`
+	BatteryCapacityPercent *int    `json:"batteryCapacityPercent,omitempty"`
+	BatteryHealth          *string `json:"batteryHealth,omitempty"`
+	BleCapable             *bool   `json:"bleCapable,omitempty"`
+	BootRom                *string `json:"bootRom,omitempty"`
+	BusSpeedMhz            *int64  `json:"busSpeedMhz,omitempty"`
+	CacheSizeKilobytes     *int64  `json:"cacheSizeKilobytes,omitempty"`
+	CoreCount              *int    `json:"coreCount,omitempty"`
+	MacAddress             *string `json:"macAddress,omitempty"`
+	Make                   *string `json:"make,omitempty"`
+	Model                  *string `json:"model,omitempty"`
+	ModelIdentifier        *string `json:"modelIdentifier,omitempty"`
+	NetworkAdapterType     *string `json:"networkAdapterType,omitempty"`
+	NicSpeed               *string `json:"nicSpeed,omitempty"`
+	OpenRamSlots           *int    `json:"openRamSlots,omitempty"`
+	OpticalDrive           *string `json:"opticalDrive,omitempty"`
+	ProcessorArchitecture  *string `json:"processorArchitecture,omitempty"`
+	ProcessorCount         *int    `json:"processorCount,omitempty"`
+	ProcessorSpeedMhz      *int64  `json:"processorSpeedMhz,omitempty"`
+	ProcessorType          *string `json:"processorType,omitempty"`
+	SerialNumber           *string `json:"serialNumber,omitempty"`
+	SmcVersion             *string `json:"smcVersion,omitempty"`
+	SupportsIosAppInstalls *bool   `json:"supportsIosAppInstalls,omitempty"`
+	TotalRamMegabytes      *int64  `json:"totalRamMegabytes,omitempty"`
+}
+
+// ComputerHardwareUpdate represents a computer hardware update.
+type ComputerHardwareUpdate struct {
+	AltMacAddress         *string                       `json:"altMacAddress,omitempty"`
+	AltNetworkAdapterType *string                       `json:"altNetworkAdapterType,omitempty"`
+	ExtensionAttributes   *[]ComputerExtensionAttribute `json:"extensionAttributes,omitempty"`
+	MacAddress            *string                       `json:"macAddress,omitempty"`
+	NetworkAdapterType    *string                       `json:"networkAdapterType,omitempty"`
+}
+
+// ComputerIbeacon represents a computer ibeacon.
+type ComputerIbeacon struct {
+	Name string `json:"name"`
+}
+
+// ComputerInventoryCollectionPreferencesV2 represents a computer inventory collection preferences v2.
+type ComputerInventoryCollectionPreferencesV2 struct {
+	AllowChangingUserAndLocation                 *bool `json:"allowChangingUserAndLocation,omitempty"`
+	CalculateSizes                               *bool `json:"calculateSizes,omitempty"`
+	CollectSyncedMobileDeviceInfo                *bool `json:"collectSyncedMobileDeviceInfo,omitempty"`
+	CollectUnmanagedCertificates                 *bool `json:"collectUnmanagedCertificates,omitempty"`
+	IncludeAccounts                              *bool `json:"includeAccounts,omitempty"`
+	IncludeHiddenAccounts                        *bool `json:"includeHiddenAccounts,omitempty"`
+	IncludePackages                              *bool `json:"includePackages,omitempty"`
+	IncludePrinters                              *bool `json:"includePrinters,omitempty"`
+	IncludeServices                              *bool `json:"includeServices,omitempty"`
+	IncludeSoftwareID                            *bool `json:"includeSoftwareId,omitempty"`
+	IncludeSoftwareUpdates                       *bool `json:"includeSoftwareUpdates,omitempty"`
+	MonitorApplicationUsage                      *bool `json:"monitorApplicationUsage,omitempty"`
+	MonitorBeacons                               *bool `json:"monitorBeacons,omitempty"`
+	UpdateLdapInfoOnComputerInventorySubmissions *bool `json:"updateLdapInfoOnComputerInventorySubmissions,omitempty"`
+	UseUnixUserPaths                             *bool `json:"useUnixUserPaths,omitempty"`
+}
+
+// ComputerInventoryCollectionSettingsV2 represents a computer inventory collection settings v2.
+type ComputerInventoryCollectionSettingsV2 struct {
+	ApplicationPaths                       *[]AppPath                                `json:"applicationPaths,omitempty"`
+	ComputerInventoryCollectionPreferences *ComputerInventoryCollectionPreferencesV2 `json:"computerInventoryCollectionPreferences,omitempty"`
+}
+
+// ComputerInventoryCreateRequestV2 represents a computer inventory create request v2.
+type ComputerInventoryCreateRequestV2 struct {
+	Applications          *[]ComputerApplicationCreate          `json:"applications,omitempty"`
+	Certificates          *[]ComputerCertificateCreate          `json:"certificates,omitempty"`
+	ConfigurationProfiles *[]ComputerConfigurationProfileCreate `json:"configurationProfiles,omitempty"`
+	General               *ComputerGeneralCreate                `json:"general,omitempty"`
+	Hardware              *ComputerHardwareCreate               `json:"hardware,omitempty"`
+	LocalUserAccounts     *[]ComputerLocalUserAccountCreate     `json:"localUserAccounts,omitempty"`
+	OperatingSystem       *ComputerOperatingSystemCreate        `json:"operatingSystem,omitempty"`
+	PackageReceipts       *ComputerPackageReceiptsCreate        `json:"packageReceipts,omitempty"`
+	Printers              *[]ComputerPrinterCreate              `json:"printers,omitempty"`
+	Purchasing            *ComputerPurchaseCreate               `json:"purchasing,omitempty"`
+	Security              *ComputerSecurityCreate               `json:"security,omitempty"`
+	Services              *[]ComputerServiceCreate              `json:"services,omitempty"`
+	SoftwareUpdates       *[]ComputerSoftwareUpdateCreate       `json:"softwareUpdates,omitempty"`
+	Storage               *ComputerStorageCreate                `json:"storage,omitempty"`
+	UDID                  *string                               `json:"udid,omitempty"`
+	UserAndLocation       *ComputerUserAndLocationCreate        `json:"userAndLocation,omitempty"`
+}
+
+// ComputerInventoryDeviceLockPinResponse represents a computer inventory device lock pin response.
+type ComputerInventoryDeviceLockPinResponse struct {
+	Pin string `json:"pin"`
+}
+
+// ComputerInventoryFileVault represents a computer inventory file vault.
+type ComputerInventoryFileVault struct {
+	BootPartitionEncryptionDetails      *ComputerPartitionEncryption `json:"bootPartitionEncryptionDetails,omitempty"`
+	ComputerID                          string                       `json:"computerId"`
+	DiskEncryptionConfigurationName     string                       `json:"diskEncryptionConfigurationName"`
+	IndividualRecoveryKeyValidityStatus string                       `json:"individualRecoveryKeyValidityStatus"`
+	InstitutionalRecoveryKeyPresent     bool                         `json:"institutionalRecoveryKeyPresent"`
+	Name                                string                       `json:"name"`
+	PersonalRecoveryKey                 string                       `json:"personalRecoveryKey"`
+}
+
+// ComputerInventoryFileVaultSearchResults represents a computer inventory file vault search results.
+type ComputerInventoryFileVaultSearchResults struct {
+	Results    []ComputerInventoryFileVault `json:"results"`
+	TotalCount int                          `json:"totalCount"`
+}
+
+// ComputerInventoryRecoveryLockPasswordResponse represents a computer inventory recovery lock password response.
+type ComputerInventoryRecoveryLockPasswordResponse struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	RecoveryLockPassword string `json:"recoveryLockPassword"`
+}
+
+// ComputerInventorySearchResultsV3 represents a computer inventory search results v3.
+type ComputerInventorySearchResultsV3 struct {
+	Results    []ComputerInventoryV3 `json:"results"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+// ComputerInventoryUpdateRequest represents a computer inventory update request.
+type ComputerInventoryUpdateRequest struct {
+	ExtensionAttributes *[]ComputerExtensionAttribute  `json:"extensionAttributes,omitempty"`
+	General             *ComputerGeneralUpdate         `json:"general,omitempty"`
+	Hardware            *ComputerHardwareUpdate        `json:"hardware,omitempty"`
+	OperatingSystem     *ComputerOperatingSystemUpdate `json:"operatingSystem,omitempty"`
+	Purchasing          *ComputerPurchase              `json:"purchasing,omitempty"`
+	UDID                *string                        `json:"udid,omitempty"`
+	UserAndLocation     *ComputerUserAndLocation       `json:"userAndLocation,omitempty"`
+}
+
+// ComputerInventoryV3 represents a computer inventory v3.
+type ComputerInventoryV3 struct {
+	Applications          []ComputerApplicationV3        `json:"applications"`
+	Attachments           []ComputerAttachment           `json:"attachments"`
+	Certificates          []ComputerCertificate          `json:"certificates"`
+	ConfigurationProfiles []ComputerConfigurationProfile `json:"configurationProfiles"`
+	ContentCaching        *ComputerContentCaching        `json:"contentCaching,omitempty"`
+	DiskEncryption        *ComputerDiskEncryption        `json:"diskEncryption,omitempty"`
+	ExtensionAttributes   []ComputerExtensionAttribute   `json:"extensionAttributes"`
+	General               *ComputerGeneral               `json:"general,omitempty"`
+	GroupMemberships      []GroupMembership              `json:"groupMemberships"`
+	Hardware              *ComputerHardware              `json:"hardware,omitempty"`
+	Ibeacons              []ComputerIbeacon              `json:"ibeacons"`
+	ID                    string                         `json:"id"`
+	LicensedSoftware      []ComputerLicensedSoftware     `json:"licensedSoftware"`
+	LocalUserAccounts     []ComputerLocalUserAccount     `json:"localUserAccounts"`
+	OperatingSystem       *ComputerOperatingSystem       `json:"operatingSystem,omitempty"`
+	PackageReceipts       *ComputerPackageReceipts       `json:"packageReceipts,omitempty"`
+	Printers              []ComputerPrinter              `json:"printers"`
+	Purchasing            *ComputerPurchase              `json:"purchasing,omitempty"`
+	Security              *ComputerSecurity              `json:"security,omitempty"`
+	Services              []ComputerService              `json:"services"`
+	SoftwareUpdates       []ComputerSoftwareUpdate       `json:"softwareUpdates"`
+	Storage               *ComputerStorage               `json:"storage,omitempty"`
+	UDID                  string                         `json:"udid"`
+	UserAndLocation       *ComputerUserAndLocation       `json:"userAndLocation,omitempty"`
+}
+
+// ComputerLicensedSoftware represents a computer licensed software.
+type ComputerLicensedSoftware struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// ComputerLocalUserAccount represents a computer local user account.
+type ComputerLocalUserAccount struct {
+	Admin                          bool   `json:"admin"`
+	AzureActiveDirectoryID         string `json:"azureActiveDirectoryId"`
+	ComputerAzureActiveDirectoryID string `json:"computerAzureActiveDirectoryId"`
+	FileVault2Enabled              bool   `json:"fileVault2Enabled"`
+	FullName                       string `json:"fullName"`
+	HomeDirectory                  string `json:"homeDirectory"`
+	HomeDirectorySizeMb            int64  `json:"homeDirectorySizeMb"`
+	PasswordHistoryDepth           int    `json:"passwordHistoryDepth"`
+	PasswordMaxAge                 int    `json:"passwordMaxAge"`
+	PasswordMinComplexCharacters   int    `json:"passwordMinComplexCharacters"`
+	PasswordMinLength              int    `json:"passwordMinLength"`
+	PasswordRequireAlphanumeric    bool   `json:"passwordRequireAlphanumeric"`
+	Uid                            string `json:"uid"`
+	UserAccountType                string `json:"userAccountType"`
+	UserAzureActiveDirectoryID     string `json:"userAzureActiveDirectoryId"`
+	UserGuid                       string `json:"userGuid"`
+	Username                       string `json:"username"`
+}
+
+// ComputerLocalUserAccountCreate represents a computer local user account create.
+type ComputerLocalUserAccountCreate struct {
+	Admin                          *bool   `json:"admin,omitempty"`
+	ComputerAzureActiveDirectoryID *string `json:"computerAzureActiveDirectoryId,omitempty"`
+	FileVault2Enabled              *bool   `json:"fileVault2Enabled,omitempty"`
+	FullName                       *string `json:"fullName,omitempty"`
+	HomeDirectory                  *string `json:"homeDirectory,omitempty"`
+	HomeDirectorySizeMb            *int64  `json:"homeDirectorySizeMb,omitempty"`
+	PasswordHistoryDepth           *int    `json:"passwordHistoryDepth,omitempty"`
+	PasswordMaxAge                 *int    `json:"passwordMaxAge,omitempty"`
+	PasswordMinComplexCharacters   *int    `json:"passwordMinComplexCharacters,omitempty"`
+	PasswordMinLength              *int    `json:"passwordMinLength,omitempty"`
+	PasswordRequireAlphanumeric    *bool   `json:"passwordRequireAlphanumeric,omitempty"`
+	Uid                            *string `json:"uid,omitempty"`
+	UserAccountType                *string `json:"userAccountType,omitempty"`
+	UserAzureActiveDirectoryID     *string `json:"userAzureActiveDirectoryId,omitempty"`
+	UserGuid                       *string `json:"userGuid,omitempty"`
+	Username                       *string `json:"username,omitempty"`
+}
+
+// ComputerMDMCapability represents a computer m d m capability.
+type ComputerMDMCapability struct {
+	Capable            bool                         `json:"capable"`
+	CapableUsers       []string                     `json:"capableUsers"`
+	UserManagementInfo []ComputerUserManagementInfo `json:"userManagementInfo"`
+}
+
+// ComputerOperatingSystem represents a computer operating system.
+type ComputerOperatingSystem struct {
+	ActiveDirectoryStatus    string                       `json:"activeDirectoryStatus"`
+	Build                    string                       `json:"build"`
+	ExtensionAttributes      []ComputerExtensionAttribute `json:"extensionAttributes"`
+	FileVault2Status         string                       `json:"fileVault2Status"`
+	Name                     string                       `json:"name"`
+	RapidSecurityResponse    string                       `json:"rapidSecurityResponse"`
+	SoftwareUpdateDeviceID   string                       `json:"softwareUpdateDeviceId"`
+	SupplementalBuildVersion string                       `json:"supplementalBuildVersion"`
+	Version                  string                       `json:"version"`
+}
+
+// ComputerOperatingSystemCreate represents a computer operating system create.
+type ComputerOperatingSystemCreate struct {
+	ActiveDirectoryStatus    *string `json:"activeDirectoryStatus,omitempty"`
+	Build                    *string `json:"build,omitempty"`
+	Name                     *string `json:"name,omitempty"`
+	RapidSecurityResponse    *string `json:"rapidSecurityResponse,omitempty"`
+	SoftwareUpdateDeviceID   *string `json:"softwareUpdateDeviceId,omitempty"`
+	SupplementalBuildVersion *string `json:"supplementalBuildVersion,omitempty"`
+	Version                  *string `json:"version,omitempty"`
+}
+
+// ComputerOperatingSystemUpdate represents a computer operating system update.
+type ComputerOperatingSystemUpdate struct {
+	ExtensionAttributes *[]ComputerExtensionAttribute `json:"extensionAttributes,omitempty"`
+}
+
+// ComputerPackageReceipts All package receipts are listed by their package name.
+type ComputerPackageReceipts struct {
+	Cached                  []string `json:"cached"`
+	InstalledByInstallerSwu []string `json:"installedByInstallerSwu"`
+	InstalledByJamfPro      []string `json:"installedByJamfPro"`
+}
+
+// ComputerPackageReceiptsCreate All package receipts are listed by their package name.
+type ComputerPackageReceiptsCreate struct {
+	Cached                  *[]string `json:"cached,omitempty"`
+	InstalledByInstallerSwu *[]string `json:"installedByInstallerSwu,omitempty"`
+	InstalledByJamfPro      *[]string `json:"installedByJamfPro,omitempty"`
+}
+
+// ComputerPartition represents a computer partition.
+type ComputerPartition struct {
+	AvailableMegabytes        int64                             `json:"availableMegabytes"`
+	FileVault2ProgressPercent *int                              `json:"fileVault2ProgressPercent,omitempty"`
+	FileVault2State           *ComputerPartitionFileVault2State `json:"fileVault2State,omitempty"`
+	LvmManaged                bool                              `json:"lvmManaged"`
+	Name                      string                            `json:"name"`
+	PartitionType             string                            `json:"partitionType"`
+	PercentUsed               int                               `json:"percentUsed"`
+	SizeMegabytes             int64                             `json:"sizeMegabytes"`
+}
+
+// ComputerPartitionCreate represents a computer partition create.
+type ComputerPartitionCreate struct {
+	AvailableMegabytes        *int64                            `json:"availableMegabytes,omitempty"`
+	FileVault2ProgressPercent *int                              `json:"fileVault2ProgressPercent,omitempty"`
+	FileVault2State           *ComputerPartitionFileVault2State `json:"fileVault2State,omitempty"`
+	LvmManaged                *bool                             `json:"lvmManaged,omitempty"`
+	Name                      *string                           `json:"name,omitempty"`
+	PartitionType             *string                           `json:"partitionType,omitempty"`
+	PercentUsed               *int                              `json:"percentUsed,omitempty"`
+	SizeMegabytes             *int64                            `json:"sizeMegabytes,omitempty"`
+}
+
+// ComputerPartitionEncryption represents a computer partition encryption.
+type ComputerPartitionEncryption struct {
+	PartitionFileVault2Percent int                               `json:"partitionFileVault2Percent"`
+	PartitionFileVault2State   *ComputerPartitionFileVault2State `json:"partitionFileVault2State,omitempty"`
+	PartitionName              string                            `json:"partitionName"`
+}
+
+// ComputerPartitionFileVault2State represents a computer partition file vault2 state value.
+type ComputerPartitionFileVault2State = string
+
+// ComputerPrinter represents a computer printer.
+type ComputerPrinter struct {
+	Location string `json:"location"`
+	Name     string `json:"name"`
+	Type     string `json:"type"`
+	URI      string `json:"uri"`
+}
+
+// ComputerPrinterCreate represents a computer printer create.
+type ComputerPrinterCreate struct {
+	Location *string `json:"location,omitempty"`
+	Name     *string `json:"name,omitempty"`
+	Type     *string `json:"type,omitempty"`
+	URI      *string `json:"uri,omitempty"`
+}
+
+// ComputerPurchase represents a computer purchase.
+type ComputerPurchase struct {
+	AppleCareID         *string                       `json:"appleCareId,omitempty"`
+	ExtensionAttributes *[]ComputerExtensionAttribute `json:"extensionAttributes,omitempty"`
+	LeaseDate           *string                       `json:"leaseDate,omitempty"`
+	Leased              *bool                         `json:"leased,omitempty"`
+	LifeExpectancy      *int                          `json:"lifeExpectancy,omitempty"`
+	PoDate              *string                       `json:"poDate,omitempty"`
+	PoNumber            *string                       `json:"poNumber,omitempty"`
+	PurchasePrice       *string                       `json:"purchasePrice,omitempty"`
+	Purchased           *bool                         `json:"purchased,omitempty"`
+	PurchasingAccount   *string                       `json:"purchasingAccount,omitempty"`
+	PurchasingContact   *string                       `json:"purchasingContact,omitempty"`
+	Vendor              *string                       `json:"vendor,omitempty"`
+	WarrantyDate        *string                       `json:"warrantyDate,omitempty"`
+}
+
+// ComputerPurchaseCreate represents a computer purchase create.
+type ComputerPurchaseCreate struct {
+	AppleCareID       *string `json:"appleCareId,omitempty"`
+	LeaseDate         *string `json:"leaseDate,omitempty"`
+	Leased            *bool   `json:"leased,omitempty"`
+	LifeExpectancy    *int    `json:"lifeExpectancy,omitempty"`
+	PoDate            *string `json:"poDate,omitempty"`
+	PoNumber          *string `json:"poNumber,omitempty"`
+	PurchasePrice     *string `json:"purchasePrice,omitempty"`
+	Purchased         *bool   `json:"purchased,omitempty"`
+	PurchasingAccount *string `json:"purchasingAccount,omitempty"`
+	PurchasingContact *string `json:"purchasingContact,omitempty"`
+	Vendor            *string `json:"vendor,omitempty"`
+	WarrantyDate      *string `json:"warrantyDate,omitempty"`
+}
+
+// ComputerRemoteManagement represents a computer remote management.
+type ComputerRemoteManagement struct {
+	Managed            bool   `json:"managed"`
+	ManagementUsername string `json:"managementUsername"`
+}
+
+// ComputerRemoteManagementCreate represents a computer remote management create.
+type ComputerRemoteManagementCreate struct {
+	Managed *bool `json:"managed,omitempty"`
+}
+
+// ComputerSecurity represents a computer security.
+type ComputerSecurity struct {
+	ActivationLockEnabled        bool   `json:"activationLockEnabled"`
+	AttestationStatus            string `json:"attestationStatus"`
+	AutoLoginDisabled            bool   `json:"autoLoginDisabled"`
+	BootstrapTokenAllowed        bool   `json:"bootstrapTokenAllowed"`
+	BootstrapTokenEscrowedStatus string `json:"bootstrapTokenEscrowedStatus"`
+	ExternalBootLevel            string `json:"externalBootLevel"`
+	FirewallEnabled              bool   `json:"firewallEnabled"`
+	GatekeeperStatus             string `json:"gatekeeperStatus"`
+	LastAttestationAttempt       string `json:"lastAttestationAttempt"`
+	LastSuccessfulAttestation    string `json:"lastSuccessfulAttestation"`
+	RecoveryLockEnabled          bool   `json:"recoveryLockEnabled"`
+	RemoteDesktopEnabled         bool   `json:"remoteDesktopEnabled"`
+	SecureBootLevel              string `json:"secureBootLevel"`
+	SipStatus                    string `json:"sipStatus"`
+	XprotectVersion              string `json:"xprotectVersion"`
+}
+
+// ComputerSecurityCreate represents a computer security create.
+type ComputerSecurityCreate struct {
+	ActivationLockEnabled *bool   `json:"activationLockEnabled,omitempty"`
+	ExternalBootLevel     *string `json:"externalBootLevel,omitempty"`
+	FirewallEnabled       *bool   `json:"firewallEnabled,omitempty"`
+	GatekeeperStatus      *string `json:"gatekeeperStatus,omitempty"`
+	RecoveryLockEnabled   *bool   `json:"recoveryLockEnabled,omitempty"`
+	SecureBootLevel       *string `json:"secureBootLevel,omitempty"`
+	SipStatus             *string `json:"sipStatus,omitempty"`
+	XprotectVersion       *string `json:"xprotectVersion,omitempty"`
+}
+
+// ComputerService represents a computer service.
+type ComputerService struct {
+	Name string `json:"name"`
+}
+
+// ComputerServiceCreate represents a computer service create.
+type ComputerServiceCreate struct {
+	Name *string `json:"name,omitempty"`
+}
+
+// ComputerSoftwareUpdate represents a computer software update.
+type ComputerSoftwareUpdate struct {
+	Name        string `json:"name"`
+	PackageName string `json:"packageName"`
+	Version     string `json:"version"`
+}
+
+// ComputerSoftwareUpdateCreate represents a computer software update create.
+type ComputerSoftwareUpdateCreate struct {
+	Name        *string `json:"name,omitempty"`
+	PackageName *string `json:"packageName,omitempty"`
+	Version     *string `json:"version,omitempty"`
+}
+
+// ComputerStorage represents a computer storage.
+type ComputerStorage struct {
+	BootDriveAvailableSpaceMegabytes int64          `json:"bootDriveAvailableSpaceMegabytes"`
+	Disks                            []ComputerDisk `json:"disks"`
+}
+
+// ComputerStorageCreate represents a computer storage create.
+type ComputerStorageCreate struct {
+	Disks *[]ComputerDiskCreate `json:"disks,omitempty"`
+}
+
+// ComputerUserAndLocation represents a computer user and location.
+type ComputerUserAndLocation struct {
+	BuildingID          *string                       `json:"buildingId,omitempty"`
+	DepartmentID        *string                       `json:"departmentId,omitempty"`
+	Email               *string                       `json:"email,omitempty"`
+	ExtensionAttributes *[]ComputerExtensionAttribute `json:"extensionAttributes,omitempty"`
+	Phone               *string                       `json:"phone,omitempty"`
+	Position            *string                       `json:"position,omitempty"`
+	Realname            *string                       `json:"realname,omitempty"`
+	Room                *string                       `json:"room,omitempty"`
+	Username            *string                       `json:"username,omitempty"`
+}
+
+// ComputerUserAndLocationCreate represents a computer user and location create.
+type ComputerUserAndLocationCreate struct {
+	BuildingID   *string `json:"buildingId,omitempty"`
+	DepartmentID *string `json:"departmentId,omitempty"`
+	Email        *string `json:"email,omitempty"`
+	Phone        *string `json:"phone,omitempty"`
+	Position     *string `json:"position,omitempty"`
+	Realname     *string `json:"realname,omitempty"`
+	Room         *string `json:"room,omitempty"`
+	Username     *string `json:"username,omitempty"`
+}
+
+// ComputerUserManagementInfo represents a computer user management info.
+type ComputerUserManagementInfo struct {
+	CapableUser  string `json:"capableUser"`
+	ManagementID string `json:"managementId"`
+}
+
 // ConfigurationProfile represents a configuration profile.
 type ConfigurationProfile struct {
 	DisplayName string `json:"displayName"`
 	Identifier  string `json:"identifier"`
 	UUID        string `json:"uuid"`
 	Version     string `json:"version"`
+}
+
+// CreatePathV2 represents a create path v2.
+type CreatePathV2 struct {
+	Path  string `json:"path"`
+	Scope string `json:"scope"`
 }
 
 // Department represents a department.
@@ -223,10 +1028,28 @@ type DetailsV2 struct {
 	UnlockToken                 string                             `json:"unlockToken"`
 }
 
+// EnrollmentMethod represents a enrollment method.
+type EnrollmentMethod struct {
+	ID         string `json:"id"`
+	ObjectName string `json:"objectName"`
+	ObjectType string `json:"objectType"`
+}
+
 // EnrollmentMethodPrestage represents a enrollment method prestage.
 type EnrollmentMethodPrestage struct {
 	MobileDevicePrestageID string `json:"mobileDevicePrestageId"`
 	ProfileName            string `json:"profileName"`
+}
+
+// EraseDeviceComputerRequest represents a erase device computer request.
+type EraseDeviceComputerRequest struct {
+	Pin *string `json:"pin,omitempty"`
+}
+
+// EraseDeviceComputerResponse represents a erase device computer response.
+type EraseDeviceComputerResponse struct {
+	CommandUUID string `json:"commandUuid"`
+	DeviceID    string `json:"deviceId"`
 }
 
 // EraseDeviceMobileDeviceRequest represents a erase device mobile device request.
@@ -292,6 +1115,14 @@ type GroupDtoV1 struct {
 	Smart            bool   `json:"smart"`
 }
 
+// GroupMembership represents a group membership.
+type GroupMembership struct {
+	GroupDescription string `json:"groupDescription"`
+	GroupID          string `json:"groupId"`
+	GroupName        string `json:"groupName"`
+	SmartGroup       bool   `json:"smartGroup"`
+}
+
 // GroupResetRequest represents a group reset request.
 type GroupResetRequest struct {
 	ClearActivationLock    *bool `json:"clearActivationLock,omitempty"`
@@ -353,6 +1184,14 @@ type IDAndNameV2 struct {
 // Ids represents a ids.
 type Ids struct {
 	IDs *[]string `json:"ids,omitempty"`
+}
+
+// InventoryInformation Jamf Pro Inventory statistics object. Aggregates managed/unmanaged devices and computers counters.
+type InventoryInformation struct {
+	ManagedComputers   int `json:"managedComputers"`
+	ManagedDevices     int `json:"managedDevices"`
+	UnmanagedComputers int `json:"unmanagedComputers"`
+	UnmanagedDevices   int `json:"unmanagedDevices"`
 }
 
 // InventoryListMobileDevice represents a inventory list mobile device.
@@ -470,6 +1309,83 @@ type InventoryListMobileDevice struct {
 type InventoryListMobileDeviceSearchResults struct {
 	Results    []InventoryListMobileDevice `json:"results"`
 	TotalCount int                         `json:"totalCount"`
+}
+
+// InventoryPreloadCsvValidationError represents a inventory preload csv validation error.
+type InventoryPreloadCsvValidationError struct {
+	Errors     []InventoryPreloadCsvValidationErrorCause `json:"errors"`
+	HttpStatus int                                       `json:"httpStatus"`
+}
+
+// InventoryPreloadCsvValidationErrorCause represents a inventory preload csv validation error cause.
+type InventoryPreloadCsvValidationErrorCause struct {
+	Code         string  `json:"code"`
+	Description  string  `json:"description"`
+	DeviceType   string  `json:"deviceType"`
+	Field        string  `json:"field"`
+	FieldSize    int     `json:"fieldSize"`
+	ID           *string `json:"id,omitempty"`
+	Line         int     `json:"line"`
+	SerialNumber string  `json:"serialNumber"`
+	Value        string  `json:"value"`
+}
+
+// InventoryPreloadCsvValidationSuccess represents a inventory preload csv validation success.
+type InventoryPreloadCsvValidationSuccess struct {
+	RecordCount int `json:"recordCount"`
+}
+
+// InventoryPreloadExtensionAttribute represents a inventory preload extension attribute.
+type InventoryPreloadExtensionAttribute struct {
+	Name  string  `json:"name"`
+	Value *string `json:"value,omitempty"`
+}
+
+// InventoryPreloadExtensionAttributeColumn represents a inventory preload extension attribute column.
+type InventoryPreloadExtensionAttributeColumn struct {
+	FullName string `json:"fullName"`
+	Name     string `json:"name"`
+}
+
+// InventoryPreloadExtensionAttributeColumnResult represents a inventory preload extension attribute column result.
+type InventoryPreloadExtensionAttributeColumnResult struct {
+	Results    []InventoryPreloadExtensionAttributeColumn `json:"results"`
+	TotalCount int                                        `json:"totalCount"`
+}
+
+// InventoryPreloadRecordSearchResultsV2 represents a inventory preload record search results v2.
+type InventoryPreloadRecordSearchResultsV2 struct {
+	Results    []InventoryPreloadRecordV2 `json:"results"`
+	TotalCount int                        `json:"totalCount"`
+}
+
+// InventoryPreloadRecordV2 represents a inventory preload record v2.
+type InventoryPreloadRecordV2 struct {
+	AppleCareID         *string                               `json:"appleCareId,omitempty"`
+	AssetTag            *string                               `json:"assetTag,omitempty"`
+	BarCode1            *string                               `json:"barCode1,omitempty"`
+	BarCode2            *string                               `json:"barCode2,omitempty"`
+	Building            *string                               `json:"building,omitempty"`
+	Department          *string                               `json:"department,omitempty"`
+	DeviceType          string                                `json:"deviceType"`
+	EmailAddress        *string                               `json:"emailAddress,omitempty"`
+	ExtensionAttributes *[]InventoryPreloadExtensionAttribute `json:"extensionAttributes,omitempty"`
+	FullName            *string                               `json:"fullName,omitempty"`
+	ID                  *string                               `json:"id,omitempty"`
+	LeaseExpiration     *string                               `json:"leaseExpiration,omitempty"`
+	LifeExpectancy      *string                               `json:"lifeExpectancy,omitempty"`
+	PhoneNumber         *string                               `json:"phoneNumber,omitempty"`
+	PoDate              *string                               `json:"poDate,omitempty"`
+	PoNumber            *string                               `json:"poNumber,omitempty"`
+	Position            *string                               `json:"position,omitempty"`
+	PurchasePrice       *string                               `json:"purchasePrice,omitempty"`
+	PurchasingAccount   *string                               `json:"purchasingAccount,omitempty"`
+	PurchasingContact   *string                               `json:"purchasingContact,omitempty"`
+	Room                *string                               `json:"room,omitempty"`
+	SerialNumber        string                                `json:"serialNumber"`
+	Username            *string                               `json:"username,omitempty"`
+	Vendor              *string                               `json:"vendor,omitempty"`
+	WarrantyExpiration  *string                               `json:"warrantyExpiration,omitempty"`
 }
 
 // LocationV2 represents a location v2.
@@ -1469,6 +2385,12 @@ type PurchasingV2 struct {
 	PurchasingContact   *string    `json:"purchasingContact,omitempty"`
 	Vendor              *string    `json:"vendor,omitempty"`
 	WarrantyExpiresDate *time.Time `json:"warrantyExpiresDate,omitempty"`
+}
+
+// RemoveComputerMDMProfileResponse represents a remove computer m d m profile response.
+type RemoveComputerMDMProfileResponse struct {
+	CommandUUID string `json:"commandUuid"`
+	DeviceID    string `json:"deviceId"`
 }
 
 // Script represents a script.

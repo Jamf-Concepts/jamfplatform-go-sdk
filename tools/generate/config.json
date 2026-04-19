@@ -286,7 +286,45 @@
         {"op": "POST /v2/patch-software-title-configurations/{id}/history", "name": "CreatePatchSoftwareTitleHistoryNoteV2"},
         {"op": "GET /v2/patch-software-title-configurations/{id}/patch-report", "name": "ListPatchSoftwareTitlePatchReportV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "GET /v2/patch-software-title-configurations/{id}/patch-summary", "name": "GetPatchSoftwareTitlePatchSummaryV2"},
-        {"op": "GET /v2/patch-software-title-configurations/{id}/patch-summary/versions", "name": "ListPatchSoftwareTitlePatchSummaryVersionsV2"}
+        {"op": "GET /v2/patch-software-title-configurations/{id}/patch-summary/versions", "name": "ListPatchSoftwareTitlePatchSummaryVersionsV2"},
+
+        {"op": "POST /v1/computer-inventory/{id}/erase", "name": "EraseComputerV1"},
+        {"op": "POST /v1/computer-inventory/{id}/remove-mdm-profile", "name": "RemoveMdmProfileFromComputerV1"},
+        {"op": "GET /v3/computers-inventory", "name": "ListComputersInventoryV3", "pagination": "totalCount", "params": ["section:[]string", "sort:[]string", "filter"]},
+        {"op": "POST /v3/computers-inventory", "name": "CreateComputerInventoryV3"},
+        {"op": "GET /v3/computers-inventory/filevault", "name": "ListComputerInventoryFileVaultsV3", "pagination": "totalCount"},
+        {"op": "GET /v3/computers-inventory/{id}", "name": "GetComputerInventoryV3", "params": ["section:[]string"]},
+        {"op": "DELETE /v3/computers-inventory/{id}", "name": "DeleteComputerInventoryV3", "expectedStatus": 204},
+        {"op": "GET /v3/computers-inventory-detail/{id}", "name": "GetComputerInventoryDetailV3"},
+        {"op": "PATCH /v3/computers-inventory-detail/{id}", "name": "UpdateComputerInventoryDetailV3"},
+        {"op": "POST /v3/computers-inventory/{id}/attachments", "name": "UploadComputerInventoryAttachmentV3"},
+        {"op": "GET /v3/computers-inventory/{id}/attachments/{attachmentId}", "name": "DownloadComputerInventoryAttachmentV3"},
+        {"op": "DELETE /v3/computers-inventory/{id}/attachments/{attachmentId}", "name": "DeleteComputerInventoryAttachmentV3", "expectedStatus": 204},
+        {"op": "GET /v3/computers-inventory/{id}/filevault", "name": "GetComputerInventoryFileVaultV3"},
+        {"op": "GET /v3/computers-inventory/{id}/view-device-lock-pin", "name": "GetComputerDeviceLockPinV3"},
+        {"op": "GET /v3/computers-inventory/{id}/view-recovery-lock-password", "name": "GetComputerRecoveryLockPasswordV3"},
+
+        {"op": "GET /v2/computer-inventory-collection-settings", "name": "GetComputerInventoryCollectionSettingsV2"},
+        {"op": "PATCH /v2/computer-inventory-collection-settings", "name": "UpdateComputerInventoryCollectionSettingsV2"},
+        {"op": "POST /v2/computer-inventory-collection-settings/custom-path", "name": "CreateComputerInventoryCollectionCustomPathV2"},
+        {"op": "DELETE /v2/computer-inventory-collection-settings/custom-path/{id}", "name": "DeleteComputerInventoryCollectionCustomPathV2", "expectedStatus": 204},
+
+        {"op": "GET /v2/inventory-preload/csv", "name": "DownloadInventoryPreloadCsvV2"},
+        {"op": "POST /v2/inventory-preload/csv", "name": "UploadInventoryPreloadCsvV2"},
+        {"op": "GET /v2/inventory-preload/csv-template", "name": "DownloadInventoryPreloadCsvTemplateV2"},
+        {"op": "POST /v2/inventory-preload/csv-validate", "name": "ValidateInventoryPreloadCsvV2"},
+        {"op": "GET /v2/inventory-preload/ea-columns", "name": "ListInventoryPreloadExtensionAttributeColumnsV2"},
+        {"op": "POST /v2/inventory-preload/export", "name": "ExportInventoryPreloadV2", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]},
+        {"op": "GET /v2/inventory-preload/history", "name": "ListInventoryPreloadHistoryV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v2/inventory-preload/history", "name": "CreateInventoryPreloadHistoryNoteV2"},
+        {"op": "GET /v2/inventory-preload/records", "name": "ListInventoryPreloadRecordsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v2/inventory-preload/records", "name": "CreateInventoryPreloadRecordV2"},
+        {"op": "POST /v2/inventory-preload/records/delete-all", "name": "DeleteAllInventoryPreloadRecordsV2"},
+        {"op": "GET /v2/inventory-preload/records/{id}", "name": "GetInventoryPreloadRecordV2"},
+        {"op": "PUT /v2/inventory-preload/records/{id}", "name": "UpdateInventoryPreloadRecordV2"},
+        {"op": "DELETE /v2/inventory-preload/records/{id}", "name": "DeleteInventoryPreloadRecordV2", "expectedStatus": 204},
+
+        {"op": "GET /v1/inventory-information", "name": "GetInventoryInformationV1"}
       ]
     },
     {
