@@ -1077,6 +1077,78 @@
         ],
         "type": "object"
       },
+      "AppRequestFormInputField": {
+        "properties": {
+          "description": {
+            "example": "How many of these would you like?",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "priority": {
+            "description": "Highest priority is 1, lowest is 255",
+            "example": 1,
+            "maximum": 255,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "title": {
+            "example": "Quantity",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "priority",
+          "title"
+        ],
+        "type": "object"
+      },
+      "AppRequestFormInputFieldSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/AppRequestFormInputField"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "AppRequestSettings": {
+        "properties": {
+          "appStoreLocale": {
+            "description": "Can be any of the country codes from /v1/app-store-country-codes or \"deviceLocale\" to use each individual device's locale",
+            "example": "deviceLocale",
+            "type": "string"
+          },
+          "approverEmails": {
+            "items": {
+              "example": "jane.doe@company.com, john.doe@company.com",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "isEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "requesterUserGroupId": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "ApplicationAttributes": {
         "properties": {
           "attributes": {
@@ -14568,6 +14640,125 @@
         ],
         "type": "object"
       },
+      "OnboardingConfiguration": {
+        "properties": {
+          "enabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "onboardingItems": {
+            "items": {
+              "$ref": "#/components/schemas/OnboardingItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "enabled",
+          "onboardingItems"
+        ],
+        "type": "object"
+      },
+      "OnboardingEligibleItem": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "Item 1",
+            "type": "string"
+          },
+          "scopeDescription": {
+            "example": "All Computers",
+            "type": "string"
+          },
+          "siteDescription": {
+            "example": "Example Site",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "scopeDescription",
+          "siteDescription"
+        ],
+        "type": "object"
+      },
+      "OnboardingEligibleItemsSearchResult": {
+        "description": "A list of onboarding eligible items",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/OnboardingEligibleItem"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "OnboardingItem": {
+        "properties": {
+          "entityId": {
+            "description": "The id of the Jamf Pro object that should be added to the onboarding workflow for end users.\nUse this in conjunction with the selfServiceEntityType. For example, if the policy with id 132\nshould be added to onboarding, then entityId should be 132 and selfServiceEntityType should be \nOS_X_POLICY.\n",
+            "example": "1",
+            "type": "string"
+          },
+          "entityName": {
+            "example": "Policy 1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "3",
+            "nullable": true,
+            "type": "string"
+          },
+          "priority": {
+            "example": 35,
+            "type": "integer"
+          },
+          "scopeDescription": {
+            "example": "All Computers",
+            "readOnly": true,
+            "type": "string"
+          },
+          "selfServiceEntityType": {
+            "enum": [
+              "OS_X_POLICY",
+              "OS_X_CONFIG_PROFILE",
+              "OS_X_MAC_APP",
+              "OS_X_APP_INSTALLER",
+              "OS_X_EBOOK",
+              "OS_X_PATCH_POLICY",
+              "UNKNOWN"
+            ],
+            "example": "OS_X_POLICY",
+            "type": "string"
+          },
+          "siteDescription": {
+            "example": "None",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "entityId",
+          "priority",
+          "selfServiceEntityType"
+        ],
+        "type": "object"
+      },
       "OrganizationName": {
         "properties": {
           "organizationName": {
@@ -21678,6 +21869,350 @@
         "x-action": true,
         "x-required-privileges": [
           "Send MDM command information in Jamf Pro API"
+        ]
+      }
+    },
+    "/v1/app-request/form-input-fields": {
+      "get": {
+        "description": "Search for form input fields",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppRequestFormInputFieldSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Search for Form Input Fields\n",
+        "tags": [
+          "app-request-preview"
+        ],
+        "x-required-privileges": [
+          "Read App Request Settings"
+        ]
+      },
+      "post": {
+        "description": "Create form input field record\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppRequestFormInputField"
+              }
+            }
+          },
+          "description": "form input field object to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppRequestFormInputField"
+                }
+              }
+            },
+            "description": "form input field record was created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid data response"
+          }
+        },
+        "summary": "Create Form Input Field record\n",
+        "tags": [
+          "app-request-preview"
+        ],
+        "x-required-privileges": [
+          "Update App Request Settings"
+        ]
+      },
+      "put": {
+        "description": "Replace all form input fields. Will delete, update, and create all input fields accordingly.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/AppRequestFormInputField"
+                },
+                "type": "array"
+              }
+            }
+          },
+          "description": "list of form input fields to replace all existing fields. Will delete, update, and create all input fields accordingly.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AppRequestFormInputField"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "form input fields were replaced"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid data response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified form input field object does not exist."
+          }
+        },
+        "summary": "Replace all Form Input Fields\n",
+        "tags": [
+          "app-request-preview"
+        ],
+        "x-required-privileges": [
+          "Update App Request Settings"
+        ]
+      }
+    },
+    "/v1/app-request/form-input-fields/{id}": {
+      "delete": {
+        "description": "Removes specified form input field record\n",
+        "parameters": [
+          {
+            "description": "Instance id of form input field record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "form input field record was deleted"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified form input field object does not exist."
+          }
+        },
+        "summary": "Remove specified Form Input Field record\n",
+        "tags": [
+          "app-request-preview"
+        ],
+        "x-required-privileges": [
+          "Update App Request Settings"
+        ]
+      },
+      "get": {
+        "description": "Gets specified form input field object\n",
+        "parameters": [
+          {
+            "description": "Instance id of form input field record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppRequestFormInputField"
+                }
+              }
+            },
+            "description": "Details of form input field were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified form input field object does not exist."
+          }
+        },
+        "summary": "Get specified Form Input Field object\n",
+        "tags": [
+          "app-request-preview"
+        ],
+        "x-required-privileges": [
+          "Read App Request Settings"
+        ]
+      },
+      "put": {
+        "description": "Update specified form input field object\n",
+        "parameters": [
+          {
+            "description": "Instance id of form input field record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppRequestFormInputField"
+              }
+            }
+          },
+          "description": "form input field object to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppRequestFormInputField"
+                }
+              }
+            },
+            "description": "form input field update"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid data response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified form input field object does not exist."
+          }
+        },
+        "summary": "Update specified Form Input Field object\n",
+        "tags": [
+          "app-request-preview"
+        ],
+        "x-required-privileges": [
+          "Update App Request Settings"
+        ]
+      }
+    },
+    "/v1/app-request/settings": {
+      "get": {
+        "description": "Get app request settings\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppRequestSettings"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get Applicastion Request Settings\n",
+        "tags": [
+          "app-request-preview"
+        ],
+        "x-required-privileges": [
+          "Read App Request Settings"
+        ]
+      },
+      "put": {
+        "description": "Update app request settings\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppRequestSettings"
+              }
+            }
+          },
+          "description": "App request settings object",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppRequestSettings"
+                }
+              }
+            },
+            "description": "App request settings updated"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid data response"
+          }
+        },
+        "summary": "Update Application Request Settings\n",
+        "tags": [
+          "app-request-preview"
+        ],
+        "x-required-privileges": [
+          "Update App Request Settings"
         ]
       }
     },
@@ -32349,6 +32884,416 @@
           "oidc"
         ],
         "x-authentication-required": false
+      }
+    },
+    "/v1/onboarding": {
+      "get": {
+        "description": "Get the current onboarding settings configuration.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingConfiguration"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Get the current onboarding settings configuration.",
+        "tags": [
+          "onboarding"
+        ],
+        "x-required-privileges": [
+          "Read Onboarding Configuration"
+        ]
+      },
+      "put": {
+        "description": "Update the onboarding configuration.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingConfiguration"
+              }
+            }
+          },
+          "description": "Onboarding settings to save.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingConfiguration"
+                }
+              }
+            },
+            "description": "Successfully updated"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Unable to add invalid or ineligible items to the onboarding configuration."
+          }
+        },
+        "summary": "Update the onboarding configuration.",
+        "tags": [
+          "onboarding"
+        ],
+        "x-required-privileges": [
+          "Update Onboarding Configuration"
+        ]
+      }
+    },
+    "/v1/onboarding/eligible-apps": {
+      "get": {
+        "description": "Retrieves a list of applications that are eligible to be used in an onboarding configuration",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingEligibleItemsSearchResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Retrieves a list of applications that are eligible to be used in an onboarding configuration",
+        "tags": [
+          "onboarding"
+        ],
+        "x-required-privileges": [
+          "Read Onboarding Configuration"
+        ]
+      }
+    },
+    "/v1/onboarding/eligible-configuration-profiles": {
+      "get": {
+        "description": "Retrieves a list of configuration profiles that are eligible to be used in an onboarding configuration",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingEligibleItemsSearchResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Retrieves a list of configuration profiles that are eligible to be used in an onboarding configuration",
+        "tags": [
+          "onboarding"
+        ],
+        "x-required-privileges": [
+          "Read Onboarding Configuration"
+        ]
+      }
+    },
+    "/v1/onboarding/eligible-policies": {
+      "get": {
+        "description": "Retrieves a list of policies that are eligible to be used in an onboarding configuration",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingEligibleItemsSearchResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Retrieves a list of policies that are eligible to be used in an onboarding configuration",
+        "tags": [
+          "onboarding"
+        ],
+        "x-required-privileges": [
+          "Read Onboarding Configuration"
+        ]
+      }
+    },
+    "/v1/onboarding/history": {
+      "get": {
+        "description": "Gets Onboarding history object\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of onboarding history were found"
+          }
+        },
+        "summary": "Get Onboarding history object\n",
+        "tags": [
+          "onboarding"
+        ],
+        "x-required-privileges": [
+          "Read Onboarding Configuration"
+        ]
+      },
+      "post": {
+        "description": "Adds Onboarding history object notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of onboarding history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Onboarding history can not be saved"
+          }
+        },
+        "summary": "Add Onboarding history object notes\n",
+        "tags": [
+          "onboarding"
+        ],
+        "x-required-privileges": [
+          "Update Onboarding Configuration"
+        ]
+      }
+    },
+    "/v1/onboarding/history/export": {
+      "post": {
+        "description": "Export history object collection in specified format for Onboarding\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/export-fields"
+          },
+          {
+            "$ref": "#/components/parameters/export-labels"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportParameters"
+              }
+            }
+          },
+          "description": "Optional. Override query parameters since they can make URI exceed 2,000 character limit."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "username,date,note,details\nadmin,2019-02-04 21:09:31,Edited,item detail\n",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "Export successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export fields specified incorrectly - non-existing column or duplicate on the list."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export currently unavailable, all export-related resources are in use. Try again later."
+          }
+        },
+        "summary": "Export history object collection in specified format for Onboarding\n",
+        "tags": [
+          "onboarding"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Onboarding Configuration"
+        ]
       }
     },
     "/v1/packages": {

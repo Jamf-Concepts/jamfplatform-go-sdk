@@ -773,7 +773,25 @@
 
         {"op": "GET /v1/icon/{id}", "name": "GetIconV1"},
         {"op": "GET /v1/icon/download/{id}", "name": "DownloadIconV1", "params": ["res:int", "scale:string"]},
-        {"op": "GET /v1/branding-images/download/{id}", "name": "DownloadBrandingImageV1"}
+        {"op": "GET /v1/branding-images/download/{id}", "name": "DownloadBrandingImageV1"},
+
+        {"op": "GET /v1/onboarding", "name": "GetOnboardingV1"},
+        {"op": "PUT /v1/onboarding", "name": "UpdateOnboardingV1"},
+        {"op": "GET /v1/onboarding/eligible-apps", "name": "ListOnboardingEligibleAppsV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v1/onboarding/eligible-configuration-profiles", "name": "ListOnboardingEligibleConfigurationProfilesV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v1/onboarding/eligible-policies", "name": "ListOnboardingEligiblePoliciesV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v1/onboarding/history", "name": "ListOnboardingHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/onboarding/history", "name": "CreateOnboardingHistoryNoteV1", "expectedStatus": 201},
+        {"op": "POST /v1/onboarding/history/export", "name": "ExportOnboardingHistoryV1"},
+
+        {"op": "GET /v1/app-request/form-input-fields", "name": "ListAppRequestFormInputFieldsV1"},
+        {"op": "POST /v1/app-request/form-input-fields", "name": "CreateAppRequestFormInputFieldV1", "expectedStatus": 200},
+        {"op": "PUT /v1/app-request/form-input-fields", "name": "ReorderAppRequestFormInputFieldsV1"},
+        {"op": "GET /v1/app-request/form-input-fields/{id}", "name": "GetAppRequestFormInputFieldV1"},
+        {"op": "PUT /v1/app-request/form-input-fields/{id}", "name": "UpdateAppRequestFormInputFieldV1"},
+        {"op": "DELETE /v1/app-request/form-input-fields/{id}", "name": "DeleteAppRequestFormInputFieldV1", "expectedStatus": 204},
+        {"op": "GET /v1/app-request/settings", "name": "GetAppRequestSettingsV1"},
+        {"op": "PUT /v1/app-request/settings", "name": "UpdateAppRequestSettingsV1"}
       ]
     },
     {

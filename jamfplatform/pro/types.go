@@ -273,6 +273,28 @@ type AppPath struct {
 	Path string `json:"path"`
 }
 
+// AppRequestFormInputField represents a app request form input field.
+type AppRequestFormInputField struct {
+	Description *string `json:"description,omitempty"`
+	ID          *int    `json:"id,omitempty"`
+	Priority    int     `json:"priority"`
+	Title       string  `json:"title"`
+}
+
+// AppRequestFormInputFieldSearchResults represents a app request form input field search results.
+type AppRequestFormInputFieldSearchResults struct {
+	Results    []AppRequestFormInputField `json:"results"`
+	TotalCount int                        `json:"totalCount"`
+}
+
+// AppRequestSettings represents a app request settings.
+type AppRequestSettings struct {
+	AppStoreLocale       *string   `json:"appStoreLocale,omitempty"`
+	ApproverEmails       *[]string `json:"approverEmails,omitempty"`
+	IsEnabled            *bool     `json:"isEnabled,omitempty"`
+	RequesterUserGroupID *int      `json:"requesterUserGroupId,omitempty"`
+}
+
 // ApplicationAttributes represents a application attributes.
 type ApplicationAttributes struct {
 	Attributes *Attributes `json:"attributes,omitempty"`
@@ -4277,6 +4299,38 @@ type OidcSettings struct {
 	JamfIDAuthenticationEnabled   *bool   `json:"jamfIdAuthenticationEnabled,omitempty"`
 	UserMapping                   string  `json:"userMapping"`
 	UsernameAttributeClaimMapping *string `json:"usernameAttributeClaimMapping,omitempty"`
+}
+
+// OnboardingConfiguration represents a onboarding configuration.
+type OnboardingConfiguration struct {
+	Enabled         bool             `json:"enabled"`
+	ID              *string          `json:"id,omitempty"`
+	OnboardingItems []OnboardingItem `json:"onboardingItems"`
+}
+
+// OnboardingEligibleItem represents a onboarding eligible item.
+type OnboardingEligibleItem struct {
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	ScopeDescription string `json:"scopeDescription"`
+	SiteDescription  string `json:"siteDescription"`
+}
+
+// OnboardingEligibleItemsSearchResult A list of onboarding eligible items.
+type OnboardingEligibleItemsSearchResult struct {
+	Results    []OnboardingEligibleItem `json:"results"`
+	TotalCount int                      `json:"totalCount"`
+}
+
+// OnboardingItem represents a onboarding item.
+type OnboardingItem struct {
+	EntityID              string  `json:"entityId"`
+	EntityName            *string `json:"entityName,omitempty"`
+	ID                    *string `json:"id,omitempty"`
+	Priority              int     `json:"priority"`
+	ScopeDescription      *string `json:"scopeDescription,omitempty"`
+	SelfServiceEntityType string  `json:"selfServiceEntityType"`
+	SiteDescription       *string `json:"siteDescription,omitempty"`
 }
 
 // OrganizationName represents a organization name.
