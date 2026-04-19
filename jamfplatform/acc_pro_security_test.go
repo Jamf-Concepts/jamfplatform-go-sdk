@@ -442,8 +442,17 @@ func TestAcceptance_Pro_Security_OidcPublicV1(t *testing.T) {
 	}
 }
 
+// TestAcceptance_Pro_Security_GenerateOidcCertificateV1 regenerates
+// the tenant's OIDC certificate. Caller has approved this as
+// non-blocking in test.
 func TestAcceptance_Pro_Security_GenerateOidcCertificateV1(t *testing.T) {
-	t.Skip("generates a new OIDC certificate on the tenant — skip to avoid rotating live SSO")
+	c := accClient(t)
+
+	if err := pro.New(c).GenerateOidcCertificateV1(context.Background()); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GenerateOidcCertificateV1: %v", err)
+	}
+	t.Log("Regenerated OIDC certificate")
 }
 
 func TestAcceptance_Pro_Security_DispatchOidcLoginV2(t *testing.T) {
@@ -494,12 +503,78 @@ func TestAcceptance_Pro_Security_SsoSettingsV3(t *testing.T) {
 	}
 }
 
+// TestAcceptance_Pro_Security_UpdateSsoSettingsV3 round-trips the
+// current SSO config back unchanged. Same pattern used for other
+// settings endpoints (enrollment V4, reenrollment, ADUE): GET →
+// PUT the exact response body → verify no error. A server-side
+// round-trip bug would surface as a 4xx/5xx here, but a no-op PUT
+// on already-stored values won't alter live SSO behaviour.
 func TestAcceptance_Pro_Security_UpdateSsoSettingsV3(t *testing.T) {
-	t.Skip("mutating SSO settings can break login for all users — skip, round-trip in a disposable tenant only")
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	current, err := p.GetSsoSettingsV3(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetSsoSettingsV3: %v", err)
+	}
+
+	if _, err := p.UpdateSsoSettingsV3(ctx, current); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateSsoSettingsV3 round-trip (configurationType=%s): %v", current.ConfigurationType, err)
+	}
+	t.Logf("UpdateSsoSettingsV3 round-trip OK (configurationType=%s)", current.ConfigurationType)
 }
 
+// TestAcceptance_Pro_Security_DisableSsoV3 disables SSO on the tenant
+// and then restores it — snapshot current settings via GET, POST the
+// disable action, then PUT the snapshot back with ssoEnabled=true so
+// the tenant is left in its original state. If SSO was already
+// disabled before the test started, skips with a note (no meaningful
+// side-effect to exercise).
 func TestAcceptance_Pro_Security_DisableSsoV3(t *testing.T) {
-	t.Skip("disables SSO on the tenant — destructive, manual only")
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	snapshot, err := p.GetSsoSettingsV3(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetSsoSettingsV3 (pre-snapshot): %v", err)
+	}
+	if !snapshot.SsoEnabled {
+		t.Skip("SSO already disabled on this tenant — nothing to disable; re-enable via the SSO settings UI before re-running")
+	}
+
+	// Restore SSO on exit regardless of the test outcome. This also
+	// covers the case where DisableSsoV3 succeeded but later assertions
+	// failed mid-flight.
+	t.Cleanup(func() {
+		restore := *snapshot
+		restore.SsoEnabled = true
+		if _, err := p.UpdateSsoSettingsV3(context.Background(), &restore); err != nil {
+			t.Logf("cleanup restore SSO: %v", err)
+		} else {
+			t.Logf("Restored SSO (ssoEnabled=true, configurationType=%s)", snapshot.ConfigurationType)
+		}
+	})
+
+	if err := p.DisableSsoV3(ctx); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DisableSsoV3: %v", err)
+	}
+	t.Log("SSO disabled — will be restored on cleanup")
+
+	// Sanity: a fresh GET should now show ssoEnabled=false.
+	post, err := p.GetSsoSettingsV3(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetSsoSettingsV3 (post-disable): %v", err)
+	}
+	if post.SsoEnabled {
+		t.Errorf("expected SsoEnabled=false after disable, got true")
+	}
 }
 
 // --- sso-certificate ---------------------------------------------------
@@ -530,8 +605,29 @@ func TestAcceptance_Pro_Security_SsoCertificateV2(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Pro_Security_MutateSsoCertificateV2(t *testing.T) {
-	t.Skip("PUT/POST/DELETE on SSO cert mutate live SAML flows — skip")
+// TestAcceptance_Pro_Security_GenerateSsoCertificateV2 fires POST
+// /v2/sso/cert which regenerates the SSO keystore certificate on the
+// tenant. The caller has approved this as non-blocking in test.
+func TestAcceptance_Pro_Security_GenerateSsoCertificateV2(t *testing.T) {
+	c := accClient(t)
+
+	resp, err := pro.New(c).GenerateSsoCertificateV2(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GenerateSsoCertificateV2: %v", err)
+	}
+	t.Logf("Generated SSO cert — details=%+v", resp)
+}
+
+// UpdateSsoCertificateV2 (PUT with a provided keystore) and
+// DeleteSsoCertificateV2 remain skipped: PUT needs a real SAML
+// keystore binary and DELETE tears down SSO login end-to-end.
+func TestAcceptance_Pro_Security_UpdateSsoCertificateV2(t *testing.T) {
+	t.Skip("PUT requires a real SAML keystore file upload — skip")
+}
+
+func TestAcceptance_Pro_Security_DeleteSsoCertificateV2(t *testing.T) {
+	t.Skip("DELETE removes the SSO keystore, breaking SAML login — skip")
 }
 
 // --- sso-failover ------------------------------------------------------
@@ -552,8 +648,21 @@ func TestAcceptance_Pro_Security_SsoFailoverV1(t *testing.T) {
 	t.Logf("SSO failover data: %+v", data)
 }
 
+// TestAcceptance_Pro_Security_GenerateSsoFailoverV1 rotates the
+// tenant's SSO failover URL. Caller has approved this as non-blocking
+// in test — the old URL becomes invalid but the new one is usable.
 func TestAcceptance_Pro_Security_GenerateSsoFailoverV1(t *testing.T) {
-	t.Skip("generates new SSO failover URL — rotates live SSO state, manual curl only")
+	c := accClient(t)
+
+	data, err := pro.New(c).GenerateSsoFailoverV1(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GenerateSsoFailoverV1: %v", err)
+	}
+	if data.FailoverURL == "" {
+		t.Error("GenerateSsoFailoverV1 returned empty FailoverURL")
+	}
+	t.Logf("SSO failover URL rotated (URL not logged)")
 }
 
 // --- sso-oauth-session-tokens -----------------------------------------
