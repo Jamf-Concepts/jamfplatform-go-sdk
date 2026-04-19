@@ -608,7 +608,26 @@
         {"op": "DELETE /v1/distribution-points/{id}", "name": "DeleteDistributionPointV1", "expectedStatus": 204},
         {"op": "PATCH /v1/distribution-points/{id}", "name": "PatchDistributionPointV1"},
         {"op": "GET /v1/distribution-points/{id}/history", "name": "ListDistributionPointHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
-        {"op": "POST /v1/distribution-points/{id}/history", "name": "CreateDistributionPointHistoryNoteV1"}
+        {"op": "POST /v1/distribution-points/{id}/history", "name": "CreateDistributionPointHistoryNoteV1"},
+
+        {"op": "GET /v1/volume-purchasing-locations", "name": "ListVolumePurchasingLocationsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/volume-purchasing-locations", "name": "CreateVolumePurchasingLocationV1"},
+        {"op": "GET /v1/volume-purchasing-locations/{id}", "name": "GetVolumePurchasingLocationV1"},
+        {"op": "DELETE /v1/volume-purchasing-locations/{id}", "name": "DeleteVolumePurchasingLocationV1", "expectedStatus": 204},
+        {"op": "PATCH /v1/volume-purchasing-locations/{id}", "name": "UpdateVolumePurchasingLocationV1", "contentType": "application/merge-patch+json"},
+        {"op": "GET /v1/volume-purchasing-locations/{id}/content", "name": "ListVolumePurchasingLocationContentV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/volume-purchasing-locations/{id}/history", "name": "ListVolumePurchasingLocationHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/volume-purchasing-locations/{id}/history", "name": "CreateVolumePurchasingLocationHistoryNoteV1", "expectedStatus": 200},
+        {"op": "POST /v1/volume-purchasing-locations/{id}/reclaim", "name": "ReclaimVolumePurchasingLocationLicensesV1"},
+        {"op": "POST /v1/volume-purchasing-locations/{id}/revoke-licenses", "name": "RevokeVolumePurchasingLocationLicensesV1"},
+
+        {"op": "GET /v1/volume-purchasing-subscriptions", "name": "ListVolumePurchasingSubscriptionsV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "POST /v1/volume-purchasing-subscriptions", "name": "CreateVolumePurchasingSubscriptionV1"},
+        {"op": "GET /v1/volume-purchasing-subscriptions/{id}", "name": "GetVolumePurchasingSubscriptionV1"},
+        {"op": "PUT /v1/volume-purchasing-subscriptions/{id}", "name": "UpdateVolumePurchasingSubscriptionV1"},
+        {"op": "DELETE /v1/volume-purchasing-subscriptions/{id}", "name": "DeleteVolumePurchasingSubscriptionV1", "expectedStatus": 204},
+        {"op": "GET /v1/volume-purchasing-subscriptions/{id}/history", "name": "ListVolumePurchasingSubscriptionHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/volume-purchasing-subscriptions/{id}/history", "name": "CreateVolumePurchasingSubscriptionHistoryNoteV1"}
       ]
     },
     {

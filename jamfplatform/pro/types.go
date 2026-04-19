@@ -2265,6 +2265,12 @@ type ExtensionAttributes struct {
 	Name        string  `json:"name"`
 }
 
+// ExternalRecipient represents a external recipient.
+type ExternalRecipient struct {
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
+
 // FileAttachmentV3 represents a file attachment v3.
 type FileAttachmentV3 struct {
 	ID   string `json:"id"`
@@ -2548,6 +2554,12 @@ type InstalledApplicationListCommand struct {
 	Identifiers     *[]string      `json:"identifiers,omitempty"`
 	Items           *[]string      `json:"items,omitempty"`
 	ManagedAppsOnly *bool          `json:"managedAppsOnly,omitempty"`
+}
+
+// InternalRecipient represents a internal recipient.
+type InternalRecipient struct {
+	AccountID string  `json:"accountId"`
+	Frequency *string `json:"frequency,omitempty"`
 }
 
 // InventoryInformation Jamf Pro Inventory statistics object. Aggregates managed/unmanaged devices and computers counters.
@@ -5144,6 +5156,123 @@ type VerifyRecoveryLockCommand struct {
 
 // VoiceRoamingSetting represents a voice roaming setting value.
 type VoiceRoamingSetting = string
+
+// VolumePurchasingContent represents a volume purchasing content.
+type VolumePurchasingContent struct {
+	AdamID               string   `json:"adamId"`
+	ContentType          string   `json:"contentType"`
+	DeviceTypes          []string `json:"deviceTypes"`
+	IconURL              string   `json:"iconUrl"`
+	LicenseCountInUse    int      `json:"licenseCountInUse"`
+	LicenseCountReported int      `json:"licenseCountReported"`
+	LicenseCountTotal    int      `json:"licenseCountTotal"`
+	Name                 string   `json:"name"`
+	PricingParam         string   `json:"pricingParam"`
+}
+
+// VolumePurchasingContentList represents a volume purchasing content list.
+type VolumePurchasingContentList struct {
+	Results    []VolumePurchasingContent `json:"results"`
+	TotalCount int                       `json:"totalCount"`
+}
+
+// VolumePurchasingLocation represents a volume purchasing location.
+type VolumePurchasingLocation struct {
+	AppleID                               string                    `json:"appleId"`
+	AutoRegisterManagedUsers              bool                      `json:"autoRegisterManagedUsers"`
+	AutomaticallyPopulatePurchasedContent bool                      `json:"automaticallyPopulatePurchasedContent"`
+	ClientContextMismatch                 bool                      `json:"clientContextMismatch"`
+	Content                               []VolumePurchasingContent `json:"content"`
+	CountryCode                           string                    `json:"countryCode"`
+	Email                                 string                    `json:"email"`
+	ID                                    string                    `json:"id"`
+	LastSyncTime                          string                    `json:"lastSyncTime"`
+	LocationName                          string                    `json:"locationName"`
+	Name                                  string                    `json:"name"`
+	OrganizationName                      string                    `json:"organizationName"`
+	SendNotificationWhenNoLongerAssigned  bool                      `json:"sendNotificationWhenNoLongerAssigned"`
+	SiteID                                string                    `json:"siteId"`
+	SiteName                              string                    `json:"siteName"`
+	TokenExpiration                       string                    `json:"tokenExpiration"`
+	TotalPurchasedLicenses                int                       `json:"totalPurchasedLicenses"`
+	TotalUsedLicenses                     int                       `json:"totalUsedLicenses"`
+}
+
+// VolumePurchasingLocationListView represents a volume purchasing location list view.
+type VolumePurchasingLocationListView struct {
+	AppleID                               string `json:"appleId"`
+	AutoRegisterManagedUsers              bool   `json:"autoRegisterManagedUsers"`
+	AutomaticallyPopulatePurchasedContent bool   `json:"automaticallyPopulatePurchasedContent"`
+	ClientContextMismatch                 bool   `json:"clientContextMismatch"`
+	CountryCode                           string `json:"countryCode"`
+	Email                                 string `json:"email"`
+	ID                                    string `json:"id"`
+	LastSyncTime                          string `json:"lastSyncTime"`
+	LocationName                          string `json:"locationName"`
+	Name                                  string `json:"name"`
+	OrganizationName                      string `json:"organizationName"`
+	SendNotificationWhenNoLongerAssigned  bool   `json:"sendNotificationWhenNoLongerAssigned"`
+	SiteID                                string `json:"siteId"`
+	SiteName                              string `json:"siteName"`
+	TokenExpiration                       string `json:"tokenExpiration"`
+	TotalPurchasedLicenses                int    `json:"totalPurchasedLicenses"`
+	TotalUsedLicenses                     int    `json:"totalUsedLicenses"`
+}
+
+// VolumePurchasingLocationPatch represents a volume purchasing location patch.
+type VolumePurchasingLocationPatch struct {
+	AutoRegisterManagedUsers              *bool   `json:"autoRegisterManagedUsers,omitempty"`
+	AutomaticallyPopulatePurchasedContent *bool   `json:"automaticallyPopulatePurchasedContent,omitempty"`
+	Name                                  *string `json:"name,omitempty"`
+	SendNotificationWhenNoLongerAssigned  *bool   `json:"sendNotificationWhenNoLongerAssigned,omitempty"`
+	ServiceToken                          *string `json:"serviceToken,omitempty"`
+	SiteID                                *string `json:"siteId,omitempty"`
+}
+
+// VolumePurchasingLocationPost represents a volume purchasing location post.
+type VolumePurchasingLocationPost struct {
+	AutoRegisterManagedUsers              *bool   `json:"autoRegisterManagedUsers,omitempty"`
+	AutomaticallyPopulatePurchasedContent *bool   `json:"automaticallyPopulatePurchasedContent,omitempty"`
+	Name                                  *string `json:"name,omitempty"`
+	SendNotificationWhenNoLongerAssigned  *bool   `json:"sendNotificationWhenNoLongerAssigned,omitempty"`
+	ServiceToken                          string  `json:"serviceToken"`
+	SiteID                                *string `json:"siteId,omitempty"`
+}
+
+// VolumePurchasingLocations represents a volume purchasing locations.
+type VolumePurchasingLocations struct {
+	Results    []VolumePurchasingLocationListView `json:"results"`
+	TotalCount int                                `json:"totalCount"`
+}
+
+// VolumePurchasingSubscription represents a volume purchasing subscription.
+type VolumePurchasingSubscription struct {
+	Enabled            bool                `json:"enabled"`
+	ExternalRecipients []ExternalRecipient `json:"externalRecipients"`
+	ID                 string              `json:"id"`
+	InternalRecipients []InternalRecipient `json:"internalRecipients"`
+	LocationIds        []string            `json:"locationIds"`
+	Name               string              `json:"name"`
+	SiteID             string              `json:"siteId"`
+	Triggers           []string            `json:"triggers"`
+}
+
+// VolumePurchasingSubscriptionBase represents a volume purchasing subscription base.
+type VolumePurchasingSubscriptionBase struct {
+	Enabled            *bool                `json:"enabled,omitempty"`
+	ExternalRecipients *[]ExternalRecipient `json:"externalRecipients,omitempty"`
+	InternalRecipients *[]InternalRecipient `json:"internalRecipients,omitempty"`
+	LocationIds        *[]string            `json:"locationIds,omitempty"`
+	Name               string               `json:"name"`
+	SiteID             *string              `json:"siteId,omitempty"`
+	Triggers           *[]string            `json:"triggers,omitempty"`
+}
+
+// VolumePurchasingSubscriptions represents a volume purchasing subscriptions.
+type VolumePurchasingSubscriptions struct {
+	Results    []VolumePurchasingSubscription `json:"results"`
+	TotalCount int                            `json:"totalCount"`
+}
 
 // WatchOsDetailsV2 will be populated if the type is watchos.
 type WatchOsDetailsV2 struct {

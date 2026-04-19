@@ -8504,6 +8504,25 @@
         ],
         "type": "object"
       },
+      "ExternalRecipient": {
+        "properties": {
+          "email": {
+            "example": "bob@example.com",
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "example": "Bob Exampleman",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "name"
+        ],
+        "type": "object"
+      },
       "FileAttachmentV3": {
         "properties": {
           "id": {
@@ -9116,6 +9135,27 @@
             "type": "object"
           }
         ]
+      },
+      "InternalRecipient": {
+        "properties": {
+          "accountId": {
+            "example": "1",
+            "pattern": "^\\d+$",
+            "type": "string"
+          },
+          "frequency": {
+            "default": "DAILY",
+            "enum": [
+              "DAILY"
+            ],
+            "example": "DAILY",
+            "type": "string"
+          }
+        },
+        "required": [
+          "accountId"
+        ],
+        "type": "object"
       },
       "InventoryInformation": {
         "description": "Jamf Pro Inventory statistics object. Aggregates managed/unmanaged devices and computers counters",
@@ -17162,6 +17202,363 @@
         ],
         "example": "ENABLE_VOICE_ROAMING",
         "type": "string"
+      },
+      "VolumePurchasingContent": {
+        "properties": {
+          "adamId": {
+            "example": "748057890",
+            "readOnly": true,
+            "type": "string"
+          },
+          "contentType": {
+            "enum": [
+              "IOS_APP",
+              "MAC_APP",
+              "BOOK",
+              "UNKNOWN"
+            ],
+            "example": "IOS_APP",
+            "readOnly": true,
+            "type": "string"
+          },
+          "deviceTypes": {
+            "items": {
+              "enum": [
+                "IOS",
+                "MACOS",
+                "TVOS"
+              ],
+              "example": "IOS",
+              "type": "string"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "iconUrl": {
+            "example": "https://is4-ssl.mzstatic.com/image/thumb/Purple113/v4/73/d4/73/73d47332-fefc-d350-2984-5b4a4755a502/AppIcon-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-6.png/360x216bb.png",
+            "readOnly": true,
+            "type": "string"
+          },
+          "licenseCountInUse": {
+            "example": 1,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "licenseCountReported": {
+            "example": 1,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "licenseCountTotal": {
+            "example": 1,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Example Content",
+            "readOnly": true,
+            "type": "string"
+          },
+          "pricingParam": {
+            "enum": [
+              "STDQ",
+              "PLUS",
+              "Unknown"
+            ],
+            "example": "STDQ",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "VolumePurchasingContentList": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/VolumePurchasingContent"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "VolumePurchasingLocation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VolumePurchasingLocationListView"
+          },
+          {
+            "properties": {
+              "content": {
+                "items": {
+                  "$ref": "#/components/schemas/VolumePurchasingContent"
+                },
+                "readOnly": true,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "VolumePurchasingLocationListView": {
+        "properties": {
+          "appleId": {
+            "example": "testUser@appleId.com",
+            "readOnly": true,
+            "type": "string"
+          },
+          "autoRegisterManagedUsers": {
+            "example": false,
+            "type": "boolean"
+          },
+          "automaticallyPopulatePurchasedContent": {
+            "example": false,
+            "type": "boolean"
+          },
+          "clientContextMismatch": {
+            "description": "If this is \"true\", the clientContext used by this server does not match the clientContext returned by the Volume Purchasing API.",
+            "example": false,
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "countryCode": {
+            "description": "The two-letter ISO 3166-1 code that designates the country where the Volume Purchasing account is located.",
+            "example": "US",
+            "readOnly": true,
+            "type": "string"
+          },
+          "email": {
+            "example": "testUser@email.com",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "lastSyncTime": {
+            "example": "2022-09-25T21:09:31.661Z",
+            "readOnly": true,
+            "type": "string"
+          },
+          "locationName": {
+            "example": "Example Location",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "Example Location",
+            "type": "string"
+          },
+          "organizationName": {
+            "example": "Jamf",
+            "readOnly": true,
+            "type": "string"
+          },
+          "sendNotificationWhenNoLongerAssigned": {
+            "example": false,
+            "type": "boolean"
+          },
+          "siteId": {
+            "example": "1",
+            "type": "string"
+          },
+          "siteName": {
+            "example": "Example Name",
+            "type": "string"
+          },
+          "tokenExpiration": {
+            "example": "2022-04-25T21:09:31.661Z",
+            "readOnly": true,
+            "type": "string"
+          },
+          "totalPurchasedLicenses": {
+            "example": 1,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "totalUsedLicenses": {
+            "example": 1,
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "VolumePurchasingLocationPatch": {
+        "properties": {
+          "autoRegisterManagedUsers": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "automaticallyPopulatePurchasedContent": {
+            "example": false,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Example Location",
+            "type": "string"
+          },
+          "sendNotificationWhenNoLongerAssigned": {
+            "example": false,
+            "type": "boolean"
+          },
+          "serviceToken": {
+            "example": "eyJleHBEYXRlIjoiMjAyMi0wMy0yOVQxNTozNjoyNiswMDAwIiwidG9rZW4iOiJWR2hwY3lCcGN5QnViM1FnWVNCMGIydGxiaTRnU0c5d1pXWjFiR3g1SUdsMElHeHZiMnR6SUd4cGEyVWdZU0IwYjJ0bGJpd2dZblYwSUdsMEozTWdibTkwTGc9PSIsIm9yZ05hbWUiOiJFeGFtcGxlIE9yZyJ9",
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "VolumePurchasingLocationPost": {
+        "properties": {
+          "autoRegisterManagedUsers": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "automaticallyPopulatePurchasedContent": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "name": {
+            "description": "If no value is provided when creating a VolumePurchasingLocation object, the 'name' will default to the 'locationName' value",
+            "example": "Example Location",
+            "type": "string"
+          },
+          "sendNotificationWhenNoLongerAssigned": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "serviceToken": {
+            "example": "eyJleHBEYXRlIjoiMjAyMi0wMy0yOVQxNTozNjoyNiswMDAwIiwidG9rZW4iOiJWR2hwY3lCcGN5QnViM1FnWVNCMGIydGxiaTRnU0c5d1pXWjFiR3g1SUdsMElHeHZiMnR6SUd4cGEyVWdZU0IwYjJ0bGJpd2dZblYwSUdsMEozTWdibTkwTGc9PSIsIm9yZ05hbWUiOiJFeGFtcGxlIE9yZyJ9",
+            "type": "string"
+          },
+          "siteId": {
+            "default": "-1",
+            "example": "1",
+            "type": "string"
+          }
+        },
+        "required": [
+          "serviceToken"
+        ],
+        "type": "object"
+      },
+      "VolumePurchasingLocations": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/VolumePurchasingLocationListView"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "VolumePurchasingSubscription": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VolumePurchasingSubscriptionBase"
+          },
+          {
+            "properties": {
+              "id": {
+                "example": "1",
+                "readOnly": true,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "VolumePurchasingSubscriptionBase": {
+        "properties": {
+          "enabled": {
+            "default": true,
+            "example": true,
+            "type": "boolean"
+          },
+          "externalRecipients": {
+            "items": {
+              "$ref": "#/components/schemas/ExternalRecipient"
+            },
+            "type": "array"
+          },
+          "internalRecipients": {
+            "items": {
+              "$ref": "#/components/schemas/InternalRecipient"
+            },
+            "type": "array"
+          },
+          "locationIds": {
+            "items": {
+              "example": "1",
+              "pattern": "^\\d+$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "example": "Example",
+            "minLength": 1,
+            "type": "string"
+          },
+          "siteId": {
+            "default": "-1",
+            "example": "1",
+            "type": "string"
+          },
+          "triggers": {
+            "items": {
+              "enum": [
+                "NO_MORE_LICENSES",
+                "REMOVED_FROM_APP_STORE"
+              ],
+              "example": "NO_MORE_LICENSES",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "VolumePurchasingSubscriptions": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/VolumePurchasingSubscription"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
       },
       "WatchOsDetailsV2": {
         "description": "will be populated if the type is watchos.",
@@ -30318,6 +30715,975 @@
         "x-authentication-required": true,
         "x-required-privileges": [
           "Update User"
+        ]
+      }
+    },
+    "/v1/volume-purchasing-locations": {
+      "get": {
+        "description": "Retrieves Volume Purchasing Locations",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter Volume Purchasing Location collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: id, name, appleId, email, organizationName, tokenExpiration, countryCode, locationName, automaticallyPopulatePurchasedContent, sendNotificationWhenNoLongerAssigned, siteId and siteName. This param can be combined with paging and sorting.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumePurchasingLocations"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Retrieve Volume Purchasing Locations",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-required-privileges": [
+          "Read Volume Purchasing Locations"
+        ]
+      },
+      "post": {
+        "description": "Creates a Volume Purchasing Location using an sToken",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VolumePurchasingLocationPost"
+              }
+            }
+          },
+          "description": "Volume Purchasing Location to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Volume Purchasing Location was created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Create a Volume Purchasing Location",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-required-privileges": [
+          "Create Volume Purchasing Locations"
+        ]
+      }
+    },
+    "/v1/volume-purchasing-locations/{id}": {
+      "delete": {
+        "description": "Deletes a Volume Purchasing Location with the supplied id",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Location identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Volume Purchasing Location object does not exist."
+          }
+        },
+        "summary": "Delete a Volume Purchasing Location with the supplied id",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-required-privileges": [
+          "Delete Volume Purchasing Locations"
+        ]
+      },
+      "get": {
+        "description": "Retrieves a Volume Purchasing Location with the supplied id",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Location identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumePurchasingLocation"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Volume Purchasing Location with that id does not exist"
+          }
+        },
+        "summary": "Retrieve a Volume Purchasing Location with the supplied id",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-required-privileges": [
+          "Read Volume Purchasing Locations"
+        ]
+      },
+      "patch": {
+        "description": "Updates a Volume Purchasing Location",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Location identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VolumePurchasingLocationPatch"
+              }
+            }
+          },
+          "description": "Volume Purchasing Location to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumePurchasingLocation"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Volume Purchasing Location with that id does not exist"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "There was an error applying the patch"
+          }
+        },
+        "summary": "Update a Volume Purchasing Location",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-required-privileges": [
+          "Update Volume Purchasing Locations"
+        ]
+      }
+    },
+    "/v1/volume-purchasing-locations/{id}/content": {
+      "get": {
+        "description": "Retrieves the Volume Purchasing Content for the Volume Purchasing Location with the supplied id",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Location identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria are supported and must be separated with a comma.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter Volume Purchasing Content collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: name, licenseCountTotal, licenseCountInUse, licenseCountReported, contentType, and pricingParam. This param can be combined with paging and sorting.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumePurchasingContentList"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Volume Purchasing Location with that id does not exist"
+          }
+        },
+        "summary": "Retrieve the Volume Purchasing Content for the Volume Purchasing Location with the supplied id",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-required-privileges": [
+          "Read Volume Purchasing Locations"
+        ]
+      }
+    },
+    "/v1/volume-purchasing-locations/{id}/history": {
+      "get": {
+        "description": "Gets specified Volume Purchasing Location history object\n",
+        "parameters": [
+          {
+            "description": "instance id of Volume Purchasing Location history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Volume Purchasing Location history were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Volume Purchasing Location object does not exist."
+          }
+        },
+        "summary": "Get specified Volume Purchasing Location history object\n",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-required-privileges": [
+          "Read Volume Purchasing Locations"
+        ]
+      },
+      "post": {
+        "description": "Adds specified Volume Purchasing Location history object notes\n",
+        "parameters": [
+          {
+            "description": "instance id of Volume Purchasing Location history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history note to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes of Volume Purchase Location history were added"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Volume Purchase Location object does not exist."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Volume Purchase Location history can not be saved"
+          }
+        },
+        "summary": "Add specified Volume Purchasing Location history object notes\n",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-required-privileges": [
+          "Update Volume Purchasing Locations"
+        ]
+      }
+    },
+    "/v1/volume-purchasing-locations/{id}/reclaim": {
+      "post": {
+        "description": "Reclaims a Volume Purchasing Location with the supplied id",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Location identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Request accepted"
+          }
+        },
+        "summary": "Reclaim a Volume Purchasing Location with the supplied id",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Volume Purchasing Locations"
+        ]
+      }
+    },
+    "/v1/volume-purchasing-locations/{id}/revoke-licenses": {
+      "post": {
+        "description": "Revokes licenses for a Volume Purchasing Location with the supplied id. The licenses must be revokable - any asset whose licenses are irrevocable will not be revoked.",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Location identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Request accepted"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Volume Purchasing Location with that id does not exist"
+          }
+        },
+        "summary": "Revoke licenses for a Volume Purchasing Location with the supplied id",
+        "tags": [
+          "volume-purchasing-locations"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Update Volume Purchasing Locations"
+        ]
+      }
+    },
+    "/v1/volume-purchasing-subscriptions": {
+      "get": {
+        "description": "Retrieves Volume Purchasing Subscriptions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Allowable properties are id, name, and enabled.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumePurchasingSubscriptions"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Retrieve Volume Purchasing Subscriptions",
+        "tags": [
+          "volume-purchasing-subscriptions"
+        ],
+        "x-required-privileges": [
+          "Read Volume Purchasing Locations"
+        ]
+      },
+      "post": {
+        "description": "Creates a Volume Purchasing Subscription",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VolumePurchasingSubscriptionBase"
+              }
+            }
+          },
+          "description": "Volume Purchasing Subscription to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Volume Purchasing Subscription was created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failed to create volume purchasing subscription"
+          }
+        },
+        "summary": "Create a Volume Purchasing Subscription",
+        "tags": [
+          "volume-purchasing-subscriptions"
+        ],
+        "x-required-privileges": [
+          "Create Volume Purchasing Locations"
+        ]
+      }
+    },
+    "/v1/volume-purchasing-subscriptions/{id}": {
+      "delete": {
+        "description": "Deletes a Volume Purchasing Subscription with the supplied id",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Subscription identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "VPP Subscription with that id does not exist"
+          }
+        },
+        "summary": "Delete a Volume Purchasing Subscription with the supplied id",
+        "tags": [
+          "volume-purchasing-subscriptions"
+        ],
+        "x-required-privileges": [
+          "Delete Volume Purchasing Locations"
+        ]
+      },
+      "get": {
+        "description": "Retrieves a Volume Purchasing Subscription with the supplied id",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Subscription identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumePurchasingSubscription"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Volume Purchasing Subscription with that id does not exist"
+          }
+        },
+        "summary": "Retrieve a Volume Purchasing Subscription with the supplied id",
+        "tags": [
+          "volume-purchasing-subscriptions"
+        ],
+        "x-required-privileges": [
+          "Read Volume Purchasing Locations"
+        ]
+      },
+      "put": {
+        "description": "Updates a Volume Purchasing Subscription",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Subscription identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VolumePurchasingSubscriptionBase"
+              }
+            }
+          },
+          "description": "Volume Purchasing Subscription to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumePurchasingSubscription"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Volume Purchasing Subscription with that id does not exist"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failed to update volume purchasing subscription"
+          }
+        },
+        "summary": "Update a Volume Purchasing Subscription",
+        "tags": [
+          "volume-purchasing-subscriptions"
+        ],
+        "x-required-privileges": [
+          "Update Volume Purchasing Locations"
+        ]
+      }
+    },
+    "/v1/volume-purchasing-subscriptions/{id}/history": {
+      "get": {
+        "description": "Gets specified Volume Purchasing Subscription history object\n",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Subscription Id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Volume Purchasing Subscription history were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Volume Purchasing Subscription object does not exist."
+          }
+        },
+        "summary": "Get specified Volume Purchasing Subscription history object\n",
+        "tags": [
+          "volume-purchasing-subscriptions"
+        ],
+        "x-required-privileges": [
+          "Read Volume Purchasing Locations"
+        ]
+      },
+      "post": {
+        "description": "Adds Volume Purchasing Subscription history object notes",
+        "parameters": [
+          {
+            "description": "Volume Purchasing Subscription Id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of Volume Purchasing Subscription history were added"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Volume Purchasing Subscription with that Id does not exist"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Volume Purchasing Subscription history can not be saved"
+          }
+        },
+        "summary": "Add Volume Purchasing Subscription history object notes\n",
+        "tags": [
+          "volume-purchasing-subscriptions"
+        ],
+        "x-required-privileges": [
+          "Update Volume Purchasing Locations"
         ]
       }
     },
