@@ -89,7 +89,7 @@ func TestAcceptance_Classic_ComputerCRUD(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateComputerByID(0): %v", err)
 	}
-	t.Cleanup(func() { _ = pc.DeleteComputerBySerialNumber(ctx, serial) })
+	cleanupDelete(t, "DeleteComputerBySerialNumber", func() error { return pc.DeleteComputerBySerialNumber(ctx, serial) })
 	t.Logf("Created computer name=%q serial=%q", name, serial)
 
 	got, err := pc.GetComputerBySerialNumber(ctx, serial)
@@ -155,7 +155,7 @@ func TestAcceptance_Classic_BuildingCRUD(t *testing.T) {
 		t.Fatalf("CreateBuildingByID returned no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteBuildingByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteBuildingByID", func() error { return pc.DeleteBuildingByID(ctx, intToStr(id)) })
 	t.Logf("Created building id=%d name=%q", id, name)
 
 	got, err := pc.GetBuildingByID(ctx, intToStr(id))
@@ -203,7 +203,7 @@ func TestAcceptance_Classic_DepartmentCRUD(t *testing.T) {
 		t.Fatalf("CreateDepartmentByID returned no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteDepartmentByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteDepartmentByID", func() error { return pc.DeleteDepartmentByID(ctx, intToStr(id)) })
 
 	got, err := pc.GetDepartmentByID(ctx, intToStr(id))
 	if err != nil {
@@ -241,7 +241,7 @@ func TestAcceptance_Classic_CategoryCRUD(t *testing.T) {
 		t.Fatalf("CreateCategoryByID returned no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteCategoryByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteCategoryByID", func() error { return pc.DeleteCategoryByID(ctx, intToStr(id)) })
 
 	got, err := pc.GetCategoryByID(ctx, intToStr(id))
 	if err != nil {
@@ -283,7 +283,7 @@ func TestAcceptance_Classic_ScriptCRUD(t *testing.T) {
 		t.Fatalf("CreateScriptByID returned no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteScriptByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteScriptByID", func() error { return pc.DeleteScriptByID(ctx, intToStr(id)) })
 
 	got, err := pc.GetScriptByID(ctx, intToStr(id))
 	if err != nil {
@@ -330,7 +330,7 @@ func TestAcceptance_Classic_UserCRUD(t *testing.T) {
 		t.Fatalf("CreateUserByID returned no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteUserByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteUserByID", func() error { return pc.DeleteUserByID(ctx, intToStr(id)) })
 
 	got, err := pc.GetUserByID(ctx, intToStr(id))
 	if err != nil {
@@ -370,7 +370,7 @@ func TestAcceptance_Classic_ComputerEACRUD(t *testing.T) {
 		t.Fatalf("CreateComputerExtensionAttributeByID returned no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteComputerExtensionAttributeByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteComputerExtensionAttributeByID", func() error { return pc.DeleteComputerExtensionAttributeByID(ctx, intToStr(id)) })
 
 	got, err := pc.GetComputerExtensionAttributeByID(ctx, intToStr(id))
 	if err != nil {
@@ -410,7 +410,7 @@ func TestAcceptance_Classic_MobileDeviceEACRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteMobileDeviceExtensionAttributeByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteMobileDeviceExtensionAttributeByID", func() error { return pc.DeleteMobileDeviceExtensionAttributeByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteMobileDeviceExtensionAttributeByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -441,7 +441,7 @@ func TestAcceptance_Classic_UserEACRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteUserExtensionAttributeByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteUserExtensionAttributeByID", func() error { return pc.DeleteUserExtensionAttributeByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteUserExtensionAttributeByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -473,7 +473,7 @@ func TestAcceptance_Classic_ComputerGroupCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteComputerGroupByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteComputerGroupByID", func() error { return pc.DeleteComputerGroupByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteComputerGroupByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -505,7 +505,7 @@ func TestAcceptance_Classic_MobileDeviceGroupCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteMobileDeviceGroupByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteMobileDeviceGroupByID", func() error { return pc.DeleteMobileDeviceGroupByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteMobileDeviceGroupByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -537,7 +537,7 @@ func TestAcceptance_Classic_UserGroupCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteUserGroupByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteUserGroupByID", func() error { return pc.DeleteUserGroupByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteUserGroupByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -567,7 +567,7 @@ func TestAcceptance_Classic_AdvancedComputerSearchCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteAdvancedComputerSearchByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteAdvancedComputerSearchByID", func() error { return pc.DeleteAdvancedComputerSearchByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteAdvancedComputerSearchByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -597,7 +597,7 @@ func TestAcceptance_Classic_AdvancedMobileDeviceSearchCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteAdvancedMobileDeviceSearchByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteAdvancedMobileDeviceSearchByID", func() error { return pc.DeleteAdvancedMobileDeviceSearchByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteAdvancedMobileDeviceSearchByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -627,7 +627,7 @@ func TestAcceptance_Classic_AdvancedUserSearchCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteAdvancedUserSearchByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteAdvancedUserSearchByID", func() error { return pc.DeleteAdvancedUserSearchByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteAdvancedUserSearchByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -661,7 +661,7 @@ func TestAcceptance_Classic_PolicyCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeletePolicyByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeletePolicyByID", func() error { return pc.DeletePolicyByID(ctx, intToStr(id)) })
 
 	got, err := pc.GetPolicyByID(ctx, intToStr(id))
 	if err != nil {
@@ -702,7 +702,7 @@ func TestAcceptance_Classic_OSXConfigurationProfileCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteOSXConfigurationProfileByID", func() error { return pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -734,13 +734,83 @@ func TestAcceptance_Classic_MobileDeviceConfigurationProfileCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteMobileDeviceConfigurationProfileByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteMobileDeviceConfigurationProfileByID", func() error { return pc.DeleteMobileDeviceConfigurationProfileByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteMobileDeviceConfigurationProfileByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("delete: %v", err)
 	}
 	_, err = pc.GetMobileDeviceConfigurationProfileByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
+}
+
+// TestAcceptance_Classic_MobileDeviceCRUD exercises the mobile_device
+// CRUD lifecycle with a synthetic placeholder record (no real device
+// is touched). The Classic POST /mobiledevices/id/0 endpoint accepts
+// a partial General block; we round-trip via GetBySerialNumber to
+// recover the server-assigned id, rename via update, then delete and
+// verify 404.
+func TestAcceptance_Classic_MobileDeviceCRUD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-classic-mobile-" + runSuffix()
+	serial := "SDK" + runSuffix()
+	udid := "sdk-udid-" + runSuffix()
+
+	_, err := pc.CreateMobileDeviceByID(ctx, "0", &proclassic.MobileDevicePost{
+		General: &proclassic.MobileDevicePostGeneral{
+			DeviceName:   classicStrPtr(name),
+			SerialNumber: classicStrPtr(serial),
+			UDID:         classicStrPtr(udid),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateMobileDeviceByID(0): %v", err)
+	}
+	cleanupDelete(t, "DeleteMobileDeviceBySerialNumber", func() error { return pc.DeleteMobileDeviceBySerialNumber(ctx, serial) })
+	t.Logf("Created mobile device name=%q serial=%q", name, serial)
+
+	got, err := pc.GetMobileDeviceBySerialNumber(ctx, serial)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceBySerialNumber(%q): %v", serial, err)
+	}
+	if got == nil || got.General == nil || got.General.ID == nil {
+		t.Fatalf("expected MobileDevice.General.ID populated, got %+v", got)
+	}
+	id := *got.General.ID
+	if got.General.DeviceName == nil || *got.General.DeviceName != name {
+		t.Errorf("DeviceName = %v, want %q", got.General.DeviceName, name)
+	}
+
+	newName := name + "-updated"
+	if err := pc.UpdateMobileDeviceByID(ctx, intToStr(id), &proclassic.MobileDevicePost{
+		General: &proclassic.MobileDevicePostGeneral{DeviceName: classicStrPtr(newName)},
+	}); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateMobileDeviceByID(%d): %v", id, err)
+	}
+
+	afterUpdate, err := pc.GetMobileDeviceByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceByID(%d) after update: %v", id, err)
+	}
+	if afterUpdate.General == nil || afterUpdate.General.DeviceName == nil || *afterUpdate.General.DeviceName != newName {
+		t.Errorf("after update DeviceName = %v, want %q", afterUpdate.General.DeviceName, newName)
+	}
+
+	if err := pc.DeleteMobileDeviceByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteMobileDeviceByID(%d): %v", id, err)
+	}
+	_, err = pc.GetMobileDeviceByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
 		t.Fatalf("after delete: want 404, got %v", err)
@@ -804,7 +874,7 @@ func TestAcceptance_Classic_PrinterCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeletePrinterByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeletePrinterByID", func() error { return pc.DeletePrinterByID(ctx, intToStr(id)) })
 
 	if err := pc.DeletePrinterByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -836,7 +906,7 @@ func TestAcceptance_Classic_DirectoryBindingCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteDirectoryBindingByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteDirectoryBindingByID", func() error { return pc.DeleteDirectoryBindingByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteDirectoryBindingByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -868,7 +938,7 @@ func TestAcceptance_Classic_ClassicPackageCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteClassicPackageByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteClassicPackageByID", func() error { return pc.DeleteClassicPackageByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteClassicPackageByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -900,7 +970,7 @@ func TestAcceptance_Classic_NetworkSegmentCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteNetworkSegmentByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteNetworkSegmentByID", func() error { return pc.DeleteNetworkSegmentByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteNetworkSegmentByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -936,7 +1006,7 @@ func TestAcceptance_Classic_DistributionPointCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteDistributionPointByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteDistributionPointByID", func() error { return pc.DeleteDistributionPointByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteDistributionPointByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -979,7 +1049,7 @@ func TestAcceptance_Classic_LDAPServerCRUD(t *testing.T) {
 	} else {
 		id = *created.Connection.ID
 	}
-	t.Cleanup(func() { _ = pc.DeleteLDAPServerByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteLDAPServerByID", func() error { return pc.DeleteLDAPServerByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteLDAPServerByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -1015,7 +1085,7 @@ func TestAcceptance_Classic_MacApplicationCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteMacApplicationByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteMacApplicationByID", func() error { return pc.DeleteMacApplicationByID(ctx, intToStr(id)) })
 
 	if err := pc.DeleteMacApplicationByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
@@ -1056,7 +1126,7 @@ func TestAcceptance_Classic_MobileDeviceApplicationCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteMobileDeviceApplicationByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteMobileDeviceApplicationByID", func() error { return pc.DeleteMobileDeviceApplicationByID(ctx, intToStr(id)) })
 	t.Logf("created mobile-device-app id=%d; delete is async-best-effort on this tenant", id)
 }
 
@@ -1084,7 +1154,7 @@ func TestAcceptance_Classic_EbookCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteEbookByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteEbookByID", func() error { return pc.DeleteEbookByID(ctx, intToStr(id)) })
 	t.Logf("created ebook id=%d; delete is async-best-effort on this tenant", id)
 }
 
@@ -1095,7 +1165,7 @@ func TestAcceptance_Classic_ClassCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateClassByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteClassByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteClassByID", func() error { return pc.DeleteClassByID(ctx, intToStr(id)) })
 	if err := pc.DeleteClassByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetClassByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1111,7 +1181,7 @@ func TestAcceptance_Classic_LicensedSoftwareCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateLicensedSoftwareByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteLicensedSoftwareByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteLicensedSoftwareByID", func() error { return pc.DeleteLicensedSoftwareByID(ctx, intToStr(id)) })
 	if err := pc.DeleteLicensedSoftwareByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetLicensedSoftwareByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1127,7 +1197,7 @@ func TestAcceptance_Classic_RestrictedSoftwareCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateRestrictedSoftwareByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteRestrictedSoftwareByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteRestrictedSoftwareByID", func() error { return pc.DeleteRestrictedSoftwareByID(ctx, intToStr(id)) })
 	if err := pc.DeleteRestrictedSoftwareByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetRestrictedSoftwareByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1141,7 +1211,7 @@ func TestAcceptance_Classic_PeripheralTypeCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreatePeripheralTypeByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeletePeripheralTypeByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeletePeripheralTypeByID", func() error { return pc.DeletePeripheralTypeByID(ctx, intToStr(id)) })
 	if err := pc.DeletePeripheralTypeByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetPeripheralTypeByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1159,7 +1229,7 @@ func TestAcceptance_Classic_DiskEncryptionConfigurationCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateDiskEncryptionConfigurationByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteDiskEncryptionConfigurationByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteDiskEncryptionConfigurationByID", func() error { return pc.DeleteDiskEncryptionConfigurationByID(ctx, intToStr(id)) })
 	if err := pc.DeleteDiskEncryptionConfigurationByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetDiskEncryptionConfigurationByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1183,7 +1253,7 @@ func TestAcceptance_Classic_BYOProfileCRUD(t *testing.T) {
 	}
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteBYOProfileByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteBYOProfileByID", func() error { return pc.DeleteBYOProfileByID(ctx, intToStr(id)) })
 	if err := pc.DeleteBYOProfileByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetBYOProfileByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1200,7 +1270,7 @@ func TestAcceptance_Classic_IBeaconCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateIBeaconByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteIBeaconByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteIBeaconByID", func() error { return pc.DeleteIBeaconByID(ctx, intToStr(id)) })
 	if err := pc.DeleteIBeaconByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetIBeaconByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1218,7 +1288,7 @@ func TestAcceptance_Classic_DockItemCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateDockItemByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteDockItemByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteDockItemByID", func() error { return pc.DeleteDockItemByID(ctx, intToStr(id)) })
 	if err := pc.DeleteDockItemByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetDockItemByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1232,7 +1302,7 @@ func TestAcceptance_Classic_RemovableMacAddressCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateRemovableMacAddressByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteRemovableMacAddressByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteRemovableMacAddressByID", func() error { return pc.DeleteRemovableMacAddressByID(ctx, intToStr(id)) })
 	if err := pc.DeleteRemovableMacAddressByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetRemovableMacAddressByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1246,7 +1316,7 @@ func TestAcceptance_Classic_AllowedFileExtensionCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateAllowedFileExtensionByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteAllowedFileExtensionByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteAllowedFileExtensionByID", func() error { return pc.DeleteAllowedFileExtensionByID(ctx, intToStr(id)) })
 	if err := pc.DeleteAllowedFileExtensionByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetAllowedFileExtensionByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1275,7 +1345,7 @@ func TestAcceptance_Classic_WebhookCRUD(t *testing.T) {
 	if err != nil { skipOnServerError(t, err); t.Fatalf("CreateWebhookByID: %v", err) }
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteWebhookByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteWebhookByID", func() error { return pc.DeleteWebhookByID(ctx, intToStr(id)) })
 	if err := pc.DeleteWebhookByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetWebhookByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1309,7 +1379,7 @@ func TestAcceptance_Classic_AccountGroupCRUD(t *testing.T) {
 	}
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteAccountGroupByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteAccountGroupByID", func() error { return pc.DeleteAccountGroupByID(ctx, intToStr(id)) })
 	if err := pc.DeleteAccountGroupByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetAccountGroupByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1330,7 +1400,7 @@ func TestAcceptance_Classic_ComputerInvitationCRUD(t *testing.T) {
 	}
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteComputerInvitationByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteComputerInvitationByID", func() error { return pc.DeleteComputerInvitationByID(ctx, intToStr(id)) })
 	if err := pc.DeleteComputerInvitationByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetComputerInvitationByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1362,7 +1432,7 @@ func TestAcceptance_Classic_MobileDeviceInvitationCRUD(t *testing.T) {
 		t.Fatalf("no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteMobileDeviceInvitationByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteMobileDeviceInvitationByID", func() error { return pc.DeleteMobileDeviceInvitationByID(ctx, intToStr(id)) })
 
 	got, err := pc.GetMobileDeviceInvitationByID(ctx, intToStr(id))
 	if err != nil {
@@ -1399,7 +1469,7 @@ func TestAcceptance_Classic_MobileDeviceEnrollmentProfileCRUD(t *testing.T) {
 	}
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteMobileDeviceEnrollmentProfileByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteMobileDeviceEnrollmentProfileByID", func() error { return pc.DeleteMobileDeviceEnrollmentProfileByID(ctx, intToStr(id)) })
 	if err := pc.DeleteMobileDeviceEnrollmentProfileByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetMobileDeviceEnrollmentProfileByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1429,7 +1499,7 @@ func TestAcceptance_Classic_PatchExternalSourceCRUD(t *testing.T) {
 	}
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeletePatchExternalSourceByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeletePatchExternalSourceByID", func() error { return pc.DeletePatchExternalSourceByID(ctx, intToStr(id)) })
 	if err := pc.DeletePatchExternalSourceByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetPatchExternalSourceByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1520,7 +1590,7 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 	}
 	if created == nil || created.ID == nil { t.Fatalf("no ID: %+v", created) }
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteSoftwareUpdateServerByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteSoftwareUpdateServerByID", func() error { return pc.DeleteSoftwareUpdateServerByID(ctx, intToStr(id)) })
 	if err := pc.DeleteSoftwareUpdateServerByID(ctx, intToStr(id)); err != nil { skipOnServerError(t, err); t.Fatalf("delete: %v", err) }
 	_, err = pc.GetSoftwareUpdateServerByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
@@ -1558,7 +1628,7 @@ func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 		t.Fatalf("CreateSiteByID returned no ID: %+v", created)
 	}
 	id := *created.ID
-	t.Cleanup(func() { _ = pc.DeleteSiteByID(ctx, intToStr(id)) })
+	cleanupDelete(t, "DeleteSiteByID", func() error { return pc.DeleteSiteByID(ctx, intToStr(id)) })
 
 	got, err := pc.GetSiteByID(ctx, intToStr(id))
 	if err != nil {

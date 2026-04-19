@@ -75,7 +75,7 @@ func TestAcceptance_Pro_BuildingCRUD(t *testing.T) {
 	if created.ID == "" {
 		t.Fatalf("CreateBuildingV1 returned no ID (href=%q)", created.Href)
 	}
-	t.Cleanup(func() { _ = p.DeleteBuildingV1(ctx, created.ID) })
+	cleanupDelete(t, "DeleteBuildingV1", func() error { return p.DeleteBuildingV1(ctx, created.ID) })
 	t.Logf("Created building %s (%s)", created.ID, created.Href)
 
 	// Get — round-trip confirmation
@@ -132,7 +132,7 @@ func TestAcceptance_Pro_ExportBuildings(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateBuildingV1: %v", err)
 	}
-	t.Cleanup(func() { _ = p.DeleteBuildingV1(ctx, created.ID) })
+	cleanupDelete(t, "DeleteBuildingV1", func() error { return p.DeleteBuildingV1(ctx, created.ID) })
 
 	csv, err := p.ExportBuildingsV1(ctx, nil)
 	if err != nil {
@@ -241,7 +241,7 @@ func TestAcceptance_Pro_PackageCRUD(t *testing.T) {
 	if created.ID == "" {
 		t.Fatalf("CreatePackageV1 returned no ID (href=%q)", created.Href)
 	}
-	t.Cleanup(func() { _ = p.DeletePackageV1(ctx, created.ID) })
+	cleanupDelete(t, "DeletePackageV1", func() error { return p.DeletePackageV1(ctx, created.ID) })
 	t.Logf("Created package %s (%s)", created.ID, name)
 
 	// Upload — multipart .pkg binary.

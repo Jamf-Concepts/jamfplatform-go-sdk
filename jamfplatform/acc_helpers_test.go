@@ -66,6 +66,20 @@ func skipOnServerError(t *testing.T, err error) {
 	}
 }
 
+// cleanupDelete registers a best-effort delete in t.Cleanup. Unlike
+// `_ = pc.DeleteXxx(...)`, it surfaces delete failures via t.Logf so a
+// server-side 5xx on cleanup doesn't silently leak a tenant record.
+// Errors are intentionally non-fatal: one failed cleanup must not
+// prevent other registered Cleanup hooks from running.
+func cleanupDelete(t *testing.T, label string, fn func() error) {
+	t.Helper()
+	t.Cleanup(func() {
+		if err := fn(); err != nil {
+			t.Logf("cleanup %s: %v", label, err)
+		}
+	})
+}
+
 // Smart group fixture — shared across all tests that need a device group scope.
 
 var smartGroupFixtureOnce sync.Once

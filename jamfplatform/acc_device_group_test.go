@@ -73,7 +73,7 @@ func TestAcceptance_DeviceGroup_CreateAndDeleteStaticGroup(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
+	cleanupDelete(t, "DeleteDeviceGroup", func() error { return dg.DeleteDeviceGroup(ctx, resp.ID) })
 
 	group, err := dg.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
@@ -108,7 +108,7 @@ func TestAcceptance_DeviceGroup_UpdateGroup(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
+	cleanupDelete(t, "DeleteDeviceGroup", func() error { return dg.DeleteDeviceGroup(ctx, resp.ID) })
 
 	renamedName := "sdk-acc-update-renamed-" + suffix
 	updatedDesc := "Updated description"
@@ -160,7 +160,7 @@ func TestAcceptance_DeviceGroup_SmartGroupWithCriteria(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
+	cleanupDelete(t, "DeleteDeviceGroup", func() error { return dg.DeleteDeviceGroup(ctx, resp.ID) })
 
 	group, err := dg.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
@@ -204,7 +204,7 @@ func TestAcceptance_DeviceGroup_PartialUpdatePreservesCriteria(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
+	cleanupDelete(t, "DeleteDeviceGroup", func() error { return dg.DeleteDeviceGroup(ctx, resp.ID) })
 
 	group, err := dg.GetDeviceGroup(ctx, resp.ID)
 	if err != nil {
@@ -284,7 +284,7 @@ func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDeviceGroup failed: %v", err)
 	}
-	t.Cleanup(func() { _ = dg.DeleteDeviceGroup(ctx, resp.ID) })
+	cleanupDelete(t, "DeleteDeviceGroup", func() error { return dg.DeleteDeviceGroup(ctx, resp.ID) })
 
 	// Add a device
 	addIDs := []string{deviceID}

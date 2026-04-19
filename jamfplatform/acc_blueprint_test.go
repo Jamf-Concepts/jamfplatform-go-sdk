@@ -31,7 +31,7 @@ func createTestBlueprint(t *testing.T, c *jamfplatform.Client, name string, grou
 		skipOnServerError(t, err)
 		t.Fatalf("CreateBlueprint failed for %q: %v", name, err)
 	}
-	t.Cleanup(func() { _ = bp.DeleteBlueprint(ctx, resp.ID) })
+	cleanupDelete(t, "DeleteBlueprint", func() error { return bp.DeleteBlueprint(ctx, resp.ID) })
 
 	got, err := bp.GetBlueprint(ctx, resp.ID)
 	if err != nil {
