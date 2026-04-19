@@ -22,12 +22,11 @@ import (
 
 // --- accounts --------------------------------------------------------
 
-// POST /v1/accounts on this tenant currently 500s with an empty
-// `errors` array even for payloads that pass enum + required-field
-// validation (tried ADMINISTRATOR with accountStatus + siteId).
-// Server-side bug — GET paths are covered, CREATE path isn't. Leave
-// the test failing-via-server-skip so the regression is visible when
-// the server is fixed.
+// POST /v1/accounts needs ldapServerId=-1 + distinguishedName="" as
+// sentinels even for non-LDAP accounts — omit them and the server
+// 500s with an empty errors array (null-deref in the LDAP lookup
+// path). Same for phone + changePasswordOnNextLogin; the schema
+// marks them optional but the create handler deref's them.
 func TestAcceptance_Pro_AccountsV1(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -51,18 +50,26 @@ func TestAcceptance_Pro_AccountsV1(t *testing.T) {
 	privilegeLevel := "ADMINISTRATOR"
 	accountType := "DEFAULT"
 	accountStatus := "Enabled"
+	phone := "000-000-0000"
+	distinguishedName := ""
 	siteID := -1
+	ldapServerID := -1
+	changePassword := false
 
 	created, err := p.CreateAccountV1(ctx, &pro.UserAccount{
-		Username:       &uname,
-		Realname:       &realname,
-		Email:          &email,
-		PlainPassword:  &password,
-		AccessLevel:    &accessLevel,
-		PrivilegeLevel: &privilegeLevel,
-		AccountType:    &accountType,
-		AccountStatus:  &accountStatus,
-		SiteID:         &siteID,
+		Username:                  &uname,
+		Realname:                  &realname,
+		Email:                     &email,
+		Phone:                     &phone,
+		PlainPassword:             &password,
+		LdapServerID:              &ldapServerID,
+		DistinguishedName:         &distinguishedName,
+		SiteID:                    &siteID,
+		AccessLevel:               &accessLevel,
+		PrivilegeLevel:            &privilegeLevel,
+		AccountStatus:             &accountStatus,
+		AccountType:               &accountType,
+		ChangePasswordOnNextLogin: &changePassword,
 	})
 	if err != nil {
 		skipOnServerError(t, err)
