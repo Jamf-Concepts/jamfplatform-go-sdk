@@ -120,17 +120,58 @@ err := jamfplatform.PollUntil(ctx, 5*time.Second, func(ctx context.Context) (boo
 
 Each API family lives in its own sub-package under `jamfplatform/`. Construct a service client with `<pkg>.New(rootClient)`.
 
-| Sub-package | Methods |
-|--------|---------|
-| `jamfplatform/devices` | ListDevices, GetDevice, UpdateDevice, DeleteDevice, ListDeviceApplications, ListDevicesForUser |
-| `jamfplatform/devicegroups` | ListDeviceGroups, GetDeviceGroup, CreateDeviceGroup, UpdateDeviceGroup, DeleteDeviceGroup, ListDeviceGroupMembers, UpdateDeviceGroupMembers, ListDeviceGroupsForDevice |
-| `jamfplatform/deviceactions` | CheckInDevice, EraseDevice, RestartDevice, ShutdownDevice, UnmanageDevice |
-| `jamfplatform/blueprints` | ListBlueprints, GetBlueprint, CreateBlueprint, UpdateBlueprint, DeleteBlueprint, DeployBlueprint, UndeployBlueprint, GetBlueprintReport, ListBlueprintComponents, GetBlueprintComponent |
-| `jamfplatform/compliancebenchmarks` | ListBaselines, GetBaselineRules, ListBenchmarks, GetBenchmark, CreateBenchmark, DeleteBenchmark, ListBenchmarkRulesStats, ListBenchmarkRuleDevices, GetBenchmarkCompliancePercentage |
-| `jamfplatform/ddmreport` | GetDeviceDeclarationReport, ListDeclarationReportClients |
-| `jamfplatform/pro` | ListBuildingsV1, GetBuildingV1, GetStartupStatus (pilot — more endpoints to be whitelisted) |
+| Sub-package | API | Coverage |
+|---|---|---|
+| `jamfplatform/devices` | Platform — device inventory | Pilot (6 methods) |
+| `jamfplatform/devicegroups` | Platform — device groups | Pilot (8 methods) |
+| `jamfplatform/deviceactions` | Platform — MDM commands | Pilot (5 methods) |
+| `jamfplatform/blueprints` | Platform — blueprints | Pilot (10 methods) |
+| `jamfplatform/compliancebenchmarks` | Platform — compliance | Pilot (9 methods) |
+| `jamfplatform/ddmreport` | Platform — declaration reporting | Pilot (2 methods) |
+| `jamfplatform/pro` | Jamf Pro JSON API | **Complete — 662/670 non-deprecated ops** (4 server-bootstrap endpoints out of scope) |
+| `jamfplatform/proclassic` | Jamf Classic XML API | **Complete — 579/579 non-deprecated ops** (byoprofiles excluded — broken upstream) |
 
-All list methods handle pagination automatically.
+All list methods handle pagination automatically. Pro's versioned endpoints emit version-suffixed Go methods (`ListBuildingsV1`, `GetCheckInSettingsV3`) so consumers pin to a specific API version.
+
+### Classic (XML) example
+
+```go
+import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
+
+classic := proclassic.New(client)
+computer, err := classic.GetComputerByID(ctx, "42")
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(computer.General.Name, computer.Hardware.ModelIdentifier)
+```
+
+Classic is fully typed — the generator hoists nested XML sections (`general`, `hardware`, `purchasing`, etc.) into named structs and emits every field as a pointer so three-state null/value semantics round-trip cleanly (required for the upcoming Terraform provider).
+
+### Pro example
+
+```go
+import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
+
+p := pro.New(client)
+pkgs, err := p.ListPackagesV1(ctx, nil, "")
+if err != nil {
+    log.Fatal(err)
+}
+for _, pkg := range pkgs {
+    fmt.Println(pkg.ID, pkg.PackageName, pkg.FileName)
+}
+
+// Multipart .pkg upload
+f, _ := os.Open("my-app.pkg")
+defer f.Close()
+created, _ := p.CreatePackageV1(ctx, &pro.Package{
+    PackageName: "my-app",
+    FileName:    "my-app.pkg",
+    CategoryID:  "-1",
+})
+_, err = p.UploadPackageV1(ctx, created.ID, "my-app.pkg", f)
+```
 
 ## Code generation
 
