@@ -83,7 +83,7 @@ func validateTypeReferences(pkgContext string, declared []GoType, methods []GoMe
 	if len(missing) == 0 {
 		return nil
 	}
-	return fmt.Errorf("%s: %d unresolved type reference(s):\n%s\n\nFix: either add the schema under components/schemas so extractTypes emits it, or correct the config-level requestType/responseType override.", pkgContext, len(missing), strings.Join(missing, "\n"))
+	return fmt.Errorf("%s: %d unresolved type reference(s):\n%s\n\nfix: either add the schema under components/schemas so extractTypes emits it, or correct the config-level requestType/responseType override", pkgContext, len(missing), strings.Join(missing, "\n"))
 }
 
 // normalizeTypeRef strips slice / pointer prefixes and returns the bare
