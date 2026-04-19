@@ -369,7 +369,42 @@
         {"op": "POST /v3/mobile-device-prestages/{id}/attachments", "name": "UploadMobileDevicePrestageAttachmentV3"},
         {"op": "POST /v3/mobile-device-prestages/{id}/attachments/delete-multiple", "name": "DeleteMultipleMobileDevicePrestageAttachmentsV3"},
         {"op": "GET /v3/mobile-device-prestages/{id}/history", "name": "ListMobileDevicePrestageHistoryV3", "pagination": "totalCount", "params": ["sort:[]string"]},
-        {"op": "POST /v3/mobile-device-prestages/{id}/history", "name": "CreateMobileDevicePrestageHistoryNoteV3"}
+        {"op": "POST /v3/mobile-device-prestages/{id}/history", "name": "CreateMobileDevicePrestageHistoryNoteV3"},
+
+        {"op": "GET /v1/adue-session-token-settings", "name": "GetADUESessionTokenSettingsV1"},
+        {"op": "PUT /v1/adue-session-token-settings", "name": "UpdateADUESessionTokenSettingsV1"},
+
+        {"op": "GET /v2/enrollment/history", "name": "ListEnrollmentHistoryV2", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "POST /v2/enrollment/history", "name": "CreateEnrollmentHistoryNoteV2"},
+        {"op": "POST /v2/enrollment/history/export", "name": "ExportEnrollmentHistoryV2", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]},
+
+        {"op": "GET /v3/enrollment/access-groups", "name": "ListEnrollmentAccessGroupsV3", "pagination": "totalCount", "params": ["sort:[]string", "all-users-option-first:bool:allUsersOptionFirst"]},
+        {"op": "POST /v3/enrollment/access-groups", "name": "CreateEnrollmentAccessGroupV3"},
+        {"op": "GET /v3/enrollment/access-groups/{id}", "name": "GetEnrollmentAccessGroupV3"},
+        {"op": "PUT /v3/enrollment/access-groups/{id}", "name": "UpdateEnrollmentAccessGroupV3"},
+        {"op": "DELETE /v3/enrollment/access-groups/{id}", "name": "DeleteEnrollmentAccessGroupV3", "expectedStatus": 204},
+
+        {"op": "GET /v3/enrollment/filtered-language-codes", "name": "ListFilteredEnrollmentLanguageCodesV3"},
+        {"op": "GET /v3/enrollment/language-codes", "name": "ListEnrollmentLanguageCodesV3"},
+        {"op": "GET /v3/enrollment/languages", "name": "ListEnrollmentLanguagesV3", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "POST /v3/enrollment/languages/delete-multiple", "name": "DeleteMultipleEnrollmentLanguagesV3"},
+        {"op": "GET /v3/enrollment/languages/{languageId}", "name": "GetEnrollmentLanguageV3", "pathNames": {"languageId": "languageID"}},
+        {"op": "PUT /v3/enrollment/languages/{languageId}", "name": "UpdateEnrollmentLanguageV3", "pathNames": {"languageId": "languageID"}},
+        {"op": "DELETE /v3/enrollment/languages/{languageId}", "name": "DeleteEnrollmentLanguageV3", "pathNames": {"languageId": "languageID"}, "expectedStatus": 204},
+
+        {"op": "GET /v4/enrollment", "name": "GetEnrollmentSettingsV4"},
+        {"op": "PUT /v4/enrollment", "name": "UpdateEnrollmentSettingsV4"},
+        {"op": "GET /v4/enrollment/access-management", "name": "GetEnrollmentAccessManagementV4"},
+        {"op": "POST /v4/enrollment/access-management", "name": "UpdateEnrollmentAccessManagementV4"},
+
+        {"op": "GET /v1/reenrollment", "name": "GetReenrollmentSettingsV1"},
+        {"op": "PUT /v1/reenrollment", "name": "UpdateReenrollmentSettingsV1", "expectedStatus": 200},
+        {"op": "GET /v1/reenrollment/history", "name": "ListReenrollmentHistoryV1", "pagination": "totalCount", "params": ["sort"]},
+        {"op": "POST /v1/reenrollment/history", "name": "CreateReenrollmentHistoryNoteV1", "expectedStatus": 200},
+        {"op": "POST /v1/reenrollment/history/export", "name": "ExportReenrollmentHistoryV1", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]},
+
+        {"op": "GET /v1/service-discovery-enrollment/well-known-settings", "name": "GetServiceDiscoveryEnrollmentWellKnownSettingsV1"},
+        {"op": "PUT /v1/service-discovery-enrollment/well-known-settings", "name": "UpdateServiceDiscoveryEnrollmentWellKnownSettingsV1"}
       ]
     },
     {

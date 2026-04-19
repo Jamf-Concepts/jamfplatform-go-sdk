@@ -10,6 +10,24 @@ import (
 	"time"
 )
 
+// AccessGroupsPreviewSearchResults represents a access groups preview search results.
+type AccessGroupsPreviewSearchResults struct {
+	Results    []EnrollmentAccessGroupPreview `json:"results"`
+	TotalCount int                            `json:"totalCount"`
+}
+
+// AccessManagementSetting represents a access management setting.
+type AccessManagementSetting struct {
+	AutomatedDeviceEnrollmentServerUUID *string `json:"automatedDeviceEnrollmentServerUuid,omitempty"`
+}
+
+// AccountDrivenUserEnrollmentSessionTokenSettings Settings for Account Driven User Enrollment. Only 1 of expirationIntervalDays or expirationIntervalSeconds can be supplied.
+type AccountDrivenUserEnrollmentSessionTokenSettings struct {
+	Enabled                   *bool `json:"enabled,omitempty"`
+	ExpirationIntervalDays    *int  `json:"expirationIntervalDays,omitempty"`
+	ExpirationIntervalSeconds *int  `json:"expirationIntervalSeconds,omitempty"`
+}
+
 // AccountSettingsRequest represents a account settings request.
 type AccountSettingsRequest struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
@@ -158,6 +176,22 @@ type Category struct {
 type CeaTemplatesResults struct {
 	Results    []ComputerExtensionAttributeTemplates `json:"results"`
 	TotalCount int                                   `json:"totalCount"`
+}
+
+// CertificateDetails represents a certificate details.
+type CertificateDetails struct {
+	SerialNumber *string `json:"serialNumber,omitempty"`
+	Subject      *string `json:"subject,omitempty"`
+}
+
+// CertificateIdentityV2 represents a certificate identity v2.
+type CertificateIdentityV2 struct {
+	Filename *string `json:"filename,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	IdentityKeystore *[]byte `json:"identityKeystore,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	KeystorePassword *string `json:"keystorePassword,omitempty"`
+	Md5Sum           *string `json:"md5Sum,omitempty"`
 }
 
 // ChangePassword represents a change password.
@@ -1244,6 +1278,19 @@ type DeviceEnrollmentToken struct {
 	TokenFileName *string `json:"tokenFileName,omitempty"`
 }
 
+// EnrollmentAccessGroupPreview represents a enrollment access group preview.
+type EnrollmentAccessGroupPreview struct {
+	AccountDrivenUserEnrollmentEnabled *bool   `json:"accountDrivenUserEnrollmentEnabled,omitempty"`
+	EnterpriseEnrollmentEnabled        *bool   `json:"enterpriseEnrollmentEnabled,omitempty"`
+	GroupID                            string  `json:"groupId"`
+	ID                                 *string `json:"id,omitempty"`
+	LdapServerID                       string  `json:"ldapServerId"`
+	Name                               string  `json:"name"`
+	PersonalEnrollmentEnabled          *bool   `json:"personalEnrollmentEnabled,omitempty"`
+	RequireEula                        *bool   `json:"requireEula,omitempty"`
+	SiteID                             *string `json:"siteId,omitempty"`
+}
+
 // EnrollmentMethod represents a enrollment method.
 type EnrollmentMethod struct {
 	ID         string `json:"id"`
@@ -1255,6 +1302,88 @@ type EnrollmentMethod struct {
 type EnrollmentMethodPrestage struct {
 	MobileDevicePrestageID string `json:"mobileDevicePrestageId"`
 	ProfileName            string `json:"profileName"`
+}
+
+// EnrollmentProcessTextObject represents a enrollment process text object.
+type EnrollmentProcessTextObject struct {
+	CertificateButton                *string `json:"certificateButton,omitempty"`
+	CertificateProfileDescription    *string `json:"certificateProfileDescription,omitempty"`
+	CertificateProfileName           *string `json:"certificateProfileName,omitempty"`
+	CertificateText                  *string `json:"certificateText,omitempty"`
+	CheckEnrollmentMessage           *string `json:"checkEnrollmentMessage,omitempty"`
+	CheckNowButton                   *string `json:"checkNowButton,omitempty"`
+	CompleteMessage                  *string `json:"completeMessage,omitempty"`
+	DeviceClassButton                *string `json:"deviceClassButton,omitempty"`
+	DeviceClassDescription           *string `json:"deviceClassDescription,omitempty"`
+	DeviceClassEnterprise            *string `json:"deviceClassEnterprise,omitempty"`
+	DeviceClassEnterpriseDescription *string `json:"deviceClassEnterpriseDescription,omitempty"`
+	DeviceClassPersonal              *string `json:"deviceClassPersonal,omitempty"`
+	DeviceClassPersonalDescription   *string `json:"deviceClassPersonalDescription,omitempty"`
+	EnterpriseButton                 *string `json:"enterpriseButton,omitempty"`
+	EnterpriseEula                   *string `json:"enterpriseEula,omitempty"`
+	EnterprisePending                *string `json:"enterprisePending,omitempty"`
+	EnterpriseProfileDescription     *string `json:"enterpriseProfileDescription,omitempty"`
+	EnterpriseProfileName            *string `json:"enterpriseProfileName,omitempty"`
+	EnterpriseText                   *string `json:"enterpriseText,omitempty"`
+	EulaButton                       *string `json:"eulaButton,omitempty"`
+	FailedMessage                    *string `json:"failedMessage,omitempty"`
+	LanguageCode                     *string `json:"languageCode,omitempty"`
+	LoginButton                      *string `json:"loginButton,omitempty"`
+	LoginDescription                 *string `json:"loginDescription,omitempty"`
+	LogoutButton                     *string `json:"logoutButton,omitempty"`
+	Name                             *string `json:"name,omitempty"`
+	Password                         *string `json:"password,omitempty"`
+	PersonalButton                   *string `json:"personalButton,omitempty"`
+	PersonalEula                     *string `json:"personalEula,omitempty"`
+	PersonalProfileDescription       *string `json:"personalProfileDescription,omitempty"`
+	PersonalProfileName              *string `json:"personalProfileName,omitempty"`
+	PersonalText                     *string `json:"personalText,omitempty"`
+	QuickAddButton                   *string `json:"quickAddButton,omitempty"`
+	QuickAddName                     *string `json:"quickAddName,omitempty"`
+	QuickAddPending                  *string `json:"quickAddPending,omitempty"`
+	QuickAddText                     *string `json:"quickAddText,omitempty"`
+	SiteDescription                  *string `json:"siteDescription,omitempty"`
+	Title                            *string `json:"title,omitempty"`
+	TryAgainButton                   *string `json:"tryAgainButton,omitempty"`
+	UserEnrollmentButton             *string `json:"userEnrollmentButton,omitempty"`
+	UserEnrollmentProfileDescription *string `json:"userEnrollmentProfileDescription,omitempty"`
+	UserEnrollmentProfileName        *string `json:"userEnrollmentProfileName,omitempty"`
+	UserEnrollmentText               *string `json:"userEnrollmentText,omitempty"`
+	Username                         *string `json:"username,omitempty"`
+}
+
+// EnrollmentSettingsV4 represents a enrollment settings v4.
+type EnrollmentSettingsV4 struct {
+	AccountDrivenDeviceIosEnrollmentEnabled      *bool                  `json:"accountDrivenDeviceIosEnrollmentEnabled,omitempty"`
+	AccountDrivenDeviceMacosEnrollmentEnabled    *bool                  `json:"accountDrivenDeviceMacosEnrollmentEnabled,omitempty"`
+	AccountDrivenDeviceVisionosEnrollmentEnabled *bool                  `json:"accountDrivenDeviceVisionosEnrollmentEnabled,omitempty"`
+	AccountDrivenUserEnrollmentEnabled           *bool                  `json:"accountDrivenUserEnrollmentEnabled,omitempty"`
+	AccountDrivenUserVisionosEnrollmentEnabled   *bool                  `json:"accountDrivenUserVisionosEnrollmentEnabled,omitempty"`
+	AllowSshOnlyManagementAccount                *bool                  `json:"allowSshOnlyManagementAccount,omitempty"`
+	CreateManagementAccount                      *bool                  `json:"createManagementAccount,omitempty"`
+	DeveloperCertificateIdentity                 *CertificateIdentityV2 `json:"developerCertificateIdentity,omitempty"`
+	DeveloperCertificateIdentityDetails          *CertificateDetails    `json:"developerCertificateIdentityDetails,omitempty"`
+	EnsureSshRunning                             *bool                  `json:"ensureSshRunning,omitempty"`
+	FlushExtensionAttributes                     *bool                  `json:"flushExtensionAttributes,omitempty"`
+	FlushLocationHistoryInformation              *bool                  `json:"flushLocationHistoryInformation,omitempty"`
+	FlushLocationInformation                     *bool                  `json:"flushLocationInformation,omitempty"`
+	FlushMDMCommandsOnReenroll                   *string                `json:"flushMdmCommandsOnReenroll,omitempty"`
+	FlushPolicyHistory                           *bool                  `json:"flushPolicyHistory,omitempty"`
+	FlushSoftwareUpdatePlans                     *bool                  `json:"flushSoftwareUpdatePlans,omitempty"`
+	HideManagementAccount                        *bool                  `json:"hideManagementAccount,omitempty"`
+	InstallSingleProfile                         *bool                  `json:"installSingleProfile,omitempty"`
+	IosEnterpriseEnrollmentEnabled               *bool                  `json:"iosEnterpriseEnrollmentEnabled,omitempty"`
+	IosPersonalEnrollmentEnabled                 *bool                  `json:"iosPersonalEnrollmentEnabled,omitempty"`
+	LaunchSelfService                            *bool                  `json:"launchSelfService,omitempty"`
+	MacOsEnterpriseEnrollmentEnabled             *bool                  `json:"macOsEnterpriseEnrollmentEnabled,omitempty"`
+	MaidUsernameMergeEnabled                     *bool                  `json:"maidUsernameMergeEnabled,omitempty"`
+	ManagementUsername                           string                 `json:"managementUsername"`
+	MDMSigningCertificate                        *CertificateIdentityV2 `json:"mdmSigningCertificate,omitempty"`
+	MDMSigningCertificateDetails                 *CertificateDetails    `json:"mdmSigningCertificateDetails,omitempty"`
+	PersonalDeviceEnrollmentType                 *string                `json:"personalDeviceEnrollmentType,omitempty"`
+	RestrictReenrollment                         *bool                  `json:"restrictReenrollment,omitempty"`
+	SignQuickAdd                                 *bool                  `json:"signQuickAdd,omitempty"`
+	SigningMDMProfileEnabled                     *bool                  `json:"signingMdmProfileEnabled,omitempty"`
 }
 
 // EraseDeviceComputerRequest represents a erase device computer request.
@@ -1710,6 +1839,12 @@ type InventoryPreloadRecordV2 struct {
 	Username            *string                               `json:"username,omitempty"`
 	Vendor              *string                               `json:"vendor,omitempty"`
 	WarrantyExpiration  *string                               `json:"warrantyExpiration,omitempty"`
+}
+
+// LanguageCode represents a language code.
+type LanguageCode struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }
 
 // LocationInformationV2 represents a location information v2.
@@ -2918,6 +3053,12 @@ type PrestageSyncStatusV2 struct {
 	Timestamp  string `json:"timestamp"`
 }
 
+// ProcessTextsSearchResults represents a process texts search results.
+type ProcessTextsSearchResults struct {
+	Results    []EnrollmentProcessTextObject `json:"results"`
+	TotalCount int                           `json:"totalCount"`
+}
+
 // PurchasingV2 represents a purchasing v2.
 type PurchasingV2 struct {
 	AppleCareID         *string    `json:"appleCareId,omitempty"`
@@ -3032,6 +3173,16 @@ type PutMobileDevicePrestageV3 struct {
 	VersionLock                            int                              `json:"versionLock"`
 }
 
+// Reenrollment represents a reenrollment.
+type Reenrollment struct {
+	FlushMDMQueue                            string `json:"flushMDMQueue"`
+	IsFlushExtensionAttributesEnabled        *bool  `json:"isFlushExtensionAttributesEnabled,omitempty"`
+	IsFlushLocationInformationEnabled        *bool  `json:"isFlushLocationInformationEnabled,omitempty"`
+	IsFlushLocationInformationHistoryEnabled *bool  `json:"isFlushLocationInformationHistoryEnabled,omitempty"`
+	IsFlushPolicyHistoryEnabled              *bool  `json:"isFlushPolicyHistoryEnabled,omitempty"`
+	IsFlushSoftwareUpdatePlansEnabled        *bool  `json:"isFlushSoftwareUpdatePlansEnabled,omitempty"`
+}
+
 // RemoveComputerMDMProfileResponse represents a remove computer m d m profile response.
 type RemoveComputerMDMProfileResponse struct {
 	CommandUUID string `json:"commandUuid"`
@@ -3082,6 +3233,9 @@ type SecurityV2 struct {
 	PasscodeCompliantWithProfile  bool       `json:"passcodeCompliantWithProfile"`
 	PasscodePresent               bool       `json:"passcodePresent"`
 }
+
+// ServiceDiscoveryVersion represents a service discovery version value.
+type ServiceDiscoveryVersion = string
 
 // SiteObject represents a site object.
 type SiteObject struct {
@@ -3349,4 +3503,21 @@ type WatchOsDetailsV2 struct {
 	Security                    *SecurityV2                        `json:"security,omitempty"`
 	Supervised                  bool                               `json:"supervised"`
 	UnlockToken                 string                             `json:"unlockToken"`
+}
+
+// WellKnownSetting represents a well known setting.
+type WellKnownSetting struct {
+	EnrollmentType ServiceDiscoveryVersion `json:"enrollmentType"`
+	OrgName        *string                 `json:"orgName,omitempty"`
+	ServerUUID     string                  `json:"serverUuid"`
+}
+
+// WellKnownSettingsRequest represents a well known settings request.
+type WellKnownSettingsRequest struct {
+	WellKnownSettings []WellKnownSetting `json:"wellKnownSettings"`
+}
+
+// WellKnownSettingsResponse represents a well known settings response.
+type WellKnownSettingsResponse struct {
+	WellKnownSettings []WellKnownSetting `json:"wellKnownSettings"`
 }
