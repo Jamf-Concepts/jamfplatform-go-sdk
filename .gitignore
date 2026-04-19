@@ -29,6 +29,3 @@ coverage.html
 # Testing
 testing/
 tools/generate/generate
-
-# Large acceptance-test fixtures (e.g. .pkg uploads) — bring your own locally.
-jamfplatform/testdata/*.pkg
