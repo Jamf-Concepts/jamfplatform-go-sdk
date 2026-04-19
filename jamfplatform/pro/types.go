@@ -1210,6 +1210,251 @@ type PagedUserResults struct {
 	TotalPages  int64  `json:"totalPages"`
 }
 
+// PatchPolicies represents a patch policies.
+type PatchPolicies struct {
+	Results    []PatchPolicyListView `json:"results"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+// PatchPolicyDetail represents a patch policy detail.
+type PatchPolicyDetail struct {
+	DeploymentMethod             string `json:"deploymentMethod"`
+	Downgrade                    bool   `json:"downgrade"`
+	Enabled                      bool   `json:"enabled"`
+	IconID                       string `json:"iconId"`
+	ID                           string `json:"id"`
+	InstallButtonText            string `json:"installButtonText"`
+	KillAppsDelayMinutes         int    `json:"killAppsDelayMinutes"`
+	KillAppsMessage              string `json:"killAppsMessage"`
+	Name                         string `json:"name"`
+	NotificationHeader           string `json:"notificationHeader"`
+	PatchUnknownVersion          bool   `json:"patchUnknownVersion"`
+	ReminderEnabled              bool   `json:"reminderEnabled"`
+	ReminderFrequency            int    `json:"reminderFrequency"`
+	SelfServiceDeadline          int    `json:"selfServiceDeadline"`
+	SelfServiceDescription       string `json:"selfServiceDescription"`
+	SelfServiceEnforceDeadline   bool   `json:"selfServiceEnforceDeadline"`
+	SoftwareTitleConfigurationID string `json:"softwareTitleConfigurationId"`
+	SoftwareTitleID              string `json:"softwareTitleId"`
+	TargetPatchVersion           string `json:"targetPatchVersion"`
+}
+
+// PatchPolicyDetails represents a patch policy details.
+type PatchPolicyDetails struct {
+	Results    []PatchPolicyDetail `json:"results"`
+	TotalCount int                 `json:"totalCount"`
+}
+
+// PatchPolicyListView represents a patch policy list view.
+type PatchPolicyListView struct {
+	Completed                    int    `json:"completed"`
+	Deferred                     int    `json:"deferred"`
+	Failed                       int    `json:"failed"`
+	ID                           string `json:"id"`
+	Pending                      int    `json:"pending"`
+	PolicyDeploymentMethod       string `json:"policyDeploymentMethod"`
+	PolicyEnabled                bool   `json:"policyEnabled"`
+	PolicyName                   string `json:"policyName"`
+	PolicyTargetVersion          string `json:"policyTargetVersion"`
+	SoftwareTitle                string `json:"softwareTitle"`
+	SoftwareTitleConfigurationID string `json:"softwareTitleConfigurationId"`
+}
+
+// PatchPolicyLogDetail represents a patch policy log detail.
+type PatchPolicyLogDetail struct {
+	Actions       []PatchPolicyLogDetailAction `json:"actions"`
+	AttemptNumber int                          `json:"attemptNumber"`
+	DeviceID      string                       `json:"deviceId"`
+	ID            string                       `json:"id"`
+}
+
+// PatchPolicyLogDetailAction represents a patch policy log detail action.
+type PatchPolicyLogDetailAction struct {
+	Action      string `json:"action"`
+	ActionOrder int    `json:"actionOrder"`
+	ID          string `json:"id"`
+}
+
+// PatchPolicyLogEligibleRetryCount represents a patch policy log eligible retry count.
+type PatchPolicyLogEligibleRetryCount struct {
+	Count int `json:"count"`
+}
+
+// PatchPolicyLogRetry represents a patch policy log retry.
+type PatchPolicyLogRetry struct {
+	DeviceIds *[]string `json:"deviceIds,omitempty"`
+}
+
+// PatchPolicyLogV2 represents a patch policy log v2.
+type PatchPolicyLogV2 struct {
+	AttemptNumber           int        `json:"attemptNumber"`
+	DeviceID                string     `json:"deviceId"`
+	DeviceName              string     `json:"deviceName"`
+	IgnoredForPatchPolicyID string     `json:"ignoredForPatchPolicyId"`
+	PatchPolicyID           string     `json:"patchPolicyId"`
+	StatusCode              int        `json:"statusCode"`
+	StatusDate              *time.Time `json:"statusDate,omitempty"`
+	StatusEnum              string     `json:"statusEnum"`
+}
+
+// PatchPolicyLogs represents a patch policy logs.
+type PatchPolicyLogs struct {
+	Results    []PatchPolicyLogV2 `json:"results"`
+	TotalCount int                `json:"totalCount"`
+}
+
+// PatchPolicyV2OnDashboard represents a patch policy v2 on dashboard.
+type PatchPolicyV2OnDashboard struct {
+	OnDashboard bool `json:"onDashboard"`
+}
+
+// PatchSoftwareTitleConfiguration represents a patch software title configuration.
+type PatchSoftwareTitleConfiguration struct {
+	CategoryID             string                                               `json:"categoryId"`
+	DisplayName            string                                               `json:"displayName"`
+	EmailNotifications     bool                                                 `json:"emailNotifications"`
+	ExtensionAttributes    []PatchSoftwareTitleConfigurationExtensionAttributes `json:"extensionAttributes"`
+	ID                     string                                               `json:"id"`
+	JamfOfficial           bool                                                 `json:"jamfOfficial"`
+	Packages               []PatchSoftwareTitlePackages                         `json:"packages"`
+	PatchSourceEnabled     bool                                                 `json:"patchSourceEnabled"`
+	PatchSourceName        string                                               `json:"patchSourceName"`
+	SiteID                 string                                               `json:"siteId"`
+	SoftwareTitleID        string                                               `json:"softwareTitleId"`
+	SoftwareTitleName      string                                               `json:"softwareTitleName"`
+	SoftwareTitleNameID    string                                               `json:"softwareTitleNameId"`
+	SoftwareTitlePublisher string                                               `json:"softwareTitlePublisher"`
+	UiNotifications        bool                                                 `json:"uiNotifications"`
+}
+
+// PatchSoftwareTitleConfigurationBase represents a patch software title configuration base.
+type PatchSoftwareTitleConfigurationBase struct {
+	CategoryID             *string                                               `json:"categoryId,omitempty"`
+	DisplayName            string                                                `json:"displayName"`
+	EmailNotifications     *bool                                                 `json:"emailNotifications,omitempty"`
+	ExtensionAttributes    *[]PatchSoftwareTitleConfigurationExtensionAttributes `json:"extensionAttributes,omitempty"`
+	JamfOfficial           *bool                                                 `json:"jamfOfficial,omitempty"`
+	PatchSourceEnabled     *bool                                                 `json:"patchSourceEnabled,omitempty"`
+	PatchSourceName        *string                                               `json:"patchSourceName,omitempty"`
+	SiteID                 *string                                               `json:"siteId,omitempty"`
+	SoftwareTitleID        string                                                `json:"softwareTitleId"`
+	SoftwareTitleName      *string                                               `json:"softwareTitleName,omitempty"`
+	SoftwareTitleNameID    *string                                               `json:"softwareTitleNameId,omitempty"`
+	SoftwareTitlePublisher *string                                               `json:"softwareTitlePublisher,omitempty"`
+	UiNotifications        *bool                                                 `json:"uiNotifications,omitempty"`
+}
+
+// PatchSoftwareTitleConfigurationDefinitionKillApp represents a patch software title configuration definition kill app.
+type PatchSoftwareTitleConfigurationDefinitionKillApp struct {
+	AppName string `json:"appName"`
+}
+
+// PatchSoftwareTitleConfigurationDependencies represents a patch software title configuration dependencies.
+type PatchSoftwareTitleConfigurationDependencies struct {
+	Results    []PatchSoftwareTitleConfigurationDependency `json:"results"`
+	TotalCount int                                         `json:"totalCount"`
+}
+
+// PatchSoftwareTitleConfigurationDependency represents a patch software title configuration dependency.
+type PatchSoftwareTitleConfigurationDependency struct {
+	SmartGroupID   string `json:"smartGroupId"`
+	SmartGroupName string `json:"smartGroupName"`
+}
+
+// PatchSoftwareTitleConfigurationExtensionAttributes represents a patch software title configuration extension attributes.
+type PatchSoftwareTitleConfigurationExtensionAttributes struct {
+	Accepted *bool   `json:"accepted,omitempty"`
+	EaID     *string `json:"eaId,omitempty"`
+}
+
+// PatchSoftwareTitleConfigurationPatch represents a patch software title configuration patch.
+type PatchSoftwareTitleConfigurationPatch struct {
+	CategoryID          *string                                               `json:"categoryId,omitempty"`
+	DisplayName         *string                                               `json:"displayName,omitempty"`
+	EmailNotifications  *bool                                                 `json:"emailNotifications,omitempty"`
+	ExtensionAttributes *[]PatchSoftwareTitleConfigurationExtensionAttributes `json:"extensionAttributes,omitempty"`
+	Packages            *[]PatchSoftwareTitlePackages                         `json:"packages,omitempty"`
+	SiteID              *string                                               `json:"siteId,omitempty"`
+	SoftwareTitleID     *string                                               `json:"softwareTitleId,omitempty"`
+	UiNotifications     *bool                                                 `json:"uiNotifications,omitempty"`
+}
+
+// PatchSoftwareTitleDefinition represents a patch software title definition.
+type PatchSoftwareTitleDefinition struct {
+	AbsoluteOrderID        string                                             `json:"absoluteOrderId"`
+	KillApps               []PatchSoftwareTitleConfigurationDefinitionKillApp `json:"killApps"`
+	MinimumOperatingSystem string                                             `json:"minimumOperatingSystem"`
+	RebootRequired         bool                                               `json:"rebootRequired"`
+	ReleaseDate            string                                             `json:"releaseDate"`
+	Standalone             bool                                               `json:"standalone"`
+	Version                string                                             `json:"version"`
+}
+
+// PatchSoftwareTitleDefinitions represents a patch software title definitions.
+type PatchSoftwareTitleDefinitions struct {
+	Results    []PatchSoftwareTitleDefinition `json:"results"`
+	TotalCount int                            `json:"totalCount"`
+}
+
+// PatchSoftwareTitleExtensionAttributes represents a patch software title extension attributes.
+type PatchSoftwareTitleExtensionAttributes struct {
+	Accepted       bool   `json:"accepted"`
+	DisplayName    string `json:"displayName"`
+	EaID           string `json:"eaId"`
+	ScriptContents string `json:"scriptContents"`
+}
+
+// PatchSoftwareTitlePackages represents a patch software title packages.
+type PatchSoftwareTitlePackages struct {
+	DisplayName *string `json:"displayName,omitempty"`
+	PackageID   *string `json:"packageId,omitempty"`
+	Version     *string `json:"version,omitempty"`
+}
+
+// PatchSoftwareTitleReport represents a patch software title report.
+type PatchSoftwareTitleReport struct {
+	BuildingName           string     `json:"buildingName"`
+	ComputerName           string     `json:"computerName"`
+	DepartmentName         string     `json:"departmentName"`
+	DeviceID               string     `json:"deviceId"`
+	LastContactTime        *time.Time `json:"lastContactTime,omitempty"`
+	OperatingSystemVersion string     `json:"operatingSystemVersion"`
+	SiteName               string     `json:"siteName"`
+	Username               string     `json:"username"`
+	Version                string     `json:"version"`
+}
+
+// PatchSoftwareTitleReportSearchResult represents a patch software title report search result.
+type PatchSoftwareTitleReportSearchResult struct {
+	Results    []PatchSoftwareTitleReport `json:"results"`
+	TotalCount int                        `json:"totalCount"`
+}
+
+// PatchSummary represents a patch summary.
+type PatchSummary struct {
+	LatestVersion                string     `json:"latestVersion"`
+	OnDashboard                  bool       `json:"onDashboard"`
+	OutOfDate                    int        `json:"outOfDate"`
+	ReleaseDate                  *time.Time `json:"releaseDate,omitempty"`
+	SoftwareTitleConfigurationID string     `json:"softwareTitleConfigurationId"`
+	SoftwareTitleID              string     `json:"softwareTitleId"`
+	Title                        string     `json:"title"`
+	UpToDate                     int        `json:"upToDate"`
+}
+
+// PatchSummaryVersion represents a patch summary version.
+type PatchSummaryVersion struct {
+	AbsoluteOrderID string `json:"absoluteOrderId"`
+	OnVersion       int    `json:"onVersion"`
+	Version         string `json:"version"`
+}
+
+// PolicyPropertiesV1 represents a policy properties v1.
+type PolicyPropertiesV1 struct {
+	AllowNetworkStateChangeTriggers   *bool `json:"allowNetworkStateChangeTriggers,omitempty"`
+	PoliciesRequireNetworkStateChange *bool `json:"policiesRequireNetworkStateChange,omitempty"`
+}
+
 // PurchasingV2 represents a purchasing v2.
 type PurchasingV2 struct {
 	AppleCareID         *string    `json:"appleCareId,omitempty"`
@@ -1360,6 +1605,11 @@ type SmartSearchCriterion struct {
 	Priority     *int   `json:"priority,omitempty"`
 	SearchType   string `json:"searchType"`
 	Value        string `json:"value"`
+}
+
+// SoftwareTitleConfigurationOnDashboard represents a software title configuration on dashboard.
+type SoftwareTitleConfigurationOnDashboard struct {
+	OnDashboard bool `json:"onDashboard"`
 }
 
 // StartupStatus represents a startup status.

@@ -250,7 +250,43 @@
         {"op": "POST /v1/users", "name": "CreateUserV1", "params": ["platform:bool"]},
         {"op": "GET /v1/users/{id}", "name": "GetUserV1", "params": ["platform:bool"]},
         {"op": "PUT /v1/users/{id}", "name": "UpdateUserV1"},
-        {"op": "DELETE /v1/users/{id}", "name": "DeleteUserV1", "expectedStatus": 204}
+        {"op": "DELETE /v1/users/{id}", "name": "DeleteUserV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/policy-properties", "name": "GetPolicyPropertiesV1"},
+        {"op": "PUT /v1/policy-properties", "name": "UpdatePolicyPropertiesV1"},
+
+        {"op": "POST /v2/patch-management-accept-disclaimer", "name": "AcceptPatchManagementDisclaimerV2"},
+
+        {"op": "GET /v2/patch-policies", "name": "ListPatchPoliciesV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v2/patch-policies/policy-details", "name": "ListPatchPolicyDetailsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v2/patch-policies/{id}/dashboard", "name": "GetPatchPolicyDashboardStatusV2"},
+        {"op": "POST /v2/patch-policies/{id}/dashboard", "name": "AddPatchPolicyToDashboardV2"},
+        {"op": "DELETE /v2/patch-policies/{id}/dashboard", "name": "RemovePatchPolicyFromDashboardV2"},
+
+        {"op": "GET /v2/patch-policies/{id}/logs", "name": "ListPatchPolicyLogsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v2/patch-policies/{id}/logs/eligible-retry-count", "name": "GetPatchPolicyEligibleRetryCountV2"},
+        {"op": "POST /v2/patch-policies/{id}/logs/retry", "name": "RetryPatchPolicyLogsV2", "expectedStatus": 204},
+        {"op": "POST /v2/patch-policies/{id}/logs/retry-all", "name": "RetryAllPatchPolicyLogsV2", "expectedStatus": 204},
+        {"op": "GET /v2/patch-policies/{id}/logs/{deviceId}", "name": "GetPatchPolicyLogForDeviceV2"},
+        {"op": "GET /v2/patch-policies/{id}/logs/{deviceId}/details", "name": "ListPatchPolicyLogDetailsForDeviceV2"},
+
+        {"op": "GET /v2/patch-software-title-configurations", "name": "ListPatchSoftwareTitleConfigurationsV2"},
+        {"op": "POST /v2/patch-software-title-configurations", "name": "CreatePatchSoftwareTitleConfigurationV2"},
+        {"op": "GET /v2/patch-software-title-configurations/{id}", "name": "GetPatchSoftwareTitleConfigurationV2"},
+        {"op": "DELETE /v2/patch-software-title-configurations/{id}", "name": "DeletePatchSoftwareTitleConfigurationV2", "expectedStatus": 204},
+        {"op": "PATCH /v2/patch-software-title-configurations/{id}", "name": "UpdatePatchSoftwareTitleConfigurationV2", "contentType": "application/merge-patch+json"},
+        {"op": "GET /v2/patch-software-title-configurations/{id}/dashboard", "name": "GetPatchSoftwareTitleDashboardStatusV2"},
+        {"op": "POST /v2/patch-software-title-configurations/{id}/dashboard", "name": "AddPatchSoftwareTitleToDashboardV2"},
+        {"op": "DELETE /v2/patch-software-title-configurations/{id}/dashboard", "name": "RemovePatchSoftwareTitleFromDashboardV2"},
+        {"op": "GET /v2/patch-software-title-configurations/{id}/definitions", "name": "ListPatchSoftwareTitleDefinitionsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v2/patch-software-title-configurations/{id}/dependencies", "name": "GetPatchSoftwareTitleDependenciesV2"},
+        {"op": "GET /v2/patch-software-title-configurations/{id}/export-report", "name": "ExportPatchSoftwareTitleReportV2", "params": ["filter", "columns-to-export:[]string:columnsToExport"]},
+        {"op": "GET /v2/patch-software-title-configurations/{id}/extension-attributes", "name": "ListPatchSoftwareTitleExtensionAttributesV2"},
+        {"op": "GET /v2/patch-software-title-configurations/{id}/history", "name": "ListPatchSoftwareTitleHistoryV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v2/patch-software-title-configurations/{id}/history", "name": "CreatePatchSoftwareTitleHistoryNoteV2"},
+        {"op": "GET /v2/patch-software-title-configurations/{id}/patch-report", "name": "ListPatchSoftwareTitlePatchReportV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v2/patch-software-title-configurations/{id}/patch-summary", "name": "GetPatchSoftwareTitlePatchSummaryV2"},
+        {"op": "GET /v2/patch-software-title-configurations/{id}/patch-summary/versions", "name": "ListPatchSoftwareTitlePatchSummaryVersionsV2"}
       ]
     },
     {
