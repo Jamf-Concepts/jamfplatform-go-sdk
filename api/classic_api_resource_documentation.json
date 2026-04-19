@@ -913,6 +913,67 @@
         "title": "class",
         "type": "object"
       },
+      "class_post": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "meeting_times": {
+            "properties": {
+              "meeting_time": {
+                "properties": {
+                  "days": {
+                    "enum": [
+                      "M",
+                      "T",
+                      "W",
+                      "Th",
+                      "F",
+                      "Sa",
+                      "Su"
+                    ],
+                    "example": "M W F",
+                    "type": "string"
+                  },
+                  "end_time": {
+                    "example": 1345,
+                    "type": "integer"
+                  },
+                  "start_time": {
+                    "example": 1300,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "description": "Name of the class",
+            "example": "Math 101",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "source": {
+            "example": "N/A",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "class",
+        "type": "object",
+        "xml": {
+          "name": "class"
+        }
+      },
       "classes": {
         "items": {
           "properties": {
@@ -1979,6 +2040,57 @@
         },
         "type": "object"
       },
+      "computer_command_post": {
+        "properties": {
+          "computers": {
+            "properties": {
+              "computer": {
+                "properties": {
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "general": {
+            "properties": {
+              "command": {
+                "description": "Command type. (UnlockUserAccount (deprecated on 2025-07-07) and DeleteUser (deprecated on 2025-02-25) require a DEP enrolled device, EnableRemoteDesktop and DisableRemoteDesktop require macOS 10.14.4 or later)",
+                "enum": [
+                  "UnmanageDevice(UnmanageDevice Deprecated on 2024-06-27)",
+                  "BlankPush(BlankPush Deprecated on 2025-05-27)",
+                  "UnlockUserAccount(deprecated on 2025-07-07)",
+                  "DeleteUser(DeleteUser on Deprecated 2025-02-25)",
+                  "EnableRemoteDesktop (macOS 10.14.4 and later)",
+                  "DisableRemoteDesktop (macOS 10.14.4 and later)",
+                  "ScheduleOSUpdate. (ScheduleOSUpdate deprecated on 2022-10-17)"
+                ],
+                "type": "string"
+              },
+              "user_name": {
+                "description": "Username for UnlockUserAccount (deprecated on 2025-07-07) and DeleteUser (deprecated on 2025-02-25) commands",
+                "example": "administrator",
+                "type": "string"
+              }
+            },
+            "required": [
+              "command"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "computer_command"
+        }
+      },
       "computer_commands": {
         "items": {
           "properties": {
@@ -2205,6 +2317,44 @@
           }
         },
         "type": "object"
+      },
+      "computer_group_post": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "properties": {
+                "criterion": {
+                  "$ref": "#/components/schemas/criterion"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_smart": {
+            "description": "Smart or static group",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Name of the group",
+            "example": "Group Name",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "required": [
+          "name",
+          "is_smart"
+        ],
+        "type": "object",
+        "xml": {
+          "name": "computer_group"
+        }
       },
       "computer_groups": {
         "items": {
@@ -3151,6 +3301,66 @@
         },
         "type": "object"
       },
+      "computer_post": {
+        "properties": {
+          "general": {
+            "properties": {
+              "building": {
+                "example": "East",
+                "type": "string"
+              },
+              "department": {
+                "example": "Accounting",
+                "type": "string"
+              },
+              "id": {
+                "type": "integer"
+              },
+              "mac_address": {
+                "example": "E0:AC:CB:97:36:G4",
+                "type": "string"
+              },
+              "managed": {
+                "type": "boolean"
+              },
+              "model": {
+                "example": "13-inch MacBook Pro (Mid 2016)",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the computer",
+                "example": "Lauras MacBook Pro",
+                "type": "string"
+              },
+              "report_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "report_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "serial_number": {
+                "example": "C02Q7KHTGFWF",
+                "type": "string"
+              },
+              "udid": {
+                "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                "type": "string"
+              },
+              "username": {
+                "example": "Laura",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "computer"
+        }
+      },
       "computer_report": {
         "items": {
           "properties": {
@@ -3515,6 +3725,138 @@
           "read_write_username"
         ],
         "type": "object"
+      },
+      "distribution_point_post": {
+        "properties": {
+          "connection_type": {
+            "enum": [
+              "SMB",
+              "AFP"
+            ],
+            "type": "string"
+          },
+          "context": {
+            "description": "Path to the share",
+            "example": "CasperShare",
+            "type": "string"
+          },
+          "enable_load_balancing": {
+            "default": false,
+            "type": "boolean"
+          },
+          "failover_point": {
+            "description": "Name of a file distribution point or \"Cloud Distribution Point\" to use as failover.",
+            "type": "string"
+          },
+          "http_downloads_enabled": {
+            "type": "boolean"
+          },
+          "http_password": {
+            "description": "Password for basic authentication",
+            "example": "password",
+            "type": "string"
+          },
+          "http_url": {
+            "description": "URL to download packages from",
+            "example": "http://ny.company.com/CasperShare",
+            "type": "string"
+          },
+          "http_username": {
+            "description": "Username to authenticate with for basic authentication",
+            "example": "casperinstall",
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "ip_address": {
+            "description": "IP address or hostname of distribution point",
+            "example": "ny.company.com",
+            "type": "string"
+          },
+          "is_master": {
+            "description": "Only one share can be set as master",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Name of the distribution point",
+            "example": "New York Share",
+            "type": "string"
+          },
+          "no_authentication_required": {
+            "default": true,
+            "example": false,
+            "type": "boolean"
+          },
+          "password": {
+            "example": "password",
+            "type": "string"
+          },
+          "port": {
+            "example": 80,
+            "type": "integer"
+          },
+          "protocol": {
+            "enum": [
+              "http",
+              "https"
+            ],
+            "type": "string"
+          },
+          "read_only_password": {
+            "description": "Password for the read only account",
+            "example": "password",
+            "type": "string"
+          },
+          "read_only_username": {
+            "description": "Account with read only privileges to the share",
+            "example": "casperinstall",
+            "type": "string"
+          },
+          "read_write_password": {
+            "description": "Password for the read/write account",
+            "example": "password",
+            "type": "string"
+          },
+          "read_write_username": {
+            "description": "Account with read/write privileges to the share",
+            "example": "casperwrite",
+            "type": "string"
+          },
+          "share_name": {
+            "description": "Name of the share",
+            "example": "Caspershare",
+            "type": "string"
+          },
+          "share_port": {
+            "example": 139,
+            "type": "integer"
+          },
+          "ssh_username": {
+            "example": "casperadmin",
+            "type": "string"
+          },
+          "username_password_required": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "workgroup_or_domain": {
+            "description": "Workgroup or domain of the accounts that have access to the share (SMB only)",
+            "example": "COMPANY",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "share_name",
+          "read_only_username",
+          "read_write_username"
+        ],
+        "type": "object",
+        "xml": {
+          "name": "distribution_point"
+        }
       },
       "distribution_points": {
         "items": {
@@ -4094,6 +4436,92 @@
           }
         },
         "type": "object"
+      },
+      "ebook_post": {
+        "properties": {
+          "general": {
+            "properties": {
+              "author": {
+                "example": "Apple Inc.",
+                "type": "string"
+              },
+              "category": {
+                "$ref": "#/components/schemas/category_object"
+              },
+              "deploy_as_managed": {
+                "type": "boolean"
+              },
+              "deployment_type": {
+                "enum": [
+                  "Make Available in Self Service",
+                  "Install Automatically/Prompt Users to Install"
+                ],
+                "example": "Install Automatically/Prompt Users to Install",
+                "type": "string"
+              },
+              "file_type": {
+                "enum": [
+                  "PDF",
+                  "IBOOK",
+                  "EPUB"
+                ],
+                "type": "string"
+              },
+              "free": {
+                "example": true,
+                "type": "boolean"
+              },
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "description": "Name of the ebook",
+                "example": "iPhone User Guide for iOS 10.3",
+                "type": "string"
+              },
+              "self_service_icon": {
+                "type": "string"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
+              "url": {
+                "description": "Download URL for the ebook",
+                "example": "https://itunes.apple.com/us/book/iphone-user-guide-for-ios-10-3/id1134772174?mt=11\u0026amp;uo=4",
+                "type": "string"
+              },
+              "version": {
+                "example": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "scope": {
+            "properties": {
+              "all_computers": {
+                "default": false,
+                "type": "boolean"
+              },
+              "all_jss_users": {
+                "default": false,
+                "type": "boolean"
+              },
+              "all_mobile_devices": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "ebook"
+        }
       },
       "ebooks": {
         "items": {
@@ -4697,6 +5125,282 @@
               },
               "use_ssl": {
                 "default": false,
+                "type": "boolean"
+              },
+              "use_wildcards": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "mappings_for_users": {
+            "properties": {
+              "user_group_mappings": {
+                "properties": {
+                  "map_group_id": {
+                    "example": "uSNCreated",
+                    "type": "string"
+                  },
+                  "map_group_name": {
+                    "example": "name",
+                    "type": "string"
+                  },
+                  "map_group_uuid": {
+                    "example": "objectGUID",
+                    "type": "string"
+                  },
+                  "map_object_class_to_any_or_all": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ],
+                    "type": "string"
+                  },
+                  "object_classes": {
+                    "example": "top, group",
+                    "type": "string"
+                  },
+                  "search_base": {
+                    "example": "DC=Company,DC=com",
+                    "type": "string"
+                  },
+                  "search_scope": {
+                    "enum": [
+                      "All Subtrees",
+                      "First Level Only"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "user_group_membership_mappings": {
+                "properties": {
+                  "append_to_username": {
+                    "example": "company.com",
+                    "type": "string"
+                  },
+                  "group_id": {
+                    "example": "uSNCreated",
+                    "type": "string"
+                  },
+                  "map_group_membership_to_user_field": {
+                    "example": "memberOf",
+                    "type": "string"
+                  },
+                  "map_object_class_to_any_or_all": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ],
+                    "type": "string"
+                  },
+                  "map_user_membership_to_group_field": {
+                    "type": "boolean"
+                  },
+                  "map_user_membership_use_dn": {
+                    "type": "boolean"
+                  },
+                  "object_classes": {
+                    "example": "group",
+                    "type": "string"
+                  },
+                  "recursive_lookups": {
+                    "type": "boolean"
+                  },
+                  "search_base": {
+                    "example": "DC=Company,DC=com",
+                    "type": "string"
+                  },
+                  "search_scope": {
+                    "enum": [
+                      "All Subtrees",
+                      "First Level Only"
+                    ],
+                    "type": "string"
+                  },
+                  "use_dn": {
+                    "type": "boolean"
+                  },
+                  "user_group_membership_stored_in": {
+                    "enum": [
+                      "user object",
+                      "group object"
+                    ],
+                    "type": "string"
+                  },
+                  "user_group_membership_use_ldap_compare": {
+                    "type": "boolean"
+                  },
+                  "username": {
+                    "example": "sAMAccountName",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "user_mappings": {
+                "properties": {
+                  "append_to_email_results": {
+                    "example": "company.com",
+                    "type": "string"
+                  },
+                  "map_building": {
+                    "example": "streetAddress",
+                    "type": "string"
+                  },
+                  "map_department": {
+                    "example": "department",
+                    "type": "string"
+                  },
+                  "map_email_address": {
+                    "example": "mail",
+                    "type": "string"
+                  },
+                  "map_object_class_to_any_or_all": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ],
+                    "type": "string"
+                  },
+                  "map_position": {
+                    "example": "title",
+                    "type": "string"
+                  },
+                  "map_realname": {
+                    "example": "displayName",
+                    "type": "string"
+                  },
+                  "map_room": {
+                    "example": "room",
+                    "type": "string"
+                  },
+                  "map_telephone": {
+                    "example": "telephoneNumber",
+                    "type": "string"
+                  },
+                  "map_user_id": {
+                    "example": "uSNCreated",
+                    "type": "string"
+                  },
+                  "map_user_uuid": {
+                    "example": "objectGUID",
+                    "type": "string"
+                  },
+                  "map_username": {
+                    "example": "sAMAccountName",
+                    "type": "string"
+                  },
+                  "object_classes": {
+                    "example": "organizationalPerson, user",
+                    "type": "string"
+                  },
+                  "search_base": {
+                    "example": "DC=Company,DC=com",
+                    "type": "string"
+                  },
+                  "search_scope": {
+                    "enum": [
+                      "All Subtrees",
+                      "First Level Only"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "ldap_server_post": {
+        "properties": {
+          "connection": {
+            "properties": {
+              "account": {
+                "properties": {
+                  "distinguished_username": {
+                    "example": "CN=Administrator,CN=Users,DC=Company,DC=com",
+                    "type": "string"
+                  },
+                  "password": {
+                    "example": "password",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "authentication_type": {
+                "enum": [
+                  "simple",
+                  "CRAM-MD5",
+                  "DIGEST-MD5",
+                  "none"
+                ],
+                "type": "string"
+              },
+              "certificate_used": {
+                "description": "Supports PEM and based64 encoded DER formats",
+                "example": "MIIEuzCCA6OgAwIBAgIBAjANBgkqhkiG9w0BAQUFADBiMQswCQYDVQQGEwJVUzETMBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxFjAUBgNVBAMTDUFwcGxlIFJvb3QgQ0EwHhcNMDYwNDI1MjE0MDM2WhcNMzUwMjA5MjE0MDM2WjBiMQswCQYDVQQGEwJVUzETMBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxFjAUBgNVBAMTDUFwcGxlIFJvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDkkakJH5HbHkdQ6wXtXnmELes2oldMVeyLGYne+Uts9QerIjAC6Bg++FAJ039BqJj50cpmnCRrEdCju+QbKsMflZ56DKRHi1vUFjczy8QPTc4UadHJGXL1XQ7Vf1+b8iUDulWPTV0N8WQ1IxVLFVkds5T39pyez1C6wVhQZ48ItCD3y6wsIG9wtj8BMIy3Q88PnT3zK0koGsj+zrW5DtleHNbLPbU6rfQPDgCSC7EhFi501TwN22IWq6NxkkdTVcGvL0Gz+PvjcM3mo0xFfh9Ma1CWQYnEdGILEINBhzOKgbEwWOxaBDKMaLOPHd5lc/9nXmW8Sdh2nzMUZaF3lMktAgMBAAGjggF6MIIBdjAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUK9BpR5R2Cf70a40uQKb3R01/CF4wHwYDVR0jBBgwFoAUK9BpR5R2Cf70a40uQKb3R01/CF4wggERBgNVHSAEggEIMIIBBDCCAQAGCSqGSIb3Y2QFATCB8jAqBggrBgEFBQcCARYeaHR0cHM6Ly93d3cuYXBwbGUuY29tL2FwcGxlY2EvMIHDBggrBgEFBQcCAjCBthqBs1JlbGlhbmNlIG9uIHRoaXMgY2VydGlmaWNhdGUgYnkgYW55IHBhcnR5IGFzc3VtZXMgYWNjZXB0YW5jZSBvZiB0aGUgdGhlbiBhcHBsaWNhYmxlIHN0YW5kYXJkIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIHVzZSwgY2VydGlmaWNhdGUgcG9saWN5IGFuZCBjZXJ0aWZpY2F0aW9uIHByYWN0aWNlIHN0YXRlbWVudHMuMA0GCSqGSIb3DQEBBQUAA4IBAQBcNplMLXi37Yyb3PN3m/J20ncwT8EfhYOFG5k9RzfyqZtAjizUsZAS2L70c5vu0mQPy3lPNNiiPvl4/2vIB+x9OYOLUyDTOMSxv5pPCmv/K/xZpwUJfBdAVhEedNO3iyM7R6PVbyTi69G3cN8PReEnyvFteO3ntRcXqNx+IjXKJdXZD9Zr1KIkIxH3oayPc4FgxhtbCS+SsvhESPBgOJ4V9T0mZyCKM2r3DYLP3uujL/lTaltkwGMzd/c6ByxW69oPIQ7aunMZT7XZNn/Bh1XZp5m5MkL72NVxnn6hUrcbvZNCJBIqxw8dtk2cXmPIS4AXUKqK1drk/NAJBzewdXUh",
+                "type": "string"
+              },
+              "connection_is_used_for": {
+                "default": "users",
+                "type": "string"
+              },
+              "hostname": {
+                "description": "Hostname or IP address of the server",
+                "example": "company.ad.com",
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "name": {
+                "description": "Name of the LDAP server",
+                "example": "Company Active Directory",
+                "type": "string"
+              },
+              "open_close_timeout": {
+                "description": "Timeout in seconds",
+                "example": 15,
+                "type": "integer"
+              },
+              "port": {
+                "example": 389,
+                "type": "integer"
+              },
+              "referral_response": {
+                "enum": [
+                  "ignore",
+                  "follow"
+                ],
+                "type": "string"
+              },
+              "search_timeout": {
+                "description": "Timeout in seconds",
+                "example": 60,
+                "type": "integer"
+              },
+              "server_type": {
+                "enum": [
+                  "Active Directory",
+                  "Open Directory",
+                  "eDirectory",
+                  "Custom"
+                ],
+                "type": "string"
+              },
+              "use_ssl": {
+                "default": false,
+                "example": true,
                 "type": "boolean"
               },
               "use_wildcards": {
@@ -7396,6 +8100,41 @@
         },
         "type": "object"
       },
+      "mobile_device_enrollment_profile_post": {
+        "properties": {
+          "general": {
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "id": {
+                "type": "integer"
+              },
+              "invitation": {
+                "example": 2.0938027893325487e+38,
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the enrollment profile",
+                "example": "Configurator Enrollment Profile",
+                "type": "string"
+              },
+              "udid": {
+                "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "mobile_device_enrollment_profile"
+        }
+      },
       "mobile_device_enrollment_profiles": {
         "items": {
           "properties": {
@@ -8129,6 +8868,119 @@
         },
         "type": "object"
       },
+      "mobile_device_invitation_post": {
+        "properties": {
+          "allow_multiple_uses": {
+            "default": false,
+            "type": "boolean"
+          },
+          "date_sent": {
+            "example": "2012-05-07T11:13:35Z",
+            "readOnly": true,
+            "type": "string"
+          },
+          "date_sent_epoch": {
+            "example": 1336407215609,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "date_sent_utc": {
+            "example": "2012-05-07T11:13:35.609-0500",
+            "readOnly": true,
+            "type": "string"
+          },
+          "enrolled_into_site": {
+            "properties": {
+              "id": {
+                "default": -1,
+                "type": "integer"
+              },
+              "name": {
+                "default": "None",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "expiration_date": {
+            "default": "Unlimited",
+            "description": "Use 'Unlimited' to specify no expiration",
+            "example": "2012-05-07T11:13:35Z",
+            "type": "string"
+          },
+          "expiration_date_epoch": {
+            "example": 1336407215609,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "expiration_date_utc": {
+            "example": "2012-05-07T11:13:35.609-0500",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "invitation": {
+            "example": 7.249663721735319e+37,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "invitation_type": {
+            "default": "USER_INITIATED_URL",
+            "example": "USER_INITATIED_EMAIL",
+            "type": "string"
+          },
+          "keep_existing_site_membership": {
+            "default": false,
+            "type": "boolean"
+          },
+          "last_action": {
+            "example": "NONE",
+            "readOnly": true,
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "reply_to": {
+            "example": "it@company.com",
+            "readOnly": true,
+            "type": "string"
+          },
+          "require_login": {
+            "default": true,
+            "type": "boolean"
+          },
+          "sent_from": {
+            "example": "Jamf Pro",
+            "readOnly": true,
+            "type": "string"
+          },
+          "sent_to": {
+            "example": "user@company.com",
+            "readOnly": true,
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "subject": {
+            "example": "Enroll your device",
+            "readOnly": true,
+            "type": "string"
+          },
+          "target_ios": {
+            "example": "iOS 4",
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "mobile_device_invitations": {
         "items": {
           "properties": {
@@ -8172,6 +9024,144 @@
           "type": "object"
         },
         "type": "array"
+      },
+      "mobile_device_post": {
+        "properties": {
+          "general": {
+            "properties": {
+              "asset_tag": {
+                "type": "string"
+              },
+              "available": {
+                "example": 11487,
+                "type": "integer"
+              },
+              "available_mb": {
+                "example": 11487,
+                "type": "integer"
+              },
+              "battery_level": {
+                "example": 95,
+                "type": "integer"
+              },
+              "bluetooth_mac_address": {
+                "example": "E0:AC:CB:97:36:G6",
+                "type": "string"
+              },
+              "capacity": {
+                "example": 12159,
+                "type": "integer"
+              },
+              "capacity_mb": {
+                "example": 12159,
+                "type": "integer"
+              },
+              "device_name": {
+                "example": "Tinas iPad",
+                "type": "string"
+              },
+              "device_ownership_level": {
+                "example": "Institutional",
+                "type": "string"
+              },
+              "display_name": {
+                "example": "Tinas iPad",
+                "type": "string"
+              },
+              "id": {
+                "type": "integer"
+              },
+              "initial_entry_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "ip_address": {
+                "example": "192.0.0.1",
+                "type": "string"
+              },
+              "last_enrollment_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_inventory_update_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "managed": {
+                "type": "boolean"
+              },
+              "model": {
+                "example": "iPhone 6S",
+                "type": "string"
+              },
+              "model_display": {
+                "example": "iPhone 6S",
+                "type": "string"
+              },
+              "model_identifier": {
+                "example": "iPhone8,1",
+                "type": "string"
+              },
+              "model_number": {
+                "example": "MKRY2LL",
+                "type": "string"
+              },
+              "modem_firmware": {
+                "example": "2.61.00",
+                "type": "string"
+              },
+              "name": {
+                "example": "Tinas iPad",
+                "type": "string"
+              },
+              "os_build": {
+                "example": "14F89",
+                "type": "string"
+              },
+              "os_type": {
+                "example": "iOS",
+                "type": "string"
+              },
+              "os_version": {
+                "example": "10.3.2",
+                "type": "string"
+              },
+              "percentage_used": {
+                "example": 5,
+                "type": "integer"
+              },
+              "phone_number": {
+                "example": "123-555-6789",
+                "type": "string"
+              },
+              "serial_number": {
+                "example": "C02Q7KHTGFWF",
+                "type": "string"
+              },
+              "supervised": {
+                "type": "boolean"
+              },
+              "udid": {
+                "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                "type": "string"
+              },
+              "wifi_mac_address": {
+                "example": "E0:AC:CB:97:36:G4",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "udid",
+              "serial_number"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "mobile_device"
+        }
       },
       "mobile_device_provisioning_profile": {
         "properties": {
@@ -8345,6 +9335,43 @@
           "ending_address"
         ],
         "type": "object"
+      },
+      "network_segment_post": {
+        "properties": {
+          "ending_address": {
+            "example": "10.10.1.1",
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the network segment",
+            "example": "Amsterdam Office",
+            "type": "string"
+          },
+          "override_buildings": {
+            "default": false,
+            "type": "boolean"
+          },
+          "override_departments": {
+            "default": false,
+            "type": "boolean"
+          },
+          "starting_address": {
+            "example": "10.1.1.1",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "starting_address",
+          "ending_address"
+        ],
+        "type": "object",
+        "xml": {
+          "name": "network_segment"
+        }
       },
       "network_segments": {
         "items": {
@@ -9636,6 +10663,54 @@
         },
         "type": "object"
       },
+      "peripheral_post": {
+        "properties": {
+          "general": {
+            "properties": {
+              "bar_code_1": {
+                "type": "string"
+              },
+              "bar_code_2": {
+                "type": "string"
+              },
+              "fields": {
+                "properties": {
+                  "field": {
+                    "properties": {
+                      "name": {
+                        "example": "Peripheral Field Name",
+                        "type": "string"
+                      },
+                      "value": {
+                        "example": "Value for menu type",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "integer"
+              },
+              "type": {
+                "description": "Name of the peripheral type",
+                "example": "Peripheral Type Name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "peripheral"
+        }
+      },
       "peripheral_type": {
         "properties": {
           "fields": {
@@ -10679,6 +11754,114 @@
         },
         "type": "object"
       },
+      "policy_post": {
+        "properties": {
+          "general": {
+            "properties": {
+              "category": {
+                "$ref": "#/components/schemas/category_object"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "frequency": {
+                "enum": [
+                  "Once per computer",
+                  "Once per user per computer",
+                  "Once per user",
+                  "Once every day",
+                  "Once every week",
+                  "Once every month",
+                  "Ongoing"
+                ],
+                "type": "string"
+              },
+              "id": {
+                "type": "integer"
+              },
+              "location_user_only": {
+                "default": false,
+                "type": "boolean"
+              },
+              "name": {
+                "example": "Disk Encryption",
+                "type": "string"
+              },
+              "network_limitations": {
+                "properties": {
+                  "any_ip_address": {
+                    "type": "boolean"
+                  },
+                  "minimum_network_connection": {
+                    "enum": [
+                      "No Minimum",
+                      "Ethernet"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "network_requirements": {
+                "enum": [
+                  "Any",
+                  "Ethernet"
+                ],
+                "type": "string"
+              },
+              "offline": {
+                "default": false,
+                "type": "boolean"
+              },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
+              "target_drive": {
+                "example": "/",
+                "type": "string"
+              },
+              "trigger": {
+                "type": "string"
+              },
+              "trigger_checkin": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_enrollment_complete": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_login": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_logout": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_network_state_changed": {
+                "default": false,
+                "type": "boolean"
+              },
+              "trigger_other": {
+                "type": "string"
+              },
+              "trigger_startup": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "policy"
+        }
+      },
       "printer": {
         "properties": {
           "CUPS_name": {
@@ -11663,6 +12846,55 @@
         },
         "type": "array"
       },
+      "user_post": {
+        "properties": {
+          "email": {
+            "example": "aharrison@company.com",
+            "type": "string"
+          },
+          "email_address": {
+            "example": "aharrison@company.com",
+            "type": "string"
+          },
+          "full_name": {
+            "example": "Ashley Harrison",
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of the user",
+            "example": "AHarrison",
+            "type": "string"
+          },
+          "phone_number": {
+            "example": "123-555-6789",
+            "type": "string"
+          },
+          "position": {
+            "example": "Teachers",
+            "type": "string"
+          },
+          "sites": {
+            "items": {
+              "properties": {
+                "site": {
+                  "$ref": "#/components/schemas/site_object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "xml": {
+          "name": "user"
+        }
+      },
       "users": {
         "items": {
           "properties": {
@@ -11918,6 +13150,34 @@
           }
         },
         "type": "object"
+      },
+      "vpp_assignment_post": {
+        "properties": {
+          "general": {
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "example": "9th Grade VPP Assignments",
+                "type": "string"
+              },
+              "vpp_admin_account_id": {
+                "example": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "vpp_admin_account_id"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "vpp_assignment"
+        }
       },
       "vpp_assignments": {
         "items": {

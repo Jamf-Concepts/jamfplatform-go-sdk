@@ -353,17 +353,43 @@ func detectResponse(op *openapi3.Operation) (int, string) {
 		if resp.Value == nil {
 			return code, ""
 		}
-		for ct, content := range resp.Value.Content {
+		// Deterministic iteration order: Go maps randomize iteration, so
+		// when a response declares multiple content types (e.g. Swagger 2.0
+		// `produces: [application/xml, application/json]` converts to two
+		// entries with the same schema), picking the "first" non-JSON
+		// caused drift between runs (typed vs []byte). Prefer a typed
+		// schema over raw bytes; prefer JSON over other content types
+		// (the spec schema is the authoritative description of the typed
+		// shape regardless of on-the-wire codec, and Classic resources
+		// use JSON pagination wrappers in docs even when XML on the wire).
+		cts := make([]string, 0, len(resp.Value.Content))
+		for ct := range resp.Value.Content {
+			cts = append(cts, ct)
+		}
+		sort.Slice(cts, func(i, j int) bool {
+			a, b := cts[i], cts[j]
+			aj, bj := isJSONContentType(a), isJSONContentType(b)
+			if aj != bj {
+				return aj
+			}
+			return a < b
+		})
+		for _, ct := range cts {
+			content := resp.Value.Content[ct]
 			if content.Schema == nil {
 				continue
 			}
-			// Non-JSON content (text/csv, application/octet-stream, etc.)
-			// returns raw bytes — the transport passes the body through
-			// unchanged when result is *[]byte.
+			// Non-JSON content (text/csv, application/octet-stream,
+			// application/xml for JSON-format specs, …) returns raw bytes
+			// regardless of any schema hint — a CSV export schema for
+			// example only carries `format: binary` and callers want the
+			// bytes, not an any-typed deserialisation.
 			if !isJSONContentType(ct) {
 				return code, "[]byte"
 			}
-			return code, refName(content.Schema)
+			if ref := refName(content.Schema); ref != "" {
+				return code, ref
+			}
 		}
 		return code, ""
 	}

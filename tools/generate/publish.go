@@ -75,6 +75,34 @@ func publishSpecs(root string, cfg Config) error {
 		usedSchemas := make(map[string]bool)
 		collectRefs(doc, usedSchemas)
 
+		// Preserve schemas named by config-level requestType/responseType
+		// overrides and walk them transitively. These are *not* reachable
+		// via $ref from the spec itself (Classic's operations carry no
+		// typed request bodies at all — the names come from config), so
+		// collectRefs misses them and they'd otherwise be pruned.
+		// Without this the published spec drops every *_post schema and
+		// downstream generation hits "Go type not emitted" errors.
+		if doc.Components != nil && doc.Components.Schemas != nil {
+			walk := newSchemaWalker(doc, func(name string) bool {
+				if usedSchemas[name] {
+					return false
+				}
+				usedSchemas[name] = true
+				return true
+			})
+			for _, op := range spec.Operations {
+				for _, typeName := range []string{op.RequestType, op.ResponseType} {
+					if typeName == "" {
+						continue
+					}
+					usedSchemas[typeName] = true
+					if ref, ok := doc.Components.Schemas[typeName]; ok {
+						walk(ref)
+					}
+				}
+			}
+		}
+
 		// Prune unreferenced schemas.
 		if doc.Components != nil && doc.Components.Schemas != nil {
 			for name := range doc.Components.Schemas {
