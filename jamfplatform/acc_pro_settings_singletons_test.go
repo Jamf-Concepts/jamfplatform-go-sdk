@@ -71,6 +71,49 @@ func TestAcceptance_Pro_Settings_SmtpServerV2Read(t *testing.T) {
 	t.Logf("SMTP server: enabled=%v authType=%s", s.Enabled, s.AuthenticationType)
 }
 
+func TestAcceptance_Pro_Settings_SmtpServerHistoryV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	if _, err := p.CreateSmtpServerHistoryNoteV1(ctx, &pro.ObjectHistoryNote{
+		Note: "sdk-acc test smtp-server history entry",
+	}); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateSmtpServerHistoryNoteV1: %v", err)
+	}
+
+	hist, err := p.ListSmtpServerHistoryV1(ctx, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListSmtpServerHistoryV1: %v", err)
+	}
+	t.Logf("SMTP server history: %d entries", len(hist))
+}
+
+// TestAcceptance_Pro_Settings_SmtpServerTestV1 sends a test email. Use an
+// obviously-synthetic recipient so a misrouted send is easy to spot.
+// Tolerate 4xx when the tenant's SMTP isn't configured to relay.
+func TestAcceptance_Pro_Settings_SmtpServerTestV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	err := pro.New(c).TestSmtpServerV1(ctx, &pro.SmtpServerTest{
+		RecipientEmail: "sdk-acc-discard@example.invalid",
+	})
+	if err == nil {
+		t.Log("TestSmtpServerV1 accepted (202) — tenant SMTP relays outbound mail")
+		return
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+		t.Logf("TestSmtpServerV1 rejected: status=%d — expected when SMTP relay blocks the test domain", apiErr.StatusCode)
+		return
+	}
+	skipOnServerError(t, err)
+	t.Fatalf("TestSmtpServerV1: %v", err)
+}
+
 // --- Jamf Pro server URL ----------------------------------------------
 
 // Changing the Jamf Pro server URL would point clients at a different

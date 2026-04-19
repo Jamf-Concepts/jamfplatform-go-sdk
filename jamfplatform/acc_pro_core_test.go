@@ -446,3 +446,74 @@ func TestAcceptance_Pro_Core_ScriptHistoryV1(t *testing.T) {
 }
 
 func ptr[T any](v T) *T { return &v }
+
+// --- dock-items ---------------------------------------------------------
+
+func TestAcceptance_Pro_Core_DockItemCRUDV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	name := "sdk-acc-dockitem-" + runSuffix()
+	created, err := p.CreateDockItemV1(ctx, &pro.DockItem{
+		Name: name,
+		Type: "APP",
+		Path: "file:///Applications/Safari.app/",
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateDockItemV1: %v", err)
+	}
+	id := created.ID
+	t.Logf("Created dock item id=%s name=%s", id, name)
+	cleanupDelete(t, "DockItem "+id, func() error { return p.DeleteDockItemV1(ctx, id) })
+
+	got, err := p.GetDockItemV1(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetDockItemV1: %v", err)
+	}
+	if got.Name != name {
+		t.Errorf("name round-trip mismatch: got %q, want %q", got.Name, name)
+	}
+
+	got.Name = name + "-upd"
+	if _, err := p.UpdateDockItemV1(ctx, id, got); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateDockItemV1: %v", err)
+	}
+}
+
+// --- ebooks -------------------------------------------------------------
+
+func TestAcceptance_Pro_Core_EbooksV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	list, err := p.ListEbooksV1(ctx, nil)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListEbooksV1: %v", err)
+	}
+	t.Logf("Ebooks: %d", len(list))
+
+	if _, err := p.GetEbookV1(ctx, "-1"); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode == 404 {
+			t.Logf("GetEbookV1(-1): 404 — expected")
+		} else {
+			skipOnServerError(t, err)
+			t.Fatalf("GetEbookV1: %v", err)
+		}
+	}
+	if _, err := p.GetEbookScopeV1(ctx, "-1"); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode == 404 {
+			t.Logf("GetEbookScopeV1(-1): 404 — expected")
+		} else {
+			skipOnServerError(t, err)
+			t.Fatalf("GetEbookScopeV1: %v", err)
+		}
+	}
+}

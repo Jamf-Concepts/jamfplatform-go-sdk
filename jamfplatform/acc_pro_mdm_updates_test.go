@@ -424,3 +424,54 @@ func TestAcceptance_Pro_MdmUpdates_ReturnToServiceCRUDV1(t *testing.T) {
 		t.Fatalf("GetReturnToServiceConfigurationV1(%s) after delete: want 404, got %v", created.ID, err)
 	}
 }
+
+// --- destructive command probes (bogus ids / fake codes) ---------------
+
+// TestAcceptance_Pro_MdmUpdates_DestructiveProbesV1 exercises three
+// device-altering command endpoints with clearly-bogus inputs: enrollment
+// profile download, management framework redeploy, app-config reinstall.
+// Each real-id call would mutate device state; bogus ids confirm the
+// transport path without touching any device.
+func TestAcceptance_Pro_MdmUpdates_DestructiveProbesV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	tolerate := func(label string, err error) {
+		t.Helper()
+		if err == nil {
+			t.Logf("%s: unexpectedly succeeded", label)
+			return
+		}
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+			t.Logf("%s: status=%d — expected rejection", label, apiErr.StatusCode)
+			return
+		}
+		skipOnServerError(t, err)
+		t.Fatalf("%s: %v", label, err)
+	}
+
+	_, err := p.DownloadMobileDeviceEnrollmentProfileV1(ctx, "-1")
+	tolerate("DownloadMobileDeviceEnrollmentProfileV1", err)
+
+	_, err = p.RedeployJamfManagementFrameworkV1(ctx, "-1")
+	tolerate("RedeployJamfManagementFrameworkV1", err)
+
+	// Reinstall-app-config with a bogus code returns 500 with message
+	// "There was an error while trying to issue App Config re-install
+	// MDM Command" — the server upgrades a validation error into an
+	// internal error instead of 4xx. Treat 500 as expected here rather
+	// than glossing over it via skipOnServerError.
+	fakeCode := "sdk-acc-fake-reinstall-code"
+	if err := p.ReinstallMobileDeviceAppConfigV1(ctx, &pro.AppConfigReinstallCode{
+		ReinstallCode: &fakeCode,
+	}); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && (apiErr.StatusCode == 400 || apiErr.StatusCode == 500) {
+			t.Logf("ReinstallMobileDeviceAppConfigV1: status=%d — expected rejection of fake code (server mislabels as 500 instead of 4xx)", apiErr.StatusCode)
+		} else {
+			t.Fatalf("ReinstallMobileDeviceAppConfigV1: unexpected error: %v", err)
+		}
+	}
+}
