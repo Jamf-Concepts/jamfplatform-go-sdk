@@ -22,6 +22,12 @@ import (
 
 // --- accounts --------------------------------------------------------
 
+// POST /v1/accounts on this tenant currently 500s with an empty
+// `errors` array even for payloads that pass enum + required-field
+// validation (tried ADMINISTRATOR with accountStatus + siteId).
+// Server-side bug — GET paths are covered, CREATE path isn't. Leave
+// the test failing-via-server-skip so the regression is visible when
+// the server is fixed.
 func TestAcceptance_Pro_AccountsV1(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -38,9 +44,14 @@ func TestAcceptance_Pro_AccountsV1(t *testing.T) {
 	realname := "SDK Acc Test " + runSuffix()
 	email := uname + "@example.invalid"
 	password := "SDKAccTestPwd!" + runSuffix()
-	accessLevel := "Full Access"
-	privilegeLevel := "Custom"
-	accountType := "Standard"
+	// Enum values from the spec — accessLevel is PascalCase, the
+	// others are SCREAMING_SNAKE. UI labels like "Full Access" /
+	// "Custom" / "Standard" will 400.
+	accessLevel := "FullAccess"
+	privilegeLevel := "ADMINISTRATOR"
+	accountType := "DEFAULT"
+	accountStatus := "Enabled"
+	siteID := -1
 
 	created, err := p.CreateAccountV1(ctx, &pro.UserAccount{
 		Username:       &uname,
@@ -50,13 +61,10 @@ func TestAcceptance_Pro_AccountsV1(t *testing.T) {
 		AccessLevel:    &accessLevel,
 		PrivilegeLevel: &privilegeLevel,
 		AccountType:    &accountType,
+		AccountStatus:  &accountStatus,
+		SiteID:         &siteID,
 	})
 	if err != nil {
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-			t.Logf("CreateAccountV1 rejected: status=%d — tenant may restrict account creation", apiErr.StatusCode)
-			return
-		}
 		skipOnServerError(t, err)
 		t.Fatalf("CreateAccountV1: %v", err)
 	}
