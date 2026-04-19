@@ -370,6 +370,21 @@
         },
         "type": "object"
       },
+      "ActivationCode": {
+        "properties": {
+          "activationCode": {
+            "description": "Activation Code for Jamf Pro. Hyphens are optional.",
+            "example": "A1A1-B2B2-C3C3-D4D4-E5E5-F6F6-G7G7-H8H8",
+            "maxLength": 39,
+            "minLength": 32,
+            "type": "string"
+          }
+        },
+        "required": [
+          "activationCode"
+        ],
+        "type": "object"
+      },
       "AdcsCertificate": {
         "properties": {
           "data": {
@@ -1796,6 +1811,66 @@
         },
         "type": "object"
       },
+      "CacheSettings": {
+        "properties": {
+          "cacheType": {
+            "example": "ehcache",
+            "type": "string"
+          },
+          "cacheUniqueId": {
+            "description": "The default is for Jamf Pro to generate a UUID, so we can only give an example instead.",
+            "example": "24864549-94ea-4cc1-bb80-d7fb392c6556",
+            "type": "string"
+          },
+          "directoryTimeToLiveSeconds": {
+            "example": 120,
+            "format": "int32",
+            "type": "integer"
+          },
+          "ehcacheMaxBytesLocalHeap": {
+            "default": "null",
+            "type": "string"
+          },
+          "elasticache": {
+            "default": false,
+            "type": "boolean"
+          },
+          "id": {
+            "default": "0",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "memcachedEndpoints": {
+            "example": [],
+            "items": {
+              "$ref": "#/components/schemas/MemcachedEndpoints"
+            },
+            "type": "array"
+          },
+          "name": {
+            "default": "cache configuration",
+            "type": "string"
+          },
+          "timeToIdleSeconds": {
+            "example": 120,
+            "format": "int32",
+            "type": "integer"
+          },
+          "timeToLiveSeconds": {
+            "example": 120,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cacheType",
+          "cacheUniqueId",
+          "memcachedEndpoints",
+          "timeToLiveSeconds"
+        ],
+        "type": "object"
+      },
       "CategoriesSearchResults": {
         "properties": {
           "results": {
@@ -2103,6 +2178,49 @@
             "type": "object"
           }
         ]
+      },
+      "ClientCheckInV3": {
+        "properties": {
+          "checkInFrequency": {
+            "default": 15,
+            "description": "Suggested values are 5, 15, 30, or 60. Web interface will not display correctly if not one of those. Minimum is 5, maximum is 60.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "createHooks": {
+            "default": false,
+            "type": "boolean"
+          },
+          "createStartupScript": {
+            "default": false,
+            "type": "boolean"
+          },
+          "enableLocalConfigurationProfiles": {
+            "default": false,
+            "type": "boolean"
+          },
+          "hookLog": {
+            "default": false,
+            "type": "boolean"
+          },
+          "hookPolicies": {
+            "default": false,
+            "type": "boolean"
+          },
+          "startupLog": {
+            "default": false,
+            "type": "boolean"
+          },
+          "startupPolicies": {
+            "default": false,
+            "type": "boolean"
+          },
+          "startupSsh": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
       },
       "CloudDistributionPoint": {
         "allOf": [
@@ -6302,6 +6420,18 @@
         "example": "ENABLE_DATA_ROAMING",
         "type": "string"
       },
+      "DayOfWeek": {
+        "enum": [
+          "MONDAY",
+          "TUESDAY",
+          "WEDNESDAY",
+          "THURSDAY",
+          "FRIDAY",
+          "SATURDAY",
+          "SUNDAY"
+        ],
+        "type": "string"
+      },
       "DeclarativeManagementCommand": {
         "allOf": [
           {
@@ -6741,6 +6871,45 @@
         "required": [
           "clientManagementId"
         ],
+        "type": "object"
+      },
+      "DeviceCommunicationSettings": {
+        "properties": {
+          "autoRenewComputerMdmProfileWhenCaRenewed": {
+            "example": true,
+            "type": "boolean"
+          },
+          "autoRenewComputerMdmProfileWhenDeviceIdentityCertExpiring": {
+            "example": true,
+            "type": "boolean"
+          },
+          "autoRenewMobileDeviceMdmProfileWhenCaRenewed": {
+            "example": true,
+            "type": "boolean"
+          },
+          "autoRenewMobileDeviceMdmProfileWhenDeviceIdentityCertExpiring": {
+            "example": true,
+            "type": "boolean"
+          },
+          "mdmProfileComputerExpirationLimitInDays": {
+            "default": 180,
+            "enum": [
+              90,
+              120,
+              180
+            ],
+            "type": "integer"
+          },
+          "mdmProfileMobileDeviceExpirationLimitInDays": {
+            "default": 180,
+            "enum": [
+              90,
+              120,
+              180
+            ],
+            "type": "integer"
+          }
+        },
         "type": "object"
       },
       "DeviceComplianceInformation": {
@@ -9055,11 +9224,162 @@
         },
         "type": "object"
       },
+      "GsxConnection": {
+        "properties": {
+          "enabled": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "gsxKeystore": {
+            "$ref": "#/components/schemas/GsxKeystore"
+          },
+          "serviceAccountNo": {
+            "example": "0000012345",
+            "maxLength": 10,
+            "type": "string"
+          },
+          "shipToNo": {
+            "example": "0000012345",
+            "maxLength": 10,
+            "type": "string"
+          },
+          "token": {
+            "example": "34dsg23-5dsgs-3sdg-4ffs-435sdgs",
+            "type": "string",
+            "writeOnly": true
+          },
+          "username": {
+            "default": " ",
+            "example": "exampleEmail@example.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "gsxKeystore",
+          "serviceAccountNo",
+          "token",
+          "username"
+        ],
+        "type": "object"
+      },
+      "GsxConnectionUpdate": {
+        "properties": {
+          "enabled": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "gsxKeystore": {
+            "$ref": "#/components/schemas/GsxKeystore"
+          },
+          "serviceAccountNo": {
+            "example": "0000012345",
+            "maxLength": 10,
+            "type": "string"
+          },
+          "shipToNo": {
+            "example": "0000012345",
+            "maxLength": 10,
+            "type": "string"
+          },
+          "token": {
+            "example": "34dsg23-5dsgs-3sdg-4ffs-435sdgs",
+            "type": "string",
+            "writeOnly": true
+          },
+          "username": {
+            "default": " ",
+            "example": "exampleEmail@example.com",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GsxKeystore": {
+        "properties": {
+          "errorMessage": {
+            "example": "Certificate error",
+            "readOnly": true,
+            "type": "string"
+          },
+          "expirationEpoch": {
+            "example": 169195490000,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "keystoreBytes": {
+            "description": "The base 64 encoded of the GSX Connection keystore.",
+            "example": "WlhoaGJYQnNaU0J2WmlCaElHSmhjMlUyTkNCbGJtTnZaR1ZrSUhaaGJHbGtJSEF4TWk0Z2EyVjVjM1J2Y21VZ1ptbHNaUT09",
+            "format": "byte",
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "writeOnly": true
+          },
+          "keystorePassword": {
+            "example": "test1234",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "name": {
+            "default": " ",
+            "example": "certificate.p12",
+            "type": "string"
+          }
+        },
+        "required": [
+          "keystore",
+          "keystorePassword",
+          "name"
+        ],
+        "type": "object"
+      },
+      "GsxTestResponse": {
+        "properties": {
+          "message": {
+            "example": "Unable to authenticate to GSX server",
+            "type": "string"
+          },
+          "request": {
+            "example": "[Accept: application/json, Content-Type: application/json, X-Apple-SoldTo: 0000012345, X-Apple-ShipTo: 0000012345] GET https://api-partner-connect.apple.com/api/authenticate/check HTTP/1.1",
+            "type": "string"
+          },
+          "response": {
+            "example": "OK",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "request",
+          "response"
+        ],
+        "type": "object"
+      },
       "HistorySearchResults": {
         "properties": {
           "results": {
             "items": {
               "$ref": "#/components/schemas/ObjectHistory"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "HistorySearchResultsV1": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectHistoryV1"
             },
             "type": "array"
           },
@@ -9121,6 +9441,33 @@
             "type": "array"
           }
         },
+        "type": "object"
+      },
+      "ImpactAlertNotificationSettingsV1": {
+        "properties": {
+          "deployableObjectsAlertEnabled": {
+            "default": true,
+            "type": "boolean"
+          },
+          "deployableObjectsConfirmationCodeEnabled": {
+            "default": false,
+            "type": "boolean"
+          },
+          "scopeableObjectsAlertEnabled": {
+            "default": true,
+            "type": "boolean"
+          },
+          "scopeableObjectsConfirmationCodeEnabled": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "deployableObjectsAlertEnabled",
+          "deployableObjectsConfirmationCodeEnabled",
+          "scopeableObjectsAlertEnabled",
+          "scopeableObjectsConfirmationCodeEnabled"
+        ],
         "type": "object"
       },
       "InstallPackage": {
@@ -9999,6 +10346,18 @@
         ],
         "type": "object"
       },
+      "JamfProServerUrl": {
+        "properties": {
+          "url": {
+            "example": "https://example.com:8443",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
       "JamfProtectPlan": {
         "properties": {
           "description": {
@@ -10391,6 +10750,58 @@
             "type": "object"
           }
         ]
+      },
+      "LoginContent": {
+        "properties": {
+          "actionText": {
+            "example": "Accept",
+            "type": "string"
+          },
+          "disclaimerHeading": {
+            "example": "Disclaimer header",
+            "type": "string"
+          },
+          "disclaimerMainText": {
+            "example": "Login disclaimer main text",
+            "type": "string"
+          },
+          "includeCustomDisclaimer": {
+            "example": true,
+            "type": "boolean"
+          },
+          "rampInstance": {
+            "example": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "includeCustomDisclaimer"
+        ],
+        "type": "object"
+      },
+      "LoginContentPut": {
+        "properties": {
+          "actionText": {
+            "example": "Accept",
+            "type": "string"
+          },
+          "disclaimerHeading": {
+            "example": "Disclaimer header",
+            "type": "string"
+          },
+          "disclaimerMainText": {
+            "example": "Login disclaimer main text",
+            "type": "string"
+          },
+          "includeCustomDisclaimer": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "includeCustomDisclaimer"
+        ],
+        "type": "object"
       },
       "ManagedApplicationListCommand": {
         "allOf": [
@@ -11312,6 +11723,37 @@
           "username": {
             "example": "admin",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MemcachedEndpoints": {
+        "properties": {
+          "enabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "hostName": {
+            "example": "https://memcache.jamf.com",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "jssCacheConfigurationId": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Jamf Fake Example Memcache",
+            "type": "string"
+          },
+          "port": {
+            "example": 9001,
+            "type": "integer"
           }
         },
         "type": "object"
@@ -13339,6 +13781,33 @@
         ],
         "type": "object"
       },
+      "ObjectHistoryV1": {
+        "properties": {
+          "date": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "type": "string"
+          },
+          "details": {
+            "example": "Is SSO Enabled false\\nSelected SSO Provider",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "type": "string"
+          },
+          "note": {
+            "example": "Sso settings update",
+            "type": "string"
+          },
+          "username": {
+            "example": "admin",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "OidcDirectIdpLoginSkipUrl": {
         "properties": {
           "url": {
@@ -13478,6 +13947,19 @@
         },
         "required": [
           "userMapping"
+        ],
+        "type": "object"
+      },
+      "OrganizationName": {
+        "properties": {
+          "organizationName": {
+            "description": "The Organization Name for Jamf Pro.",
+            "example": "Your Organization Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationName"
         ],
         "type": "object"
       },
@@ -13782,6 +14264,64 @@
             "type": "integer"
           }
         },
+        "type": "object"
+      },
+      "ParentApp": {
+        "properties": {
+          "allowClearPasscode": {
+            "example": true,
+            "type": "boolean"
+          },
+          "allowTemplates": {
+            "example": true,
+            "type": "boolean"
+          },
+          "deviceGroupId": {
+            "example": 1,
+            "type": "integer"
+          },
+          "disassociateOnWipeAndReEnroll": {
+            "example": true,
+            "type": "boolean"
+          },
+          "isEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "restrictedTimes": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TimeFrame"
+            },
+            "example": {
+              "SUNDAY": {
+                "beginTime": "08:30:00",
+                "endTime": "15:45:00"
+              }
+            },
+            "properties": {
+              "key": {
+                "$ref": "#/components/schemas/DayOfWeek"
+              }
+            },
+            "type": "object"
+          },
+          "safelistedApps": {
+            "items": {
+              "$ref": "#/components/schemas/SafelistedApp"
+            },
+            "type": "array"
+          },
+          "timezoneId": {
+            "example": "Europe/Paris",
+            "type": "string"
+          }
+        },
+        "required": [
+          "deviceGroupId",
+          "isEnabled",
+          "restrictedTimes",
+          "timezoneId"
+        ],
         "type": "object"
       },
       "PatchPolicies": {
@@ -15549,6 +16089,19 @@
         },
         "type": "object"
       },
+      "SafelistedApp": {
+        "properties": {
+          "bundleId": {
+            "example": "com.jamf.parent",
+            "type": "string"
+          },
+          "name": {
+            "example": "Content Filter",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "SamlSettings": {
         "properties": {
           "entityId": {
@@ -15819,6 +16372,16 @@
           },
           "passcodePresent": {
             "example": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "SelfServicePlusSettings": {
+        "properties": {
+          "enabled": {
+            "description": "Whether Self Service Plus is enabled",
+            "example": true,
             "type": "boolean"
           }
         },
@@ -16491,6 +17054,199 @@
         ],
         "type": "object"
       },
+      "SmtpBasicCredentials": {
+        "properties": {
+          "password": {
+            "default": "",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "username": {
+            "default": "",
+            "example": "exampleEmail@example.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "password",
+          "username"
+        ],
+        "type": "object"
+      },
+      "SmtpConnectionSettings": {
+        "properties": {
+          "connectionTimeout": {
+            "default": 5,
+            "example": 5,
+            "type": "integer"
+          },
+          "encryptionType": {
+            "default": "NONE",
+            "enum": [
+              "NONE",
+              "SSL",
+              "TLS_1_2",
+              "TLS_1_1",
+              "TLS_1",
+              "TLS_1_3"
+            ],
+            "example": "SSL",
+            "type": "string"
+          },
+          "host": {
+            "default": "",
+            "example": "abcd.server.com",
+            "type": "string"
+          },
+          "port": {
+            "default": 25,
+            "example": 25,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "connectionTimeout",
+          "encryptionType",
+          "host",
+          "port"
+        ],
+        "type": "object"
+      },
+      "SmtpGoogleMailAuthentication": {
+        "properties": {
+          "emailAddress": {
+            "default": "",
+            "example": "exampleEmail@example.com",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "FAILED",
+              "UNAUTHENTICATED",
+              "AUTHENTICATED"
+            ],
+            "example": "AUTHENTICATED",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "emailAddress",
+          "status"
+        ],
+        "type": "object"
+      },
+      "SmtpGoogleMailCredentials": {
+        "properties": {
+          "authentications": {
+            "items": {
+              "$ref": "#/components/schemas/SmtpGoogleMailAuthentication"
+            },
+            "type": "array"
+          },
+          "clientId": {
+            "default": "",
+            "example": "012345678901-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
+            "type": "string"
+          },
+          "clientSecret": {
+            "default": "",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "clientId",
+          "clientSecret"
+        ],
+        "type": "object"
+      },
+      "SmtpGraphApiCredentials": {
+        "properties": {
+          "clientId": {
+            "default": "",
+            "example": "5294f9d1-f723-419c-93db-ff040bf7c947",
+            "type": "string"
+          },
+          "clientSecret": {
+            "default": "",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "tenantId": {
+            "default": "",
+            "example": "c84b7b82-c277-411b-975d-7431b4ce40ac",
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientId",
+          "clientSecret",
+          "tenantId"
+        ],
+        "type": "object"
+      },
+      "SmtpSenderSettings": {
+        "properties": {
+          "displayName": {
+            "default": "Jamf Pro Server",
+            "example": "Jamf Pro Server",
+            "type": "string"
+          },
+          "emailAddress": {
+            "default": "",
+            "example": "exampleEmail@example.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "emailAddress"
+        ],
+        "type": "object"
+      },
+      "SmtpServerV2": {
+        "properties": {
+          "authenticationType": {
+            "enum": [
+              "NONE",
+              "BASIC",
+              "GRAPH_API",
+              "GOOGLE_MAIL"
+            ],
+            "example": "NONE",
+            "type": "string"
+          },
+          "basicAuthCredentials": {
+            "$ref": "#/components/schemas/SmtpBasicCredentials"
+          },
+          "connectionSettings": {
+            "$ref": "#/components/schemas/SmtpConnectionSettings"
+          },
+          "enabled": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "googleMailCredentials": {
+            "$ref": "#/components/schemas/SmtpGoogleMailCredentials"
+          },
+          "graphApiCredentials": {
+            "$ref": "#/components/schemas/SmtpGraphApiCredentials"
+          },
+          "senderSettings": {
+            "$ref": "#/components/schemas/SmtpSenderSettings"
+          }
+        },
+        "required": [
+          "authenticationType",
+          "enabled",
+          "senderSettings"
+        ],
+        "type": "object"
+      },
       "SoftwareTitleConfigurationOnDashboard": {
         "properties": {
           "onDashboard": {
@@ -17131,6 +17887,106 @@
             "type": "object"
           }
         ]
+      },
+      "TeacherFeatures": {
+        "properties": {
+          "isAllowAppLock": {
+            "example": true,
+            "type": "boolean"
+          },
+          "isAllowAttentionScreen": {
+            "example": true,
+            "type": "boolean"
+          },
+          "isAllowClearPasscode": {
+            "example": true,
+            "type": "boolean"
+          },
+          "isAllowRestrictions": {
+            "example": true,
+            "type": "boolean"
+          },
+          "isAllowWebLock": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "TeacherSettingsRequest": {
+        "properties": {
+          "autoClear": {
+            "example": "05:30",
+            "nullable": true,
+            "type": "string"
+          },
+          "isEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "maxRestrictionLengthSeconds": {
+            "example": 600,
+            "type": "integer"
+          },
+          "safelistedApps": {
+            "items": {
+              "$ref": "#/components/schemas/SafelistedApp"
+            },
+            "type": "array"
+          },
+          "timezoneId": {
+            "example": "Europe/Paris",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TeacherSettingsResponse": {
+        "properties": {
+          "autoClear": {
+            "example": "05:30",
+            "type": "string"
+          },
+          "displayNameType": {
+            "example": "user",
+            "type": "string"
+          },
+          "features": {
+            "$ref": "#/components/schemas/TeacherFeatures"
+          },
+          "isEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "maxRestrictionLengthSeconds": {
+            "example": 600,
+            "type": "integer"
+          },
+          "safelistedApps": {
+            "items": {
+              "$ref": "#/components/schemas/SafelistedApp"
+            },
+            "type": "array"
+          },
+          "timezoneId": {
+            "example": "Europe/Paris",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TimeFrame": {
+        "properties": {
+          "beginTime": {
+            "example": "08:30:00",
+            "type": "string"
+          },
+          "endTime": {
+            "example": "15:45:00",
+            "type": "string"
+          }
+        },
+        "type": "object"
       },
       "TvOsDetails": {
         "description": "will be populated if the type is appleTv.",
@@ -18249,6 +19105,267 @@
           "startup-status"
         ],
         "x-authentication-required": false
+      }
+    },
+    "/v1/activation-code": {
+      "put": {
+        "description": "Updates Activation Code in Jamf Pro.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivationCode"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Update successful."
+          }
+        },
+        "summary": "Updates Activation Code",
+        "tags": [
+          "activation-code"
+        ],
+        "x-required-privileges": [
+          "Update Activation Code"
+        ]
+      }
+    },
+    "/v1/activation-code/history": {
+      "get": {
+        "description": "Get Activation Code history object",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Fields allowed in the query: id, username, date, note, details Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,note:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: id, username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Activation Code history was found."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Activation Code object does not exist."
+          }
+        },
+        "summary": "Get Activation Code history object",
+        "tags": [
+          "activation-code"
+        ],
+        "x-required-privileges": [
+          "Read Activation Code"
+        ]
+      },
+      "post": {
+        "description": "Adds Activation Code object note.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "Activation Code history notes to create.",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes of Activation Code history were added."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Activation Code history cannot be saved."
+          }
+        },
+        "summary": "Add Activation Code object note\n",
+        "tags": [
+          "activation-code"
+        ],
+        "x-required-privileges": [
+          "Update Activation Code"
+        ]
+      }
+    },
+    "/v1/activation-code/history/export": {
+      "post": {
+        "description": "Export history object collection in specified format for Activation Code\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/export-fields"
+          },
+          {
+            "$ref": "#/components/parameters/export-labels"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportParameters"
+              }
+            }
+          },
+          "description": "Optional. Override query parameters since they can make URI exceed 2,000 character limit."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "example": "id,username,date,note,details\n1,admin,2019-02-04 21:09:31,Buildings update,Some details\n",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "Export successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export fields specified incorrectly - non-existing column or duplicate on the list."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export currently unavailable, all export-related resources are in use. Try again later."
+          }
+        },
+        "summary": "Export history object collection in specified format for Activation Code\n",
+        "tags": [
+          "activation-code"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read Activation Code"
+        ]
+      }
+    },
+    "/v1/activation-code/organization-name": {
+      "patch": {
+        "description": "Updates Organization Name in Jamf Pro.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationName"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Update successful."
+          }
+        },
+        "summary": "Updates Organization Name",
+        "tags": [
+          "activation-code"
+        ],
+        "x-required-privileges": [
+          "Update Activation Code"
+        ]
       }
     },
     "/v1/adue-session-token-settings": {
@@ -19950,6 +21067,72 @@
         ],
         "x-required-privileges": [
           "Update Buildings"
+        ]
+      }
+    },
+    "/v1/cache-settings": {
+      "get": {
+        "description": "gets cache settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CacheSettings"
+                }
+              }
+            },
+            "description": "cache settings"
+          }
+        },
+        "summary": "Get Cache Settings\n",
+        "tags": [
+          "cache-settings"
+        ],
+        "x-required-privileges": [
+          "Read Cache"
+        ]
+      },
+      "put": {
+        "description": "updates cache settings\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CacheSettings"
+                }
+              }
+            },
+            "description": "cache has been updated"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "The following code is returned by this call:\nHOSTED_ENVIRONMENT - PUT command is not available in hosted environments.\n"
+          }
+        },
+        "summary": "Update Cache Settings\n",
+        "tags": [
+          "cache-settings"
+        ],
+        "x-required-privileges": [
+          "Update Cache"
         ]
       }
     },
@@ -23421,6 +24604,164 @@
         ]
       }
     },
+    "/v1/device-communication-settings": {
+      "get": {
+        "description": "Retrieves all device communication settings, including automatic renewal of the MDM profile.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceCommunicationSettings"
+                }
+              }
+            },
+            "description": "Successful response - Device Communication Settings retrieved"
+          }
+        },
+        "summary": "Retrieves all settings for device communication\n",
+        "tags": [
+          "device-communication-settings"
+        ],
+        "x-required-privileges": [
+          "Read Automatically Renew MDM Profile Settings"
+        ]
+      },
+      "put": {
+        "description": "Update device communication settings\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceCommunicationSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceCommunicationSettings"
+                }
+              }
+            },
+            "description": "Successful response - Device communication Settings updated"
+          }
+        },
+        "summary": "Update device communication settings\n",
+        "tags": [
+          "device-communication-settings"
+        ],
+        "x-required-privileges": [
+          "Update Automatically Renew MDM Profile Settings"
+        ]
+      }
+    },
+    "/v1/device-communication-settings/history": {
+      "get": {
+        "description": "Gets Device Communication settings history\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Device Communication Settings history were found"
+          }
+        },
+        "summary": "Get Device Communication settings history\n",
+        "tags": [
+          "device-communication-settings"
+        ],
+        "x-required-privileges": [
+          "Read Automatically Renew MDM Profile Settings"
+        ]
+      },
+      "post": {
+        "description": "Adds Device Communication Settings history notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes to Device Communication Settings history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Device Communication Settings history can not be saved"
+          }
+        },
+        "summary": "Add Device Communication Settings history notes\n",
+        "tags": [
+          "device-communication-settings"
+        ],
+        "x-required-privileges": [
+          "Update Automatically Renew MDM Profile Settings"
+        ]
+      }
+    },
     "/v1/device-enrollments": {
       "get": {
         "description": "Search for sorted and paged device enrollment instances",
@@ -25823,6 +27164,279 @@
         "x-authentication-required": true
       }
     },
+    "/v1/gsx-connection": {
+      "get": {
+        "description": "Finds the Jamf Pro GSX Connection information\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GsxConnection"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Finds the Jamf Pro GSX Connection information\n",
+        "tags": [
+          "gsx-connection"
+        ],
+        "x-required-privileges": [
+          "Read GSX Connection",
+          "Read Push Certificates"
+        ]
+      },
+      "patch": {
+        "description": "Updates Jamf Pro GSX Connection information\n",
+        "requestBody": {
+          "content": {
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GsxConnectionUpdate"
+              }
+            }
+          },
+          "description": "GSX Connection to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GsxConnection"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "There was an error applying the put"
+          }
+        },
+        "summary": "Updates Jamf Pro GSX Connection information\n",
+        "tags": [
+          "gsx-connection"
+        ],
+        "x-required-privileges": [
+          "Update GSX Connection",
+          "Update Push Certificates"
+        ]
+      },
+      "put": {
+        "description": "Updates Jamf Pro GSX Connection information\n",
+        "requestBody": {
+          "content": {
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GsxConnection"
+              }
+            }
+          },
+          "description": "GSX Connection to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GsxConnection"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "There was an error applying the put"
+          }
+        },
+        "summary": "Updates Jamf Pro GSX Connection information\n",
+        "tags": [
+          "gsx-connection"
+        ],
+        "x-required-privileges": [
+          "Update GSX Connection",
+          "Update Push Certificates"
+        ]
+      }
+    },
+    "/v1/gsx-connection/history": {
+      "get": {
+        "description": "Gets specified GSX Connection history object\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResultsV1"
+                }
+              }
+            },
+            "description": "Details of GSX Connection history were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified GSX Connection object does not exist."
+          }
+        },
+        "summary": "Get specified GSX Connection History object\n",
+        "tags": [
+          "gsx-connection"
+        ],
+        "x-required-privileges": [
+          "Read GSX Connection"
+        ]
+      },
+      "post": {
+        "description": "Adds specified GSX Connection history object notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of GSX Connection history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "GSX Connection history can not be saved"
+          }
+        },
+        "summary": "Add specified GSX Connection history object notes\n",
+        "tags": [
+          "gsx-connection"
+        ],
+        "x-required-privileges": [
+          "Update GSX Connection"
+        ]
+      }
+    },
+    "/v1/gsx-connection/test": {
+      "post": {
+        "description": "Test functionality of an GSX Connection",
+        "responses": {
+          "202": {
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GsxTestResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Test functionality of an GSX Connection",
+        "tags": [
+          "gsx-connection"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Read GSX Connection"
+        ]
+      }
+    },
     "/v1/icon": {
       "post": {
         "description": "Uploads an icon",
@@ -25883,6 +27497,76 @@
           "icon"
         ],
         "x-authentication-required": true
+      }
+    },
+    "/v1/impact-alert-notification-settings": {
+      "get": {
+        "description": "Get Impact Alert Notification Settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactAlertNotificationSettingsV1"
+                }
+              }
+            },
+            "description": "Successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Get Impact Alert Notification Settings",
+        "tags": [
+          "impact-alert-notification-settings"
+        ],
+        "x-required-privileges": [
+          "Read Impact Alert Notification Settings"
+        ]
+      },
+      "put": {
+        "description": "Update Impact Alert Notification Settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpactAlertNotificationSettingsV1"
+              }
+            }
+          },
+          "description": "Configure Access Management settings",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Update Successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Update Impact Alert Notification Settings",
+        "tags": [
+          "impact-alert-notification-settings"
+        ],
+        "x-required-privileges": [
+          "Update Impact Alert Notification Settings"
+        ]
       }
     },
     "/v1/inventory-information": {
@@ -26211,6 +27895,175 @@
         ],
         "x-required-privileges": [
           "Update Jamf Connect Settings"
+        ]
+      }
+    },
+    "/v1/jamf-pro-server-url": {
+      "get": {
+        "description": "Get Jamf Pro Server URL settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JamfProServerUrl"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get Jamf Pro Server URL settings\n",
+        "tags": [
+          "jamf-pro-server-url-preview"
+        ],
+        "x-required-privileges": [
+          "Read JSS URL"
+        ]
+      },
+      "put": {
+        "description": "Update Jamf Pro Server URL settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JamfProServerUrl"
+              }
+            }
+          },
+          "description": "Jamf Pro Server URL settings object",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JamfProServerUrl"
+                }
+              }
+            },
+            "description": "Jamf Pro Server URL settings updated"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Pro Server URL is managed by Jamf Cloud"
+          }
+        },
+        "summary": "Update Jamf Pro Server URL settings\n",
+        "tags": [
+          "jamf-pro-server-url-preview"
+        ],
+        "x-required-privileges": [
+          "Update JSS URL"
+        ]
+      }
+    },
+    "/v1/jamf-pro-server-url/history": {
+      "get": {
+        "description": "Gets Jamf Pro Server URL settings history",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/pagesize"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "date:desc",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Jamf Pro Server URL settings history were found"
+          }
+        },
+        "summary": "Get Jamf Pro Server URL settings history\n",
+        "tags": [
+          "jamf-pro-server-url-preview"
+        ],
+        "x-required-privileges": [
+          "Read JSS URL"
+        ]
+      },
+      "post": {
+        "description": "Adds Jamf Pro Server URL settings history notes",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes to Jamf Pro Server URL settings history were added"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Pro Server URL is managed by Jamf Cloud"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Pro Server URL history does not exist."
+          }
+        },
+        "summary": "Add Jamf Pro Server URL settings history notes\n",
+        "tags": [
+          "jamf-pro-server-url-preview"
+        ],
+        "x-required-privileges": [
+          "Update JSS URL"
         ]
       }
     },
@@ -26859,6 +28712,62 @@
         ],
         "x-required-privileges": [
           "Read LDAP Servers"
+        ]
+      }
+    },
+    "/v1/login-customization": {
+      "get": {
+        "description": "Returns knob whether disclaimer is enabled and if saved, its contents.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginContent"
+                }
+              }
+            },
+            "description": "Get Login Customization disclaimer settings."
+          }
+        },
+        "summary": "Get current login disclaimer settings",
+        "tags": [
+          "login-customization"
+        ],
+        "x-authentication-required": true
+      },
+      "put": {
+        "description": "Update current login disclaimer settings.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginContentPut"
+              }
+            }
+          },
+          "description": "Login disclaimer settings to save.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginContentPut"
+                }
+              }
+            },
+            "description": "Update login customization disclaimer settings."
+          }
+        },
+        "summary": "Update current login disclaimer settings.",
+        "tags": [
+          "login-customization"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "Update Login Disclaimer"
         ]
       }
     },
@@ -29645,6 +31554,162 @@
         ]
       }
     },
+    "/v1/parent-app": {
+      "get": {
+        "description": "Get the current Jamf Parent app settings\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentApp"
+                }
+              }
+            },
+            "description": "Details of the current Jamf Parent app settings."
+          }
+        },
+        "summary": "Get the current Jamf Parent app settings\n",
+        "tags": [
+          "parent-app-preview"
+        ],
+        "x-required-privileges": [
+          "Read Parent App Settings"
+        ]
+      },
+      "put": {
+        "description": "Update Jamf Parent app settings\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParentApp"
+              }
+            }
+          },
+          "description": "Jamf Parent app settings to save.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentApp"
+                }
+              }
+            },
+            "description": "Jamf Parent app settings updated"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request, could not parse input."
+          }
+        },
+        "summary": "Update Jamf Parent app settings\n",
+        "tags": [
+          "parent-app-preview"
+        ],
+        "x-required-privileges": [
+          "Update Parent App Settings"
+        ]
+      }
+    },
+    "/v1/parent-app/history": {
+      "get": {
+        "description": "Gets Jamf Parent app settings history\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "date:desc",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Jamf Parent app settings history were found"
+          }
+        },
+        "summary": "Get Jamf Parent app settings history\n",
+        "tags": [
+          "parent-app-preview"
+        ],
+        "x-required-privileges": [
+          "Read Parent App Settings"
+        ]
+      },
+      "post": {
+        "description": "Adds Jamf Parent app settings history notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes to Jamf Parent app settings history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Parent app history can not be saved"
+          }
+        },
+        "summary": "Add Jamf Parent app settings history notes\n",
+        "tags": [
+          "parent-app-preview"
+        ],
+        "x-required-privileges": [
+          "Update Parent App Settings"
+        ]
+      }
+    },
     "/v1/pki/adcs-settings": {
       "post": {
         "description": "Create AD CS Settings configuration and initialize renewal monitor. Once set, the configuration cannot change between inbound and outbound modes.",
@@ -31338,6 +33403,77 @@
         ]
       }
     },
+    "/v1/self-service-plus/feature-toggle/enabled": {
+      "get": {
+        "description": "This endpoint is used to determine if the Self Service Plus feature toggle is enabled.\n",
+        "operationId": "getSelfServicePlusFeatureToggleEnabled",
+        "responses": {
+          "204": {
+            "description": "Feature toggle is enabled"
+          },
+          "404": {
+            "description": "Feature toggle is disabled"
+          }
+        },
+        "summary": "Determines if Self Service Plus feature toggle is enabled.",
+        "tags": [
+          "self-service-plus"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/self-service-plus/settings": {
+      "get": {
+        "description": "Get Self Service Plus settings.",
+        "operationId": "getSelfServicePlusSettings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelfServicePlusSettings"
+                }
+              }
+            },
+            "description": "Self Service Plus settings"
+          }
+        },
+        "summary": "Get Self Service Plus settings.",
+        "tags": [
+          "self-service-plus"
+        ],
+        "x-required-privileges": [
+          "Read Self Service"
+        ]
+      },
+      "put": {
+        "description": "Save Self Service Plus settings.",
+        "operationId": "putSelfServicePlusSettings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfServicePlusSettings"
+              }
+            }
+          },
+          "description": "Self Service Plus settings",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful PUT"
+          }
+        },
+        "summary": "Save Self Service Plus settings.",
+        "tags": [
+          "self-service-plus"
+        ],
+        "x-required-privileges": [
+          "Update Self Service"
+        ]
+      }
+    },
     "/v1/service-discovery-enrollment/well-known-settings": {
       "get": {
         "description": "Returns current settings for all AxM organizations.\n",
@@ -31624,6 +33760,154 @@
         "x-action": true,
         "x-required-privileges": [
           "Update SSO Settings"
+        ]
+      }
+    },
+    "/v1/teacher-app": {
+      "get": {
+        "description": "Get the Jamf Teacher settings that you have access to see.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeacherSettingsResponse"
+                }
+              }
+            },
+            "description": "List of Jamf Teacher settings"
+          }
+        },
+        "summary": "Get the Jamf Teacher settings that you have access to see\n",
+        "tags": [
+          "teacher-app"
+        ],
+        "x-required-privileges": [
+          "Read Teacher App Settings"
+        ]
+      },
+      "put": {
+        "description": "Update a Jamf Teacher settings object.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeacherSettingsRequest"
+              }
+            }
+          },
+          "description": "Teacher settings to create.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeacherSettingsResponse"
+                }
+              }
+            },
+            "description": "Updated Jamf Teacher settings."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Update Failed."
+          }
+        },
+        "summary": "Update a Jamf Teacher settings object\n",
+        "tags": [
+          "teacher-app"
+        ],
+        "x-required-privileges": [
+          "Update Teacher App Settings"
+        ]
+      }
+    },
+    "/v1/teacher-app/history": {
+      "get": {
+        "description": "Gets Jamf Teacher app settings history\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Jamf Teacher app settings history were found"
+          }
+        },
+        "summary": "Get Jamf Teacher app settings history\n",
+        "tags": [
+          "teacher-app"
+        ],
+        "x-required-privileges": [
+          "Read Teacher App Settings"
+        ]
+      },
+      "post": {
+        "description": "Adds Jamf Teacher app settings history notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes to Jamf Teacher app settings history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Teacher app history can not be saved"
+          }
+        },
+        "summary": "Add Jamf Teacher app settings history notes\n",
+        "tags": [
+          "teacher-app"
+        ],
+        "x-required-privileges": [
+          "Update Teacher App Settings"
         ]
       }
     },
@@ -38747,6 +41031,106 @@
         ]
       }
     },
+    "/v2/smtp-server": {
+      "get": {
+        "description": "Finds the Jamf Pro SMTP Server information\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmtpServerV2"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Finds the Jamf Pro SMTP Server information\n",
+        "tags": [
+          "smtp-server"
+        ],
+        "x-required-privileges": [
+          "Read SMTP Server"
+        ]
+      },
+      "put": {
+        "description": "Updates Jamf Pro SMTP Server information. If requiresAuthentication is set to true, a username and password must be provided\n",
+        "parameters": [
+          {
+            "description": "The OAuth state that was last used to authorize a Google Mail account. This is only required when the authentication type is Google Mail and new accounts are being added.",
+            "explode": true,
+            "in": "query",
+            "name": "oauth-state",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmtpServerV2"
+              }
+            }
+          },
+          "description": "SMTP Server to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmtpServerV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "There was an error applying the put"
+          }
+        },
+        "summary": "Updates Jamf Pro SMTP Server information\n",
+        "tags": [
+          "smtp-server"
+        ],
+        "x-required-privileges": [
+          "Update SMTP Server"
+        ]
+      }
+    },
     "/v2/sso/cert": {
       "delete": {
         "description": "Deletes the currently configured certificate used by SSO.",
@@ -38918,6 +41302,168 @@
         "x-action": true,
         "x-required-privileges": [
           "Update SSO Settings"
+        ]
+      }
+    },
+    "/v3/check-in": {
+      "get": {
+        "description": "Gets `Client Check-In` object.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientCheckInV3"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get Client Check-In settings\n",
+        "tags": [
+          "client-check-in"
+        ],
+        "x-required-privileges": [
+          "Read Computer Check-In"
+        ]
+      },
+      "put": {
+        "description": "Update Client Check-In object\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientCheckInV3"
+              }
+            }
+          },
+          "description": "Client Check-In object to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientCheckInV3"
+                }
+              }
+            },
+            "description": "Client Check-In was updated"
+          }
+        },
+        "summary": "Update Client Check-In object\n",
+        "tags": [
+          "client-check-in"
+        ],
+        "x-required-privileges": [
+          "Update Computer Check-In"
+        ]
+      }
+    },
+    "/v3/check-in/history": {
+      "get": {
+        "description": "Gets Client Check-In history object\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,username:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "example": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResultsV1"
+                }
+              }
+            },
+            "description": "Details of Client Check-In history were found"
+          }
+        },
+        "summary": "Get Client Check-In history object\n",
+        "tags": [
+          "client-check-in"
+        ],
+        "x-required-privileges": [
+          "Read Computer Check-In"
+        ]
+      },
+      "post": {
+        "description": "Adds Client Check-In history object notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of Client Check-In history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Client Check-In history can not be saved"
+          }
+        },
+        "summary": "Add a Note to Client Check-In History\n",
+        "tags": [
+          "client-check-in"
+        ],
+        "x-required-privileges": [
+          "Update Computer Check-In"
         ]
       }
     },

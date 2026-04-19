@@ -82,6 +82,11 @@ type AccountSettingsResponse struct {
 	VersionLock                             int    `json:"versionLock"`
 }
 
+// ActivationCode represents a activation code.
+type ActivationCode struct {
+	ActivationCode string `json:"activationCode"`
+}
+
 // AdcsCertificate represents a adcs certificate.
 type AdcsCertificate struct {
 	Data     [][]byte `json:"data"`
@@ -470,6 +475,20 @@ type BuildingSearchResults struct {
 	TotalCount int        `json:"totalCount"`
 }
 
+// CacheSettings represents a cache settings.
+type CacheSettings struct {
+	CacheType                  string               `json:"cacheType"`
+	CacheUniqueID              string               `json:"cacheUniqueId"`
+	DirectoryTimeToLiveSeconds *int                 `json:"directoryTimeToLiveSeconds,omitempty"`
+	EhcacheMaxBytesLocalHeap   *string              `json:"ehcacheMaxBytesLocalHeap,omitempty"`
+	Elasticache                *bool                `json:"elasticache,omitempty"`
+	ID                         *string              `json:"id,omitempty"`
+	MemcachedEndpoints         []MemcachedEndpoints `json:"memcachedEndpoints"`
+	Name                       *string              `json:"name,omitempty"`
+	TimeToIdleSeconds          *int                 `json:"timeToIdleSeconds,omitempty"`
+	TimeToLiveSeconds          int                  `json:"timeToLiveSeconds"`
+}
+
 // CategoriesSearchResults represents a categories search results.
 type CategoriesSearchResults struct {
 	Results    []Category `json:"results"`
@@ -565,6 +584,19 @@ type ClearPasscodeCommand struct {
 // ClearRestrictionsPasswordCommand represents a clear restrictions password command.
 type ClearRestrictionsPasswordCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
+}
+
+// ClientCheckInV3 represents a client check in v3.
+type ClientCheckInV3 struct {
+	CheckInFrequency                 *int  `json:"checkInFrequency,omitempty"`
+	CreateHooks                      *bool `json:"createHooks,omitempty"`
+	CreateStartupScript              *bool `json:"createStartupScript,omitempty"`
+	EnableLocalConfigurationProfiles *bool `json:"enableLocalConfigurationProfiles,omitempty"`
+	HookLog                          *bool `json:"hookLog,omitempty"`
+	HookPolicies                     *bool `json:"hookPolicies,omitempty"`
+	StartupLog                       *bool `json:"startupLog,omitempty"`
+	StartupPolicies                  *bool `json:"startupPolicies,omitempty"`
+	StartupSsh                       *bool `json:"startupSsh,omitempty"`
 }
 
 // CloudDistributionPoint represents a cloud distribution point.
@@ -1656,6 +1688,9 @@ type CsaToken struct {
 // DataRoamingSetting represents a data roaming setting value.
 type DataRoamingSetting = string
 
+// DayOfWeek represents a day of week value.
+type DayOfWeek = string
+
 // DeclarativeManagementCommand represents a declarative management command.
 type DeclarativeManagementCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
@@ -1774,6 +1809,16 @@ type DeviceCommonDetailsRequest struct {
 	MDMProfileNeedsRenewalDueToDeviceIdentityCertExpiring *bool      `json:"mdmProfileNeedsRenewalDueToDeviceIdentityCertExpiring,omitempty"`
 	MDMServerURL                                          *string    `json:"mdmServerUrl,omitempty"`
 	RenewMDMProfileStartDate                              *time.Time `json:"renewMdmProfileStartDate,omitempty"`
+}
+
+// DeviceCommunicationSettings represents a device communication settings.
+type DeviceCommunicationSettings struct {
+	AutoRenewComputerMDMProfileWhenCaRenewed                      *bool `json:"autoRenewComputerMdmProfileWhenCaRenewed,omitempty"`
+	AutoRenewComputerMDMProfileWhenDeviceIdentityCertExpiring     *bool `json:"autoRenewComputerMdmProfileWhenDeviceIdentityCertExpiring,omitempty"`
+	AutoRenewMobileDeviceMDMProfileWhenCaRenewed                  *bool `json:"autoRenewMobileDeviceMdmProfileWhenCaRenewed,omitempty"`
+	AutoRenewMobileDeviceMDMProfileWhenDeviceIdentityCertExpiring *bool `json:"autoRenewMobileDeviceMdmProfileWhenDeviceIdentityCertExpiring,omitempty"`
+	MDMProfileComputerExpirationLimitInDays                       *int  `json:"mdmProfileComputerExpirationLimitInDays,omitempty"`
+	MDMProfileMobileDeviceExpirationLimitInDays                   *int  `json:"mdmProfileMobileDeviceExpirationLimitInDays,omitempty"`
 }
 
 // DeviceComplianceInformation Device compliance information record.
@@ -2534,10 +2579,56 @@ type GroupWithCriteriaDtoV1 struct {
 	Smart            bool                  `json:"smart"`
 }
 
+// GsxConnection represents a gsx connection.
+type GsxConnection struct {
+	Enabled          bool        `json:"enabled"`
+	GsxKeystore      GsxKeystore `json:"gsxKeystore"`
+	ServiceAccountNo string      `json:"serviceAccountNo"`
+	ShipToNo         *string     `json:"shipToNo,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Token    string `json:"token"`
+	Username string `json:"username"`
+}
+
+// GsxConnectionUpdate represents a gsx connection update.
+type GsxConnectionUpdate struct {
+	Enabled          *bool        `json:"enabled,omitempty"`
+	GsxKeystore      *GsxKeystore `json:"gsxKeystore,omitempty"`
+	ServiceAccountNo *string      `json:"serviceAccountNo,omitempty"`
+	ShipToNo         *string      `json:"shipToNo,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Token    *string `json:"token,omitempty"`
+	Username *string `json:"username,omitempty"`
+}
+
+// GsxKeystore represents a gsx keystore.
+type GsxKeystore struct {
+	ErrorMessage    *string `json:"errorMessage,omitempty"`
+	ExpirationEpoch *int64  `json:"expirationEpoch,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	KeystoreBytes *[]byte `json:"keystoreBytes,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	KeystorePassword string `json:"keystorePassword"`
+	Name             string `json:"name"`
+}
+
+// GsxTestResponse represents a gsx test response.
+type GsxTestResponse struct {
+	Message  string `json:"message"`
+	Request  string `json:"request"`
+	Response string `json:"response"`
+}
+
 // HistorySearchResults represents a history search results.
 type HistorySearchResults struct {
 	Results    []ObjectHistory `json:"results"`
 	TotalCount int             `json:"totalCount"`
+}
+
+// HistorySearchResultsV1 represents a history search results v1.
+type HistorySearchResultsV1 struct {
+	Results    []ObjectHistoryV1 `json:"results"`
+	TotalCount int               `json:"totalCount"`
 }
 
 // HrefResponse represents a href response.
@@ -2561,6 +2652,14 @@ type IDAndNameV2 struct {
 // Ids represents a ids.
 type Ids struct {
 	IDs *[]string `json:"ids,omitempty"`
+}
+
+// ImpactAlertNotificationSettingsV1 represents a impact alert notification settings v1.
+type ImpactAlertNotificationSettingsV1 struct {
+	DeployableObjectsAlertEnabled            bool `json:"deployableObjectsAlertEnabled"`
+	DeployableObjectsConfirmationCodeEnabled bool `json:"deployableObjectsConfirmationCodeEnabled"`
+	ScopeableObjectsAlertEnabled             bool `json:"scopeableObjectsAlertEnabled"`
+	ScopeableObjectsConfirmationCodeEnabled  bool `json:"scopeableObjectsConfirmationCodeEnabled"`
 }
 
 // InstallPackage Either devices or groupId must be provided.
@@ -2787,6 +2886,11 @@ type InventoryPreloadRecordV2 struct {
 	WarrantyExpiration  *string                               `json:"warrantyExpiration,omitempty"`
 }
 
+// JamfProServerURL represents a jamf pro server u r l.
+type JamfProServerURL struct {
+	URL string `json:"url"`
+}
+
 // JamfProtectPlan represents a jamf protect plan.
 type JamfProtectPlan struct {
 	Description      string `json:"description"`
@@ -2907,6 +3011,23 @@ type LocationV2 struct {
 // LogOutUserCommand represents a log out user command.
 type LogOutUserCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
+}
+
+// LoginContent represents a login content.
+type LoginContent struct {
+	ActionText              string `json:"actionText"`
+	DisclaimerHeading       string `json:"disclaimerHeading"`
+	DisclaimerMainText      string `json:"disclaimerMainText"`
+	IncludeCustomDisclaimer bool   `json:"includeCustomDisclaimer"`
+	RampInstance            bool   `json:"rampInstance"`
+}
+
+// LoginContentPut represents a login content put.
+type LoginContentPut struct {
+	ActionText              *string `json:"actionText,omitempty"`
+	DisclaimerHeading       *string `json:"disclaimerHeading,omitempty"`
+	DisclaimerMainText      *string `json:"disclaimerMainText,omitempty"`
+	IncludeCustomDisclaimer bool    `json:"includeCustomDisclaimer"`
 }
 
 // ManagedApplicationListCommand represents a managed application list command.
@@ -3128,6 +3249,16 @@ type MembershipTestSearchRequest struct {
 type MembershipTestSearchResponse struct {
 	IsMember bool   `json:"isMember"`
 	Username string `json:"username"`
+}
+
+// MemcachedEndpoints represents a memcached endpoints.
+type MemcachedEndpoints struct {
+	Enabled                 *bool   `json:"enabled,omitempty"`
+	HostName                *string `json:"hostName,omitempty"`
+	ID                      *string `json:"id,omitempty"`
+	JssCacheConfigurationID *int    `json:"jssCacheConfigurationId,omitempty"`
+	Name                    *string `json:"name,omitempty"`
+	Port                    *int    `json:"port,omitempty"`
 }
 
 // MobileDeviceApplication represents a mobile device application.
@@ -3886,6 +4017,15 @@ type ObjectHistoryNote struct {
 	Note string `json:"note"`
 }
 
+// ObjectHistoryV1 represents a object history v1.
+type ObjectHistoryV1 struct {
+	Date     string  `json:"date"`
+	Details  *string `json:"details,omitempty"`
+	ID       string  `json:"id"`
+	Note     string  `json:"note"`
+	Username string  `json:"username"`
+}
+
 // OidcDirectIdpLoginSkipURL represents a oidc direct idp login skip u r l.
 type OidcDirectIdpLoginSkipURL struct {
 	URL string `json:"url"`
@@ -3935,6 +4075,11 @@ type OidcSettings struct {
 	JamfIDAuthenticationEnabled   *bool   `json:"jamfIdAuthenticationEnabled,omitempty"`
 	UserMapping                   string  `json:"userMapping"`
 	UsernameAttributeClaimMapping *string `json:"usernameAttributeClaimMapping,omitempty"`
+}
+
+// OrganizationName represents a organization name.
+type OrganizationName struct {
+	OrganizationName string `json:"organizationName"`
 }
 
 // Package represents a package.
@@ -4006,6 +4151,23 @@ type PagedUserResults struct {
 	Results     []User `json:"results"`
 	TotalCount  int64  `json:"totalCount"`
 	TotalPages  int64  `json:"totalPages"`
+}
+
+// ParentApp represents a parent app.
+type ParentApp struct {
+	AllowClearPasscode            *bool                    `json:"allowClearPasscode,omitempty"`
+	AllowTemplates                *bool                    `json:"allowTemplates,omitempty"`
+	DeviceGroupID                 int                      `json:"deviceGroupId"`
+	DisassociateOnWipeAndReEnroll *bool                    `json:"disassociateOnWipeAndReEnroll,omitempty"`
+	IsEnabled                     bool                     `json:"isEnabled"`
+	RestrictedTimes               ParentAppRestrictedTimes `json:"restrictedTimes"`
+	SafelistedApps                *[]SafelistedApp         `json:"safelistedApps,omitempty"`
+	TimezoneID                    string                   `json:"timezoneId"`
+}
+
+// ParentAppRestrictedTimes represents a parent app restricted times.
+type ParentAppRestrictedTimes struct {
+	Key *DayOfWeek `json:"key,omitempty"`
 }
 
 // PatchPolicies represents a patch policies.
@@ -4671,6 +4833,12 @@ type ReturnToServiceConfigurationSearchResults struct {
 	TotalCount int                            `json:"totalCount"`
 }
 
+// SafelistedApp represents a safelisted app.
+type SafelistedApp struct {
+	BundleID *string `json:"bundleId,omitempty"`
+	Name     *string `json:"name,omitempty"`
+}
+
 // SamlSettings represents a saml settings.
 type SamlSettings struct {
 	EntityID                *string `json:"entityId,omitempty"`
@@ -4737,6 +4905,11 @@ type SecurityV2 struct {
 	PasscodeCompliant             bool       `json:"passcodeCompliant"`
 	PasscodeCompliantWithProfile  bool       `json:"passcodeCompliantWithProfile"`
 	PasscodePresent               bool       `json:"passcodePresent"`
+}
+
+// SelfServicePlusSettings represents a self service plus settings.
+type SelfServicePlusSettings struct {
+	Enabled *bool `json:"enabled,omitempty"`
 }
 
 // ServiceDiscoveryVersion represents a service discovery version value.
@@ -4931,6 +5104,60 @@ type SmartSearchCriterion struct {
 	Value        string `json:"value"`
 }
 
+// SmtpBasicCredentials represents a smtp basic credentials.
+type SmtpBasicCredentials struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+	Username string `json:"username"`
+}
+
+// SmtpConnectionSettings represents a smtp connection settings.
+type SmtpConnectionSettings struct {
+	ConnectionTimeout int    `json:"connectionTimeout"`
+	EncryptionType    string `json:"encryptionType"`
+	Host              string `json:"host"`
+	Port              int    `json:"port"`
+}
+
+// SmtpGoogleMailAuthentication represents a smtp google mail authentication.
+type SmtpGoogleMailAuthentication struct {
+	EmailAddress string `json:"emailAddress"`
+	Status       string `json:"status"`
+}
+
+// SmtpGoogleMailCredentials represents a smtp google mail credentials.
+type SmtpGoogleMailCredentials struct {
+	Authentications *[]SmtpGoogleMailAuthentication `json:"authentications,omitempty"`
+	ClientID        string                          `json:"clientId"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	ClientSecret string `json:"clientSecret"`
+}
+
+// SmtpGraphApiCredentials represents a smtp graph api credentials.
+type SmtpGraphApiCredentials struct {
+	ClientID string `json:"clientId"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	ClientSecret string `json:"clientSecret"`
+	TenantID     string `json:"tenantId"`
+}
+
+// SmtpSenderSettings represents a smtp sender settings.
+type SmtpSenderSettings struct {
+	DisplayName  *string `json:"displayName,omitempty"`
+	EmailAddress string  `json:"emailAddress"`
+}
+
+// SmtpServerV2 represents a smtp server v2.
+type SmtpServerV2 struct {
+	AuthenticationType    string                     `json:"authenticationType"`
+	BasicAuthCredentials  *SmtpBasicCredentials      `json:"basicAuthCredentials,omitempty"`
+	ConnectionSettings    *SmtpConnectionSettings    `json:"connectionSettings,omitempty"`
+	Enabled               bool                       `json:"enabled"`
+	GoogleMailCredentials *SmtpGoogleMailCredentials `json:"googleMailCredentials,omitempty"`
+	GraphApiCredentials   *SmtpGraphApiCredentials   `json:"graphApiCredentials,omitempty"`
+	SenderSettings        SmtpSenderSettings         `json:"senderSettings"`
+}
+
 // SoftwareTitleConfigurationOnDashboard represents a software title configuration on dashboard.
 type SoftwareTitleConfigurationOnDashboard struct {
 	OnDashboard bool `json:"onDashboard"`
@@ -5103,6 +5330,41 @@ type StatusItems struct {
 // StopMirroringCommand represents a stop mirroring command.
 type StopMirroringCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
+}
+
+// TeacherFeatures represents a teacher features.
+type TeacherFeatures struct {
+	IsAllowAppLock         bool `json:"isAllowAppLock"`
+	IsAllowAttentionScreen bool `json:"isAllowAttentionScreen"`
+	IsAllowClearPasscode   bool `json:"isAllowClearPasscode"`
+	IsAllowRestrictions    bool `json:"isAllowRestrictions"`
+	IsAllowWebLock         bool `json:"isAllowWebLock"`
+}
+
+// TeacherSettingsRequest represents a teacher settings request.
+type TeacherSettingsRequest struct {
+	AutoClear                   *string          `json:"autoClear,omitempty"`
+	IsEnabled                   *bool            `json:"isEnabled,omitempty"`
+	MaxRestrictionLengthSeconds *int             `json:"maxRestrictionLengthSeconds,omitempty"`
+	SafelistedApps              *[]SafelistedApp `json:"safelistedApps,omitempty"`
+	TimezoneID                  *string          `json:"timezoneId,omitempty"`
+}
+
+// TeacherSettingsResponse represents a teacher settings response.
+type TeacherSettingsResponse struct {
+	AutoClear                   string           `json:"autoClear"`
+	DisplayNameType             string           `json:"displayNameType"`
+	Features                    *TeacherFeatures `json:"features,omitempty"`
+	IsEnabled                   bool             `json:"isEnabled"`
+	MaxRestrictionLengthSeconds int              `json:"maxRestrictionLengthSeconds"`
+	SafelistedApps              []SafelistedApp  `json:"safelistedApps"`
+	TimezoneID                  string           `json:"timezoneId"`
+}
+
+// TimeFrame represents a time frame.
+type TimeFrame struct {
+	BeginTime *string `json:"beginTime,omitempty"`
+	EndTime   *string `json:"endTime,omitempty"`
 }
 
 // TvOsDetails will be populated if the type is appleTv.

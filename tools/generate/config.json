@@ -653,7 +653,61 @@
         {"op": "GET /v1/jamf-remote-assist/session/{id}", "name": "GetJamfRemoteAssistSessionV1"},
         {"op": "GET /v2/jamf-remote-assist/session", "name": "ListJamfRemoteAssistSessionsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v2/jamf-remote-assist/session/export", "name": "ExportJamfRemoteAssistSessionsV2"},
-        {"op": "GET /v2/jamf-remote-assist/session/{id}", "name": "GetJamfRemoteAssistSessionV2"}
+        {"op": "GET /v2/jamf-remote-assist/session/{id}", "name": "GetJamfRemoteAssistSessionV2"},
+
+        {"op": "PUT /v1/activation-code", "name": "UpdateActivationCodeV1", "expectedStatus": 202},
+        {"op": "GET /v1/activation-code/history", "name": "ListActivationCodeHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/activation-code/history", "name": "CreateActivationCodeHistoryNoteV1", "expectedStatus": 201},
+        {"op": "POST /v1/activation-code/history/export", "name": "ExportActivationCodeHistoryV1"},
+        {"op": "PATCH /v1/activation-code/organization-name", "name": "UpdateActivationCodeOrganizationNameV1", "expectedStatus": 202},
+
+        {"op": "GET /v2/smtp-server", "name": "GetSmtpServerV2"},
+        {"op": "PUT /v2/smtp-server", "name": "UpdateSmtpServerV2"},
+
+        {"op": "GET /v1/jamf-pro-server-url", "name": "GetJamfProServerURLV1"},
+        {"op": "PUT /v1/jamf-pro-server-url", "name": "UpdateJamfProServerURLV1"},
+        {"op": "GET /v1/jamf-pro-server-url/history", "name": "ListJamfProServerURLHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/jamf-pro-server-url/history", "name": "CreateJamfProServerURLHistoryNoteV1", "expectedStatus": 201},
+
+        {"op": "GET /v1/device-communication-settings", "name": "GetDeviceCommunicationSettingsV1"},
+        {"op": "PUT /v1/device-communication-settings", "name": "UpdateDeviceCommunicationSettingsV1"},
+        {"op": "GET /v1/device-communication-settings/history", "name": "ListDeviceCommunicationSettingsHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/device-communication-settings/history", "name": "CreateDeviceCommunicationSettingsHistoryNoteV1", "expectedStatus": 201},
+
+        {"op": "GET /v3/check-in", "name": "GetCheckInSettingsV3"},
+        {"op": "PUT /v3/check-in", "name": "UpdateCheckInSettingsV3"},
+        {"op": "GET /v3/check-in/history", "name": "ListCheckInHistoryV3", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v3/check-in/history", "name": "CreateCheckInHistoryNoteV3", "expectedStatus": 201},
+
+        {"op": "GET /v1/cache-settings", "name": "GetCacheSettingsV1"},
+        {"op": "PUT /v1/cache-settings", "name": "UpdateCacheSettingsV1"},
+
+        {"op": "GET /v1/login-customization", "name": "GetLoginCustomizationV1"},
+        {"op": "PUT /v1/login-customization", "name": "UpdateLoginCustomizationV1"},
+
+        {"op": "GET /v1/parent-app", "name": "GetParentAppSettingsV1"},
+        {"op": "PUT /v1/parent-app", "name": "UpdateParentAppSettingsV1"},
+        {"op": "GET /v1/parent-app/history", "name": "ListParentAppHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/parent-app/history", "name": "CreateParentAppHistoryNoteV1", "expectedStatus": 201},
+
+        {"op": "GET /v1/teacher-app", "name": "GetTeacherAppSettingsV1"},
+        {"op": "PUT /v1/teacher-app", "name": "UpdateTeacherAppSettingsV1"},
+        {"op": "GET /v1/teacher-app/history", "name": "ListTeacherAppHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/teacher-app/history", "name": "CreateTeacherAppHistoryNoteV1", "expectedStatus": 201},
+
+        {"op": "GET /v1/gsx-connection", "name": "GetGSXConnectionV1"},
+        {"op": "PUT /v1/gsx-connection", "name": "UpdateGSXConnectionV1"},
+        {"op": "PATCH /v1/gsx-connection", "name": "PatchGSXConnectionV1"},
+        {"op": "GET /v1/gsx-connection/history", "name": "ListGSXConnectionHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/gsx-connection/history", "name": "CreateGSXConnectionHistoryNoteV1", "expectedStatus": 201},
+        {"op": "POST /v1/gsx-connection/test", "name": "TestGSXConnectionV1", "expectedStatus": 202},
+
+        {"op": "GET /v1/impact-alert-notification-settings", "name": "GetImpactAlertNotificationSettingsV1"},
+        {"op": "PUT /v1/impact-alert-notification-settings", "name": "UpdateImpactAlertNotificationSettingsV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/self-service-plus/feature-toggle/enabled", "name": "GetSelfServicePlusFeatureToggleEnabledV1", "expectedStatus": 204},
+        {"op": "GET /v1/self-service-plus/settings", "name": "GetSelfServicePlusSettingsV1"},
+        {"op": "PUT /v1/self-service-plus/settings", "name": "UpdateSelfServicePlusSettingsV1", "expectedStatus": 204}
       ]
     },
     {
