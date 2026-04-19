@@ -42,30 +42,30 @@ type GoField struct {
 }
 
 type GoMethod struct {
-	Name            string
-	Comment         string
-	Category        string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart
-	HTTPMethod      string
-	Namespace       string
-	Version         string
-	Tag             string // first OpenAPI tag of the operation, used when SplitByTag is enabled
-	ResourcePath    string // path after version prefix, e.g. "/devices/{id}"
-	MultipartFields []GoMultipartField
-	PathParams      []GoPathParam
-	QueryParams     []ExtraParam
-	RequestType       string
-	ResponseType      string
-	ResponseWireName  string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies
-	ExpectedStatus    int
-	ContentType     string
-	PaginationStyle string
-	PageSizeParam   string
-	ItemType        string
-	ResultsField    string
-	ReturnsSlice    bool
-	SpecPath        string
-	UnwrapResults   string
-	Format          string // carried from SpecDef so per-method templates can branch without $-scope
+	Name             string
+	Comment          string
+	Category         string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart
+	HTTPMethod       string
+	Namespace        string
+	Version          string
+	Tag              string // first OpenAPI tag of the operation, used when SplitByTag is enabled
+	ResourcePath     string // path after version prefix, e.g. "/devices/{id}"
+	MultipartFields  []GoMultipartField
+	PathParams       []GoPathParam
+	QueryParams      []ExtraParam
+	RequestType      string
+	ResponseType     string
+	ResponseWireName string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies
+	ExpectedStatus   int
+	ContentType      string
+	PaginationStyle  string
+	PageSizeParam    string
+	ItemType         string
+	ResultsField     string
+	ReturnsSlice     bool
+	SpecPath         string
+	UnwrapResults    string
+	Format           string // carried from SpecDef so per-method templates can branch without $-scope
 }
 
 type GoPathParam struct {

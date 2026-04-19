@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	"maps"
 	"sort"
 	"strings"
 
@@ -757,9 +758,7 @@ func flattenAllOf(schema *openapi3.Schema) (map[string]*openapi3.SchemaRef, []st
 		if s == nil {
 			return
 		}
-		for k, v := range s.Properties {
-			props[k] = v
-		}
+		maps.Copy(props, s.Properties)
 		for _, r := range s.Required {
 			reqSet[r] = true
 		}
@@ -978,8 +977,8 @@ func xmlWireName(specName string, schema *openapi3.Schema) string {
 	if schema != nil && schema.XML != nil && schema.XML.Name != "" {
 		return schema.XML.Name
 	}
-	if strings.HasSuffix(specName, "_post") {
-		return strings.TrimSuffix(specName, "_post")
+	if before, ok := strings.CutSuffix(specName, "_post"); ok {
+		return before
 	}
 	return specName
 }

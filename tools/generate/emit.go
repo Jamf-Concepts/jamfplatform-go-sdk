@@ -83,8 +83,8 @@ func loadSpec(path string, allowed map[string]bool) (*openapi3.T, error) {
 			rewritten := openapi3.NewPaths()
 			for _, p := range v3.Paths.InMatchingOrder() {
 				key := p
-				if strings.HasPrefix(p, trimmed) {
-					key = strings.TrimPrefix(p, trimmed)
+				if after, ok := strings.CutPrefix(p, trimmed); ok {
+					key = after
 					if key == "" {
 						key = "/"
 					}
@@ -421,7 +421,7 @@ import (
 
 // BigInt is an arbitrary-precision integer with XML/JSON codecs. The zero
 // value is usable and equivalent to big.NewInt(0). Targeted by
-// FieldTypeOverrides for Classic fields the spec types as ` + "`integer`" + ` whose
+// FieldTypeOverrides for Classic fields the spec types as `+"`integer`"+` whose
 // actual wire values exceed int64 — canonically invitation codes and
 // epoch millis beyond year ~2500.
 type BigInt struct {

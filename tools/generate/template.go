@@ -108,6 +108,7 @@ var funcMap = template.FuncMap{
 
 var sourceTmpl = template.Must(template.New("source").Funcs(funcMap).Parse(sourceTemplate))
 var testTmpl = template.Must(template.New("tests").Delims("<%", "%>").Funcs(funcMap).Parse(testTemplate))
+
 // ---------------------------------------------------------------------------
 // Source template
 // ---------------------------------------------------------------------------
