@@ -125,6 +125,82 @@
         },
         "type": "object"
       },
+      "Account": {
+        "properties": {
+          "accessLevel": {
+            "enum": [
+              "FullAccess",
+              "SiteAccess",
+              "GroupBasedAccess"
+            ],
+            "example": "FullAccess",
+            "type": "string"
+          },
+          "currentSiteId": {
+            "example": 1,
+            "type": "integer"
+          },
+          "email": {
+            "example": "ITBob@Jamf.com",
+            "type": "string"
+          },
+          "groupIds": {
+            "example": [
+              1,
+              3
+            ],
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "isMultiSiteAdmin": {
+            "example": false,
+            "type": "boolean"
+          },
+          "preferences": {
+            "$ref": "#/components/schemas/AccountPreferences"
+          },
+          "privilegeSet": {
+            "enum": [
+              "ADMINISTRATOR",
+              "AUDITOR",
+              "ENROLLMENT",
+              "CUSTOM"
+            ],
+            "example": "CUSTOM",
+            "type": "string"
+          },
+          "privilegesBySite": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "example": {
+              "1": [
+                "Read SSO Settings",
+                "Delete eBooks"
+              ]
+            },
+            "type": "object"
+          },
+          "realName": {
+            "example": "IT Bob",
+            "type": "string"
+          },
+          "username": {
+            "example": "admin",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "AccountDrivenUserEnrollmentSessionTokenSettings": {
         "description": "Settings for Account Driven User Enrollment. Only 1 of expirationIntervalDays or expirationIntervalSeconds can be supplied.",
         "properties": {
@@ -188,6 +264,49 @@
         },
         "type": "object"
       },
+      "AccountPreferences": {
+        "properties": {
+          "dateFormat": {
+            "example": "MM/dd/yyyy",
+            "type": "string"
+          },
+          "isDisableRelativeDates": {
+            "example": false,
+            "type": "boolean"
+          },
+          "language": {
+            "example": "en",
+            "type": "string"
+          },
+          "region": {
+            "example": "Europe",
+            "type": "string"
+          },
+          "timezone": {
+            "example": "Etc/GMT",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AccountPreferencesSearchType": {
+        "enum": [
+          "EXACT_MATCH",
+          "STARTS_WITH",
+          "CONTAINS"
+        ],
+        "example": "EXACT_MATCH",
+        "type": "string"
+      },
+      "AccountPreferencesUserInterfaceDisplayTheme": {
+        "enum": [
+          "MATCH_SYSTEM",
+          "LIGHT",
+          "DARK"
+        ],
+        "example": "MATCH_SYSTEM",
+        "type": "string"
+      },
       "AccountPreferencesV1": {
         "properties": {
           "dateFormat": {
@@ -211,6 +330,134 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "AccountPreferencesV6": {
+        "properties": {
+          "computerApplicationSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerApplicationUsageSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerLocalUserAccountSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerPackageReceiptSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerPeripheralSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerPrinterSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerServiceSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerSoftwareUpdateSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "configProfilesSortingMethod": {
+            "example": "ALPHABETICALLY",
+            "type": "string"
+          },
+          "dateFormat": {
+            "example": "MM/dd/yyyy",
+            "type": "string"
+          },
+          "disablePageLeaveCheck": {
+            "example": true,
+            "type": "boolean"
+          },
+          "disableRelativeDates": {
+            "example": false,
+            "type": "boolean"
+          },
+          "disableShortcutsTooltips": {
+            "example": true,
+            "type": "boolean"
+          },
+          "disableTablePagination": {
+            "example": true,
+            "type": "boolean"
+          },
+          "language": {
+            "default": "en",
+            "description": "Language codes supported by Jamf Pro",
+            "enum": [
+              "en",
+              "de",
+              "fr",
+              "es",
+              "ja",
+              "zh-hant"
+            ],
+            "type": "string"
+          },
+          "mobileDeviceAppSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "mobileDeviceSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "resultsPerPage": {
+            "default": 100,
+            "example": 50,
+            "type": "integer"
+          },
+          "timezone": {
+            "example": "America/Chicago",
+            "type": "string"
+          },
+          "userAllContentSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "userEbookSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "userInterfaceDisplayTheme": {
+            "$ref": "#/components/schemas/AccountPreferencesUserInterfaceDisplayTheme"
+          },
+          "userMacAppStoreAppSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "userMobileDeviceAppSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "userSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          }
+        },
+        "required": [
+          "computerApplicationSearchMethod",
+          "computerApplicationUsageSearchMethod",
+          "computerLocalUserAccountSearchMethod",
+          "computerPackageReceiptSearchMethod",
+          "computerPrinterSearchMethod",
+          "computerSearchMethod",
+          "computerServiceSearchMethod",
+          "configProfilesSortingMethod",
+          "dateFormat",
+          "disablePageLeaveCheck",
+          "disableRelativeDates",
+          "disableShortcutsTooltips",
+          "disableTablePagination",
+          "language",
+          "mobileDeviceAppSearchMethod",
+          "mobileDeviceSearchMethod",
+          "resultsPerPage",
+          "timezone",
+          "userAllContentSearchMethod",
+          "userEbookSearchMethod",
+          "userInterfaceDisplayTheme",
+          "userMacAppStoreAppSearchMethod",
+          "userMobileDeviceAppSearchMethod",
+          "userSearchMethod"
+        ],
         "type": "object"
       },
       "AccountSettingsRequest": {
@@ -6547,6 +6794,259 @@
             "example": "12345678",
             "nullable": true,
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DashboardApiError": {
+        "properties": {
+          "description": {
+            "default": "",
+            "example": "Could not collect dashboard data for licensed software",
+            "type": "string"
+          },
+          "httpStatusCode": {
+            "default": 500,
+            "example": 500,
+            "type": "integer"
+          },
+          "id": {
+            "default": "",
+            "example": "3",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DashboardItem": {
+        "properties": {
+          "details": {
+            "items": {
+              "description": "Additional details that will be found in a legend of the widgets on the dashboard",
+              "properties": {
+                "label": {
+                  "example": "10.2.001.4",
+                  "type": "string"
+                },
+                "value": {
+                  "example": "24",
+                  "type": "string"
+                }
+              },
+              "title": "DashboardDetail",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "enabled": {
+            "default": true,
+            "description": "Logical to decide whether widget should be enabled or disabled; i.e. Policy",
+            "type": "boolean"
+          },
+          "error": {
+            "$ref": "#/components/schemas/DashboardApiError"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "info": {
+            "description": "Additional information such as identifiers for a specific policy within a software patch",
+            "example": "3",
+            "nullable": true,
+            "type": "string"
+          },
+          "metrics": {
+            "items": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "description": "Logical to decide whether metric should be enabled or disabled; i.e. Policy can be at Retrying-Disabled status",
+                  "type": "boolean"
+                },
+                "tag": {
+                  "enum": [
+                    "Completed",
+                    "Remaining",
+                    "Site License",
+                    "No Licenses",
+                    "Over",
+                    "Failed",
+                    "Retrying",
+                    "Retrying-disabled",
+                    "Pending",
+                    "Expiring",
+                    "Active",
+                    "Inactive",
+                    "Computers",
+                    "Devices",
+                    "Users",
+                    "In Use",
+                    "N/A",
+                    "Latest Version",
+                    "Other Versions"
+                  ],
+                  "example": "Completed",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "Usually a number associated with the tag; i.e. 23 Pending Computers",
+                  "example": "2",
+                  "type": "string"
+                }
+              },
+              "title": "DashboardMetric",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "subtitle": {
+            "example": "Adobe Patch Policy",
+            "nullable": true,
+            "type": "string"
+          },
+          "title": {
+            "example": "Patch Report",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DashboardObject": {
+        "description": "Dashboard object consisting of object type, object's ID, and whether it should display on the Jamf Pro dashboard",
+        "properties": {
+          "enabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "objectId": {
+            "example": "1",
+            "type": "string"
+          },
+          "objectType": {
+            "enum": [
+              "TYPE_IOS_CONFIGURATION_PROFILE",
+              "TYPE_MACOS_CONFIGURATION_PROFILE",
+              "TYPE_USER_GROUP",
+              "TYPE_LICENSED_SOFTWARE",
+              "TYPE_PATCH_SOFTWARE_TITLE_CONFIGURATION",
+              "TYPE_PATCH_POLICY",
+              "TYPE_POLICY",
+              "TYPE_COMPUTER_GROUP",
+              "TYPE_MOBILE_DEVICE_GROUP",
+              "TYPE_DIGICERT_PKI_MANAGER_SETTINGS"
+            ],
+            "example": "TYPE_IOS_CONFIGURATION_PROFILE",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "objectId",
+          "objectType"
+        ],
+        "type": "object"
+      },
+      "DashboardSetup": {
+        "description": "Response object that has lists of information for widgets, and what setup tasks to display.",
+        "properties": {
+          "featureOptions": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/DashboardItem"
+              },
+              "type": "array"
+            },
+            "example": {
+              "TYPE_PATCH_SOFTWARE_TITLE_CONFIGURATION": [
+                {
+                  "details": [
+                    {
+                      "label": "10.2.001.4",
+                      "value": "24"
+                    }
+                  ],
+                  "enabled": true,
+                  "error": {
+                    "description": "Null pointer exception example error",
+                    "httpStatusCode": "500",
+                    "id": "3"
+                  },
+                  "id": "1",
+                  "info": "3",
+                  "metrics": [
+                    {
+                      "enabled": true,
+                      "tag": "Completed",
+                      "value": "2"
+                    }
+                  ],
+                  "subtitle": "Adobe Patch Policy",
+                  "title": "Patch Report"
+                }
+              ]
+            },
+            "properties": {
+              "feature": {
+                "enum": [
+                  "TYPE_IOS_CONFIGURATION_PROFILE",
+                  "TYPE_MACOS_CONFIGURATION_PROFILE",
+                  "TYPE_USER_GROUP",
+                  "TYPE_LICENSED_SOFTWARE",
+                  "TYPE_PATCH_SOFTWARE_TITLE_CONFIGURATION",
+                  "TYPE_PATCH_POLICY",
+                  "TYPE_POLICY",
+                  "TYPE_COMPUTER_GROUP",
+                  "TYPE_MOBILE_DEVICE_GROUP",
+                  "TYPE_DIGICERT_PKI_MANAGER_SETTINGS"
+                ],
+                "example": "TYPE_POLICY",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "setupTaskOptions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DashboardSetupTask"
+            },
+            "example": {
+              "TYPE_SSL_SETUP_TASK": {
+                "available": true,
+                "error": {
+                  "description": "Null pointer exception example error",
+                  "httpStatusCode": "500",
+                  "id": ""
+                }
+              }
+            },
+            "properties": {
+              "setupTask": {
+                "enum": [
+                  "TYPE_LDAP_SERVER_SETUP_TASK",
+                  "TYPE_PUSH_NOTIFICATION_SETTINGS_SETUP_TASK",
+                  "TYPE_SMTP_SERVER_SETUP_TASK",
+                  "TYPE_SSL_SETUP_TASK"
+                ],
+                "example": "TYPE_SSL_SETUP_TASK",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "DashboardSetupTask": {
+        "properties": {
+          "available": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "error": {
+            "$ref": "#/components/schemas/DashboardApiError"
           }
         },
         "type": "object"
@@ -14747,6 +15247,95 @@
         },
         "type": "object"
       },
+      "NotificationType": {
+        "enum": [
+          "APNS_CERT_REVOKED",
+          "APNS_CONNECTION_FAILURE",
+          "APPLE_SCHOOL_MANAGER_T_C_NOT_SIGNED",
+          "BUILT_IN_CA_EXPIRED",
+          "BUILT_IN_CA_EXPIRING",
+          "BUILT_IN_CA_RENEWAL_FAILED",
+          "BUILT_IN_CA_RENEWAL_SUCCESS",
+          "CLOUD_LDAP_CERT_EXPIRED",
+          "CLOUD_LDAP_CERT_WILL_EXPIRE",
+          "DEP_INSTANCE_EXPIRED",
+          "DEP_INSTANCE_WILL_EXPIRE",
+          "DEVICE_ENROLLMENT_PROGRAM_T_C_NOT_SIGNED",
+          "EXCEEDED_LICENSE_COUNT",
+          "FREQUENT_INVENTORY_COLLECTION_POLICY",
+          "GSX_CERT_EXPIRED",
+          "GSX_CERT_WILL_EXPIRE",
+          "HCL_BIND_ERROR",
+          "HCL_ERROR",
+          "INSECURE_LDAP",
+          "INVALID_REFERENCES_EXT_ATTR",
+          "INVALID_REFERENCES_POLICIES",
+          "INVALID_REFERENCES_SCRIPTS",
+          "JAMF_CONNECT_UPDATE",
+          "JAMF_PROTECT_UPDATE",
+          "JIM_ERROR",
+          "LDAP_CONNECTION_CHECK_THROUGH_JIM_FAILED",
+          "LDAP_CONNECTION_CHECK_THROUGH_JIM_SUCCESSFUL",
+          "MDM_EXTERNAL_SIGNING_CERTIFICATE_EXPIRED",
+          "MDM_EXTERNAL_SIGNING_CERTIFICATE_EXPIRING",
+          "MDM_EXTERNAL_SIGNING_CERTIFICATE_EXPIRING_TODAY",
+          "MII_HEARTBEAT_FAILED_NOTIFICATION",
+          "MII_INVENTORY_UPLOAD_FAILED_NOTIFICATION",
+          "MII_UNATHORIZED_RESPONSE_NOTIFICATION",
+          "PATCH_EXTENTION_ATTRIBUTE",
+          "PATCH_UPDATE",
+          "POLICY_MANAGEMENT_ACCOUNT_PAYLOAD_SECURITY_MULTIPLE",
+          "POLICY_MANAGEMENT_ACCOUNT_PAYLOAD_SECURITY_SINGLE",
+          "PUSH_CERT_EXPIRED",
+          "PUSH_CERT_WILL_EXPIRE",
+          "PUSH_PROXY_CERT_EXPIRED",
+          "SSO_CERT_EXPIRED",
+          "SSO_IDP_CERT_EXPIRED",
+          "SSO_CERT_WILL_EXPIRE",
+          "SSO_IDP_CERT_WILL_EXPIRE",
+          "TOMCAT_SSL_CERT_EXPIRED",
+          "TOMCAT_SSL_CERT_WILL_EXPIRE",
+          "USER_INITIATED_ENROLLMENT_MANAGEMENT_ACCOUNT_SECURITY_ISSUE",
+          "USER_MAID_DUPLICATE_ERROR",
+          "USER_MAID_MISMATCH_ERROR",
+          "USER_MAID_ROSTER_DUPLICATE_ERROR",
+          "VPP_ACCOUNT_EXPIRED",
+          "VPP_ACCOUNT_WILL_EXPIRE",
+          "VPP_TOKEN_REVOKED",
+          "DEVICE_COMPLIANCE_CONNECTION_ERROR",
+          "CONDITIONAL_ACCESS_CONNECTION_ERROR",
+          "AZURE_AD_MIGRATION_REPORT_GENERATED",
+          "BEYOND_CORP_CONNECTION_ERROR",
+          "APP_INSTALLERS_NEW_APP_VERSION_AVAILABLE",
+          "APP_INSTALLERS_NEW_APP_VERSION_DEPLOYMENT_STARTED",
+          "APP_INSTALLERS_APP_VERSION_REMOVED",
+          "APP_INSTALLERS_APP_TITLE_REMOVED",
+          "APP_INSTALLERS_DEPLOYMENT_INSTALLATION_FAILED",
+          "SAML_RESPONSE_ASSERTION_SIGNING_REQUIRED",
+          "DIRECTORY_CACHE_AWAITING_SYNC"
+        ],
+        "type": "string"
+      },
+      "NotificationV1": {
+        "description": "Jamf Pro notification used for important alerts.",
+        "properties": {
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": "object"
+            },
+            "example": {},
+            "type": "object"
+          },
+          "type": {
+            "$ref": "#/components/schemas/NotificationType"
+          }
+        },
+        "type": "object"
+      },
       "OAuthClientCredentials": {
         "properties": {
           "clientId": {
@@ -17762,6 +18351,15 @@
         "example": "mdm-byod",
         "type": "string"
       },
+      "Session": {
+        "properties": {
+          "currentSiteId": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "SessionHistoryItem": {
         "properties": {
           "comment": {
@@ -19656,6 +20254,124 @@
           }
         ]
       },
+      "UserAccount": {
+        "properties": {
+          "accessLevel": {
+            "default": "FullAccess",
+            "description": "Access level for the account",
+            "enum": [
+              "FullAccess",
+              "SiteAccess",
+              "GroupBasedAccess"
+            ],
+            "type": "string"
+          },
+          "accountStatus": {
+            "default": "Enabled",
+            "description": "Status of the account",
+            "enum": [
+              "Enabled",
+              "Disabled"
+            ],
+            "type": "string"
+          },
+          "accountType": {
+            "default": "DEFAULT",
+            "description": "Type of the account",
+            "enum": [
+              "DEFAULT",
+              "FEDERATED"
+            ],
+            "type": "string"
+          },
+          "changePasswordOnNextLogin": {
+            "example": true,
+            "type": "boolean"
+          },
+          "distinguishedName": {
+            "example": "",
+            "type": "string"
+          },
+          "email": {
+            "example": "bob@jamf.com",
+            "type": "string"
+          },
+          "failedLoginAttempts": {
+            "example": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "lastPasswordChange": {
+            "example": "2017-07-21T17:32:28Z",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "ldapServerId": {
+            "default": -1,
+            "example": -1,
+            "type": "integer"
+          },
+          "phone": {
+            "example": "715-999-9999",
+            "type": "string"
+          },
+          "plainPassword": {
+            "example": "testpassword4321",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "privilegeLevel": {
+            "default": "ADMINISTRATOR",
+            "description": "Privilege level for the account",
+            "enum": [
+              "ADMINISTRATOR",
+              "AUDITOR",
+              "ENROLLMENT",
+              "CUSTOM"
+            ],
+            "type": "string"
+          },
+          "realname": {
+            "example": "Bob Jones",
+            "type": "string"
+          },
+          "siteId": {
+            "default": -1,
+            "example": -1,
+            "type": "integer"
+          },
+          "username": {
+            "example": "testusername",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UserAccountSearchResults": {
+        "properties": {
+          "results": {
+            "description": "The collection of user accounts for the requested page",
+            "items": {
+              "$ref": "#/components/schemas/UserAccount"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "description": "Total number of user accounts matching the filter criteria",
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "UserInventory": {
         "properties": {
           "customPhotoUrl": {
@@ -19782,6 +20498,37 @@
           "userID",
           "userUuid",
           "username"
+        ],
+        "type": "object"
+      },
+      "UserPreferencesJson": {
+        "description": "Valid JSON of any client-desired structure",
+        "type": "object"
+      },
+      "UserPreferencesSettings": {
+        "description": "Response object.",
+        "properties": {
+          "key": {
+            "example": "mobileDeviceDisplayHeadings",
+            "type": "string"
+          },
+          "username": {
+            "example": "jamfuser",
+            "type": "string"
+          },
+          "values": {
+            "description": "List of preferences for the specific key and user.",
+            "items": {
+              "example": "Device name",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "username",
+          "values"
         ],
         "type": "object"
       },
@@ -20709,6 +21456,227 @@
           "startup-status"
         ],
         "x-authentication-required": false
+      }
+    },
+    "/user": {
+      "get": {
+        "description": "Return all Jamf Pro user acounts.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Account"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List of all Jamf Pro user acounts."
+          }
+        },
+        "summary": "Return all Jamf Pro user acounts\n",
+        "tags": [
+          "user-session-preview"
+        ],
+        "x-required-privileges": [
+          "Read Accounts"
+        ]
+      }
+    },
+    "/user/updateSession": {
+      "post": {
+        "description": "Updates values in the user's current session.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Session"
+              }
+            }
+          },
+          "description": "Values to update in user's current session."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            },
+            "description": "The user's current session has been sucessfully updated."
+          }
+        },
+        "summary": "Update values in the User's current session\n",
+        "tags": [
+          "user-session-preview"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/accounts": {
+      "get": {
+        "description": "Get all user accounts with pagination, sorting, and filtering support.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is\nusername:desc. Multiple sort criteria are supported and must be separated with a comma.\nAccepts fields: id, lastPasswordChange, failedLoginAttempts, username, realname, email, phone, ldapServerId, distinguishedName, siteId, privilegeLevel, changePasswordOnNextLogin, accountStatus. \nIf any other field is passed it will be ignored in sorting operation and/or create unpredictable results.\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "username:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format to filter user accounts collection. An empty query returns all results for the requested page.\nSupported fields: id, lastPasswordChange, failedLoginAttempts, username, realname, email, phone, ldapServerId, distinguishedName, siteId, privilegeLevel, changePasswordOnNextLogin, accountStatus.\nMultiple conditions can be combined using logical operators.\nThis parameter can be used with paging and sorting parameters.\nExample: username==\"admin\" and accountStatus==Enabled and failedLoginAttempts==0\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccountSearchResults"
+                }
+              }
+            },
+            "description": "User accounts retrieved successfully"
+          }
+        },
+        "summary": "Get user accounts",
+        "tags": [
+          "accounts"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "Read Accounts"
+        ]
+      },
+      "post": {
+        "description": "Adds the user account provided.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAccount"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            },
+            "description": "Successful response - Jamf Pro user account added"
+          }
+        },
+        "summary": "Adds new account.\n",
+        "tags": [
+          "accounts"
+        ],
+        "x-action": true,
+        "x-authentication-required": true,
+        "x-rate-limit": false,
+        "x-required-privileges": [
+          "Create Accounts"
+        ]
+      }
+    },
+    "/v1/accounts/{id}": {
+      "delete": {
+        "description": "Deletes the user account for the given id.\n",
+        "parameters": [
+          {
+            "description": "id of target account",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful response - Jamf Pro user account deleted"
+          }
+        },
+        "summary": "Deletes the user account.\n",
+        "tags": [
+          "accounts"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "Delete Accounts"
+        ]
+      },
+      "get": {
+        "description": "Gets the user account for the given id.\n",
+        "parameters": [
+          {
+            "description": "id of target account",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            },
+            "description": "Successful response - Jamf Pro user account retrieved"
+          }
+        },
+        "summary": "Gets the user account.\n",
+        "tags": [
+          "accounts"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "Read Accounts"
+        ]
       }
     },
     "/v1/activation-code": {
@@ -26255,6 +27223,72 @@
         "x-required-privileges": [
           "Read Cloud Services Settings"
         ]
+      }
+    },
+    "/v1/dashboard": {
+      "get": {
+        "description": "Get all the dashboard information for widgets and setup tasks\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardSetup"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorCause"
+                }
+              }
+            },
+            "description": "Dashboard service is unavailable"
+          }
+        },
+        "summary": "Get all the dashboard setup information\n",
+        "tags": [
+          "dashboard"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/dashboard/toggle": {
+      "post": {
+        "description": "Add or remove dashboard detail by the type of object, and the object's ID. Duplicates will not be added again.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DashboardObject"
+              }
+            }
+          },
+          "description": "Dashboard object with the associated type and ID with a toggle to add or remove the object",
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Object toggled on/off for the Jamf Pro dashboard"
+          }
+        },
+        "summary": "Add or remove an object to the Jamf Pro dashboard\n",
+        "tags": [
+          "dashboard"
+        ],
+        "x-action": true,
+        "x-authentication-required": true
       }
     },
     "/v1/ddm/{clientManagementId}/status-items": {
@@ -33995,6 +35029,72 @@
         ]
       }
     },
+    "/v1/notifications": {
+      "get": {
+        "description": "Gets notifications for user and site\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationV1"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get Notifications for user and site\n",
+        "tags": [
+          "jamf-pro-notifications"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/notifications/{type}/{id}": {
+      "delete": {
+        "description": "Deletes notifications with given type and id.\n",
+        "parameters": [
+          {
+            "description": "instance ID of the notification",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "type of the notification",
+            "explode": false,
+            "in": "path",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/NotificationType"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucessful deletion"
+          }
+        },
+        "summary": "Delete Notifications\n",
+        "tags": [
+          "jamf-pro-notifications"
+        ],
+        "x-required-privileges": [
+          "Dismiss Notifications"
+        ]
+      }
+    },
     "/v1/oauth2/session-tokens": {
       "get": {
         "description": "Retrieve the access token and user information for the current session.",
@@ -39942,6 +41042,145 @@
         "x-required-privileges": [
           "Change Password"
         ]
+      }
+    },
+    "/v1/user/preferences/settings/{keyId}": {
+      "get": {
+        "description": "Gets the user preferences for the authenticated user and key.\n",
+        "parameters": [
+          {
+            "description": "user setting to be retrieved",
+            "explode": false,
+            "in": "path",
+            "name": "keyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferencesSettings"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get the user preferences for the authenticated user and key.\n",
+        "tags": [
+          "jamf-pro-user-account-settings"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/user/preferences/{keyId}": {
+      "delete": {
+        "description": "Remove specified setting for authenticated user\n",
+        "parameters": [
+          {
+            "description": "unique key of user setting to be persisted",
+            "explode": false,
+            "in": "path",
+            "name": "keyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "setting was deleted"
+          }
+        },
+        "summary": "Remove specified setting for authenticated user\n",
+        "tags": [
+          "jamf-pro-user-account-settings"
+        ],
+        "x-authentication-required": true
+      },
+      "get": {
+        "description": "Gets the user setting for the authenticated user and key.\n",
+        "parameters": [
+          {
+            "description": "user setting to be retrieved",
+            "explode": false,
+            "in": "path",
+            "name": "keyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferencesJson"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get the user setting for the authenticated user and key\n",
+        "tags": [
+          "jamf-pro-user-account-settings"
+        ],
+        "x-authentication-required": true
+      },
+      "put": {
+        "description": "Persists the user setting\n",
+        "parameters": [
+          {
+            "description": "unique key of user setting to be persisted",
+            "explode": false,
+            "in": "path",
+            "name": "keyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "description": "user setting value to be persisted"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferencesJson"
+                }
+              }
+            },
+            "description": "setting successfully updated"
+          }
+        },
+        "summary": "Persist the user setting\n",
+        "tags": [
+          "jamf-pro-user-account-settings"
+        ],
+        "x-authentication-required": true
       }
     },
     "/v1/users": {
@@ -48026,6 +49265,95 @@
         "x-required-privileges": [
           "Update SSO Settings"
         ]
+      }
+    },
+    "/v3/account-preferences": {
+      "get": {
+        "description": "Get Jamf Pro account preferences\n",
+        "parameters": [
+          {
+            "description": "Locale to be used.",
+            "explode": false,
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountPreferencesV6"
+                }
+              }
+            },
+            "description": "Successful response - Jamf Pro Account Preferences retrieved"
+          }
+        },
+        "summary": "Get Jamf Pro account preferences\n",
+        "tags": [
+          "jamf-pro-account-preferences"
+        ],
+        "x-authentication-required": true
+      },
+      "patch": {
+        "description": "Update Jamf Pro account preferences\n",
+        "parameters": [
+          {
+            "description": "Locale to be used, when user has not defined preferred language.",
+            "explode": false,
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Session cookie, that's used to determine user session where account preferences should be refreshed",
+            "explode": true,
+            "in": "cookie",
+            "name": "JSESSIONID",
+            "schema": {
+              "default": "null",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPreferencesV6"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful response - Jamf Pro Account Preferences updated"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Pro account preferences not valid"
+          }
+        },
+        "summary": "Update Jamf Pro account preferences\n",
+        "tags": [
+          "jamf-pro-account-preferences"
+        ],
+        "x-authentication-required": true
       }
     },
     "/v3/check-in": {

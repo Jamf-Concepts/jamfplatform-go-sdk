@@ -21,6 +21,21 @@ type AccessManagementSetting struct {
 	AutomatedDeviceEnrollmentServerUUID *string `json:"automatedDeviceEnrollmentServerUuid,omitempty"`
 }
 
+// Account represents a account.
+type Account struct {
+	AccessLevel      string              `json:"accessLevel"`
+	CurrentSiteID    int                 `json:"currentSiteId"`
+	Email            string              `json:"email"`
+	GroupIds         []int               `json:"groupIds"`
+	ID               int                 `json:"id"`
+	IsMultiSiteAdmin bool                `json:"isMultiSiteAdmin"`
+	Preferences      *AccountPreferences `json:"preferences,omitempty"`
+	PrivilegeSet     string              `json:"privilegeSet"`
+	PrivilegesBySite map[string][]string `json:"privilegesBySite"`
+	RealName         string              `json:"realName"`
+	Username         string              `json:"username"`
+}
+
 // AccountDrivenUserEnrollmentSessionTokenSettings Settings for Account Driven User Enrollment. Only 1 of expirationIntervalDays or expirationIntervalSeconds can be supplied.
 type AccountDrivenUserEnrollmentSessionTokenSettings struct {
 	Enabled                   *bool `json:"enabled,omitempty"`
@@ -37,6 +52,21 @@ type AccountGroup struct {
 	SiteID        int      `json:"siteId"`
 }
 
+// AccountPreferences represents a account preferences.
+type AccountPreferences struct {
+	DateFormat             string `json:"dateFormat"`
+	IsDisableRelativeDates bool   `json:"isDisableRelativeDates"`
+	Language               string `json:"language"`
+	Region                 string `json:"region"`
+	Timezone               string `json:"timezone"`
+}
+
+// AccountPreferencesSearchType represents a account preferences search type value.
+type AccountPreferencesSearchType = string
+
+// AccountPreferencesUserInterfaceDisplayTheme represents a account preferences user interface display theme value.
+type AccountPreferencesUserInterfaceDisplayTheme = string
+
 // AccountPreferencesV1 represents a account preferences v1.
 type AccountPreferencesV1 struct {
 	DateFormat           string `json:"dateFormat"`
@@ -44,6 +74,36 @@ type AccountPreferencesV1 struct {
 	Language             string `json:"language"`
 	Region               string `json:"region"`
 	Timezone             string `json:"timezone"`
+}
+
+// AccountPreferencesV6 represents a account preferences v6.
+type AccountPreferencesV6 struct {
+	ComputerApplicationSearchMethod      AccountPreferencesSearchType                `json:"computerApplicationSearchMethod"`
+	ComputerApplicationUsageSearchMethod AccountPreferencesSearchType                `json:"computerApplicationUsageSearchMethod"`
+	ComputerLocalUserAccountSearchMethod AccountPreferencesSearchType                `json:"computerLocalUserAccountSearchMethod"`
+	ComputerPackageReceiptSearchMethod   AccountPreferencesSearchType                `json:"computerPackageReceiptSearchMethod"`
+	ComputerPeripheralSearchMethod       *AccountPreferencesSearchType               `json:"computerPeripheralSearchMethod,omitempty"`
+	ComputerPrinterSearchMethod          AccountPreferencesSearchType                `json:"computerPrinterSearchMethod"`
+	ComputerSearchMethod                 AccountPreferencesSearchType                `json:"computerSearchMethod"`
+	ComputerServiceSearchMethod          AccountPreferencesSearchType                `json:"computerServiceSearchMethod"`
+	ComputerSoftwareUpdateSearchMethod   *AccountPreferencesSearchType               `json:"computerSoftwareUpdateSearchMethod,omitempty"`
+	ConfigProfilesSortingMethod          string                                      `json:"configProfilesSortingMethod"`
+	DateFormat                           string                                      `json:"dateFormat"`
+	DisablePageLeaveCheck                bool                                        `json:"disablePageLeaveCheck"`
+	DisableRelativeDates                 bool                                        `json:"disableRelativeDates"`
+	DisableShortcutsTooltips             bool                                        `json:"disableShortcutsTooltips"`
+	DisableTablePagination               bool                                        `json:"disableTablePagination"`
+	Language                             string                                      `json:"language"`
+	MobileDeviceAppSearchMethod          AccountPreferencesSearchType                `json:"mobileDeviceAppSearchMethod"`
+	MobileDeviceSearchMethod             AccountPreferencesSearchType                `json:"mobileDeviceSearchMethod"`
+	ResultsPerPage                       int                                         `json:"resultsPerPage"`
+	Timezone                             string                                      `json:"timezone"`
+	UserAllContentSearchMethod           AccountPreferencesSearchType                `json:"userAllContentSearchMethod"`
+	UserEbookSearchMethod                AccountPreferencesSearchType                `json:"userEbookSearchMethod"`
+	UserInterfaceDisplayTheme            AccountPreferencesUserInterfaceDisplayTheme `json:"userInterfaceDisplayTheme"`
+	UserMacAppStoreAppSearchMethod       AccountPreferencesSearchType                `json:"userMacAppStoreAppSearchMethod"`
+	UserMobileDeviceAppSearchMethod      AccountPreferencesSearchType                `json:"userMobileDeviceAppSearchMethod"`
+	UserSearchMethod                     AccountPreferencesSearchType                `json:"userSearchMethod"`
 }
 
 // AccountSettingsRequest represents a account settings request.
@@ -1722,6 +1782,67 @@ type CsaToken struct {
 	Scopes                  []string `json:"scopes"`
 	Subject                 string   `json:"subject"`
 	TenantID                *string  `json:"tenantId,omitempty"`
+}
+
+// DashboardApiError represents a dashboard api error.
+type DashboardApiError struct {
+	Description    string `json:"description"`
+	HttpStatusCode int    `json:"httpStatusCode"`
+	ID             string `json:"id"`
+}
+
+// DashboardItem represents a dashboard item.
+type DashboardItem struct {
+	Details  []DashboardItemDetailsItem `json:"details"`
+	Enabled  bool                       `json:"enabled"`
+	Error    *DashboardApiError         `json:"error,omitempty"`
+	ID       string                     `json:"id"`
+	Info     *string                    `json:"info,omitempty"`
+	Metrics  []DashboardItemMetricsItem `json:"metrics"`
+	Subtitle *string                    `json:"subtitle,omitempty"`
+	Title    *string                    `json:"title,omitempty"`
+}
+
+// DashboardItemDetailsItem Additional details that will be found in a legend of the widgets on the dashboard.
+type DashboardItemDetailsItem struct {
+	Label string `json:"label"`
+	Value string `json:"value"`
+}
+
+// DashboardItemMetricsItem represents a dashboard item metrics item.
+type DashboardItemMetricsItem struct {
+	Enabled bool   `json:"enabled"`
+	Tag     string `json:"tag"`
+	Value   string `json:"value"`
+}
+
+// DashboardObject Dashboard object consisting of object type, object's ID, and whether it should display on the Jamf Pro dashboard.
+type DashboardObject struct {
+	Enabled    bool   `json:"enabled"`
+	ObjectID   string `json:"objectId"`
+	ObjectType string `json:"objectType"`
+}
+
+// DashboardSetup Response object that has lists of information for widgets, and what setup tasks to display.
+type DashboardSetup struct {
+	FeatureOptions   *DashboardSetupFeatureOptions   `json:"featureOptions,omitempty"`
+	SetupTaskOptions *DashboardSetupSetupTaskOptions `json:"setupTaskOptions,omitempty"`
+}
+
+// DashboardSetupFeatureOptions represents a dashboard setup feature options.
+type DashboardSetupFeatureOptions struct {
+	Feature string `json:"feature"`
+}
+
+// DashboardSetupSetupTaskOptions represents a dashboard setup setup task options.
+type DashboardSetupSetupTaskOptions struct {
+	SetupTask string `json:"setupTask"`
+}
+
+// DashboardSetupTask represents a dashboard setup task.
+type DashboardSetupTask struct {
+	Available bool               `json:"available"`
+	Error     *DashboardApiError `json:"error,omitempty"`
 }
 
 // DataRoamingSetting represents a data roaming setting value.
@@ -4303,6 +4424,16 @@ type NetworkV2 struct {
 	VoiceRoamingEnabled      bool   `json:"voiceRoamingEnabled"`
 }
 
+// NotificationType represents a notification type value.
+type NotificationType = string
+
+// NotificationV1 Jamf Pro notification used for important alerts.
+type NotificationV1 struct {
+	ID     string            `json:"id"`
+	Params map[string]any    `json:"params"`
+	Type   *NotificationType `json:"type,omitempty"`
+}
+
 // OAuthClientCredentials represents a o auth client credentials.
 type OAuthClientCredentials struct {
 	ClientID     string `json:"clientId"`
@@ -5323,6 +5454,11 @@ type SelfServiceSettings struct {
 // ServiceDiscoveryVersion represents a service discovery version value.
 type ServiceDiscoveryVersion = string
 
+// Session represents a session.
+type Session struct {
+	CurrentSiteID *int `json:"currentSiteId,omitempty"`
+}
+
 // SessionHistoryItem represents a session history item.
 type SessionHistoryItem struct {
 	Comment                 string     `json:"comment"`
@@ -5890,6 +6026,33 @@ type User struct {
 	Username             string  `json:"username"`
 }
 
+// UserAccount represents a user account.
+type UserAccount struct {
+	AccessLevel               *string `json:"accessLevel,omitempty"`
+	AccountStatus             *string `json:"accountStatus,omitempty"`
+	AccountType               *string `json:"accountType,omitempty"`
+	ChangePasswordOnNextLogin *bool   `json:"changePasswordOnNextLogin,omitempty"`
+	DistinguishedName         *string `json:"distinguishedName,omitempty"`
+	Email                     *string `json:"email,omitempty"`
+	FailedLoginAttempts       *int    `json:"failedLoginAttempts,omitempty"`
+	ID                        *string `json:"id,omitempty"`
+	LastPasswordChange        *string `json:"lastPasswordChange"`
+	LdapServerID              *int    `json:"ldapServerId,omitempty"`
+	Phone                     *string `json:"phone,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	PlainPassword  *string `json:"plainPassword,omitempty"`
+	PrivilegeLevel *string `json:"privilegeLevel,omitempty"`
+	Realname       *string `json:"realname,omitempty"`
+	SiteID         *int    `json:"siteId,omitempty"`
+	Username       *string `json:"username,omitempty"`
+}
+
+// UserAccountSearchResults represents a user account search results.
+type UserAccountSearchResults struct {
+	Results    []UserAccount `json:"results"`
+	TotalCount int           `json:"totalCount"`
+}
+
 // UserInventory represents a user inventory.
 type UserInventory struct {
 	CustomPhotoURL       *string `json:"customPhotoUrl,omitempty"`
@@ -5919,6 +6082,16 @@ type UserMappings struct {
 	UserID                string  `json:"userID"`
 	UserUUID              string  `json:"userUuid"`
 	Username              string  `json:"username"`
+}
+
+// UserPreferencesJson valid JSON of any client-desired structure.
+type UserPreferencesJson = json.RawMessage
+
+// UserPreferencesSettings Response object.
+type UserPreferencesSettings struct {
+	Key      string   `json:"key"`
+	Username string   `json:"username"`
+	Values   []string `json:"values"`
 }
 
 // UserTestAttributes represents a user test attributes.

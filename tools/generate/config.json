@@ -115,7 +115,9 @@
       "specFile": "pro_api.json",
       "fieldTypeOverrides": {
         "managed_software_update_plan_toggle_status.elapsedTime": "*float64",
-        "linked_connect_profile.profileId": "*int"
+        "linked_connect_profile.profileId": "*int",
+        "user_account.lastPasswordChange": "*string",
+        "notification_v1.params": "map[string]any"
       },
       "excludePaths": [
         "POST /v1/auth/token",
@@ -830,7 +832,29 @@
         {"op": "GET /v1/ebooks/{id}/scope", "name": "GetEbookScopeV1"},
 
         {"op": "GET /v1/slasa", "name": "GetSlasaAcceptanceV1"},
-        {"op": "POST /v1/slasa", "name": "AcceptSlasaV1", "expectedStatus": 204}
+        {"op": "POST /v1/slasa", "name": "AcceptSlasaV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/accounts", "name": "ListAccountsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/accounts", "name": "CreateAccountV1", "expectedStatus": 201},
+        {"op": "GET /v1/accounts/{id}", "name": "GetAccountV1"},
+        {"op": "DELETE /v1/accounts/{id}", "name": "DeleteAccountV1", "expectedStatus": 204},
+
+        {"op": "GET /user", "name": "GetUserSessionV1"},
+        {"op": "POST /user/updateSession", "name": "UpdateUserSessionV1"},
+
+        {"op": "GET /v1/user/preferences/settings/{keyId}", "name": "GetUserPreferencesSettingsV1"},
+        {"op": "GET /v1/user/preferences/{keyId}", "name": "GetUserPreferenceV1"},
+        {"op": "PUT /v1/user/preferences/{keyId}", "name": "UpdateUserPreferenceV1"},
+        {"op": "DELETE /v1/user/preferences/{keyId}", "name": "DeleteUserPreferenceV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/notifications", "name": "ListNotificationsV1"},
+        {"op": "DELETE /v1/notifications/{type}/{id}", "name": "DeleteNotificationV1", "expectedStatus": 204, "pathNames": {"type": "notificationType"}},
+
+        {"op": "GET /v1/dashboard", "name": "GetDashboardV1"},
+        {"op": "POST /v1/dashboard/toggle", "name": "ToggleDashboardObjectV1", "expectedStatus": 202},
+
+        {"op": "GET /v3/account-preferences", "name": "GetAccountPreferencesV3"},
+        {"op": "PATCH /v3/account-preferences", "name": "UpdateAccountPreferencesV3", "expectedStatus": 204}
       ]
     },
     {
