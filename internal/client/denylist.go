@@ -27,11 +27,10 @@ var deniedPathSuffixes = map[string]string{
 // denied API path. Matching uses the URL tail after /tenant/{id}, so it
 // applies uniformly across namespace and version path segments.
 func checkDeniedPath(method, fullURL string) error {
-	tenantIdx := strings.Index(fullURL, "/tenant/")
-	if tenantIdx < 0 {
+	_, after, ok := strings.Cut(fullURL, "/tenant/")
+	if !ok {
 		return nil
 	}
-	after := fullURL[tenantIdx+len("/tenant/"):]
 	slash := strings.Index(after, "/")
 	if slash < 0 {
 		return nil

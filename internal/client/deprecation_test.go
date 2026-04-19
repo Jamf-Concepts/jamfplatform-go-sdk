@@ -31,7 +31,7 @@ func TestDeprecationHeader_LogsOncePerPath(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		if err := c.Do(ctx, http.MethodGet, "/api/old", nil, nil); err != nil {
 			t.Fatalf("Do %d: %v", i, err)
 		}

@@ -154,4 +154,3 @@ func WithTenantID(id string) Option {
 		cfg.tenantID = id
 	}
 }
-

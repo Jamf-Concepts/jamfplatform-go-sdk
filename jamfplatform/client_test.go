@@ -90,4 +90,3 @@ func TestWithTenantID(t *testing.T) {
 		t.Errorf("tenantID = %q, want tenant-uuid", got)
 	}
 }
-
