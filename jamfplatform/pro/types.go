@@ -28,6 +28,24 @@ type AccountDrivenUserEnrollmentSessionTokenSettings struct {
 	ExpirationIntervalSeconds *int  `json:"expirationIntervalSeconds,omitempty"`
 }
 
+// AccountGroup represents a account group.
+type AccountGroup struct {
+	AccessLevel   string   `json:"accessLevel"`
+	MemberUserIds []int    `json:"memberUserIds"`
+	PrivilegeSet  string   `json:"privilegeSet"`
+	Privileges    []string `json:"privileges"`
+	SiteID        int      `json:"siteId"`
+}
+
+// AccountPreferencesV1 represents a account preferences v1.
+type AccountPreferencesV1 struct {
+	DateFormat           string `json:"dateFormat"`
+	DisableRelativeDates bool   `json:"disableRelativeDates"`
+	Language             string `json:"language"`
+	Region               string `json:"region"`
+	Timezone             string `json:"timezone"`
+}
+
 // AccountSettingsRequest represents a account settings request.
 type AccountSettingsRequest struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
@@ -62,6 +80,64 @@ type AccountSettingsResponse struct {
 	PreventPrefillInfoFromModification      bool   `json:"preventPrefillInfoFromModification"`
 	UserAccountType                         string `json:"userAccountType"`
 	VersionLock                             int    `json:"versionLock"`
+}
+
+// AdcsCertificate represents a adcs certificate.
+type AdcsCertificate struct {
+	Data     [][]byte `json:"data"`
+	Filename string   `json:"filename"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password *string `json:"password,omitempty"`
+}
+
+// AdcsCertificateResponse represents a adcs certificate response.
+type AdcsCertificateResponse struct {
+	ExpirationDate *time.Time `json:"expirationDate,omitempty"`
+	Filename       string     `json:"filename"`
+	Issuer         string     `json:"issuer"`
+	SerialNumber   string     `json:"serialNumber"`
+	Subject        string     `json:"subject"`
+}
+
+// AdcsDependencies represents a adcs dependencies.
+type AdcsDependencies struct {
+	Results    []AdcsDependency `json:"results"`
+	TotalCount int              `json:"totalCount"`
+}
+
+// AdcsDependency represents a adcs dependency.
+type AdcsDependency struct {
+	ConfigProfileID   int    `json:"configProfileId"`
+	ConfigProfileName string `json:"configProfileName"`
+	ConfigProfileType string `json:"configProfileType"`
+}
+
+// AdcsSettings AD CS Settings object to create, or update with a merge-patch strategy. Certificate data must be provided in full, or not at all for update with merge-patch strategy.
+type AdcsSettings struct {
+	AdcsURL           *string          `json:"adcsUrl,omitempty"`
+	ApiClientID       *string          `json:"apiClientId,omitempty"`
+	CaName            *string          `json:"caName,omitempty"`
+	ClientCert        *AdcsCertificate `json:"clientCert,omitempty"`
+	DisplayName       *string          `json:"displayName,omitempty"`
+	Fqdn              *string          `json:"fqdn,omitempty"`
+	Outbound          *bool            `json:"outbound,omitempty"`
+	RevocationEnabled *bool            `json:"revocationEnabled,omitempty"`
+	ServerCert        *AdcsCertificate `json:"serverCert,omitempty"`
+}
+
+// AdcsSettingsResponse represents a adcs settings response.
+type AdcsSettingsResponse struct {
+	AdcsURL                       string                   `json:"adcsUrl"`
+	ApiClientID                   string                   `json:"apiClientId"`
+	CaName                        string                   `json:"caName"`
+	ClientCert                    *AdcsCertificateResponse `json:"clientCert,omitempty"`
+	ConnectorLastCheckInTimestamp *time.Time               `json:"connectorLastCheckInTimestamp,omitempty"`
+	DisplayName                   string                   `json:"displayName"`
+	Fqdn                          string                   `json:"fqdn"`
+	ID                            string                   `json:"id"`
+	Outbound                      bool                     `json:"outbound"`
+	RevocationEnabled             bool                     `json:"revocationEnabled"`
+	ServerCert                    *AdcsCertificateResponse `json:"serverCert,omitempty"`
 }
 
 // AdvancedSearch represents a advanced search.
@@ -111,6 +187,55 @@ type ApiErrorCause struct {
 	Description string  `json:"description"`
 	Field       string  `json:"field"`
 	ID          *string `json:"id,omitempty"`
+}
+
+// ApiIntegrationRequest represents a api integration request.
+type ApiIntegrationRequest struct {
+	AccessTokenLifetimeSeconds *int     `json:"accessTokenLifetimeSeconds,omitempty"`
+	AuthorizationScopes        []string `json:"authorizationScopes"`
+	DisplayName                string   `json:"displayName"`
+	Enabled                    *bool    `json:"enabled,omitempty"`
+}
+
+// ApiIntegrationResponse represents a api integration response.
+type ApiIntegrationResponse struct {
+	AccessTokenLifetimeSeconds int      `json:"accessTokenLifetimeSeconds"`
+	AppType                    string   `json:"appType"`
+	AuthorizationScopes        []string `json:"authorizationScopes"`
+	ClientID                   string   `json:"clientId"`
+	DisplayName                string   `json:"displayName"`
+	Enabled                    bool     `json:"enabled"`
+	ID                         int      `json:"id"`
+}
+
+// ApiIntegrationSearchResult represents a api integration search result.
+type ApiIntegrationSearchResult struct {
+	Results    []ApiIntegrationResponse `json:"results"`
+	TotalCount int                      `json:"totalCount"`
+}
+
+// ApiRole represents a api role.
+type ApiRole struct {
+	DisplayName string   `json:"displayName"`
+	ID          string   `json:"id"`
+	Privileges  []string `json:"privileges"`
+}
+
+// ApiRolePrivileges represents a api role privileges.
+type ApiRolePrivileges struct {
+	Privileges []string `json:"privileges"`
+}
+
+// ApiRoleRequest represents a api role request.
+type ApiRoleRequest struct {
+	DisplayName string   `json:"displayName"`
+	Privileges  []string `json:"privileges"`
+}
+
+// ApiRoleResult represents a api role result.
+type ApiRoleResult struct {
+	Results    []ApiRole `json:"results"`
+	TotalCount int       `json:"totalCount"`
 }
 
 // ApnsClientPushStatus Information about a client with push notifications disabled.
@@ -199,6 +324,32 @@ type Attributes struct {
 	VpnUUID               *string   `json:"vpnUuid,omitempty"`
 }
 
+// AuthAccountV1 represents a auth account v1.
+type AuthAccountV1 struct {
+	AccessLevel      string                `json:"accessLevel"`
+	CurrentSiteID    string                `json:"currentSiteId"`
+	Email            string                `json:"email"`
+	GroupIds         []string              `json:"groupIds"`
+	ID               string                `json:"id"`
+	MultiSiteAdmin   bool                  `json:"multiSiteAdmin"`
+	Preferences      *AccountPreferencesV1 `json:"preferences,omitempty"`
+	PrivilegeSet     string                `json:"privilegeSet"`
+	PrivilegesBySite map[string][]string   `json:"privilegesBySite"`
+	RealName         string                `json:"realName"`
+	Username         string                `json:"username"`
+}
+
+// AuthenticationType represents a authentication type value.
+type AuthenticationType = string
+
+// AuthorizationV1 represents a authorization v1.
+type AuthorizationV1 struct {
+	Account            *AuthAccountV1      `json:"account,omitempty"`
+	AccountGroups      []AccountGroup      `json:"accountGroups"`
+	AuthenticationType *AuthenticationType `json:"authenticationType,omitempty"`
+	Sites              []V1Site            `json:"sites"`
+}
+
 // AvailableOsUpdates represents a available os updates.
 type AvailableOsUpdates struct {
 	AvailableUpdates *AvailableOsUpdatesAvailableUpdates `json:"availableUpdates,omitempty"`
@@ -208,6 +359,82 @@ type AvailableOsUpdates struct {
 type AvailableOsUpdatesAvailableUpdates struct {
 	IOS   []string `json:"iOS"`
 	MacOS []string `json:"macOS"`
+}
+
+// AzureConfiguration A Cloud Identity Provider Azure configuration for responses.
+type AzureConfiguration struct {
+	CloudIDPCommon *CloudIDPCommon           `json:"cloudIdPCommon,omitempty"`
+	Server         *AzureServerConfiguration `json:"server,omitempty"`
+}
+
+// AzureConfigurationRequest A Cloud Identity Provider Azure configuration for responses.
+type AzureConfigurationRequest struct {
+	CloudIDPCommon CloudIDPCommonRequest           `json:"cloudIdPCommon"`
+	Server         AzureServerConfigurationRequest `json:"server"`
+}
+
+// AzureConfigurationUpdate A Cloud Identity Provider Azure configuration for update.
+type AzureConfigurationUpdate struct {
+	CloudIDPCommon CloudIDPCommon                 `json:"cloudIdPCommon"`
+	Server         AzureServerConfigurationUpdate `json:"server"`
+}
+
+// AzureMappings Azure Cloud Identity Provider mappings.
+type AzureMappings struct {
+	Building   string `json:"building"`
+	Department string `json:"department"`
+	Email      string `json:"email"`
+	GroupID    string `json:"groupId"`
+	GroupName  string `json:"groupName"`
+	Phone      string `json:"phone"`
+	Position   string `json:"position"`
+	RealName   string `json:"realName"`
+	Room       string `json:"room"`
+	UserID     string `json:"userId"`
+	UserName   string `json:"userName"`
+}
+
+// AzureServerConfiguration Azure Cloud Identity Provider configuration.
+type AzureServerConfiguration struct {
+	DeprecatedConsent                        bool           `json:"deprecatedConsent"`
+	Enabled                                  bool           `json:"enabled"`
+	ID                                       string         `json:"id"`
+	Mappings                                 *AzureMappings `json:"mappings,omitempty"`
+	MembershipCalculationOptimizationEnabled bool           `json:"membershipCalculationOptimizationEnabled"`
+	Migrated                                 bool           `json:"migrated"`
+	SearchTimeout                            int            `json:"searchTimeout"`
+	TenantID                                 string         `json:"tenantId"`
+	TransitiveDirectoryMembershipEnabled     bool           `json:"transitiveDirectoryMembershipEnabled"`
+	TransitiveMembershipEnabled              bool           `json:"transitiveMembershipEnabled"`
+	TransitiveMembershipUserField            string         `json:"transitiveMembershipUserField"`
+	Type                                     string         `json:"type"`
+}
+
+// AzureServerConfigurationRequest Azure Cloud Identity Provider configuration request.
+type AzureServerConfigurationRequest struct {
+	Code                                     string        `json:"code"`
+	Enabled                                  bool          `json:"enabled"`
+	ID                                       *string       `json:"id,omitempty"`
+	Mappings                                 AzureMappings `json:"mappings"`
+	MembershipCalculationOptimizationEnabled *bool         `json:"membershipCalculationOptimizationEnabled,omitempty"`
+	SearchTimeout                            int           `json:"searchTimeout"`
+	TenantID                                 string        `json:"tenantId"`
+	TransitiveDirectoryMembershipEnabled     bool          `json:"transitiveDirectoryMembershipEnabled"`
+	TransitiveMembershipEnabled              bool          `json:"transitiveMembershipEnabled"`
+	TransitiveMembershipUserField            string        `json:"transitiveMembershipUserField"`
+	Type                                     *string       `json:"type,omitempty"`
+}
+
+// AzureServerConfigurationUpdate Azure Cloud Identity Provider configuration update.
+type AzureServerConfigurationUpdate struct {
+	Enabled                                  bool          `json:"enabled"`
+	ID                                       string        `json:"id"`
+	Mappings                                 AzureMappings `json:"mappings"`
+	MembershipCalculationOptimizationEnabled *bool         `json:"membershipCalculationOptimizationEnabled,omitempty"`
+	SearchTimeout                            int           `json:"searchTimeout"`
+	TransitiveDirectoryMembershipEnabled     bool          `json:"transitiveDirectoryMembershipEnabled"`
+	TransitiveMembershipEnabled              bool          `json:"transitiveMembershipEnabled"`
+	TransitiveMembershipUserField            string        `json:"transitiveMembershipUserField"`
 }
 
 // BlankPushRequest represents a blank push request.
@@ -278,9 +505,30 @@ type CertificateIdentityV2 struct {
 	Md5Sum           *string `json:"md5Sum,omitempty"`
 }
 
+// CertificateKey represents a certificate key.
+type CertificateKey struct {
+	ID    *string `json:"id,omitempty"`
+	Valid *bool   `json:"valid,omitempty"`
+}
+
 // CertificateListCommand represents a certificate list command.
 type CertificateListCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
+}
+
+// CertificateRecord represents a certificate record.
+type CertificateRecord struct {
+	IssuerX500Principal  string     `json:"issuerX500Principal"`
+	KeyUsage             []string   `json:"keyUsage"`
+	KeyUsageExtended     []string   `json:"keyUsageExtended"`
+	NotAfter             int        `json:"notAfter"`
+	NotBefore            int        `json:"notBefore"`
+	SerialNumber         string     `json:"serialNumber"`
+	Sha1Fingerprint      string     `json:"sha1Fingerprint"`
+	Sha256Fingerprint    string     `json:"sha256Fingerprint"`
+	Signature            *Signature `json:"signature,omitempty"`
+	SubjectX500Principal string     `json:"subjectX500Principal"`
+	Version              int        `json:"version"`
 }
 
 // ChangePassword represents a change password.
@@ -289,6 +537,23 @@ type ChangePassword struct {
 	CurrentPassword string `json:"currentPassword"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	NewPassword string `json:"newPassword"`
+}
+
+// ClassicLdapMappings Classic Ldap mappings configuration.
+type ClassicLdapMappings struct {
+	UserGroupObjectMapGroupNameTo string `json:"userGroupObjectMapGroupNameTo"`
+	UserGroupObjectMapIDTo        string `json:"userGroupObjectMapIdTo"`
+	UserGroupObjectMapUUIDTo      string `json:"userGroupObjectMapUuidTo"`
+	UserObjectMapBuildingTo       string `json:"userObjectMapBuildingTo"`
+	UserObjectMapDepartmentTo     string `json:"userObjectMapDepartmentTo"`
+	UserObjectMapEmailTo          string `json:"userObjectMapEmailTo"`
+	UserObjectMapIDTo             string `json:"userObjectMapIdTo"`
+	UserObjectMapPhoneTo          string `json:"userObjectMapPhoneTo"`
+	UserObjectMapPositionTo       string `json:"userObjectMapPositionTo"`
+	UserObjectMapRealNameTo       string `json:"userObjectMapRealNameTo"`
+	UserObjectMapRoomTo           string `json:"userObjectMapRoomTo"`
+	UserObjectMapUsernameTo       string `json:"userObjectMapUsernameTo"`
+	UserObjectMapUUIDTo           string `json:"userObjectMapUuidTo"`
 }
 
 // ClearPasscodeCommand represents a clear passcode command.
@@ -300,6 +565,128 @@ type ClearPasscodeCommand struct {
 // ClearRestrictionsPasswordCommand represents a clear restrictions password command.
 type ClearRestrictionsPasswordCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
+}
+
+// CloudIDPCommon A Cloud Identity Provider information.
+type CloudIDPCommon struct {
+	DisplayName  string `json:"displayName"`
+	ID           string `json:"id"`
+	ProviderName string `json:"providerName"`
+}
+
+// CloudIDPCommonRequest A Cloud Identity Provider information for request.
+type CloudIDPCommonRequest struct {
+	DisplayName  string `json:"displayName"`
+	ProviderName string `json:"providerName"`
+}
+
+// CloudIDPCommonResponse A Cloud Identity Provider information for responses.
+type CloudIDPCommonResponse struct {
+	DisplayName         string `json:"displayName"`
+	Enabled             bool   `json:"enabled"`
+	ID                  string `json:"id"`
+	ProviderDescription string `json:"providerDescription"`
+	ProviderName        string `json:"providerName"`
+}
+
+// CloudLdapConnectionPoolStatistics Ldap Cloud Identity Provider conection pool statistics.
+type CloudLdapConnectionPoolStatistics struct {
+	MaximumAvailableConnections          int64 `json:"maximumAvailableConnections"`
+	NumAvailableConnections              int64 `json:"numAvailableConnections"`
+	NumConnectionsClosedDefunct          int64 `json:"numConnectionsClosedDefunct"`
+	NumConnectionsClosedExpired          int64 `json:"numConnectionsClosedExpired"`
+	NumConnectionsClosedUnneeded         int64 `json:"numConnectionsClosedUnneeded"`
+	NumFailedCheckouts                   int64 `json:"numFailedCheckouts"`
+	NumFailedConnectionAttempts          int64 `json:"numFailedConnectionAttempts"`
+	NumReleasedValid                     int64 `json:"numReleasedValid"`
+	NumSuccessfulCheckouts               int64 `json:"numSuccessfulCheckouts"`
+	NumSuccessfulCheckoutsAfterWaiting   int64 `json:"numSuccessfulCheckoutsAfterWaiting"`
+	NumSuccessfulCheckoutsNewConnection  int64 `json:"numSuccessfulCheckoutsNewConnection"`
+	NumSuccessfulCheckoutsWithoutWaiting int64 `json:"numSuccessfulCheckoutsWithoutWaiting"`
+	NumSuccessfulConnectionAttempts      int64 `json:"numSuccessfulConnectionAttempts"`
+}
+
+// CloudLdapConnectionStatus Status of tested Cloud Ldap connection.
+type CloudLdapConnectionStatus struct {
+	Status string `json:"status"`
+}
+
+// CloudLdapKeystore Response with keystore information.
+type CloudLdapKeystore struct {
+	ExpirationDate *time.Time `json:"expirationDate,omitempty"`
+	FileName       string     `json:"fileName"`
+	Subject        string     `json:"subject"`
+	Type           string     `json:"type"`
+}
+
+// CloudLdapKeystoreFile Request with the Base64-encoded keystore file.
+type CloudLdapKeystoreFile struct {
+	FileBytes []byte `json:"fileBytes"`
+	FileName  string `json:"fileName"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+}
+
+// CloudLdapMappingsRequest Mappings configurations request for Ldap Cloud Identity Provider configuration.
+type CloudLdapMappingsRequest struct {
+	GroupMappings      GroupMappings      `json:"groupMappings"`
+	MembershipMappings MembershipMappings `json:"membershipMappings"`
+	UserMappings       UserMappings       `json:"userMappings"`
+}
+
+// CloudLdapMappingsResponse Mappings configuration response for Ldap Cloud Identity Provider configuration.
+type CloudLdapMappingsResponse struct {
+	GroupMappings      *GroupMappings      `json:"groupMappings,omitempty"`
+	MembershipMappings *MembershipMappings `json:"membershipMappings,omitempty"`
+	UserMappings       *UserMappings       `json:"userMappings,omitempty"`
+}
+
+// CloudLdapServerRequest A Cloud Identity Provider LDAP server configuration for requests.
+type CloudLdapServerRequest struct {
+	ConnectionTimeout                        int                   `json:"connectionTimeout"`
+	ConnectionType                           string                `json:"connectionType"`
+	DomainName                               string                `json:"domainName"`
+	Enabled                                  bool                  `json:"enabled"`
+	Keystore                                 CloudLdapKeystoreFile `json:"keystore"`
+	MembershipCalculationOptimizationEnabled *bool                 `json:"membershipCalculationOptimizationEnabled,omitempty"`
+	Port                                     int                   `json:"port"`
+	SearchTimeout                            int                   `json:"searchTimeout"`
+	ServerURL                                string                `json:"serverUrl"`
+	UseWildcards                             bool                  `json:"useWildcards"`
+}
+
+// CloudLdapServerResponse A Cloud Identity Provider LDAP server configuration for responses.
+type CloudLdapServerResponse struct {
+	ConnectionTimeout                        int                `json:"connectionTimeout"`
+	ConnectionType                           string             `json:"connectionType"`
+	DomainName                               string             `json:"domainName"`
+	Enabled                                  bool               `json:"enabled"`
+	ID                                       string             `json:"id"`
+	Keystore                                 *CloudLdapKeystore `json:"keystore,omitempty"`
+	MembershipCalculationOptimizationEnabled bool               `json:"membershipCalculationOptimizationEnabled"`
+	Port                                     int                `json:"port"`
+	SearchTimeout                            int                `json:"searchTimeout"`
+	ServerURL                                string             `json:"serverUrl"`
+	UseWildcards                             bool               `json:"useWildcards"`
+}
+
+// CloudLdapServerUpdate A Cloud Identity Provider LDAP server configuration for updates.
+type CloudLdapServerUpdate struct {
+	ConnectionTimeout                        int                    `json:"connectionTimeout"`
+	ConnectionType                           string                 `json:"connectionType"`
+	DomainName                               string                 `json:"domainName"`
+	Enabled                                  bool                   `json:"enabled"`
+	Keystore                                 *CloudLdapKeystoreFile `json:"keystore,omitempty"`
+	MembershipCalculationOptimizationEnabled *bool                  `json:"membershipCalculationOptimizationEnabled,omitempty"`
+	Port                                     int                    `json:"port"`
+	SearchTimeout                            int                    `json:"searchTimeout"`
+	ServerURL                                string                 `json:"serverUrl"`
+	UseWildcards                             bool                   `json:"useWildcards"`
+}
+
+// ComplianceVendorDeviceInformation Additional, compliance vendor specific device details.
+type ComplianceVendorDeviceInformation struct {
+	DeviceIds []string `json:"deviceIds"`
 }
 
 // ComputerApplicationCreate represents a computer application create.
@@ -1188,10 +1575,30 @@ type ConfigurationProfile struct {
 	Version     string `json:"version"`
 }
 
+// ConfigurationSearchResults A list with Cloud Identity Providers informations about configurations.
+type ConfigurationSearchResults struct {
+	Results    []CloudIDPCommonResponse `json:"results"`
+	TotalCount int                      `json:"totalCount"`
+}
+
 // CreatePathV2 represents a create path v2.
 type CreatePathV2 struct {
 	Path  string `json:"path"`
 	Scope string `json:"scope"`
+}
+
+// CsaTenantIDInfo represents a csa tenant i d info.
+type CsaTenantIDInfo struct {
+	TenantID *string `json:"tenantId,omitempty"`
+}
+
+// CsaToken represents a csa token.
+type CsaToken struct {
+	LegacyJamfSalesforceIds []string `json:"legacyJamfSalesforceIds"`
+	RefreshExpiration       int64    `json:"refreshExpiration"`
+	Scopes                  []string `json:"scopes"`
+	Subject                 string   `json:"subject"`
+	TenantID                *string  `json:"tenantId,omitempty"`
 }
 
 // DataRoamingSetting represents a data roaming setting value.
@@ -1299,6 +1706,15 @@ type DeviceCommonDetailsRequest struct {
 	MDMProfileNeedsRenewalDueToDeviceIdentityCertExpiring *bool      `json:"mdmProfileNeedsRenewalDueToDeviceIdentityCertExpiring,omitempty"`
 	MDMServerURL                                          *string    `json:"mdmServerUrl,omitempty"`
 	RenewMDMProfileStartDate                              *time.Time `json:"renewMdmProfileStartDate,omitempty"`
+}
+
+// DeviceComplianceInformation Device compliance information record.
+type DeviceComplianceInformation struct {
+	Applicable                        bool                               `json:"applicable"`
+	ComplianceState                   string                             `json:"complianceState"`
+	ComplianceVendor                  string                             `json:"complianceVendor"`
+	ComplianceVendorDeviceInformation *ComplianceVendorDeviceInformation `json:"complianceVendorDeviceInformation,omitempty"`
+	DeviceID                          string                             `json:"deviceId"`
 }
 
 // DeviceEnrollmentDevice represents a device enrollment device.
@@ -1508,6 +1924,18 @@ type EnrollmentCustomizationBrandingSettings struct {
 	TextColor       string `json:"textColor"`
 }
 
+// EnrollmentCustomizationDependencies represents a enrollment customization dependencies.
+type EnrollmentCustomizationDependencies struct {
+	Dependencies []EnrollmentCustomizationDependency `json:"dependencies"`
+}
+
+// EnrollmentCustomizationDependency represents a enrollment customization dependency.
+type EnrollmentCustomizationDependency struct {
+	HumanReadableName string `json:"humanReadableName"`
+	Hyperlink         string `json:"hyperlink"`
+	Name              string `json:"name"`
+}
+
 // EnrollmentCustomizationLdapGroupAccess represents a enrollment customization ldap group access.
 type EnrollmentCustomizationLdapGroupAccess struct {
 	GroupName    *string `json:"groupName,omitempty"`
@@ -1667,6 +2095,12 @@ type EnrollmentSettingsV4 struct {
 	RestrictReenrollment                         *bool                  `json:"restrictReenrollment,omitempty"`
 	SignQuickAdd                                 *bool                  `json:"signQuickAdd,omitempty"`
 	SigningMDMProfileEnabled                     *bool                  `json:"signingMdmProfileEnabled,omitempty"`
+}
+
+// EnrollmentSsoConfig represents a enrollment sso config.
+type EnrollmentSsoConfig struct {
+	Hosts          *[]string `json:"hosts,omitempty"`
+	ManagementHint *string   `json:"managementHint,omitempty"`
 }
 
 // EraseDeviceCommand represents a erase device command.
@@ -1909,6 +2343,17 @@ type GroupDtoV1 struct {
 	Smart            bool   `json:"smart"`
 }
 
+// GroupMappings Cloud Identity Provider user group mappings configuration.
+type GroupMappings struct {
+	GroupID               string `json:"groupID"`
+	GroupName             string `json:"groupName"`
+	GroupUUID             string `json:"groupUuid"`
+	ObjectClassLimitation string `json:"objectClassLimitation"`
+	ObjectClasses         string `json:"objectClasses"`
+	SearchBase            string `json:"searchBase"`
+	SearchScope           string `json:"searchScope"`
+}
+
 // GroupMembership represents a group membership.
 type GroupMembership struct {
 	GroupDescription string `json:"groupDescription"`
@@ -1929,6 +2374,26 @@ type GroupResetRequest struct {
 type GroupSearchResult struct {
 	Results    []GroupDtoV1 `json:"results"`
 	TotalCount int          `json:"totalCount"`
+}
+
+// GroupTestSearch represents a group test search.
+type GroupTestSearch struct {
+	DistinguishedName string `json:"distinguishedName"`
+	ID                string `json:"id"`
+	Name              string `json:"name"`
+	ServerID          string `json:"serverId"`
+	UUID              string `json:"uuid"`
+}
+
+// GroupTestSearchRequest represents a group test search request.
+type GroupTestSearchRequest struct {
+	Groupname string `json:"groupname"`
+}
+
+// GroupTestSearchResponse represents a group test search response.
+type GroupTestSearchResponse struct {
+	Results    []GroupTestSearch `json:"results"`
+	TotalCount int               `json:"totalCount"`
 }
 
 // GroupUpdateDtoV1 represents a group update dto v1.
@@ -2204,6 +2669,48 @@ type LanguageCode struct {
 	Value string `json:"value"`
 }
 
+// LdapConfigurationRequest A Cloud Identity Provider LDAP configuration for requests.
+type LdapConfigurationRequest struct {
+	CloudIDPCommon CloudIDPCommonRequest     `json:"cloudIdPCommon"`
+	Mappings       *CloudLdapMappingsRequest `json:"mappings,omitempty"`
+	Server         CloudLdapServerRequest    `json:"server"`
+}
+
+// LdapConfigurationResponse A Cloud Identity Provider LDAP configuration for responses.
+type LdapConfigurationResponse struct {
+	CloudIDPCommon *CloudIDPCommon            `json:"cloudIdPCommon,omitempty"`
+	Mappings       *CloudLdapMappingsResponse `json:"mappings,omitempty"`
+	Server         *CloudLdapServerResponse   `json:"server,omitempty"`
+}
+
+// LdapConfigurationUpdate A Cloud Identity Provider LDAP configuration for updates.
+type LdapConfigurationUpdate struct {
+	CloudIDPCommon CloudIDPCommon            `json:"cloudIdPCommon"`
+	Mappings       *CloudLdapMappingsRequest `json:"mappings,omitempty"`
+	Server         CloudLdapServerUpdate     `json:"server"`
+}
+
+// LdapGroup An LDAP group.
+type LdapGroup struct {
+	DistinguishedName string `json:"distinguishedName"`
+	ID                string `json:"id"`
+	LdapServerID      int    `json:"ldapServerId"`
+	Name              string `json:"name"`
+	UUID              string `json:"uuid"`
+}
+
+// LdapGroupSearchResults represents a ldap group search results.
+type LdapGroupSearchResults struct {
+	Results    []LdapGroup `json:"results"`
+	TotalCount int         `json:"totalCount"`
+}
+
+// LdapServer An LDAP Server.
+type LdapServer struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 // LocationInformationV2 represents a location information v2.
 type LocationInformationV2 struct {
 	BuildingID   string `json:"buildingId"`
@@ -2452,6 +2959,23 @@ type MDMRenewalStrategy struct {
 
 // MDMRenewalStrategyType represents a m d m renewal strategy type value.
 type MDMRenewalStrategyType = string
+
+// MembershipMappings Cloud Identity Provider user group membership mappings configuration.
+type MembershipMappings struct {
+	GroupMembershipMapping string `json:"groupMembershipMapping"`
+}
+
+// MembershipTestSearchRequest represents a membership test search request.
+type MembershipTestSearchRequest struct {
+	Groupname string `json:"groupname"`
+	Username  string `json:"username"`
+}
+
+// MembershipTestSearchResponse represents a membership test search response.
+type MembershipTestSearchResponse struct {
+	IsMember bool   `json:"isMember"`
+	Username string `json:"username"`
+}
 
 // MobileDeviceApplication represents a mobile device application.
 type MobileDeviceApplication struct {
@@ -3183,6 +3707,18 @@ type NetworkV2 struct {
 	VoiceRoamingEnabled      bool   `json:"voiceRoamingEnabled"`
 }
 
+// OAuthClientCredentials represents a o auth client credentials.
+type OAuthClientCredentials struct {
+	ClientID     string `json:"clientId"`
+	ClientSecret string `json:"clientSecret"`
+}
+
+// OauthTokens represents a oauth tokens.
+type OauthTokens struct {
+	AccessToken string `json:"accessToken"`
+	IDToken     string `json:"idToken"`
+}
+
 // ObjectHistory represents a object history.
 type ObjectHistory struct {
 	Date     string  `json:"date"`
@@ -3195,6 +3731,57 @@ type ObjectHistory struct {
 // ObjectHistoryNote represents a object history note.
 type ObjectHistoryNote struct {
 	Note string `json:"note"`
+}
+
+// OidcDirectIdpLoginSkipURL represents a oidc direct idp login skip u r l.
+type OidcDirectIdpLoginSkipURL struct {
+	URL string `json:"url"`
+}
+
+// OidcJwksResponse represents a oidc jwks response.
+type OidcJwksResponse struct {
+	Keys []OidcJwksResponseKeysItem `json:"keys"`
+}
+
+// OidcJwksResponseKeysItem represents a oidc jwks response keys item.
+type OidcJwksResponseKeysItem struct {
+	Alg string `json:"alg"`
+	E   string `json:"e"`
+	Iat int    `json:"iat"`
+	Kid string `json:"kid"`
+	Kty string `json:"kty"`
+	N   string `json:"n"`
+	Use string `json:"use"`
+}
+
+// OidcLoginDispatchRequest represents a oidc login dispatch request.
+type OidcLoginDispatchRequest struct {
+	EmailAddress string `json:"emailAddress"`
+	OriginalURL  string `json:"originalUrl"`
+}
+
+// OidcLoginDispatchResponseV2 represents a oidc login dispatch response v2.
+type OidcLoginDispatchResponseV2 struct {
+	IdpRedirects []OidcLoginDispatchResponseV2IdpRedirectsItem `json:"idpRedirects"`
+}
+
+// OidcLoginDispatchResponseV2IdpRedirectsItem represents a oidc login dispatch response v2 idp redirects item.
+type OidcLoginDispatchResponseV2IdpRedirectsItem struct {
+	IdpName     string `json:"idpName"`
+	IdpType     string `json:"idpType"`
+	RedirectURL string `json:"redirectUrl"`
+}
+
+// OidcPublicFeaturesResponse represents a oidc public features response.
+type OidcPublicFeaturesResponse struct {
+	JamfIDAuthenticationEnabled bool `json:"jamfIdAuthenticationEnabled"`
+}
+
+// OidcSettings represents a oidc settings.
+type OidcSettings struct {
+	JamfIDAuthenticationEnabled   *bool   `json:"jamfIdAuthenticationEnabled,omitempty"`
+	UserMapping                   string  `json:"userMapping"`
+	UsernameAttributeClaimMapping *string `json:"usernameAttributeClaimMapping,omitempty"`
 }
 
 // Package represents a package.
@@ -3899,6 +4486,24 @@ type ReturnToServiceConfigurationSearchResults struct {
 	TotalCount int                            `json:"totalCount"`
 }
 
+// SamlSettings represents a saml settings.
+type SamlSettings struct {
+	EntityID                *string `json:"entityId,omitempty"`
+	FederationMetadataFile  *[]byte `json:"federationMetadataFile,omitempty"`
+	GroupAttributeName      *string `json:"groupAttributeName,omitempty"`
+	GroupRdnKey             *string `json:"groupRdnKey,omitempty"`
+	IdpProviderType         *string `json:"idpProviderType,omitempty"`
+	IdpURL                  *string `json:"idpUrl,omitempty"`
+	MetadataFileName        *string `json:"metadataFileName,omitempty"`
+	MetadataSource          *string `json:"metadataSource,omitempty"`
+	OtherProviderTypeName   *string `json:"otherProviderTypeName,omitempty"`
+	SessionTimeout          *int    `json:"sessionTimeout,omitempty"`
+	TokenExpirationDisabled *bool   `json:"tokenExpirationDisabled,omitempty"`
+	UserAttributeEnabled    *bool   `json:"userAttributeEnabled,omitempty"`
+	UserAttributeName       *string `json:"userAttributeName,omitempty"`
+	UserMapping             *string `json:"userMapping,omitempty"`
+}
+
 // Script represents a script.
 type Script struct {
 	CategoryID     *string `json:"categoryId,omitempty"`
@@ -3989,6 +4594,11 @@ type SettingsCommand struct {
 	VoiceRoaming                         *VoiceRoamingSetting         `json:"voiceRoaming,omitempty"`
 }
 
+// SharedDeviceComplianceFeatureToggle represents a shared device compliance feature toggle.
+type SharedDeviceComplianceFeatureToggle struct {
+	SharedDeviceFeatureEnabled bool `json:"sharedDeviceFeatureEnabled"`
+}
+
 // SharedDeviceConfiguration represents a shared device configuration.
 type SharedDeviceConfiguration struct {
 	QuotaSize     *int `json:"quotaSize,omitempty"`
@@ -3998,6 +4608,13 @@ type SharedDeviceConfiguration struct {
 // ShutDownDeviceCommand represents a shut down device command.
 type ShutDownDeviceCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
+}
+
+// Signature represents a signature.
+type Signature struct {
+	Algorithm    string `json:"algorithm"`
+	AlgorithmOid string `json:"algorithmOid"`
+	Value        string `json:"value"`
 }
 
 // SiteObject represents a site object.
@@ -4099,6 +4716,83 @@ type SoftwareTitleConfigurationOnDashboard struct {
 // SoftwareUpdateSettings represents a software update settings.
 type SoftwareUpdateSettings struct {
 	RecommendationCadence *string `json:"recommendationCadence,omitempty"`
+}
+
+// SsoFailoverData represents a sso failover data.
+type SsoFailoverData struct {
+	FailoverURL    string `json:"failoverUrl"`
+	GenerationTime int64  `json:"generationTime"`
+}
+
+// SsoKeystore represents a sso keystore.
+type SsoKeystore struct {
+	Key              string           `json:"key"`
+	Keys             []CertificateKey `json:"keys"`
+	KeystoreFile     []byte           `json:"keystoreFile"`
+	KeystoreFileName string           `json:"keystoreFileName"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	KeystorePassword  string `json:"keystorePassword"`
+	KeystoreSetupType string `json:"keystoreSetupType"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+	Type     string `json:"type"`
+}
+
+// SsoKeystoreCertParseResponse represents a sso keystore cert parse response.
+type SsoKeystoreCertParseResponse struct {
+	Key               string           `json:"key"`
+	Keys              []CertificateKey `json:"keys"`
+	KeystoreFile      [][]byte         `json:"keystoreFile"`
+	KeystoreFileName  string           `json:"keystoreFileName"`
+	KeystoreSetupType string           `json:"keystoreSetupType"`
+	Type              string           `json:"type"`
+}
+
+// SsoKeystoreDetails represents a sso keystore details.
+type SsoKeystoreDetails struct {
+	Expiration   string   `json:"expiration"`
+	Issuer       string   `json:"issuer"`
+	Keys         []string `json:"keys"`
+	SerialNumber int      `json:"serialNumber"`
+	Subject      string   `json:"subject"`
+}
+
+// SsoKeystoreParse represents a sso keystore parse.
+type SsoKeystoreParse struct {
+	KeystoreFile     []byte `json:"keystoreFile"`
+	KeystoreFileName string `json:"keystoreFileName"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	KeystorePassword string `json:"keystorePassword"`
+}
+
+// SsoKeystoreResponse represents a sso keystore response.
+type SsoKeystoreResponse struct {
+	Key               string           `json:"key"`
+	Keys              []CertificateKey `json:"keys"`
+	KeystoreFileName  string           `json:"keystoreFileName"`
+	KeystoreSetupType string           `json:"keystoreSetupType"`
+	Type              string           `json:"type"`
+}
+
+// SsoKeystoreResponseWithDetails represents a sso keystore response with details.
+type SsoKeystoreResponseWithDetails struct {
+	Keystore        *SsoKeystoreResponse `json:"keystore,omitempty"`
+	KeystoreDetails *SsoKeystoreDetails  `json:"keystoreDetails,omitempty"`
+}
+
+// SsoSettingsV3 represents a sso settings v3.
+type SsoSettingsV3 struct {
+	ConfigurationType                              string               `json:"configurationType"`
+	EnrollmentSsoConfig                            *EnrollmentSsoConfig `json:"enrollmentSsoConfig,omitempty"`
+	EnrollmentSsoForAccountDrivenEnrollmentEnabled bool                 `json:"enrollmentSsoForAccountDrivenEnrollmentEnabled"`
+	GroupEnrollmentAccessEnabled                   bool                 `json:"groupEnrollmentAccessEnabled"`
+	GroupEnrollmentAccessName                      *string              `json:"groupEnrollmentAccessName,omitempty"`
+	OidcSettings                                   OidcSettings         `json:"oidcSettings"`
+	SamlSettings                                   SamlSettings         `json:"samlSettings"`
+	SsoBypassAllowed                               bool                 `json:"ssoBypassAllowed"`
+	SsoEnabled                                     bool                 `json:"ssoEnabled"`
+	SsoForEnrollmentEnabled                        bool                 `json:"ssoForEnrollmentEnabled"`
+	SsoForMacOsSelfServiceEnabled                  bool                 `json:"ssoForMacOsSelfServiceEnabled"`
 }
 
 // StartupStatus represents a startup status.
@@ -4269,6 +4963,57 @@ type UserInventory struct {
 	Position             *string `json:"position,omitempty"`
 	Realname             *string `json:"realname,omitempty"`
 	Username             *string `json:"username,omitempty"`
+}
+
+// UserMappings Cloud Identity Provider user mappings configuration.
+type UserMappings struct {
+	AdditionalSearchBase  *string `json:"additionalSearchBase,omitempty"`
+	Building              string  `json:"building"`
+	Department            string  `json:"department"`
+	EmailAddress          string  `json:"emailAddress"`
+	ObjectClassLimitation string  `json:"objectClassLimitation"`
+	ObjectClasses         string  `json:"objectClasses"`
+	Phone                 string  `json:"phone"`
+	Position              string  `json:"position"`
+	RealName              string  `json:"realName"`
+	Room                  string  `json:"room"`
+	SearchBase            string  `json:"searchBase"`
+	SearchScope           string  `json:"searchScope"`
+	UserID                string  `json:"userID"`
+	UserUUID              string  `json:"userUuid"`
+	Username              string  `json:"username"`
+}
+
+// UserTestAttributes represents a user test attributes.
+type UserTestAttributes struct {
+	BuildingName   string `json:"buildingName"`
+	DepartmentName string `json:"departmentName"`
+	EmailAddress   string `json:"emailAddress"`
+	FullName       string `json:"fullName"`
+	PhoneNumber    string `json:"phoneNumber"`
+	Position       string `json:"position"`
+	Room           string `json:"room"`
+}
+
+// UserTestSearch represents a user test search.
+type UserTestSearch struct {
+	Attributes        *UserTestAttributes `json:"attributes,omitempty"`
+	DistinguishedName string              `json:"distinguishedName"`
+	ID                string              `json:"id"`
+	Name              string              `json:"name"`
+	ServerID          string              `json:"serverId"`
+	UUID              string              `json:"uuid"`
+}
+
+// UserTestSearchRequest represents a user test search request.
+type UserTestSearchRequest struct {
+	Username string `json:"username"`
+}
+
+// UserTestSearchResponse represents a user test search response.
+type UserTestSearchResponse struct {
+	Results    []UserTestSearch `json:"results"`
+	TotalCount int              `json:"totalCount"`
 }
 
 // V1Site represents a v1 site.

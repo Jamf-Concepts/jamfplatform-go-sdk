@@ -481,7 +481,112 @@
         {"op": "POST /v1/return-to-service", "name": "CreateReturnToServiceConfigurationV1"},
         {"op": "GET /v1/return-to-service/{id}", "name": "GetReturnToServiceConfigurationV1"},
         {"op": "PUT /v1/return-to-service/{id}", "name": "UpdateReturnToServiceConfigurationV1"},
-        {"op": "DELETE /v1/return-to-service/{id}", "name": "DeleteReturnToServiceConfigurationV1", "expectedStatus": 204}
+        {"op": "DELETE /v1/return-to-service/{id}", "name": "DeleteReturnToServiceConfigurationV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/auth", "name": "GetAuthorizationV1"},
+
+        {"op": "GET /v1/api-integrations", "name": "ListApiIntegrationsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/api-integrations", "name": "CreateApiIntegrationV1", "expectedStatus": 200},
+        {"op": "GET /v1/api-integrations/{id}", "name": "GetApiIntegrationV1"},
+        {"op": "PUT /v1/api-integrations/{id}", "name": "UpdateApiIntegrationV1"},
+        {"op": "DELETE /v1/api-integrations/{id}", "name": "DeleteApiIntegrationV1", "expectedStatus": 204},
+        {"op": "POST /v1/api-integrations/{id}/client-credentials", "name": "RotateApiIntegrationClientCredentialsV1"},
+
+        {"op": "GET /v1/api-roles", "name": "ListApiRolesV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/api-roles", "name": "CreateApiRoleV1"},
+        {"op": "GET /v1/api-roles/{id}", "name": "GetApiRoleV1"},
+        {"op": "PUT /v1/api-roles/{id}", "name": "UpdateApiRoleV1"},
+        {"op": "DELETE /v1/api-roles/{id}", "name": "DeleteApiRoleV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/api-role-privileges", "name": "ListApiRolePrivilegesV1"},
+        {"op": "GET /v1/api-role-privileges/search", "name": "SearchApiRolePrivilegesV1", "params": ["name", "limit"]},
+
+        {"op": "POST /v1/pki/adcs-settings", "name": "CreateAdcsSettingsV1", "responseType": "HrefResponse"},
+        {"op": "POST /v1/pki/adcs-settings/validate-certificate", "name": "ValidateAdcsCertificateV1"},
+        {"op": "POST /v1/pki/adcs-settings/validate-client-certificate", "name": "ValidateAdcsClientCertificateV1"},
+        {"op": "GET /v1/pki/adcs-settings/{id}", "name": "GetAdcsSettingsV1"},
+        {"op": "DELETE /v1/pki/adcs-settings/{id}", "name": "DeleteAdcsSettingsV1", "expectedStatus": 204},
+        {"op": "PATCH /v1/pki/adcs-settings/{id}", "name": "UpdateAdcsSettingsV1", "contentType": "application/merge-patch+json", "expectedStatus": 204},
+        {"op": "GET /v1/pki/adcs-settings/{id}/dependencies", "name": "GetAdcsSettingsDependenciesV1"},
+        {"op": "GET /v1/pki/adcs-settings/{id}/history", "name": "ListAdcsSettingsHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/pki/adcs-settings/{id}/history", "name": "CreateAdcsSettingsHistoryNoteV1"},
+
+        {"op": "GET /v1/pki/certificate-authority/active", "name": "GetActiveCertificateAuthorityV1"},
+        {"op": "GET /v1/pki/certificate-authority/active/der", "name": "DownloadActiveCertificateAuthorityDerV1"},
+        {"op": "GET /v1/pki/certificate-authority/active/pem", "name": "DownloadActiveCertificateAuthorityPemV1"},
+        {"op": "GET /v1/pki/certificate-authority/{id}", "name": "GetCertificateAuthorityV1"},
+        {"op": "GET /v1/pki/certificate-authority/{id}/der", "name": "DownloadCertificateAuthorityDerV1"},
+        {"op": "GET /v1/pki/certificate-authority/{id}/pem", "name": "DownloadCertificateAuthorityPemV1"},
+
+        {"op": "GET /v1/classic-ldap/{id}", "name": "GetClassicLdapMappingsV1"},
+
+        {"op": "POST /v1/cloud-azure", "name": "CreateCloudAzureV1"},
+        {"op": "GET /v1/cloud-azure/defaults/server-configuration", "name": "GetCloudAzureDefaultServerConfigurationV1"},
+        {"op": "GET /v1/cloud-azure/{id}", "name": "GetCloudAzureV1"},
+        {"op": "PUT /v1/cloud-azure/{id}", "name": "UpdateCloudAzureV1"},
+        {"op": "DELETE /v1/cloud-azure/{id}", "name": "DeleteCloudAzureV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/cloud-idp", "name": "ListCloudIdpV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "POST /v1/cloud-idp/export", "name": "ExportCloudIdpV1", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]},
+        {"op": "GET /v1/cloud-idp/{id}", "name": "GetCloudIdpV1"},
+        {"op": "GET /v1/cloud-idp/{id}/history", "name": "ListCloudIdpHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/cloud-idp/{id}/history", "name": "CreateCloudIdpHistoryNoteV1"},
+        {"op": "POST /v1/cloud-idp/{id}/test-group", "name": "TestCloudIdpGroupV1"},
+        {"op": "POST /v1/cloud-idp/{id}/test-user", "name": "TestCloudIdpUserV1"},
+        {"op": "POST /v1/cloud-idp/{id}/test-user-membership", "name": "TestCloudIdpUserMembershipV1"},
+
+        {"op": "POST /v1/ldap-keystore/verify", "name": "VerifyLdapKeystoreV1"},
+        {"op": "POST /v2/cloud-ldaps", "name": "CreateCloudLdapV2"},
+        {"op": "GET /v2/cloud-ldaps/defaults/{provider}/mappings", "name": "GetCloudLdapDefaultMappingsV2"},
+        {"op": "GET /v2/cloud-ldaps/defaults/{provider}/server-configuration", "name": "GetCloudLdapDefaultServerConfigurationV2"},
+        {"op": "GET /v2/cloud-ldaps/{id}", "name": "GetCloudLdapV2"},
+        {"op": "PUT /v2/cloud-ldaps/{id}", "name": "UpdateCloudLdapV2"},
+        {"op": "DELETE /v2/cloud-ldaps/{id}", "name": "DeleteCloudLdapV2", "expectedStatus": 204},
+        {"op": "GET /v2/cloud-ldaps/{id}/connection/bind", "name": "GetCloudLdapBindStatisticsV2"},
+        {"op": "GET /v2/cloud-ldaps/{id}/connection/search", "name": "GetCloudLdapSearchStatisticsV2"},
+        {"op": "GET /v2/cloud-ldaps/{id}/connection/status", "name": "GetCloudLdapConnectionStatusV2"},
+        {"op": "GET /v2/cloud-ldaps/{id}/mappings", "name": "GetCloudLdapMappingsV2"},
+        {"op": "PUT /v2/cloud-ldaps/{id}/mappings", "name": "UpdateCloudLdapMappingsV2"},
+
+        {"op": "GET /v1/conditional-access/device-compliance/feature-toggle", "name": "GetConditionalAccessFeatureToggleV1"},
+        {"op": "GET /v1/conditional-access/device-compliance-information/computer/{deviceId}", "name": "GetConditionalAccessComputerComplianceV1", "pathNames": {"deviceId": "deviceID"}},
+        {"op": "GET /v1/conditional-access/device-compliance-information/mobile/{deviceId}", "name": "GetConditionalAccessMobileComplianceV1", "pathNames": {"deviceId": "deviceID"}},
+
+        {"op": "GET /v1/csa/tenant-id", "name": "GetCsaTenantIdV1"},
+        {"op": "GET /v1/csa/token", "name": "GetCsaTokenV1"},
+        {"op": "DELETE /v1/csa/token", "name": "DeleteCsaTokenV1", "expectedStatus": 204},
+
+        {"op": "GET /ldap/groups", "name": "SearchLdapGroupsPreview", "params": ["q"]},
+        {"op": "GET /ldap/servers", "name": "ListLdapServersPreview"},
+        {"op": "GET /v1/ldap/groups", "name": "SearchLdapGroupsV1", "params": ["q"]},
+        {"op": "GET /v1/ldap/ldap-servers", "name": "ListLdapLdapServersV1"},
+        {"op": "GET /v1/ldap/servers", "name": "ListLdapServersV1"},
+
+        {"op": "GET /v1/oidc/direct-idp-login-url", "name": "GetOidcDirectIdpLoginUrlV1"},
+        {"op": "POST /v1/oidc/generate-certificate", "name": "GenerateOidcCertificateV1"},
+        {"op": "GET /v1/oidc/public-features", "name": "GetOidcPublicFeaturesV1"},
+        {"op": "GET /v1/oidc/public-key", "name": "GetOidcPublicKeyV1"},
+        {"op": "POST /v2/oidc/dispatch", "name": "DispatchOidcLoginV2"},
+
+        {"op": "GET /v2/sso/cert", "name": "GetSsoCertificateV2"},
+        {"op": "PUT /v2/sso/cert", "name": "UpdateSsoCertificateV2"},
+        {"op": "POST /v2/sso/cert", "name": "GenerateSsoCertificateV2"},
+        {"op": "DELETE /v2/sso/cert", "name": "DeleteSsoCertificateV2", "expectedStatus": 204},
+        {"op": "GET /v2/sso/cert/download", "name": "DownloadSsoCertificateV2"},
+        {"op": "POST /v2/sso/cert/parse", "name": "ParseSsoCertificateV2"},
+
+        {"op": "GET /v1/sso/failover", "name": "GetSsoFailoverV1"},
+        {"op": "POST /v1/sso/failover/generate", "name": "GenerateSsoFailoverV1"},
+
+        {"op": "GET /v1/oauth2/session-tokens", "name": "ListSsoOauthSessionTokensV1"},
+
+        {"op": "GET /v3/sso", "name": "GetSsoSettingsV3"},
+        {"op": "PUT /v3/sso", "name": "UpdateSsoSettingsV3"},
+        {"op": "GET /v3/sso/dependencies", "name": "GetSsoDependenciesV3"},
+        {"op": "POST /v3/sso/disable", "name": "DisableSsoV3"},
+        {"op": "GET /v3/sso/history", "name": "ListSsoHistoryV3", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v3/sso/history", "name": "CreateSsoHistoryNoteV3"},
+        {"op": "GET /v3/sso/metadata/download", "name": "DownloadSsoMetadataV3"}
       ]
     },
     {
