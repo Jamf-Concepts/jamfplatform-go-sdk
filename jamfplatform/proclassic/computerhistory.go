@@ -66,3 +66,58 @@ func (c *Client) GetComputerHistoryByMacAddress(ctx context.Context, macAddress 
 	}
 	return &result, nil
 }
+
+// GetComputerHistoryByIDSubset finds a subset of computer history data by ID.
+func (c *Client) GetComputerHistoryByIDSubset(ctx context.Context, id string, subset string) (*ComputerHistory, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerHistory
+	endpoint := fmt.Sprintf("%s/computerhistory/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerHistoryByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetComputerHistoryByMacAddressSubset finds a subset of computer history data by MAC address.
+func (c *Client) GetComputerHistoryByMacAddressSubset(ctx context.Context, macaddress string, subset string) (*ComputerHistory, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerHistory
+	endpoint := fmt.Sprintf("%s/computerhistory/macaddress/%s/subset/%s", prefix, url.PathEscape(macaddress), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerHistoryByMacAddressSubset(%s): %w", macaddress, err)
+	}
+	return &result, nil
+}
+
+// GetComputerHistoryByNameSubset finds a subset of computer history data by name.
+func (c *Client) GetComputerHistoryByNameSubset(ctx context.Context, name string, subset string) (*ComputerHistory, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerHistory
+	endpoint := fmt.Sprintf("%s/computerhistory/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerHistoryByNameSubset(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// GetComputerHistoryBySerialNumberSubset finds a subset of computer history data by serial number.
+func (c *Client) GetComputerHistoryBySerialNumberSubset(ctx context.Context, serialnumber string, subset string) (*ComputerHistory, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerHistory
+	endpoint := fmt.Sprintf("%s/computerhistory/serialnumber/%s/subset/%s", prefix, url.PathEscape(serialnumber), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerHistoryBySerialNumberSubset(%s): %w", serialnumber, err)
+	}
+	return &result, nil
+}
+
+// GetComputerHistoryByUDIDSubset finds a subset of computer history data by UDID.
+func (c *Client) GetComputerHistoryByUDIDSubset(ctx context.Context, udid string, subset string) (*ComputerHistory, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerHistory
+	endpoint := fmt.Sprintf("%s/computerhistory/udid/%s/subset/%s", prefix, url.PathEscape(udid), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerHistoryByUDIDSubset(%s): %w", udid, err)
+	}
+	return &result, nil
+}

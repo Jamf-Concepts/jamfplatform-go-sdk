@@ -75,3 +75,24 @@ func (c *Client) ListPatchExternalSources(ctx context.Context) (*PatchExternalSo
 	}
 	return &result, nil
 }
+
+// CreatePatchExternalSourceByName create a new patch external source by name.
+func (c *Client) CreatePatchExternalSourceByName(ctx context.Context, name string, request *PatchExternalSource) (*PatchExternalSource, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchExternalSource
+	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreatePatchExternalSourceByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdatePatchExternalSourceByName updates a patch external source by name.
+func (c *Client) UpdatePatchExternalSourceByName(ctx context.Context, name string, request *PatchExternalSource) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdatePatchExternalSourceByName(%s): %w", name, err)
+	}
+	return nil
+}

@@ -55,3 +55,44 @@ func (c *Client) ListMobileDeviceCommands(ctx context.Context) (*MobileDeviceCom
 	}
 	return &result, nil
 }
+
+// CreateMobileDeviceCommandScheduleOSUpdateByInstallActionIDList creates a new command to request that a mobile device update its OS. Command and mobile device list specified in URL. Device will be updated to the latest OS version based on device eligibility. (deprecated on 2022-10-17).
+func (c *Client) CreateMobileDeviceCommandScheduleOSUpdateByInstallActionIDList(ctx context.Context, install_action string, id_list string, request *MobileDeviceCommandPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/ScheduleOSUpdate/%s/id/%s", prefix, url.PathEscape(install_action), url.PathEscape(id_list))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceCommandScheduleOSUpdateByInstallActionIDList(%s): %w", install_action, err)
+	}
+	return nil
+}
+
+// CreateMobileDeviceCommandScheduleOSUpdateByInstallActionProductVersionIDList creates a new command to request that a mobile device update its OS. Command and mobile device list specified in URL. Mixing iOS and tvOS devices in ID list is not advised, as product version is specific to OS type. (deprecated on 2022-10-17).
+func (c *Client) CreateMobileDeviceCommandScheduleOSUpdateByInstallActionProductVersionIDList(ctx context.Context, install_action string, product_version string, id_list string, request *MobileDeviceCommandPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/ScheduleOSUpdate/%s/%s/id/%s", prefix, url.PathEscape(install_action), url.PathEscape(product_version), url.PathEscape(id_list))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceCommandScheduleOSUpdateByInstallActionProductVersionIDList(%s): %w", install_action, err)
+	}
+	return nil
+}
+
+// GetMobileDeviceCommandByCommand finds all mobile device commands for specified command.
+func (c *Client) GetMobileDeviceCommandByCommand(ctx context.Context, command string) (*MobileDeviceCommand, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceCommand
+	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s", prefix, url.PathEscape(command))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceCommandByCommand(%s): %w", command, err)
+	}
+	return &result, nil
+}
+
+// CreateMobileDeviceCommandByCommandID creates a new mobile device command.
+func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, command string, id_list string, request *MobileDeviceCommandPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(id_list))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceCommandByCommandID(%s): %w", command, err)
+	}
+	return nil
+}

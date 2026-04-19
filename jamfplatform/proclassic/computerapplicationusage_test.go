@@ -40,3 +40,123 @@ func TestGetComputerApplicationUsageByID_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestGetComputerApplicationUsageByMacAddressDateRange(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computerapplicationusage/macaddress/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<computer_application_usage></computer_application_usage>")
+	})
+
+	result, err := c.GetComputerApplicationUsageByMacAddressDateRange(context.Background(), "test-id", "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerApplicationUsageByMacAddressDateRange_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computerapplicationusage/macaddress/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetComputerApplicationUsageByMacAddressDateRange(context.Background(), "test-id", "test-id", "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestGetComputerApplicationUsageByNameDateRange(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computerapplicationusage/name/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<computer_application_usage></computer_application_usage>")
+	})
+
+	result, err := c.GetComputerApplicationUsageByNameDateRange(context.Background(), "test-id", "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerApplicationUsageByNameDateRange_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computerapplicationusage/name/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetComputerApplicationUsageByNameDateRange(context.Background(), "test-id", "test-id", "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestGetComputerApplicationUsageBySerialNumberDateRange(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computerapplicationusage/serialnumber/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<computer_application_usage></computer_application_usage>")
+	})
+
+	result, err := c.GetComputerApplicationUsageBySerialNumberDateRange(context.Background(), "test-id", "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerApplicationUsageBySerialNumberDateRange_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computerapplicationusage/serialnumber/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetComputerApplicationUsageBySerialNumberDateRange(context.Background(), "test-id", "test-id", "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestGetComputerApplicationUsageByUDIDDateRange(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computerapplicationusage/udid/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<computer_application_usage></computer_application_usage>")
+	})
+
+	result, err := c.GetComputerApplicationUsageByUDIDDateRange(context.Background(), "test-id", "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerApplicationUsageByUDIDDateRange_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computerapplicationusage/udid/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetComputerApplicationUsageByUDIDDateRange(context.Background(), "test-id", "test-id", "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}

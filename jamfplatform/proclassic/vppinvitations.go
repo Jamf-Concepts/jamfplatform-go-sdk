@@ -64,3 +64,14 @@ func (c *Client) ListVPPInvitations(ctx context.Context) (*VppInvitations, error
 	}
 	return &result, nil
 }
+
+// GetVPPInvitationByIDSubset finds a subset of data for a VPP invitation.
+func (c *Client) GetVPPInvitationByIDSubset(ctx context.Context, id string, subset string) (*VppInvitation, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result VppInvitation
+	endpoint := fmt.Sprintf("%s/vppinvitations/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetVPPInvitationByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}

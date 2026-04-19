@@ -118,3 +118,39 @@ func TestListComputerCommands_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestCreateComputerCommandByCommand(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computercommands/command/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, http.StatusCreated, "<computer_command></computer_command>")
+	})
+
+	result, err := c.CreateComputerCommandByCommand(context.Background(), "test-id", &ComputerCommandPost{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestCreateComputerCommandByCommandActionID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computercommands/command/test-id/action/test-id/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, http.StatusCreated, "<computer_command></computer_command>")
+	})
+
+	result, err := c.CreateComputerCommandByCommandActionID(context.Background(), "test-id", "test-id", "test-id", &ComputerCommandPost{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

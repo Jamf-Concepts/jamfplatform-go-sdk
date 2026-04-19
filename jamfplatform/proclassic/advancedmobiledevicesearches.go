@@ -85,3 +85,13 @@ func (c *Client) ListAdvancedMobileDeviceSearches(ctx context.Context) (*Advance
 	}
 	return &result, nil
 }
+
+// UpdateAdvancedMobileDeviceSearchByName updates an existing advanced mobile device search by name.
+func (c *Client) UpdateAdvancedMobileDeviceSearchByName(ctx context.Context, name string, request *AdvancedMobileDeviceSearch) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateAdvancedMobileDeviceSearchByName(%s): %w", name, err)
+	}
+	return nil
+}

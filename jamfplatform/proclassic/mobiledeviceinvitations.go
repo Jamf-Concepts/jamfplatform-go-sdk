@@ -54,3 +54,35 @@ func (c *Client) ListMobileDeviceInvitations(ctx context.Context) (*MobileDevice
 	}
 	return &result, nil
 }
+
+// DeleteMobileDeviceInvitationByInvitation deletes a mobile device invitation by invitation.
+func (c *Client) DeleteMobileDeviceInvitationByInvitation(ctx context.Context, invitation string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/invitation/%s", prefix, url.PathEscape(invitation))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceInvitationByInvitation(%s): %w", invitation, err)
+	}
+	return nil
+}
+
+// GetMobileDeviceInvitationByInvitation finds mobile device invitations by invitation.
+func (c *Client) GetMobileDeviceInvitationByInvitation(ctx context.Context, invitation string) (*MobileDeviceInvitation, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceInvitation
+	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/invitation/%s", prefix, url.PathEscape(invitation))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceInvitationByInvitation(%s): %w", invitation, err)
+	}
+	return &result, nil
+}
+
+// CreateMobileDeviceInvitationByInvitation creates a new mobile device invitation by invitation.
+func (c *Client) CreateMobileDeviceInvitationByInvitation(ctx context.Context, invitation string, request *MobileDeviceInvitationPost) (*MobileDeviceInvitation, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceInvitation
+	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/invitation/%s", prefix, url.PathEscape(invitation))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateMobileDeviceInvitationByInvitation(%s): %w", invitation, err)
+	}
+	return &result, nil
+}

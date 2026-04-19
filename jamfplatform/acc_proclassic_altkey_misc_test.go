@@ -335,3 +335,146 @@ func TestAcceptance_Classic_Probe_IssueMobileDeviceCommand(t *testing.T) {
 	}
 	t.Logf("Issued UpdateInventory to mobile device id=%d", *targetID)
 }
+
+func TestAcceptance_Classic_Probe_CreateComputerCommandByCommand(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).CreateComputerCommandByCommand(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.ComputerCommandPost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreateComputerCommandByCommand transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_CreateComputerCommandByCommandActionID(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).CreateComputerCommandByCommandActionID(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", &proclassic.ComputerCommandPost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreateComputerCommandByCommandActionID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_CreateComputerInvitationByInvitation(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).CreateComputerInvitationByInvitation(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.ComputerInvitation{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreateComputerInvitationByInvitation transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UploadFileByResourceIDTypeID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UploadFileByResourceIDTypeID(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UploadFileByResourceIDTypeID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_CreateMobileDeviceCommandScheduleOSUpdateByInstallActionIDList(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).CreateMobileDeviceCommandScheduleOSUpdateByInstallActionIDList(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceCommandPost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreateMobileDeviceCommandScheduleOSUpdateByInstallActionIDList transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_CreateMobileDeviceCommandScheduleOSUpdateByInstallActionProductVersionIDList(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).CreateMobileDeviceCommandScheduleOSUpdateByInstallActionProductVersionIDList(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceCommandPost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreateMobileDeviceCommandScheduleOSUpdateByInstallActionProductVersionIDList transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_CreateMobileDeviceCommandByCommandID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).CreateMobileDeviceCommandByCommandID(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceCommandPost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreateMobileDeviceCommandByCommandID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_CreateMobileDeviceInvitationByInvitation(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).CreateMobileDeviceInvitationByInvitation(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceInvitationPost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreateMobileDeviceInvitationByInvitation transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_CreateMobileDeviceProvisioningProfileByName(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).CreateMobileDeviceProvisioningProfileByName(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceProvisioningProfile{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreateMobileDeviceProvisioningProfileByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_CreateMobileDeviceProvisioningProfileByUUID(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).CreateMobileDeviceProvisioningProfileByUUID(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceProvisioningProfile{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreateMobileDeviceProvisioningProfileByUUID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_CreatePatchExternalSourceByName(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).CreatePatchExternalSourceByName(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.PatchExternalSource{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("CreatePatchExternalSourceByName transport error: %v", err)
+	}
+}

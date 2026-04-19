@@ -85,3 +85,13 @@ func (c *Client) ListAdvancedComputerSearches(ctx context.Context) (*AdvancedCom
 	}
 	return &result, nil
 }
+
+// UpdateAdvancedComputerSearchByName updates an existing advanced computer search by name.
+func (c *Client) UpdateAdvancedComputerSearchByName(ctx context.Context, name string, request *AdvancedComputerSearch) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateAdvancedComputerSearchByName(%s): %w", name, err)
+	}
+	return nil
+}

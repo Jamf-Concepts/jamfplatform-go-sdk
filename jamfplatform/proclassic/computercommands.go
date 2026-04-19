@@ -55,3 +55,25 @@ func (c *Client) ListComputerCommands(ctx context.Context) (*ComputerCommands, e
 	}
 	return &result, nil
 }
+
+// CreateComputerCommandByCommand creates a new computer command using command name.
+func (c *Client) CreateComputerCommandByCommand(ctx context.Context, command string, request *ComputerCommandPost) (*ComputerCommand, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerCommand
+	endpoint := fmt.Sprintf("%s/computercommands/command/%s", prefix, url.PathEscape(command))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateComputerCommandByCommand(%s): %w", command, err)
+	}
+	return &result, nil
+}
+
+// CreateComputerCommandByCommandActionID creates a new computer command with a command specific action. Commands supported: ScheduleOSUpdate (deprecated on 2022-10-17).
+func (c *Client) CreateComputerCommandByCommandActionID(ctx context.Context, command string, action string, id string, request *ComputerCommandPost) (*ComputerCommand, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerCommand
+	endpoint := fmt.Sprintf("%s/computercommands/command/%s/action/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(action), url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateComputerCommandByCommandActionID(%s): %w", command, err)
+	}
+	return &result, nil
+}

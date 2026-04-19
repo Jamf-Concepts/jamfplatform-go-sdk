@@ -1172,3 +1172,146 @@ func TestAcceptance_Classic_ProbeUpdate_UpdateWebhookByName(t *testing.T) {
 		t.Fatalf("UpdateWebhookByName transport error: %v", err)
 	}
 }
+
+func TestAcceptance_Classic_Probe_UpdateAdvancedComputerSearchByName(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateAdvancedComputerSearchByName(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.AdvancedComputerSearch{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateAdvancedComputerSearchByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateAdvancedMobileDeviceSearchByName(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateAdvancedMobileDeviceSearchByName(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.AdvancedMobileDeviceSearch{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateAdvancedMobileDeviceSearchByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateAdvancedUserSearchByName(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateAdvancedUserSearchByName(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.AdvancedUserSearch{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateAdvancedUserSearchByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateMobileDeviceApplicationByBundleID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateMobileDeviceApplicationByBundleID(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceApplication{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateMobileDeviceApplicationByBundleID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateMobileDeviceApplicationByBundleIDVersion(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateMobileDeviceApplicationByBundleIDVersion(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceApplication{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateMobileDeviceApplicationByBundleIDVersion transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateMobileDeviceEnrollmentProfileByInvitation(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateMobileDeviceEnrollmentProfileByInvitation(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceEnrollmentProfilePost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateMobileDeviceEnrollmentProfileByInvitation transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateMobileDeviceEnrollmentProfileByName(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateMobileDeviceEnrollmentProfileByName(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceEnrollmentProfilePost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateMobileDeviceEnrollmentProfileByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateMobileDeviceProvisioningProfileByName(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).UpdateMobileDeviceProvisioningProfileByName(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceProvisioningProfile{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateMobileDeviceProvisioningProfileByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateMobileDeviceProvisioningProfileByUUID(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).UpdateMobileDeviceProvisioningProfileByUUID(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.MobileDeviceProvisioningProfile{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateMobileDeviceProvisioningProfileByUUID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateClassicPackageByName(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateClassicPackageByName(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.Package{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateClassicPackageByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdatePatchExternalSourceByName(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdatePatchExternalSourceByName(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.PatchExternalSource{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdatePatchExternalSourceByName transport error: %v", err)
+	}
+}

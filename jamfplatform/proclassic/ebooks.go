@@ -95,3 +95,25 @@ func (c *Client) ListEbooks(ctx context.Context) (*Ebooks, error) {
 	}
 	return &result, nil
 }
+
+// GetEbookByIDSubset finds a subset of data for an ebook by ID.
+func (c *Client) GetEbookByIDSubset(ctx context.Context, id string, subset string) (*Ebook, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Ebook
+	endpoint := fmt.Sprintf("%s/ebooks/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetEbookByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetEbookByNameSubset finds a subset of data for ebooks by name.
+func (c *Client) GetEbookByNameSubset(ctx context.Context, name string, subset string) (*Ebook, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Ebook
+	endpoint := fmt.Sprintf("%s/ebooks/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetEbookByNameSubset(%s): %w", name, err)
+	}
+	return &result, nil
+}

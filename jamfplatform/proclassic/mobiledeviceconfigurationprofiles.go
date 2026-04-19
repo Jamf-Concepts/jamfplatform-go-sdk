@@ -95,3 +95,25 @@ func (c *Client) ListMobileDeviceConfigurationProfiles(ctx context.Context) (*Mo
 	}
 	return &result, nil
 }
+
+// GetMobileDeviceConfigurationProfileByIDSubset finds a subset of data for a mobile device configuration profile by ID.
+func (c *Client) GetMobileDeviceConfigurationProfileByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceConfigurationProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceConfigurationProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceConfigurationProfileByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetMobileDeviceConfigurationProfileByNameSubset finds a subset of data for mobile device configuration profiles by name.
+func (c *Client) GetMobileDeviceConfigurationProfileByNameSubset(ctx context.Context, name string, subset string) (*MobileDeviceConfigurationProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceConfigurationProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceConfigurationProfileByNameSubset(%s): %w", name, err)
+	}
+	return &result, nil
+}

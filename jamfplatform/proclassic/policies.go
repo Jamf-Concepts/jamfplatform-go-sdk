@@ -95,3 +95,47 @@ func (c *Client) ListPolicies(ctx context.Context) (*Policies, error) {
 	}
 	return &result, nil
 }
+
+// GetPolicyByCategory finds all policies by category.
+func (c *Client) GetPolicyByCategory(ctx context.Context, category string) (*Policy, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Policy
+	endpoint := fmt.Sprintf("%s/policies/category/%s", prefix, url.PathEscape(category))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPolicyByCategory(%s): %w", category, err)
+	}
+	return &result, nil
+}
+
+// GetPolicyByCreatedBy finds all policies by type.
+func (c *Client) GetPolicyByCreatedBy(ctx context.Context, createdBy string) (*Policy, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Policy
+	endpoint := fmt.Sprintf("%s/policies/createdBy/%s", prefix, url.PathEscape(createdBy))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPolicyByCreatedBy(%s): %w", createdBy, err)
+	}
+	return &result, nil
+}
+
+// GetPolicyByIDSubset finds a subset of data for a policy.
+func (c *Client) GetPolicyByIDSubset(ctx context.Context, id string, subset string) (*Policy, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Policy
+	endpoint := fmt.Sprintf("%s/policies/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPolicyByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetPolicyByNameSubset finds a subset of data for policies by name.
+func (c *Client) GetPolicyByNameSubset(ctx context.Context, name string, subset string) (*Policy, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Policy
+	endpoint := fmt.Sprintf("%s/policies/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPolicyByNameSubset(%s): %w", name, err)
+	}
+	return &result, nil
+}

@@ -95,3 +95,25 @@ func (c *Client) ListMacApplications(ctx context.Context) (*MacApplications, err
 	}
 	return &result, nil
 }
+
+// GetMacApplicationByIDSubset finds a subset of date for a mac application by ID.
+func (c *Client) GetMacApplicationByIDSubset(ctx context.Context, id string, subset string) (*MacApplication, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MacApplication
+	endpoint := fmt.Sprintf("%s/macapplications/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMacApplicationByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetMacApplicationByNameSubset finds a subset of data for mac applications by name.
+func (c *Client) GetMacApplicationByNameSubset(ctx context.Context, name string, subset string) (*MacApplication, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MacApplication
+	endpoint := fmt.Sprintf("%s/macapplications/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMacApplicationByNameSubset(%s): %w", name, err)
+	}
+	return &result, nil
+}

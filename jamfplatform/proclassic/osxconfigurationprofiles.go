@@ -95,3 +95,25 @@ func (c *Client) ListOSXConfigurationProfiles(ctx context.Context) (*OsXConfigur
 	}
 	return &result, nil
 }
+
+// GetOsxConfigurationProfileByIDSubset finds a subset of data for an OS X configuration profile.
+func (c *Client) GetOsxConfigurationProfileByIDSubset(ctx context.Context, id string, subset string) (*OsXConfigurationProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result OsXConfigurationProfile
+	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetOsxConfigurationProfileByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetOsxConfigurationProfileByNameSubset finds a subset of data for OS X configuration profiles by name.
+func (c *Client) GetOsxConfigurationProfileByNameSubset(ctx context.Context, name string, subset string) (*OsXConfigurationProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result OsXConfigurationProfile
+	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetOsxConfigurationProfileByNameSubset(%s): %w", name, err)
+	}
+	return &result, nil
+}

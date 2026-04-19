@@ -715,3 +715,146 @@ func TestAcceptance_Classic_ProbeDelete_DeleteWebhookByName(t *testing.T) {
 		t.Fatalf("DeleteWebhookByName transport error: %v", err)
 	}
 }
+
+func TestAcceptance_Classic_Probe_DeleteCommandFlush(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteCommandFlush(context.Background(), &proclassic.Commandflush{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteCommandFlush transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteCommandFlushByIDTypeIDStatus(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteCommandFlushByIDTypeIDStatus(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteCommandFlushByIDTypeIDStatus transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteComputerInvitationByInvitation(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteComputerInvitationByInvitation(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteComputerInvitationByInvitation transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteLogFlush(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteLogFlush(context.Background(), &proclassic.Logflush{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteLogFlush transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteLogFlushByLogIDInterval(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteLogFlushByLogIDInterval(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteLogFlushByLogIDInterval transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteLogFlushByLogInterval(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteLogFlushByLogInterval(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteLogFlushByLogInterval transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteMobileDeviceApplicationByBundleID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteMobileDeviceApplicationByBundleID(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteMobileDeviceApplicationByBundleID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteMobileDeviceApplicationByBundleIDVersion(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteMobileDeviceApplicationByBundleIDVersion(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteMobileDeviceApplicationByBundleIDVersion transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteMobileDeviceEnrollmentProfileByInvitation(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteMobileDeviceEnrollmentProfileByInvitation(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteMobileDeviceEnrollmentProfileByInvitation transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteMobileDeviceInvitationByInvitation(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteMobileDeviceInvitationByInvitation(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteMobileDeviceInvitationByInvitation transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteClassicPackageByName(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteClassicPackageByName(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteClassicPackageByName transport error: %v", err)
+	}
+}

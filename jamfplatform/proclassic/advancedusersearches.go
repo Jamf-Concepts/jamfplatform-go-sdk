@@ -85,3 +85,13 @@ func (c *Client) ListAdvancedUserSearches(ctx context.Context) (*AdvancedUserSea
 	}
 	return &result, nil
 }
+
+// UpdateAdvancedUserSearchByName updates an existing advanced user search by name.
+func (c *Client) UpdateAdvancedUserSearchByName(ctx context.Context, name string, request *AdvancedUserSearch) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/advancedusersearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateAdvancedUserSearchByName(%s): %w", name, err)
+	}
+	return nil
+}

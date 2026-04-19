@@ -188,3 +188,69 @@ func (c *Client) ListMobileDevices(ctx context.Context) (*MobileDevices, error) 
 	}
 	return &result, nil
 }
+
+// GetMobileDeviceByIDSubset finds a subset of data for a mobile device.
+func (c *Client) GetMobileDeviceByIDSubset(ctx context.Context, id string, subset string) (*MobileDevice, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDevice
+	endpoint := fmt.Sprintf("%s/mobiledevices/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetMobileDeviceByMacAddressSubset finds a subset of data for mobile devices by Mac address.
+func (c *Client) GetMobileDeviceByMacAddressSubset(ctx context.Context, macaddress string, subset string) (*MobileDevice, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDevice
+	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s/subset/%s", prefix, url.PathEscape(macaddress), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceByMacAddressSubset(%s): %w", macaddress, err)
+	}
+	return &result, nil
+}
+
+// GetMobileDeviceByMatch searches for mobile devices that match the provided parameter.
+func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*MobileDevice, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDevice
+	endpoint := fmt.Sprintf("%s/mobiledevices/match/%s", prefix, url.PathEscape(match))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceByMatch(%s): %w", match, err)
+	}
+	return &result, nil
+}
+
+// GetMobileDeviceByNameSubset finds a subset of data for mobile devices by name.
+func (c *Client) GetMobileDeviceByNameSubset(ctx context.Context, name string, subset string) (*MobileDevice, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDevice
+	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceByNameSubset(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// GetMobileDeviceBySerialNumberSubset finds a subset of data for mobile devices by serial number.
+func (c *Client) GetMobileDeviceBySerialNumberSubset(ctx context.Context, serialnumber string, subset string) (*MobileDevice, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDevice
+	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s/subset/%s", prefix, url.PathEscape(serialnumber), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceBySerialNumberSubset(%s): %w", serialnumber, err)
+	}
+	return &result, nil
+}
+
+// GetMobileDeviceByUDIDSubset finds a subset of data for mobile devices by UDID.
+func (c *Client) GetMobileDeviceByUDIDSubset(ctx context.Context, udid string, subset string) (*MobileDevice, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDevice
+	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s/subset/%s", prefix, url.PathEscape(udid), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceByUDIDSubset(%s): %w", udid, err)
+	}
+	return &result, nil
+}

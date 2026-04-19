@@ -163,3 +163,18 @@ func TestListAdvancedMobileDeviceSearches_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestUpdateAdvancedMobileDeviceSearchByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/advancedmobiledevicesearches/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.UpdateAdvancedMobileDeviceSearchByName(context.Background(), "test-id", &AdvancedMobileDeviceSearch{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}

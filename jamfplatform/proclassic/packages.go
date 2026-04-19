@@ -64,3 +64,34 @@ func (c *Client) ListClassicPackages(ctx context.Context) (*Packages, error) {
 	}
 	return &result, nil
 }
+
+// DeleteClassicPackageByName deletes a package by name.
+func (c *Client) DeleteClassicPackageByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteClassicPackageByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// GetClassicPackageByName finds packages by name.
+func (c *Client) GetClassicPackageByName(ctx context.Context, name string) (*Package, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Package
+	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetClassicPackageByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateClassicPackageByName updates an existing package by name.
+func (c *Client) UpdateClassicPackageByName(ctx context.Context, name string, request *Package) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateClassicPackageByName(%s): %w", name, err)
+	}
+	return nil
+}

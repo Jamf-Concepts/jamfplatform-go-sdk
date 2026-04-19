@@ -95,3 +95,69 @@ func (c *Client) ListLDAPServers(ctx context.Context) (*LdapServers, error) {
 	}
 	return &result, nil
 }
+
+// GetLDAPServerByIDGroup display information for matching groups for an LDAP server.
+func (c *Client) GetLDAPServerByIDGroup(ctx context.Context, id string, group string) (*LdapServer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LdapServer
+	endpoint := fmt.Sprintf("%s/ldapservers/id/%s/group/%s", prefix, url.PathEscape(id), url.PathEscape(group))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLDAPServerByIDGroup(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetLDAPServerByIDGroupUser display information about user membership in a group for an LDAP server.
+func (c *Client) GetLDAPServerByIDGroupUser(ctx context.Context, id string, group string, user string) (*LdapServer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LdapServer
+	endpoint := fmt.Sprintf("%s/ldapservers/id/%s/group/%s/user/%s", prefix, url.PathEscape(id), url.PathEscape(group), url.PathEscape(user))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLDAPServerByIDGroupUser(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetLDAPServerByIDUser display information for matching users for an LDAP server.
+func (c *Client) GetLDAPServerByIDUser(ctx context.Context, id string, user string) (*LdapServer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LdapServer
+	endpoint := fmt.Sprintf("%s/ldapservers/id/%s/user/%s", prefix, url.PathEscape(id), url.PathEscape(user))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLDAPServerByIDUser(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetLDAPServerByNameGroup display information for matching groups for an LDAP server.
+func (c *Client) GetLDAPServerByNameGroup(ctx context.Context, name string, group string) (*LdapServer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LdapServer
+	endpoint := fmt.Sprintf("%s/ldapservers/name/%s/group/%s", prefix, url.PathEscape(name), url.PathEscape(group))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLDAPServerByNameGroup(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// GetLDAPServerByNameGroupUser display information about user membership in a group for an LDAP server.
+func (c *Client) GetLDAPServerByNameGroupUser(ctx context.Context, name string, group string, user string) (*LdapServer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LdapServer
+	endpoint := fmt.Sprintf("%s/ldapservers/name/%s/group/%s/user/%s", prefix, url.PathEscape(name), url.PathEscape(group), url.PathEscape(user))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLDAPServerByNameGroupUser(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// GetLDAPServerByNameUser display information for matching users for an LDAP server.
+func (c *Client) GetLDAPServerByNameUser(ctx context.Context, name string, user string) (*LdapServer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result LdapServer
+	endpoint := fmt.Sprintf("%s/ldapservers/name/%s/user/%s", prefix, url.PathEscape(name), url.PathEscape(user))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLDAPServerByNameUser(%s): %w", name, err)
+	}
+	return &result, nil
+}

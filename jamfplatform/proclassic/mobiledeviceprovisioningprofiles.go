@@ -107,3 +107,47 @@ func (c *Client) ListMobileDeviceProvisioningProfiles(ctx context.Context) (*Mob
 	}
 	return &result, nil
 }
+
+// CreateMobileDeviceProvisioningProfileByName creates a mobile device provisioning profiles by name.
+func (c *Client) CreateMobileDeviceProvisioningProfileByName(ctx context.Context, name string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceProvisioningProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateMobileDeviceProvisioningProfileByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// UpdateMobileDeviceProvisioningProfileByName updates an existing mobile device provisioning profiles by name.
+func (c *Client) UpdateMobileDeviceProvisioningProfileByName(ctx context.Context, name string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceProvisioningProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("UpdateMobileDeviceProvisioningProfileByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// CreateMobileDeviceProvisioningProfileByUUID creates a mobile device provisioning profiles by uuid.
+func (c *Client) CreateMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceProvisioningProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/uuid/%s", prefix, url.PathEscape(uuid))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateMobileDeviceProvisioningProfileByUUID(%s): %w", uuid, err)
+	}
+	return &result, nil
+}
+
+// UpdateMobileDeviceProvisioningProfileByUUID updates an existing mobile device provisioning profiles by uuid.
+func (c *Client) UpdateMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceProvisioningProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/uuid/%s", prefix, url.PathEscape(uuid))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("UpdateMobileDeviceProvisioningProfileByUUID(%s): %w", uuid, err)
+	}
+	return &result, nil
+}

@@ -96,3 +96,55 @@ func (c *Client) ListMobileDeviceEnrollmentProfiles(ctx context.Context) (*Mobil
 	}
 	return &result, nil
 }
+
+// GetMobileDeviceEnrollmentProfileByIDSubset finds a subset of data for an enrollment profile.
+func (c *Client) GetMobileDeviceEnrollmentProfileByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceEnrollmentProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceEnrollmentProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceEnrollmentProfileByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// DeleteMobileDeviceEnrollmentProfileByInvitation deletes a mobile device enrollment profile by invitation.
+func (c *Client) DeleteMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceEnrollmentProfileByInvitation(%s): %w", invitation, err)
+	}
+	return nil
+}
+
+// UpdateMobileDeviceEnrollmentProfileByInvitation updates an existing mobile device enrollment profile by invitation.
+func (c *Client) UpdateMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string, request *MobileDeviceEnrollmentProfilePost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateMobileDeviceEnrollmentProfileByInvitation(%s): %w", invitation, err)
+	}
+	return nil
+}
+
+// UpdateMobileDeviceEnrollmentProfileByName updates an existing mobile device enrollment profile by name.
+func (c *Client) UpdateMobileDeviceEnrollmentProfileByName(ctx context.Context, name string, request *MobileDeviceEnrollmentProfilePost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateMobileDeviceEnrollmentProfileByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// GetMobileDeviceEnrollmentProfileByNameSubset finds a subset of data for mobile device enrollment profiles by name.
+func (c *Client) GetMobileDeviceEnrollmentProfileByNameSubset(ctx context.Context, name string, subset string) (*MobileDeviceEnrollmentProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceEnrollmentProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceEnrollmentProfileByNameSubset(%s): %w", name, err)
+	}
+	return &result, nil
+}

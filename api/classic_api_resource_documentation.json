@@ -1001,6 +1001,38 @@
         },
         "type": "array"
       },
+      "commandflush": {
+        "properties": {
+          "mobile_devices": {
+            "properties": {
+              "mobile_device": {
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "Pending",
+              "Failed",
+              "Pending+Failed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
       "computer": {
         "properties": {
           "certificates": {
@@ -1925,6 +1957,87 @@
         "example": "2018/01/29",
         "type": "string"
       },
+      "computer_applications": {
+        "properties": {
+          "unique_computers": {
+            "properties": {
+              "computer": {
+                "items": {
+                  "$ref": "#/components/schemas/computer_applications_computer"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "versions": {
+            "properties": {
+              "version": {
+                "items": {
+                  "$ref": "#/components/schemas/computer_applications_version"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "computer_applications_computer": {
+        "properties": {
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "mac_address": {
+            "example": "E0:AC:CB:97:36:G4",
+            "type": "string"
+          },
+          "name": {
+            "example": "Admins MacBook Pro",
+            "type": "string"
+          },
+          "serial_number": {
+            "example": "C02Q7KHTGFWF",
+            "type": "string"
+          },
+          "udid": {
+            "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "computer_applications_number": {
+        "example": "10.1.1",
+        "type": "string"
+      },
+      "computer_applications_version": {
+        "items": {
+          "properties": {
+            "computers": {
+              "items": {
+                "properties": {
+                  "computer": {
+                    "$ref": "#/components/schemas/computer_applications_computer"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "number": {
+              "$ref": "#/components/schemas/computer_applications_number"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array",
+        "xml": {
+          "name": "version"
+        }
+      },
       "computer_check_in": {
         "properties": {
           "check_for_policies_at_login_logout": {
@@ -2385,6 +2498,190 @@
           }
         },
         "type": "array"
+      },
+      "computer_hardware_software_reports": {
+        "properties": {
+          "font_report": {
+            "properties": {
+              "date_time": {
+                "example": "2017-07-07T18:37:04Z",
+                "type": "string"
+              },
+              "date_time_epoch": {
+                "example": 1499470624555,
+                "type": "string"
+              },
+              "date_time_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "name": {
+                "example": "Al Nile.ttc",
+                "type": "string"
+              },
+              "path": {
+                "example": "/Library/Fonts/Al Nile.ttc",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "Added",
+                  "Deleted"
+                ],
+                "type": "string"
+              },
+              "version": {
+                "example": "n/a",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "hardware_report": {
+            "properties": {
+              "NIC_speed": {
+                "example": "n/a",
+                "type": "string"
+              },
+              "boot_partition_used_percent": {
+                "example": 19,
+                "type": "integer"
+              },
+              "core_count": {
+                "example": 2,
+                "type": "integer"
+              },
+              "date_time": {
+                "example": "2017-07-07T18:37:04Z",
+                "type": "string"
+              },
+              "date_time_epoch": {
+                "example": 1499470624555,
+                "type": "string"
+              },
+              "date_time_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "make": {
+                "example": "Apple",
+                "type": "string"
+              },
+              "model_identifier": {
+                "example": "MacBookPro11,1",
+                "type": "string"
+              },
+              "open_ram_slots": {
+                "example": 0,
+                "type": "integer"
+              },
+              "operating_system": {
+                "example": "Mac OS X 10.12.4",
+                "type": "string"
+              },
+              "optical_drive": {
+                "type": "string"
+              },
+              "processor_count": {
+                "example": 1,
+                "type": "integer"
+              },
+              "processor_speed_mhz": {
+                "example": 2600,
+                "type": "integer"
+              },
+              "serial_number": {
+                "example": "C02Q7KHTGFWF",
+                "type": "string"
+              },
+              "service_pack": {
+                "type": "string"
+              },
+              "total_harddrive_size": {
+                "example": "500.28 GB",
+                "type": "string"
+              },
+              "total_ram_mb": {
+                "example": 16384,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "plugin_report": {
+            "properties": {
+              "date_time": {
+                "example": "2017-07-07T18:37:04Z",
+                "type": "string"
+              },
+              "date_time_epoch": {
+                "example": 1499470624555,
+                "type": "string"
+              },
+              "date_time_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "name": {
+                "example": "Quartz Composer.webplugin",
+                "type": "string"
+              },
+              "path": {
+                "example": "/Library/Internet Plug-Ins/Quartz Composer.webplugin",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "Added",
+                  "Removed"
+                ],
+                "type": "string"
+              },
+              "version": {
+                "example": 1.4,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "software_report": {
+            "properties": {
+              "date_time": {
+                "example": "2017-07-07T18:37:04Z",
+                "type": "string"
+              },
+              "date_time_epoch": {
+                "example": 1499470624555,
+                "type": "string"
+              },
+              "date_time_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "name": {
+                "example": "Parallels Desktop.app",
+                "type": "string"
+              },
+              "path": {
+                "example": "/Applications/Parallels Desktop.app",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "Added",
+                  "Deleted"
+                ],
+                "type": "string"
+              },
+              "version": {
+                "example": 9,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
       },
       "computer_history": {
         "properties": {
@@ -5874,6 +6171,65 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "logflush": {
+        "properties": {
+          "computers": {
+            "properties": {
+              "computer": {
+                "properties": {
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "interval": {
+            "enum": [
+              "Zero Days",
+              "Zero Weeks",
+              "Zero Months",
+              "Zero Years",
+              "One Days",
+              "One Weeks",
+              "One Months",
+              "One Years",
+              "Two Days",
+              "Two Weeks",
+              "Two Months",
+              "Two Years",
+              "Three Days",
+              "Three Weeks",
+              "Three Months",
+              "Three Years",
+              "Six Days",
+              "Six Weeks",
+              "Six Months",
+              "Six Years"
+            ],
+            "type": "string"
+          },
+          "log": {
+            "enum": [
+              "policy"
+            ],
+            "type": "string"
+          },
+          "log_id": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "log",
+          "log_id",
+          "interval"
+        ],
         "type": "object"
       },
       "mac_application": {
@@ -14210,6 +14566,30 @@
         "tags": [
           "advancedcomputersearches"
         ]
+      },
+      "put": {
+        "operationId": "updateAdvancedComputerSearchByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing advanced computer search by name",
+        "tags": [
+          "advancedcomputersearches"
+        ],
+        "x-explorer-enabled": false
       }
     },
     "/advancedmobiledevicesearches": {
@@ -14405,6 +14785,30 @@
         "tags": [
           "advancedmobiledevicesearches"
         ]
+      },
+      "put": {
+        "operationId": "updateAdvancedMobileDeviceSearchByName",
+        "parameters": [
+          {
+            "description": "Nameto filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing advanced mobile device search by name",
+        "tags": [
+          "advancedmobiledevicesearches"
+        ],
+        "x-explorer-enabled": false
       }
     },
     "/advancedusersearches": {
@@ -14600,6 +15004,30 @@
         "tags": [
           "advancedusersearches"
         ]
+      },
+      "put": {
+        "operationId": "updateAdvancedUserSearchByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Updates an existing advanced user search by name",
+        "tags": [
+          "advancedusersearches"
+        ],
+        "x-explorer-enabled": false
       }
     },
     "/allowedfileextensions": {
@@ -15410,6 +15838,271 @@
         "x-explorer-enabled": false
       }
     },
+    "/commandflush": {
+      "delete": {
+        "operationId": "commandFlush",
+        "requestBody": {
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/commandflush"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Flushes commands based on information specified in an XML file",
+        "tags": [
+          "commandflush"
+        ]
+      }
+    },
+    "/commandflush/{idtype}/id/{id}/status/{status}": {
+      "delete": {
+        "operationId": "createCommandFlushWithIdAndStatus",
+        "parameters": [
+          {
+            "description": "Type of device to be flushed",
+            "in": "path",
+            "name": "idtype",
+            "required": true,
+            "schema": {
+              "enum": [
+                "computers",
+                "computergroups",
+                "mobiledevices",
+                "mobiledevicegroups"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of device to be flushed",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Command status to be flushed",
+            "in": "path",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "enum": [
+                "Pending",
+                "Failed",
+                "Pending+Failed"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Flushes commands for devices",
+        "tags": [
+          "commandflush"
+        ]
+      }
+    },
+    "/computerapplications/application/{application}": {
+      "get": {
+        "operationId": "findComputerApplicationsByName",
+        "parameters": [
+          {
+            "description": "Application name to filter by",
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_applications"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_applications"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer applications by name",
+        "tags": [
+          "computerapplications"
+        ]
+      }
+    },
+    "/computerapplications/application/{application}/inventory/{inventory}": {
+      "get": {
+        "description": "Valid values for inventory are comma separated Display Fields for computers. Display Fields with spaces must be percent encoded (e.g. /computerapplications/application/Safari.app/inventory/Operating%20System,Last%20Check-in)",
+        "operationId": "findComputerApplicationsByNameInventory",
+        "parameters": [
+          {
+            "description": "Application name to filter by",
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Inventory options",
+            "in": "path",
+            "name": "inventory",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_applications"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_applications"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer applications by name with additional display fields",
+        "tags": [
+          "computerapplications"
+        ]
+      }
+    },
+    "/computerapplications/application/{application}/version/{version}": {
+      "get": {
+        "operationId": "findComputerApplicationByNameAndVersion",
+        "parameters": [
+          {
+            "description": "Application name to filter by",
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Version to filter by",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_applications"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_applications"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer applications by name and version",
+        "tags": [
+          "computerapplications"
+        ]
+      }
+    },
+    "/computerapplications/application/{application}/version/{version}/inventory/{inventory}": {
+      "get": {
+        "description": "Generates additional inventory data for the devices matching the search criteria. Inventory values may be displayed in addition to computer identification information. Use Default to view the same fields as those checked for Inventory Display, otherwise list display fields separated by commas.",
+        "operationId": "findComputerApplicationsByNameAndVersionAndInventory",
+        "parameters": [
+          {
+            "description": "Application name to filter by",
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Version to filter by",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Inventory options",
+            "in": "path",
+            "name": "inventory",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_applications"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_applications"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer applications by name and version",
+        "tags": [
+          "computerapplications"
+        ]
+      }
+    },
     "/computerapplicationusage/id/{id}/{start_date}_{end_date}": {
       "get": {
         "operationId": "findComputerApplicationUsageById",
@@ -15462,6 +16155,226 @@
           }
         },
         "summary": "Finds computer application usage by computer ID",
+        "tags": [
+          "computerapplicationusage"
+        ]
+      }
+    },
+    "/computerapplicationusage/macaddress/{macaddress}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerApplicationUsageByMacAddress",
+        "parameters": [
+          {
+            "description": "MAC address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer application usage by computer MAC address",
+        "tags": [
+          "computerapplicationusage"
+        ]
+      }
+    },
+    "/computerapplicationusage/name/{name}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerApplicationUsageByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer application usage by computer name",
+        "tags": [
+          "computerapplicationusage"
+        ]
+      }
+    },
+    "/computerapplicationusage/serialnumber/{serialnumber}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerApplicationUsageBySerial",
+        "parameters": [
+          {
+            "description": "Serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer application usage by computer serial number",
+        "tags": [
+          "computerapplicationusage"
+        ]
+      }
+    },
+    "/computerapplicationusage/udid/{udid}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerApplicationUsageByUDID",
+        "parameters": [
+          {
+            "description": "UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_application_usage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer application usage by computer UDID",
         "tags": [
           "computerapplicationusage"
         ]
@@ -15541,6 +16454,89 @@
         "tags": [
           "computercommands"
         ]
+      }
+    },
+    "/computercommands/command/{command}": {
+      "post": {
+        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameter | Requirements |\n| ------- | --------- | ------------ |\n| DeleteUser (deprecated on 2025-02-25) (deprecated on 2025-02-25) | user_name | DEP enrolled device and user_name value (string) |\n| DisableRemoteDesktop | N/A | macOS 10.14.4 or later |\n| EnableRemoteDesktop | N/A | macOS 10.14.4 or later |\n| ScheduleOSUpdate (deprecated on 2022-10-17) | action | macOS 10.12.0 or later |\n| UnlockUserAccount (deprecated on 2025-07-07)| user_name |  DEP enrolled device and user_name value (string) |\n",
+        "operationId": "createComputerCommandByCommand",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "command",
+            "required": true,
+            "schema": {
+              "enum": [
+                "UnmanageDevice(UnmanageDevice Deprecated on 2024-06-27)",
+                "BlankPush(BlankPush Deprecated on 2025-05-27)",
+                "EnableRemoteDesktop (macOS 10.14.4 and later)",
+                "DisableRemoteDesktop (macOS 10.14.4 and later)",
+                "ScheduleOSUpdate. (ScheduleOSUpdate deprecated on 2022-10-17)"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new computer command using command name",
+        "tags": [
+          "computercommands"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/computercommands/command/{command}/action/{action}/id/{id}": {
+      "post": {
+        "operationId": "createComputerCommandByCommandAndAction",
+        "parameters": [
+          {
+            "description": "Id of computer or computers (supports comma separated values e.g. /id/8,10,55) to send the command",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "A value of \"install\" is similar to clicking the \"Download and Install Updates\" button on the UI. Any other value mimics the behavior of \"Download Updates\" from the UI.",
+            "in": "path",
+            "name": "action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "install"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Command to send to device.",
+            "in": "path",
+            "name": "command",
+            "required": true,
+            "schema": {
+              "enum": [
+                "ScheduleOSUpdate"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new computer command with a command specific action. Commands supported: ScheduleOSUpdate (deprecated on 2022-10-17)",
+        "tags": [
+          "computercommands"
+        ],
+        "x-explorer-enabled": false
       }
     },
     "/computercommands/command/{command}/id/{id}": {
@@ -16099,6 +17095,656 @@
         "x-explorer-enabled": false
       }
     },
+    "/computerhardwaresoftwarereports/id/{id}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerHardwareSoftwareReportsById",
+        "parameters": [
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds hardware/software reports by computer ID",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
+    "/computerhardwaresoftwarereports/id/{id}/{start_date}_{end_date}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/Software\u0026Hardware)",
+        "operationId": "findComputerHardwareSoftwareReportsByIdSubset",
+        "parameters": [
+          {
+            "description": "Computer ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "Software",
+                "Hardwre",
+                "Fonts",
+                "Plugins"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of hardware/software reports by computer ID",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
+    "/computerhardwaresoftwarereports/macaddress/{macaddress}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerHardwareSoftwareReportsByMacAddress",
+        "parameters": [
+          {
+            "description": "MAC address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds hardware/software reports by computer MAC address",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
+    "/computerhardwaresoftwarereports/macaddress/{macaddress}/{start_date}_{end_date}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/Software\u0026Hardware)",
+        "operationId": "findComputerHardwareSoftwareReportsByMacAddressSubset",
+        "parameters": [
+          {
+            "description": "MAC address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "Software",
+                "Hardwre",
+                "Fonts",
+                "Plugins"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of hardware/software reports by computer MAC address",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
+    "/computerhardwaresoftwarereports/name/{name}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerHardwareSoftwareReportsByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds hardware/software reports by computer name",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
+    "/computerhardwaresoftwarereports/name/{name}/{start_date}_{end_date}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/Software\u0026Hardware)",
+        "operationId": "findComputerHardwareSoftwareReportsByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "Software",
+                "Hardwre",
+                "Fonts",
+                "Plugins"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of hardware/software reports by computer name",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
+    "/computerhardwaresoftwarereports/serialnumber/{serialnumber}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerHardwareSoftwareReportsBySerial",
+        "parameters": [
+          {
+            "description": "Serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds hardware/software reports by computer serial number",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
+    "/computerhardwaresoftwarereports/serialnumber/{serialnumber}/{start_date}_{end_date}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/Software\u0026Hardware)",
+        "operationId": "findComputerHardwareSoftwareReportsBySerialSubset",
+        "parameters": [
+          {
+            "description": "Serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "Software",
+                "Hardwre",
+                "Fonts",
+                "Plugins"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of hardware/software reports by computer serial number",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
+    "/computerhardwaresoftwarereports/udid/{udid}/{start_date}_{end_date}": {
+      "get": {
+        "operationId": "findComputerHardwareSoftwareReportsByUDID",
+        "parameters": [
+          {
+            "description": "UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds hardware/software reports by computer UDID",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
+    "/computerhardwaresoftwarereports/udid/{udid}/{start_date}_{end_date}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/Software\u0026Hardware)",
+        "operationId": "findComputerHardwareSoftwareReportsByUDIDSubset",
+        "parameters": [
+          {
+            "description": "UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End date (e.g. yyyy-mm-dd)",
+            "in": "path",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "Software",
+                "Hardwre",
+                "Fonts",
+                "Plugins"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_hardware_software_reports"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of hardware/software reports by computer UDID",
+        "tags": [
+          "computerhardwaresoftwarereports"
+        ]
+      }
+    },
     "/computerhistory/id/{id}": {
       "get": {
         "operationId": "findComputerHistoryById",
@@ -16131,6 +17777,65 @@
           }
         },
         "summary": "Finds computer history by ID",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
+    "/computerhistory/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Commands)",
+        "operationId": "findComputerHistoryByIdSubset",
+        "parameters": [
+          {
+            "description": "Computer ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ComputerUsageLogs",
+                "Audits",
+                "PolicyLogs",
+                "CasperRemoteLogs",
+                "ScreenSharingLogs",
+                "CasperImagingLogs",
+                "Commands",
+                "UserLocation",
+                "MacAppStoreApplications"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer history data by ID",
         "tags": [
           "computerhistory"
         ]
@@ -16173,6 +17878,65 @@
         ]
       }
     },
+    "/computerhistory/macaddress/{macaddress}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Commands)",
+        "operationId": "findComputerHistoryByMacAddressSubset",
+        "parameters": [
+          {
+            "description": "Computer Mac Address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ComputerUsageLogs",
+                "Audits",
+                "PolicyLogs",
+                "CasperRemoteLogs",
+                "ScreenSharingLogs",
+                "CasperImagingLogs",
+                "Commands",
+                "UserLocation",
+                "MacAppStoreApplications"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer history data by MAC address",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
     "/computerhistory/name/{name}": {
       "get": {
         "operationId": "findComputerHistoryByName",
@@ -16205,6 +17969,65 @@
           }
         },
         "summary": "Finds computer history by name",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
+    "/computerhistory/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Commands)",
+        "operationId": "findComputerHistoryByNameSubset",
+        "parameters": [
+          {
+            "description": "Computer Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ComputerUsageLogs",
+                "Audits",
+                "PolicyLogs",
+                "CasperRemoteLogs",
+                "ScreenSharingLogs",
+                "CasperImagingLogs",
+                "Commands",
+                "UserLocation",
+                "MacAppStoreApplications"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer history data by name",
         "tags": [
           "computerhistory"
         ]
@@ -16247,6 +18070,65 @@
         ]
       }
     },
+    "/computerhistory/serialnumber/{serialnumber}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Commands)",
+        "operationId": "findComputerHistoryBySerialNumberSubset",
+        "parameters": [
+          {
+            "description": "Computer Serial Number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ComputerUsageLogs",
+                "Audits",
+                "PolicyLogs",
+                "CasperRemoteLogs",
+                "ScreenSharingLogs",
+                "CasperImagingLogs",
+                "Commands",
+                "UserLocation",
+                "MacAppStoreApplications"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer history data by serial number",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
     "/computerhistory/udid/{udid}": {
       "get": {
         "operationId": "findComputerHistoryByUDID",
@@ -16279,6 +18161,65 @@
           }
         },
         "summary": "Finds computer history by UDID",
+        "tags": [
+          "computerhistory"
+        ]
+      }
+    },
+    "/computerhistory/udid/{udid}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Commands)",
+        "operationId": "findComputerHistoryByUDIDSubset",
+        "parameters": [
+          {
+            "description": "Computer UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ComputerUsageLogs",
+                "Audits",
+                "PolicyLogs",
+                "CasperRemoteLogs",
+                "ScreenSharingLogs",
+                "CasperImagingLogs",
+                "Commands",
+                "UserLocation",
+                "MacAppStoreApplications"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer history data by UDID",
         "tags": [
           "computerhistory"
         ]
@@ -16451,6 +18392,97 @@
         "x-explorer-enabled": false
       }
     },
+    "/computerinvitations/invitation/{invitation}": {
+      "delete": {
+        "operationId": "deleteComputerInvitationByInvitation",
+        "parameters": [
+          {
+            "description": "Invitation value to filter by",
+            "in": "path",
+            "name": "invitation",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a computer invitation by invitation",
+        "tags": [
+          "computerinvitations"
+        ]
+      },
+      "get": {
+        "operationId": "findComputerInvitationsByInvitation",
+        "parameters": [
+          {
+            "description": "Invitation value to filter by",
+            "in": "path",
+            "name": "invitation",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_invitation"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_invitation"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds computer invitations by invitation",
+        "tags": [
+          "computerinvitations"
+        ]
+      },
+      "post": {
+        "operationId": "createComputerInvitationsByInvitation",
+        "parameters": [
+          {
+            "description": "Invitation value to filter by",
+            "in": "path",
+            "name": "invitation",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_invitation"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new computer invitation by invitation",
+        "tags": [
+          "computerinvitations"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
     "/computermanagement/id/{id}": {
       "get": {
         "operationId": "findComputerManagementById",
@@ -16483,6 +18515,223 @@
           }
         },
         "summary": "Finds computer management information by ID",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/id/{id}/patchfilter/{filter}": {
+      "get": {
+        "operationId": "findComputerManagementByIdPatchFilter",
+        "parameters": [
+          {
+            "description": "Computer ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "filter to apply",
+            "in": "path",
+            "name": "filter",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Display patch management information for a computer and filter",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementByIdSubset",
+        "parameters": [
+          {
+            "description": "Computer ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer management information by ID",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/id/{id}/username/{username}": {
+      "get": {
+        "operationId": "findComputerManagementByIdUsername",
+        "parameters": [
+          {
+            "description": "Computer ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds management information for a computer and username",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/id/{id}/username/{username}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementByIdUsernameSubset",
+        "parameters": [
+          {
+            "description": "Computer ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of management information for a computer and username",
         "tags": [
           "computermanagement"
         ]
@@ -16525,6 +18774,223 @@
         ]
       }
     },
+    "/computermanagement/macaddress/{macaddress}/patchfilter/{filter}": {
+      "get": {
+        "operationId": "findComputerManagementByMacAddressPatchFilter",
+        "parameters": [
+          {
+            "description": "Computer Mac address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "filter to apply",
+            "in": "path",
+            "name": "filter",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Display patch management information for a computer and filter",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/macaddress/{macaddress}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementByMacAddressSubset",
+        "parameters": [
+          {
+            "description": "Computer Mac Address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer management information by MAC address",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/macaddress/{macaddress}/username/{username}": {
+      "get": {
+        "operationId": "findComputerManagementByMacAddressUsername",
+        "parameters": [
+          {
+            "description": "Computer Mac address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds management information for a computer and username",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/macaddress/{macaddress}/username/{username}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementByMacAddressUsernameSubset",
+        "parameters": [
+          {
+            "description": "Computer Mac Address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of management information for a computer and username",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
     "/computermanagement/name/{name}": {
       "get": {
         "operationId": "findComputerManagementByName",
@@ -16557,6 +19023,223 @@
           }
         },
         "summary": "Finds computer management information by name",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/name/{name}/patchfilter/{filter}": {
+      "get": {
+        "operationId": "findComputerManagementByNamePatchFilter",
+        "parameters": [
+          {
+            "description": "Computer name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "filter to apply",
+            "in": "path",
+            "name": "filter",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Display patch management information for a computer and filter",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementByNameSubset",
+        "parameters": [
+          {
+            "description": "Computer Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer management information by name",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/name/{name}/username/{username}": {
+      "get": {
+        "operationId": "findComputerManagementByNameUsername",
+        "parameters": [
+          {
+            "description": "Computer name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds management information for a computer and username",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/name/{name}/username/{username}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementByNameUsernameSubset",
+        "parameters": [
+          {
+            "description": "Computer name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of management information for a computer and username",
         "tags": [
           "computermanagement"
         ]
@@ -16599,6 +19282,223 @@
         ]
       }
     },
+    "/computermanagement/serialnumber/{serialnumber}/patchfilter/{filter}": {
+      "get": {
+        "operationId": "findComputerManagementBySerialNumberPatchFilter",
+        "parameters": [
+          {
+            "description": "Computer serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "filter to apply",
+            "in": "path",
+            "name": "filter",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Display patch management information for a computer and filter",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/serialnumber/{serialnumber}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementBySerialNumberSubset",
+        "parameters": [
+          {
+            "description": "Computer Serial Number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer management information by serial number",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/serialnumber/{serialnumber}/username/{username}": {
+      "get": {
+        "operationId": "findComputerManagementBySerialNumberUsername",
+        "parameters": [
+          {
+            "description": "Computer serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds management information for a computer and username",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/serialnumber/{serialnumber}/username/{username}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementBySerialNumberUsernameSubset",
+        "parameters": [
+          {
+            "description": "Computer serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of management information for a computer and username",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
     "/computermanagement/udid/{udid}": {
       "get": {
         "operationId": "findComputerManagementByUDID",
@@ -16631,6 +19531,223 @@
           }
         },
         "summary": "Finds computer management information by UDID",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/udid/{udid}/patchfilter/{filter}": {
+      "get": {
+        "operationId": "findComputerManagementByUdidPatchFilter",
+        "parameters": [
+          {
+            "description": "Computer UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "filter to apply",
+            "in": "path",
+            "name": "filter",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Display patch management information for a computer and filter",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/udid/{udid}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementByUDIDSubset",
+        "parameters": [
+          {
+            "description": "Computer UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of computer management information by UDID",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/udid/{udid}/username/{username}": {
+      "get": {
+        "operationId": "findComputerManagementByUdidUsername",
+        "parameters": [
+          {
+            "description": "Computer UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds management information for a computer and username",
+        "tags": [
+          "computermanagement"
+        ]
+      }
+    },
+    "/computermanagement/udid/{udid}/username/{username}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Policies)",
+        "operationId": "findComputerManagementByUdidUsernameSubset",
+        "parameters": [
+          {
+            "description": "Computer UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Username to filter by",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Policies",
+                "Ebooks",
+                "MacAppStoreApps",
+                "OSXConfigurationProfiles",
+                "RestrictedSoftware",
+                "SmartGroups",
+                "StaticGroups",
+                "PatchReportingSoftwareTitles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer_management"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of management information for a computer and username",
         "tags": [
           "computermanagement"
         ]
@@ -18254,6 +21371,46 @@
         "x-explorer-enabled": false
       }
     },
+    "/ebooks/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findEbookssByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for an ebook by ID",
+        "tags": [
+          "ebooks"
+        ]
+      }
+    },
     "/ebooks/name/{name}": {
       "delete": {
         "operationId": "deleteEBookByName",
@@ -18336,6 +21493,125 @@
           "ebooks"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/ebooks/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findEBooksByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ebook"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ebook"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for ebooks by name",
+        "tags": [
+          "ebooks"
+        ]
+      }
+    },
+    "/fileuploads/{resource}/{idType}/{id}": {
+      "post": {
+        "description": "Here is a sample command curl -k -u user:password https://my.server.com:8443/JSSResource/fileuploads/computers/id/2 -F name=@/Users/admin/Documents/Sample.doc -X POST",
+        "operationId": "uploadFiles",
+        "parameters": [
+          {
+            "description": "Resource to attach the file to",
+            "in": "path",
+            "name": "resource",
+            "required": true,
+            "schema": {
+              "enum": [
+                "computers",
+                "mobiledevices",
+                "enrollmentprofiles",
+                "printers",
+                "peripherals",
+                "policies",
+                "ebooks",
+                "mobiledeviceapplicationsicon",
+                "mobiledeviceapplicationsipa",
+                "diskencryptionconfigurations"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Name is supported for all but the peripherals resource",
+            "in": "path",
+            "name": "idType",
+            "required": true,
+            "schema": {
+              "enum": [
+                "id",
+                "name"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Uploads the .ipa to Jamf Cloud Distribution Service instead of the Jamf Pro database. Only supported for Jamf Cloud customers and the `mobiledeviceapplicationsipa` resource.",
+            "in": "query",
+            "name": "FORCE_IPA_UPLOAD",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates file attachments in Jamf Pro",
+        "tags": [
+          "fileuploads"
+        ]
       }
     },
     "/gsxconnection": {
@@ -19170,6 +22446,120 @@
         "x-explorer-enabled": false
       }
     },
+    "/ldapservers/id/{id}/group/{group}": {
+      "get": {
+        "description": "Displays information about matching groups for an ldap server specified with the {id} parameter.",
+        "operationId": "findLDAPServerGroupById",
+        "parameters": [
+          {
+            "description": "Server ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Group to filter by",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Display information for matching groups for an LDAP server",
+        "tags": [
+          "ldapservers"
+        ]
+      }
+    },
+    "/ldapservers/id/{id}/group/{group}/user/{user}": {
+      "get": {
+        "description": "Displays information about user membership in a group for an ldap server specified with the {id} parameter. Multiple users separated by a comma are allowed.",
+        "operationId": "findLDAPServerGroupUserById",
+        "parameters": [
+          {
+            "description": "Server ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Group to filter by",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "User to filter by",
+            "in": "path",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Display information about user membership in a group for an LDAP server",
+        "tags": [
+          "ldapservers"
+        ]
+      }
+    },
+    "/ldapservers/id/{id}/user/{user}": {
+      "get": {
+        "description": "Displays information about matching users for an ldap server specified with the {id} parameter.",
+        "operationId": "findLDAPServerUserById",
+        "parameters": [
+          {
+            "description": "Server ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "User to filter by",
+            "in": "path",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Display information for matching users for an LDAP server",
+        "tags": [
+          "ldapservers"
+        ]
+      }
+    },
     "/ldapservers/name/{name}": {
       "delete": {
         "operationId": "deleteLDAPServerByName",
@@ -19240,6 +22630,120 @@
           "ldapservers"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/ldapservers/name/{name}/group/{group}": {
+      "get": {
+        "description": "Displays information about matching groups for an ldap server specified with the {name} parameter.",
+        "operationId": "findLDAPServerGroupByName",
+        "parameters": [
+          {
+            "description": "Server name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Group to filter by",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Display information for matching groups for an LDAP server",
+        "tags": [
+          "ldapservers"
+        ]
+      }
+    },
+    "/ldapservers/name/{name}/group/{group}/user/{user}": {
+      "get": {
+        "description": "Displays information about user membership in a group for an ldap server specified with the {name} parameter. Multiple users separated by a comma are allowed.",
+        "operationId": "findLDAPServerGroupUserByName",
+        "parameters": [
+          {
+            "description": "Server name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Group to filter by",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "User to filter by",
+            "in": "path",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Display information about user membership in a group for an LDAP server",
+        "tags": [
+          "ldapservers"
+        ]
+      }
+    },
+    "/ldapservers/name/{name}/user/{user}": {
+      "get": {
+        "description": "Displays information about matching users for an ldap server specified with the {name} parameter.",
+        "operationId": "findLDAPServerUserByName",
+        "parameters": [
+          {
+            "description": "Server name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "User to filter by",
+            "in": "path",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Display information for matching users for an LDAP server",
+        "tags": [
+          "ldapservers"
+        ]
       }
     },
     "/licensedsoftware": {
@@ -19464,6 +22968,114 @@
         "x-explorer-enabled": false
       }
     },
+    "/logflush": {
+      "delete": {
+        "operationId": "logFlush",
+        "requestBody": {
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/logflush"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Flushes a log specified in an XML file",
+        "tags": [
+          "logflush"
+        ]
+      }
+    },
+    "/logflush/{log}/id/{id}/interval/{interval}": {
+      "delete": {
+        "operationId": "createLogFlushWithIdAndInterval",
+        "parameters": [
+          {
+            "description": "ID of policy whose log will be flushed",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "At this time, only 'policy' logs are supported",
+            "in": "path",
+            "name": "log",
+            "required": true,
+            "schema": {
+              "enum": [
+                "policy"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Supported values are a combination of [Zero, One, Two, Three, Six] and [Days, Weeks, Months, Years]. For example, JSSResource/logflush/policies/id/1/interval/Three+Months",
+            "in": "path",
+            "name": "interval",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Flushes a single log for a given interval",
+        "tags": [
+          "logflush"
+        ]
+      }
+    },
+    "/logflush/{log}/interval/{interval}": {
+      "delete": {
+        "operationId": "createLogFlushForInterval",
+        "parameters": [
+          {
+            "description": "Supported values are a combination of [Zero, One, Two, Three, Six] and [Days, Weeks, Months, Years]. For example, JSSResource/logflush/policies/interval/Three+Months",
+            "in": "path",
+            "name": "interval",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "At this time, only 'policy' logs are supported",
+            "in": "path",
+            "name": "log",
+            "required": true,
+            "schema": {
+              "enum": [
+                "policy"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Flushes all logs for a given interval",
+        "tags": [
+          "logflush"
+        ]
+      }
+    },
     "/macapplications": {
       "get": {
         "operationId": "findMacapps",
@@ -19601,6 +23213,48 @@
         "x-explorer-enabled": false
       }
     },
+    "/macapplications/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findMacappsByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService",
+                "VPPCodes",
+                "VPP"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of date for a mac application by ID",
+        "tags": [
+          "macapplications"
+        ]
+      }
+    },
     "/macapplications/name/{name}": {
       "delete": {
         "operationId": "deleteMacappByName",
@@ -19686,6 +23340,60 @@
         "x-explorer-enabled": false
       }
     },
+    "/macapplications/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findMacappsByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService",
+                "VPPCodes",
+                "VPP"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mac_application"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mac_application"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mac applications by name",
+        "tags": [
+          "macapplications"
+        ]
+      }
+    },
     "/mobiledeviceapplications": {
       "get": {
         "operationId": "findMobileDeviceApplications",
@@ -19713,6 +23421,29 @@
       }
     },
     "/mobiledeviceapplications/bundleid/{bundleid}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceApplicationByBundleID",
+        "parameters": [
+          {
+            "description": "Bundle ID value to filter by",
+            "in": "path",
+            "name": "bundleid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device application by bundle ID",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      },
       "get": {
         "description": "If multiple applications match, no application is returned. You may specify both bundle id and version to uniquely identify a mobile device application.",
         "operationId": "findMobileDeviceApplicationsByBundleID",
@@ -19748,6 +23479,141 @@
         "tags": [
           "mobiledeviceapplications"
         ]
+      },
+      "put": {
+        "operationId": "updateMobileDeviceApplicationByBundleID",
+        "parameters": [
+          {
+            "description": "Bundle ID value to filter by",
+            "in": "path",
+            "name": "bundleid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device application by bundle ID",
+        "tags": [
+          "mobiledeviceapplications"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceapplications/bundleid/{bundleid}/version/{version}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceApplicationByBundleIDandVersion",
+        "parameters": [
+          {
+            "description": "Bundle ID value to filter by",
+            "in": "path",
+            "name": "bundleid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Version to filter by",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device application by bundle ID and version",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceApplicationsByBundleIDandVersion",
+        "parameters": [
+          {
+            "description": "Bundle ID to filter by",
+            "in": "path",
+            "name": "bundleid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Version to filter by",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device applications by bundle ID and version",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      },
+      "put": {
+        "operationId": "updateMobileDeviceApplicationByBundleIDandVersion",
+        "parameters": [
+          {
+            "description": "Bundle ID value to filter by",
+            "in": "path",
+            "name": "bundleid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Version to filter by",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device application by bundle ID and version",
+        "tags": [
+          "mobiledeviceapplications"
+        ],
+        "x-explorer-enabled": false
       }
     },
     "/mobiledeviceapplications/id/{id}": {
@@ -19861,6 +23727,49 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledeviceapplications/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findMobileDeviceAppsByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService",
+                "VPPCodes",
+                "VPP",
+                "AppConfiguration"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for a mobile device application by ID",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      }
+    },
     "/mobiledeviceapplications/name/{name}": {
       "delete": {
         "operationId": "deleteMobileDeviceApplicationByName",
@@ -19945,6 +23854,61 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledeviceapplications/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findMobileDeviceApplicationsByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService",
+                "VPPCodes",
+                "VPP",
+                "AppConfiguration"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_application"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile device applications by name",
+        "tags": [
+          "mobiledeviceapplications"
+        ]
+      }
+    },
     "/mobiledevicecommands": {
       "get": {
         "operationId": "findMobileDeviceCommands",
@@ -19987,6 +23951,186 @@
           "required": true,
           "x-originalParamName": "body"
         },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new mobile device command",
+        "tags": [
+          "mobiledevicecommands"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevicecommands/command/ScheduleOSUpdate/{install_action}/id/{id_list}": {
+      "post": {
+        "operationId": "createMobileScheduleOSUpdateCommandURL",
+        "parameters": [
+          {
+            "description": "Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15)",
+            "in": "path",
+            "name": "id_list",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Specify the behavior of the install. Possible integer values are: 1 (Download the update for users to install), 2 (Download and install the update, and restart devices after installation)",
+            "in": "path",
+            "name": "install_action",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                2
+              ],
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new command to request that a mobile device update its OS. Command and mobile device list specified in URL. Device will be updated to the latest OS version based on device eligibility. (deprecated on 2022-10-17)",
+        "tags": [
+          "mobiledevicecommands"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevicecommands/command/ScheduleOSUpdate/{install_action}/{product_version}/id/{id_list}": {
+      "post": {
+        "operationId": "createMobileScheduleOSUpdateCommandWithProductVersionURL",
+        "parameters": [
+          {
+            "description": "Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15)",
+            "in": "path",
+            "name": "id_list",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Specify the behavior of the install. Possible integer values are: 1 (Download the update for users to install), 2 (Download and install the update, and restart devices after installation)",
+            "in": "path",
+            "name": "install_action",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                2
+              ],
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Specify the OS version of the update. Updating to a specific iOS version requires devices with iOS 11.3 or later. Updating to a specific tvOS version requires devices with tvOS 12.2 or later. install_action required by the ScheduleOSUpdate command if product_version is specified.",
+            "in": "path",
+            "name": "product_version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new command to request that a mobile device update its OS. Command and mobile device list specified in URL. Mixing iOS and tvOS devices in ID list is not advised, as product version is specific to OS type. (deprecated on 2022-10-17)",
+        "tags": [
+          "mobiledevicecommands"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevicecommands/command/{command}": {
+      "get": {
+        "operationId": "findMobileDeviceCommandsByCommand",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "command",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_command"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_command"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all mobile device commands for specified command",
+        "tags": [
+          "mobiledevicecommands"
+        ]
+      }
+    },
+    "/mobiledevicecommands/command/{command}/id/{id_list}": {
+      "post": {
+        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values |\n| ---------- | ------- | ------------ | ------ |\n| DeviceLocation | N/A | Supervised and in lost mode | N/A |\n| DisableLostMode | N/A | Supervised and in lost mode | N/A |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string |\n| EnableLostMode | lost_mode_footnote | optional | string |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer) |\n| PlayLostModeSound | N/A | Supervised and in lost mode | N/A |\n| RestartDevice (deprecated) | N/A | Supervised device | N/A |\n",
+        "operationId": "createMobileDeviceCommandURL",
+        "parameters": [
+          {
+            "description": "Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15)",
+            "in": "path",
+            "name": "id_list",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Command to send device",
+            "in": "path",
+            "name": "command",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BlankPush(Deprecated on 2025-05-27)",
+                "ClearPasscode (Deprecated on 2025-04-03)",
+                "ClearRestrictionsPassword (Deprecated 2024-04-11)",
+                "DeviceLocation",
+                "DisableLostMode",
+                "EnableLostMode",
+                "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)",
+                "PlayLostModeSound",
+                "RestartDevice (deprecated on 2025-02-25)",
+                "Settings",
+                "SettingsEnablePersonalHotspot (Deprecated 2024-04-24)",
+                "SettingsDisablePersonalHotspot (Deprecated 2024-04-24)",
+                "SettingsDisableDataRoaming (Deprecated 2024-04-24)",
+                "SettingsDisableVoiceRoaming (Deprecated 2024-04-24)",
+                "SettingsEnableDataRoaming (Deprecated 2024-04-24)",
+                "SettingsEnableVoiceRoaming",
+                "UnmanageDevice (Deprecated on 2024-06-27)",
+                "UpdateInventory"
+              ],
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -20208,6 +24352,46 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledeviceconfigurationprofiles/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findMobileDeviceConfigurationProfilesByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for a mobile device configuration profile by ID",
+        "tags": [
+          "mobiledeviceconfigurationprofiles"
+        ]
+      }
+    },
     "/mobiledeviceconfigurationprofiles/name/{name}": {
       "delete": {
         "operationId": "deleteMobileDeviceConfigurationProfileByName",
@@ -20290,6 +24474,58 @@
           "mobiledeviceconfigurationprofiles"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceconfigurationprofiles/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findMobileDeviceConfigurationProfilesByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_configuration_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_configuration_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile device configuration profiles by name",
+        "tags": [
+          "mobiledeviceconfigurationprofiles"
+        ]
       }
     },
     "/mobiledeviceenrollmentprofiles": {
@@ -20427,7 +24663,71 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledeviceenrollmentprofiles/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Location)",
+        "operationId": "findMobileDeviceEnrollmentProfilesByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Location",
+                "Purchasing",
+                "Attachments"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for an enrollment profile",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ]
+      }
+    },
     "/mobiledeviceenrollmentprofiles/invitation/{invitation}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceEnrollmentProfileByInvitation",
+        "parameters": [
+          {
+            "description": "Invitation value to filter by",
+            "in": "path",
+            "name": "invitation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device enrollment profile by invitation",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ]
+      },
       "get": {
         "operationId": "findMobileDeviceEnrollmentProfilesByInvitation",
         "parameters": [
@@ -20462,6 +24762,30 @@
         "tags": [
           "mobiledeviceenrollmentprofiles"
         ]
+      },
+      "put": {
+        "operationId": "updateMobileDeviceEnrollmentProfileByInvitation",
+        "parameters": [
+          {
+            "description": "Invitation value to filter by",
+            "in": "path",
+            "name": "invitation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device enrollment profile by invitation",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ],
+        "x-explorer-enabled": false
       }
     },
     "/mobiledeviceenrollmentprofiles/name/{name}": {
@@ -20519,6 +24843,83 @@
           }
         },
         "summary": "Finds mobile device enrollment profiles by name",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ]
+      },
+      "put": {
+        "operationId": "updateMobileDeviceEnrollmentProfileByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing mobile device enrollment profile by name",
+        "tags": [
+          "mobiledeviceenrollmentprofiles"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceenrollmentprofiles/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Location)",
+        "operationId": "findMobileDeviceEnrollmentProfilesByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Location",
+                "Purchasing",
+                "Attachments"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_enrollment_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile device enrollment profiles by name",
         "tags": [
           "mobiledeviceenrollmentprofiles"
         ]
@@ -21001,6 +25402,49 @@
         ]
       }
     },
+    "/mobiledevicehistory/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Audits)",
+        "operationId": "findMobileDeviceHistoryByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ManagementCommands",
+                "UserLocation",
+                "Audits",
+                "Applications",
+                "Ebooks"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "finds a subset of data for a mobile device history",
+        "tags": [
+          "mobiledevicehistory"
+        ]
+      }
+    },
     "/mobiledevicehistory/macaddress/{macaddress}": {
       "get": {
         "operationId": "findMobileDeviceHistoryByMacAddress",
@@ -21033,6 +25477,61 @@
           }
         },
         "summary": "Finds mobile device history by wifi mac address",
+        "tags": [
+          "mobiledevicehistory"
+        ]
+      }
+    },
+    "/mobiledevicehistory/macaddress/{macaddress}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Audits)",
+        "operationId": "findMobileDeviceHistoryByMacAddressSubset",
+        "parameters": [
+          {
+            "description": "Mac address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ManagementCommands",
+                "UserLocation",
+                "Audits",
+                "Applications",
+                "Ebooks"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile device history by wifi mac address",
         "tags": [
           "mobiledevicehistory"
         ]
@@ -21075,6 +25574,61 @@
         ]
       }
     },
+    "/mobiledevicehistory/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Audits)",
+        "operationId": "findMobileDeviceHistoryByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ManagementCommands",
+                "UserLocation",
+                "Audits",
+                "Applications",
+                "Ebooks"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile device history by name",
+        "tags": [
+          "mobiledevicehistory"
+        ]
+      }
+    },
     "/mobiledevicehistory/serialnumber/{serialnumber}": {
       "get": {
         "operationId": "findMobileDeviceHistoryBySerialNumber",
@@ -21112,6 +25666,61 @@
         ]
       }
     },
+    "/mobiledevicehistory/serialnumber/{serialnumber}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Audits)",
+        "operationId": "findMobileDeviceHistoryBySerialNumberSubset",
+        "parameters": [
+          {
+            "description": "Serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ManagementCommands",
+                "UserLocation",
+                "Audits",
+                "Applications",
+                "Ebooks"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile device history by serial number",
+        "tags": [
+          "mobiledevicehistory"
+        ]
+      }
+    },
     "/mobiledevicehistory/udid/{udid}": {
       "get": {
         "operationId": "findMobileDeviceHistoryByUDID",
@@ -21144,6 +25753,61 @@
           }
         },
         "summary": "Finds mobile device history by UDID",
+        "tags": [
+          "mobiledevicehistory"
+        ]
+      }
+    },
+    "/mobiledevicehistory/udid/{udid}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Audits)",
+        "operationId": "findMobileDeviceHistoryByUDIDSubset",
+        "parameters": [
+          {
+            "description": "UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "ManagementCommands",
+                "UserLocation",
+                "Audits",
+                "Applications",
+                "Ebooks"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_history"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile device history by UDID",
         "tags": [
           "mobiledevicehistory"
         ]
@@ -21260,6 +25924,97 @@
           }
         },
         "summary": "Creates a new mobile device invitation by id",
+        "tags": [
+          "mobiledeviceinvitations"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/mobiledeviceinvitations/invitation/{invitation}": {
+      "delete": {
+        "operationId": "deleteMobileDeviceInvitationByInvitation",
+        "parameters": [
+          {
+            "description": "Invitation value to filter by",
+            "in": "path",
+            "name": "invitation",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a mobile device invitation by invitation",
+        "tags": [
+          "mobiledeviceinvitations"
+        ]
+      },
+      "get": {
+        "operationId": "findMobileDeviceInvitationsByInvitation",
+        "parameters": [
+          {
+            "description": "Invitation value to filter by",
+            "in": "path",
+            "name": "invitation",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_invitation"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_invitation"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds mobile device invitations by invitation",
+        "tags": [
+          "mobiledeviceinvitations"
+        ]
+      },
+      "post": {
+        "operationId": "createMobileDeviceInvitationsByInvitation",
+        "parameters": [
+          {
+            "description": "Invitation value to filter by",
+            "in": "path",
+            "name": "invitation",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_invitation_post"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a new mobile device invitation by invitation",
         "tags": [
           "mobiledeviceinvitations"
         ],
@@ -21470,6 +26225,66 @@
         "tags": [
           "mobiledeviceprovisioningprofiles"
         ]
+      },
+      "post": {
+        "operationId": "createMobileDeviceProvisioningProfilesByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a mobile device provisioning profiles by name",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateMobileDeviceProvisioningProfilesByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Updates an existing mobile device provisioning profiles by name",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ],
+        "x-explorer-enabled": false
       }
     },
     "/mobiledeviceprovisioningprofiles/uuid/{uuid}": {
@@ -21530,6 +26345,66 @@
         "tags": [
           "mobiledeviceprovisioningprofiles"
         ]
+      },
+      "post": {
+        "operationId": "createMobileDeviceProvisioningProfilesByUUID",
+        "parameters": [
+          {
+            "description": "Uuid value to filter by",
+            "in": "path",
+            "name": "uuid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Creates a mobile device provisioning profiles by uuid",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updateMobileDeviceProvisioningProfilesByUUID",
+        "parameters": [
+          {
+            "description": "Uuid value to filter by",
+            "in": "path",
+            "name": "uuid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device_provisioning_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Updates an existing mobile device provisioning profiles by uuid",
+        "tags": [
+          "mobiledeviceprovisioningprofiles"
+        ],
+        "x-explorer-enabled": false
       }
     },
     "/mobiledevices": {
@@ -21669,6 +26544,54 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledevices/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Location)",
+        "operationId": "findMobileDevicesByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Location",
+                "Purchasing",
+                "Applications",
+                "Security",
+                "Network",
+                "Certificates",
+                "ConfigurationProfiles",
+                "ProvisioningProfiles",
+                "MobileDeviceGroups",
+                "ExtensionAttributes"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for a mobile device",
+        "tags": [
+          "mobiledevices"
+        ]
+      }
+    },
     "/mobiledevices/macaddress/{macaddress}": {
       "delete": {
         "operationId": "deleteMobileDeviceByMacAddress",
@@ -21752,6 +26675,104 @@
           "mobiledevices"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevices/macaddress/{macaddress}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Location)",
+        "operationId": "findMobileDevicesByMacAddressSubset",
+        "parameters": [
+          {
+            "description": "Mac address to filter by",
+            "in": "path",
+            "name": "macaddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Location",
+                "Purchasing",
+                "Applications",
+                "Security",
+                "Network",
+                "Certificates",
+                "ConfigurationProfiles",
+                "ProvisioningProfiles",
+                "MobileDeviceGroups",
+                "ExtensionAttributes"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile devices by Mac address",
+        "tags": [
+          "mobiledevices"
+        ]
+      }
+    },
+    "/mobiledevices/match/{match}": {
+      "get": {
+        "description": "Match performs the same function as a simple search in the GUI.",
+        "operationId": "matchMobileDevices",
+        "parameters": [
+          {
+            "description": "Name, mac address, etc. to filter by. Match uses the same format as the general search in Jamf Pro.",
+            "in": "path",
+            "name": "match",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Searches for mobile devices that match the provided parameter",
+        "tags": [
+          "mobiledevices"
+        ]
       }
     },
     "/mobiledevices/name/{name}": {
@@ -21839,6 +26860,66 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledevices/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Location)",
+        "operationId": "findMobileDevicesByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Location",
+                "Purchasing",
+                "Applications",
+                "Security",
+                "Network",
+                "Certificates",
+                "ConfigurationProfiles",
+                "ProvisioningProfiles",
+                "MobileDeviceGroups",
+                "ExtensionAttributes"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile devices by name",
+        "tags": [
+          "mobiledevices"
+        ]
+      }
+    },
     "/mobiledevices/serialnumber/{serialnumber}": {
       "delete": {
         "operationId": "deleteMobileDeviceBySerialNumber",
@@ -21924,6 +27005,66 @@
         "x-explorer-enabled": false
       }
     },
+    "/mobiledevices/serialnumber/{serialnumber}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Location)",
+        "operationId": "findMobileDevicesBySerialNumberSubset",
+        "parameters": [
+          {
+            "description": "Serial number to filter by",
+            "in": "path",
+            "name": "serialnumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Location",
+                "Purchasing",
+                "Applications",
+                "Security",
+                "Network",
+                "Certificates",
+                "ConfigurationProfiles",
+                "ProvisioningProfiles",
+                "MobileDeviceGroups",
+                "ExtensionAttributes"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile devices by serial number",
+        "tags": [
+          "mobiledevices"
+        ]
+      }
+    },
     "/mobiledevices/udid/{udid}": {
       "delete": {
         "operationId": "deleteMobileDeviceByUDID",
@@ -22007,6 +27148,66 @@
           "mobiledevices"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/mobiledevices/udid/{udid}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Location)",
+        "operationId": "findMobileDevicesByUDIDSubset",
+        "parameters": [
+          {
+            "description": "UDID to filter by",
+            "in": "path",
+            "name": "udid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Location",
+                "Purchasing",
+                "Applications",
+                "Security",
+                "Network",
+                "Certificates",
+                "ConfigurationProfiles",
+                "ProvisioningProfiles",
+                "MobileDeviceGroups",
+                "ExtensionAttributes"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mobile_device"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for mobile devices by UDID",
+        "tags": [
+          "mobiledevices"
+        ]
       }
     },
     "/networksegments": {
@@ -22363,6 +27564,46 @@
         "x-explorer-enabled": false
       }
     },
+    "/osxconfigurationprofiles/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findOsxConfigurationProfilesByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for an OS X configuration profile",
+        "tags": [
+          "osxconfigurationprofiles"
+        ]
+      }
+    },
     "/osxconfigurationprofiles/name/{name}": {
       "delete": {
         "operationId": "deleteOsxConfigurationProfileByName",
@@ -22445,6 +27686,58 @@
           "osxconfigurationprofiles"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/osxconfigurationprofiles/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findOsxConfigurationProfilesByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/os_x_configuration_profile"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/os_x_configuration_profile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for OS X configuration profiles by name",
+        "tags": [
+          "osxconfigurationprofiles"
+        ]
       }
     },
     "/packages": {
@@ -22576,6 +27869,90 @@
           }
         },
         "summary": "Updates an existing package by ID",
+        "tags": [
+          "packages"
+        ],
+        "x-explorer-enabled": false
+      }
+    },
+    "/packages/name/{name}": {
+      "delete": {
+        "operationId": "deletePackageByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletes a package by name",
+        "tags": [
+          "packages"
+        ]
+      },
+      "get": {
+        "operationId": "findPackagesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/package"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/package"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds packages by name",
+        "tags": [
+          "packages"
+        ]
+      },
+      "put": {
+        "operationId": "updatePackageByName",
+        "parameters": [
+          {
+            "description": "Name value to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates an existing package by name",
         "tags": [
           "packages"
         ],
@@ -22929,6 +28306,54 @@
         "tags": [
           "patchexternalsources"
         ]
+      },
+      "post": {
+        "operationId": "createPatchExternalSourcesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created"
+          }
+        },
+        "summary": "Create a new patch external source by name",
+        "tags": [
+          "patchexternalsources"
+        ],
+        "x-explorer-enabled": false
+      },
+      "put": {
+        "operationId": "updatePatchExternalSourcesByName",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created"
+          }
+        },
+        "summary": "Updates a patch external source by name",
+        "tags": [
+          "patchexternalsources"
+        ],
+        "x-explorer-enabled": false
       }
     },
     "/patchinternalsources": {
@@ -23140,6 +28565,57 @@
           "patchpolicies"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/patchpolicies/id/{id}/subset/{subset}": {
+      "get": {
+        "operationId": "findPatchPoliciesByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "UserInteraction"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Display subsets of information for a patch policy",
+        "tags": [
+          "patchpolicies"
+        ]
       }
     },
     "/patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}": {
@@ -23716,6 +29192,62 @@
         ]
       }
     },
+    "/policies/category/{category}": {
+      "get": {
+        "description": "Category may be specified by id or name, or 'None' for policies with no category.",
+        "operationId": "findPoliciesByCategory",
+        "parameters": [
+          {
+            "description": "Category to filter by",
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all policies by category",
+        "tags": [
+          "policies"
+        ]
+      }
+    },
+    "/policies/createdBy/{createdBy}": {
+      "get": {
+        "description": "The value 'casper' refers to Casper Remote. The value 'jss' refers to policies created in the GUI or via the API.",
+        "operationId": "findPoliciesByType",
+        "parameters": [
+          {
+            "description": "Type to filter by",
+            "in": "path",
+            "name": "createdBy",
+            "required": true,
+            "schema": {
+              "enum": [
+                "jss",
+                "casper"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds all policies by type",
+        "tags": [
+          "policies"
+        ]
+      }
+    },
     "/policies/id/{id}": {
       "delete": {
         "operationId": "deletePolicyById",
@@ -23825,6 +29357,56 @@
         "x-explorer-enabled": false
       }
     },
+    "/policies/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findPoliciesByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService",
+                "PackageConfiguration",
+                "Scripts",
+                "Printers",
+                "DockItems",
+                "AccountMaintenance",
+                "Reboot",
+                "Maintenance",
+                "FilesProcesses",
+                "UserInteraction",
+                "DiskEncryption"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for a policy",
+        "tags": [
+          "policies"
+        ]
+      }
+    },
     "/policies/name/{name}": {
       "delete": {
         "operationId": "deletePolicyByName",
@@ -23907,6 +29489,68 @@
           "policies"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/policies/name/{name}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findPoliciesByNameSubset",
+        "parameters": [
+          {
+            "description": "Name to filter by",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "SelfService",
+                "PackageConfiguration",
+                "Scripts",
+                "Printers",
+                "DockItems",
+                "AccountMaintenance",
+                "Reboot",
+                "Maintenance",
+                "FilesProcesses",
+                "UserInteraction",
+                "DiskEncryption"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/policy"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/policy"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for policies by name",
+        "tags": [
+          "policies"
+        ]
       }
     },
     "/printers": {
@@ -26433,6 +32077,46 @@
           "vppinvitations"
         ],
         "x-explorer-enabled": false
+      }
+    },
+    "/vppinvitations/id/{id}/subset/{subset}": {
+      "get": {
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Scope)",
+        "operationId": "findInvitationsByIdSubset",
+        "parameters": [
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Scope",
+                "InvitationUsages"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Finds a subset of data for a VPP invitation",
+        "tags": [
+          "vppinvitations"
+        ]
       }
     },
     "/webhooks": {

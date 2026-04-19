@@ -211,3 +211,75 @@ func TestListMobileDeviceProvisioningProfiles_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestCreateMobileDeviceProvisioningProfileByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, http.StatusCreated, "<mobile_device_provisioning_profile></mobile_device_provisioning_profile>")
+	})
+
+	result, err := c.CreateMobileDeviceProvisioningProfileByName(context.Background(), "test-id", &MobileDeviceProvisioningProfile{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUpdateMobileDeviceProvisioningProfileByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		writeXML(t, w, http.StatusCreated, "<mobile_device_provisioning_profile></mobile_device_provisioning_profile>")
+	})
+
+	result, err := c.UpdateMobileDeviceProvisioningProfileByName(context.Background(), "test-id", &MobileDeviceProvisioningProfile{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestCreateMobileDeviceProvisioningProfileByUUID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/uuid/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, http.StatusCreated, "<mobile_device_provisioning_profile></mobile_device_provisioning_profile>")
+	})
+
+	result, err := c.CreateMobileDeviceProvisioningProfileByUUID(context.Background(), "test-id", &MobileDeviceProvisioningProfile{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUpdateMobileDeviceProvisioningProfileByUUID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/uuid/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		writeXML(t, w, http.StatusCreated, "<mobile_device_provisioning_profile></mobile_device_provisioning_profile>")
+	})
+
+	result, err := c.UpdateMobileDeviceProvisioningProfileByUUID(context.Background(), "test-id", &MobileDeviceProvisioningProfile{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

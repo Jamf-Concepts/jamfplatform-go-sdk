@@ -79,3 +79,14 @@ func (c *Client) ListPatchPolicies(ctx context.Context) (*PatchPolicies, error) 
 	}
 	return &result, nil
 }
+
+// GetPatchPolicyByIDSubset display subsets of information for a patch policy.
+func (c *Client) GetPatchPolicyByIDSubset(ctx context.Context, id string, subset string) (*PatchPolicy, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchPolicy
+	endpoint := fmt.Sprintf("%s/patchpolicies/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchPolicyByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}

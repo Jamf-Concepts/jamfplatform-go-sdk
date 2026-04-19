@@ -106,3 +106,76 @@ func (c *Client) ListMobileDeviceApplications(ctx context.Context) (*MobileDevic
 	}
 	return &result, nil
 }
+
+// DeleteMobileDeviceApplicationByBundleID deletes a mobile device application by bundle ID.
+func (c *Client) DeleteMobileDeviceApplicationByBundleID(ctx context.Context, bundleid string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s", prefix, url.PathEscape(bundleid))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceApplicationByBundleID(%s): %w", bundleid, err)
+	}
+	return nil
+}
+
+// UpdateMobileDeviceApplicationByBundleID updates an existing mobile device application by bundle ID.
+func (c *Client) UpdateMobileDeviceApplicationByBundleID(ctx context.Context, bundleid string, request *MobileDeviceApplication) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s", prefix, url.PathEscape(bundleid))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateMobileDeviceApplicationByBundleID(%s): %w", bundleid, err)
+	}
+	return nil
+}
+
+// DeleteMobileDeviceApplicationByBundleIDVersion deletes a mobile device application by bundle ID and version.
+func (c *Client) DeleteMobileDeviceApplicationByBundleIDVersion(ctx context.Context, bundleid string, version string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s/version/%s", prefix, url.PathEscape(bundleid), url.PathEscape(version))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteMobileDeviceApplicationByBundleIDVersion(%s): %w", bundleid, err)
+	}
+	return nil
+}
+
+// GetMobileDeviceApplicationByBundleIDVersion finds mobile device applications by bundle ID and version.
+func (c *Client) GetMobileDeviceApplicationByBundleIDVersion(ctx context.Context, bundleid string, version string) (*MobileDeviceApplication, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceApplication
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s/version/%s", prefix, url.PathEscape(bundleid), url.PathEscape(version))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceApplicationByBundleIDVersion(%s): %w", bundleid, err)
+	}
+	return &result, nil
+}
+
+// UpdateMobileDeviceApplicationByBundleIDVersion updates an existing mobile device application by bundle ID and version.
+func (c *Client) UpdateMobileDeviceApplicationByBundleIDVersion(ctx context.Context, bundleid string, version string, request *MobileDeviceApplication) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s/version/%s", prefix, url.PathEscape(bundleid), url.PathEscape(version))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateMobileDeviceApplicationByBundleIDVersion(%s): %w", bundleid, err)
+	}
+	return nil
+}
+
+// GetMobileDeviceApplicationByIDSubset finds a subset of data for a mobile device application by ID.
+func (c *Client) GetMobileDeviceApplicationByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceApplication, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceApplication
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceApplicationByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetMobileDeviceApplicationByNameSubset finds a subset of data for mobile device applications by name.
+func (c *Client) GetMobileDeviceApplicationByNameSubset(ctx context.Context, name string, subset string) (*MobileDeviceApplication, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceApplication
+	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceApplicationByNameSubset(%s): %w", name, err)
+	}
+	return &result, nil
+}

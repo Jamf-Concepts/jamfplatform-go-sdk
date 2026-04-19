@@ -22,3 +22,47 @@ func (c *Client) GetComputerApplicationUsageByID(ctx context.Context, id string,
 	}
 	return &result, nil
 }
+
+// GetComputerApplicationUsageByMacAddressDateRange finds computer application usage by computer MAC address.
+func (c *Client) GetComputerApplicationUsageByMacAddressDateRange(ctx context.Context, macaddress string, start_date string, end_date string) (*ComputerApplicationUsage, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerApplicationUsage
+	endpoint := fmt.Sprintf("%s/computerapplicationusage/macaddress/%s/%s_%s", prefix, url.PathEscape(macaddress), url.PathEscape(start_date), url.PathEscape(end_date))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerApplicationUsageByMacAddressDateRange(%s): %w", macaddress, err)
+	}
+	return &result, nil
+}
+
+// GetComputerApplicationUsageByNameDateRange finds computer application usage by computer name.
+func (c *Client) GetComputerApplicationUsageByNameDateRange(ctx context.Context, name string, start_date string, end_date string) (*ComputerApplicationUsage, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerApplicationUsage
+	endpoint := fmt.Sprintf("%s/computerapplicationusage/name/%s/%s_%s", prefix, url.PathEscape(name), url.PathEscape(start_date), url.PathEscape(end_date))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerApplicationUsageByNameDateRange(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// GetComputerApplicationUsageBySerialNumberDateRange finds computer application usage by computer serial number.
+func (c *Client) GetComputerApplicationUsageBySerialNumberDateRange(ctx context.Context, serialnumber string, start_date string, end_date string) (*ComputerApplicationUsage, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerApplicationUsage
+	endpoint := fmt.Sprintf("%s/computerapplicationusage/serialnumber/%s/%s_%s", prefix, url.PathEscape(serialnumber), url.PathEscape(start_date), url.PathEscape(end_date))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerApplicationUsageBySerialNumberDateRange(%s): %w", serialnumber, err)
+	}
+	return &result, nil
+}
+
+// GetComputerApplicationUsageByUDIDDateRange finds computer application usage by computer UDID.
+func (c *Client) GetComputerApplicationUsageByUDIDDateRange(ctx context.Context, udid string, start_date string, end_date string) (*ComputerApplicationUsage, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerApplicationUsage
+	endpoint := fmt.Sprintf("%s/computerapplicationusage/udid/%s/%s_%s", prefix, url.PathEscape(udid), url.PathEscape(start_date), url.PathEscape(end_date))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerApplicationUsageByUDIDDateRange(%s): %w", udid, err)
+	}
+	return &result, nil
+}

@@ -118,3 +118,78 @@ func TestListMobileDeviceCommands_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestCreateMobileDeviceCommandScheduleOSUpdateByInstallActionIDList(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevicecommands/command/ScheduleOSUpdate/test-id/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateMobileDeviceCommandScheduleOSUpdateByInstallActionIDList(context.Background(), "test-id", "test-id", &MobileDeviceCommandPost{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateMobileDeviceCommandScheduleOSUpdateByInstallActionProductVersionIDList(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevicecommands/command/ScheduleOSUpdate/test-id/test-id/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateMobileDeviceCommandScheduleOSUpdateByInstallActionProductVersionIDList(context.Background(), "test-id", "test-id", "test-id", &MobileDeviceCommandPost{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestGetMobileDeviceCommandByCommand(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevicecommands/command/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mobile_device_command></mobile_device_command>")
+	})
+
+	result, err := c.GetMobileDeviceCommandByCommand(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetMobileDeviceCommandByCommand_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevicecommands/command/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetMobileDeviceCommandByCommand(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestCreateMobileDeviceCommandByCommandID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevicecommands/command/test-id/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateMobileDeviceCommandByCommandID(context.Background(), "test-id", "test-id", &MobileDeviceCommandPost{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
