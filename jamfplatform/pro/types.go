@@ -141,6 +141,11 @@ type AssignmentDtoV1 struct {
 	Selected bool   `json:"selected"`
 }
 
+// BrandingImageURL represents a branding image u r l.
+type BrandingImageURL struct {
+	URL string `json:"url"`
+}
+
 // Building represents a building.
 type Building struct {
 	City           *string `json:"city,omitempty"`
@@ -1291,6 +1296,81 @@ type EnrollmentAccessGroupPreview struct {
 	SiteID                             *string `json:"siteId,omitempty"`
 }
 
+// EnrollmentCustomizationBrandingSettings represents a enrollment customization branding settings.
+type EnrollmentCustomizationBrandingSettings struct {
+	BackgroundColor string `json:"backgroundColor"`
+	ButtonColor     string `json:"buttonColor"`
+	ButtonTextColor string `json:"buttonTextColor"`
+	IconURL         string `json:"iconUrl"`
+	TextColor       string `json:"textColor"`
+}
+
+// EnrollmentCustomizationLdapGroupAccess represents a enrollment customization ldap group access.
+type EnrollmentCustomizationLdapGroupAccess struct {
+	GroupName    *string `json:"groupName,omitempty"`
+	LdapServerID *int    `json:"ldapServerId,omitempty"`
+}
+
+// EnrollmentCustomizationPanel represents a enrollment customization panel.
+type EnrollmentCustomizationPanel struct {
+	DisplayName string `json:"displayName"`
+	Rank        int    `json:"rank"`
+}
+
+// EnrollmentCustomizationPanelLdapAuth represents a enrollment customization panel ldap auth.
+type EnrollmentCustomizationPanelLdapAuth struct {
+	BackButtonText     string                                   `json:"backButtonText"`
+	ContinueButtonText string                                   `json:"continueButtonText"`
+	DisplayName        string                                   `json:"displayName"`
+	LdapGroupAccess    []EnrollmentCustomizationLdapGroupAccess `json:"ldapGroupAccess"`
+	PasswordLabel      string                                   `json:"passwordLabel"`
+	Rank               int                                      `json:"rank"`
+	Title              string                                   `json:"title"`
+	UsernameLabel      string                                   `json:"usernameLabel"`
+}
+
+// EnrollmentCustomizationPanelList represents a enrollment customization panel list.
+type EnrollmentCustomizationPanelList struct {
+	Panels []GetEnrollmentCustomizationPanel `json:"panels"`
+}
+
+// EnrollmentCustomizationPanelSsoAuth represents a enrollment customization panel sso auth.
+type EnrollmentCustomizationPanelSsoAuth struct {
+	DisplayName                    string `json:"displayName"`
+	GroupEnrollmentAccessName      string `json:"groupEnrollmentAccessName"`
+	IsGroupEnrollmentAccessEnabled bool   `json:"isGroupEnrollmentAccessEnabled"`
+	IsUseJamfConnect               bool   `json:"isUseJamfConnect"`
+	LongNameAttribute              string `json:"longNameAttribute"`
+	Rank                           int    `json:"rank"`
+	ShortNameAttribute             string `json:"shortNameAttribute"`
+}
+
+// EnrollmentCustomizationPanelText represents a enrollment customization panel text.
+type EnrollmentCustomizationPanelText struct {
+	BackButtonText     string `json:"backButtonText"`
+	Body               string `json:"body"`
+	ContinueButtonText string `json:"continueButtonText"`
+	DisplayName        string `json:"displayName"`
+	Rank               int    `json:"rank"`
+	Subtext            string `json:"subtext"`
+	Title              string `json:"title"`
+}
+
+// EnrollmentCustomizationSearchResultsV2 represents a enrollment customization search results v2.
+type EnrollmentCustomizationSearchResultsV2 struct {
+	Results    []EnrollmentCustomizationV2 `json:"results"`
+	TotalCount int                         `json:"totalCount"`
+}
+
+// EnrollmentCustomizationV2 represents a enrollment customization v2.
+type EnrollmentCustomizationV2 struct {
+	Description                             string                                  `json:"description"`
+	DisplayName                             string                                  `json:"displayName"`
+	EnrollmentCustomizationBrandingSettings EnrollmentCustomizationBrandingSettings `json:"enrollmentCustomizationBrandingSettings"`
+	ID                                      *string                                 `json:"id,omitempty"`
+	SiteID                                  string                                  `json:"siteId"`
+}
+
 // EnrollmentMethod represents a enrollment method.
 type EnrollmentMethod struct {
 	ID         string `json:"id"`
@@ -1500,6 +1580,54 @@ type GetComputerPrestageV3 struct {
 	SupportEmailAddress                string                           `json:"supportEmailAddress"`
 	SupportPhoneNumber                 string                           `json:"supportPhoneNumber"`
 	VersionLock                        int                              `json:"versionLock"`
+}
+
+// GetEnrollmentCustomizationPanel represents a get enrollment customization panel.
+type GetEnrollmentCustomizationPanel struct {
+	DisplayName string `json:"displayName"`
+	ID          int    `json:"id"`
+	Rank        int    `json:"rank"`
+	Type        string `json:"type"`
+}
+
+// GetEnrollmentCustomizationPanelLdapAuth represents a get enrollment customization panel ldap auth.
+type GetEnrollmentCustomizationPanelLdapAuth struct {
+	BackButtonText     string                                   `json:"backButtonText"`
+	ContinueButtonText string                                   `json:"continueButtonText"`
+	DisplayName        string                                   `json:"displayName"`
+	ID                 int                                      `json:"id"`
+	LdapGroupAccess    []EnrollmentCustomizationLdapGroupAccess `json:"ldapGroupAccess"`
+	PasswordLabel      string                                   `json:"passwordLabel"`
+	Rank               int                                      `json:"rank"`
+	Title              string                                   `json:"title"`
+	Type               string                                   `json:"type"`
+	UsernameLabel      string                                   `json:"usernameLabel"`
+}
+
+// GetEnrollmentCustomizationPanelSsoAuth represents a get enrollment customization panel sso auth.
+type GetEnrollmentCustomizationPanelSsoAuth struct {
+	DisplayName                    string `json:"displayName"`
+	GroupEnrollmentAccessName      string `json:"groupEnrollmentAccessName"`
+	ID                             int    `json:"id"`
+	IsGroupEnrollmentAccessEnabled bool   `json:"isGroupEnrollmentAccessEnabled"`
+	IsUseJamfConnect               bool   `json:"isUseJamfConnect"`
+	LongNameAttribute              string `json:"longNameAttribute"`
+	Rank                           int    `json:"rank"`
+	ShortNameAttribute             string `json:"shortNameAttribute"`
+	Type                           string `json:"type"`
+}
+
+// GetEnrollmentCustomizationPanelText represents a get enrollment customization panel text.
+type GetEnrollmentCustomizationPanelText struct {
+	BackButtonText     string `json:"backButtonText"`
+	Body               string `json:"body"`
+	ContinueButtonText string `json:"continueButtonText"`
+	DisplayName        string `json:"displayName"`
+	ID                 int    `json:"id"`
+	Rank               int    `json:"rank"`
+	Subtext            string `json:"subtext"`
+	Title              string `json:"title"`
+	Type               string `json:"type"`
 }
 
 // GetMobileDevicePrestageV3 represents a get mobile device prestage v3.
@@ -1885,6 +2013,11 @@ type LocationV2 struct {
 	RealName     *string `json:"realName,omitempty"`
 	Room         *string `json:"room,omitempty"`
 	Username     *string `json:"username,omitempty"`
+}
+
+// Markdown represents a markdown.
+type Markdown struct {
+	Markdown *string `json:"markdown,omitempty"`
 }
 
 // MobileDeviceApplication represents a mobile device application.
@@ -2976,6 +3109,18 @@ type PostComputerPrestageV3 struct {
 	SkipSetupItems             map[string]bool `json:"skipSetupItems"`
 	SupportEmailAddress        string          `json:"supportEmailAddress"`
 	SupportPhoneNumber         string          `json:"supportPhoneNumber"`
+}
+
+// PrestageDependencies represents a prestage dependencies.
+type PrestageDependencies struct {
+	Dependencies []PrestageDependency `json:"dependencies"`
+}
+
+// PrestageDependency represents a prestage dependency.
+type PrestageDependency struct {
+	HumanReadableName string `json:"humanReadableName"`
+	Hyperlink         string `json:"hyperlink"`
+	Name              string `json:"name"`
 }
 
 // PrestageFileAttachmentV3 represents a prestage file attachment v3.

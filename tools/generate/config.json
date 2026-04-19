@@ -404,7 +404,36 @@
         {"op": "POST /v1/reenrollment/history/export", "name": "ExportReenrollmentHistoryV1", "params": ["export-fields:[]string:exportFields", "export-labels:[]string:exportLabels", "sort:[]string", "filter"]},
 
         {"op": "GET /v1/service-discovery-enrollment/well-known-settings", "name": "GetServiceDiscoveryEnrollmentWellKnownSettingsV1"},
-        {"op": "PUT /v1/service-discovery-enrollment/well-known-settings", "name": "UpdateServiceDiscoveryEnrollmentWellKnownSettingsV1"}
+        {"op": "PUT /v1/service-discovery-enrollment/well-known-settings", "name": "UpdateServiceDiscoveryEnrollmentWellKnownSettingsV1"},
+
+        {"op": "POST /v1/enrollment-customization/parse-markdown", "name": "ParseEnrollmentCustomizationMarkdownV1"},
+        {"op": "GET /v1/enrollment-customization/{id}/all", "name": "ListEnrollmentCustomizationPanelsV1"},
+        {"op": "GET /v1/enrollment-customization/{id}/all/{panel-id}", "name": "GetEnrollmentCustomizationPanelV1"},
+        {"op": "DELETE /v1/enrollment-customization/{id}/all/{panel-id}", "name": "DeleteEnrollmentCustomizationPanelV1", "expectedStatus": 204},
+        {"op": "POST /v1/enrollment-customization/{id}/ldap", "name": "CreateEnrollmentCustomizationLdapPanelV1"},
+        {"op": "GET /v1/enrollment-customization/{id}/ldap/{panel-id}", "name": "GetEnrollmentCustomizationLdapPanelV1"},
+        {"op": "PUT /v1/enrollment-customization/{id}/ldap/{panel-id}", "name": "UpdateEnrollmentCustomizationLdapPanelV1"},
+        {"op": "DELETE /v1/enrollment-customization/{id}/ldap/{panel-id}", "name": "DeleteEnrollmentCustomizationLdapPanelV1", "expectedStatus": 204},
+        {"op": "POST /v1/enrollment-customization/{id}/sso", "name": "CreateEnrollmentCustomizationSsoPanelV1"},
+        {"op": "GET /v1/enrollment-customization/{id}/sso/{panel-id}", "name": "GetEnrollmentCustomizationSsoPanelV1"},
+        {"op": "PUT /v1/enrollment-customization/{id}/sso/{panel-id}", "name": "UpdateEnrollmentCustomizationSsoPanelV1"},
+        {"op": "DELETE /v1/enrollment-customization/{id}/sso/{panel-id}", "name": "DeleteEnrollmentCustomizationSsoPanelV1", "expectedStatus": 204},
+        {"op": "POST /v1/enrollment-customization/{id}/text", "name": "CreateEnrollmentCustomizationTextPanelV1"},
+        {"op": "GET /v1/enrollment-customization/{id}/text/{panel-id}", "name": "GetEnrollmentCustomizationTextPanelV1"},
+        {"op": "PUT /v1/enrollment-customization/{id}/text/{panel-id}", "name": "UpdateEnrollmentCustomizationTextPanelV1"},
+        {"op": "DELETE /v1/enrollment-customization/{id}/text/{panel-id}", "name": "DeleteEnrollmentCustomizationTextPanelV1", "expectedStatus": 204},
+        {"op": "GET /v1/enrollment-customization/{id}/text/{panel-id}/markdown", "name": "GetEnrollmentCustomizationTextPanelMarkdownV1"},
+
+        {"op": "GET /v2/enrollment-customizations", "name": "ListEnrollmentCustomizationsV2", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "POST /v2/enrollment-customizations", "name": "CreateEnrollmentCustomizationV2"},
+        {"op": "POST /v2/enrollment-customizations/images", "name": "UploadEnrollmentCustomizationImageV2", "expectedStatus": 200},
+        {"op": "GET /v2/enrollment-customizations/images/{id}", "name": "DownloadEnrollmentCustomizationImageV2"},
+        {"op": "GET /v2/enrollment-customizations/{id}", "name": "GetEnrollmentCustomizationV2"},
+        {"op": "PUT /v2/enrollment-customizations/{id}", "name": "UpdateEnrollmentCustomizationV2"},
+        {"op": "DELETE /v2/enrollment-customizations/{id}", "name": "DeleteEnrollmentCustomizationV2", "expectedStatus": 204},
+        {"op": "GET /v2/enrollment-customizations/{id}/history", "name": "ListEnrollmentCustomizationHistoryV2", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "POST /v2/enrollment-customizations/{id}/history", "name": "CreateEnrollmentCustomizationHistoryNoteV2"},
+        {"op": "GET /v2/enrollment-customizations/{id}/prestages", "name": "ListEnrollmentCustomizationPrestagesV2"}
       ]
     },
     {

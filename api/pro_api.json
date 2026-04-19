@@ -550,6 +550,15 @@
         ],
         "type": "object"
       },
+      "BrandingImageUrl": {
+        "properties": {
+          "url": {
+            "example": "https://jamfpro.jamf/image?1",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "Building": {
         "properties": {
           "city": {
@@ -4932,6 +4941,250 @@
         ],
         "type": "object"
       },
+      "EnrollmentCustomizationBrandingSettings": {
+        "properties": {
+          "backgroundColor": {
+            "example": "0000FF",
+            "type": "string"
+          },
+          "buttonColor": {
+            "example": "0000FF",
+            "type": "string"
+          },
+          "buttonTextColor": {
+            "example": "0000FF",
+            "type": "string"
+          },
+          "iconUrl": {
+            "example": "https://jamfUrl/api/v2/enrollment-customizations/images/1",
+            "type": "string"
+          },
+          "textColor": {
+            "example": "0000FF",
+            "type": "string"
+          }
+        },
+        "required": [
+          "backgroundColor",
+          "buttonColor",
+          "buttonTextColor",
+          "iconUrl",
+          "textColor"
+        ],
+        "type": "object"
+      },
+      "EnrollmentCustomizationLdapGroupAccess": {
+        "properties": {
+          "groupName": {
+            "example": "admins",
+            "type": "string"
+          },
+          "ldapServerId": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "EnrollmentCustomizationPanel": {
+        "properties": {
+          "displayName": {
+            "example": "A Panel",
+            "type": "string"
+          },
+          "rank": {
+            "example": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "displayName",
+          "rank"
+        ],
+        "type": "object"
+      },
+      "EnrollmentCustomizationPanelLdapAuth": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnrollmentCustomizationPanel"
+          },
+          {
+            "properties": {
+              "backButtonText": {
+                "example": "Back",
+                "type": "string"
+              },
+              "continueButtonText": {
+                "example": "Continue",
+                "type": "string"
+              },
+              "ldapGroupAccess": {
+                "items": {
+                  "$ref": "#/components/schemas/EnrollmentCustomizationLdapGroupAccess"
+                },
+                "type": "array"
+              },
+              "passwordLabel": {
+                "example": "Password",
+                "type": "string"
+              },
+              "title": {
+                "example": "My Ldap Panel",
+                "pattern": "\\S",
+                "type": "string"
+              },
+              "usernameLabel": {
+                "example": "Username",
+                "type": "string"
+              }
+            },
+            "required": [
+              "backButtonText",
+              "continueButtonText",
+              "passwordLabel",
+              "title",
+              "usernameLabel"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "EnrollmentCustomizationPanelList": {
+        "properties": {
+          "panels": {
+            "items": {
+              "$ref": "#/components/schemas/GetEnrollmentCustomizationPanel"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "EnrollmentCustomizationPanelSsoAuth": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnrollmentCustomizationPanel"
+          },
+          {
+            "properties": {
+              "groupEnrollmentAccessName": {
+                "default": "",
+                "example": "GroupNameA",
+                "type": "string"
+              },
+              "isGroupEnrollmentAccessEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "isUseJamfConnect": {
+                "example": false,
+                "type": "boolean"
+              },
+              "longNameAttribute": {
+                "example": "long name",
+                "type": "string"
+              },
+              "shortNameAttribute": {
+                "example": "name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "groupEnrollmentAccessName",
+              "isGroupEnrollmentAccessEnabled",
+              "isUseJamfConnect",
+              "longNameAttribute",
+              "shortNameAttribute"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "EnrollmentCustomizationPanelText": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnrollmentCustomizationPanel"
+          },
+          {
+            "properties": {
+              "backButtonText": {
+                "example": "Back",
+                "type": "string"
+              },
+              "body": {
+                "example": "Welcome!",
+                "type": "string"
+              },
+              "continueButtonText": {
+                "example": "Continue",
+                "type": "string"
+              },
+              "subtext": {
+                "example": "World!",
+                "type": "string"
+              },
+              "title": {
+                "example": "My text panel",
+                "type": "string"
+              }
+            },
+            "required": [
+              "backButtonText",
+              "body",
+              "continueButtonText",
+              "title"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "EnrollmentCustomizationSearchResultsV2": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/EnrollmentCustomizationV2"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "EnrollmentCustomizationV2": {
+        "properties": {
+          "description": {
+            "example": "Example description",
+            "type": "string"
+          },
+          "displayName": {
+            "example": "Example",
+            "type": "string"
+          },
+          "enrollmentCustomizationBrandingSettings": {
+            "$ref": "#/components/schemas/EnrollmentCustomizationBrandingSettings"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "siteId": {
+            "example": "2",
+            "type": "string"
+          }
+        },
+        "required": [
+          "description",
+          "displayName",
+          "enrollmentCustomizationBrandingSettings",
+          "siteId"
+        ],
+        "type": "object"
+      },
       "EnrollmentMethod": {
         "properties": {
           "id": {
@@ -5557,6 +5810,86 @@
                 "example": 0,
                 "minimum": 0,
                 "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GetEnrollmentCustomizationPanel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnrollmentCustomizationPanel"
+          },
+          {
+            "properties": {
+              "id": {
+                "example": 2,
+                "type": "integer"
+              },
+              "type": {
+                "example": "text",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GetEnrollmentCustomizationPanelLdapAuth": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnrollmentCustomizationPanelLdapAuth"
+          },
+          {
+            "properties": {
+              "id": {
+                "example": 2,
+                "type": "integer"
+              },
+              "type": {
+                "example": "ldap",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GetEnrollmentCustomizationPanelSsoAuth": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnrollmentCustomizationPanelSsoAuth"
+          },
+          {
+            "properties": {
+              "id": {
+                "example": 2,
+                "type": "integer"
+              },
+              "type": {
+                "example": "sso",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GetEnrollmentCustomizationPanelText": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnrollmentCustomizationPanelText"
+          },
+          {
+            "properties": {
+              "id": {
+                "example": 2,
+                "type": "integer"
+              },
+              "type": {
+                "example": "text",
+                "type": "string"
               }
             },
             "type": "object"
@@ -6772,6 +7105,15 @@
           },
           "username": {
             "example": "admin",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Markdown": {
+        "properties": {
+          "markdown": {
+            "example": "**markdown**",
             "type": "string"
           }
         },
@@ -9736,6 +10078,34 @@
             "type": "object"
           }
         ]
+      },
+      "PrestageDependencies": {
+        "properties": {
+          "dependencies": {
+            "items": {
+              "$ref": "#/components/schemas/PrestageDependency"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "PrestageDependency": {
+        "properties": {
+          "humanReadableName": {
+            "example": "Computer PreStage",
+            "type": "string"
+          },
+          "hyperlink": {
+            "example": "/mobile-prestage/id",
+            "type": "string"
+          },
+          "name": {
+            "example": "Name",
+            "type": "string"
+          }
+        },
+        "type": "object"
       },
       "PrestageFileAttachmentV3": {
         "properties": {
@@ -14586,6 +14956,909 @@
         ]
       }
     },
+    "/v1/enrollment-customization/parse-markdown": {
+      "post": {
+        "description": "Parse the given string as markdown text and return Html output",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Markdown"
+              }
+            }
+          },
+          "description": "Enrollment Customization Panel to create",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Markdown"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Parse the given string as markdown text and return Html output\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      }
+    },
+    "/v1/enrollment-customization/{id}/all": {
+      "get": {
+        "description": "Get all panels for single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentCustomizationPanelList"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization with that id does not exist"
+          }
+        },
+        "summary": "Get all Panels for single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      }
+    },
+    "/v1/enrollment-customization/{id}/all/{panel-id}": {
+      "delete": {
+        "description": "Delete a single panel from an Enrollment Customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "summary": "Delete a single Panel from an Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      },
+      "get": {
+        "description": "Get a single panel for a single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanel"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization with that id does not exist"
+          }
+        },
+        "summary": "Get a single Panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      }
+    },
+    "/v1/enrollment-customization/{id}/ldap": {
+      "post": {
+        "description": "Create an LDAP panel for a single enrollment customization. If multiple LDAP access groups are defined with the same name and id, only one will be saved.",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentCustomizationPanelLdapAuth"
+              }
+            }
+          },
+          "description": "Enrollment Customization Panel to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanelLdapAuth"
+                }
+              }
+            },
+            "description": "LDAP panel was created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Create an LDAP Panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      }
+    },
+    "/v1/enrollment-customization/{id}/ldap/{panel-id}": {
+      "delete": {
+        "description": "Delete an LDAP single Panel from an Enrollment Customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "summary": "Delete an LDAP single panel from an Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      },
+      "get": {
+        "description": "Get a single LDAP panel for a single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanelLdapAuth"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization or Panel does not exist"
+          }
+        },
+        "summary": "Get a single LDAP panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      },
+      "put": {
+        "description": "Update a single LDAP panel for a single enrollment customization. If multiple LDAP access groups are defined with the same name and id, only one will be saved.",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentCustomizationPanelLdapAuth"
+              }
+            }
+          },
+          "description": "Enrollment Customization Panel to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanelLdapAuth"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization or Panel does not exist"
+          }
+        },
+        "summary": "Update a single LDAP Panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      }
+    },
+    "/v1/enrollment-customization/{id}/sso": {
+      "post": {
+        "description": "Create an SSO panel for a single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentCustomizationPanelSsoAuth"
+              }
+            }
+          },
+          "description": "Enrollment Customization Panel to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanelSsoAuth"
+                }
+              }
+            },
+            "description": "Auth panel was created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Create an SSO Panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      }
+    },
+    "/v1/enrollment-customization/{id}/sso/{panel-id}": {
+      "delete": {
+        "description": "Delete a single SSO panel from an Enrollment Customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "summary": "Delete a single SSO Panel from an Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      },
+      "get": {
+        "description": "Get a single SSO panel for a single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanelSsoAuth"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization or Panel does not exist"
+          }
+        },
+        "summary": "Get a single SSO Panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      },
+      "put": {
+        "description": "Update a single SSO panel for a single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentCustomizationPanelSsoAuth"
+              }
+            }
+          },
+          "description": "Enrollment Customization Panel to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanelSsoAuth"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization or Panel does not exist"
+          }
+        },
+        "summary": "Update a single SSO Panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      }
+    },
+    "/v1/enrollment-customization/{id}/text": {
+      "post": {
+        "description": "Create a Text panel for a single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentCustomizationPanelText"
+              }
+            }
+          },
+          "description": "Enrollment Customization Panel to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanelText"
+                }
+              }
+            },
+            "description": "Text panel was created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Create a Text Panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      }
+    },
+    "/v1/enrollment-customization/{id}/text/{panel-id}": {
+      "delete": {
+        "description": "Delete a Text single panel from an Enrollment Customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "summary": "Delete a Text single Panel from an Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      },
+      "get": {
+        "description": "Get a single Text panel for a single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanelText"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization with that id does not exist"
+          }
+        },
+        "summary": "Get a single Text Panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      },
+      "put": {
+        "description": "Update a single Text panel for a single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentCustomizationPanelText"
+              }
+            }
+          },
+          "description": "Enrollment Customization Panel to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnrollmentCustomizationPanelText"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization or Panel does not exist"
+          }
+        },
+        "summary": "Update a single Text Panel for a single Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      }
+    },
+    "/v1/enrollment-customization/{id}/text/{panel-id}/markdown": {
+      "get": {
+        "description": "Get the markdown output of a single Text panel for a single enrollment customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Panel object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "panel-id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Markdown"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization with that id does not exist"
+          }
+        },
+        "summary": "Get the markdown output of a single Text Panel for a single Enrollment\n",
+        "tags": [
+          "enrollment-customization-preview"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      }
+    },
     "/v1/groups": {
       "get": {
         "description": "Returns group information for all Mobile Device and Computer groups. The type of groups returned will be dependent upon the corresponding group type READ privileges. Results can be sorted by name, description, group type, or isSmart. Default sorting is by group name in ascending order.",
@@ -18735,6 +20008,461 @@
         "x-action": true,
         "x-required-privileges": [
           "Update Computer PreStage Enrollments"
+        ]
+      }
+    },
+    "/v2/enrollment-customizations": {
+      "get": {
+        "description": "Retrieves sorted and paged Enrollment Customizations",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentCustomizationSearchResultsV2"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Retrieve sorted and paged Enrollment Customizations\n",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      },
+      "post": {
+        "description": "Create an enrollment customization",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentCustomizationV2"
+              }
+            }
+          },
+          "description": "Enrollment customization to create.",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Enrollment customization was created"
+          }
+        },
+        "summary": "Create an Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-required-privileges": [
+          "Create Enrollment Customizations"
+        ]
+      }
+    },
+    "/v2/enrollment-customizations/images": {
+      "post": {
+        "description": "Uploads an image",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrandingImageUrl"
+                }
+              }
+            },
+            "description": "Image successfully uploaded"
+          }
+        },
+        "summary": "Upload an image",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      }
+    },
+    "/v2/enrollment-customizations/images/{id}": {
+      "get": {
+        "description": "Download an enrollment customization image",
+        "parameters": [
+          {
+            "description": "id of the enrollment customization image",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Download an enrollment customization image\n",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-authentication-required": false
+      }
+    },
+    "/v2/enrollment-customizations/{id}": {
+      "delete": {
+        "description": "Deletes an Enrollment Customization with the supplied id",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "summary": "Delete an Enrollment Customization with the supplied id\n",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-required-privileges": [
+          "Delete Enrollment Customizations",
+          "Read Enrollment Customizations"
+        ]
+      },
+      "get": {
+        "description": "Retrieves an Enrollment Customization with the supplied id",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentCustomizationV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization with that id does not exist"
+          }
+        },
+        "summary": "Retrieve an Enrollment Customization with the supplied id\n",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      },
+      "put": {
+        "description": "Updates an Enrollment Customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentCustomizationV2"
+              }
+            }
+          },
+          "description": "Enrollment Customization to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentCustomizationV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization with that id does not exist"
+          }
+        },
+        "summary": "Update an Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      }
+    },
+    "/v2/enrollment-customizations/{id}/history": {
+      "get": {
+        "description": "Gets sorted and paged enrollment customization history objects",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property,asc/desc. Default sort order is descending. Multiple sort criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort' query param is duplicated for each sort criterion, e.g., ...\u0026sort=name%2Casc\u0026sort=date%2Cdesc",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of enrollment customization history were found"
+          }
+        },
+        "summary": "Get sorted and paged Enrollment Customization history objects\n",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
+        ]
+      },
+      "post": {
+        "description": "Adds enrollment customization history object notes",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes of enrollment customization history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment customization history can not be saved"
+          }
+        },
+        "summary": "Add Enrollment Customization history object notes\n",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-required-privileges": [
+          "Update Enrollment Customizations"
+        ]
+      }
+    },
+    "/v2/enrollment-customizations/{id}/prestages": {
+      "get": {
+        "description": "Retrieves the list of Prestages using this Enrollment Customization",
+        "parameters": [
+          {
+            "description": "Enrollment Customization identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageDependencies"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Enrollment Customization with that id does not exist"
+          }
+        },
+        "summary": "Retrieve the list of Prestages using this Enrollment Customization\n",
+        "tags": [
+          "enrollment-customization"
+        ],
+        "x-required-privileges": [
+          "Read Enrollment Customizations"
         ]
       }
     },
