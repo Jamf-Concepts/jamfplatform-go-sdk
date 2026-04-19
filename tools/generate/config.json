@@ -111,6 +111,7 @@
       "namespace": "pro",
       "package": "pro",
       "splitByTag": true,
+      "skipDeprecated": true,
       "specFile": "pro_api.json",
       "excludePaths": [
         "POST /v1/auth/token",
@@ -135,7 +136,37 @@
         {"op": "GET /v1/packages/{id}", "name": "GetPackageV1"},
         {"op": "PUT /v1/packages/{id}", "name": "UpdatePackageV1"},
         {"op": "DELETE /v1/packages/{id}", "name": "DeletePackageV1"},
-        {"op": "POST /v1/packages/{id}/upload", "name": "UploadPackageV1"}
+        {"op": "POST /v1/packages/{id}/upload", "name": "UploadPackageV1"},
+
+        {"op": "GET /v1/categories", "name": "ListCategoriesV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/categories", "name": "CreateCategoryV1"},
+        {"op": "POST /v1/categories/delete-multiple", "name": "DeleteMultipleCategoriesV1"},
+        {"op": "GET /v1/categories/{id}", "name": "GetCategoryV1"},
+        {"op": "PUT /v1/categories/{id}", "name": "UpdateCategoryV1"},
+        {"op": "DELETE /v1/categories/{id}", "name": "DeleteCategoryV1"},
+        {"op": "GET /v1/categories/{id}/history", "name": "ListCategoryHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/categories/{id}/history", "name": "CreateCategoryHistoryNoteV1", "expectedStatus": 200},
+
+        {"op": "GET /v1/departments", "name": "ListDepartmentsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/departments", "name": "CreateDepartmentV1"},
+        {"op": "POST /v1/departments/delete-multiple", "name": "DeleteMultipleDepartmentsV1"},
+        {"op": "GET /v1/departments/{id}", "name": "GetDepartmentV1"},
+        {"op": "PUT /v1/departments/{id}", "name": "UpdateDepartmentV1"},
+        {"op": "DELETE /v1/departments/{id}", "name": "DeleteDepartmentV1"},
+        {"op": "GET /v1/departments/{id}/history", "name": "ListDepartmentHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/departments/{id}/history", "name": "CreateDepartmentHistoryNoteV1"},
+
+        {"op": "GET /v1/sites", "name": "ListSitesV1"},
+        {"op": "GET /v1/sites/{id}/objects", "name": "ListSiteObjectsV1", "pagination": "rawArray", "params": ["sort:[]string", "filter"]},
+
+        {"op": "GET /v1/scripts", "name": "ListScriptsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/scripts", "name": "CreateScriptV1"},
+        {"op": "GET /v1/scripts/{id}", "name": "GetScriptV1"},
+        {"op": "PUT /v1/scripts/{id}", "name": "UpdateScriptV1"},
+        {"op": "DELETE /v1/scripts/{id}", "name": "DeleteScriptV1"},
+        {"op": "GET /v1/scripts/{id}/download", "name": "DownloadScriptV1"},
+        {"op": "GET /v1/scripts/{id}/history", "name": "ListScriptHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/scripts/{id}/history", "name": "CreateScriptHistoryNoteV1", "expectedStatus": 200}
       ]
     },
     {

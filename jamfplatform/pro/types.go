@@ -42,12 +42,37 @@ type BuildingSearchResults struct {
 	TotalCount int        `json:"totalCount"`
 }
 
+// CategoriesSearchResults represents a categories search results.
+type CategoriesSearchResults struct {
+	Results    []Category `json:"results"`
+	TotalCount int        `json:"totalCount"`
+}
+
+// Category represents a category.
+type Category struct {
+	ID       *string `json:"id,omitempty"`
+	Name     string  `json:"name"`
+	Priority int     `json:"priority"`
+}
+
 // ChangePassword represents a change password.
 type ChangePassword struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	CurrentPassword string `json:"currentPassword"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	NewPassword string `json:"newPassword"`
+}
+
+// Department represents a department.
+type Department struct {
+	ID   *string `json:"id,omitempty"`
+	Name string  `json:"name"`
+}
+
+// DepartmentsSearchResults represents a departments search results.
+type DepartmentsSearchResults struct {
+	Results    []Department `json:"results"`
+	TotalCount int          `json:"totalCount"`
 }
 
 // EnrollmentMethodPrestage represents a enrollment method prestage.
@@ -71,6 +96,12 @@ type ExportParameters struct {
 	Sort     *[]string      `json:"sort,omitempty"`
 }
 
+// HistorySearchResults represents a history search results.
+type HistorySearchResults struct {
+	Results    []ObjectHistory `json:"results"`
+	TotalCount int             `json:"totalCount"`
+}
+
 // HrefResponse represents a href response.
 type HrefResponse struct {
 	Href string `json:"href"`
@@ -81,6 +112,11 @@ type HrefResponse struct {
 type IconResponse struct {
 	ID  int    `json:"id"`
 	URL string `json:"url"`
+}
+
+// Ids represents a ids.
+type Ids struct {
+	IDs *[]string `json:"ids,omitempty"`
 }
 
 // MobileDeviceApplicationInventoryDetail represents a mobile device application inventory detail.
@@ -553,6 +589,20 @@ type MobileDeviceWatchOsInventory struct {
 	UserAndLocation      *MobileDeviceUserAndLocation             `json:"userAndLocation,omitempty"`
 }
 
+// ObjectHistory represents a object history.
+type ObjectHistory struct {
+	Date     string  `json:"date"`
+	Details  *string `json:"details,omitempty"`
+	ID       int     `json:"id"`
+	Note     string  `json:"note"`
+	Username string  `json:"username"`
+}
+
+// ObjectHistoryNote represents a object history note.
+type ObjectHistoryNote struct {
+	Note string `json:"note"`
+}
+
 // Package represents a package.
 type Package struct {
 	BasePath             *string `json:"basePath,omitempty"`
@@ -599,6 +649,40 @@ type PackagesSearchResults struct {
 	TotalCount int       `json:"totalCount"`
 }
 
+// Script represents a script.
+type Script struct {
+	CategoryID     *string `json:"categoryId,omitempty"`
+	CategoryName   *string `json:"categoryName,omitempty"`
+	ID             *string `json:"id,omitempty"`
+	Info           *string `json:"info,omitempty"`
+	Name           string  `json:"name"`
+	Notes          *string `json:"notes,omitempty"`
+	OsRequirements *string `json:"osRequirements,omitempty"`
+	Parameter10    *string `json:"parameter10,omitempty"`
+	Parameter11    *string `json:"parameter11,omitempty"`
+	Parameter4     *string `json:"parameter4,omitempty"`
+	Parameter5     *string `json:"parameter5,omitempty"`
+	Parameter6     *string `json:"parameter6,omitempty"`
+	Parameter7     *string `json:"parameter7,omitempty"`
+	Parameter8     *string `json:"parameter8,omitempty"`
+	Parameter9     *string `json:"parameter9,omitempty"`
+	Priority       *string `json:"priority,omitempty"`
+	ScriptContents *string `json:"scriptContents,omitempty"`
+}
+
+// ScriptsSearchResults represents a scripts search results.
+type ScriptsSearchResults struct {
+	Results    []Script `json:"results"`
+	TotalCount int      `json:"totalCount"`
+}
+
+// SiteObject represents a site object.
+type SiteObject struct {
+	ObjectID   string `json:"objectId"`
+	ObjectType string `json:"objectType"`
+	SiteID     string `json:"siteId"`
+}
+
 // StartupStatus represents a startup status.
 type StartupStatus struct {
 	Error                   *string `json:"error,omitempty"`
@@ -611,4 +695,10 @@ type StartupStatus struct {
 	Warning                 *string `json:"warning,omitempty"`
 	WarningCode             *string `json:"warningCode,omitempty"`
 	WarningParam            *string `json:"warningParam,omitempty"`
+}
+
+// V1Site represents a v1 site.
+type V1Site struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }

@@ -206,6 +206,46 @@
         },
         "type": "object"
       },
+      "CategoriesSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/Category"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "Category": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "The Best",
+            "type": "string"
+          },
+          "priority": {
+            "example": 9,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "priority"
+        ],
+        "type": "object"
+      },
       "ChangePassword": {
         "properties": {
           "currentPassword": {
@@ -225,6 +265,42 @@
           "currentPassword",
           "newPassword"
         ],
+        "type": "object"
+      },
+      "Department": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "Department of Redundancy Department",
+            "maxLength": 225,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "DepartmentsSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/Department"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
         "type": "object"
       },
       "EnrollmentMethodPrestage": {
@@ -301,6 +377,22 @@
         },
         "type": "object"
       },
+      "HistorySearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectHistory"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "HrefResponse": {
         "properties": {
           "href": {
@@ -324,6 +416,18 @@
           "url": {
             "example": "https://stage-ics.services.jamfcloud.com/icon/hash_c315ef577b84505de1bfcb50b0c4b1c963da30b2a805f84b24ad09f282b7fad4",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Ids": {
+        "properties": {
+          "ids": {
+            "items": {
+              "example": "1",
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -1534,6 +1638,45 @@
           }
         ]
       },
+      "ObjectHistory": {
+        "properties": {
+          "date": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "type": "string"
+          },
+          "details": {
+            "example": "Is SSO Enabled false\\nSelected SSO Provider",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "note": {
+            "example": "Sso settings update",
+            "type": "string"
+          },
+          "username": {
+            "example": "admin",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ObjectHistoryNote": {
+        "properties": {
+          "note": {
+            "example": "A generic note can sometimes be useful, but generally not.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "note"
+        ],
+        "type": "object"
+      },
       "Package": {
         "properties": {
           "basePath": {
@@ -1733,6 +1876,176 @@
         },
         "type": "object"
       },
+      "Script": {
+        "properties": {
+          "categoryId": {
+            "example": "1",
+            "type": "string"
+          },
+          "categoryName": {
+            "example": "Developer Tools",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "info": {
+            "example": "Installs utilities for developers",
+            "type": "string"
+          },
+          "name": {
+            "example": "Install Developer Utils Script",
+            "type": "string"
+          },
+          "notes": {
+            "example": "Should be able to be re-run without problem.",
+            "type": "string"
+          },
+          "osRequirements": {
+            "example": "10.10.x",
+            "type": "string"
+          },
+          "parameter10": {
+            "example": "7",
+            "type": "string"
+          },
+          "parameter11": {
+            "example": "8",
+            "type": "string"
+          },
+          "parameter4": {
+            "example": "1",
+            "type": "string"
+          },
+          "parameter5": {
+            "example": "2",
+            "type": "string"
+          },
+          "parameter6": {
+            "example": "3",
+            "type": "string"
+          },
+          "parameter7": {
+            "example": "4",
+            "type": "string"
+          },
+          "parameter8": {
+            "example": "5",
+            "type": "string"
+          },
+          "parameter9": {
+            "example": "6",
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "BEFORE",
+              "AFTER",
+              "AT_REBOOT"
+            ],
+            "example": "AFTER",
+            "type": "string"
+          },
+          "scriptContents": {
+            "example": "echo \"Trivial script.\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "ScriptsSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/Script"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "SiteObject": {
+        "properties": {
+          "objectId": {
+            "example": "1",
+            "type": "string"
+          },
+          "objectType": {
+            "enum": [
+              "Computer",
+              "Peripheral",
+              "Licensed Software",
+              "Licensed Software Template",
+              "Policy",
+              "macOS Configuration Profile",
+              "Restricted Software",
+              "Managed Preference Profile",
+              "Computer Group",
+              "Mobile Device",
+              "Apple TV",
+              "User Group",
+              "iOS Configuration Profile",
+              "Mobile Device App",
+              "E-book",
+              "Mobile Device Group",
+              "Classroom",
+              "Advanced Computer Search",
+              "Advanced Mobile Search",
+              "Advanced User Search",
+              "Advanced User Content Search",
+              "Computer Invitation",
+              "Mobile Device Invitation",
+              "Mobile Device Enrollment Profile",
+              "Device Enrollment Program Instance",
+              "Mobile Device Prestage",
+              "Computer DEP Prestage",
+              "Enrollment Customization",
+              "VPP Location",
+              "VPP Subscription",
+              "VPP Invitation",
+              "VPP Assignment",
+              "User",
+              "Network Integration",
+              "Mac App",
+              "App Installer",
+              "Self Service Plugin",
+              "Software Title",
+              "Patch Software Title Summary",
+              "Patch Policy",
+              "Patch Software Title Configuration",
+              "Change Password",
+              "Mobile Device Inventory",
+              "Computer Inventory",
+              "Change Management",
+              "Licensed Software License",
+              "Unknown"
+            ],
+            "example": "User",
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "type": "string"
+          }
+        },
+        "required": [
+          "objectId",
+          "objectType",
+          "siteId"
+        ],
+        "type": "object"
+      },
       "StartupStatus": {
         "properties": {
           "error": {
@@ -1828,6 +2141,19 @@
           "warningParam": {
             "example": "13 MB",
             "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "V1Site": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "Eau Claire",
             "type": "string"
           }
         },
@@ -2197,6 +2523,803 @@
         ]
       }
     },
+    "/v1/categories": {
+      "get": {
+        "description": "Gets `Category` objects.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter categories collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: name, priority. This param can be combined with paging and sorting. Example: filter=name==\"Apps*\" and priority\u003e=5",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoriesSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get Category objects\n",
+        "tags": [
+          "categories"
+        ],
+        "x-required-privileges": [
+          "Read Categories",
+          "Read Self Service"
+        ]
+      },
+      "post": {
+        "description": "Create category record\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          },
+          "description": "category object to create. IDs defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Category record was created"
+          }
+        },
+        "summary": "Create Category record\n",
+        "tags": [
+          "categories"
+        ],
+        "x-required-privileges": [
+          "Create Categories"
+        ]
+      }
+    },
+    "/v1/categories/delete-multiple": {
+      "post": {
+        "description": "Delete multiple Categories by their IDs",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ids"
+              }
+            }
+          },
+          "description": "IDs of the categories to be deleted",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "All Category IDs passed in request sucessfully deleted."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Request processed.  Returns IDs and error codes of any categories unable to be deleted.  Expected error codes: INVALID_ID - id does not exist SYSTEM_EXCEPTION - a system exception occurred trying to delete the category."
+          }
+        },
+        "summary": "Delete multiple Categories by their IDs\n",
+        "tags": [
+          "categories"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Delete Categories"
+        ]
+      }
+    },
+    "/v1/categories/{id}": {
+      "delete": {
+        "description": "Removes specified category record\n",
+        "parameters": [
+          {
+            "description": "instance id of category record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Category record was deleted"
+          }
+        },
+        "summary": "Remove specified Category record\n",
+        "tags": [
+          "categories"
+        ],
+        "x-required-privileges": [
+          "Delete Categories"
+        ]
+      },
+      "get": {
+        "description": "Gets specified Category object\n",
+        "parameters": [
+          {
+            "description": "instance id of category record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            },
+            "description": "Details of category were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified category object does not exist."
+          }
+        },
+        "summary": "Get specified Category object\n",
+        "tags": [
+          "categories"
+        ],
+        "x-required-privileges": [
+          "Read Categories"
+        ]
+      },
+      "put": {
+        "description": "Update specified category object\n",
+        "parameters": [
+          {
+            "description": "instance id of category record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          },
+          "description": "category object to create. id defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            },
+            "description": "Category record was updated"
+          }
+        },
+        "summary": "Update specified Category object\n",
+        "tags": [
+          "categories"
+        ],
+        "x-required-privileges": [
+          "Update Categories"
+        ]
+      }
+    },
+    "/v1/categories/{id}/history": {
+      "get": {
+        "description": "Gets specified Category history object\n",
+        "parameters": [
+          {
+            "description": "instance id of category history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of category history were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified category object does not exist."
+          }
+        },
+        "summary": "Get specified Category history object\n",
+        "tags": [
+          "categories"
+        ],
+        "x-required-privileges": [
+          "Read Categories"
+        ]
+      },
+      "post": {
+        "description": "Adds specified Category history object notes\n",
+        "parameters": [
+          {
+            "description": "instance id of category history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes of category history were added"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified category object does not exist."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Category history can not be saved"
+          }
+        },
+        "summary": "Add specified Category history object notes\n",
+        "tags": [
+          "categories"
+        ],
+        "x-required-privileges": [
+          "Update Categories"
+        ]
+      }
+    },
+    "/v1/departments": {
+      "get": {
+        "description": "Search for Departments\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter department collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: id, name. Example: name==\"*department*\"",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentsSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Search for Departments\n",
+        "tags": [
+          "departments"
+        ],
+        "x-required-privileges": [
+          "Read Departments"
+        ]
+      },
+      "post": {
+        "description": "Create department record\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Department"
+              }
+            }
+          },
+          "description": "department object to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Department record was created"
+          }
+        },
+        "summary": "Create department record\n",
+        "tags": [
+          "departments"
+        ],
+        "x-required-privileges": [
+          "Create Departments"
+        ]
+      }
+    },
+    "/v1/departments/delete-multiple": {
+      "post": {
+        "description": "Deletes all departments by ids passed in body\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ids"
+              }
+            }
+          },
+          "description": "ids of departments to be deleted. pass in an array of ids",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "All department ids passed in request sucessfully deleted."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Request processed.  Returns ids and error codes of any departments unable to be deleted.  Expected error codes: INVALID_ID - id does not exist SYSTEM_EXCEPTION - a system exception occured trying to delete the department."
+          }
+        },
+        "summary": "Deletes all departments by ids passed in body\n",
+        "tags": [
+          "departments"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Delete Departments"
+        ]
+      }
+    },
+    "/v1/departments/{id}": {
+      "delete": {
+        "description": "Removes specified department record\n",
+        "parameters": [
+          {
+            "description": "instance id of department record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Department record was deleted"
+          }
+        },
+        "summary": "Remove specified department record\n",
+        "tags": [
+          "departments"
+        ],
+        "x-required-privileges": [
+          "Delete Departments"
+        ]
+      },
+      "get": {
+        "description": "Gets specified Department object\n",
+        "parameters": [
+          {
+            "description": "instance id of department record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Department"
+                }
+              }
+            },
+            "description": "Details of department were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified department object does not exist."
+          }
+        },
+        "summary": "Get specified Department object\n",
+        "tags": [
+          "departments"
+        ],
+        "x-required-privileges": [
+          "Read Departments"
+        ]
+      },
+      "put": {
+        "description": "Update specified department object\n",
+        "parameters": [
+          {
+            "description": "instance id of department record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Department"
+              }
+            }
+          },
+          "description": "department object to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Department"
+                }
+              }
+            },
+            "description": "Department update"
+          }
+        },
+        "summary": "Update specified department object\n",
+        "tags": [
+          "departments"
+        ],
+        "x-required-privileges": [
+          "Update Departments"
+        ]
+      }
+    },
+    "/v1/departments/{id}/history": {
+      "get": {
+        "description": "Gets specified Department history object\n",
+        "parameters": [
+          {
+            "description": "instance id of department history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of department history were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified department object does not exist."
+          }
+        },
+        "summary": "Get specified Department history object\n",
+        "tags": [
+          "departments"
+        ],
+        "x-required-privileges": [
+          "Read Departments"
+        ]
+      },
+      "post": {
+        "description": "Adds specified Department history object notes\n",
+        "parameters": [
+          {
+            "description": "instance id of department history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of department history were added"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified department object does not exist."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Department history can not be saved"
+          }
+        },
+        "summary": "Add specified Department history object notes\n",
+        "tags": [
+          "departments"
+        ],
+        "x-required-privileges": [
+          "Update Departments"
+        ]
+      }
+    },
     "/v1/icon": {
       "post": {
         "description": "Uploads an icon",
@@ -2538,6 +3661,534 @@
         "x-required-privileges": [
           "Update Packages",
           "Read Packages"
+        ]
+      }
+    },
+    "/v1/scripts": {
+      "get": {
+        "description": "Search for sorted and paged scripts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria are supported and must be separated with a comma. Fields allowed in the query: `id`, `name`, `info`, `notes`, `priority`, `categoryId`, `categoryName`, `parameter4` up to `parameter11`, `osRequirements`, `scriptContents`. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "name:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter scripts collection. Default search is empty query - returning all results for the requested page. Fields allowed in the query: `id`, `name`, `info`, `notes`, `priority`, `categoryId`, `categoryName`, `parameter4` up to `parameter11`, `osRequirements`, `scriptContents`. This param can be combined with paging and sorting. Example: filter=categoryName==\"Category\" and name==\"*script name*\"",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScriptsSearchResults"
+                }
+              }
+            },
+            "description": "Found scripts matching search params."
+          }
+        },
+        "summary": "Search for sorted and paged Scripts\n",
+        "tags": [
+          "scripts"
+        ],
+        "x-required-privileges": [
+          "Read Scripts"
+        ]
+      },
+      "post": {
+        "description": "Creates a script",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Script"
+              }
+            }
+          },
+          "description": "new script to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Script created successfully"
+          }
+        },
+        "summary": "Create a Script\n",
+        "tags": [
+          "scripts"
+        ],
+        "x-required-privileges": [
+          "Create Scripts"
+        ]
+      }
+    },
+    "/v1/scripts/{id}": {
+      "delete": {
+        "description": "Deletes a script at the specified id",
+        "parameters": [
+          {
+            "description": "Script object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          }
+        },
+        "summary": "Delete a Script at the specified id\n",
+        "tags": [
+          "scripts"
+        ],
+        "x-required-privileges": [
+          "Delete Scripts"
+        ]
+      },
+      "get": {
+        "description": "Retrieves a full script object",
+        "parameters": [
+          {
+            "description": "Script object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Script"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Script with that ID does not exist"
+          }
+        },
+        "summary": "Retrieve a full script object\n",
+        "tags": [
+          "scripts"
+        ],
+        "x-required-privileges": [
+          "Read Scripts"
+        ]
+      },
+      "put": {
+        "description": "Replaces the script at the id with the supplied information",
+        "parameters": [
+          {
+            "description": "Script object identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Script"
+              }
+            }
+          },
+          "description": "new script to upload to existing id. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Script"
+                }
+              }
+            },
+            "description": "Script at id was updated"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Script with that id does not exist"
+          }
+        },
+        "summary": "Replace the script at the id with the supplied information\n",
+        "tags": [
+          "scripts"
+        ],
+        "x-required-privileges": [
+          "Update Scripts"
+        ]
+      }
+    },
+    "/v1/scripts/{id}/download": {
+      "get": {
+        "description": "Download a text file of the script contents",
+        "parameters": [
+          {
+            "description": "id of the script to be downloaded",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The script of the specified id"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Download a text file of the Script contents\n",
+        "tags": [
+          "scripts"
+        ],
+        "x-required-privileges": [
+          "Read Scripts"
+        ]
+      }
+    },
+    "/v1/scripts/{id}/history": {
+      "get": {
+        "description": "Gets specified Script history object\n",
+        "parameters": [
+          {
+            "description": "id of script history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified script does not exist."
+          }
+        },
+        "summary": "Get specified Script history object\n",
+        "tags": [
+          "scripts"
+        ],
+        "x-required-privileges": [
+          "Read Scripts"
+        ]
+      },
+      "post": {
+        "description": "Adds specified Script history object notes\n",
+        "parameters": [
+          {
+            "description": "instance id of script history record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes of script history were added"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified script does not exist."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Script history can not be saved"
+          }
+        },
+        "summary": "Add specified Script history object notes\n",
+        "tags": [
+          "scripts"
+        ],
+        "x-required-privileges": [
+          "Update Scripts"
+        ]
+      }
+    },
+    "/v1/sites": {
+      "get": {
+        "description": "Find all sites\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/V1Site"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Find all sites\n",
+        "tags": [
+          "sites"
+        ],
+        "x-required-privileges": [
+          "Read Sites"
+        ]
+      }
+    },
+    "/v1/sites/{id}/objects": {
+      "get": {
+        "description": "Find site objects for Site ID, with the ability to filter out different object types and object IDs for the site ID\n",
+        "parameters": [
+          {
+            "description": "Site ID to get objects for\n",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": "1",
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `objectType:asc`. Multiple sort criteria are supported and must be separated\nwith a comma.\n\nExample: `sort=objectId:asc,objectType:desc`.\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "objectType:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing filter of site object information.\nDefault filter returns all objects for the site ID.\n\nFields allowed in the query: `objectType`, `objectId`\n\nExample: `filter=objectType==\"User\"`\n\nList of `objectType` options (case-insensitive) [\"Computer\", \"Peripheral\", \"Licensed Software\", \"Licensed Software Template\", \"Policy\", \"macOS Configuration Profile\", \"Restricted Software\", \"Managed Preference Profile\", \"Computer Group\", \"Mobile Device\", \"Apple TV\", \"Android Device\", \"User Group\", \"iOS Configuration Profile\", \"Mobile Device App\", \"E-book\", \"Mobile Device Group\", \"Classroom\", \"Advanced Computer Search\", \"Advanced Mobile Search\", \"Advanced User Search\", \"Advanced User Content Search\", \"Computer Invitation\", \"Mobile Device Invitation\", \"Mobile Device Enrollment Profile\", \"Device Enrollment Program Instance\", \"Mobile Device Prestage\", \"Computer DEP Prestage\", \"Enrollment Customization\", \"VPP Location\", \"VPP Subscription\", \"VPP Invitation\", \"VPP Assignment\", \"User\", \"Network Integration\", \"Mac App\", \"App Installer\", \"Self Service Plugin\", \"Software Title\", \"Patch Software Title Summary\", \"Patch Policy\", \"Patch Software Title Configuration\", \"Change Password\", \"Mobile Device Inventory\", \"Computer Inventory\", \"Change Management\", \"Licensed Software License\"]\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "objectType==\"User\"",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SiteObject"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Find and filter site objects for a site ID\n",
+        "tags": [
+          "sites"
+        ],
+        "x-required-privileges": [
+          "Read Sites"
         ]
       }
     },
