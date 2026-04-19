@@ -148,7 +148,8 @@
       "fieldTypeOverrides": {
         "*.invitation": "*BigInt",
         "*.expiration_date_epoch": "*BigInt",
-        "*.date_sent_epoch": "*BigInt"
+        "*.date_sent_epoch": "*BigInt",
+        "*.notification": "*NotificationValue"
       },
       "operations": [
         {"op": "GET /computers/id/{id}", "name": "GetComputerByID", "responseType": "computer", "pathNames": {"id": "id"}},

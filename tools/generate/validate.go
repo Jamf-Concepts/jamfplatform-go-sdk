@@ -43,12 +43,13 @@ var builtinTypeRefs = map[string]bool{
 	"time.Time":       true,
 	"json.RawMessage": true,
 	"xml.Name":        true,
-	// BigInt is a hand-written per-package type (see jamfplatform/proclassic/
-	// bignum.go) the generator uses as a FieldTypeOverride target for
-	// spec-integer fields whose wire values exceed int64. Treat it as a
-	// builtin for validation — the validator can't see the file-level
-	// declaration and would false-positive.
-	"BigInt":          true,
+	// BigInt and NotificationValue are supplemental types the generator
+	// emits into XML packages (see xml_helpers.go) as FieldTypeOverride
+	// targets for spec bugs the XML wire exposes (int overflow, duplicate
+	// repeated elements). Treat them as builtins for validation — the
+	// validator can't see supplemental files and would false-positive.
+	"BigInt":            true,
+	"NotificationValue": true,
 }
 
 // validateTypeReferences reports missing Go types referenced by methods.

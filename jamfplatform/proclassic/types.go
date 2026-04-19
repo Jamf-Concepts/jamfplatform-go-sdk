@@ -3673,7 +3673,7 @@ type EbookSelfService struct {
 	FeatureOnMainPage           *bool                                  `xml:"feature_on_main_page,omitempty"`
 	ForceUsersToViewDescription *bool                                  `xml:"force_users_to_view_description,omitempty"`
 	InstallButtonText           *string                                `xml:"install_button_text,omitempty"`
-	Notification                *bool                                  `xml:"notification,omitempty"`
+	Notification                *NotificationValue                     `xml:"notification"`
 	NotificationMessage         *string                                `xml:"notification_message,omitempty"`
 	NotificationSubject         *string                                `xml:"notification_subject,omitempty"`
 	SelfServiceCategories       *EbookSelfServiceSelfServiceCategories `xml:"self_service_categories,omitempty"`
@@ -5314,7 +5314,7 @@ type MacApplicationSelfService struct {
 	FeatureOnMainPage           *bool                                                 `xml:"feature_on_main_page,omitempty"`
 	ForceUsersToViewDescription *bool                                                 `xml:"force_users_to_view_description,omitempty"`
 	InstallButtonText           *string                                               `xml:"install_button_text,omitempty"`
-	Notification                *string                                               `xml:"notification,omitempty"`
+	Notification                *NotificationValue                                    `xml:"notification"`
 	NotificationMessage         *string                                               `xml:"notification_message,omitempty"`
 	NotificationSubject         *string                                               `xml:"notification_subject,omitempty"`
 	SelfServiceCategories       *[]MacApplicationSelfServiceSelfServiceCategoriesItem `xml:"self_service_categories,omitempty"`
@@ -6025,7 +6025,7 @@ type MobileDeviceApplicationSelfService struct {
 	XMLName                xml.Name
 	ID                     *int                                                           `xml:"id,omitempty"`
 	FeatureOnMainPage      *bool                                                          `xml:"feature_on_main_page,omitempty"`
-	Notification           *bool                                                          `xml:"notification,omitempty"`
+	Notification           *NotificationValue                                             `xml:"notification"`
 	NotificationMessage    *string                                                        `xml:"notification_message,omitempty"`
 	NotificationSubject    *string                                                        `xml:"notification_subject,omitempty"`
 	SelfServiceCategories  *[]MobileDeviceApplicationSelfServiceSelfServiceCategoriesItem `xml:"self_service_categories,omitempty"`
@@ -8276,7 +8276,7 @@ type OsXConfigurationProfileSelfService struct {
 	FeatureOnMainPage           *bool                                                    `xml:"feature_on_main_page,omitempty"`
 	ForceUsersToViewDescription *bool                                                    `xml:"force_users_to_view_description,omitempty"`
 	InstallButtonText           *string                                                  `xml:"install_button_text,omitempty"`
-	Notification                *string                                                  `xml:"notification,omitempty"`
+	Notification                *NotificationValue                                       `xml:"notification"`
 	NotificationMessage         *string                                                  `xml:"notification_message,omitempty"`
 	NotificationSubject         *string                                                  `xml:"notification_subject,omitempty"`
 	SelfServiceCategories       *OsXConfigurationProfileSelfServiceSelfServiceCategories `xml:"self_service_categories,omitempty"`

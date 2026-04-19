@@ -106,7 +106,8 @@ For JSON APIs (Platform, Pro), the spec-driven heuristic is sufficient — those
 - `url.PathEscape` for path parameters, `url.QueryEscape` for query parameters.
 - Error wrapping: `fmt.Errorf("MethodName(%s): %w", id, err)`.
 - Do not hand-edit generated files — modify the generator config instead.
-- **Never modify the OpenAPI specs under `testing/`**. They are the source-of-truth mirrors of Jamf's published specs. Spec quirks (typos, wrong types, polymorphic roots, missing fields) are fixed at the generator level — via config overrides, post-processing passes, or hand-written supplemental files in the target package — not by patching the spec. Specs must round-trip upstream changes cleanly; our fixups live in the generator so they stay attached to the code that needs them.
+- **Never add handwritten code to a generated-output sub-package** (e.g. `jamfplatform/proclassic/`, `jamfplatform/pro/`, `jamfplatform/devices/`). Every `.go` file in those directories must be written by `make generate`. Supplemental types needed as FieldTypeOverride targets (e.g. `BigInt`, `NotificationValue`) live in the generator as emitted static files (see `emitPkgXMLSupplements`) so they stay in lock-step with spec/override changes and can't drift out of sync. Adding `foo.go` to a generated package is a correctness hazard, not a shortcut — make the generator emit it.
+- **Never modify the OpenAPI specs under `testing/`**. They are the source-of-truth mirrors of Jamf's published specs. Spec quirks (typos, wrong types, polymorphic roots, missing fields) are fixed at the generator level — via config overrides, post-processing passes, or generator-emitted supplemental files — not by patching the spec and not by handwriting files in the target package. Specs must round-trip upstream changes cleanly; our fixups live in the generator so they stay attached to the code that needs them.
 
 ## Acceptance tests
 
