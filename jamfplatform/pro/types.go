@@ -30,6 +30,21 @@ type AdvancedSearchSearchResults struct {
 	TotalCount int              `json:"totalCount"`
 }
 
+// AdvancedUserContentSearch represents a advanced user content search.
+type AdvancedUserContentSearch struct {
+	Criteria      *[]SmartSearchCriterion `json:"criteria,omitempty"`
+	DisplayFields *[]string               `json:"displayFields,omitempty"`
+	ID            *string                 `json:"id,omitempty"`
+	Name          string                  `json:"name"`
+	SiteID        *string                 `json:"siteId,omitempty"`
+}
+
+// AdvancedUserContentSearchSearchResults represents a advanced user content search search results.
+type AdvancedUserContentSearchSearchResults struct {
+	Results    []AdvancedUserContentSearch `json:"results"`
+	TotalCount int                         `json:"totalCount"`
+}
+
 // ApiError represents a api error.
 type ApiError struct {
 	Errors     []ApiErrorCause `json:"errors"`
@@ -48,6 +63,12 @@ type ApiErrorCause struct {
 type Assignment struct {
 	MobileDeviceID *string `json:"mobileDeviceId,omitempty"`
 	Selected       *bool   `json:"selected,omitempty"`
+}
+
+// AssignmentDtoV1 represents a assignment dto v1.
+type AssignmentDtoV1 struct {
+	DeviceID string `json:"deviceId"`
+	Selected bool   `json:"selected"`
 }
 
 // Building represents a building.
@@ -260,12 +281,49 @@ type ExtensionAttributes struct {
 	Name        string  `json:"name"`
 }
 
+// GroupDtoV1 represents a group dto v1.
+type GroupDtoV1 struct {
+	GroupDescription string `json:"groupDescription"`
+	GroupJamfProID   string `json:"groupJamfProId"`
+	GroupName        string `json:"groupName"`
+	GroupPlatformID  string `json:"groupPlatformId"`
+	GroupType        string `json:"groupType"`
+	MembershipCount  int    `json:"membershipCount"`
+	Smart            bool   `json:"smart"`
+}
+
 // GroupResetRequest represents a group reset request.
 type GroupResetRequest struct {
 	ClearActivationLock    *bool `json:"clearActivationLock,omitempty"`
 	DisallowProximitySetup *bool `json:"disallowProximitySetup,omitempty"`
 	PreserveDataPlan       *bool `json:"preserveDataPlan,omitempty"`
 	ReturnToService        *bool `json:"returnToService,omitempty"`
+}
+
+// GroupSearchResult represents a group search result.
+type GroupSearchResult struct {
+	Results    []GroupDtoV1 `json:"results"`
+	TotalCount int          `json:"totalCount"`
+}
+
+// GroupUpdateDtoV1 represents a group update dto v1.
+type GroupUpdateDtoV1 struct {
+	Assignments      *[]AssignmentDtoV1    `json:"assignments,omitempty"`
+	Criteria         *[]SmartGroupCriteria `json:"criteria,omitempty"`
+	GroupDescription *string               `json:"groupDescription,omitempty"`
+	GroupName        *string               `json:"groupName,omitempty"`
+}
+
+// GroupWithCriteriaDtoV1 represents a group with criteria dto v1.
+type GroupWithCriteriaDtoV1 struct {
+	Criteria         *[]SmartGroupCriteria `json:"criteria,omitempty"`
+	GroupDescription string                `json:"groupDescription"`
+	GroupJamfProID   string                `json:"groupJamfProId"`
+	GroupName        string                `json:"groupName"`
+	GroupPlatformID  string                `json:"groupPlatformId"`
+	GroupType        string                `json:"groupType"`
+	MembershipCount  int                   `json:"membershipCount"`
+	Smart            bool                  `json:"smart"`
 }
 
 // HistorySearchResults represents a history search results.
@@ -1141,6 +1199,17 @@ type PackagesSearchResults struct {
 	TotalCount int       `json:"totalCount"`
 }
 
+// PagedUserResults represents a paged user results.
+type PagedUserResults struct {
+	HasNext     bool   `json:"hasNext"`
+	HasPrevious bool   `json:"hasPrevious"`
+	Page        int    `json:"page"`
+	PageSize    int    `json:"pageSize"`
+	Results     []User `json:"results"`
+	TotalCount  int64  `json:"totalCount"`
+	TotalPages  int64  `json:"totalPages"`
+}
+
 // PurchasingV2 represents a purchasing v2.
 type PurchasingV2 struct {
 	AppleCareID         *string    `json:"appleCareId,omitempty"`
@@ -1408,6 +1477,31 @@ type UpdateTvOs struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	AirplayPassword *string       `json:"airplayPassword,omitempty"`
 	Purchasing      *PurchasingV2 `json:"purchasing,omitempty"`
+}
+
+// User represents a user.
+type User struct {
+	CustomPhotoURL       string  `json:"customPhotoUrl"`
+	Email                string  `json:"email"`
+	EnableCustomPhotoURL bool    `json:"enableCustomPhotoUrl"`
+	ID                   string  `json:"id"`
+	ManagedAppleID       string  `json:"managedAppleId"`
+	Phone                *string `json:"phone,omitempty"`
+	Position             *string `json:"position,omitempty"`
+	Realname             string  `json:"realname"`
+	Username             string  `json:"username"`
+}
+
+// UserInventory represents a user inventory.
+type UserInventory struct {
+	CustomPhotoURL       *string `json:"customPhotoUrl,omitempty"`
+	Email                *string `json:"email,omitempty"`
+	EnableCustomPhotoURL *bool   `json:"enableCustomPhotoUrl,omitempty"`
+	ManagedAppleID       *string `json:"managedAppleId,omitempty"`
+	Phone                *string `json:"phone,omitempty"`
+	Position             *string `json:"position,omitempty"`
+	Realname             *string `json:"realname,omitempty"`
+	Username             *string `json:"username,omitempty"`
 }
 
 // V1Site represents a v1 site.

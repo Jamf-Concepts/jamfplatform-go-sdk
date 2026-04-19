@@ -233,7 +233,24 @@
         {"op": "GET /v2/mobile-devices/{id}/detail", "name": "GetMobileDeviceDetailV2"},
         {"op": "POST /v2/mobile-devices/{id}/erase", "name": "EraseMobileDeviceV2"},
         {"op": "GET /v2/mobile-devices/{id}/paired-devices", "name": "ListMobileDevicePairedDevicesV2", "pagination": "totalCount", "params": ["section:[]string", "sort:[]string", "filter"]},
-        {"op": "POST /v2/mobile-devices/{id}/unmanage", "name": "UnmanageMobileDeviceV2"}
+        {"op": "POST /v2/mobile-devices/{id}/unmanage", "name": "UnmanageMobileDeviceV2"},
+
+        {"op": "GET /v1/advanced-user-content-searches", "name": "ListAdvancedUserContentSearchesV1"},
+        {"op": "POST /v1/advanced-user-content-searches", "name": "CreateAdvancedUserContentSearchV1"},
+        {"op": "GET /v1/advanced-user-content-searches/{id}", "name": "GetAdvancedUserContentSearchV1"},
+        {"op": "PUT /v1/advanced-user-content-searches/{id}", "name": "UpdateAdvancedUserContentSearchV1"},
+        {"op": "DELETE /v1/advanced-user-content-searches/{id}", "name": "DeleteAdvancedUserContentSearchV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/groups", "name": "ListGroupsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/groups/{id}", "name": "GetGroupV1"},
+        {"op": "DELETE /v1/groups/{id}", "name": "DeleteGroupV1", "expectedStatus": 204},
+        {"op": "PATCH /v1/groups/{id}", "name": "PatchGroupV1"},
+
+        {"op": "GET /v1/users", "name": "ListUsersV1", "pagination": "hasNext", "params": ["sort:[]string", "filter", "platform:bool"]},
+        {"op": "POST /v1/users", "name": "CreateUserV1", "params": ["platform:bool"]},
+        {"op": "GET /v1/users/{id}", "name": "GetUserV1", "params": ["platform:bool"]},
+        {"op": "PUT /v1/users/{id}", "name": "UpdateUserV1"},
+        {"op": "DELETE /v1/users/{id}", "name": "DeleteUserV1", "expectedStatus": 204}
       ]
     },
     {
