@@ -17,7 +17,7 @@ func TestListComputerGroupsV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{"id": "test-id"}})
+		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 	})
 
 	result, err := c.ListComputerGroupsV1(context.Background())
@@ -91,7 +91,7 @@ func TestGetSmartComputerGroupV2(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.GetSmartComputerGroupV2(context.Background(), "test-id")
@@ -158,7 +158,7 @@ func TestGetSmartComputerGroupMembershipV2(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.GetSmartComputerGroupMembershipV2(context.Background(), "test-id")
@@ -232,7 +232,7 @@ func TestGetStaticComputerGroupV2(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.GetStaticComputerGroupV2(context.Background(), "test-id")

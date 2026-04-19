@@ -96,7 +96,7 @@ func TestGetComputerExtensionAttributeTemplateV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.GetComputerExtensionAttributeTemplateV1(context.Background(), "test-id")
@@ -150,7 +150,7 @@ func TestGetComputerExtensionAttributeV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.GetComputerExtensionAttributeV1(context.Background(), "test-id")
@@ -217,7 +217,7 @@ func TestGetComputerExtensionAttributeDataDependencyV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.GetComputerExtensionAttributeDataDependencyV1(context.Background(), "test-id")
@@ -251,7 +251,7 @@ func TestDownloadComputerExtensionAttributeV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{"id": "test-id"}})
+		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 	})
 
 	result, err := c.DownloadComputerExtensionAttributeV1(context.Background(), "test-id")

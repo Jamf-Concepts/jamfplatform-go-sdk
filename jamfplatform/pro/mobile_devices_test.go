@@ -32,3 +32,185 @@ func TestListMobileDevicesDetailV2(t *testing.T) {
 		t.Fatalf("len = %d, want 1", len(results))
 	}
 }
+
+func TestListMobileDevicesV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{}},
+			"totalCount": 1,
+			"hasNext":    false,
+		})
+	})
+
+	results, err := c.ListMobileDevicesV2(context.Background(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
+func TestGetMobileDeviceV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetMobileDeviceV2(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetMobileDeviceV2_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetMobileDeviceV2(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestPatchMobileDeviceV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPatch {
+			t.Errorf("method = %s, want PATCH", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.PatchMobileDeviceV2(context.Background(), "test-id", &UpdateMobileDeviceV2{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetMobileDeviceDetailV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/test-id/detail", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetMobileDeviceDetailV2(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetMobileDeviceDetailV2_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/test-id/detail", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetMobileDeviceDetailV2(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestEraseMobileDeviceV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.EraseMobileDeviceV2(context.Background(), "test-id", &EraseDeviceMobileDeviceRequest{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestListMobileDevicePairedDevicesV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/test-id/paired-devices", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{}},
+			"totalCount": 1,
+			"hasNext":    false,
+		})
+	})
+
+	results, err := c.ListMobileDevicePairedDevicesV2(context.Background(), "test-id", nil, nil, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
+func TestUnmanageMobileDeviceV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/test-id/unmanage", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.UnmanageMobileDeviceV2(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUnmanageMobileDeviceV2_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/test-id/unmanage", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.UnmanageMobileDeviceV2(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}

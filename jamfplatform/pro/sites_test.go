@@ -17,7 +17,7 @@ func TestListSitesV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{"id": "test-id"}})
+		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 	})
 
 	result, err := c.ListSitesV1(context.Background())

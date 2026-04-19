@@ -57,7 +57,7 @@ func TestGetDeviceGroup(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.GetDeviceGroup(context.Background(), "test-id")

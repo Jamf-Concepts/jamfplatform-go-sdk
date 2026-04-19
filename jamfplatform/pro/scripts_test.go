@@ -57,7 +57,7 @@ func TestGetScriptV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.GetScriptV1(context.Background(), "test-id")
@@ -124,7 +124,7 @@ func TestDownloadScriptV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{"id": "test-id"}})
+		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 	})
 
 	result, err := c.DownloadScriptV1(context.Background(), "test-id")

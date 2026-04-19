@@ -592,9 +592,9 @@ func Test<% .Name %>(t *testing.T) {
 		<%- if eq .Format "xml" %>
 		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
 		<%- else if .ReturnsSlice %>
-		writeJSON(t, w, http.StatusOK, []map[string]any{{"id": "test-id"}})
+		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 		<%- else %>
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 		<%- end %>
 	})
 
