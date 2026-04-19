@@ -586,7 +586,29 @@
         {"op": "POST /v3/sso/disable", "name": "DisableSsoV3"},
         {"op": "GET /v3/sso/history", "name": "ListSsoHistoryV3", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v3/sso/history", "name": "CreateSsoHistoryNoteV3"},
-        {"op": "GET /v3/sso/metadata/download", "name": "DownloadSsoMetadataV3"}
+        {"op": "GET /v3/sso/metadata/download", "name": "DownloadSsoMetadataV3"},
+
+        {"op": "GET /v1/cloud-distribution-point", "name": "GetCloudDistributionPointV1"},
+        {"op": "POST /v1/cloud-distribution-point", "name": "CreateCloudDistributionPointV1"},
+        {"op": "DELETE /v1/cloud-distribution-point", "name": "DeleteCloudDistributionPointV1", "expectedStatus": 204},
+        {"op": "PATCH /v1/cloud-distribution-point", "name": "UpdateCloudDistributionPointV1", "expectedStatus": 202},
+        {"op": "POST /v1/cloud-distribution-point/fail-upload/{id}", "name": "FailCloudDistributionPointUploadV1", "params": ["file-name:string:fileName", "type:string:uploadType"]},
+        {"op": "GET /v1/cloud-distribution-point/files", "name": "ListCloudDistributionPointFilesV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/cloud-distribution-point/history", "name": "ListCloudDistributionPointHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/cloud-distribution-point/history", "name": "CreateCloudDistributionPointHistoryNoteV1"},
+        {"op": "POST /v1/cloud-distribution-point/refresh-inventory", "name": "RefreshCloudDistributionPointInventoryV1", "params": ["file-name:string:fileName"]},
+        {"op": "GET /v1/cloud-distribution-point/test-connection", "name": "TestCloudDistributionPointConnectionV1"},
+        {"op": "GET /v1/cloud-distribution-point/upload-capability", "name": "GetCloudDistributionPointUploadCapabilityV1"},
+
+        {"op": "GET /v1/distribution-points", "name": "ListDistributionPointsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/distribution-points", "name": "CreateDistributionPointV1"},
+        {"op": "POST /v1/distribution-points/delete-multiple", "name": "DeleteMultipleDistributionPointsV1"},
+        {"op": "GET /v1/distribution-points/{id}", "name": "GetDistributionPointV1"},
+        {"op": "PUT /v1/distribution-points/{id}", "name": "UpdateDistributionPointV1"},
+        {"op": "DELETE /v1/distribution-points/{id}", "name": "DeleteDistributionPointV1", "expectedStatus": 204},
+        {"op": "PATCH /v1/distribution-points/{id}", "name": "PatchDistributionPointV1"},
+        {"op": "GET /v1/distribution-points/{id}/history", "name": "ListDistributionPointHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/distribution-points/{id}/history", "name": "CreateDistributionPointHistoryNoteV1"}
       ]
     },
     {

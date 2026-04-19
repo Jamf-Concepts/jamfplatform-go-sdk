@@ -567,6 +567,58 @@ type ClearRestrictionsPasswordCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
 }
 
+// CloudDistributionPoint represents a cloud distribution point.
+type CloudDistributionPoint struct {
+	CdnType                string `json:"cdnType"`
+	CdnURL                 string `json:"cdnUrl"`
+	Directory              string `json:"directory"`
+	DownloadURL            string `json:"downloadUrl"`
+	ExpirationSeconds      int    `json:"expirationSeconds"`
+	HasConnectionSucceeded bool   `json:"hasConnectionSucceeded"`
+	InventoryID            string `json:"inventoryId"`
+	KeyPairID              string `json:"keyPairId"`
+	Master                 bool   `json:"master"`
+	Message                string `json:"message"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password                string `json:"password"`
+	PrivateKey              []byte `json:"privateKey"`
+	RequireSignedUrls       bool   `json:"requireSignedUrls"`
+	SecondaryAuthRequired   bool   `json:"secondaryAuthRequired"`
+	SecondaryAuthStatusCode int    `json:"secondaryAuthStatusCode"`
+	SecondaryAuthTimeToLive int    `json:"secondaryAuthTimeToLive"`
+	UploadURL               string `json:"uploadUrl"`
+	Username                string `json:"username"`
+}
+
+// CloudDistributionPointInventoryFileInfo represents a cloud distribution point inventory file info.
+type CloudDistributionPointInventoryFileInfo struct {
+	Category     string `json:"category"`
+	FileName     string `json:"fileName"`
+	FileObjectID string `json:"fileObjectId"`
+	ID           string `json:"id"`
+	InventoryID  string `json:"inventoryId"`
+	Status       string `json:"status"`
+	Type         string `json:"type"`
+}
+
+// CloudDistributionPointInventoryFilesResults represents a cloud distribution point inventory files results.
+type CloudDistributionPointInventoryFilesResults struct {
+	Results    []CloudDistributionPointInventoryFileInfo `json:"results"`
+	TotalCount int                                       `json:"totalCount"`
+}
+
+// CloudDistributionPointTestConnection represents a cloud distribution point test connection.
+type CloudDistributionPointTestConnection struct {
+	HasConnectionSucceeded bool   `json:"hasConnectionSucceeded"`
+	Message                string `json:"message"`
+}
+
+// CloudDistributionPointUploadCapability represents a cloud distribution point upload capability.
+type CloudDistributionPointUploadCapability struct {
+	DirectUploadCapable             bool `json:"directUploadCapable"`
+	PrincipalDistributionTechnology bool `json:"principalDistributionTechnology"`
+}
+
 // CloudIDPCommon A Cloud Identity Provider information.
 type CloudIDPCommon struct {
 	DisplayName  string `json:"displayName"`
@@ -1869,6 +1921,43 @@ type DisableLostModeCommand struct {
 // DisableRemoteDesktopCommand represents a disable remote desktop command.
 type DisableRemoteDesktopCommand struct {
 	CommandType any `json:"commandType"`
+}
+
+// DistributionPoint represents a distribution point.
+type DistributionPoint struct {
+	BackupDistributionPointID *string `json:"backupDistributionPointId,omitempty"`
+	EnableLoadBalancing       *bool   `json:"enableLoadBalancing,omitempty"`
+	FileSharingConnectionType string  `json:"fileSharingConnectionType"`
+	HttpsContext              *string `json:"httpsContext,omitempty"`
+	HttpsEnabled              *bool   `json:"httpsEnabled,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	HttpsPassword     *string `json:"httpsPassword,omitempty"`
+	HttpsPort         *int    `json:"httpsPort,omitempty"`
+	HttpsSecurityType *string `json:"httpsSecurityType,omitempty"`
+	HttpsUsername     *string `json:"httpsUsername,omitempty"`
+	ID                *string `json:"id,omitempty"`
+	LocalPathToShare  *string `json:"localPathToShare,omitempty"`
+	Name              string  `json:"name"`
+	Port              *int    `json:"port,omitempty"`
+	Principal         *bool   `json:"principal,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	ReadOnlyPassword *string `json:"readOnlyPassword,omitempty"`
+	ReadOnlyUsername *string `json:"readOnlyUsername,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	ReadWritePassword *string `json:"readWritePassword,omitempty"`
+	ReadWriteUsername *string `json:"readWriteUsername,omitempty"`
+	ServerName        string  `json:"serverName"`
+	ShareName         *string `json:"shareName,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	SshPassword *string `json:"sshPassword,omitempty"`
+	SshUsername *string `json:"sshUsername,omitempty"`
+	Workgroup   *string `json:"workgroup,omitempty"`
+}
+
+// DistributionPointSearchResults represents a distribution point search results.
+type DistributionPointSearchResults struct {
+	Results    []DistributionPoint `json:"results"`
+	TotalCount int                 `json:"totalCount"`
 }
 
 // DssDeclaration represents a dss declaration.
