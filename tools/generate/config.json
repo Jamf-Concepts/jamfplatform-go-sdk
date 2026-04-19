@@ -707,7 +707,29 @@
 
         {"op": "GET /v1/self-service-plus/feature-toggle/enabled", "name": "GetSelfServicePlusFeatureToggleEnabledV1", "expectedStatus": 204},
         {"op": "GET /v1/self-service-plus/settings", "name": "GetSelfServicePlusSettingsV1"},
-        {"op": "PUT /v1/self-service-plus/settings", "name": "UpdateSelfServicePlusSettingsV1", "expectedStatus": 204}
+        {"op": "PUT /v1/self-service-plus/settings", "name": "UpdateSelfServicePlusSettingsV1", "expectedStatus": 204},
+
+        {"op": "POST /v1/pki/digicert/trust-lifecycle-manager", "name": "CreateDigicertTrustLifecycleManagerV1", "expectedStatus": 201},
+        {"op": "GET /v1/pki/digicert/trust-lifecycle-manager/{id}", "name": "GetDigicertTrustLifecycleManagerV1"},
+        {"op": "PATCH /v1/pki/digicert/trust-lifecycle-manager/{id}", "name": "UpdateDigicertTrustLifecycleManagerV1", "expectedStatus": 204},
+        {"op": "DELETE /v1/pki/digicert/trust-lifecycle-manager/{id}", "name": "DeleteDigicertTrustLifecycleManagerV1", "expectedStatus": 204},
+        {"op": "GET /v1/pki/digicert/trust-lifecycle-manager/{id}/connection-status", "name": "GetDigicertTrustLifecycleManagerConnectionStatusV1"},
+        {"op": "GET /v1/pki/digicert/trust-lifecycle-manager/{id}/dependencies", "name": "GetDigicertTrustLifecycleManagerDependenciesV1"},
+        {"op": "POST /v1/pki/digicert/trust-lifecycle-manager/validate-client-certificate", "name": "ValidateDigicertClientCertificateV1", "expectedStatus": 204},
+
+        {"op": "POST /v1/pki/venafi", "name": "CreateVenafiV1", "expectedStatus": 201},
+        {"op": "GET /v1/pki/venafi/{id}", "name": "GetVenafiV1"},
+        {"op": "PATCH /v1/pki/venafi/{id}", "name": "UpdateVenafiV1"},
+        {"op": "DELETE /v1/pki/venafi/{id}", "name": "DeleteVenafiV1", "expectedStatus": 204},
+        {"op": "GET /v1/pki/venafi/{id}/connection-status", "name": "GetVenafiConnectionStatusV1"},
+        {"op": "GET /v1/pki/venafi/{id}/dependent-profiles", "name": "GetVenafiDependentProfilesV1"},
+        {"op": "GET /v1/pki/venafi/{id}/history", "name": "ListVenafiHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/pki/venafi/{id}/history", "name": "CreateVenafiHistoryNoteV1", "expectedStatus": 201},
+        {"op": "GET /v1/pki/venafi/{id}/jamf-public-key", "name": "GetVenafiJamfPublicKeyV1"},
+        {"op": "POST /v1/pki/venafi/{id}/jamf-public-key/regenerate", "name": "RegenerateVenafiJamfPublicKeyV1", "expectedStatus": 204},
+        {"op": "GET /v1/pki/venafi/{id}/proxy-trust-store", "name": "GetVenafiProxyTrustStoreV1"},
+        {"op": "POST /v1/pki/venafi/{id}/proxy-trust-store", "name": "UploadVenafiProxyTrustStoreV1", "expectedStatus": 204},
+        {"op": "DELETE /v1/pki/venafi/{id}/proxy-trust-store", "name": "DeleteVenafiProxyTrustStoreV1", "expectedStatus": 204}
       ]
     },
     {

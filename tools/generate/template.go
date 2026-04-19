@@ -90,6 +90,16 @@ var funcMap = template.FuncMap{
 		return ", " + strings.Join(args, ", ")
 	},
 	"isStringSlice": func(s string) bool { return s == "[]string" },
+	"requestArg": func(t string) string {
+		// Test stub's zero-value literal for the request parameter.
+		// Primitives can't be composite-literal'd (e.g. `&string{}`
+		// is invalid), so use new(T) which yields *T zero-pointer.
+		switch t {
+		case "string", "bool", "int", "int32", "int64", "float32", "float64":
+			return "new(" + t + ")"
+		}
+		return "&" + t + "{}"
+	},
 	"testMultipartArgs": func(m GoMethod) string {
 		if len(m.MultipartFields) == 0 {
 			return ""
@@ -657,7 +667,7 @@ func Test<% .Name %>(t *testing.T) {
 <%- end %>
 	})
 
-	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %>, &<% .RequestType %>{}<% testExtraArgs . %>)
+	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %>, <% requestArg .RequestType %><% testExtraArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -677,7 +687,7 @@ func Test<% .Name %>(t *testing.T) {
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 	})
 
-	err := c.<% .Name %>(context.Background()<% testCallArgs . %>, &<% .RequestType %>{}<% testExtraArgs . %>)
+	err := c.<% .Name %>(context.Background()<% testCallArgs . %>, <% requestArg .RequestType %><% testExtraArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}

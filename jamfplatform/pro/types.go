@@ -508,6 +508,14 @@ type CeaTemplatesResults struct {
 	TotalCount int                                   `json:"totalCount"`
 }
 
+// Certificate represents a certificate.
+type Certificate struct {
+	Data     [][]byte `json:"data"`
+	Filename string   `json:"filename"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password *string `json:"password,omitempty"`
+}
+
 // CertificateDetails represents a certificate details.
 type CertificateDetails struct {
 	SerialNumber *string `json:"serialNumber,omitempty"`
@@ -548,6 +556,15 @@ type CertificateRecord struct {
 	Signature            *Signature `json:"signature,omitempty"`
 	SubjectX500Principal string     `json:"subjectX500Principal"`
 	Version              int        `json:"version"`
+}
+
+// CertificateResponse represents a certificate response.
+type CertificateResponse struct {
+	ExpirationDate *time.Time `json:"expirationDate,omitempty"`
+	Filename       string     `json:"filename"`
+	Issuer         string     `json:"issuer"`
+	SerialNumber   string     `json:"serialNumber"`
+	Subject        string     `json:"subject"`
 }
 
 // ChangePassword represents a change password.
@@ -1973,6 +1990,41 @@ type DeviceLockCommand struct {
 
 // DiagnosticSubmissionSetting represents a diagnostic submission setting value.
 type DiagnosticSubmissionSetting = string
+
+// DigiCertSetting DigiCert Trust Lifecycle Manager object to create, or update with a merge-patch strategy. Certificate data must be provided in full, or not at all for update with merge-patch strategy.
+type DigiCertSetting struct {
+	CaName            *string      `json:"caName,omitempty"`
+	ClientCert        *Certificate `json:"clientCert,omitempty"`
+	Fqdn              *string      `json:"fqdn,omitempty"`
+	RevocationEnabled *bool        `json:"revocationEnabled,omitempty"`
+}
+
+// DigiCertSettingResponse DigiCert Trust Lifecycle Manager response object.
+type DigiCertSettingResponse struct {
+	CaName            string               `json:"caName"`
+	ClientCert        *CertificateResponse `json:"clientCert,omitempty"`
+	Fqdn              string               `json:"fqdn"`
+	ID                string               `json:"id"`
+	RevocationEnabled bool                 `json:"revocationEnabled"`
+}
+
+// DigicertConnectionStatus represents a digicert connection status.
+type DigicertConnectionStatus struct {
+	Status string `json:"status"`
+}
+
+// DigicertDependencies represents a digicert dependencies.
+type DigicertDependencies struct {
+	Results    []DigicertDependency `json:"results"`
+	TotalCount int                  `json:"totalCount"`
+}
+
+// DigicertDependency represents a digicert dependency.
+type DigicertDependency struct {
+	ConfigProfileID   int    `json:"configProfileId"`
+	ConfigProfileName string `json:"configProfileName"`
+	ConfigProfileType string `json:"configProfileType"`
+}
 
 // DisableLostModeCommand represents a disable lost mode command.
 type DisableLostModeCommand struct {
@@ -5510,6 +5562,35 @@ type V1Site struct {
 // ValidateApplicationsCommand represents a validate applications command.
 type ValidateApplicationsCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
+}
+
+// VenafiCaRecord represents a venafi ca record.
+type VenafiCaRecord struct {
+	ClientID     *string `json:"clientId,omitempty"`
+	ID           *int    `json:"id,omitempty"`
+	Name         string  `json:"name"`
+	ProxyAddress *string `json:"proxyAddress,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	RefreshToken           *string `json:"refreshToken,omitempty"`
+	RefreshTokenConfigured *bool   `json:"refreshTokenConfigured,omitempty"`
+	RevocationEnabled      *bool   `json:"revocationEnabled,omitempty"`
+}
+
+// VenafiPkiPayloadRecord represents a venafi pki payload record.
+type VenafiPkiPayloadRecord struct {
+	Name    string `json:"name"`
+	URLPath string `json:"urlPath"`
+}
+
+// VenafiPkiPayloadRecordSearchResults represents a venafi pki payload record search results.
+type VenafiPkiPayloadRecordSearchResults struct {
+	Results    []VenafiPkiPayloadRecord `json:"results"`
+	TotalCount int                      `json:"totalCount"`
+}
+
+// VenafiServiceStatus represents a venafi service status.
+type VenafiServiceStatus struct {
+	Status string `json:"status"`
 }
 
 // VerbosePackageDeploymentResponse represents a verbose package deployment response.
