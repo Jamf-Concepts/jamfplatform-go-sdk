@@ -164,23 +164,52 @@ func TestAcceptance_Pro_Patch_PatchPolicyLogsV2(t *testing.T) {
 	t.Logf("Policy=%s device=%s has %d log-detail entries", policyID, deviceID, len(details))
 }
 
-// TestAcceptance_Pro_Patch_RetryPatchPolicyLogV2 is a destructive-ish
-// action (re-issues an MDM install command to the target device). Probe
-// with a bogus policy id so real devices aren't re-notified.
+// TestAcceptance_Pro_Patch_RetryPatchPolicyLogV2 exercises the per-device
+// retry endpoint against a real patch policy + log entry when available.
+//
+// Can't be exercised with a bogus policy id: the server returns 500 for
+// any unknown id rather than 404. Can't be exercised by creating a
+// fixture policy either — patch policies can only come from a patch
+// software title configuration, which requires an external patch source
+// integration this test can't provision. Skips when the tenant has no
+// real policy with logs.
 func TestAcceptance_Pro_Patch_RetryPatchPolicyLogV2(t *testing.T) {
 	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
 
-	err := pro.New(c).RetryPatchPolicyLogsV2(context.Background(), "99999999", &pro.PatchPolicyLogRetry{})
-	if err == nil {
-		t.Fatal("RetryPatchPolicyLogsV2 against bogus id succeeded — expected 4xx")
+	policies, err := p.ListPatchPoliciesV2(ctx, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListPatchPoliciesV2: %v", err)
 	}
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-		t.Logf("RetryPatchPolicyLogsV2(bogus) rejected: status=%d", apiErr.StatusCode)
-		return
+	if len(policies) == 0 {
+		t.Skip("tenant has no patch policies and they can't be created without an external patch source integration — skipping retry probe")
 	}
-	skipOnServerError(t, err)
-	t.Logf("RetryPatchPolicyLogsV2(bogus) rejected: %v", err)
+
+	policyID := policies[0].ID
+	logs, err := p.ListPatchPolicyLogsV2(ctx, policyID, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListPatchPolicyLogsV2(%s): %v", policyID, err)
+	}
+	if len(logs) == 0 {
+		t.Skipf("patch policy %s has no log entries — nothing to retry", policyID)
+	}
+
+	deviceID := logs[0].DeviceID
+	if err := p.RetryPatchPolicyLogsV2(ctx, policyID, &pro.PatchPolicyLogRetry{
+		DeviceIds: &[]string{deviceID},
+	}); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+			t.Logf("RetryPatchPolicyLogsV2 rejected: status=%d — policy=%s device=%s may not be eligible", apiErr.StatusCode, policyID, deviceID)
+			return
+		}
+		skipOnServerError(t, err)
+		t.Fatalf("RetryPatchPolicyLogsV2(%s, %s): %v", policyID, deviceID, err)
+	}
+	t.Logf("RetryPatchPolicyLogsV2 accepted for policy=%s device=%s", policyID, deviceID)
 }
 
 // TestAcceptance_Pro_Patch_RetryAllPatchPolicyLogsV2 exercises plumbing
