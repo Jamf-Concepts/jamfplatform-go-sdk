@@ -595,17 +595,7 @@ func TestAcceptance_Classic_ProbeUpdate_UpdateMobileDeviceApplicationByName(t *t
 	}
 }
 
-func TestAcceptance_Classic_ProbeUpdate_UpdateMobileDeviceByID(t *testing.T) {
-	c := accClient(t)
-	if err := proclassic.New(c).UpdateMobileDeviceByID(context.Background(), "999999999", &proclassic.MobileDevicePost{}); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("UpdateMobileDeviceByID transport error: %v", err)
-	}
-}
+// UpdateMobileDeviceByID — covered by TestAcceptance_Classic_MobileDeviceCRUD.
 
 func TestAcceptance_Classic_ProbeUpdate_UpdateMobileDeviceByMacAddress(t *testing.T) {
 	c := accClient(t)
