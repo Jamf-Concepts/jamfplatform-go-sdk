@@ -491,6 +491,18 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 		if len({{ .Go }}) > 0 {
 			params.Set("{{ .Spec }}", strings.Join({{ .Go }}, ","))
 		}
+{{- else if eq .Type "bool" }}
+		if {{ .Go }} {
+			params.Set("{{ .Spec }}", "true")
+		}
+{{- else if eq .Type "int" }}
+		if {{ .Go }} != 0 {
+			params.Set("{{ .Spec }}", strconv.Itoa({{ .Go }}))
+		}
+{{- else if eq .Type "int64" }}
+		if {{ .Go }} != 0 {
+			params.Set("{{ .Spec }}", strconv.FormatInt({{ .Go }}, 10))
+		}
 {{- else }}
 		if {{ .Go }} != "" {
 			params.Set("{{ .Spec }}", {{ .Go }})
