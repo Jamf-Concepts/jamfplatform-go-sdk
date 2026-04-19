@@ -113,6 +113,9 @@
       "splitByTag": true,
       "skipDeprecated": true,
       "specFile": "pro_api.json",
+      "fieldTypeOverrides": {
+        "managed_software_update_plan_toggle_status.elapsedTime": "*float64"
+      },
       "excludePaths": [
         "POST /v1/auth/token",
         "POST /v1/auth/keep-alive",
@@ -433,7 +436,52 @@
         {"op": "DELETE /v2/enrollment-customizations/{id}", "name": "DeleteEnrollmentCustomizationV2", "expectedStatus": 204},
         {"op": "GET /v2/enrollment-customizations/{id}/history", "name": "ListEnrollmentCustomizationHistoryV2", "pagination": "totalCount", "params": ["sort:[]string"]},
         {"op": "POST /v2/enrollment-customizations/{id}/history", "name": "CreateEnrollmentCustomizationHistoryNoteV2"},
-        {"op": "GET /v2/enrollment-customizations/{id}/prestages", "name": "ListEnrollmentCustomizationPrestagesV2"}
+        {"op": "GET /v2/enrollment-customizations/{id}/prestages", "name": "ListEnrollmentCustomizationPrestagesV2"},
+
+        {"op": "GET /v1/apns-client-push-status", "name": "ListApnsClientPushStatusesV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/apns-client-push-status/enable-all-clients", "name": "EnableAllApnsClientsV1"},
+        {"op": "GET /v1/apns-client-push-status/enable-all-clients/status", "name": "GetEnableAllApnsClientsStatusV1"},
+        {"op": "POST /v1/apns-client-push-status/enable-client", "name": "EnableApnsClientV1"},
+
+        {"op": "GET /v1/ddm/{clientManagementId}/status-items", "name": "ListDdmStatusItemsV1", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v1/ddm/{clientManagementId}/status-items/{key}", "name": "GetDdmStatusItemV1", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "POST /v1/ddm/{clientManagementId}/sync", "name": "SyncDdmV1", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v1/dss-declarations/{declarationId}", "name": "GetDssDeclarationV1", "pathNames": {"declarationId": "declarationID"}},
+
+        {"op": "GET /v1/managed-software-updates/available-updates", "name": "ListAvailableOsUpdatesV1"},
+        {"op": "GET /v1/managed-software-updates/plans", "name": "ListManagedSoftwareUpdatePlansV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/managed-software-updates/plans", "name": "CreateManagedSoftwareUpdatePlanV1"},
+        {"op": "GET /v1/managed-software-updates/plans/feature-toggle", "name": "GetManagedSoftwareUpdateFeatureToggleV1"},
+        {"op": "PUT /v1/managed-software-updates/plans/feature-toggle", "name": "UpdateManagedSoftwareUpdateFeatureToggleV1"},
+        {"op": "POST /v1/managed-software-updates/plans/feature-toggle/abandon", "name": "AbandonManagedSoftwareUpdateFeatureToggleV1"},
+        {"op": "GET /v1/managed-software-updates/plans/feature-toggle/status", "name": "GetManagedSoftwareUpdateFeatureToggleStatusV1"},
+        {"op": "POST /v1/managed-software-updates/plans/group", "name": "CreateManagedSoftwareUpdateGroupPlanV1"},
+        {"op": "GET /v1/managed-software-updates/plans/group/{id}", "name": "GetManagedSoftwareUpdateGroupPlansV1", "params": ["group-type:string:groupType"]},
+        {"op": "GET /v1/managed-software-updates/plans/{id}", "name": "GetManagedSoftwareUpdatePlanV1"},
+        {"op": "GET /v1/managed-software-updates/plans/{id}/declarations", "name": "GetManagedSoftwareUpdatePlanDeclarationsV1"},
+        {"op": "GET /v1/managed-software-updates/plans/{id}/events", "name": "GetManagedSoftwareUpdatePlanEventsV1"},
+        {"op": "GET /v1/managed-software-updates/update-statuses", "name": "ListManagedSoftwareUpdateStatusesV1", "params": ["filter"]},
+        {"op": "GET /v1/managed-software-updates/update-statuses/computer-groups/{id}", "name": "GetManagedSoftwareUpdateStatusesForComputerGroupV1"},
+        {"op": "GET /v1/managed-software-updates/update-statuses/computers/{id}", "name": "GetManagedSoftwareUpdateStatusesForComputerV1"},
+        {"op": "GET /v1/managed-software-updates/update-statuses/mobile-device-groups/{id}", "name": "GetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1"},
+        {"op": "GET /v1/managed-software-updates/update-statuses/mobile-devices/{id}", "name": "GetManagedSoftwareUpdateStatusesForMobileDeviceV1"},
+
+        {"op": "POST /v1/deploy-package", "name": "DeployPackageV1", "params": ["verbose:bool"]},
+        {"op": "POST /v1/mdm/renew-profile", "name": "RenewMdmProfileV1"},
+        {"op": "POST /v2/mdm/blank-push", "name": "SendMdmBlankPushV2"},
+        {"op": "GET /v2/mdm/commands", "name": "ListMdmCommandsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v2/mdm/commands", "name": "SendMdmCommandV2"},
+
+        {"op": "PATCH /v1/mdm-renewal/device-common-details", "name": "UpdateMdmRenewalDeviceCommonDetailsV1"},
+        {"op": "GET /v1/mdm-renewal/device-common-details/{clientManagementId}", "name": "GetMdmRenewalDeviceCommonDetailsV1", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "GET /v1/mdm-renewal/renewal-strategies/{clientManagementId}", "name": "GetMdmRenewalStrategiesV1", "pathNames": {"clientManagementId": "clientManagementID"}},
+        {"op": "DELETE /v1/mdm-renewal/renewal-strategies/{clientManagementId}", "name": "DeleteMdmRenewalStrategiesV1", "pathNames": {"clientManagementId": "clientManagementID"}, "expectedStatus": 204},
+
+        {"op": "GET /v1/return-to-service", "name": "ListReturnToServiceConfigurationsV1"},
+        {"op": "POST /v1/return-to-service", "name": "CreateReturnToServiceConfigurationV1"},
+        {"op": "GET /v1/return-to-service/{id}", "name": "GetReturnToServiceConfigurationV1"},
+        {"op": "PUT /v1/return-to-service/{id}", "name": "UpdateReturnToServiceConfigurationV1"},
+        {"op": "DELETE /v1/return-to-service/{id}", "name": "DeleteReturnToServiceConfigurationV1", "expectedStatus": 204}
       ]
     },
     {

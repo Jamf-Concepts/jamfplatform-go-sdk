@@ -113,10 +113,53 @@ type ApiErrorCause struct {
 	ID          *string `json:"id,omitempty"`
 }
 
+// ApnsClientPushStatus Information about a client with push notifications disabled.
+type ApnsClientPushStatus struct {
+	ClientID     string     `json:"clientId"`
+	DeviceType   string     `json:"deviceType"`
+	DisabledAt   *time.Time `json:"disabledAt,omitempty"`
+	ManagementID string     `json:"managementId"`
+}
+
+// ApnsClientPushStatusSearchResults Search results containing APNS client push status records.
+type ApnsClientPushStatusSearchResults struct {
+	Results    []ApnsClientPushStatus `json:"results"`
+	TotalCount int64                  `json:"totalCount"`
+}
+
+// ApnsPushEnableRequest Status information for an enable all clients push request.
+type ApnsPushEnableRequest struct {
+	ProcessedTime *time.Time `json:"processedTime,omitempty"`
+	RequestedTime *time.Time `json:"requestedTime,omitempty"`
+	Status        string     `json:"status"`
+}
+
+// AppAnalyticsSetting represents a app analytics setting value.
+type AppAnalyticsSetting = string
+
 // AppPath represents a app path.
 type AppPath struct {
 	ID   string `json:"id"`
 	Path string `json:"path"`
+}
+
+// ApplicationAttributes represents a application attributes.
+type ApplicationAttributes struct {
+	Attributes *Attributes `json:"attributes,omitempty"`
+	Identifier *string     `json:"identifier,omitempty"`
+}
+
+// ApplicationConfiguration represents a application configuration.
+type ApplicationConfiguration struct {
+	Configuration *string `json:"configuration,omitempty"`
+	Identifier    *string `json:"identifier,omitempty"`
+}
+
+// ApplyRedemptionCodeCommand represents a apply redemption code command.
+type ApplyRedemptionCodeCommand struct {
+	CommandType    MDMCommandType `json:"commandType"`
+	Identifier     string         `json:"identifier"`
+	RedemptionCode string         `json:"redemptionCode"`
 }
 
 // AssignRemoveProfileResponseSyncState represents a assign remove profile response sync state.
@@ -139,6 +182,42 @@ type Assignment struct {
 type AssignmentDtoV1 struct {
 	DeviceID string `json:"deviceId"`
 	Selected bool   `json:"selected"`
+}
+
+// Attributes represents a attributes.
+type Attributes struct {
+	AssociatedDomains     *[]string `json:"associatedDomains,omitempty"`
+	CellularSliceUUID     *string   `json:"cellularSliceUuid,omitempty"`
+	ContentFilterUUID     *string   `json:"contentFilterUuid,omitempty"`
+	DnsProxyUUID          *string   `json:"dnsProxyUuid,omitempty"`
+	EnableDirectDownloads *bool     `json:"enableDirectDownloads,omitempty"`
+	Hideable              *bool     `json:"hideable,omitempty"`
+	Lockable              *bool     `json:"lockable,omitempty"`
+	RelayUUID             *string   `json:"relayUuid,omitempty"`
+	Removable             *bool     `json:"removable,omitempty"`
+	TapToPayScreenLock    *bool     `json:"tapToPayScreenLock,omitempty"`
+	VpnUUID               *string   `json:"vpnUuid,omitempty"`
+}
+
+// AvailableOsUpdates represents a available os updates.
+type AvailableOsUpdates struct {
+	AvailableUpdates *AvailableOsUpdatesAvailableUpdates `json:"availableUpdates,omitempty"`
+}
+
+// AvailableOsUpdatesAvailableUpdates represents a available os updates available updates.
+type AvailableOsUpdatesAvailableUpdates struct {
+	IOS   []string `json:"iOS"`
+	MacOS []string `json:"macOS"`
+}
+
+// BlankPushRequest represents a blank push request.
+type BlankPushRequest struct {
+	ClientManagementIds []string `json:"clientManagementIds"`
+}
+
+// BlankPushResponse represents a blank push response.
+type BlankPushResponse struct {
+	ErrorUuids []string `json:"errorUuids"`
 }
 
 // BrandingImageURL represents a branding image u r l.
@@ -199,12 +278,28 @@ type CertificateIdentityV2 struct {
 	Md5Sum           *string `json:"md5Sum,omitempty"`
 }
 
+// CertificateListCommand represents a certificate list command.
+type CertificateListCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
 // ChangePassword represents a change password.
 type ChangePassword struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	CurrentPassword string `json:"currentPassword"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	NewPassword string `json:"newPassword"`
+}
+
+// ClearPasscodeCommand represents a clear passcode command.
+type ClearPasscodeCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	UnlockToken string         `json:"unlockToken"`
+}
+
+// ClearRestrictionsPasswordCommand represents a clear restrictions password command.
+type ClearRestrictionsPasswordCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
 }
 
 // ComputerApplicationCreate represents a computer application create.
@@ -1099,6 +1194,30 @@ type CreatePathV2 struct {
 	Scope string `json:"scope"`
 }
 
+// DataRoamingSetting represents a data roaming setting value.
+type DataRoamingSetting = string
+
+// DeclarativeManagementCommand represents a declarative management command.
+type DeclarativeManagementCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	Data        string         `json:"data"`
+}
+
+// DefaultApplications represents a default applications.
+type DefaultApplications struct {
+	Calling    *string `json:"calling,omitempty"`
+	Messaging  *string `json:"messaging,omitempty"`
+	WebBrowser *string `json:"webBrowser,omitempty"`
+}
+
+// DeleteUserCommand represents a delete user command.
+type DeleteUserCommand struct {
+	CommandType    MDMCommandType `json:"commandType"`
+	DeleteAllUsers bool           `json:"deleteAllUsers"`
+	ForceDeletion  bool           `json:"forceDeletion"`
+	UserName       string         `json:"userName"`
+}
+
 // Department represents a department.
 type Department struct {
 	ID   *string `json:"id,omitempty"`
@@ -1159,6 +1278,27 @@ type DetailsV2 struct {
 	Shared                      bool                               `json:"shared"`
 	Supervised                  bool                               `json:"supervised"`
 	UnlockToken                 string                             `json:"unlockToken"`
+}
+
+// DeviceCommonDetails represents a device common details.
+type DeviceCommonDetails struct {
+	ClientManagementID                                    string     `json:"clientManagementId"`
+	ID                                                    string     `json:"id"`
+	MDMCheckinURL                                         *string    `json:"mdmCheckinUrl,omitempty"`
+	MDMProfileNeedsRenewalDueToCaRenewed                  bool       `json:"mdmProfileNeedsRenewalDueToCaRenewed"`
+	MDMProfileNeedsRenewalDueToDeviceIdentityCertExpiring bool       `json:"mdmProfileNeedsRenewalDueToDeviceIdentityCertExpiring"`
+	MDMServerURL                                          *string    `json:"mdmServerUrl,omitempty"`
+	RenewMDMProfileStartDate                              *time.Time `json:"renewMdmProfileStartDate,omitempty"`
+}
+
+// DeviceCommonDetailsRequest represents a device common details request.
+type DeviceCommonDetailsRequest struct {
+	ClientManagementID                                    string     `json:"clientManagementId"`
+	MDMCheckinURL                                         *string    `json:"mdmCheckinUrl,omitempty"`
+	MDMProfileNeedsRenewalDueToCaRenewed                  *bool      `json:"mdmProfileNeedsRenewalDueToCaRenewed,omitempty"`
+	MDMProfileNeedsRenewalDueToDeviceIdentityCertExpiring *bool      `json:"mdmProfileNeedsRenewalDueToDeviceIdentityCertExpiring,omitempty"`
+	MDMServerURL                                          *string    `json:"mdmServerUrl,omitempty"`
+	RenewMDMProfileStartDate                              *time.Time `json:"renewMdmProfileStartDate,omitempty"`
 }
 
 // DeviceEnrollmentDevice represents a device enrollment device.
@@ -1281,6 +1421,69 @@ type DeviceEnrollmentPrestageV3 struct {
 type DeviceEnrollmentToken struct {
 	EncodedToken  *[]byte `json:"encodedToken,omitempty"`
 	TokenFileName *string `json:"tokenFileName,omitempty"`
+}
+
+// DeviceInformationCommand represents a device information command.
+type DeviceInformationCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	Queries     []string       `json:"queries"`
+}
+
+// DeviceLocationCommand represents a device location command.
+type DeviceLocationCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
+// DeviceLockCommand represents a device lock command.
+type DeviceLockCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	Message     string         `json:"message"`
+	PhoneNumber string         `json:"phoneNumber"`
+	Pin         string         `json:"pin"`
+}
+
+// DiagnosticSubmissionSetting represents a diagnostic submission setting value.
+type DiagnosticSubmissionSetting = string
+
+// DisableLostModeCommand represents a disable lost mode command.
+type DisableLostModeCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
+// DisableRemoteDesktopCommand represents a disable remote desktop command.
+type DisableRemoteDesktopCommand struct {
+	CommandType any `json:"commandType"`
+}
+
+// DssDeclaration represents a dss declaration.
+type DssDeclaration struct {
+	Group       *string `json:"group,omitempty"`
+	PayloadJson *string `json:"payloadJson,omitempty"`
+	Type        *string `json:"type,omitempty"`
+	UUID        string  `json:"uuid"`
+}
+
+// DssDeclarations represents a dss declarations.
+type DssDeclarations struct {
+	Declarations []DssDeclaration `json:"declarations"`
+}
+
+// EnableLostModeCommand represents a enable lost mode command.
+type EnableLostModeCommand struct {
+	CommandType      MDMCommandType `json:"commandType"`
+	LostModeFootnote string         `json:"lostModeFootnote"`
+	LostModeMessage  string         `json:"lostModeMessage"`
+	LostModePhone    string         `json:"lostModePhone"`
+}
+
+// EnablePushRequest Request body to enable push notifications for a client.
+type EnablePushRequest struct {
+	ManagementID string `json:"managementId"`
+}
+
+// EnableRemoteDesktopCommand represents a enable remote desktop command.
+type EnableRemoteDesktopCommand struct {
+	CommandType any `json:"commandType"`
 }
 
 // EnrollmentAccessGroupPreview represents a enrollment access group preview.
@@ -1464,6 +1667,16 @@ type EnrollmentSettingsV4 struct {
 	RestrictReenrollment                         *bool                  `json:"restrictReenrollment,omitempty"`
 	SignQuickAdd                                 *bool                  `json:"signQuickAdd,omitempty"`
 	SigningMDMProfileEnabled                     *bool                  `json:"signingMdmProfileEnabled,omitempty"`
+}
+
+// EraseDeviceCommand represents a erase device command.
+type EraseDeviceCommand struct {
+	CommandType            MDMCommandType   `json:"commandType"`
+	DisallowProximitySetup bool             `json:"disallowProximitySetup"`
+	ObliterationBehavior   string           `json:"obliterationBehavior"`
+	Pin                    string           `json:"pin"`
+	PreserveDataPlan       bool             `json:"preserveDataPlan"`
+	ReturnToService        *ReturnToService `json:"returnToService,omitempty"`
 }
 
 // EraseDeviceComputerRequest represents a erase device computer request.
@@ -1767,6 +1980,22 @@ type Ids struct {
 	IDs *[]string `json:"ids,omitempty"`
 }
 
+// InstallPackage Either devices or groupId must be provided.
+type InstallPackage struct {
+	Devices          *[]int          `json:"devices,omitempty"`
+	GroupID          *string         `json:"groupId,omitempty"`
+	InstallAsManaged *bool           `json:"installAsManaged,omitempty"`
+	Manifest         PackageManifest `json:"manifest"`
+}
+
+// InstalledApplicationListCommand represents a installed application list command.
+type InstalledApplicationListCommand struct {
+	CommandType     MDMCommandType `json:"commandType"`
+	Identifiers     *[]string      `json:"identifiers,omitempty"`
+	Items           *[]string      `json:"items,omitempty"`
+	ManagedAppsOnly *bool          `json:"managedAppsOnly,omitempty"`
+}
+
 // InventoryInformation Jamf Pro Inventory statistics object. Aggregates managed/unmanaged devices and computers counters.
 type InventoryInformation struct {
 	ManagedComputers   int `json:"managedComputers"`
@@ -2015,10 +2244,214 @@ type LocationV2 struct {
 	Username     *string `json:"username,omitempty"`
 }
 
+// LogOutUserCommand represents a log out user command.
+type LogOutUserCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
+// ManagedApplicationListCommand represents a managed application list command.
+type ManagedApplicationListCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	Identifiers *[]string      `json:"identifiers,omitempty"`
+}
+
+// ManagedMediaListCommand represents a managed media list command.
+type ManagedMediaListCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
+// ManagedSoftwareUpdatePlan represents a managed software update plan.
+type ManagedSoftwareUpdatePlan struct {
+	BuildVersion              *string     `json:"buildVersion,omitempty"`
+	Device                    *PlanDevice `json:"device,omitempty"`
+	ForceInstallLocalDateTime *string     `json:"forceInstallLocalDateTime,omitempty"`
+	MaxDeferrals              int         `json:"maxDeferrals"`
+	PlanUUID                  string      `json:"planUuid"`
+	RecipeID                  string      `json:"recipeId"`
+	SpecificVersion           string      `json:"specificVersion"`
+	Status                    *PlanStatus `json:"status,omitempty"`
+	UpdateAction              string      `json:"updateAction"`
+	VersionType               string      `json:"versionType"`
+}
+
+// ManagedSoftwareUpdatePlanEventStore represents a managed software update plan event store.
+type ManagedSoftwareUpdatePlanEventStore struct {
+	Events string `json:"events"`
+}
+
+// ManagedSoftwareUpdatePlanGroupPost represents a managed software update plan group post.
+type ManagedSoftwareUpdatePlanGroupPost struct {
+	Config PlanConfigurationPost `json:"config"`
+	Group  PlanGroupPost         `json:"group"`
+}
+
+// ManagedSoftwareUpdatePlanPost represents a managed software update plan post.
+type ManagedSoftwareUpdatePlanPost struct {
+	Config  PlanConfigurationPost `json:"config"`
+	Devices []PlanDevicePost      `json:"devices"`
+}
+
+// ManagedSoftwareUpdatePlanPostResponse represents a managed software update plan post response.
+type ManagedSoftwareUpdatePlanPostResponse struct {
+	Plans []PlanDeviceResponse `json:"plans"`
+}
+
+// ManagedSoftwareUpdatePlanToggle represents a managed software update plan toggle.
+type ManagedSoftwareUpdatePlanToggle struct {
+	CustomVersionEnabled         *bool `json:"customVersionEnabled,omitempty"`
+	DssEnabled                   *bool `json:"dssEnabled,omitempty"`
+	ForceInstallLocalDateEnabled *bool `json:"forceInstallLocalDateEnabled,omitempty"`
+	RecipeEnabled                *bool `json:"recipeEnabled,omitempty"`
+	Toggle                       bool  `json:"toggle"`
+}
+
+// ManagedSoftwareUpdatePlanToggleStatus represents a managed software update plan toggle status.
+type ManagedSoftwareUpdatePlanToggleStatus struct {
+	ElapsedTime              *float64 `json:"elapsedTime"`
+	EndTime                  *string  `json:"endTime,omitempty"`
+	ExitMessage              string   `json:"exitMessage"`
+	ExitState                string   `json:"exitState"`
+	FormattedPercentComplete string   `json:"formattedPercentComplete"`
+	PercentComplete          float64  `json:"percentComplete"`
+	ProcessedRecords         int64    `json:"processedRecords"`
+	StartTime                *string  `json:"startTime,omitempty"`
+	State                    string   `json:"state"`
+	TotalRecords             int64    `json:"totalRecords"`
+}
+
+// ManagedSoftwareUpdatePlanToggleStatusWrapper represents a managed software update plan toggle status wrapper.
+type ManagedSoftwareUpdatePlanToggleStatusWrapper struct {
+	ToggleOff *ManagedSoftwareUpdatePlanToggleStatus `json:"toggleOff,omitempty"`
+	ToggleOn  *ManagedSoftwareUpdatePlanToggleStatus `json:"toggleOn,omitempty"`
+}
+
+// ManagedSoftwareUpdatePlans represents a managed software update plans.
+type ManagedSoftwareUpdatePlans struct {
+	Results    []ManagedSoftwareUpdatePlan `json:"results"`
+	TotalCount int                         `json:"totalCount"`
+}
+
+// ManagedSoftwareUpdateStatus represents a managed software update status.
+type ManagedSoftwareUpdateStatus struct {
+	Created                 *time.Time                         `json:"created,omitempty"`
+	DeferralsRemaining      int                                `json:"deferralsRemaining"`
+	Device                  *ManagedSoftwareUpdateStatusDevice `json:"device,omitempty"`
+	DownloadPercentComplete float64                            `json:"downloadPercentComplete"`
+	Downloaded              bool                               `json:"downloaded"`
+	MaxDeferrals            int                                `json:"maxDeferrals"`
+	NextScheduledInstall    *time.Time                         `json:"nextScheduledInstall,omitempty"`
+	OsUpdatesStatusID       string                             `json:"osUpdatesStatusId"`
+	PastNotifications       []time.Time                        `json:"pastNotifications"`
+	ProductKey              string                             `json:"productKey"`
+	Status                  string                             `json:"status"`
+	Updated                 *time.Time                         `json:"updated,omitempty"`
+}
+
+// ManagedSoftwareUpdateStatusDevice represents a managed software update status device.
+type ManagedSoftwareUpdateStatusDevice struct {
+	DeviceID   string `json:"deviceId"`
+	Href       string `json:"href"`
+	ObjectType string `json:"objectType"`
+}
+
+// ManagedSoftwareUpdateStatuses represents a managed software update statuses.
+type ManagedSoftwareUpdateStatuses struct {
+	Results    []ManagedSoftwareUpdateStatus `json:"results"`
+	TotalCount int                           `json:"totalCount"`
+}
+
 // Markdown represents a markdown.
 type Markdown struct {
 	Markdown *string `json:"markdown,omitempty"`
 }
+
+// MDMClientType represents a m d m client type value.
+type MDMClientType = string
+
+// MDMCommand represents a m d m command.
+type MDMCommand struct {
+	Client        *MDMCommandClient `json:"client,omitempty"`
+	CommandError  *MDMCommandError  `json:"commandError,omitempty"`
+	CommandState  *MDMCommandState  `json:"commandState,omitempty"`
+	CommandType   *MDMCommandType   `json:"commandType,omitempty"`
+	DateCompleted *time.Time        `json:"dateCompleted,omitempty"`
+	DateSent      *time.Time        `json:"dateSent,omitempty"`
+	ProfileID     int               `json:"profileId"`
+	UUID          string            `json:"uuid"`
+}
+
+// MDMCommandBase represents a m d m command base.
+type MDMCommandBase struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
+// MDMCommandClient represents a m d m command client.
+type MDMCommandClient struct {
+	ClientType   *MDMClientType `json:"clientType,omitempty"`
+	ManagementID string         `json:"managementId"`
+}
+
+// MDMCommandClientRequest represents a m d m command client request.
+type MDMCommandClientRequest struct {
+	ManagementID *string `json:"managementId,omitempty"`
+}
+
+// MDMCommandError represents a m d m command error.
+type MDMCommandError struct {
+	ErrorCode                 int    `json:"errorCode"`
+	ErrorDomain               string `json:"errorDomain"`
+	ErrorEnglishDescription   string `json:"errorEnglishDescription"`
+	ErrorLocalizedDescription string `json:"errorLocalizedDescription"`
+}
+
+// MDMCommandRequest represents a m d m command request.
+type MDMCommandRequest struct {
+	ClientData  *[]MDMCommandClientRequest `json:"clientData,omitempty"`
+	CommandData any                        `json:"commandData"`
+}
+
+// MDMCommandResults represents a m d m command results.
+type MDMCommandResults struct {
+	Results    []MDMCommand `json:"results"`
+	TotalCount int          `json:"totalCount"`
+}
+
+// MDMCommandState represents a m d m command state value.
+type MDMCommandState = string
+
+// MDMCommandType represents a m d m command type value.
+type MDMCommandType = string
+
+// MDMRenewalError represents a m d m renewal error.
+type MDMRenewalError struct {
+	ClientManagementID  string              `json:"clientManagementId"`
+	ErrorTimeStamp      *time.Time          `json:"errorTimeStamp,omitempty"`
+	FailureCount        int                 `json:"failureCount"`
+	MDMRenewalErrorID   string              `json:"mdmRenewalErrorId"`
+	MDMRenewalErrorType MDMRenewalErrorType `json:"mdmRenewalErrorType"`
+}
+
+// MDMRenewalErrorStrategiesResponse represents a m d m renewal error strategies response.
+type MDMRenewalErrorStrategiesResponse struct {
+	Error      *MDMRenewalError     `json:"error,omitempty"`
+	Strategies []MDMRenewalStrategy `json:"strategies"`
+}
+
+// MDMRenewalErrorType represents a m d m renewal error type value.
+type MDMRenewalErrorType = string
+
+// MDMRenewalStrategy represents a m d m renewal strategy.
+type MDMRenewalStrategy struct {
+	ID                     string                 `json:"id"`
+	MDMRenewalCheckInURL   string                 `json:"mdmRenewalCheckInUrl"`
+	MDMRenewalErrorID      string                 `json:"mdmRenewalErrorId"`
+	MDMRenewalServerURL    string                 `json:"mdmRenewalServerUrl"`
+	MDMRenewalStrategyType MDMRenewalStrategyType `json:"mdmRenewalStrategyType"`
+	StrategyTimeStamp      *time.Time             `json:"strategyTimeStamp,omitempty"`
+}
+
+// MDMRenewalStrategyType represents a m d m renewal strategy type value.
+type MDMRenewalStrategyType = string
 
 // MobileDeviceApplication represents a mobile device application.
 type MobileDeviceApplication struct {
@@ -2804,6 +3237,20 @@ type Package struct {
 	Swu                  *bool   `json:"swu,omitempty"`
 }
 
+// PackageManifest represents a package manifest.
+type PackageManifest struct {
+	BundleID         string  `json:"bundleId"`
+	BundleVersion    string  `json:"bundleVersion"`
+	DisplayImageURL  *string `json:"displayImageUrl,omitempty"`
+	FullSizeImageURL *string `json:"fullSizeImageUrl,omitempty"`
+	Hash             string  `json:"hash"`
+	HashType         string  `json:"hashType"`
+	SizeInBytes      int     `json:"sizeInBytes"`
+	Subtitle         *string `json:"subtitle,omitempty"`
+	Title            string  `json:"title"`
+	URL              string  `json:"url"`
+}
+
 // PackagesSearchResults represents a packages search results.
 type PackagesSearchResults struct {
 	Results    []Package `json:"results"`
@@ -3060,6 +3507,56 @@ type PatchSummaryVersion struct {
 	Version         string `json:"version"`
 }
 
+// PersonalHotspotSetting represents a personal hotspot setting value.
+type PersonalHotspotSetting = string
+
+// PlanConfigurationPost represents a plan configuration post.
+type PlanConfigurationPost struct {
+	BuildVersion              *string `json:"buildVersion,omitempty"`
+	ForceInstallLocalDateTime *string `json:"forceInstallLocalDateTime,omitempty"`
+	MaxDeferrals              *int    `json:"maxDeferrals,omitempty"`
+	SpecificVersion           *string `json:"specificVersion,omitempty"`
+	UpdateAction              string  `json:"updateAction"`
+	VersionType               string  `json:"versionType"`
+}
+
+// PlanDevice represents a plan device.
+type PlanDevice struct {
+	DeviceID   string `json:"deviceId"`
+	Href       string `json:"href"`
+	ObjectType string `json:"objectType"`
+}
+
+// PlanDevicePost represents a plan device post.
+type PlanDevicePost struct {
+	DeviceID   string `json:"deviceId"`
+	ObjectType string `json:"objectType"`
+}
+
+// PlanDeviceResponse represents a plan device response.
+type PlanDeviceResponse struct {
+	Device *PlanDevice `json:"device,omitempty"`
+	Href   string      `json:"href"`
+	PlanID string      `json:"planId"`
+}
+
+// PlanGroupPost represents a plan group post.
+type PlanGroupPost struct {
+	GroupID    string `json:"groupId"`
+	ObjectType string `json:"objectType"`
+}
+
+// PlanStatus represents a plan status.
+type PlanStatus struct {
+	ErrorReasons *[]string `json:"errorReasons,omitempty"`
+	State        string    `json:"state"`
+}
+
+// PlayLostModeSoundCommand represents a play lost mode sound command.
+type PlayLostModeSoundCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
 // PolicyPropertiesV1 represents a policy properties v1.
 type PolicyPropertiesV1 struct {
 	AllowNetworkStateChangeTriggers   *bool `json:"allowNetworkStateChangeTriggers,omitempty"`
@@ -3204,6 +3701,18 @@ type ProcessTextsSearchResults struct {
 	TotalCount int                           `json:"totalCount"`
 }
 
+// ProfileListCommand represents a profile list command.
+type ProfileListCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	ManagedOnly *bool          `json:"managedOnly,omitempty"`
+}
+
+// ProvisioningProfileListCommand represents a provisioning profile list command.
+type ProvisioningProfileListCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	ManagedOnly *bool          `json:"managedOnly,omitempty"`
+}
+
 // PurchasingV2 represents a purchasing v2.
 type PurchasingV2 struct {
 	AppleCareID         *string    `json:"appleCareId,omitempty"`
@@ -3328,10 +3837,66 @@ type Reenrollment struct {
 	IsFlushSoftwareUpdatePlansEnabled        *bool  `json:"isFlushSoftwareUpdatePlansEnabled,omitempty"`
 }
 
+// RefreshCellularPlansCommand represents a refresh cellular plans command.
+type RefreshCellularPlansCommand struct {
+	CommandType   MDMCommandType `json:"commandType"`
+	EsimServerURL string         `json:"esimServerUrl"`
+}
+
 // RemoveComputerMDMProfileResponse represents a remove computer m d m profile response.
 type RemoveComputerMDMProfileResponse struct {
 	CommandUUID string `json:"commandUuid"`
 	DeviceID    string `json:"deviceId"`
+}
+
+// RenewMDMProfileResponse represents a renew m d m profile response.
+type RenewMDMProfileResponse struct {
+	UdidsNotProcessed *Udids `json:"udidsNotProcessed,omitempty"`
+}
+
+// RequestMirroringCommand represents a request mirroring command.
+type RequestMirroringCommand struct {
+	CommandType         MDMCommandType `json:"commandType"`
+	DestinationDeviceID string         `json:"destinationDeviceId"`
+	DestinationName     string         `json:"destinationName"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password *string `json:"password,omitempty"`
+	ScanTime *int    `json:"scanTime,omitempty"`
+}
+
+// RestartDeviceCommand represents a restart device command.
+type RestartDeviceCommand struct {
+	CommandType        MDMCommandType `json:"commandType"`
+	KextPaths          []string       `json:"kextPaths"`
+	NotifyUser         bool           `json:"notifyUser"`
+	RebuildKernelCache bool           `json:"rebuildKernelCache"`
+}
+
+// ReturnToService The configuration settings for Return to Service.
+type ReturnToService struct {
+	BootstrapToken  *string `json:"bootstrapToken,omitempty"`
+	Enabled         bool    `json:"enabled"`
+	MDMProfileData  *string `json:"mdmProfileData,omitempty"`
+	WifiProfileData *string `json:"wifiProfileData,omitempty"`
+}
+
+// ReturnToServiceConfiguration represents a return to service configuration.
+type ReturnToServiceConfiguration struct {
+	DisplayName   string `json:"displayName"`
+	ID            string `json:"id"`
+	WifiProfileID string `json:"wifiProfileId"`
+}
+
+// ReturnToServiceConfigurationRequest represents a return to service configuration request.
+type ReturnToServiceConfigurationRequest struct {
+	DisplayName   *string `json:"displayName,omitempty"`
+	WifiProfileID *string `json:"wifiProfileId,omitempty"`
+}
+
+// ReturnToServiceConfigurationSearchResults represents a return to service configuration search results.
+type ReturnToServiceConfigurationSearchResults struct {
+	Results    []ReturnToServiceConfiguration `json:"results"`
+	TotalCount int                            `json:"totalCount"`
 }
 
 // Script represents a script.
@@ -3361,6 +3926,11 @@ type ScriptsSearchResults struct {
 	TotalCount int      `json:"totalCount"`
 }
 
+// SecurityInfoCommand represents a security info command.
+type SecurityInfoCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
 // SecurityV2 represents a security v2.
 type SecurityV2 struct {
 	ActivationLockEnabled         bool       `json:"activationLockEnabled"`
@@ -3381,6 +3951,54 @@ type SecurityV2 struct {
 
 // ServiceDiscoveryVersion represents a service discovery version value.
 type ServiceDiscoveryVersion = string
+
+// SetAutoAdminPasswordCommand represents a set auto admin password command.
+type SetAutoAdminPasswordCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	Guid        string         `json:"guid"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+}
+
+// SetRecoveryLockCommand represents a set recovery lock command.
+type SetRecoveryLockCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	NewPassword string `json:"newPassword"`
+}
+
+// SettingsCommand represents a settings command.
+type SettingsCommand struct {
+	ActivationLockAllowedWhileSupervised bool                         `json:"activationLockAllowedWhileSupervised"`
+	AppAnalytics                         *AppAnalyticsSetting         `json:"appAnalytics,omitempty"`
+	ApplicationAttributes                *ApplicationAttributes       `json:"applicationAttributes,omitempty"`
+	ApplicationConfiguration             *ApplicationConfiguration    `json:"applicationConfiguration,omitempty"`
+	Bluetooth                            *bool                        `json:"bluetooth,omitempty"`
+	BootstrapTokenAllowed                *bool                        `json:"bootstrapTokenAllowed,omitempty"`
+	CommandType                          MDMCommandType               `json:"commandType"`
+	DataRoaming                          *DataRoamingSetting          `json:"dataRoaming,omitempty"`
+	DefaultApplications                  *DefaultApplications         `json:"defaultApplications,omitempty"`
+	DeviceName                           string                       `json:"deviceName"`
+	DiagnosticSubmission                 *DiagnosticSubmissionSetting `json:"diagnosticSubmission,omitempty"`
+	MaximumResidentUsers                 *int                         `json:"maximumResidentUsers,omitempty"`
+	PasscodeLockGracePeriod              *int                         `json:"passcodeLockGracePeriod,omitempty"`
+	PersonalHotspot                      *PersonalHotspotSetting      `json:"personalHotspot,omitempty"`
+	SharedDeviceConfiguration            *SharedDeviceConfiguration   `json:"sharedDeviceConfiguration,omitempty"`
+	SoftwareUpdateSettings               *SoftwareUpdateSettings      `json:"softwareUpdateSettings,omitempty"`
+	TimeZone                             *string                      `json:"timeZone,omitempty"`
+	VoiceRoaming                         *VoiceRoamingSetting         `json:"voiceRoaming,omitempty"`
+}
+
+// SharedDeviceConfiguration represents a shared device configuration.
+type SharedDeviceConfiguration struct {
+	QuotaSize     *int `json:"quotaSize,omitempty"`
+	ResidentUsers *int `json:"residentUsers,omitempty"`
+}
+
+// ShutDownDeviceCommand represents a shut down device command.
+type ShutDownDeviceCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
 
 // SiteObject represents a site object.
 type SiteObject struct {
@@ -3478,6 +4096,11 @@ type SoftwareTitleConfigurationOnDashboard struct {
 	OnDashboard bool `json:"onDashboard"`
 }
 
+// SoftwareUpdateSettings represents a software update settings.
+type SoftwareUpdateSettings struct {
+	RecommendationCadence *string `json:"recommendationCadence,omitempty"`
+}
+
 // StartupStatus represents a startup status.
 type StartupStatus struct {
 	Error                   *string `json:"error,omitempty"`
@@ -3548,6 +4171,23 @@ type StaticGroupSearchResults struct {
 	TotalCount int           `json:"totalCount"`
 }
 
+// StatusItem represents a status item.
+type StatusItem struct {
+	Key            string `json:"key"`
+	LastUpdateTime string `json:"lastUpdateTime"`
+	Value          string `json:"value"`
+}
+
+// StatusItems represents a status items.
+type StatusItems struct {
+	StatusItems []StatusItem `json:"statusItems"`
+}
+
+// StopMirroringCommand represents a stop mirroring command.
+type StopMirroringCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
 // TvOsDetails will be populated if the type is appleTv.
 type TvOsDetails struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
@@ -3562,6 +4202,17 @@ type TvOsDetails struct {
 	ModelNumber           string                      `json:"modelNumber"`
 	Purchasing            *PurchasingV2               `json:"purchasing,omitempty"`
 	Supervised            bool                        `json:"supervised"`
+}
+
+// Udids represents a udids.
+type Udids struct {
+	Udids *[]string `json:"udids,omitempty"`
+}
+
+// UnlockUserAccountCommand represents a unlock user account command.
+type UnlockUserAccountCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	UserName    string         `json:"userName"`
 }
 
 // UnmanageMobileDeviceResponse represents a unmanage mobile device response.
@@ -3625,6 +4276,40 @@ type V1Site struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
+
+// ValidateApplicationsCommand represents a validate applications command.
+type ValidateApplicationsCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
+// VerbosePackageDeploymentResponse represents a verbose package deployment response.
+type VerbosePackageDeploymentResponse struct {
+	Errors         []VerbosePackageDeploymentResponseErrorsItem         `json:"errors"`
+	QueuedCommands []VerbosePackageDeploymentResponseQueuedCommandsItem `json:"queuedCommands"`
+}
+
+// VerbosePackageDeploymentResponseErrorsItem The error will contain either the 'device' or 'group' property.
+type VerbosePackageDeploymentResponseErrorsItem struct {
+	Device int    `json:"device"`
+	Group  int    `json:"group"`
+	Reason string `json:"reason"`
+}
+
+// VerbosePackageDeploymentResponseQueuedCommandsItem represents a verbose package deployment response queued commands item.
+type VerbosePackageDeploymentResponseQueuedCommandsItem struct {
+	CommandUUID string `json:"commandUuid"`
+	Device      int    `json:"device"`
+}
+
+// VerifyRecoveryLockCommand represents a verify recovery lock command.
+type VerifyRecoveryLockCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+}
+
+// VoiceRoamingSetting represents a voice roaming setting value.
+type VoiceRoamingSetting = string
 
 // WatchOsDetailsV2 will be populated if the type is watchos.
 type WatchOsDetailsV2 struct {
