@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"strconv"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
@@ -26,4 +28,36 @@ func (c *Client) UploadIconV1(ctx context.Context, fileFilename string, file io.
 		return nil, fmt.Errorf("UploadIconV1: %w", err)
 	}
 	return &result, nil
+}
+
+// GetIconV1 get an icon.
+func (c *Client) GetIconV1(ctx context.Context, id string) (*IconResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result IconResponse
+	endpoint := fmt.Sprintf("%s/icon/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetIconV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// DownloadIconV1 download a self service icon.
+func (c *Client) DownloadIconV1(ctx context.Context, id string, res int, scale string) ([]byte, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result []byte
+	endpoint := fmt.Sprintf("%s/icon/download/%s", prefix, url.PathEscape(id))
+	params := url.Values{}
+	if res != 0 {
+		params.Set("res", strconv.Itoa(res))
+	}
+	if scale != "" {
+		params.Set("scale", scale)
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("DownloadIconV1(%s): %w", id, err)
+	}
+	return result, nil
 }

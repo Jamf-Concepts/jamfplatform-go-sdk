@@ -2938,6 +2938,23 @@ type InventoryPreloadRecordV2 struct {
 	WarrantyExpiration  *string                               `json:"warrantyExpiration,omitempty"`
 }
 
+// IosBrandingConfiguration represents a ios branding configuration.
+type IosBrandingConfiguration struct {
+	BrandingName              string  `json:"brandingName"`
+	BrandingNameColorCode     string  `json:"brandingNameColorCode"`
+	HeaderBackgroundColorCode string  `json:"headerBackgroundColorCode"`
+	IconID                    *int    `json:"iconId,omitempty"`
+	ID                        *string `json:"id,omitempty"`
+	MenuIconColorCode         string  `json:"menuIconColorCode"`
+	StatusBarTextColor        string  `json:"statusBarTextColor"`
+}
+
+// IosBrandingSearchResults represents a ios branding search results.
+type IosBrandingSearchResults struct {
+	Results    []IosBrandingConfiguration `json:"results"`
+	TotalCount int                        `json:"totalCount"`
+}
+
 // JamfProServerURL represents a jamf pro server u r l.
 type JamfProServerURL struct {
 	URL string `json:"url"`
@@ -3195,6 +3212,24 @@ type LoginContentPut struct {
 	DisclaimerHeading       *string `json:"disclaimerHeading,omitempty"`
 	DisclaimerMainText      *string `json:"disclaimerMainText,omitempty"`
 	IncludeCustomDisclaimer bool    `json:"includeCustomDisclaimer"`
+}
+
+// MacOsBrandingConfiguration represents a mac os branding configuration.
+type MacOsBrandingConfiguration struct {
+	ApplicationName       *string `json:"applicationName,omitempty"`
+	BrandingHeaderImageID *int    `json:"brandingHeaderImageId,omitempty"`
+	BrandingName          *string `json:"brandingName,omitempty"`
+	BrandingNameSecondary *string `json:"brandingNameSecondary,omitempty"`
+	HomeHeading           *string `json:"homeHeading,omitempty"`
+	HomeSubheading        *string `json:"homeSubheading,omitempty"`
+	IconID                *int    `json:"iconId,omitempty"`
+	ID                    *string `json:"id,omitempty"`
+}
+
+// MacOsBrandingSearchResults represents a mac os branding search results.
+type MacOsBrandingSearchResults struct {
+	Results    []MacOsBrandingConfiguration `json:"results"`
+	TotalCount int                          `json:"totalCount"`
 }
 
 // ManagedApplicationListCommand represents a managed application list command.
@@ -5074,9 +5109,39 @@ type SecurityV2 struct {
 	PasscodePresent               bool       `json:"passcodePresent"`
 }
 
+// SelfServiceInstallSettings object representation of Self Service settings regarding installation.
+type SelfServiceInstallSettings struct {
+	InstallAutomatically *bool  `json:"installAutomatically,omitempty"`
+	InstallLocation      string `json:"installLocation"`
+}
+
+// SelfServiceInteractionSettings object representation of Self Service settings regarding user interaction.
+type SelfServiceInteractionSettings struct {
+	AlertUserApprovedMDM  *bool   `json:"alertUserApprovedMdm,omitempty"`
+	BookmarksName         string  `json:"bookmarksName"`
+	DefaultHomeCategoryID *int    `json:"defaultHomeCategoryId,omitempty"`
+	DefaultLandingPage    *string `json:"defaultLandingPage,omitempty"`
+	NotificationsEnabled  *bool   `json:"notificationsEnabled,omitempty"`
+}
+
+// SelfServiceLoginSettings object representation of Self Service settings regarding login.
+type SelfServiceLoginSettings struct {
+	AllowRememberMe *bool  `json:"allowRememberMe,omitempty"`
+	AuthType        string `json:"authType"`
+	UseFido2        *bool  `json:"useFido2,omitempty"`
+	UserLoginLevel  string `json:"userLoginLevel"`
+}
+
 // SelfServicePlusSettings represents a self service plus settings.
 type SelfServicePlusSettings struct {
 	Enabled *bool `json:"enabled,omitempty"`
+}
+
+// SelfServiceSettings object representation of Self Service settings.
+type SelfServiceSettings struct {
+	ConfigurationSettings *SelfServiceInteractionSettings `json:"configurationSettings,omitempty"`
+	InstallSettings       *SelfServiceInstallSettings     `json:"installSettings,omitempty"`
+	LoginSettings         *SelfServiceLoginSettings       `json:"loginSettings,omitempty"`
 }
 
 // ServiceDiscoveryVersion represents a service discovery version value.

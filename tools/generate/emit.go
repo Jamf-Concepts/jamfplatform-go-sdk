@@ -587,6 +587,9 @@ func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, m
 // tagToFileBase converts an OpenAPI tag ("startup-status", "declaration report",
 // "mobile-device-extension-attributes-preview") into a Go-friendly filename base.
 // Hyphens and whitespace collapse to underscores; non-word characters are dropped.
+// Filenames ending in `_<goos>` or `_<goarch>` are rewritten to avoid the
+// Go toolchain's implicit build constraints — e.g. `self_service_branding_ios.go`
+// would otherwise only compile for GOOS=ios.
 func tagToFileBase(tag string) string {
 	s := strings.ToLower(strings.TrimSpace(tag))
 	var b strings.Builder
@@ -599,7 +602,26 @@ func tagToFileBase(tag string) string {
 			b.WriteByte('_')
 		}
 	}
-	return b.String()
+	out := b.String()
+	for _, suf := range reservedFileSuffixes {
+		if strings.HasSuffix(out, "_"+suf) {
+			return out + "_api"
+		}
+	}
+	return out
+}
+
+// reservedFileSuffixes lists the GOOS and GOARCH values whose trailing
+// use as `_<value>.go` would turn the whole file into a per-platform
+// build-constrained source. Keep in sync with Go's build constraints.
+var reservedFileSuffixes = []string{
+	// GOOS
+	"aix", "android", "darwin", "dragonfly", "freebsd", "hurd", "illumos",
+	"ios", "js", "linux", "nacl", "netbsd", "openbsd", "plan9", "solaris",
+	"wasip1", "windows", "zos",
+	// GOARCH
+	"386", "amd64", "arm", "arm64", "loong64", "mips", "mips64", "mips64le",
+	"mipsle", "ppc64", "ppc64le", "riscv64", "s390x", "wasm",
 }
 
 // emitTemplated executes a template and writes the goimports-formatted result

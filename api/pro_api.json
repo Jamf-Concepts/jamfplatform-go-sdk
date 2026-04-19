@@ -10517,6 +10517,63 @@
         ],
         "type": "object"
       },
+      "IosBrandingConfiguration": {
+        "properties": {
+          "brandingName": {
+            "example": "Self Service",
+            "type": "string"
+          },
+          "brandingNameColorCode": {
+            "example": "000000",
+            "type": "string"
+          },
+          "headerBackgroundColorCode": {
+            "example": "FFFFFF",
+            "type": "string"
+          },
+          "iconId": {
+            "example": 1,
+            "type": "integer"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "menuIconColorCode": {
+            "example": "000001",
+            "type": "string"
+          },
+          "statusBarTextColor": {
+            "example": "dark",
+            "type": "string"
+          }
+        },
+        "required": [
+          "brandingName",
+          "brandingNameColorCode",
+          "headerBackgroundColorCode",
+          "menuIconColorCode",
+          "statusBarTextColor"
+        ],
+        "type": "object"
+      },
+      "IosBrandingSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/IosBrandingConfiguration"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "JamfProServerUrl": {
         "properties": {
           "url": {
@@ -11308,6 +11365,60 @@
         "required": [
           "includeCustomDisclaimer"
         ],
+        "type": "object"
+      },
+      "MacOsBrandingConfiguration": {
+        "properties": {
+          "applicationName": {
+            "example": "Self Service",
+            "type": "string"
+          },
+          "brandingHeaderImageId": {
+            "example": 1,
+            "type": "integer"
+          },
+          "brandingName": {
+            "example": "Self Service",
+            "type": "string"
+          },
+          "brandingNameSecondary": {
+            "example": "Self Service",
+            "type": "string"
+          },
+          "homeHeading": {
+            "example": "Welcome to Self Service",
+            "type": "string"
+          },
+          "homeSubheading": {
+            "example": "We help organizations succeed with Apple",
+            "type": "string"
+          },
+          "iconId": {
+            "example": 1,
+            "type": "integer"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MacOsBrandingSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/MacOsBrandingConfiguration"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
         "type": "object"
       },
       "ManagedApplicationListCommand": {
@@ -16884,12 +16995,128 @@
         },
         "type": "object"
       },
+      "SelfServiceInstallSettings": {
+        "description": "object representation of Self Service settings regarding installation\n",
+        "properties": {
+          "installAutomatically": {
+            "default": false,
+            "description": "true if Self Service is installed automatically, false if not\n",
+            "type": "boolean"
+          },
+          "installLocation": {
+            "description": "path at which Self Service is installed. Required if installAutomatically is true\n",
+            "example": "/Applications",
+            "type": "string"
+          }
+        },
+        "required": [
+          "installLocation"
+        ],
+        "type": "object"
+      },
+      "SelfServiceInteractionSettings": {
+        "description": "object representation of Self Service settings regarding user interaction\n",
+        "properties": {
+          "alertUserApprovedMdm": {
+            "default": true,
+            "description": "whether users should be notified they need to approve organization's MDM profile\n",
+            "type": "boolean"
+          },
+          "bookmarksName": {
+            "description": "renamed string for bookmarks if the admin wishes\n",
+            "example": "Bookmarks",
+            "type": "string"
+          },
+          "defaultHomeCategoryId": {
+            "default": -1,
+            "description": "id for the default home category in Self Service\n",
+            "format": "int32",
+            "minimum": -4,
+            "type": "integer"
+          },
+          "defaultLandingPage": {
+            "default": "HOME",
+            "description": "the default landing page in Self Service\n",
+            "enum": [
+              "HOME",
+              "BROWSE",
+              "HISTORY",
+              "NOTIFICATIONS"
+            ],
+            "example": "HOME",
+            "type": "string"
+          },
+          "notificationsEnabled": {
+            "default": false,
+            "description": "global Self Service setting for if notifications are on or off\n",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "bookmarksName"
+        ],
+        "type": "object"
+      },
+      "SelfServiceLoginSettings": {
+        "description": "object representation of Self Service settings regarding login\n",
+        "properties": {
+          "allowRememberMe": {
+            "default": false,
+            "description": "true if remember me functionality is allowed, false if not\n",
+            "type": "boolean"
+          },
+          "authType": {
+            "description": "login type to be used when asking users to log in\n",
+            "enum": [
+              "Basic",
+              "Saml"
+            ],
+            "example": "Basic",
+            "type": "string"
+          },
+          "useFido2": {
+            "default": false,
+            "description": "true if use FIDO2 functionality is allowed, false if not\n",
+            "type": "boolean"
+          },
+          "userLoginLevel": {
+            "description": "login setting to tell clients how to let users log in\n",
+            "enum": [
+              "NotRequired",
+              "Anonymous",
+              "Required"
+            ],
+            "example": "NotRequired",
+            "type": "string"
+          }
+        },
+        "required": [
+          "authType",
+          "userLoginLevel"
+        ],
+        "type": "object"
+      },
       "SelfServicePlusSettings": {
         "properties": {
           "enabled": {
             "description": "Whether Self Service Plus is enabled",
             "example": true,
             "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "SelfServiceSettings": {
+        "description": "object representation of Self Service settings\n",
+        "properties": {
+          "configurationSettings": {
+            "$ref": "#/components/schemas/SelfServiceInteractionSettings"
+          },
+          "installSettings": {
+            "$ref": "#/components/schemas/SelfServiceInstallSettings"
+          },
+          "loginSettings": {
+            "$ref": "#/components/schemas/SelfServiceLoginSettings"
           }
         },
         "type": "object"
@@ -19762,6 +19989,50 @@
         ]
       }
     },
+    "/self-service/branding/images": {
+      "post": {
+        "description": "Uploads an image",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrandingImageUrl"
+                }
+              }
+            },
+            "description": "Image successfully uploaded"
+          }
+        },
+        "summary": "Upload an image\n",
+        "tags": [
+          "self-service-branding-preview"
+        ],
+        "x-required-privileges": [
+          "Update Self Service Branding Configuration"
+        ]
+      }
+    },
     "/startup-status": {
       "get": {
         "description": "Retrieves information about application startup. Current startup operation taking place (if any) and overall startup completion percentage.",
@@ -21433,6 +21704,42 @@
         "summary": "Get all the Authorization details associated with the current api\n",
         "tags": [
           "api-authentication"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/branding-images/download/{id}": {
+      "get": {
+        "description": "Download a self service branding image",
+        "parameters": [
+          {
+            "description": "id of the self service branding image",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Download a self service branding image\n",
+        "tags": [
+          "branding"
         ],
         "x-authentication-required": true
       }
@@ -28170,6 +28477,101 @@
           }
         },
         "summary": "Upload an icon\n",
+        "tags": [
+          "icon"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/icon/download/{id}": {
+      "get": {
+        "description": "Download a self service icon",
+        "parameters": [
+          {
+            "description": "id of the self service icon",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "request a specific resolution of original, 300, or 512; invalid options will result in original resolution",
+            "explode": true,
+            "in": "query",
+            "name": "res",
+            "schema": {
+              "default": "original",
+              "example": "300",
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "description": "request a scale; 0 results in original image, non-0 results in scaled to 300",
+            "explode": true,
+            "in": "query",
+            "name": "scale",
+            "schema": {
+              "default": "0",
+              "example": "1",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Download a self service icon\n",
+        "tags": [
+          "icon"
+        ],
+        "x-authentication-required": true
+      }
+    },
+    "/v1/icon/{id}": {
+      "get": {
+        "description": "Get an icon",
+        "parameters": [
+          {
+            "description": "id of the icon",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IconResponse"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get an icon\n",
         "tags": [
           "icon"
         ],
@@ -35146,6 +35548,555 @@
         "summary": "Save Self Service Plus settings.",
         "tags": [
           "self-service-plus"
+        ],
+        "x-required-privileges": [
+          "Update Self Service"
+        ]
+      }
+    },
+    "/v1/self-service/branding/ios": {
+      "get": {
+        "description": "Search for sorted and paged iOS branding configurations",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=id:desc,brandingName:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IosBrandingSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Search for sorted and paged iOS branding configurations\n",
+        "tags": [
+          "self-service-branding-ios"
+        ],
+        "x-required-privileges": [
+          "Read Self Service Branding Configuration"
+        ]
+      },
+      "post": {
+        "description": "Create a Self Service iOS branding configuration with the supplied details",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IosBrandingConfiguration"
+              }
+            }
+          },
+          "description": "The iOS branding configuration to create"
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Create a Self Service iOS branding configuration with the supplied\n",
+        "tags": [
+          "self-service-branding-ios"
+        ],
+        "x-required-privileges": [
+          "Create Self Service Branding Configuration"
+        ]
+      }
+    },
+    "/v1/self-service/branding/ios/{id}": {
+      "delete": {
+        "description": "Delete the Self Service iOS branding configuration indicated by the provided id.",
+        "parameters": [
+          {
+            "description": "id of iOS branding configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid id"
+          }
+        },
+        "summary": "Delete the Self Service iOS branding configuration indicated by the provided id\n",
+        "tags": [
+          "self-service-branding-ios"
+        ],
+        "x-required-privileges": [
+          "Delete Self Service Branding Configuration"
+        ]
+      },
+      "get": {
+        "description": "Read a single Self Service iOS branding configuration indicated by the provided id.",
+        "parameters": [
+          {
+            "description": "id of iOS branding configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IosBrandingConfiguration"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Read a single Self Service iOS branding configuration indicated by the provided id\n",
+        "tags": [
+          "self-service-branding-ios"
+        ],
+        "x-required-privileges": [
+          "Read Self Service Branding Configuration"
+        ]
+      },
+      "put": {
+        "description": "Update a Self Service iOS branding configuration with the supplied details",
+        "parameters": [
+          {
+            "description": "id of iOS branding configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IosBrandingConfiguration"
+              }
+            }
+          },
+          "description": "The iOS branding configuration values to update"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IosBrandingConfiguration"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid id"
+          }
+        },
+        "summary": "Update a Self Service iOS branding configuration with the supplied details\n",
+        "tags": [
+          "self-service-branding-ios"
+        ],
+        "x-required-privileges": [
+          "Update Self Service Branding Configuration"
+        ]
+      }
+    },
+    "/v1/self-service/branding/macos": {
+      "get": {
+        "description": "Search for sorted and paged macOS branding configurations",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=id:desc,brandingName:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MacOsBrandingSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Search for sorted and paged macOS branding configurations\n",
+        "tags": [
+          "self-service-branding-macos"
+        ],
+        "x-required-privileges": [
+          "Read Self Service Branding Configuration",
+          "Read Self Service"
+        ]
+      },
+      "post": {
+        "description": "Create a Self Service macOS branding configuration with the supplied details",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MacOsBrandingConfiguration"
+              }
+            }
+          },
+          "description": "The macOS branding configuration to create"
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Create a Self Service macOS branding configuration with the supplied\n",
+        "tags": [
+          "self-service-branding-macos"
+        ],
+        "x-required-privileges": [
+          "Create Self Service Branding Configuration"
+        ]
+      }
+    },
+    "/v1/self-service/branding/macos/{id}": {
+      "delete": {
+        "description": "Delete the Self Service macOS branding configuration indicated by the provided id.",
+        "parameters": [
+          {
+            "description": "id of macOS branding configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid id"
+          }
+        },
+        "summary": "Delete the Self Service macOS branding configuration indicated by the provided id\n",
+        "tags": [
+          "self-service-branding-macos"
+        ],
+        "x-required-privileges": [
+          "Delete Self Service Branding Configuration"
+        ]
+      },
+      "get": {
+        "description": "Read a single Self Service macOS branding configuration indicated by the provided id.",
+        "parameters": [
+          {
+            "description": "id of macOS branding configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MacOsBrandingConfiguration"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Read a single Self Service macOS branding configuration indicated by the provided id\n",
+        "tags": [
+          "self-service-branding-macos"
+        ],
+        "x-required-privileges": [
+          "Read Self Service Branding Configuration"
+        ]
+      },
+      "put": {
+        "description": "Update a Self Service macOS branding configuration with the supplied details",
+        "parameters": [
+          {
+            "description": "id of macOS branding configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MacOsBrandingConfiguration"
+              }
+            }
+          },
+          "description": "The macOS branding configuration values to update"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MacOsBrandingConfiguration"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid id"
+          }
+        },
+        "summary": "Update a Self Service macOS branding configuration with the supplied details\n",
+        "tags": [
+          "self-service-branding-macos"
+        ],
+        "x-required-privileges": [
+          "Update Self Service Branding Configuration"
+        ]
+      }
+    },
+    "/v1/self-service/settings": {
+      "get": {
+        "description": "gets an object representation of Self Service settings\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelfServiceSettings"
+                }
+              }
+            },
+            "description": "successful GET\n"
+          }
+        },
+        "summary": "Get an object representation of Self Service settings\n",
+        "tags": [
+          "self-service"
+        ],
+        "x-required-privileges": [
+          "Read Self Service"
+        ]
+      },
+      "put": {
+        "description": "puts an object representation of Self Service settings\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfServiceSettings"
+              }
+            }
+          },
+          "description": "object that contains all editable global fields to alter Self Service settings\n",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelfServiceSettings"
+                }
+              }
+            },
+            "description": "successful PUT\n"
+          }
+        },
+        "summary": "Put an object representation of Self Service settings\n",
+        "tags": [
+          "self-service"
+        ],
+        "x-required-privileges": [
+          "Update Self Service"
+        ]
+      }
+    },
+    "/v1/self-service/settings/history": {
+      "get": {
+        "description": "Get a page of Self Service settings history\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Self Service settings history were found"
+          }
+        },
+        "summary": "Get a page of Self Service settings history\n",
+        "tags": [
+          "self-service"
+        ],
+        "x-required-privileges": [
+          "Read Self Service"
+        ]
+      },
+      "post": {
+        "description": "Add Self Service settings history notes\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "history notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes to Self Service settings history were added"
+          }
+        },
+        "summary": "Add Self Service settings history notes\n",
+        "tags": [
+          "self-service"
         ],
         "x-required-privileges": [
           "Update Self Service"

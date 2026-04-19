@@ -750,7 +750,30 @@
         {"op": "PUT /v1/supervision-identities/{id}", "name": "UpdateSupervisionIdentityV1"},
         {"op": "DELETE /v1/supervision-identities/{id}", "name": "DeleteSupervisionIdentityV1", "expectedStatus": 204},
         {"op": "GET /v1/supervision-identities/{id}/download", "name": "DownloadSupervisionIdentityV1"},
-        {"op": "POST /v1/supervision-identities/upload", "name": "UploadSupervisionIdentityV1", "expectedStatus": 201}
+        {"op": "POST /v1/supervision-identities/upload", "name": "UploadSupervisionIdentityV1", "expectedStatus": 201},
+
+        {"op": "GET /v1/self-service/branding/ios", "name": "ListIOSBrandingConfigurationsV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "POST /v1/self-service/branding/ios", "name": "CreateIOSBrandingConfigurationV1", "expectedStatus": 201},
+        {"op": "GET /v1/self-service/branding/ios/{id}", "name": "GetIOSBrandingConfigurationV1"},
+        {"op": "PUT /v1/self-service/branding/ios/{id}", "name": "UpdateIOSBrandingConfigurationV1"},
+        {"op": "DELETE /v1/self-service/branding/ios/{id}", "name": "DeleteIOSBrandingConfigurationV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/self-service/branding/macos", "name": "ListMacOSBrandingConfigurationsV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "POST /v1/self-service/branding/macos", "name": "CreateMacOSBrandingConfigurationV1", "expectedStatus": 201},
+        {"op": "GET /v1/self-service/branding/macos/{id}", "name": "GetMacOSBrandingConfigurationV1"},
+        {"op": "PUT /v1/self-service/branding/macos/{id}", "name": "UpdateMacOSBrandingConfigurationV1"},
+        {"op": "DELETE /v1/self-service/branding/macos/{id}", "name": "DeleteMacOSBrandingConfigurationV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/self-service/settings", "name": "GetSelfServiceSettingsV1"},
+        {"op": "PUT /v1/self-service/settings", "name": "UpdateSelfServiceSettingsV1"},
+        {"op": "GET /v1/self-service/settings/history", "name": "ListSelfServiceSettingsHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/self-service/settings/history", "name": "CreateSelfServiceSettingsHistoryNoteV1", "expectedStatus": 201},
+
+        {"op": "POST /self-service/branding/images", "name": "UploadBrandingImageV1", "expectedStatus": 201},
+
+        {"op": "GET /v1/icon/{id}", "name": "GetIconV1"},
+        {"op": "GET /v1/icon/download/{id}", "name": "DownloadIconV1", "params": ["res:int", "scale:string"]},
+        {"op": "GET /v1/branding-images/download/{id}", "name": "DownloadBrandingImageV1"}
       ]
     },
     {
