@@ -108,10 +108,11 @@ func TestAcceptance_Pro_Distribution_CloudDistributionPointLifecycleV1(t *testin
 	}
 	pkgPath := pkgMatches[0]
 
-	// Snapshot the current CDP before anything else. If the GET 404s
-	// the tenant has no CDP configured and we don't have a baseline to
-	// restore to — skip the test to avoid leaving a tenant in an
-	// unknown state.
+	// Snapshot the current CDP before anything else. If the GET 404s,
+	// or the snapshot is a post-DELETE stub (cdnType empty/NONE), we
+	// have no real baseline to restore to — skip so we don't leave the
+	// tenant in an unknown state. The singleton endpoint's POST-on-NONE
+	// rejects cdnType=NONE, so a NONE snapshot is functionally unusable.
 	snapshot, err := p.GetCloudDistributionPointV1(ctx)
 	if err != nil {
 		var apiErr *jamfplatform.APIResponseError
@@ -121,35 +122,52 @@ func TestAcceptance_Pro_Distribution_CloudDistributionPointLifecycleV1(t *testin
 		skipOnServerError(t, err)
 		t.Fatalf("GetCloudDistributionPointV1 (snapshot): %v", err)
 	}
+	if snapshot.CdnType == "" || snapshot.CdnType == "NONE" {
+		t.Skipf("tenant CDP is a stub (cdnType=%q master=%v) — no real baseline to restore; configure a live CDP and re-run", snapshot.CdnType, snapshot.Master)
+	}
 	t.Logf("CDP snapshot: cdnType=%s master=%v", snapshot.CdnType, snapshot.Master)
 
-	// Restore regardless of test outcome. POST creates; if the CDP is
-	// still present (e.g. partway through the test), we re-POST and
-	// let the 400 surface as a log — the unconditional restore is the
-	// safety net, not the happy path.
+	// Restore on exit. GET current state first — only POST when the
+	// CDP is genuinely gone (404) or is a post-DELETE stub (cdnType
+	// empty or NONE). POSTing on top of a real, live CDP produces
+	// duplicate records that wedge the singleton endpoint on subsequent
+	// runs (409 "Multiple cloud distribution points are configured"
+	// with no SDK path to disambiguate — requires Jamf support).
 	t.Cleanup(func() {
-		// Clear server-minted fields before re-POSTing so the server
-		// mints fresh ones on the recreate.
+		cur, ge := p.GetCloudDistributionPointV1(context.Background())
+		if ge == nil {
+			if cur.CdnType != "" && cur.CdnType != "NONE" {
+				t.Logf("cleanup: real CDP present (cdnType=%s master=%v) — no restore needed", cur.CdnType, cur.Master)
+				return
+			}
+			t.Logf("cleanup: CDP stub present (cdnType=%q master=%v) — restoring snapshot", cur.CdnType, cur.Master)
+		} else {
+			var apiErr *jamfplatform.APIResponseError
+			if !errors.As(ge, &apiErr) || !apiErr.HasStatus(404) {
+				t.Logf("cleanup GET CDP: %v — skipping restore (won't POST on uncertain state)", ge)
+				return
+			}
+			t.Logf("cleanup: CDP 404 — restoring snapshot")
+		}
 		restore := *snapshot
 		restore.InventoryID = ""
 		if _, err := p.CreateCloudDistributionPointV1(context.Background(), &restore); err != nil {
-			var apiErr *jamfplatform.APIResponseError
-			if errors.As(err, &apiErr) && apiErr.StatusCode == 400 {
-				// Already exists — probably the lifecycle completed the
-				// restore itself. Check and log.
-				if cur, ge := p.GetCloudDistributionPointV1(context.Background()); ge == nil {
-					t.Logf("cleanup: CDP already present (cdnType=%s master=%v)", cur.CdnType, cur.Master)
-					return
-				}
-			}
 			t.Logf("cleanup restore CDP: %v", err)
 			return
 		}
 		t.Logf("cleanup: CDP restored (cdnType=%s)", snapshot.CdnType)
 	})
 
-	// 1. Delete current CDP.
+	// 1. Delete current CDP. The singleton DELETE surfaces 409 for two
+	// different latent states — "Multiple cloud distribution points are
+	// configured" (too many, can't disambiguate) and "Cloud distribution
+	// point is not configured" (NONE stub). Neither is recoverable via
+	// the SDK; skip so the tenant is untouched and CI passes.
 	if err := p.DeleteCloudDistributionPointV1(ctx); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode == 409 {
+			t.Skipf("DeleteCloudDistributionPointV1: 409 — singleton CDP endpoint in an unrecoverable state (multiple configured or not configured): %v", err)
+		}
 		skipOnServerError(t, err)
 		t.Fatalf("DeleteCloudDistributionPointV1: %v", err)
 	}
