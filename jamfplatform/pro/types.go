@@ -10,6 +10,26 @@ import (
 	"time"
 )
 
+// AdvancedSearch represents a advanced search.
+type AdvancedSearch struct {
+	Criteria      *[]SmartSearchCriterion `json:"criteria,omitempty"`
+	DisplayFields *[]string               `json:"displayFields,omitempty"`
+	ID            *string                 `json:"id,omitempty"`
+	Name          string                  `json:"name"`
+	SiteID        *string                 `json:"siteId,omitempty"`
+}
+
+// AdvancedSearchCriteriaChoices represents a advanced search criteria choices.
+type AdvancedSearchCriteriaChoices struct {
+	Choices []string `json:"choices"`
+}
+
+// AdvancedSearchSearchResults represents a advanced search search results.
+type AdvancedSearchSearchResults struct {
+	Results    []AdvancedSearch `json:"results"`
+	TotalCount int              `json:"totalCount"`
+}
+
 // ApiError represents a api error.
 type ApiError struct {
 	Errors     []ApiErrorCause `json:"errors"`
@@ -22,6 +42,12 @@ type ApiErrorCause struct {
 	Description string  `json:"description"`
 	Field       string  `json:"field"`
 	ID          *string `json:"id,omitempty"`
+}
+
+// Assignment represents a assignment.
+type Assignment struct {
+	MobileDeviceID *string `json:"mobileDeviceId,omitempty"`
+	Selected       *bool   `json:"selected,omitempty"`
 }
 
 // Building represents a building.
@@ -106,6 +132,14 @@ type ComputerGroup struct {
 	SmartGroup  bool   `json:"smartGroup"`
 }
 
+// ConfigurationProfile represents a configuration profile.
+type ConfigurationProfile struct {
+	DisplayName string `json:"displayName"`
+	Identifier  string `json:"identifier"`
+	UUID        string `json:"uuid"`
+	Version     string `json:"version"`
+}
+
 // Department represents a department.
 type Department struct {
 	ID   *string `json:"id,omitempty"`
@@ -133,10 +167,59 @@ type DependencyObjectResultsResultsItem struct {
 	ObjectID         int    `json:"objectId"`
 }
 
+// DetailsV2 will be populated if the type is ios or visionos.
+type DetailsV2 struct {
+	Applications                []MobileDeviceApplication          `json:"applications"`
+	Attachments                 []MobileDeviceAttachmentV2         `json:"attachments"`
+	AvailableMb                 int                                `json:"availableMb"`
+	BatteryHealth               string                             `json:"batteryHealth"`
+	BatteryLevel                int                                `json:"batteryLevel"`
+	BleCapable                  bool                               `json:"bleCapable"`
+	CapacityMb                  int                                `json:"capacityMb"`
+	Certificates                []MobileDeviceCertificateV2        `json:"certificates"`
+	CloudBackupEnabled          bool                               `json:"cloudBackupEnabled"`
+	Computer                    *IDAndNameV2                       `json:"computer,omitempty"`
+	ConfigurationProfiles       []ConfigurationProfile             `json:"configurationProfiles"`
+	DeviceLocatorServiceEnabled bool                               `json:"deviceLocatorServiceEnabled"`
+	DoNotDisturbEnabled         bool                               `json:"doNotDisturbEnabled"`
+	Ebooks                      []MobileDeviceEbook                `json:"ebooks"`
+	ITunesStoreAccountActive    bool                               `json:"iTunesStoreAccountActive"`
+	LastBackupTimestamp         *time.Time                         `json:"lastBackupTimestamp,omitempty"`
+	LastCloudBackupTimestamp    *time.Time                         `json:"lastCloudBackupTimestamp,omitempty"`
+	LocationServicesEnabled     bool                               `json:"locationServicesEnabled"`
+	MDMCapableUsers             []MobileDeviceMDMCapableUser       `json:"mdmCapableUsers"`
+	Model                       string                             `json:"model"`
+	ModelIdentifier             string                             `json:"modelIdentifier"`
+	ModelNumber                 string                             `json:"modelNumber"`
+	Network                     *NetworkV2                         `json:"network,omitempty"`
+	PercentageUsed              int                                `json:"percentageUsed"`
+	ProvisioningProfiles        []MobileDeviceProvisioningProfiles `json:"provisioningProfiles"`
+	Purchasing                  *PurchasingV2                      `json:"purchasing,omitempty"`
+	Security                    *SecurityV2                        `json:"security,omitempty"`
+	ServiceSubscriptions        []MobileDeviceServiceSubscriptions `json:"serviceSubscriptions"`
+	Shared                      bool                               `json:"shared"`
+	Supervised                  bool                               `json:"supervised"`
+	UnlockToken                 string                             `json:"unlockToken"`
+}
+
 // EnrollmentMethodPrestage represents a enrollment method prestage.
 type EnrollmentMethodPrestage struct {
 	MobileDevicePrestageID string `json:"mobileDevicePrestageId"`
 	ProfileName            string `json:"profileName"`
+}
+
+// EraseDeviceMobileDeviceRequest represents a erase device mobile device request.
+type EraseDeviceMobileDeviceRequest struct {
+	ClearActivationLock    *bool `json:"clearActivationLock,omitempty"`
+	DisallowProximitySetup *bool `json:"disallowProximitySetup,omitempty"`
+	PreserveDataPlan       *bool `json:"preserveDataPlan,omitempty"`
+	ReturnToService        *bool `json:"returnToService,omitempty"`
+}
+
+// EraseDeviceMobileDeviceResponse represents a erase device mobile device response.
+type EraseDeviceMobileDeviceResponse struct {
+	CommandUUID string `json:"commandUuid"`
+	DeviceID    string `json:"deviceId"`
 }
 
 // ExportField Field to be included in the export operation.
@@ -154,12 +237,35 @@ type ExportParameters struct {
 	Sort     *[]string      `json:"sort,omitempty"`
 }
 
+// ExtensionAttributeV2 represents a extension attribute v2.
+type ExtensionAttributeV2 struct {
+	ExtensionAttributeCollectionAllowed *bool     `json:"extensionAttributeCollectionAllowed,omitempty"`
+	ID                                  *string   `json:"id,omitempty"`
+	Name                                *string   `json:"name,omitempty"`
+	Type                                *string   `json:"type,omitempty"`
+	Value                               *[]string `json:"value,omitempty"`
+}
+
+// ExtensionAttributeValue represents a extension attribute value.
+type ExtensionAttributeValue struct {
+	DisplayName string  `json:"displayName"`
+	Value       *string `json:"value,omitempty"`
+}
+
 // ExtensionAttributes represents a extension attributes.
 type ExtensionAttributes struct {
 	DataType    string  `json:"dataType"`
 	Description *string `json:"description,omitempty"`
 	ID          *string `json:"id,omitempty"`
 	Name        string  `json:"name"`
+}
+
+// GroupResetRequest represents a group reset request.
+type GroupResetRequest struct {
+	ClearActivationLock    *bool `json:"clearActivationLock,omitempty"`
+	DisallowProximitySetup *bool `json:"disallowProximitySetup,omitempty"`
+	PreserveDataPlan       *bool `json:"preserveDataPlan,omitempty"`
+	ReturnToService        *bool `json:"returnToService,omitempty"`
 }
 
 // HistorySearchResults represents a history search results.
@@ -180,9 +286,152 @@ type IconResponse struct {
 	URL string `json:"url"`
 }
 
+// IDAndNameV2 represents a i d and name v2.
+type IDAndNameV2 struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // Ids represents a ids.
 type Ids struct {
 	IDs *[]string `json:"ids,omitempty"`
+}
+
+// InventoryListMobileDevice represents a inventory list mobile device.
+type InventoryListMobileDevice struct {
+	ActivationLockEnabled bool `json:"activationLockEnabled"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	AirPlayPassword                             string                    `json:"airPlayPassword"`
+	AppAnalyticsEnabled                         bool                      `json:"appAnalyticsEnabled"`
+	AppleCareID                                 string                    `json:"appleCareId"`
+	AssetTag                                    string                    `json:"assetTag"`
+	AvailableSpaceMb                            int                       `json:"availableSpaceMb"`
+	BatteryHealth                               string                    `json:"batteryHealth"`
+	BatteryLevel                                int                       `json:"batteryLevel"`
+	BlockEncryptionCapable                      bool                      `json:"blockEncryptionCapable"`
+	BluetoothLowEnergyCapable                   bool                      `json:"bluetoothLowEnergyCapable"`
+	BluetoothMacAddress                         string                    `json:"bluetoothMacAddress"`
+	Building                                    string                    `json:"building"`
+	CapacityMb                                  int                       `json:"capacityMb"`
+	CarrierSettingsVersion                      string                    `json:"carrierSettingsVersion"`
+	CellularTechnology                          string                    `json:"cellularTechnology"`
+	CloudBackupEnabled                          bool                      `json:"cloudBackupEnabled"`
+	CurrentCarrierNetwork                       string                    `json:"currentCarrierNetwork"`
+	CurrentMobileCountryCode                    string                    `json:"currentMobileCountryCode"`
+	CurrentMobileNetworkCode                    string                    `json:"currentMobileNetworkCode"`
+	DataProtection                              bool                      `json:"dataProtection"`
+	DataRoamingEnabled                          bool                      `json:"dataRoamingEnabled"`
+	DeclarativeDeviceManagementEnabled          bool                      `json:"declarativeDeviceManagementEnabled"`
+	Department                                  string                    `json:"department"`
+	DeviceID                                    string                    `json:"deviceId"`
+	DeviceLocatorServiceEnabled                 bool                      `json:"deviceLocatorServiceEnabled"`
+	DeviceOwnershipType                         string                    `json:"deviceOwnershipType"`
+	DevicePhoneNumber                           string                    `json:"devicePhoneNumber"`
+	DiagnosticAndUsageReportingEnabled          bool                      `json:"diagnosticAndUsageReportingEnabled"`
+	DisplayName                                 string                    `json:"displayName"`
+	DoNotDisturbEnabled                         bool                      `json:"doNotDisturbEnabled"`
+	Eid                                         string                    `json:"eid"`
+	EmailAddress                                string                    `json:"emailAddress"`
+	EnrollmentSessionTokenValid                 bool                      `json:"enrollmentSessionTokenValid"`
+	ExchangeDeviceID                            string                    `json:"exchangeDeviceId"`
+	ExtensionAttributeValueList                 []ExtensionAttributeValue `json:"extensionAttributeValueList"`
+	FileEncryptionCapable                       bool                      `json:"fileEncryptionCapable"`
+	FullName                                    string                    `json:"fullName"`
+	HardwareEncryptionSupported                 bool                      `json:"hardwareEncryptionSupported"`
+	HomeCarrierNetwork                          string                    `json:"homeCarrierNetwork"`
+	HomeMobileCountryCode                       string                    `json:"homeMobileCountryCode"`
+	HomeMobileNetworkCode                       string                    `json:"homeMobileNetworkCode"`
+	Iccid                                       string                    `json:"iccid"`
+	Imei                                        string                    `json:"imei"`
+	Imei2                                       string                    `json:"imei2"`
+	IPAddress                                   string                    `json:"ipAddress"`
+	ItunesStoreAccountActive                    bool                      `json:"itunesStoreAccountActive"`
+	JailbreakStatus                             string                    `json:"jailbreakStatus"`
+	JamfParentPairings                          int                       `json:"jamfParentPairings"`
+	Languages                                   string                    `json:"languages"`
+	LastBackupDate                              *time.Time                `json:"lastBackupDate,omitempty"`
+	LastCloudBackupDate                         *time.Time                `json:"lastCloudBackupDate,omitempty"`
+	LastEnrolledDate                            *time.Time                `json:"lastEnrolledDate,omitempty"`
+	LastInventoryUpdateDate                     *time.Time                `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameSelfService             *string                   `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp    *time.Time                `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	LeaseExpirationDate                         *time.Time                `json:"leaseExpirationDate,omitempty"`
+	LifeExpectancyYears                         int                       `json:"lifeExpectancyYears"`
+	Locales                                     string                    `json:"locales"`
+	LocationServicesForSelfServiceMobileEnabled bool                      `json:"locationServicesForSelfServiceMobileEnabled"`
+	LostModeEnabled                             bool                      `json:"lostModeEnabled"`
+	LostModeEnabledDate                         *time.Time                `json:"lostModeEnabledDate,omitempty"`
+	Managed                                     bool                      `json:"managed"`
+	ManagementID                                string                    `json:"managementId"`
+	MDMProfileExpirationDate                    *time.Time                `json:"mdmProfileExpirationDate,omitempty"`
+	Meid                                        string                    `json:"meid"`
+	MobileDeviceID                              string                    `json:"mobileDeviceId"`
+	Model                                       string                    `json:"model"`
+	ModelIdentifier                             string                    `json:"modelIdentifier"`
+	ModelNumber                                 string                    `json:"modelNumber"`
+	ModemFirmwareVersion                        string                    `json:"modemFirmwareVersion"`
+	OsBuild                                     string                    `json:"osBuild"`
+	OsRapidSecurityResponse                     string                    `json:"osRapidSecurityResponse"`
+	OsSupplementalBuildVersion                  string                    `json:"osSupplementalBuildVersion"`
+	OsVersion                                   string                    `json:"osVersion"`
+	PairedDevices                               int                       `json:"pairedDevices"`
+	PasscodeCompliant                           bool                      `json:"passcodeCompliant"`
+	PasscodeCompliantWithProfile                bool                      `json:"passcodeCompliantWithProfile"`
+	PasscodeLockGracePeriodEnforcedSeconds      int                       `json:"passcodeLockGracePeriodEnforcedSeconds"`
+	PasscodePresent                             bool                      `json:"passcodePresent"`
+	PersonalDeviceProfileCurrent                bool                      `json:"personalDeviceProfileCurrent"`
+	PersonalHotspotEnabled                      bool                      `json:"personalHotspotEnabled"`
+	PoDate                                      *time.Time                `json:"poDate,omitempty"`
+	PoNumber                                    string                    `json:"poNumber"`
+	Position                                    string                    `json:"position"`
+	PreferredVoiceNumber                        string                    `json:"preferredVoiceNumber"`
+	PurchasePrice                               string                    `json:"purchasePrice"`
+	PurchasedOrLeased                           bool                      `json:"purchasedOrLeased"`
+	PurchasingAccount                           string                    `json:"purchasingAccount"`
+	PurchasingContact                           string                    `json:"purchasingContact"`
+	QuotaSize                                   int                       `json:"quotaSize"`
+	ResidentUsers                               int                       `json:"residentUsers"`
+	Roaming                                     bool                      `json:"roaming"`
+	Room                                        string                    `json:"room"`
+	SerialNumber                                string                    `json:"serialNumber"`
+	SharedIpad                                  bool                      `json:"sharedIpad"`
+	Supervised                                  bool                      `json:"supervised"`
+	Tethered                                    bool                      `json:"tethered"`
+	TimeZone                                    string                    `json:"timeZone"`
+	UDID                                        string                    `json:"udid"`
+	UsedSpacePercentage                         int                       `json:"usedSpacePercentage"`
+	UserPhoneNumber                             string                    `json:"userPhoneNumber"`
+	Username                                    string                    `json:"username"`
+	Vendor                                      string                    `json:"vendor"`
+	VoiceRoamingEnabled                         string                    `json:"voiceRoamingEnabled"`
+	WarrantyExpirationDate                      *time.Time                `json:"warrantyExpirationDate,omitempty"`
+	WifiMacAddress                              string                    `json:"wifiMacAddress"`
+}
+
+// InventoryListMobileDeviceSearchResults represents a inventory list mobile device search results.
+type InventoryListMobileDeviceSearchResults struct {
+	Results    []InventoryListMobileDevice `json:"results"`
+	TotalCount int                         `json:"totalCount"`
+}
+
+// LocationV2 represents a location v2.
+type LocationV2 struct {
+	BuildingID   *string `json:"buildingId,omitempty"`
+	DepartmentID *string `json:"departmentId,omitempty"`
+	EmailAddress *string `json:"emailAddress,omitempty"`
+	PhoneNumber  *string `json:"phoneNumber,omitempty"`
+	Position     *string `json:"position,omitempty"`
+	RealName     *string `json:"realName,omitempty"`
+	Room         *string `json:"room,omitempty"`
+	Username     *string `json:"username,omitempty"`
+}
+
+// MobileDeviceApplication represents a mobile device application.
+type MobileDeviceApplication struct {
+	Identifier   string `json:"identifier"`
+	Name         string `json:"name"`
+	ShortVersion string `json:"shortVersion"`
+	Version      string `json:"version"`
 }
 
 // MobileDeviceApplicationInventoryDetail represents a mobile device application inventory detail.
@@ -197,11 +446,111 @@ type MobileDeviceApplicationInventoryDetail struct {
 	Version          string `json:"version"`
 }
 
+// MobileDeviceAttachmentV2 represents a mobile device attachment v2.
+type MobileDeviceAttachmentV2 struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // MobileDeviceCertificate represents a mobile device certificate.
 type MobileDeviceCertificate struct {
 	CommonName     string     `json:"commonName"`
 	ExpirationDate *time.Time `json:"expirationDate,omitempty"`
 	Identity       bool       `json:"identity"`
+}
+
+// MobileDeviceCertificateV2 represents a mobile device certificate v2.
+type MobileDeviceCertificateV2 struct {
+	CertificateStatus   string     `json:"certificateStatus"`
+	CommonName          string     `json:"commonName"`
+	ExpirationDateEpoch *time.Time `json:"expirationDateEpoch,omitempty"`
+	Identity            bool       `json:"identity"`
+	IssuedDateEpoch     string     `json:"issuedDateEpoch"`
+	LifecycleStatus     string     `json:"lifecycleStatus"`
+	SerialNumber        string     `json:"serialNumber"`
+	Sha1Fingerprint     string     `json:"sha1Fingerprint"`
+	SubjectName         string     `json:"subjectName"`
+}
+
+// MobileDeviceDetailsGetV2 represents a mobile device details get v2.
+type MobileDeviceDetailsGetV2 struct {
+	AssetTag                           string                       `json:"assetTag"`
+	BluetoothMacAddress                string                       `json:"bluetoothMacAddress"`
+	DeclarativeDeviceManagementEnabled bool                         `json:"declarativeDeviceManagementEnabled"`
+	DeviceOwnershipLevel               string                       `json:"deviceOwnershipLevel"`
+	EnforceName                        bool                         `json:"enforceName"`
+	EnrollmentMethod                   string                       `json:"enrollmentMethod"`
+	EnrollmentSessionTokenValid        bool                         `json:"enrollmentSessionTokenValid"`
+	ExtensionAttributes                []ExtensionAttributeV2       `json:"extensionAttributes"`
+	Groups                             []MobileDeviceInventoryGroup `json:"groups"`
+	ID                                 string                       `json:"id"`
+	InitialEntryTimestamp              *time.Time                   `json:"initialEntryTimestamp,omitempty"`
+	Ios                                *DetailsV2                   `json:"ios,omitempty"`
+	IPAddress                          string                       `json:"ipAddress"`
+	LastEnrollmentTimestamp            *time.Time                   `json:"lastEnrollmentTimestamp,omitempty"`
+	LastInventoryUpdateTimestamp       *time.Time                   `json:"lastInventoryUpdateTimestamp,omitempty"`
+	Location                           *LocationV2                  `json:"location,omitempty"`
+	Managed                            bool                         `json:"managed"`
+	ManagementID                       string                       `json:"managementId"`
+	MDMProfileExpirationTimestamp      *time.Time                   `json:"mdmProfileExpirationTimestamp,omitempty"`
+	Name                               string                       `json:"name"`
+	OsBuild                            string                       `json:"osBuild"`
+	OsRapidSecurityResponse            string                       `json:"osRapidSecurityResponse"`
+	OsSupplementalBuildVersion         string                       `json:"osSupplementalBuildVersion"`
+	OsVersion                          string                       `json:"osVersion"`
+	SerialNumber                       string                       `json:"serialNumber"`
+	Site                               *V1Site                      `json:"site,omitempty"`
+	SoftwareUpdateDeviceID             string                       `json:"softwareUpdateDeviceId"`
+	TimeZone                           string                       `json:"timeZone"`
+	Tvos                               *TvOsDetails                 `json:"tvos,omitempty"`
+	Type                               string                       `json:"type"`
+	UDID                               string                       `json:"udid"`
+	Visionos                           *DetailsV2                   `json:"visionos,omitempty"`
+	Watchos                            *WatchOsDetailsV2            `json:"watchos,omitempty"`
+	WifiMacAddress                     string                       `json:"wifiMacAddress"`
+}
+
+// MobileDeviceDetailsV2 represents a mobile device details v2.
+type MobileDeviceDetailsV2 struct {
+	AssetTag                           string                 `json:"assetTag"`
+	BluetoothMacAddress                string                 `json:"bluetoothMacAddress"`
+	DeclarativeDeviceManagementEnabled bool                   `json:"declarativeDeviceManagementEnabled"`
+	DeviceOwnershipLevel               string                 `json:"deviceOwnershipLevel"`
+	EnforceName                        bool                   `json:"enforceName"`
+	EnrollmentMethod                   string                 `json:"enrollmentMethod"`
+	EnrollmentSessionTokenValid        bool                   `json:"enrollmentSessionTokenValid"`
+	ExtensionAttributes                []ExtensionAttributeV2 `json:"extensionAttributes"`
+	ID                                 string                 `json:"id"`
+	InitialEntryTimestamp              *time.Time             `json:"initialEntryTimestamp,omitempty"`
+	Ios                                *DetailsV2             `json:"ios,omitempty"`
+	IPAddress                          string                 `json:"ipAddress"`
+	LastEnrollmentTimestamp            *time.Time             `json:"lastEnrollmentTimestamp,omitempty"`
+	LastInventoryUpdateTimestamp       *time.Time             `json:"lastInventoryUpdateTimestamp,omitempty"`
+	Location                           *LocationV2            `json:"location,omitempty"`
+	Managed                            bool                   `json:"managed"`
+	MDMProfileExpirationTimestamp      *time.Time             `json:"mdmProfileExpirationTimestamp,omitempty"`
+	Name                               string                 `json:"name"`
+	OsBuild                            string                 `json:"osBuild"`
+	OsRapidSecurityResponse            string                 `json:"osRapidSecurityResponse"`
+	OsSupplementalBuildVersion         string                 `json:"osSupplementalBuildVersion"`
+	OsVersion                          string                 `json:"osVersion"`
+	SerialNumber                       string                 `json:"serialNumber"`
+	Site                               *V1Site                `json:"site,omitempty"`
+	SoftwareUpdateDeviceID             string                 `json:"softwareUpdateDeviceId"`
+	TimeZone                           string                 `json:"timeZone"`
+	Tvos                               *TvOsDetails           `json:"tvos,omitempty"`
+	Type                               string                 `json:"type"`
+	UDID                               string                 `json:"udid"`
+	Visionos                           *DetailsV2             `json:"visionos,omitempty"`
+	Watchos                            *WatchOsDetailsV2      `json:"watchos,omitempty"`
+	WifiMacAddress                     string                 `json:"wifiMacAddress"`
+}
+
+// MobileDeviceEbook represents a mobile device ebook.
+type MobileDeviceEbook struct {
+	Author  string `json:"author"`
+	Title   string `json:"title"`
+	Version string `json:"version"`
 }
 
 // MobileDeviceEbookInventoryDetail represents a mobile device ebook inventory detail.
@@ -221,6 +570,25 @@ type MobileDeviceExtensionAttribute struct {
 	Name                                string   `json:"name"`
 	Type                                string   `json:"type"`
 	Value                               []string `json:"value"`
+}
+
+// MobileDeviceExtensionAttributeSearchResults represents a mobile device extension attribute search results.
+type MobileDeviceExtensionAttributeSearchResults struct {
+	Results    []MobileDeviceExtensionAttributes `json:"results"`
+	TotalCount int                               `json:"totalCount"`
+}
+
+// MobileDeviceExtensionAttributes represents a mobile device extension attributes.
+type MobileDeviceExtensionAttributes struct {
+	DataType                      string   `json:"dataType"`
+	Description                   string   `json:"description"`
+	ID                            string   `json:"id"`
+	InputType                     string   `json:"inputType"`
+	InventoryDisplayType          string   `json:"inventoryDisplayType"`
+	LdapAttributeMapping          string   `json:"ldapAttributeMapping"`
+	LdapExtensionAttributeAllowed bool     `json:"ldapExtensionAttributeAllowed"`
+	Name                          string   `json:"name"`
+	PopupMenuChoices              []string `json:"popupMenuChoices"`
 }
 
 // MobileDeviceGeneral represents a mobile device general.
@@ -249,6 +617,14 @@ type MobileDeviceGeneral struct {
 	Supervised                               bool                             `json:"supervised"`
 	TimeZone                                 string                           `json:"timeZone"`
 	UDID                                     string                           `json:"udid"`
+}
+
+// MobileDeviceGroup represents a mobile device group.
+type MobileDeviceGroup struct {
+	Description  string `json:"description"`
+	ID           int    `json:"id"`
+	IsSmartGroup bool   `json:"isSmartGroup"`
+	Name         string `json:"name"`
 }
 
 // MobileDeviceHardware represents a mobile device hardware.
@@ -377,6 +753,12 @@ type MobileDeviceLostModeLocation struct {
 	LostModeLocationVerticalAccuracyMeters   float64    `json:"lostModeLocationVerticalAccuracyMeters"`
 }
 
+// MobileDeviceMDMCapableUser represents a mobile device m d m capable user.
+type MobileDeviceMDMCapableUser struct {
+	ManagementID  string `json:"managementId"`
+	UserShortName string `json:"userShortName"`
+}
+
 // MobileDeviceNetwork This section only avaiable for Ios type.
 type MobileDeviceNetwork struct {
 	CarrierSettingsVersion   string `json:"carrierSettingsVersion"`
@@ -478,6 +860,12 @@ func (m MobileDeviceResponse) MarshalJSON() ([]byte, error) {
 		return json.Marshal(m.WatchOS)
 	}
 	return json.Marshal(map[string]string{"deviceType": m.DeviceType})
+}
+
+// MobileDeviceSearchResultsV2 represents a mobile device search results v2.
+type MobileDeviceSearchResultsV2 struct {
+	Results    []MobileDeviceV2 `json:"results"`
+	TotalCount int              `json:"totalCount"`
 }
 
 // MobileDeviceSecurity This section only available for Ios type.
@@ -605,6 +993,22 @@ type MobileDeviceUserProfile struct {
 	Version       string     `json:"version"`
 }
 
+// MobileDeviceV2 represents a mobile device v2.
+type MobileDeviceV2 struct {
+	ID                     string `json:"id"`
+	ManagementID           string `json:"managementId"`
+	Model                  string `json:"model"`
+	ModelIdentifier        string `json:"modelIdentifier"`
+	Name                   string `json:"name"`
+	PhoneNumber            string `json:"phoneNumber"`
+	SerialNumber           string `json:"serialNumber"`
+	SoftwareUpdateDeviceID string `json:"softwareUpdateDeviceId"`
+	Type                   string `json:"type"`
+	UDID                   string `json:"udid"`
+	Username               string `json:"username"`
+	WifiMacAddress         string `json:"wifiMacAddress"`
+}
+
 // MobileDeviceWatchOsGeneral represents a mobile device watch os general.
 type MobileDeviceWatchOsGeneral struct {
 	AppAnalyticsEnabled                      bool                             `json:"appAnalyticsEnabled"`
@@ -653,6 +1057,28 @@ type MobileDeviceWatchOsInventory struct {
 	ProvisioningProfiles []MobileDeviceProvisioningProfiles       `json:"provisioningProfiles"`
 	Security             *MobileDeviceSecurity                    `json:"security,omitempty"`
 	UserAndLocation      *MobileDeviceUserAndLocation             `json:"userAndLocation,omitempty"`
+}
+
+// NetworkV2 represents a network v2.
+type NetworkV2 struct {
+	CarrierSettingsVersion   string `json:"carrierSettingsVersion"`
+	CellularTechnology       string `json:"cellularTechnology"`
+	CurrentCarrierNetwork    string `json:"currentCarrierNetwork"`
+	CurrentMobileCountryCode string `json:"currentMobileCountryCode"`
+	CurrentMobileNetworkCode string `json:"currentMobileNetworkCode"`
+	DataRoamingEnabled       bool   `json:"dataRoamingEnabled"`
+	Eid                      string `json:"eid"`
+	HomeCarrierNetwork       string `json:"homeCarrierNetwork"`
+	HomeMobileCountryCode    string `json:"homeMobileCountryCode"`
+	HomeMobileNetworkCode    string `json:"homeMobileNetworkCode"`
+	Iccid                    string `json:"iccid"`
+	Imei                     string `json:"imei"`
+	Meid                     string `json:"meid"`
+	PersonalHotspotEnabled   bool   `json:"personalHotspotEnabled"`
+	PhoneNumber              string `json:"phoneNumber"`
+	PreferredVoiceNumber     string `json:"preferredVoiceNumber"`
+	Roaming                  bool   `json:"roaming"`
+	VoiceRoamingEnabled      bool   `json:"voiceRoamingEnabled"`
 }
 
 // ObjectHistory represents a object history.
@@ -715,6 +1141,22 @@ type PackagesSearchResults struct {
 	TotalCount int       `json:"totalCount"`
 }
 
+// PurchasingV2 represents a purchasing v2.
+type PurchasingV2 struct {
+	AppleCareID         *string    `json:"appleCareId,omitempty"`
+	LeaseExpiresDate    *time.Time `json:"leaseExpiresDate,omitempty"`
+	Leased              *bool      `json:"leased,omitempty"`
+	LifeExpectancy      *int       `json:"lifeExpectancy,omitempty"`
+	PoDate              *time.Time `json:"poDate,omitempty"`
+	PoNumber            *string    `json:"poNumber,omitempty"`
+	PurchasePrice       *string    `json:"purchasePrice,omitempty"`
+	Purchased           *bool      `json:"purchased,omitempty"`
+	PurchasingAccount   *string    `json:"purchasingAccount,omitempty"`
+	PurchasingContact   *string    `json:"purchasingContact,omitempty"`
+	Vendor              *string    `json:"vendor,omitempty"`
+	WarrantyExpiresDate *time.Time `json:"warrantyExpiresDate,omitempty"`
+}
+
 // Script represents a script.
 type Script struct {
 	CategoryID     *string `json:"categoryId,omitempty"`
@@ -742,6 +1184,24 @@ type ScriptsSearchResults struct {
 	TotalCount int      `json:"totalCount"`
 }
 
+// SecurityV2 represents a security v2.
+type SecurityV2 struct {
+	ActivationLockEnabled         bool       `json:"activationLockEnabled"`
+	AttestationStatus             string     `json:"attestationStatus"`
+	BlockLevelEncryptionCapable   bool       `json:"blockLevelEncryptionCapable"`
+	BootstrapToken                string     `json:"bootstrapToken"`
+	BootstrapTokenEscrowed        string     `json:"bootstrapTokenEscrowed"`
+	DataProtected                 bool       `json:"dataProtected"`
+	FileLevelEncryptionCapable    bool       `json:"fileLevelEncryptionCapable"`
+	HardwareEncryption            int        `json:"hardwareEncryption"`
+	JailBreakDetected             bool       `json:"jailBreakDetected"`
+	LastAttestationAttemptDate    *time.Time `json:"lastAttestationAttemptDate,omitempty"`
+	LastSuccessfulAttestationDate *time.Time `json:"lastSuccessfulAttestationDate,omitempty"`
+	PasscodeCompliant             bool       `json:"passcodeCompliant"`
+	PasscodeCompliantWithProfile  bool       `json:"passcodeCompliantWithProfile"`
+	PasscodePresent               bool       `json:"passcodePresent"`
+}
+
 // SiteObject represents a site object.
 type SiteObject struct {
 	ObjectID   string `json:"objectId"`
@@ -766,6 +1226,45 @@ type SmartComputerGroupV2 struct {
 	SiteID      *string                 `json:"siteId,omitempty"`
 }
 
+// SmartGroup represents a smart group.
+type SmartGroup struct {
+	Count            int    `json:"count"`
+	GroupDescription string `json:"groupDescription"`
+	GroupID          string `json:"groupId"`
+	GroupName        string `json:"groupName"`
+	SiteID           string `json:"siteId"`
+}
+
+// SmartGroupAssignment represents a smart group assignment.
+type SmartGroupAssignment struct {
+	Criteria         *[]SmartGroupCriteria `json:"criteria,omitempty"`
+	GroupDescription *string               `json:"groupDescription,omitempty"`
+	GroupID          *string               `json:"groupId,omitempty"`
+	GroupName        string                `json:"groupName"`
+	SiteID           *string               `json:"siteId,omitempty"`
+}
+
+// SmartGroupCriteria represents a smart group criteria.
+type SmartGroupCriteria struct {
+	AndOr        string `json:"andOr"`
+	ClosingParen *bool  `json:"closingParen,omitempty"`
+	Name         string `json:"name"`
+	OpeningParen *bool  `json:"openingParen,omitempty"`
+	Priority     int    `json:"priority"`
+	SearchType   string `json:"searchType"`
+	Value        string `json:"value"`
+}
+
+// SmartGroupDetail represents a smart group detail.
+type SmartGroupDetail struct {
+	Count            int                  `json:"count"`
+	Criteria         []SmartGroupCriteria `json:"criteria"`
+	GroupDescription string               `json:"groupDescription"`
+	GroupID          string               `json:"groupId"`
+	GroupName        string               `json:"groupName"`
+	SiteID           string               `json:"siteId"`
+}
+
 // SmartGroupMembership the ids of the computers that are members of the smart group.
 type SmartGroupMembership struct {
 	Members []int `json:"members"`
@@ -775,6 +1274,12 @@ type SmartGroupMembership struct {
 type SmartGroupSearchResult struct {
 	Results    []SmartComputerGroupSearch `json:"results"`
 	TotalCount int                        `json:"totalCount"`
+}
+
+// SmartGroupSearchResults represents a smart group search results.
+type SmartGroupSearchResults struct {
+	Results    []SmartGroup `json:"results"`
+	TotalCount int          `json:"totalCount"`
 }
 
 // SmartSearchCriterion represents a smart search criterion.
@@ -834,8 +1339,103 @@ type StaticComputerGroupSummary struct {
 	SiteID      *string `json:"siteId,omitempty"`
 }
 
+// StaticGroup represents a static group.
+type StaticGroup struct {
+	Count            int    `json:"count"`
+	GroupDescription string `json:"groupDescription"`
+	GroupID          string `json:"groupId"`
+	GroupName        string `json:"groupName"`
+	SiteID           string `json:"siteId"`
+}
+
+// StaticGroupAssignment represents a static group assignment.
+type StaticGroupAssignment struct {
+	Assignments      *[]Assignment `json:"assignments,omitempty"`
+	GroupDescription *string       `json:"groupDescription,omitempty"`
+	GroupID          *string       `json:"groupId,omitempty"`
+	GroupName        string        `json:"groupName"`
+	SiteID           *string       `json:"siteId,omitempty"`
+}
+
+// StaticGroupSearchResults represents a static group search results.
+type StaticGroupSearchResults struct {
+	Results    []StaticGroup `json:"results"`
+	TotalCount int           `json:"totalCount"`
+}
+
+// TvOsDetails will be populated if the type is appleTv.
+type TvOsDetails struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	AirplayPassword       string                      `json:"airplayPassword"`
+	Applications          []MobileDeviceApplication   `json:"applications"`
+	Certificates          []MobileDeviceCertificateV2 `json:"certificates"`
+	ConfigurationProfiles []ConfigurationProfile      `json:"configurationProfiles"`
+	DeviceID              string                      `json:"deviceId"`
+	Locales               string                      `json:"locales"`
+	Model                 string                      `json:"model"`
+	ModelIdentifier       string                      `json:"modelIdentifier"`
+	ModelNumber           string                      `json:"modelNumber"`
+	Purchasing            *PurchasingV2               `json:"purchasing,omitempty"`
+	Supervised            bool                        `json:"supervised"`
+}
+
+// UnmanageMobileDeviceResponse represents a unmanage mobile device response.
+type UnmanageMobileDeviceResponse struct {
+	CommandUUID string `json:"commandUuid"`
+	DeviceID    string `json:"deviceId"`
+}
+
+// UpdateIosV2 represents a update ios v2.
+type UpdateIosV2 struct {
+	Purchasing *PurchasingV2 `json:"purchasing,omitempty"`
+}
+
+// UpdateMobileDeviceV2 represents a update mobile device v2.
+type UpdateMobileDeviceV2 struct {
+	AssetTag                   *string                 `json:"assetTag,omitempty"`
+	EnforceName                *bool                   `json:"enforceName,omitempty"`
+	Ios                        *UpdateIosV2            `json:"ios,omitempty"`
+	Location                   *LocationV2             `json:"location,omitempty"`
+	Name                       *string                 `json:"name,omitempty"`
+	SiteID                     *string                 `json:"siteId,omitempty"`
+	TimeZone                   *string                 `json:"timeZone,omitempty"`
+	Tvos                       *UpdateTvOs             `json:"tvos,omitempty"`
+	UpdatedExtensionAttributes *[]ExtensionAttributeV2 `json:"updatedExtensionAttributes,omitempty"`
+}
+
+// UpdateTvOs represents a update tv os.
+type UpdateTvOs struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	AirplayPassword *string       `json:"airplayPassword,omitempty"`
+	Purchasing      *PurchasingV2 `json:"purchasing,omitempty"`
+}
+
 // V1Site represents a v1 site.
 type V1Site struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+// WatchOsDetailsV2 will be populated if the type is watchos.
+type WatchOsDetailsV2 struct {
+	Applications                []MobileDeviceApplication          `json:"applications"`
+	Attachments                 []MobileDeviceAttachmentV2         `json:"attachments"`
+	AvailableMb                 int                                `json:"availableMb"`
+	BatteryLevel                int                                `json:"batteryLevel"`
+	BleCapable                  bool                               `json:"bleCapable"`
+	CapacityMb                  int                                `json:"capacityMb"`
+	Certificates                []MobileDeviceCertificateV2        `json:"certificates"`
+	ConfigurationProfiles       []ConfigurationProfile             `json:"configurationProfiles"`
+	DeviceLocatorServiceEnabled bool                               `json:"deviceLocatorServiceEnabled"`
+	DoNotDisturbEnabled         bool                               `json:"doNotDisturbEnabled"`
+	ITunesStoreAccountActive    bool                               `json:"iTunesStoreAccountActive"`
+	LastCloudBackupTimestamp    *time.Time                         `json:"lastCloudBackupTimestamp,omitempty"`
+	Model                       string                             `json:"model"`
+	ModelIdentifier             string                             `json:"modelIdentifier"`
+	ModelNumber                 string                             `json:"modelNumber"`
+	PercentageUsed              int                                `json:"percentageUsed"`
+	ProvisioningProfiles        []MobileDeviceProvisioningProfiles `json:"provisioningProfiles"`
+	Security                    *SecurityV2                        `json:"security,omitempty"`
+	Supervised                  bool                               `json:"supervised"`
+	UnlockToken                 string                             `json:"unlockToken"`
 }

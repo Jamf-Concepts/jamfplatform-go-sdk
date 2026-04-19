@@ -193,7 +193,47 @@
         {"op": "GET /v1/computer-extension-attributes/{id}/data-dependency", "name": "GetComputerExtensionAttributeDataDependencyV1"},
         {"op": "GET /v1/computer-extension-attributes/{id}/download", "name": "DownloadComputerExtensionAttributeV1"},
         {"op": "GET /v1/computer-extension-attributes/{id}/history", "name": "ListComputerExtensionAttributeHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
-        {"op": "POST /v1/computer-extension-attributes/{id}/history", "name": "CreateComputerExtensionAttributeHistoryNoteV1"}
+        {"op": "POST /v1/computer-extension-attributes/{id}/history", "name": "CreateComputerExtensionAttributeHistoryNoteV1"},
+
+        {"op": "GET /v1/advanced-mobile-device-searches", "name": "ListAdvancedMobileDeviceSearchesV1"},
+        {"op": "POST /v1/advanced-mobile-device-searches", "name": "CreateAdvancedMobileDeviceSearchV1"},
+        {"op": "POST /v1/advanced-mobile-device-searches/delete-multiple", "name": "DeleteMultipleAdvancedMobileDeviceSearchesV1"},
+        {"op": "GET /v1/advanced-mobile-device-searches/choices", "name": "ListAdvancedMobileDeviceSearchChoicesV1", "params": ["criteria", "site", "contains"]},
+        {"op": "GET /v1/advanced-mobile-device-searches/{id}", "name": "GetAdvancedMobileDeviceSearchV1"},
+        {"op": "PUT /v1/advanced-mobile-device-searches/{id}", "name": "UpdateAdvancedMobileDeviceSearchV1"},
+        {"op": "DELETE /v1/advanced-mobile-device-searches/{id}", "name": "DeleteAdvancedMobileDeviceSearchV1", "expectedStatus": 204},
+
+        {"op": "GET /v1/mobile-device-extension-attributes", "name": "ListMobileDeviceExtensionAttributesV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/mobile-device-extension-attributes", "name": "CreateMobileDeviceExtensionAttributeV1"},
+        {"op": "GET /v1/mobile-device-extension-attributes/{id}", "name": "GetMobileDeviceExtensionAttributeV1"},
+        {"op": "PUT /v1/mobile-device-extension-attributes/{id}", "name": "UpdateMobileDeviceExtensionAttributeV1", "expectedStatus": 202},
+        {"op": "DELETE /v1/mobile-device-extension-attributes/{id}", "name": "DeleteMobileDeviceExtensionAttributeV1"},
+        {"op": "GET /v1/mobile-device-extension-attributes/{id}/data-dependency", "name": "GetMobileDeviceExtensionAttributeDataDependencyV1"},
+        {"op": "GET /v1/mobile-device-extension-attributes/{id}/history", "name": "ListMobileDeviceExtensionAttributeHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/mobile-device-extension-attributes/{id}/history", "name": "CreateMobileDeviceExtensionAttributeHistoryNoteV1"},
+
+        {"op": "GET /v1/mobile-device-groups", "name": "ListMobileDeviceGroupsV1"},
+        {"op": "GET /v1/mobile-device-groups/smart-groups", "name": "ListSmartMobileDeviceGroupsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/mobile-device-groups/smart-groups", "name": "CreateSmartMobileDeviceGroupV1", "params": ["platform:bool"]},
+        {"op": "GET /v1/mobile-device-groups/smart-groups/{id}", "name": "GetSmartMobileDeviceGroupV1"},
+        {"op": "PUT /v1/mobile-device-groups/smart-groups/{id}", "name": "UpdateSmartMobileDeviceGroupV1", "expectedStatus": 200},
+        {"op": "DELETE /v1/mobile-device-groups/smart-groups/{id}", "name": "DeleteSmartMobileDeviceGroupV1", "expectedStatus": 204},
+        {"op": "GET /v1/mobile-device-groups/smart-group-membership/{id}", "name": "ListSmartMobileDeviceGroupMembershipV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/mobile-device-groups/static-groups", "name": "ListStaticMobileDeviceGroupsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/mobile-device-groups/static-groups", "name": "CreateStaticMobileDeviceGroupV1", "params": ["platform:bool"]},
+        {"op": "GET /v1/mobile-device-groups/static-groups/{id}", "name": "GetStaticMobileDeviceGroupV1"},
+        {"op": "DELETE /v1/mobile-device-groups/static-groups/{id}", "name": "DeleteStaticMobileDeviceGroupV1", "expectedStatus": 204},
+        {"op": "PATCH /v1/mobile-device-groups/static-groups/{id}", "name": "PatchStaticMobileDeviceGroupV1"},
+        {"op": "GET /v1/mobile-device-groups/static-group-membership/{id}", "name": "ListStaticMobileDeviceGroupMembershipV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/mobile-device-groups/{id}/erase", "name": "EraseMobileDeviceGroupV1"},
+
+        {"op": "GET /v2/mobile-devices", "name": "ListMobileDevicesV2", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v2/mobile-devices/{id}", "name": "GetMobileDeviceV2"},
+        {"op": "PATCH /v2/mobile-devices/{id}", "name": "PatchMobileDeviceV2"},
+        {"op": "GET /v2/mobile-devices/{id}/detail", "name": "GetMobileDeviceDetailV2"},
+        {"op": "POST /v2/mobile-devices/{id}/erase", "name": "EraseMobileDeviceV2"},
+        {"op": "GET /v2/mobile-devices/{id}/paired-devices", "name": "ListMobileDevicePairedDevicesV2", "pagination": "totalCount", "params": ["section:[]string", "sort:[]string", "filter"]},
+        {"op": "POST /v2/mobile-devices/{id}/unmanage", "name": "UnmanageMobileDeviceV2"}
       ]
     },
     {

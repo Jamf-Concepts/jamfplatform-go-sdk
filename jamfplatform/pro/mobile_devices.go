@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -46,4 +47,119 @@ func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string
 		hasNext := (page+1)*pageSize < result.TotalCount
 		return result.Results, hasNext, nil
 	})
+}
+
+// ListMobileDevicesV2 get Mobile Device objects.
+func (c *Client) ListMobileDevicesV2(ctx context.Context, sort []string) ([]MobileDeviceV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceV2, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+
+		endpoint := prefix + "/mobile-devices"
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int              `json:"totalCount"`
+			Results    []MobileDeviceV2 `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
+// GetMobileDeviceV2 get Mobile Device.
+func (c *Client) GetMobileDeviceV2(ctx context.Context, id string) (*MobileDeviceV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result MobileDeviceV2
+	endpoint := fmt.Sprintf("%s/mobile-devices/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// PatchMobileDeviceV2 update fields on a mobile device that are allowed to be modified by users.
+func (c *Client) PatchMobileDeviceV2(ctx context.Context, id string, request *UpdateMobileDeviceV2) (*MobileDeviceDetailsV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result MobileDeviceDetailsV2
+	endpoint := fmt.Sprintf("%s/mobile-devices/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("PatchMobileDeviceV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetMobileDeviceDetailV2 get Mobile Device.
+func (c *Client) GetMobileDeviceDetailV2(ctx context.Context, id string) (*MobileDeviceDetailsGetV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result MobileDeviceDetailsGetV2
+	endpoint := fmt.Sprintf("%s/mobile-devices/%s/detail", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceDetailV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// EraseMobileDeviceV2 erase a Mobile Device.
+func (c *Client) EraseMobileDeviceV2(ctx context.Context, id string, request *EraseDeviceMobileDeviceRequest) (*EraseDeviceMobileDeviceResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result EraseDeviceMobileDeviceResponse
+	endpoint := fmt.Sprintf("%s/mobile-devices/%s/erase", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("EraseMobileDeviceV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// ListMobileDevicePairedDevicesV2 return paginated Mobile Device Inventory records of all paired devices for the device.
+func (c *Client) ListMobileDevicePairedDevicesV2(ctx context.Context, id string, section []string, sort []string, filter string) ([]MobileDeviceResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(section) > 0 {
+			params.Set("section", strings.Join(section, ","))
+		}
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := fmt.Sprintf("%s/mobile-devices/%s/paired-devices", prefix, url.PathEscape(id))
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int                    `json:"totalCount"`
+			Results    []MobileDeviceResponse `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
+// UnmanageMobileDeviceV2 unmanage a Mobile Device.
+func (c *Client) UnmanageMobileDeviceV2(ctx context.Context, id string) (*UnmanageMobileDeviceResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result UnmanageMobileDeviceResponse
+	endpoint := fmt.Sprintf("%s/mobile-devices/%s/unmanage", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodPost, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("UnmanageMobileDeviceV2(%s): %w", id, err)
+	}
+	return &result, nil
 }
