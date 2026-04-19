@@ -128,7 +128,7 @@ Each API family lives in its own sub-package under `jamfplatform/`. Construct a 
 | `jamfplatform/blueprints` | Platform blueprints + components |
 | `jamfplatform/ddmreport` | Platform declaration reporting |
 | `jamfplatform/compliancebenchmarks` | Platform compliance benchmarks |
-| `jamfplatform/pro` | Jamf Pro JSON API (buildings, packages, policies, MDM, enrollment, settings, PKI, etc.) |
+| `jamfplatform/pro` | Jamf Pro JSON API (buildings, packages, policies, MDM, enrollment, settings, PKI, App Installers, etc.) |
 | `jamfplatform/proclassic` | Jamf Classic XML API (computers, mobile devices, groups, profiles, policies, etc.) |
 
 All list methods handle pagination automatically. Pro's versioned endpoints emit version-suffixed Go methods (`ListBuildingsV1`, `GetCheckInSettingsV3`) so consumers pin to a specific API version. Exact method lists are generated from the OpenAPI specs under `testing/` — see the published specs in [`api/`](api/) for the current surface.
