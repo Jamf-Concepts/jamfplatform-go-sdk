@@ -154,6 +154,9 @@
       "schemaAdditions": {
         "account": {
           "password": "string:password"
+        },
+        "json_web_token_configuration": {
+          "encryption_key": "string:password"
         }
       },
       "operations": [

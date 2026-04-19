@@ -4260,11 +4260,13 @@ func (t InfrastructureManagersItem) MarshalXML(e *xml.Encoder, start xml.StartEl
 
 // JsonWebTokenConfiguration represents a json web token configuration.
 type JsonWebTokenConfiguration struct {
-	XMLName     xml.Name
-	Disabled    *bool   `xml:"disabled,omitempty"`
-	ID          *int    `xml:"id,omitempty"`
-	Name        *string `xml:"name,omitempty"`
-	TokenExpiry *int    `xml:"token_expiry,omitempty"`
+	XMLName  xml.Name
+	Disabled *bool `xml:"disabled,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	EncryptionKey *string `xml:"encryption_key,omitempty"`
+	ID            *int    `xml:"id,omitempty"`
+	Name          *string `xml:"name,omitempty"`
+	TokenExpiry   *int    `xml:"token_expiry,omitempty"`
 }
 
 // MarshalXML forces the JsonWebTokenConfiguration root element name to the wire value

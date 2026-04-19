@@ -1302,14 +1302,52 @@ func TestAcceptance_Classic_AllowedFileExtensionCRUD(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) { t.Fatalf("after delete: want 404, got %v", err) }
 }
 
-// TestAcceptance_Classic_JsonWebTokenConfigurationCRUD is intentionally
-// skipped: the server requires an `encryption_key` field on create that
-// Jamf's v11.20.0 spec does not declare, so the generated
-// JsonWebTokenConfiguration struct can't carry it. The SDK's CRUD path
-// is exercised by the unit tests; restoring this live test needs a
-// spec patch (or a generator option for spec-unmodeled required fields).
+// TestAcceptance_Classic_JsonWebTokenConfigurationCRUD exercises the
+// /jsonwebtokenconfigurations CRUD lifecycle. The server requires an
+// `encryption_key` field on create that the Classic spec omits; the
+// SDK generator injects it via schemaAdditions in config.json.
 func TestAcceptance_Classic_JsonWebTokenConfigurationCRUD(t *testing.T) {
-	t.Skip("spec omits required encryption_key; generated struct can't carry it. See unit tests for endpoint coverage.")
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-jwt-" + runSuffix()
+	created, err := pc.CreateJsonWebTokenConfigurationByID(ctx, "0", &proclassic.JsonWebTokenConfiguration{
+		Name:          classicStrPtr(name),
+		EncryptionKey: classicStrPtr("sdk-acc-jwt-key-" + runSuffix()),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("forbidden on this tenant: %v", err)
+		}
+		t.Fatalf("CreateJsonWebTokenConfigurationByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteJsonWebTokenConfigurationByID", func() error { return pc.DeleteJsonWebTokenConfigurationByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetJsonWebTokenConfigurationByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetJsonWebTokenConfigurationByID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("Name = %v, want %q", got.Name, name)
+	}
+
+	if err := pc.DeleteJsonWebTokenConfigurationByID(ctx, intToStr(id)); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = pc.GetJsonWebTokenConfigurationByID(ctx, intToStr(id))
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("after delete: want 404, got %v", err)
+	}
 }
 
 func TestAcceptance_Classic_WebhookCRUD(t *testing.T) {

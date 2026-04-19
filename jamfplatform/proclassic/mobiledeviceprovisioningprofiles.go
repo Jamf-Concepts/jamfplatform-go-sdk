@@ -35,14 +35,14 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByID(ctx context.Context, 
 }
 
 // UpdateMobileDeviceProvisioningProfileByID updates an existing mobile device provisioning profiles by id.
-func (c *Client) UpdateMobileDeviceProvisioningProfileByID(ctx context.Context, id string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
+func (c *Client) UpdateMobileDeviceProvisioningProfileByID(ctx context.Context, id string, request *MobileDeviceProvisioningProfile) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result MobileDeviceProvisioningProfile
+	var result []byte
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("UpdateMobileDeviceProvisioningProfileByID(%s): %w", id, err)
 	}
-	return &result, nil
+	return result, nil
 }
 
 // DeleteMobileDeviceProvisioningProfileByID deletes a mobile device provisioning profiles by id.
