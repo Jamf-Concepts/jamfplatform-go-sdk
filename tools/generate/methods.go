@@ -41,7 +41,18 @@ func extractMultipartFields(schema *openapi3.Schema) []GoMultipartField {
 	fields := make([]GoMultipartField, 0, len(schema.Properties))
 	for _, name := range sortedKeys(schema.Properties) {
 		prop := schema.Properties[name].Value
-		isFile := prop != nil && prop.Type != nil && prop.Type.Is("string") && prop.Format == "binary"
+		// A field is a file upload when the spec marks it as such
+		// (string + format: binary) OR — as a fallback for spec bugs —
+		// when the field is conventionally named "file" with string
+		// type but no format. The Jamf Pro spec has at least two
+		// endpoints (/v2/inventory-preload/csv, csv-validate) where
+		// the author omitted format: binary, and treating those as a
+		// plain form string would emit a callable signature that
+		// doesn't actually accept a file. Path-name heuristic is safe
+		// because any real JSON form field named "file" would be a
+		// genuine file upload semantically.
+		isFile := prop != nil && prop.Type != nil && prop.Type.Is("string") &&
+			(prop.Format == "binary" || name == "file")
 		f := GoMultipartField{
 			Name:   name,
 			GoName: toLowerCamelCase(name),

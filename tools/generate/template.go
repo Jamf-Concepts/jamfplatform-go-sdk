@@ -711,7 +711,9 @@ func Test<% .Name %>(t *testing.T) {
 		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
 			t.Errorf("Content-Type = %q, want multipart/form-data", ct)
 		}
-		<%- if .ResponseType %>
+		<%- if and .ResponseType .ReturnsSlice %>
+		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
+		<%- else if .ResponseType %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})
 		<%- else %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
