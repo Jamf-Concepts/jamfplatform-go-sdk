@@ -9,7 +9,6 @@ import (
 	"context"
 	"errors"
 	"math/rand/v2"
-	"os"
 	"strconv"
 	"testing"
 
@@ -19,16 +18,12 @@ import (
 
 // App Installers: catalog titles (read-only) + deployment CRUD. Titles
 // come from Jamf's shared App Catalog — every tenant sees the same
-// ~340 entries. Deployments are per-tenant; tests create + delete
-// against the tenant's existing Active Directory Not Bound group
-// (smart group id 29, or another empty group via env override) so
-// no device actually installs the app during the CRUD cycle.
+// ~340 entries. Deployments target a smart computer group; each
+// mutating test provisions a throwaway smart group with an always-
+// false criterion (so zero devices match, no install fires), uses it
+// as the deployment target, and tears it down on cleanup.
 
-const (
-	appInstallerSmartGroupIDEnv = "JAMFPLATFORM_APP_INSTALLER_SMART_GROUP_ID"
-	appInstallerDefaultGroupID  = "29"
-	appInstallerSweepPercent    = 10 // CRUD this percentage of the catalog per run
-)
+const appInstallerSweepPercent = 10 // CRUD this percentage of the catalog per run
 
 // TestAcceptance_Pro_AppInstallerTitles pulls the full catalog and
 // asserts pagination returns a plausible number of titles with the
@@ -66,19 +61,16 @@ func TestAcceptance_Pro_AppInstallerTitles(t *testing.T) {
 }
 
 // TestAcceptance_Pro_AppInstallerDeploymentCRUD exercises the full
-// deployment lifecycle against a single title. Picks the first catalog
-// title, creates a disabled SELF_SERVICE deployment targeting a known-
-// empty smart group (so no actual install fires), round-trips the GET,
-// updates the enabled flag, then deletes.
+// deployment lifecycle against a single title. Creates a throwaway
+// empty smart group as the deployment target, picks the first
+// catalog title, creates a disabled SELF_SERVICE deployment, round-
+// trips GET, PUTs, then cleans up.
 func TestAcceptance_Pro_AppInstallerDeploymentCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	p := pro.New(c)
 
-	groupID := os.Getenv(appInstallerSmartGroupIDEnv)
-	if groupID == "" {
-		groupID = appInstallerDefaultGroupID
-	}
+	groupID := createAppInstallerSmartGroup(t, p)
 
 	titles, err := p.ListAppInstallerTitlesV1(ctx)
 	if err != nil {
@@ -127,10 +119,7 @@ func TestAcceptance_Pro_AppInstallerDeploymentsRandomSweep(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	groupID := os.Getenv(appInstallerSmartGroupIDEnv)
-	if groupID == "" {
-		groupID = appInstallerDefaultGroupID
-	}
+	groupID := createAppInstallerSmartGroup(t, p)
 
 	titles, err := p.ListAppInstallerTitlesV1(ctx)
 	if err != nil {
@@ -200,6 +189,36 @@ func TestAcceptance_Pro_AppInstallerDeploymentsRandomSweep(t *testing.T) {
 }
 
 // Helpers -------------------------------------------------------------
+
+// createAppInstallerSmartGroup provisions a throwaway Classic smart
+// computer group with an always-false criterion (Computer Name is
+// SDK_ACC_NEVER_MATCHES) so no device ever matches — guarantees the
+// App Installer deployment won't push to anything real. Registers a
+// cleanup that deletes the group after the test.
+func createAppInstallerSmartGroup(t *testing.T, p *pro.Client) string {
+	t.Helper()
+	ctx := context.Background()
+	name := "sdk-acc-appinst-group-" + runSuffix()
+	resp, err := p.CreateSmartComputerGroupV2(ctx, &pro.SmartComputerGroupV2{
+		Name: name,
+		Criteria: &[]pro.SmartSearchCriterion{
+			{
+				AndOr:      "and",
+				Name:       "Computer Name",
+				SearchType: "is",
+				Value:      "SDK_ACC_NEVER_MATCHES",
+			},
+		},
+	}, false)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateSmartComputerGroupV2 for app-installer test: %v", err)
+	}
+	id := resp.ID
+	t.Logf("Created throwaway smart group id=%s for app-installer test", id)
+	cleanupDelete(t, "SmartComputerGroup "+id, func() error { return p.DeleteSmartComputerGroupV2(ctx, id) })
+	return id
+}
 
 func createDeployment(t *testing.T, p *pro.Client, titleID, smartGroupID, name string) *pro.AppInstallerDeployment {
 	t.Helper()
