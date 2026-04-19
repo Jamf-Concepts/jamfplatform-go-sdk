@@ -60,8 +60,12 @@ func (j *FileCookieJar) SetCookies(u *url.URL, cookies []*http.Cookie) {
 	j.persistLocked()
 }
 
-// Cookies implements http.CookieJar.
+// Cookies implements http.CookieJar. The inner jar is goroutine-safe on its
+// own, but we take the same lock SetCookies holds so reads are consistent
+// with in-flight persists (no observing a half-updated jar state).
 func (j *FileCookieJar) Cookies(u *url.URL) []*http.Cookie {
+	j.mu.Lock()
+	defer j.mu.Unlock()
 	return j.inner.Cookies(u)
 }
 

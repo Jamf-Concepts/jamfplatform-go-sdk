@@ -281,8 +281,8 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 	}
 	if resp.StatusCode == http.StatusTooManyRequests {
 		delay := parseRetryAfter(resp.Header.Get("Retry-After"), time.Now())
-		_ = resp.Body.Close()
 		if delay > 0 && delay <= 60*time.Second {
+			_ = resp.Body.Close()
 			select {
 			case <-time.After(delay):
 			case <-ctx.Done():
@@ -292,17 +292,12 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 			if err != nil {
 				return err
 			}
-		} else {
-			// Out-of-policy Retry-After (missing, negative, or >60s): return
-			// the 429 to the caller as an APIResponseError rather than sleep
-			// unbounded or silently drop.
-			return &APIResponseError{
-				StatusCode: http.StatusTooManyRequests,
-				Method:     method,
-				URL:        c.buildURL(path),
-				Body:       "rate limited",
-			}
 		}
+		// Out-of-policy Retry-After (missing, negative, or >60s) or retry
+		// also returned 429: fall through to handleResponse so the caller
+		// sees the server's actual error body + traceId, not a synthetic
+		// one. handleResponse builds an APIResponseError for any status !=
+		// expectedStatus, which 429 will be.
 	}
 	return c.handleResponse(ctx, resp, classic, expectedStatus, result)
 }

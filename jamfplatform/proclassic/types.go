@@ -200,7 +200,7 @@ func (t Accounts) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // AccountsGroups represents a accounts groups.
 type AccountsGroups struct {
 	XMLName xml.Name
-	Group   []AccountsGroupsGroupItem `xml:"group"`
+	Group   *[]AccountsGroupsGroupItem `xml:"group,omitempty"`
 }
 
 // MarshalXML forces the AccountsGroups root element name to the wire value
@@ -239,7 +239,7 @@ func (t AccountsGroupsGroupItem) MarshalXML(e *xml.Encoder, start xml.StartEleme
 // AccountsUsers represents a accounts users.
 type AccountsUsers struct {
 	XMLName xml.Name
-	User    []AccountsUsersUserItem `xml:"user"`
+	User    *[]AccountsUsersUserItem `xml:"user,omitempty"`
 }
 
 // MarshalXML forces the AccountsUsers root element name to the wire value
@@ -964,21 +964,21 @@ type CategoryObject struct {
 // Class represents a class.
 type Class struct {
 	XMLName             xml.Name
-	AppleTvs            []ClassAppleTvsItem            `xml:"apple_tvs"`
-	Description         *string                        `xml:"description,omitempty"`
-	ID                  *int                           `xml:"id,omitempty"`
-	MeetingTimes        *ClassMeetingTimes             `xml:"meeting_times,omitempty"`
-	MobileDeviceGroup   *IDName                        `xml:"mobile_device_group,omitempty"`
-	MobileDeviceGroupID []ClassMobileDeviceGroupIDItem `xml:"mobile_device_group_id"`
-	MobileDevices       []ClassMobileDevicesItem       `xml:"mobile_devices"`
-	Name                *string                        `xml:"name,omitempty"`
-	Site                *SiteObject                    `xml:"site,omitempty"`
-	Source              *string                        `xml:"source,omitempty"`
-	StudentGroupIds     []ClassStudentGroupIdsItem     `xml:"student_group_ids"`
-	Students            []ClassStudentsItem            `xml:"students"`
-	TeacherGroupIds     []ClassTeacherGroupIdsItem     `xml:"teacher_group_ids"`
-	TeacherIds          []ClassTeacherIdsItem          `xml:"teacher_ids"`
-	Teachers            []ClassTeachersItem            `xml:"teachers"`
+	AppleTvs            *[]ClassAppleTvsItem            `xml:"apple_tvs,omitempty"`
+	Description         *string                         `xml:"description,omitempty"`
+	ID                  *int                            `xml:"id,omitempty"`
+	MeetingTimes        *ClassMeetingTimes              `xml:"meeting_times,omitempty"`
+	MobileDeviceGroup   *IDName                         `xml:"mobile_device_group,omitempty"`
+	MobileDeviceGroupID *[]ClassMobileDeviceGroupIDItem `xml:"mobile_device_group_id,omitempty"`
+	MobileDevices       *[]ClassMobileDevicesItem       `xml:"mobile_devices,omitempty"`
+	Name                *string                         `xml:"name,omitempty"`
+	Site                *SiteObject                     `xml:"site,omitempty"`
+	Source              *string                         `xml:"source,omitempty"`
+	StudentGroupIds     *[]ClassStudentGroupIdsItem     `xml:"student_group_ids,omitempty"`
+	Students            *[]ClassStudentsItem            `xml:"students,omitempty"`
+	TeacherGroupIds     *[]ClassTeacherGroupIdsItem     `xml:"teacher_group_ids,omitempty"`
+	TeacherIds          *[]ClassTeacherIdsItem          `xml:"teacher_ids,omitempty"`
+	Teachers            *[]ClassTeachersItem            `xml:"teachers,omitempty"`
 }
 
 // MarshalXML forces the Class root element name to the wire value
@@ -1326,9 +1326,9 @@ func (t CommandflushMobileDevicesMobileDevice) MarshalXML(e *xml.Encoder, start 
 type Computer struct {
 	XMLName               xml.Name
 	ID                    *int                    `xml:"id,omitempty"`
-	Certificates          []any                   `xml:"certificates"`
-	ConfigurationProfiles []any                   `xml:"configuration_profiles"`
-	ExtensionAttributes   []any                   `xml:"extension_attributes"`
+	Certificates          *[]any                  `xml:"certificates,omitempty"`
+	ConfigurationProfiles *[]any                  `xml:"configuration_profiles,omitempty"`
+	ExtensionAttributes   *[]any                  `xml:"extension_attributes,omitempty"`
 	General               *ComputerGeneral        `xml:"general,omitempty"`
 	GroupsAccounts        *ComputerGroupsAccounts `xml:"groups_accounts,omitempty"`
 	Hardware              *ComputerHardware       `xml:"hardware,omitempty"`
@@ -1469,8 +1469,8 @@ func (t ComputerGeneralRemoteManagement) MarshalXML(e *xml.Encoder, start xml.St
 // ComputerGroupsAccounts represents a computer groups accounts.
 type ComputerGroupsAccounts struct {
 	XMLName                  xml.Name
-	ComputerGroupMemberships []any `xml:"computer_group_memberships"`
-	LocalAccounts            []any `xml:"local_accounts"`
+	ComputerGroupMemberships *[]any `xml:"computer_group_memberships,omitempty"`
+	LocalAccounts            *[]any `xml:"local_accounts,omitempty"`
 }
 
 // MarshalXML forces the ComputerGroupsAccounts root element name to the wire value
@@ -1499,11 +1499,11 @@ type ComputerHardware struct {
 	CacheSize                   *int    `xml:"cache_size,omitempty"`
 	CacheSizeKb                 *int    `xml:"cache_size_kb,omitempty"`
 	DiskEncryptionConfiguration *string `xml:"disk_encryption_configuration,omitempty"`
-	Filevault2Users             []any   `xml:"filevault_2_users"`
+	Filevault2Users             *[]any  `xml:"filevault_2_users,omitempty"`
 	GatekeeperStatus            *string `xml:"gatekeeper_status,omitempty"`
 	InstitutionalRecoveryKey    *string `xml:"institutional_recovery_key,omitempty"`
 	Make                        *string `xml:"make,omitempty"`
-	MappedPrinters              []any   `xml:"mapped_printers"`
+	MappedPrinters              *[]any  `xml:"mapped_printers,omitempty"`
 	MasterPasswordSet           *bool   `xml:"master_password_set,omitempty"`
 	Model                       *string `xml:"model,omitempty"`
 	ModelIdentifier             *string `xml:"model_identifier,omitempty"`
@@ -1521,7 +1521,7 @@ type ComputerHardware struct {
 	ServicePack                 *string `xml:"service_pack,omitempty"`
 	SipStatus                   *string `xml:"sip_status,omitempty"`
 	SmcVersion                  *string `xml:"smc_version,omitempty"`
-	Storage                     []any   `xml:"storage"`
+	Storage                     *[]any  `xml:"storage,omitempty"`
 	TotalRam                    *int    `xml:"total_ram,omitempty"`
 	TotalRamMb                  *int    `xml:"total_ram_mb,omitempty"`
 	XprotectVersion             *string `xml:"xprotect_version,omitempty"`
@@ -1566,16 +1566,16 @@ func (t ComputerSecurity) MarshalXML(e *xml.Encoder, start xml.StartElement) err
 // ComputerSoftware represents a computer software.
 type ComputerSoftware struct {
 	XMLName                  xml.Name
-	Applications             []any   `xml:"applications"`
-	AvailableSoftwareUpdates []any   `xml:"available_software_updates"`
-	AvailableUpdates         []any   `xml:"available_updates"`
-	CachedByCasper           []any   `xml:"cached_by_casper"`
-	Fonts                    []any   `xml:"fonts"`
-	InstalledByCasper        []any   `xml:"installed_by_casper"`
-	InstalledByInstallerSwu  []any   `xml:"installed_by_installer_swu"`
-	LicensedSoftware         []any   `xml:"licensed_software"`
-	Plugins                  []any   `xml:"plugins"`
-	RunningServices          []any   `xml:"running_services"`
+	Applications             *[]any  `xml:"applications,omitempty"`
+	AvailableSoftwareUpdates *[]any  `xml:"available_software_updates,omitempty"`
+	AvailableUpdates         *[]any  `xml:"available_updates,omitempty"`
+	CachedByCasper           *[]any  `xml:"cached_by_casper,omitempty"`
+	Fonts                    *[]any  `xml:"fonts,omitempty"`
+	InstalledByCasper        *[]any  `xml:"installed_by_casper,omitempty"`
+	InstalledByInstallerSwu  *[]any  `xml:"installed_by_installer_swu,omitempty"`
+	LicensedSoftware         *[]any  `xml:"licensed_software,omitempty"`
+	Plugins                  *[]any  `xml:"plugins,omitempty"`
+	RunningServices          *[]any  `xml:"running_services,omitempty"`
 	UnixExecutables          *string `xml:"unix_executables,omitempty"`
 }
 
@@ -1634,9 +1634,9 @@ func (t ComputerApplicationUsageItem) MarshalXML(e *xml.Encoder, start xml.Start
 // ComputerApplicationUsageItemUsage represents a computer application usage item usage.
 type ComputerApplicationUsageItemUsage struct {
 	XMLName xml.Name
-	ID      *int                                        `xml:"id,omitempty"`
-	Apps    []ComputerApplicationUsageItemUsageAppsItem `xml:"apps"`
-	Date    *ComputerApplicationUsageDate               `xml:"date,omitempty"`
+	ID      *int                                         `xml:"id,omitempty"`
+	Apps    *[]ComputerApplicationUsageItemUsageAppsItem `xml:"apps,omitempty"`
+	Date    *ComputerApplicationUsageDate                `xml:"date,omitempty"`
 }
 
 // MarshalXML forces the ComputerApplicationUsageItemUsage root element name to the wire value
@@ -1693,7 +1693,7 @@ func (t ComputerApplications) MarshalXML(e *xml.Encoder, start xml.StartElement)
 // ComputerApplicationsUniqueComputers represents a computer applications unique computers.
 type ComputerApplicationsUniqueComputers struct {
 	XMLName  xml.Name
-	Computer []ComputerApplicationsComputer `xml:"computer"`
+	Computer *[]ComputerApplicationsComputer `xml:"computer,omitempty"`
 }
 
 // MarshalXML forces the ComputerApplicationsUniqueComputers root element name to the wire value
@@ -1712,7 +1712,7 @@ func (t ComputerApplicationsUniqueComputers) MarshalXML(e *xml.Encoder, start xm
 // ComputerApplicationsVersions represents a computer applications versions.
 type ComputerApplicationsVersions struct {
 	XMLName xml.Name
-	Version []ComputerApplicationsVersion `xml:"version"`
+	Version *[]ComputerApplicationsVersion `xml:"version,omitempty"`
 }
 
 // MarshalXML forces the ComputerApplicationsVersions root element name to the wire value
@@ -1746,9 +1746,9 @@ type ComputerApplicationsVersion = []ComputerApplicationsVersionItem
 // ComputerApplicationsVersionItem represents a computer applications version item.
 type ComputerApplicationsVersionItem struct {
 	XMLName   xml.Name
-	ID        *int                                           `xml:"id,omitempty"`
-	Computers []ComputerApplicationsVersionItemComputersItem `xml:"computers"`
-	Number    *ComputerApplicationsNumber                    `xml:"number,omitempty"`
+	ID        *int                                            `xml:"id,omitempty"`
+	Computers *[]ComputerApplicationsVersionItemComputersItem `xml:"computers,omitempty"`
+	Number    *ComputerApplicationsNumber                     `xml:"number,omitempty"`
 }
 
 // MarshalXML forces the ComputerApplicationsVersionItem root element name to the wire value
@@ -2012,12 +2012,12 @@ func (t ComputerCommandsItem) MarshalXML(e *xml.Encoder, start xml.StartElement)
 // ComputerCommandsItemComputerCommand represents a computer commands item computer command.
 type ComputerCommandsItemComputerCommand struct {
 	XMLName   xml.Name
-	Command   *string                                            `xml:"command,omitempty"`
-	Computers []ComputerCommandsItemComputerCommandComputersItem `xml:"computers"`
-	ID        *int                                               `xml:"id,omitempty"`
-	ProfileID *int                                               `xml:"profile_id,omitempty"`
-	UDID      *string                                            `xml:"udid,omitempty"`
-	UUID      *string                                            `xml:"uuid,omitempty"`
+	Command   *string                                             `xml:"command,omitempty"`
+	Computers *[]ComputerCommandsItemComputerCommandComputersItem `xml:"computers,omitempty"`
+	ID        *int                                                `xml:"id,omitempty"`
+	ProfileID *int                                                `xml:"profile_id,omitempty"`
+	UDID      *string                                             `xml:"udid,omitempty"`
+	UUID      *string                                             `xml:"uuid,omitempty"`
 }
 
 // MarshalXML forces the ComputerCommandsItemComputerCommand root element name to the wire value
@@ -2150,12 +2150,12 @@ func (t ComputerExtensionAttributesItem) MarshalXML(e *xml.Encoder, start xml.St
 // ComputerGroup represents a computer group.
 type ComputerGroup struct {
 	XMLName   xml.Name
-	Computers []ComputerGroupComputersItem `xml:"computers"`
-	Criteria  []ComputerGroupCriteriaItem  `xml:"criteria"`
-	ID        *int                         `xml:"id,omitempty"`
-	IsSmart   *bool                        `xml:"is_smart,omitempty"`
-	Name      *string                      `xml:"name,omitempty"`
-	Site      *SiteObject                  `xml:"site,omitempty"`
+	Computers *[]ComputerGroupComputersItem `xml:"computers,omitempty"`
+	Criteria  *[]ComputerGroupCriteriaItem  `xml:"criteria,omitempty"`
+	ID        *int                          `xml:"id,omitempty"`
+	IsSmart   *bool                         `xml:"is_smart,omitempty"`
+	Name      *string                       `xml:"name,omitempty"`
+	Site      *SiteObject                   `xml:"site,omitempty"`
 }
 
 // MarshalXML forces the ComputerGroup root element name to the wire value
@@ -2288,9 +2288,9 @@ func (t ComputerGroups) MarshalXML(e *xml.Encoder, start xml.StartElement) error
 // ComputerGroupsItem represents a computer groups item.
 type ComputerGroupsItem struct {
 	XMLName       xml.Name
-	ID            *int                                  `xml:"id,omitempty"`
-	ComputerGroup []ComputerGroupsItemComputerGroupItem `xml:"computer_group"`
-	Size          *Size                                 `xml:"size,omitempty"`
+	ID            *int                                   `xml:"id,omitempty"`
+	ComputerGroup *[]ComputerGroupsItemComputerGroupItem `xml:"computer_group,omitempty"`
+	Size          *Size                                  `xml:"size,omitempty"`
 }
 
 // MarshalXML forces the ComputerGroupsItem root element name to the wire value
@@ -2464,16 +2464,16 @@ func (t ComputerHardwareSoftwareReportsSoftwareReport) MarshalXML(e *xml.Encoder
 type ComputerHistory struct {
 	XMLName                 xml.Name
 	ID                      *int                                    `xml:"id,omitempty"`
-	Audits                  []any                                   `xml:"audits"`
-	CasperImagingLogs       []any                                   `xml:"casper_imaging_logs"`
-	CasperRemoteLogs        []any                                   `xml:"casper_remote_logs"`
+	Audits                  *[]any                                  `xml:"audits,omitempty"`
+	CasperImagingLogs       *[]any                                  `xml:"casper_imaging_logs,omitempty"`
+	CasperRemoteLogs        *[]any                                  `xml:"casper_remote_logs,omitempty"`
 	Commands                *ComputerHistoryCommands                `xml:"commands,omitempty"`
-	ComputerUsageLogs       []any                                   `xml:"computer_usage_logs"`
+	ComputerUsageLogs       *[]any                                  `xml:"computer_usage_logs,omitempty"`
 	General                 *ComputerHistoryGeneral                 `xml:"general,omitempty"`
 	MacAppStoreApplications *ComputerHistoryMacAppStoreApplications `xml:"mac_app_store_applications,omitempty"`
-	PolicyLogs              []any                                   `xml:"policy_logs"`
-	ScreenSharingLogs       []any                                   `xml:"screen_sharing_logs"`
-	UserLocation            []any                                   `xml:"user_location"`
+	PolicyLogs              *[]any                                  `xml:"policy_logs,omitempty"`
+	ScreenSharingLogs       *[]any                                  `xml:"screen_sharing_logs,omitempty"`
+	UserLocation            *[]any                                  `xml:"user_location,omitempty"`
 }
 
 // MarshalXML forces the ComputerHistory root element name to the wire value
@@ -2492,9 +2492,9 @@ func (t ComputerHistory) MarshalXML(e *xml.Encoder, start xml.StartElement) erro
 // ComputerHistoryCommands represents a computer history commands.
 type ComputerHistoryCommands struct {
 	XMLName   xml.Name
-	Completed []any `xml:"completed"`
-	Failed    []any `xml:"failed"`
-	Pending   []any `xml:"pending"`
+	Completed *[]any `xml:"completed,omitempty"`
+	Failed    *[]any `xml:"failed,omitempty"`
+	Pending   *[]any `xml:"pending,omitempty"`
 }
 
 // MarshalXML forces the ComputerHistoryCommands root element name to the wire value
@@ -2536,9 +2536,9 @@ func (t ComputerHistoryGeneral) MarshalXML(e *xml.Encoder, start xml.StartElemen
 // ComputerHistoryMacAppStoreApplications represents a computer history mac app store applications.
 type ComputerHistoryMacAppStoreApplications struct {
 	XMLName   xml.Name
-	Failed    []any `xml:"failed"`
-	Installed []any `xml:"installed"`
-	Pending   []any `xml:"pending"`
+	Failed    *[]any `xml:"failed,omitempty"`
+	Installed *[]any `xml:"installed,omitempty"`
+	Pending   *[]any `xml:"pending,omitempty"`
 }
 
 // MarshalXML forces the ComputerHistoryMacAppStoreApplications root element name to the wire value
@@ -2790,16 +2790,16 @@ func (t ComputerInvitationsItemComputerInvitation) MarshalXML(e *xml.Encoder, st
 type ComputerManagement struct {
 	XMLName                      xml.Name
 	ID                           *int                       `xml:"id,omitempty"`
-	Ebooks                       []any                      `xml:"ebooks"`
+	Ebooks                       *[]any                     `xml:"ebooks,omitempty"`
 	General                      *ComputerManagementGeneral `xml:"general,omitempty"`
-	MacAppStoreApps              []any                      `xml:"mac_app_store_apps"`
-	OsXConfigurationProfiles     []any                      `xml:"os_x_configuration_profiles"`
-	PatchPolicies                []any                      `xml:"patch_policies"`
-	PatchReportingSoftwareTitles []any                      `xml:"patch_reporting_software_titles"`
-	Policies                     []any                      `xml:"policies"`
-	RestrictedSoftware           []any                      `xml:"restricted_software"`
-	SmartGroups                  []any                      `xml:"smart_groups"`
-	StaticGroups                 []any                      `xml:"static_groups"`
+	MacAppStoreApps              *[]any                     `xml:"mac_app_store_apps,omitempty"`
+	OsXConfigurationProfiles     *[]any                     `xml:"os_x_configuration_profiles,omitempty"`
+	PatchPolicies                *[]any                     `xml:"patch_policies,omitempty"`
+	PatchReportingSoftwareTitles *[]any                     `xml:"patch_reporting_software_titles,omitempty"`
+	Policies                     *[]any                     `xml:"policies,omitempty"`
+	RestrictedSoftware           *[]any                     `xml:"restricted_software,omitempty"`
+	SmartGroups                  *[]any                     `xml:"smart_groups,omitempty"`
+	StaticGroups                 *[]any                     `xml:"static_groups,omitempty"`
 }
 
 // MarshalXML forces the ComputerManagement root element name to the wire value
@@ -3534,21 +3534,21 @@ func (t EbookGeneralSelfServiceIcon) MarshalXML(e *xml.Encoder, start xml.StartE
 // EbookScope represents a ebook scope.
 type EbookScope struct {
 	XMLName            xml.Name
-	ID                 *int                               `xml:"id,omitempty"`
-	AllComputers       *bool                              `xml:"all_computers,omitempty"`
-	AllJssUsers        *bool                              `xml:"all_jss_users,omitempty"`
-	AllMobileDevices   *bool                              `xml:"all_mobile_devices,omitempty"`
-	Buildings          []EbookScopeBuildingsItem          `xml:"buildings"`
-	Classes            []EbookScopeClassesItem            `xml:"classes"`
-	ComputerGroups     []EbookScopeComputerGroupsItem     `xml:"computer_groups"`
-	Computers          []EbookScopeComputersItem          `xml:"computers"`
-	Departments        []EbookScopeDepartmentsItem        `xml:"departments"`
-	Exclusions         *EbookScopeExclusions              `xml:"exclusions,omitempty"`
-	JssUserGroups      []EbookScopeJssUserGroupsItem      `xml:"jss_user_groups"`
-	JssUsers           []EbookScopeJssUsersItem           `xml:"jss_users"`
-	Limitations        *EbookScopeLimitations             `xml:"limitations,omitempty"`
-	MobileDeviceGroups []EbookScopeMobileDeviceGroupsItem `xml:"mobile_device_groups"`
-	MobileDevices      []EbookScopeMobileDevicesItem      `xml:"mobile_devices"`
+	ID                 *int                                `xml:"id,omitempty"`
+	AllComputers       *bool                               `xml:"all_computers,omitempty"`
+	AllJssUsers        *bool                               `xml:"all_jss_users,omitempty"`
+	AllMobileDevices   *bool                               `xml:"all_mobile_devices,omitempty"`
+	Buildings          *[]EbookScopeBuildingsItem          `xml:"buildings,omitempty"`
+	Classes            *[]EbookScopeClassesItem            `xml:"classes,omitempty"`
+	ComputerGroups     *[]EbookScopeComputerGroupsItem     `xml:"computer_groups,omitempty"`
+	Computers          *[]EbookScopeComputersItem          `xml:"computers,omitempty"`
+	Departments        *[]EbookScopeDepartmentsItem        `xml:"departments,omitempty"`
+	Exclusions         *EbookScopeExclusions               `xml:"exclusions,omitempty"`
+	JssUserGroups      *[]EbookScopeJssUserGroupsItem      `xml:"jss_user_groups,omitempty"`
+	JssUsers           *[]EbookScopeJssUsersItem           `xml:"jss_users,omitempty"`
+	Limitations        *EbookScopeLimitations              `xml:"limitations,omitempty"`
+	MobileDeviceGroups *[]EbookScopeMobileDeviceGroupsItem `xml:"mobile_device_groups,omitempty"`
+	MobileDevices      *[]EbookScopeMobileDevicesItem      `xml:"mobile_devices,omitempty"`
 }
 
 // MarshalXML forces the EbookScope root element name to the wire value
@@ -3618,17 +3618,17 @@ type EbookScopeDepartmentsItem struct {
 // EbookScopeExclusions represents a ebook scope exclusions.
 type EbookScopeExclusions struct {
 	XMLName            xml.Name
-	Buildings          []EbookScopeExclusionsBuildingsItem          `xml:"buildings"`
-	ComputerGroups     []EbookScopeExclusionsComputerGroupsItem     `xml:"computer_groups"`
-	Computers          []EbookScopeExclusionsComputersItem          `xml:"computers"`
-	Departments        []EbookScopeExclusionsDepartmentsItem        `xml:"departments"`
-	JssUserGroups      []EbookScopeExclusionsJssUserGroupsItem      `xml:"jss_user_groups"`
-	JssUsers           []EbookScopeExclusionsJssUsersItem           `xml:"jss_users"`
-	MobileDeviceGroups []EbookScopeExclusionsMobileDeviceGroupsItem `xml:"mobile_device_groups"`
-	MobileDevices      []EbookScopeExclusionsMobileDevicesItem      `xml:"mobile_devices"`
-	NetworkSegments    []EbookScopeExclusionsNetworkSegmentsItem    `xml:"network_segments"`
-	UserGroups         []EbookScopeExclusionsUserGroupsItem         `xml:"user_groups"`
-	Users              []EbookScopeExclusionsUsersItem              `xml:"users"`
+	Buildings          *[]EbookScopeExclusionsBuildingsItem          `xml:"buildings,omitempty"`
+	ComputerGroups     *[]EbookScopeExclusionsComputerGroupsItem     `xml:"computer_groups,omitempty"`
+	Computers          *[]EbookScopeExclusionsComputersItem          `xml:"computers,omitempty"`
+	Departments        *[]EbookScopeExclusionsDepartmentsItem        `xml:"departments,omitempty"`
+	JssUserGroups      *[]EbookScopeExclusionsJssUserGroupsItem      `xml:"jss_user_groups,omitempty"`
+	JssUsers           *[]EbookScopeExclusionsJssUsersItem           `xml:"jss_users,omitempty"`
+	MobileDeviceGroups *[]EbookScopeExclusionsMobileDeviceGroupsItem `xml:"mobile_device_groups,omitempty"`
+	MobileDevices      *[]EbookScopeExclusionsMobileDevicesItem      `xml:"mobile_devices,omitempty"`
+	NetworkSegments    *[]EbookScopeExclusionsNetworkSegmentsItem    `xml:"network_segments,omitempty"`
+	UserGroups         *[]EbookScopeExclusionsUserGroupsItem         `xml:"user_groups,omitempty"`
+	Users              *[]EbookScopeExclusionsUsersItem              `xml:"users,omitempty"`
 }
 
 // MarshalXML forces the EbookScopeExclusions root element name to the wire value
@@ -3808,9 +3808,9 @@ type EbookScopeJssUsersItem struct {
 // EbookScopeLimitations represents a ebook scope limitations.
 type EbookScopeLimitations struct {
 	XMLName         xml.Name
-	NetworkSegments []EbookScopeLimitationsNetworkSegmentsItem `xml:"network_segments"`
-	UserGroups      []EbookScopeLimitationsUserGroupsItem      `xml:"user_groups"`
-	Users           []EbookScopeLimitationsUsersItem           `xml:"users"`
+	NetworkSegments *[]EbookScopeLimitationsNetworkSegmentsItem `xml:"network_segments,omitempty"`
+	UserGroups      *[]EbookScopeLimitationsUserGroupsItem      `xml:"user_groups,omitempty"`
+	Users           *[]EbookScopeLimitationsUsersItem           `xml:"users,omitempty"`
 }
 
 // MarshalXML forces the EbookScopeLimitations root element name to the wire value
@@ -5721,15 +5721,15 @@ func (t MacApplicationsItemMacApplication) MarshalXML(e *xml.Encoder, start xml.
 type MobileDevice struct {
 	XMLName               xml.Name
 	ID                    *int                        `xml:"id,omitempty"`
-	Applications          []any                       `xml:"applications"`
-	Certificates          []any                       `xml:"certificates"`
-	ConfigurationProfiles []any                       `xml:"configuration_profiles"`
-	ExtensionAttributes   []any                       `xml:"extension_attributes"`
+	Applications          *[]any                      `xml:"applications,omitempty"`
+	Certificates          *[]any                      `xml:"certificates,omitempty"`
+	ConfigurationProfiles *[]any                      `xml:"configuration_profiles,omitempty"`
+	ExtensionAttributes   *[]any                      `xml:"extension_attributes,omitempty"`
 	General               *MobileDeviceGeneral        `xml:"general,omitempty"`
 	Location              *Location                   `xml:"location,omitempty"`
-	MobileDeviceGroups    []any                       `xml:"mobile_device_groups"`
+	MobileDeviceGroups    *[]any                      `xml:"mobile_device_groups,omitempty"`
 	Network               *MobileDeviceNetwork        `xml:"network,omitempty"`
-	ProvisioningProfiles  []any                       `xml:"provisioning_profiles"`
+	ProvisioningProfiles  *[]any                      `xml:"provisioning_profiles,omitempty"`
 	Purchasing            *Purchasing                 `xml:"purchasing,omitempty"`
 	SecurityObject        *MobileDeviceSecurityObject `xml:"security_object,omitempty"`
 }
@@ -7153,7 +7153,7 @@ func (t MobileDeviceConfigurationProfilesItemConfigurationProfile) MarshalXML(e 
 type MobileDeviceEnrollmentProfile struct {
 	XMLName     xml.Name
 	ID          *int                                  `xml:"id,omitempty"`
-	Attachments []any                                 `xml:"attachments"`
+	Attachments *[]any                                `xml:"attachments,omitempty"`
 	General     *MobileDeviceEnrollmentProfileGeneral `xml:"general,omitempty"`
 	Location    *Location                             `xml:"location,omitempty"`
 	Purchasing  *Purchasing                           `xml:"purchasing,omitempty"`
@@ -7493,11 +7493,11 @@ type MobileDeviceHistory struct {
 	XMLName            xml.Name
 	ID                 *int                                   `xml:"id,omitempty"`
 	Applications       *MobileDeviceHistoryApplications       `xml:"applications,omitempty"`
-	Audits             []any                                  `xml:"audits"`
+	Audits             *[]any                                 `xml:"audits,omitempty"`
 	Ebooks             *MobileDeviceHistoryEbooks             `xml:"ebooks,omitempty"`
 	General            *MobileDeviceHistoryGeneral            `xml:"general,omitempty"`
 	ManagementCommands *MobileDeviceHistoryManagementCommands `xml:"management_commands,omitempty"`
-	UserLocation       []any                                  `xml:"user_location"`
+	UserLocation       *[]any                                 `xml:"user_location,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceHistory root element name to the wire value
@@ -7516,9 +7516,9 @@ func (t MobileDeviceHistory) MarshalXML(e *xml.Encoder, start xml.StartElement) 
 // MobileDeviceHistoryApplications represents a mobile device history applications.
 type MobileDeviceHistoryApplications struct {
 	XMLName   xml.Name
-	Failed    []any `xml:"failed"`
-	Installed []any `xml:"installed"`
-	Pending   []any `xml:"pending"`
+	Failed    *[]any `xml:"failed,omitempty"`
+	Installed *[]any `xml:"installed,omitempty"`
+	Pending   *[]any `xml:"pending,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceHistoryApplications root element name to the wire value
@@ -7538,9 +7538,9 @@ func (t MobileDeviceHistoryApplications) MarshalXML(e *xml.Encoder, start xml.St
 type MobileDeviceHistoryEbooks struct {
 	XMLName   xml.Name
 	ID        *int                                `xml:"id,omitempty"`
-	Failed    []any                               `xml:"failed"`
+	Failed    *[]any                              `xml:"failed,omitempty"`
 	Installed *MobileDeviceHistoryEbooksInstalled `xml:"installed,omitempty"`
-	Pending   []any                               `xml:"pending"`
+	Pending   *[]any                              `xml:"pending,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceHistoryEbooks root element name to the wire value
@@ -7559,8 +7559,8 @@ func (t MobileDeviceHistoryEbooks) MarshalXML(e *xml.Encoder, start xml.StartEle
 // MobileDeviceHistoryEbooksInstalled represents a mobile device history ebooks installed.
 type MobileDeviceHistoryEbooksInstalled struct {
 	XMLName    xml.Name
-	Ibookstore []any `xml:"ibookstore"`
-	Inhouse    []any `xml:"inhouse"`
+	Ibookstore *[]any `xml:"ibookstore,omitempty"`
+	Inhouse    *[]any `xml:"inhouse,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceHistoryEbooksInstalled root element name to the wire value
@@ -7602,9 +7602,9 @@ func (t MobileDeviceHistoryGeneral) MarshalXML(e *xml.Encoder, start xml.StartEl
 // MobileDeviceHistoryManagementCommands represents a mobile device history management commands.
 type MobileDeviceHistoryManagementCommands struct {
 	XMLName   xml.Name
-	Completed []any `xml:"completed"`
-	Failed    []any `xml:"failed"`
-	Pending   []any `xml:"pending"`
+	Completed *[]any `xml:"completed,omitempty"`
+	Failed    *[]any `xml:"failed,omitempty"`
+	Pending   *[]any `xml:"pending,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceHistoryManagementCommands root element name to the wire value
@@ -8736,9 +8736,9 @@ func (t PackagesItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // PatchAvailableTitles represents a patch available titles.
 type PatchAvailableTitles struct {
 	XMLName         xml.Name
-	ID              *int  `xml:"id,omitempty"`
-	AvailableTitles []any `xml:"available_titles"`
-	Size            *Size `xml:"size,omitempty"`
+	ID              *int   `xml:"id,omitempty"`
+	AvailableTitles *[]any `xml:"available_titles,omitempty"`
+	Size            *Size  `xml:"size,omitempty"`
 }
 
 // MarshalXML forces the PatchAvailableTitles root element name to the wire value
@@ -9246,7 +9246,7 @@ type PatchReport struct {
 	PatchSoftwareTitleID *string `xml:"patch_software_title_id,omitempty"`
 	TotalComputers       *int    `xml:"total_computers,omitempty"`
 	TotalVersions        *int    `xml:"total_versions,omitempty"`
-	Versions             []any   `xml:"versions"`
+	Versions             *[]any  `xml:"versions,omitempty"`
 }
 
 // MarshalXML forces the PatchReport root element name to the wire value
@@ -9373,7 +9373,7 @@ func (t PatchSoftwareTitlesItemPatchSoftwareTitle) MarshalXML(e *xml.Encoder, st
 type Peripheral struct {
 	XMLName     xml.Name
 	ID          *int               `xml:"id,omitempty"`
-	Attachments []any              `xml:"attachments"`
+	Attachments *[]any             `xml:"attachments,omitempty"`
 	General     *PeripheralGeneral `xml:"general,omitempty"`
 	Location    *Location          `xml:"location,omitempty"`
 	Purchasing  *Purchasing        `xml:"purchasing,omitempty"`
@@ -9397,7 +9397,7 @@ type PeripheralGeneral struct {
 	XMLName  xml.Name
 	BarCode1 *string `xml:"bar_code_1,omitempty"`
 	BarCode2 *string `xml:"bar_code_2,omitempty"`
-	Fields   []any   `xml:"fields"`
+	Fields   *[]any  `xml:"fields,omitempty"`
 	ID       *int    `xml:"id,omitempty"`
 	Type     *string `xml:"type,omitempty"`
 }
@@ -9672,12 +9672,12 @@ type Policy struct {
 	ID                   *int                        `xml:"id,omitempty"`
 	AccountMaintenance   *PolicyAccountMaintenance   `xml:"account_maintenance,omitempty"`
 	DiskEncryption       *PolicyDiskEncryption       `xml:"disk_encryption,omitempty"`
-	DockItems            []any                       `xml:"dock_items"`
+	DockItems            *[]any                      `xml:"dock_items,omitempty"`
 	FilesProcesses       *PolicyFilesProcesses       `xml:"files_processes,omitempty"`
 	General              *PolicyGeneral              `xml:"general,omitempty"`
 	Maintenance          *PolicyMaintenance          `xml:"maintenance,omitempty"`
 	PackageConfiguration *PolicyPackageConfiguration `xml:"package_configuration,omitempty"`
-	Printers             []any                       `xml:"printers"`
+	Printers             *[]any                      `xml:"printers,omitempty"`
 	Scope                *PolicyScope                `xml:"scope,omitempty"`
 	Scripts              *PolicyScripts              `xml:"scripts,omitempty"`
 	SelfService          *PolicySelfService          `xml:"self_service,omitempty"`
@@ -9701,8 +9701,8 @@ func (t Policy) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 type PolicyAccountMaintenance struct {
 	XMLName                 xml.Name
 	ID                      *int                                             `xml:"id,omitempty"`
-	Accounts                []any                                            `xml:"accounts"`
-	DirectoryBindings       []any                                            `xml:"directory_bindings"`
+	Accounts                *[]any                                           `xml:"accounts,omitempty"`
+	DirectoryBindings       *[]any                                           `xml:"directory_bindings,omitempty"`
 	ManagementAccount       *PolicyAccountMaintenanceManagementAccount       `xml:"management_account,omitempty"`
 	OpenFirmwareEfiPassword *PolicyAccountMaintenanceOpenFirmwareEfiPassword `xml:"open_firmware_efi_password,omitempty"`
 }
@@ -9972,7 +9972,7 @@ func (t PolicyMaintenance) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 // PolicyPackageConfiguration represents a policy package configuration.
 type PolicyPackageConfiguration struct {
 	XMLName  xml.Name
-	Packages []any `xml:"packages"`
+	Packages *[]any `xml:"packages,omitempty"`
 }
 
 // MarshalXML forces the PolicyPackageConfiguration root element name to the wire value
@@ -9991,15 +9991,15 @@ func (t PolicyPackageConfiguration) MarshalXML(e *xml.Encoder, start xml.StartEl
 // PolicyScope represents a policy scope.
 type PolicyScope struct {
 	XMLName        xml.Name
-	ID             *int                            `xml:"id,omitempty"`
-	AllComputers   *bool                           `xml:"all_computers,omitempty"`
-	Buildings      []PolicyScopeBuildingsItem      `xml:"buildings"`
-	ComputerGroups []PolicyScopeComputerGroupsItem `xml:"computer_groups"`
-	Computers      []PolicyScopeComputersItem      `xml:"computers"`
-	Departments    []PolicyScopeDepartmentsItem    `xml:"departments"`
-	Exclusions     *PolicyScopeExclusions          `xml:"exclusions,omitempty"`
-	LimitToUsers   *PolicyScopeLimitToUsers        `xml:"limit_to_users,omitempty"`
-	Limitations    *PolicyScopeLimitations         `xml:"limitations,omitempty"`
+	ID             *int                             `xml:"id,omitempty"`
+	AllComputers   *bool                            `xml:"all_computers,omitempty"`
+	Buildings      *[]PolicyScopeBuildingsItem      `xml:"buildings,omitempty"`
+	ComputerGroups *[]PolicyScopeComputerGroupsItem `xml:"computer_groups,omitempty"`
+	Computers      *[]PolicyScopeComputersItem      `xml:"computers,omitempty"`
+	Departments    *[]PolicyScopeDepartmentsItem    `xml:"departments,omitempty"`
+	Exclusions     *PolicyScopeExclusions           `xml:"exclusions,omitempty"`
+	LimitToUsers   *PolicyScopeLimitToUsers         `xml:"limit_to_users,omitempty"`
+	Limitations    *PolicyScopeLimitations          `xml:"limitations,omitempty"`
 }
 
 // MarshalXML forces the PolicyScope root element name to the wire value
@@ -10063,14 +10063,14 @@ type PolicyScopeDepartmentsItem struct {
 // PolicyScopeExclusions represents a policy scope exclusions.
 type PolicyScopeExclusions struct {
 	XMLName         xml.Name
-	Buildings       []PolicyScopeExclusionsBuildingsItem       `xml:"buildings"`
-	ComputerGroups  []PolicyScopeExclusionsComputerGroupsItem  `xml:"computer_groups"`
-	Computers       []PolicyScopeExclusionsComputersItem       `xml:"computers"`
-	Departments     []PolicyScopeExclusionsDepartmentsItem     `xml:"departments"`
-	Ibeacons        []PolicyScopeExclusionsIbeaconsItem        `xml:"ibeacons"`
-	NetworkSegments []PolicyScopeExclusionsNetworkSegmentsItem `xml:"network_segments"`
-	UserGroups      []PolicyScopeExclusionsUserGroupsItem      `xml:"user_groups"`
-	Users           []PolicyScopeExclusionsUsersItem           `xml:"users"`
+	Buildings       *[]PolicyScopeExclusionsBuildingsItem       `xml:"buildings,omitempty"`
+	ComputerGroups  *[]PolicyScopeExclusionsComputerGroupsItem  `xml:"computer_groups,omitempty"`
+	Computers       *[]PolicyScopeExclusionsComputersItem       `xml:"computers,omitempty"`
+	Departments     *[]PolicyScopeExclusionsDepartmentsItem     `xml:"departments,omitempty"`
+	Ibeacons        *[]PolicyScopeExclusionsIbeaconsItem        `xml:"ibeacons,omitempty"`
+	NetworkSegments *[]PolicyScopeExclusionsNetworkSegmentsItem `xml:"network_segments,omitempty"`
+	UserGroups      *[]PolicyScopeExclusionsUserGroupsItem      `xml:"user_groups,omitempty"`
+	Users           *[]PolicyScopeExclusionsUsersItem           `xml:"users,omitempty"`
 }
 
 // MarshalXML forces the PolicyScopeExclusions root element name to the wire value
@@ -10198,7 +10198,7 @@ func (t PolicyScopeExclusionsUsersItemUser) MarshalXML(e *xml.Encoder, start xml
 // PolicyScopeLimitToUsers represents a policy scope limit to users.
 type PolicyScopeLimitToUsers struct {
 	XMLName    xml.Name
-	UserGroups []any `xml:"user_groups"`
+	UserGroups *[]any `xml:"user_groups,omitempty"`
 }
 
 // MarshalXML forces the PolicyScopeLimitToUsers root element name to the wire value
@@ -10217,10 +10217,10 @@ func (t PolicyScopeLimitToUsers) MarshalXML(e *xml.Encoder, start xml.StartEleme
 // PolicyScopeLimitations represents a policy scope limitations.
 type PolicyScopeLimitations struct {
 	XMLName         xml.Name
-	Ibeacons        []PolicyScopeLimitationsIbeaconsItem        `xml:"ibeacons"`
-	NetworkSegments []PolicyScopeLimitationsNetworkSegmentsItem `xml:"network_segments"`
-	UserGroups      []PolicyScopeLimitationsUserGroupsItem      `xml:"user_groups"`
-	Users           []PolicyScopeLimitationsUsersItem           `xml:"users"`
+	Ibeacons        *[]PolicyScopeLimitationsIbeaconsItem        `xml:"ibeacons,omitempty"`
+	NetworkSegments *[]PolicyScopeLimitationsNetworkSegmentsItem `xml:"network_segments,omitempty"`
+	UserGroups      *[]PolicyScopeLimitationsUserGroupsItem      `xml:"user_groups,omitempty"`
+	Users           *[]PolicyScopeLimitationsUsersItem           `xml:"users,omitempty"`
 }
 
 // MarshalXML forces the PolicyScopeLimitations root element name to the wire value
@@ -10263,9 +10263,9 @@ type PolicyScopeLimitationsUsersItem struct {
 // PolicyScripts represents a policy scripts.
 type PolicyScripts struct {
 	XMLName xml.Name
-	ID      *int  `xml:"id,omitempty"`
-	Script  []any `xml:"script"`
-	Size    *Size `xml:"size,omitempty"`
+	ID      *int   `xml:"id,omitempty"`
+	Script  *[]any `xml:"script,omitempty"`
+	Size    *Size  `xml:"size,omitempty"`
 }
 
 // MarshalXML forces the PolicyScripts root element name to the wire value
@@ -11102,7 +11102,7 @@ type User struct {
 	Email                *string         `xml:"email,omitempty"`
 	EmailAddress         *string         `xml:"email_address,omitempty"`
 	EnableCustomPhotoURL *bool           `xml:"enable_custom_photo_url,omitempty"`
-	ExtensionAttributes  []any           `xml:"extension_attributes"`
+	ExtensionAttributes  *[]any          `xml:"extension_attributes,omitempty"`
 	FullName             *string         `xml:"full_name,omitempty"`
 	ID                   *int            `xml:"id,omitempty"`
 	LdapServer           *UserLdapServer `xml:"ldap_server,omitempty"`
@@ -11110,7 +11110,7 @@ type User struct {
 	Name                 *string         `xml:"name,omitempty"`
 	PhoneNumber          *string         `xml:"phone_number,omitempty"`
 	Position             *string         `xml:"position,omitempty"`
-	Sites                []any           `xml:"sites"`
+	Sites                *[]any          `xml:"sites,omitempty"`
 }
 
 // MarshalXML forces the User root element name to the wire value
@@ -11563,10 +11563,10 @@ func (t VppAccountsItem) MarshalXML(e *xml.Encoder, start xml.StartElement) erro
 type VppAssignment struct {
 	XMLName xml.Name
 	ID      *int                  `xml:"id,omitempty"`
-	Ebooks  []any                 `xml:"ebooks"`
+	Ebooks  *[]any                `xml:"ebooks,omitempty"`
 	General *VppAssignmentGeneral `xml:"general,omitempty"`
-	IosApps []any                 `xml:"ios_apps"`
-	MacApps []any                 `xml:"mac_apps"`
+	IosApps *[]any                `xml:"ios_apps,omitempty"`
+	MacApps *[]any                `xml:"mac_apps,omitempty"`
 	Scope   *VppAssignmentScope   `xml:"scope,omitempty"`
 }
 
@@ -11611,8 +11611,8 @@ type VppAssignmentScope struct {
 	ID            *int                           `xml:"id,omitempty"`
 	AllJssUsers   *bool                          `xml:"all_jss_users,omitempty"`
 	Exclusions    *VppAssignmentScopeExclusions  `xml:"exclusions,omitempty"`
-	JssUserGroups []any                          `xml:"jss_user_groups"`
-	JssUsers      []any                          `xml:"jss_users"`
+	JssUserGroups *[]any                         `xml:"jss_user_groups,omitempty"`
+	JssUsers      *[]any                         `xml:"jss_users,omitempty"`
 	Limitations   *VppAssignmentScopeLimitations `xml:"limitations,omitempty"`
 }
 
@@ -11632,9 +11632,9 @@ func (t VppAssignmentScope) MarshalXML(e *xml.Encoder, start xml.StartElement) e
 // VppAssignmentScopeExclusions represents a vpp assignment scope exclusions.
 type VppAssignmentScopeExclusions struct {
 	XMLName       xml.Name
-	JssUserGroups []any `xml:"jss_user_groups"`
-	JssUsers      []any `xml:"jss_users"`
-	UserGroups    []any `xml:"user_groups"`
+	JssUserGroups *[]any `xml:"jss_user_groups,omitempty"`
+	JssUsers      *[]any `xml:"jss_users,omitempty"`
+	UserGroups    *[]any `xml:"user_groups,omitempty"`
 }
 
 // MarshalXML forces the VppAssignmentScopeExclusions root element name to the wire value
@@ -11653,7 +11653,7 @@ func (t VppAssignmentScopeExclusions) MarshalXML(e *xml.Encoder, start xml.Start
 // VppAssignmentScopeLimitations represents a vpp assignment scope limitations.
 type VppAssignmentScopeLimitations struct {
 	XMLName    xml.Name
-	UserGroups []any `xml:"user_groups"`
+	UserGroups *[]any `xml:"user_groups,omitempty"`
 }
 
 // MarshalXML forces the VppAssignmentScopeLimitations root element name to the wire value

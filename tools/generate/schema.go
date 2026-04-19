@@ -844,7 +844,16 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 		needsPtr := isNullable || (isStructRef && !isRequest) || (!isRequired && !isScalar(goType)) ||
 			(isRequest && !isRequired) || format == "xml"
 
-		if isRequest && !isRequired && !strings.HasPrefix(goType, "*") && (strings.HasPrefix(goType, "[]") || strings.HasPrefix(goType, "map[")) {
+		if format == "xml" && !strings.HasPrefix(goType, "*") && goType != "any" {
+			// XML mode: every field is `*T` with `,omitempty`, including
+			// slices/maps. Matches the three-state null/empty/value
+			// semantics the Terraform plugin framework depends on for
+			// Classic-backed resources — a nil slice field must be
+			// distinguishable from an empty slice so the provider can
+			// send "omit" vs "clear" to the server.
+			goType = "*" + goType
+			jsonTag += ",omitempty"
+		} else if isRequest && !isRequired && !strings.HasPrefix(goType, "*") && (strings.HasPrefix(goType, "[]") || strings.HasPrefix(goType, "map[")) {
 			// For request types, unrequired slices/maps get pointer-wrapped so
 			// callers can distinguish "omit field" (nil) from "send empty" (&[]T{}).
 			goType = "*" + goType
