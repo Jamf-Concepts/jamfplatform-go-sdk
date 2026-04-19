@@ -246,9 +246,46 @@ func TestAcceptance_Classic_Probe_IssueComputerCommandByID(t *testing.T) {
 	}
 }
 
+// TestAcceptance_Classic_Probe_IssueMobileDeviceCommand issues a harmless
+// UpdateInventory command to a supervised mobile device. The endpoint 500s
+// on an empty body, so the probe first lists mobile devices, picks the
+// first supervised one (MDM commands only succeed against supervised
+// targets), and constructs the wire payload from there. Skips cleanly
+// when the tenant has no mobile devices, or none are supervised.
 func TestAcceptance_Classic_Probe_IssueMobileDeviceCommand(t *testing.T) {
 	c := accClient(t)
-	if _, err := proclassic.New(c).IssueMobileDeviceCommand(context.Background(), &proclassic.MobileDeviceCommandPost{}); err != nil {
+	pc := proclassic.New(c)
+	ctx := context.Background()
+
+	list, err := pc.ListMobileDevices(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListMobileDevices: %v", err)
+	}
+	if list == nil || len(list.MobileDevices) == 0 {
+		t.Skip("tenant has no mobile devices enrolled")
+	}
+
+	var targetID *int
+	for i := range list.MobileDevices {
+		d := &list.MobileDevices[i]
+		if d.Supervised != nil && *d.Supervised && d.ID != nil {
+			targetID = d.ID
+			break
+		}
+	}
+	if targetID == nil {
+		t.Skip("no supervised mobile devices on this tenant; UpdateInventory needs a supervised target")
+	}
+
+	cmd := "UpdateInventory"
+	_, err = pc.IssueMobileDeviceCommand(ctx, &proclassic.MobileDeviceCommandPost{
+		General: &proclassic.MobileDeviceCommandPostGeneral{Command: &cmd},
+		MobileDevices: &proclassic.MobileDeviceCommandPostMobileDevices{
+			MobileDevice: &proclassic.MobileDeviceCommandPostMobileDevicesMobileDevice{ID: targetID},
+		},
+	})
+	if err != nil {
 		skipOnServerError(t, err)
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) {
@@ -256,4 +293,5 @@ func TestAcceptance_Classic_Probe_IssueMobileDeviceCommand(t *testing.T) {
 		}
 		t.Fatalf("IssueMobileDeviceCommand transport error: %v", err)
 	}
+	t.Logf("Issued UpdateInventory to mobile device id=%d", *targetID)
 }
