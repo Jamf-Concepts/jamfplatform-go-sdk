@@ -587,11 +587,23 @@ func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, m
 // tagToFileBase converts an OpenAPI tag ("startup-status", "declaration report",
 // "mobile-device-extension-attributes-preview") into a Go-friendly filename base.
 // Hyphens and whitespace collapse to underscores; non-word characters are dropped.
-// Filenames ending in `_<goos>` or `_<goarch>` are rewritten to avoid the
-// Go toolchain's implicit build constraints — e.g. `self_service_branding_ios.go`
-// would otherwise only compile for GOOS=ios.
+//
+// Two post-processing rules:
+//
+//  1. Trailing "-preview" is stripped. Jamf's API team tags in-development
+//     endpoints with "-preview"; when the endpoint graduates to stable the
+//     tag loses the suffix and the filename would churn. Stripping at
+//     generate-time keeps the SDK filename stable across that transition
+//     and consolidates preview + stable variants of the same resource
+//     (e.g. mobile-device-extension-attributes + *-preview) into one file.
+//
+//  2. Filenames ending in `_<goos>` or `_<goarch>` get `_api` appended so
+//     the Go toolchain doesn't interpret them as implicit build constraints
+//     — e.g. `self_service_branding_ios.go` would otherwise only compile
+//     for GOOS=ios.
 func tagToFileBase(tag string) string {
 	s := strings.ToLower(strings.TrimSpace(tag))
+	s = strings.TrimSuffix(s, "-preview")
 	var b strings.Builder
 	b.Grow(len(s))
 	for _, r := range s {

@@ -10,133 +10,22 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
-	"strings"
-
-	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
-// ListMobileDeviceExtensionAttributesV1 retrieve Mobile Device Extension Attributes.
-func (c *Client) ListMobileDeviceExtensionAttributesV1(ctx context.Context, sort []string, filter string) ([]MobileDeviceExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceExtensionAttributes, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := prefix + "/mobile-device-extension-attributes"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                               `json:"totalCount"`
-			Results    []MobileDeviceExtensionAttributes `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
-// CreateMobileDeviceExtensionAttributeV1 create Mobile Device Extension Attribute.
-func (c *Client) CreateMobileDeviceExtensionAttributeV1(ctx context.Context, request *MobileDeviceExtensionAttributes) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	var result HrefResponse
-	endpoint := prefix + "/mobile-device-extension-attributes"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateMobileDeviceExtensionAttributeV1: %w", err)
+// ListDeviceExtensionAttributesPreview get Mobile Device Extension Attribute values placed in select paramter.
+func (c *Client) ListDeviceExtensionAttributesPreview(ctx context.Context, selectAttr string) (*MobileDeviceExtensionAttributeResults, error) {
+	prefix := c.transport.TenantPrefix("pro", "")
+	var result MobileDeviceExtensionAttributeResults
+	endpoint := prefix + "/devices/extensionAttributes"
+	params := url.Values{}
+	if selectAttr != "" {
+		params.Set("select", selectAttr)
 	}
-	return &result, nil
-}
-
-// GetMobileDeviceExtensionAttributeV1 get specified Mobile Device Extension Attribute object.
-func (c *Client) GetMobileDeviceExtensionAttributeV1(ctx context.Context, id string) (*MobileDeviceExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	var result MobileDeviceExtensionAttributes
-	endpoint := fmt.Sprintf("%s/mobile-device-extension-attributes/%s", prefix, url.PathEscape(id))
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetMobileDeviceExtensionAttributeV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// UpdateMobileDeviceExtensionAttributeV1 update specified Mobile Device Extension Attribute object.
-func (c *Client) UpdateMobileDeviceExtensionAttributeV1(ctx context.Context, id string, request *MobileDeviceExtensionAttributes) (*MobileDeviceExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	var result MobileDeviceExtensionAttributes
-	endpoint := fmt.Sprintf("%s/mobile-device-extension-attributes/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
-		return nil, fmt.Errorf("UpdateMobileDeviceExtensionAttributeV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// DeleteMobileDeviceExtensionAttributeV1 delete a Mobile Device Extension Attribute by ID.
-func (c *Client) DeleteMobileDeviceExtensionAttributeV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/mobile-device-extension-attributes/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteMobileDeviceExtensionAttributeV1(%s): %w", id, err)
-	}
-	return nil
-}
-
-// GetMobileDeviceExtensionAttributeDataDependencyV1 get smart group dependent object for a specified mobile device extension attribute.
-func (c *Client) GetMobileDeviceExtensionAttributeDataDependencyV1(ctx context.Context, id string) (*DependencyObjectResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	var result DependencyObjectResults
-	endpoint := fmt.Sprintf("%s/mobile-device-extension-attributes/%s/data-dependency", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetMobileDeviceExtensionAttributeDataDependencyV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// ListMobileDeviceExtensionAttributeHistoryV1 get specified Mobile Device Extension Attribute History object.
-func (c *Client) ListMobileDeviceExtensionAttributeHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := fmt.Sprintf("%s/mobile-device-extension-attributes/%s/history", prefix, url.PathEscape(id))
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int             `json:"totalCount"`
-			Results    []ObjectHistory `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
-// CreateMobileDeviceExtensionAttributeHistoryNoteV1 add specified Mobile Device Extension Attribute history object notes.
-func (c *Client) CreateMobileDeviceExtensionAttributeHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	var result ObjectHistory
-	endpoint := fmt.Sprintf("%s/mobile-device-extension-attributes/%s/history", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateMobileDeviceExtensionAttributeHistoryNoteV1(%s): %w", id, err)
+		return nil, fmt.Errorf("ListDeviceExtensionAttributesPreview: %w", err)
 	}
 	return &result, nil
 }

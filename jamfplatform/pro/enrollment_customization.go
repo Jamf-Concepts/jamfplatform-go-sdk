@@ -8,155 +8,189 @@ package pro
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
-	"strconv"
-	"strings"
-
-	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
-// ListEnrollmentCustomizationsV2 retrieve sorted and paged Enrollment Customizations.
-func (c *Client) ListEnrollmentCustomizationsV2(ctx context.Context, sort []string) ([]EnrollmentCustomizationV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]EnrollmentCustomizationV2, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-
-		endpoint := prefix + "/enrollment-customizations"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                         `json:"totalCount"`
-			Results    []EnrollmentCustomizationV2 `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
-// CreateEnrollmentCustomizationV2 create an Enrollment Customization.
-func (c *Client) CreateEnrollmentCustomizationV2(ctx context.Context, request *EnrollmentCustomizationV2) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	var result HrefResponse
-	endpoint := prefix + "/enrollment-customizations"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateEnrollmentCustomizationV2: %w", err)
+// ParseEnrollmentCustomizationMarkdownV1 parse the given string as markdown text and return Html output.
+func (c *Client) ParseEnrollmentCustomizationMarkdownV1(ctx context.Context, request *Markdown) (*Markdown, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result Markdown
+	endpoint := prefix + "/enrollment-customization/parse-markdown"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("ParseEnrollmentCustomizationMarkdownV1: %w", err)
 	}
 	return &result, nil
 }
 
-// UploadEnrollmentCustomizationImageV2 upload an image.
-func (c *Client) UploadEnrollmentCustomizationImageV2(ctx context.Context, fileFilename string, file io.Reader) (*BrandingImageURL, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	var result BrandingImageURL
-	endpoint := prefix + "/enrollment-customizations/images"
-	parts := []client.MultipartField{
-		{Name: "file", Filename: fileFilename, Content: file},
-	}
-	if err := c.transport.DoMultipart(ctx, http.MethodPost, endpoint, parts, http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UploadEnrollmentCustomizationImageV2: %w", err)
-	}
-	return &result, nil
-}
-
-// DownloadEnrollmentCustomizationImageV2 download an enrollment customization image.
-func (c *Client) DownloadEnrollmentCustomizationImageV2(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	var result []byte
-	endpoint := fmt.Sprintf("%s/enrollment-customizations/images/%s", prefix, url.PathEscape(id))
+// ListEnrollmentCustomizationPanelsV1 get all Panels for single Enrollment Customization.
+func (c *Client) ListEnrollmentCustomizationPanelsV1(ctx context.Context, id string) (*EnrollmentCustomizationPanelList, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result EnrollmentCustomizationPanelList
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/all", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("DownloadEnrollmentCustomizationImageV2(%s): %w", id, err)
+		return nil, fmt.Errorf("ListEnrollmentCustomizationPanelsV1(%s): %w", id, err)
 	}
-	return result, nil
+	return &result, nil
 }
 
-// GetEnrollmentCustomizationV2 retrieve an Enrollment Customization with the supplied id.
-func (c *Client) GetEnrollmentCustomizationV2(ctx context.Context, id string) (*EnrollmentCustomizationV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	var result EnrollmentCustomizationV2
-	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s", prefix, url.PathEscape(id))
+// GetEnrollmentCustomizationPanelV1 get a single Panel for a single Enrollment Customization.
+func (c *Client) GetEnrollmentCustomizationPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanel, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanel
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/all/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetEnrollmentCustomizationV2(%s): %w", id, err)
+		return nil, fmt.Errorf("GetEnrollmentCustomizationPanelV1(%s): %w", id, err)
 	}
 	return &result, nil
 }
 
-// UpdateEnrollmentCustomizationV2 update an Enrollment Customization.
-func (c *Client) UpdateEnrollmentCustomizationV2(ctx context.Context, id string, request *EnrollmentCustomizationV2) (*EnrollmentCustomizationV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	var result EnrollmentCustomizationV2
-	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UpdateEnrollmentCustomizationV2(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// DeleteEnrollmentCustomizationV2 delete an Enrollment Customization with the supplied id.
-func (c *Client) DeleteEnrollmentCustomizationV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s", prefix, url.PathEscape(id))
+// DeleteEnrollmentCustomizationPanelV1 delete a single Panel from an Enrollment Customization.
+func (c *Client) DeleteEnrollmentCustomizationPanelV1(ctx context.Context, id string, panelID string) error {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/all/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteEnrollmentCustomizationV2(%s): %w", id, err)
+		return fmt.Errorf("DeleteEnrollmentCustomizationPanelV1(%s): %w", id, err)
 	}
 	return nil
 }
 
-// ListEnrollmentCustomizationHistoryV2 get sorted and paged Enrollment Customization history objects.
-func (c *Client) ListEnrollmentCustomizationHistoryV2(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-
-		endpoint := fmt.Sprintf("%s/enrollment-customizations/%s/history", prefix, url.PathEscape(id))
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int             `json:"totalCount"`
-			Results    []ObjectHistory `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
-// CreateEnrollmentCustomizationHistoryNoteV2 add Enrollment Customization history object notes.
-func (c *Client) CreateEnrollmentCustomizationHistoryNoteV2(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	var result ObjectHistory
-	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s/history", prefix, url.PathEscape(id))
+// CreateEnrollmentCustomizationLdapPanelV1 create an LDAP Panel for a single Enrollment Customization.
+func (c *Client) CreateEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, request *EnrollmentCustomizationPanelLdapAuth) (*GetEnrollmentCustomizationPanelLdapAuth, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanelLdapAuth
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/ldap", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateEnrollmentCustomizationHistoryNoteV2(%s): %w", id, err)
+		return nil, fmt.Errorf("CreateEnrollmentCustomizationLdapPanelV1(%s): %w", id, err)
 	}
 	return &result, nil
 }
 
-// ListEnrollmentCustomizationPrestagesV2 retrieve the list of Prestages using this Enrollment Customization.
-func (c *Client) ListEnrollmentCustomizationPrestagesV2(ctx context.Context, id string) (*PrestageDependencies, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
-	var result PrestageDependencies
-	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s/prestages", prefix, url.PathEscape(id))
+// GetEnrollmentCustomizationLdapPanelV1 get a single LDAP panel for a single Enrollment Customization.
+func (c *Client) GetEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanelLdapAuth, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanelLdapAuth
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/ldap/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("ListEnrollmentCustomizationPrestagesV2(%s): %w", id, err)
+		return nil, fmt.Errorf("GetEnrollmentCustomizationLdapPanelV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// UpdateEnrollmentCustomizationLdapPanelV1 update a single LDAP Panel for a single Enrollment Customization.
+func (c *Client) UpdateEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, panelID string, request *EnrollmentCustomizationPanelLdapAuth) (*GetEnrollmentCustomizationPanelLdapAuth, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanelLdapAuth
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/ldap/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateEnrollmentCustomizationLdapPanelV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// DeleteEnrollmentCustomizationLdapPanelV1 delete an LDAP single panel from an Enrollment Customization.
+func (c *Client) DeleteEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, panelID string) error {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/ldap/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteEnrollmentCustomizationLdapPanelV1(%s): %w", id, err)
+	}
+	return nil
+}
+
+// CreateEnrollmentCustomizationSsoPanelV1 create an SSO Panel for a single Enrollment Customization.
+func (c *Client) CreateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, request *EnrollmentCustomizationPanelSsoAuth) (*GetEnrollmentCustomizationPanelSsoAuth, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanelSsoAuth
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/sso", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateEnrollmentCustomizationSsoPanelV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetEnrollmentCustomizationSsoPanelV1 get a single SSO Panel for a single Enrollment Customization.
+func (c *Client) GetEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanelSsoAuth, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanelSsoAuth
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/sso/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetEnrollmentCustomizationSsoPanelV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// UpdateEnrollmentCustomizationSsoPanelV1 update a single SSO Panel for a single Enrollment Customization.
+func (c *Client) UpdateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, panelID string, request *EnrollmentCustomizationPanelSsoAuth) (*GetEnrollmentCustomizationPanelSsoAuth, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanelSsoAuth
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/sso/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateEnrollmentCustomizationSsoPanelV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// DeleteEnrollmentCustomizationSsoPanelV1 delete a single SSO Panel from an Enrollment Customization.
+func (c *Client) DeleteEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, panelID string) error {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/sso/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteEnrollmentCustomizationSsoPanelV1(%s): %w", id, err)
+	}
+	return nil
+}
+
+// CreateEnrollmentCustomizationTextPanelV1 create a Text Panel for a single Enrollment Customization.
+func (c *Client) CreateEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, request *EnrollmentCustomizationPanelText) (*GetEnrollmentCustomizationPanelText, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanelText
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateEnrollmentCustomizationTextPanelV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetEnrollmentCustomizationTextPanelV1 get a single Text Panel for a single Enrollment Customization.
+func (c *Client) GetEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanelText, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanelText
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetEnrollmentCustomizationTextPanelV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// UpdateEnrollmentCustomizationTextPanelV1 update a single Text Panel for a single Enrollment Customization.
+func (c *Client) UpdateEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, panelID string, request *EnrollmentCustomizationPanelText) (*GetEnrollmentCustomizationPanelText, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result GetEnrollmentCustomizationPanelText
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateEnrollmentCustomizationTextPanelV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// DeleteEnrollmentCustomizationTextPanelV1 delete a Text single Panel from an Enrollment Customization.
+func (c *Client) DeleteEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, panelID string) error {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteEnrollmentCustomizationTextPanelV1(%s): %w", id, err)
+	}
+	return nil
+}
+
+// GetEnrollmentCustomizationTextPanelMarkdownV1 get the markdown output of a single Text Panel for a single Enrollment.
+func (c *Client) GetEnrollmentCustomizationTextPanelMarkdownV1(ctx context.Context, id string, panelID string) (*Markdown, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result Markdown
+	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text/%s/markdown", prefix, url.PathEscape(id), url.PathEscape(panelID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetEnrollmentCustomizationTextPanelMarkdownV1(%s): %w", id, err)
 	}
 	return &result, nil
 }

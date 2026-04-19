@@ -6,65 +6,21 @@
 package pro
 
 import (
-	"bytes"
 	"context"
 	"net/http"
-	"strings"
 	"testing"
 )
 
-func TestListEnrollmentCustomizationsV2(t *testing.T) {
+func TestParseEnrollmentCustomizationMarkdownV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListEnrollmentCustomizationsV2(context.Background(), nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
-
-func TestCreateEnrollmentCustomizationV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/parse-markdown", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
-		}
-		writeJSON(t, w, http.StatusCreated, map[string]any{})
-	})
-
-	result, err := c.CreateEnrollmentCustomizationV2(context.Background(), &EnrollmentCustomizationV2{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestUploadEnrollmentCustomizationImageV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/images", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
-			t.Errorf("Content-Type = %q, want multipart/form-data", ct)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
-	result, err := c.UploadEnrollmentCustomizationImageV2(context.Background(), "test.bin", bytes.NewBufferString("stub"))
+
+	result, err := c.ParseEnrollmentCustomizationMarkdownV1(context.Background(), &Markdown{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,16 +29,16 @@ func TestUploadEnrollmentCustomizationImageV2(t *testing.T) {
 	}
 }
 
-func TestDownloadEnrollmentCustomizationImageV2(t *testing.T) {
+func TestListEnrollmentCustomizationPanelsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/images/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/all", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
-	result, err := c.DownloadEnrollmentCustomizationImageV2(context.Background(), "test-id")
+	result, err := c.ListEnrollmentCustomizationPanelsV1(context.Background(), "test-id")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,9 +47,9 @@ func TestDownloadEnrollmentCustomizationImageV2(t *testing.T) {
 	}
 }
 
-func TestDownloadEnrollmentCustomizationImageV2_NotFound(t *testing.T) {
+func TestListEnrollmentCustomizationPanelsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/images/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/all", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -101,22 +57,22 @@ func TestDownloadEnrollmentCustomizationImageV2_NotFound(t *testing.T) {
 		})
 	})
 
-	_, err := c.DownloadEnrollmentCustomizationImageV2(context.Background(), "test-id")
+	_, err := c.ListEnrollmentCustomizationPanelsV1(context.Background(), "test-id")
 	if err == nil {
 		t.Fatal("expected error")
 	}
 }
 
-func TestGetEnrollmentCustomizationV2(t *testing.T) {
+func TestGetEnrollmentCustomizationPanelV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/all/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
-	result, err := c.GetEnrollmentCustomizationV2(context.Background(), "test-id")
+	result, err := c.GetEnrollmentCustomizationPanelV1(context.Background(), "test-id", "test-id")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,9 +81,9 @@ func TestGetEnrollmentCustomizationV2(t *testing.T) {
 	}
 }
 
-func TestGetEnrollmentCustomizationV2_NotFound(t *testing.T) {
+func TestGetEnrollmentCustomizationPanelV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/all/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -135,77 +91,37 @@ func TestGetEnrollmentCustomizationV2_NotFound(t *testing.T) {
 		})
 	})
 
-	_, err := c.GetEnrollmentCustomizationV2(context.Background(), "test-id")
+	_, err := c.GetEnrollmentCustomizationPanelV1(context.Background(), "test-id", "test-id")
 	if err == nil {
 		t.Fatal("expected error")
 	}
 }
 
-func TestUpdateEnrollmentCustomizationV2(t *testing.T) {
+func TestDeleteEnrollmentCustomizationPanelV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPut {
-			t.Errorf("method = %s, want PUT", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.UpdateEnrollmentCustomizationV2(context.Background(), "test-id", &EnrollmentCustomizationV2{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestDeleteEnrollmentCustomizationV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/all/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	err := c.DeleteEnrollmentCustomizationV2(context.Background(), "test-id")
+	err := c.DeleteEnrollmentCustomizationPanelV1(context.Background(), "test-id", "test-id")
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestListEnrollmentCustomizationHistoryV2(t *testing.T) {
+func TestCreateEnrollmentCustomizationLdapPanelV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/test-id/history", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListEnrollmentCustomizationHistoryV2(context.Background(), "test-id", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
-
-func TestCreateEnrollmentCustomizationHistoryNoteV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/ldap", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
 		writeJSON(t, w, http.StatusCreated, map[string]any{})
 	})
 
-	result, err := c.CreateEnrollmentCustomizationHistoryNoteV2(context.Background(), "test-id", &ObjectHistoryNote{})
+	result, err := c.CreateEnrollmentCustomizationLdapPanelV1(context.Background(), "test-id", &EnrollmentCustomizationPanelLdapAuth{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -214,16 +130,16 @@ func TestCreateEnrollmentCustomizationHistoryNoteV2(t *testing.T) {
 	}
 }
 
-func TestListEnrollmentCustomizationPrestagesV2(t *testing.T) {
+func TestGetEnrollmentCustomizationLdapPanelV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/test-id/prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/ldap/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
-	result, err := c.ListEnrollmentCustomizationPrestagesV2(context.Background(), "test-id")
+	result, err := c.GetEnrollmentCustomizationLdapPanelV1(context.Background(), "test-id", "test-id")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -232,9 +148,9 @@ func TestListEnrollmentCustomizationPrestagesV2(t *testing.T) {
 	}
 }
 
-func TestListEnrollmentCustomizationPrestagesV2_NotFound(t *testing.T) {
+func TestGetEnrollmentCustomizationLdapPanelV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/test-id/prestages", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/ldap/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -242,7 +158,244 @@ func TestListEnrollmentCustomizationPrestagesV2_NotFound(t *testing.T) {
 		})
 	})
 
-	_, err := c.ListEnrollmentCustomizationPrestagesV2(context.Background(), "test-id")
+	_, err := c.GetEnrollmentCustomizationLdapPanelV1(context.Background(), "test-id", "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateEnrollmentCustomizationLdapPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/ldap/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.UpdateEnrollmentCustomizationLdapPanelV1(context.Background(), "test-id", "test-id", &EnrollmentCustomizationPanelLdapAuth{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestDeleteEnrollmentCustomizationLdapPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/ldap/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteEnrollmentCustomizationLdapPanelV1(context.Background(), "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateEnrollmentCustomizationSsoPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/sso", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
+	})
+
+	result, err := c.CreateEnrollmentCustomizationSsoPanelV1(context.Background(), "test-id", &EnrollmentCustomizationPanelSsoAuth{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetEnrollmentCustomizationSsoPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/sso/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetEnrollmentCustomizationSsoPanelV1(context.Background(), "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetEnrollmentCustomizationSsoPanelV1_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/sso/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetEnrollmentCustomizationSsoPanelV1(context.Background(), "test-id", "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateEnrollmentCustomizationSsoPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/sso/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.UpdateEnrollmentCustomizationSsoPanelV1(context.Background(), "test-id", "test-id", &EnrollmentCustomizationPanelSsoAuth{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestDeleteEnrollmentCustomizationSsoPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/sso/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteEnrollmentCustomizationSsoPanelV1(context.Background(), "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateEnrollmentCustomizationTextPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/text", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
+	})
+
+	result, err := c.CreateEnrollmentCustomizationTextPanelV1(context.Background(), "test-id", &EnrollmentCustomizationPanelText{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetEnrollmentCustomizationTextPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/text/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetEnrollmentCustomizationTextPanelV1(context.Background(), "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetEnrollmentCustomizationTextPanelV1_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/text/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetEnrollmentCustomizationTextPanelV1(context.Background(), "test-id", "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateEnrollmentCustomizationTextPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/text/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.UpdateEnrollmentCustomizationTextPanelV1(context.Background(), "test-id", "test-id", &EnrollmentCustomizationPanelText{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestDeleteEnrollmentCustomizationTextPanelV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/text/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteEnrollmentCustomizationTextPanelV1(context.Background(), "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestGetEnrollmentCustomizationTextPanelMarkdownV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/text/test-id/markdown", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetEnrollmentCustomizationTextPanelMarkdownV1(context.Background(), "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetEnrollmentCustomizationTextPanelMarkdownV1_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/enrollment-customization/test-id/text/test-id/markdown", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetEnrollmentCustomizationTextPanelMarkdownV1(context.Background(), "test-id", "test-id")
 	if err == nil {
 		t.Fatal("expected error")
 	}
