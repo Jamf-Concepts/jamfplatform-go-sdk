@@ -120,18 +120,18 @@ err := jamfplatform.PollUntil(ctx, 5*time.Second, func(ctx context.Context) (boo
 
 Each API family lives in its own sub-package under `jamfplatform/`. Construct a service client with `<pkg>.New(rootClient)`.
 
-| Sub-package | API | Coverage |
-|---|---|---|
-| `jamfplatform/devices` | Platform — device inventory | Pilot (6 methods) |
-| `jamfplatform/devicegroups` | Platform — device groups | Pilot (8 methods) |
-| `jamfplatform/deviceactions` | Platform — MDM commands | Pilot (5 methods) |
-| `jamfplatform/blueprints` | Platform — blueprints | Pilot (10 methods) |
-| `jamfplatform/compliancebenchmarks` | Platform — compliance | Pilot (9 methods) |
-| `jamfplatform/ddmreport` | Platform — declaration reporting | Pilot (2 methods) |
-| `jamfplatform/pro` | Jamf Pro JSON API | **Complete — 662/670 non-deprecated ops** (4 server-bootstrap endpoints out of scope) |
-| `jamfplatform/proclassic` | Jamf Classic XML API | **Complete — 579/579 non-deprecated ops** (byoprofiles excluded — broken upstream) |
+| Sub-package | API |
+|---|---|
+| `jamfplatform/devices` | Platform device inventory |
+| `jamfplatform/devicegroups` | Platform device groups |
+| `jamfplatform/deviceactions` | Platform MDM commands (erase, restart, shutdown, unmanage, check-in) |
+| `jamfplatform/blueprints` | Platform blueprints + components |
+| `jamfplatform/ddmreport` | Platform declaration reporting |
+| `jamfplatform/compliancebenchmarks` | Platform compliance benchmarks |
+| `jamfplatform/pro` | Jamf Pro JSON API (buildings, packages, policies, MDM, enrollment, settings, PKI, etc.) |
+| `jamfplatform/proclassic` | Jamf Classic XML API (computers, mobile devices, groups, profiles, policies, etc.) |
 
-All list methods handle pagination automatically. Pro's versioned endpoints emit version-suffixed Go methods (`ListBuildingsV1`, `GetCheckInSettingsV3`) so consumers pin to a specific API version.
+All list methods handle pagination automatically. Pro's versioned endpoints emit version-suffixed Go methods (`ListBuildingsV1`, `GetCheckInSettingsV3`) so consumers pin to a specific API version. Exact method lists are generated from the OpenAPI specs under `testing/` — see the published specs in [`api/`](api/) for the current surface.
 
 ### Classic (XML) example
 
