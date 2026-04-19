@@ -869,7 +869,32 @@
         {"op": "GET /v1/static-user-groups", "name": "ListStaticUserGroupsV1"},
         {"op": "GET /v1/static-user-groups/{id}", "name": "GetStaticUserGroupV1"},
         {"op": "GET /devices/extensionAttributes", "name": "ListDeviceExtensionAttributesPreview", "params": ["select:string:selectAttr"]},
-        {"op": "GET /v1/devices/{id}/groups", "name": "GetDeviceGroupsForDeviceV1"}
+        {"op": "GET /v1/devices/{id}/groups", "name": "GetDeviceGroupsForDeviceV1"},
+
+        {"op": "GET /preview/computers", "name": "ListPreviewComputers", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /preview/remote-administration-configurations", "name": "ListRemoteAdminConfigurations", "pagination": "totalCount"},
+        {"op": "POST /preview/remote-administration-configurations/team-viewer", "name": "CreateTeamViewerConfiguration", "expectedStatus": 201},
+        {"op": "GET /preview/remote-administration-configurations/team-viewer/{id}", "name": "GetTeamViewerConfiguration"},
+        {"op": "PATCH /preview/remote-administration-configurations/team-viewer/{id}", "name": "UpdateTeamViewerConfiguration"},
+        {"op": "DELETE /preview/remote-administration-configurations/team-viewer/{id}", "name": "DeleteTeamViewerConfiguration", "expectedStatus": 204},
+        {"op": "GET /preview/remote-administration-configurations/team-viewer/{id}/status", "name": "GetTeamViewerConfigurationStatus"},
+        {"op": "GET /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions", "name": "ListTeamViewerSessions", "pagination": "totalCount", "params": ["filter"], "pathNames": {"configurationId": "configurationID"}},
+        {"op": "POST /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions", "name": "CreateTeamViewerSession", "expectedStatus": 201, "pathNames": {"configurationId": "configurationID"}},
+        {"op": "GET /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}", "name": "GetTeamViewerSession", "pathNames": {"configurationId": "configurationID", "sessionId": "sessionID"}},
+        {"op": "GET /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}/status", "name": "GetTeamViewerSessionStatus", "pathNames": {"configurationId": "configurationID", "sessionId": "sessionID"}},
+        {"op": "POST /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}/close", "name": "CloseTeamViewerSession", "expectedStatus": 204, "pathNames": {"configurationId": "configurationID", "sessionId": "sessionID"}},
+        {"op": "POST /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}/resend-notification", "name": "ResendTeamViewerSessionNotification", "expectedStatus": 204, "pathNames": {"configurationId": "configurationID", "sessionId": "sessionID"}},
+
+        {"op": "POST /v1/smart-computer-groups/{id}/recalculate", "name": "RecalculateSmartComputerGroupV1"},
+        {"op": "POST /v1/smart-mobile-device-groups/{id}/recalculate", "name": "RecalculateSmartMobileDeviceGroupV1"},
+        {"op": "POST /v1/smart-user-groups/{id}/recalculate", "name": "RecalculateSmartUserGroupV1"},
+        {"op": "POST /v1/computers/{id}/recalculate-smart-groups", "name": "RecalculateComputerSmartGroupsV1"},
+        {"op": "POST /v1/mobile-devices/{id}/recalculate-smart-groups", "name": "RecalculateMobileDeviceSmartGroupsV1"},
+        {"op": "POST /v1/users/{id}/recalculate-smart-groups", "name": "RecalculateUserSmartGroupsV1"},
+
+        {"op": "GET /v1/mobile-device-enrollment-profile/{id}/download-profile", "name": "DownloadMobileDeviceEnrollmentProfileV1"},
+        {"op": "POST /v1/jamf-management-framework/redeploy/{id}", "name": "RedeployJamfManagementFrameworkV1", "expectedStatus": 202},
+        {"op": "POST /v1/mobile-device-apps/reinstall-app-config", "name": "ReinstallMobileDeviceAppConfigV1", "expectedStatus": 204}
       ]
     },
     {

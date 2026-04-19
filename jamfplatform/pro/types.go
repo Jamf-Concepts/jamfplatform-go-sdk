@@ -327,6 +327,11 @@ type ApnsPushEnableRequest struct {
 // AppAnalyticsSetting represents a app analytics setting value.
 type AppAnalyticsSetting = string
 
+// AppConfigReinstallCode represents a app config reinstall code.
+type AppConfigReinstallCode struct {
+	ReinstallCode *string `json:"reinstallCode,omitempty"`
+}
+
 // AppPath represents a app path.
 type AppPath struct {
 	ID   string `json:"id"`
@@ -1469,6 +1474,13 @@ type ComputerLocalUserAccountCreate struct {
 	Username                       *string `json:"username,omitempty"`
 }
 
+// ComputerLocation represents a computer location.
+type ComputerLocation struct {
+	Position string `json:"position"`
+	Room     string `json:"room"`
+	Username string `json:"username"`
+}
+
 // ComputerMDMCapability represents a computer m d m capability.
 type ComputerMDMCapability struct {
 	Capable            bool                         `json:"capable"`
@@ -1503,6 +1515,29 @@ type ComputerOperatingSystemCreate struct {
 // ComputerOperatingSystemUpdate represents a computer operating system update.
 type ComputerOperatingSystemUpdate struct {
 	ExtensionAttributes *[]ComputerExtensionAttribute `json:"extensionAttributes,omitempty"`
+}
+
+// ComputerOverview represents a computer overview.
+type ComputerOverview struct {
+	AssetTag                                string            `json:"assetTag"`
+	ID                                      string            `json:"id"`
+	IPAddress                               string            `json:"ipAddress"`
+	IsManaged                               bool              `json:"isManaged"`
+	LastContactDate                         string            `json:"lastContactDate"`
+	LastEnrolledDate                        string            `json:"lastEnrolledDate"`
+	LastReportDate                          string            `json:"lastReportDate"`
+	Location                                *ComputerLocation `json:"location,omitempty"`
+	MacAddress                              string            `json:"macAddress"`
+	ManagementID                            string            `json:"managementId"`
+	MDMAccessRights                         int               `json:"mdmAccessRights"`
+	ModelIdentifier                         string            `json:"modelIdentifier"`
+	Name                                    string            `json:"name"`
+	OperatingSystemBuild                    string            `json:"operatingSystemBuild"`
+	OperatingSystemRapidSecurityResponse    string            `json:"operatingSystemRapidSecurityResponse"`
+	OperatingSystemSupplementalBuildVersion string            `json:"operatingSystemSupplementalBuildVersion"`
+	OperatingSystemVersion                  string            `json:"operatingSystemVersion"`
+	SerialNumber                            string            `json:"serialNumber"`
+	UDID                                    string            `json:"udid"`
 }
 
 // ComputerPackageReceipts All package receipts are listed by their package name.
@@ -1758,6 +1793,12 @@ type ComputerUserManagementInfo struct {
 	ManagementID string `json:"managementId"`
 }
 
+// ComputersSearchResults represents a computers search results.
+type ComputersSearchResults struct {
+	Results    []ComputerOverview `json:"results"`
+	TotalCount int                `json:"totalCount"`
+}
+
 // ConfigurationProfile represents a configuration profile.
 type ConfigurationProfile struct {
 	DisplayName string `json:"displayName"`
@@ -1770,6 +1811,37 @@ type ConfigurationProfile struct {
 type ConfigurationSearchResults struct {
 	Results    []CloudIDPCommonResponse `json:"results"`
 	TotalCount int                      `json:"totalCount"`
+}
+
+// ConnectionConfigurationCandidateRequest Request that creates configuration and initialize connection between Jamf Pro and Team Viewer.
+type ConnectionConfigurationCandidateRequest struct {
+	DisplayName    string `json:"displayName"`
+	Enabled        bool   `json:"enabled"`
+	ScriptToken    string `json:"scriptToken"`
+	SessionTimeout int    `json:"sessionTimeout"`
+	SiteID         string `json:"siteId"`
+}
+
+// ConnectionConfigurationResponse Response that contains information about connection configuration for Team Viewer.
+type ConnectionConfigurationResponse struct {
+	DisplayName    string `json:"displayName"`
+	Enabled        bool   `json:"enabled"`
+	ID             string `json:"id"`
+	SessionTimeout *int   `json:"sessionTimeout,omitempty"`
+	SiteID         string `json:"siteId"`
+}
+
+// ConnectionConfigurationStatusResponse Response that contains connection configuration status for Team Viewer.
+type ConnectionConfigurationStatusResponse struct {
+	ConnectionVerificationResult string `json:"connectionVerificationResult"`
+}
+
+// ConnectionConfigurationUpdateRequest Request that updates configuration connection between Jamf Pro and Team Viewer.
+type ConnectionConfigurationUpdateRequest struct {
+	DisplayName    *string `json:"displayName,omitempty"`
+	Enabled        *bool   `json:"enabled,omitempty"`
+	SessionTimeout *int    `json:"sessionTimeout,omitempty"`
+	Token          *string `json:"token,omitempty"`
 }
 
 // Country represents a country.
@@ -5328,6 +5400,17 @@ type PutMobileDevicePrestageV3 struct {
 	VersionLock                            int                              `json:"versionLock"`
 }
 
+// RecalculationResults represents a recalculation results.
+type RecalculationResults struct {
+	Count int `json:"count"`
+}
+
+// RedeployJamfManagementFrameworkResponse represents a redeploy jamf management framework response.
+type RedeployJamfManagementFrameworkResponse struct {
+	CommandUUID string `json:"commandUuid"`
+	DeviceID    string `json:"deviceId"`
+}
+
 // Reenrollment represents a reenrollment.
 type Reenrollment struct {
 	FlushMDMQueue                            string `json:"flushMDMQueue"`
@@ -5342,6 +5425,20 @@ type Reenrollment struct {
 type RefreshCellularPlansCommand struct {
 	CommandType   MDMCommandType `json:"commandType"`
 	EsimServerURL string         `json:"esimServerUrl"`
+}
+
+// RemoteAdministrationResponse A Remote administration response.
+type RemoteAdministrationResponse struct {
+	DisplayName string `json:"displayName"`
+	ID          string `json:"id"`
+	SiteID      string `json:"siteId"`
+	Type        string `json:"type"`
+}
+
+// RemoteAdministrationSearchResults A list with Remote administration configurations.
+type RemoteAdministrationSearchResults struct {
+	Results    []RemoteAdministrationResponse `json:"results"`
+	TotalCount int                            `json:"totalCount"`
 }
 
 // RemoveComputerMDMProfileResponse represents a remove computer m d m profile response.
@@ -5551,6 +5648,35 @@ type Session struct {
 	CurrentSiteID *int `json:"currentSiteId,omitempty"`
 }
 
+// SessionCandidateRequest Request to crate new remote session. Ultimately this allows connection between an admin and an end-user.
+type SessionCandidateRequest struct {
+	Description string `json:"description"`
+	DeviceID    string `json:"deviceId"`
+	DeviceType  string `json:"deviceType"`
+}
+
+// SessionDetails Session details.
+type SessionDetails struct {
+	Code          string     `json:"code"`
+	CreatedAt     *time.Time `json:"createdAt,omitempty"`
+	CreatorID     string     `json:"creatorId"`
+	CreatorName   string     `json:"creatorName"`
+	Description   string     `json:"description"`
+	DeviceID      string     `json:"deviceId"`
+	DeviceName    string     `json:"deviceName"`
+	DeviceType    string     `json:"deviceType"`
+	EndUserLink   string     `json:"endUserLink"`
+	ID            string     `json:"id"`
+	State         string     `json:"state"`
+	SupporterLink string     `json:"supporterLink"`
+}
+
+// SessionDetailsSearchResults Sessions search result.
+type SessionDetailsSearchResults struct {
+	Results    []SessionDetails `json:"results"`
+	TotalCount int              `json:"totalCount"`
+}
+
 // SessionHistoryItem represents a session history item.
 type SessionHistoryItem struct {
 	Comment                 string     `json:"comment"`
@@ -5587,6 +5713,12 @@ type SessionHistoryItemWithDetails struct {
 type SessionHistorySearchResults struct {
 	Results    []SessionHistoryItem `json:"results"`
 	TotalCount int                  `json:"totalCount"`
+}
+
+// SessionStatus Session status.
+type SessionStatus struct {
+	Online       bool   `json:"online"`
+	SessionState string `json:"sessionState"`
 }
 
 // SetAutoAdminPasswordCommand represents a set auto admin password command.

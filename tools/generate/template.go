@@ -812,7 +812,11 @@ func Test<% .Name %>(t *testing.T) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
 		}
+<%- if .ReturnsSlice %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
+<%- else %>
+		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})
+<%- end %>
 	})
 
 	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
