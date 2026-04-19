@@ -18,7 +18,7 @@ func TestListDeclarationReportClients(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{"id": "item-1"}},
+			"results":    []map[string]any{{}},
 			"totalCount": 1,
 			"hasNext":    false,
 		})

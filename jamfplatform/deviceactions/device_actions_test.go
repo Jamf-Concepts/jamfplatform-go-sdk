@@ -32,7 +32,7 @@ func TestEraseDevice(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusCreated, []map[string]any{{"id": "new-id"}})
+		writeJSON(t, w, http.StatusCreated, []map[string]any{{}})
 	})
 
 	result, err := c.EraseDevice(context.Background(), "test-id", &EraseDeviceRequest{})

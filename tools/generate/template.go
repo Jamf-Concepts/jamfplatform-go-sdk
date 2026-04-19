@@ -510,6 +510,12 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 		}
 		hasNext := (page+1)*pageSize < result.TotalCount
 		return result.Results, hasNext, nil
+{{- else if eq .PaginationStyle "rawArray" }}
+		var result []{{ .ItemType }}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		return result, len(result) >= pageSize && len(result) > 0, nil
 {{- end }}
 	})
 }
@@ -564,6 +570,8 @@ func Test<% .Name %>(t *testing.T) {
 		}
 		<%- if eq .Format "xml" %>
 		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
+		<%- else if .ReturnsSlice %>
+		writeJSON(t, w, http.StatusOK, []map[string]any{{"id": "test-id"}})
 		<%- else %>
 		writeJSON(t, w, http.StatusOK, map[string]any{"id": "test-id"})
 		<%- end %>
@@ -609,9 +617,9 @@ func Test<% .Name %>(t *testing.T) {
 <%- if eq .Format "xml" %>
 		writeXML(t, w, <% statusConst .ExpectedStatus %>, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
 <%- else if .ReturnsSlice %>
-		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{"id": "new-id"}})
+		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 <%- else %>
-		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{"id": "new-id"})
+		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})
 <%- end %>
 	})
 
@@ -778,11 +786,15 @@ func Test<% .Name %>(t *testing.T) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
 		}
+<%- if eq .PaginationStyle "rawArray" %>
+		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
+<%- else %>
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{"id": "item-1"}},
+			"results":    []map[string]any{{}},
 			"totalCount": 1,
 			"hasNext":    false,
 		})
+<%- end %>
 	})
 
 	results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)

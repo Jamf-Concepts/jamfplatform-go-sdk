@@ -51,7 +51,7 @@ type OperationDef struct {
 	Op            string            `json:"op"`                   // "GET /v1/devices/{id}"
 	Name          string            `json:"name"`                 // Go method name
 	ContentType   string            `json:"contentType,omitempty"`
-	Pagination    string            `json:"pagination,omitempty"` // hasNext, sizeCheck, totalCount
+	Pagination    string            `json:"pagination,omitempty"` // hasNext, sizeCheck, totalCount, rawArray
 	PageSizeParam string            `json:"pageSizeParam,omitempty"`
 	Version       string            `json:"version,omitempty"`    // override version for tenantPrefix
 	PathNames     map[string]string `json:"pathNames,omitempty"`  // spec param -> Go param name

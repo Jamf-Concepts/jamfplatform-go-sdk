@@ -18,7 +18,7 @@ func TestListBuildingsV1(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{"id": "item-1"}},
+			"results":    []map[string]any{{}},
 			"totalCount": 1,
 			"hasNext":    false,
 		})
@@ -39,7 +39,7 @@ func TestCreateBuildingV1(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusCreated, map[string]any{"id": "new-id"})
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
 	})
 
 	result, err := c.CreateBuildingV1(context.Background(), &Building{})
@@ -91,7 +91,7 @@ func TestUpdateBuildingV1(t *testing.T) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"id": "new-id"})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.UpdateBuildingV1(context.Background(), "test-id", &Building{})
@@ -124,7 +124,7 @@ func TestExportBuildingsV1(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{"id": "new-id"}})
+		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 	})
 
 	result, err := c.ExportBuildingsV1(context.Background(), &ExportParameters{})

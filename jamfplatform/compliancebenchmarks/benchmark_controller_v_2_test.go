@@ -51,7 +51,7 @@ func TestCreateBenchmark(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusAccepted, map[string]any{"id": "new-id"})
+		writeJSON(t, w, http.StatusAccepted, map[string]any{})
 	})
 
 	result, err := c.CreateBenchmark(context.Background(), &BenchmarkRequestV2{})

@@ -429,6 +429,11 @@ func detectPaginatedItemType(op *openapi3.Operation) string {
 		if r := schema.Properties["results"]; r != nil && r.Value != nil && r.Value.Items != nil {
 			return refName(r.Value.Items)
 		}
+		// Raw array response — no wrapper, items live at the top level.
+		// Paired with pagination style "rawArray" in config.
+		if schema.Type.Is("array") && schema.Items != nil {
+			return refName(schema.Items)
+		}
 	}
 	return "any"
 }
