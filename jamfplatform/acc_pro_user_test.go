@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
+	"os"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -97,7 +98,17 @@ func TestAcceptance_Pro_User_ListUsersV1(t *testing.T) {
 	t.Logf("Found %d users", len(users))
 }
 
+// TestAcceptance_Pro_User_UserCRUD is gated behind JAMFPLATFORM_USER_WRITE_OK
+// because the Pro users write path via the Platform gateway is currently
+// broken on the nmartin tenant: POST returns 500 but actually persists the
+// record, and DELETE returns 500 with no effect. Every invocation leaks an
+// orphan user until someone with direct Jamf Pro admin access cleans it up.
+// Set JAMFPLATFORM_USER_WRITE_OK=1 to opt in once the gateway is fixed.
 func TestAcceptance_Pro_User_UserCRUD(t *testing.T) {
+	if os.Getenv("JAMFPLATFORM_USER_WRITE_OK") == "" {
+		t.Skip("gated behind JAMFPLATFORM_USER_WRITE_OK — Pro users POST+DELETE currently broken at the gateway; opting in leaks an orphan per run")
+	}
+
 	c := accClient(t)
 	ctx := context.Background()
 	p := pro.New(c)
