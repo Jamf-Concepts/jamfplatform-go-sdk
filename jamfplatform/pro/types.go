@@ -6590,3 +6590,120 @@ type WellKnownSettingsRequest struct {
 type WellKnownSettingsResponse struct {
 	WellKnownSettings []WellKnownSetting `json:"wellKnownSettings"`
 }
+
+// AppInstallerAppRef represents a app installer app ref.
+type AppInstallerAppRef struct {
+	IconURL   string `json:"iconUrl"`
+	ID        string `json:"id"`
+	Publisher string `json:"publisher"`
+	TitleName string `json:"titleName"`
+}
+
+// AppInstallerComputerStatuses represents a app installer computer statuses.
+type AppInstallerComputerStatuses struct {
+	Available   int `json:"available"`
+	Failed      int `json:"failed"`
+	InProgress  int `json:"inProgress"`
+	Installed   int `json:"installed"`
+	Unqualified int `json:"unqualified"`
+}
+
+// AppInstallerDeployment Single-item shape for App Installer deployment (used for GET by id, POST create, PUT update). References to other resources are flat IDs rather than nested objects.
+type AppInstallerDeployment struct {
+	AppTitleID                      *string                           `json:"appTitleId,omitempty"`
+	CategoryID                      *string                           `json:"categoryId,omitempty"`
+	DeploymentType                  *string                           `json:"deploymentType,omitempty"`
+	Enabled                         *bool                             `json:"enabled,omitempty"`
+	ID                              *string                           `json:"id,omitempty"`
+	InstallPredefinedConfigProfiles *bool                             `json:"installPredefinedConfigProfiles,omitempty"`
+	LatestAvailableVersion          *string                           `json:"latestAvailableVersion,omitempty"`
+	Name                            *string                           `json:"name,omitempty"`
+	NotificationSettings            *AppInstallerNotificationSettings `json:"notificationSettings,omitempty"`
+	SelectedVersion                 *string                           `json:"selectedVersion,omitempty"`
+	SelfServiceSettings             *AppInstallerSelfServiceSettings  `json:"selfServiceSettings,omitempty"`
+	SiteID                          *string                           `json:"siteId,omitempty"`
+	SmartGroupID                    *string                           `json:"smartGroupId,omitempty"`
+	TitleAvailableInAis             *bool                             `json:"titleAvailableInAis,omitempty"`
+	TriggerAdminNotifications       *bool                             `json:"triggerAdminNotifications,omitempty"`
+	UpdateBehavior                  *string                           `json:"updateBehavior,omitempty"`
+	VersionRemoved                  *bool                             `json:"versionRemoved,omitempty"`
+}
+
+// AppInstallerDeploymentHrefResponse represents a app installer deployment href response.
+type AppInstallerDeploymentHrefResponse struct {
+	Href string `json:"href"`
+	ID   string `json:"id"`
+}
+
+// AppInstallerDeploymentListEntry List-view of an App Installer deployment. The server expands site, category, smartGroup, and app into nested objects for the list endpoint; single-item GET / POST / PUT returns the flat-ID shape (AppInstallerDeployment).
+type AppInstallerDeploymentListEntry struct {
+	App                    *AppInstallerAppRef           `json:"app,omitempty"`
+	Category               *AppInstallerNamedRef         `json:"category,omitempty"`
+	ComputerStatuses       *AppInstallerComputerStatuses `json:"computerStatuses,omitempty"`
+	DeploymentType         string                        `json:"deploymentType"`
+	Enabled                bool                          `json:"enabled"`
+	ID                     string                        `json:"id"`
+	LatestAvailableVersion string                        `json:"latestAvailableVersion"`
+	Name                   string                        `json:"name"`
+	SelectedVersion        string                        `json:"selectedVersion"`
+	Site                   *AppInstallerNamedRef         `json:"site,omitempty"`
+	SmartGroup             *AppInstallerNamedRef         `json:"smartGroup,omitempty"`
+	UpdateBehavior         string                        `json:"updateBehavior"`
+	VersionRemoved         bool                          `json:"versionRemoved"`
+}
+
+// AppInstallerDeploymentSearchResults represents a app installer deployment search results.
+type AppInstallerDeploymentSearchResults struct {
+	Results    []AppInstallerDeploymentListEntry `json:"results"`
+	TotalCount int                               `json:"totalCount"`
+}
+
+// AppInstallerNamedRef represents a app installer named ref.
+type AppInstallerNamedRef struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
+// AppInstallerNotificationSettings represents a app installer notification settings.
+type AppInstallerNotificationSettings struct {
+	CompleteMessage      *string `json:"completeMessage,omitempty"`
+	Deadline             *int    `json:"deadline,omitempty"`
+	DeadlineMessage      *string `json:"deadlineMessage,omitempty"`
+	NotificationInterval *int    `json:"notificationInterval,omitempty"`
+	NotificationMessage  *string `json:"notificationMessage,omitempty"`
+	QuitDelay            *int    `json:"quitDelay,omitempty"`
+	Relaunch             *bool   `json:"relaunch,omitempty"`
+	Suppress             *bool   `json:"suppress,omitempty"`
+}
+
+// AppInstallerSelfServiceSettings represents a app installer self service settings.
+type AppInstallerSelfServiceSettings struct {
+	Categories                  *[]AppInstallerNamedRef `json:"categories,omitempty"`
+	Description                 *string                 `json:"description,omitempty"`
+	ForceViewDescription        *bool                   `json:"forceViewDescription,omitempty"`
+	IncludeInComplianceCategory *bool                   `json:"includeInComplianceCategory,omitempty"`
+	IncludeInFeaturedCategory   *bool                   `json:"includeInFeaturedCategory,omitempty"`
+}
+
+// AppInstallerTitle represents a app installer title.
+type AppInstallerTitle struct {
+	Architecture           string `json:"architecture"`
+	AvailabilityDate       string `json:"availabilityDate"`
+	BundleID               string `json:"bundleId"`
+	IconURL                string `json:"iconUrl"`
+	ID                     string `json:"id"`
+	InstallationPathShared bool   `json:"installationPathShared"`
+	Language               string `json:"language"`
+	MinimumOsVersion       string `json:"minimumOsVersion"`
+	Publisher              string `json:"publisher"`
+	ShortVersion           string `json:"shortVersion"`
+	SizeInBytes            int    `json:"sizeInBytes"`
+	TitleName              string `json:"titleName"`
+	Version                string `json:"version"`
+}
+
+// AppInstallerTitleSearchResults represents a app installer title search results.
+type AppInstallerTitleSearchResults struct {
+	Results    []AppInstallerTitle `json:"results"`
+	TotalCount int                 `json:"totalCount"`
+}

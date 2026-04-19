@@ -1616,6 +1616,22 @@
         {"op": "GET /vppinvitations/id/{id}/subset/{subset}", "name": "GetVPPInvitationByIDSubset", "responseType": "vpp_invitation", "pathNames": {"id": "id"}}
 
       ]
+    },
+    {
+      "file": "testing/app-installers.yaml",
+      "namespace": "pro",
+      "package": "pro",
+      "specFile": "app_installers_api.json",
+      "splitByTag": true,
+      "operations": [
+        {"op": "GET /v1/app-installers/titles", "name": "ListAppInstallerTitlesV1", "pagination": "totalCount"},
+        {"op": "GET /v1/app-installers/titles/{id}", "name": "GetAppInstallerTitleV1"},
+        {"op": "GET /v1/app-installers/deployments", "name": "ListAppInstallerDeploymentsV1", "pagination": "totalCount"},
+        {"op": "POST /v1/app-installers/deployments", "name": "CreateAppInstallerDeploymentV1", "expectedStatus": 201},
+        {"op": "GET /v1/app-installers/deployments/{id}", "name": "GetAppInstallerDeploymentV1"},
+        {"op": "PUT /v1/app-installers/deployments/{id}", "name": "UpdateAppInstallerDeploymentV1"},
+        {"op": "DELETE /v1/app-installers/deployments/{id}", "name": "DeleteAppInstallerDeploymentV1", "expectedStatus": 204}
+      ]
     }
   ]
 }
