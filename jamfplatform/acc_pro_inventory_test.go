@@ -138,23 +138,104 @@ func TestAcceptance_Pro_Inventory_RemoveMdmProfileFromComputerV1(t *testing.T) {
 	t.Skip("destructive (removes MDM from a real computer, requires re-enrollment) — verify manually via curl")
 }
 
-func TestAcceptance_Pro_Inventory_CreateComputerV3(t *testing.T) {
-	t.Skip("creating a phantom computer inventory record pollutes the tenant without a corresponding real machine — manual probe only")
-}
+// TestAcceptance_Pro_Inventory_ComputerCRUDV3 exercises full CRUD against a
+// synthetic computer inventory record seeded with a sdk-acc-* UDID. Server
+// accepts a minimal create body; no real managed computer is touched.
+// Covers create, get, detail update (PATCH), attachment upload, attachment
+// download, attachment delete, and record delete.
+func TestAcceptance_Pro_Inventory_ComputerCRUDV3(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
 
-func TestAcceptance_Pro_Inventory_DeleteComputerV3(t *testing.T) {
-	t.Skip("destructive (removes the inventory record of a real managed computer) — manual probe only")
-}
+	udid := "sdk-acc-udid-" + runSuffix()
+	name := "sdk-acc-mac-" + runSuffix()
 
-func TestAcceptance_Pro_Inventory_UpdateComputerDetailV3(t *testing.T) {
-	t.Skip("PATCH on a real computer detail mutates inventory — skip to avoid disturbing live state")
-}
+	created, err := p.CreateComputerInventoryV3(ctx, &pro.ComputerInventoryCreateRequestV2{
+		UDID: &udid,
+		General: &pro.ComputerGeneralCreate{
+			Name: name,
+		},
+		Hardware: &pro.ComputerHardwareCreate{
+			Make:            ptr("Apple"),
+			Model:           ptr("SDK Acceptance Virtual"),
+			ModelIdentifier: ptr("SDKAcc1,1"),
+		},
+		OperatingSystem: &pro.ComputerOperatingSystemCreate{
+			Name:    ptr("macOS"),
+			Version: ptr("14.0"),
+			Build:   ptr("23A344"),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateComputerInventoryV3: %v", err)
+	}
+	if created.ID == "" {
+		t.Fatalf("CreateComputerInventoryV3 returned no ID (href=%q)", created.Href)
+	}
+	cleanupDelete(t, "DeleteComputerInventoryV3", func() error { return p.DeleteComputerInventoryV3(ctx, created.ID) })
+	t.Logf("Created computer inventory record %s (udid=%s)", created.ID, udid)
 
-// Attachments: CRUD requires the ability to attach to a real computer inventory
-// and to later delete. Non-destructive in principle but leaks on the first
-// failure. Skipped until a disposable-computer fixture is available.
-func TestAcceptance_Pro_Inventory_ComputerAttachmentCRUDV3(t *testing.T) {
-	t.Skip("attaches to a real computer inventory record — no disposable fixture available; manual probe only")
+	// Round-trip verify.
+	got, err := p.GetComputerInventoryV3(ctx, created.ID, []string{"GENERAL", "HARDWARE"})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerInventoryV3(%s): %v", created.ID, err)
+	}
+	if got.UDID != udid {
+		t.Errorf("UDID = %q, want %q", got.UDID, udid)
+	}
+
+	// PATCH detail — returns 204.
+	assetTag := "sdk-acc-tag-" + runSuffix()
+	if err := p.UpdateComputerInventoryDetailV3(ctx, created.ID, &pro.ComputerInventoryUpdateRequest{
+		General: &pro.ComputerGeneralUpdate{AssetTag: &assetTag},
+	}); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateComputerInventoryDetailV3(%s): %v", created.ID, err)
+	}
+
+	// Upload attachment (inline bytes).
+	body := "sdk-acc attachment probe payload " + runSuffix()
+	att, err := p.UploadComputerInventoryAttachmentV3(ctx, created.ID, "probe.txt", strings.NewReader(body))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UploadComputerInventoryAttachmentV3(%s): %v", created.ID, err)
+	}
+	t.Logf("Uploaded attachment %s", att.ID)
+
+	// Download the attachment — returns text/plain bytes.
+	downloaded, err := p.DownloadComputerInventoryAttachmentV3(ctx, created.ID, att.ID)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DownloadComputerInventoryAttachmentV3(%s, %s): %v", created.ID, att.ID, err)
+	}
+	if !strings.Contains(string(downloaded), "sdk-acc attachment probe") {
+		t.Errorf("Download body %q does not contain expected probe string", downloaded)
+	}
+
+	// Delete attachment.
+	if err := p.DeleteComputerInventoryAttachmentV3(ctx, created.ID, att.ID); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteComputerInventoryAttachmentV3(%s, %s): %v", created.ID, att.ID, err)
+	}
+
+	// Delete record.
+	if err := p.DeleteComputerInventoryV3(ctx, created.ID); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteComputerInventoryV3(%s): %v", created.ID, err)
+	}
+
+	// Verify gone.
+	_, err = p.GetComputerInventoryV3(ctx, created.ID, nil)
+	if err == nil {
+		t.Fatalf("GetComputerInventoryV3(%s) after delete should 404", created.ID)
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("GetComputerInventoryV3(%s) after delete: want 404, got %v", created.ID, err)
+	}
 }
 
 // --- computer-inventory-collection-settings V2 --------------------------

@@ -296,7 +296,7 @@
         {"op": "GET /v3/computers-inventory/{id}", "name": "GetComputerInventoryV3", "params": ["section:[]string"]},
         {"op": "DELETE /v3/computers-inventory/{id}", "name": "DeleteComputerInventoryV3", "expectedStatus": 204},
         {"op": "GET /v3/computers-inventory-detail/{id}", "name": "GetComputerInventoryDetailV3"},
-        {"op": "PATCH /v3/computers-inventory-detail/{id}", "name": "UpdateComputerInventoryDetailV3"},
+        {"op": "PATCH /v3/computers-inventory-detail/{id}", "name": "UpdateComputerInventoryDetailV3", "expectedStatus": 204},
         {"op": "POST /v3/computers-inventory/{id}/attachments", "name": "UploadComputerInventoryAttachmentV3"},
         {"op": "GET /v3/computers-inventory/{id}/attachments/{attachmentId}", "name": "DownloadComputerInventoryAttachmentV3"},
         {"op": "DELETE /v3/computers-inventory/{id}/attachments/{attachmentId}", "name": "DeleteComputerInventoryAttachmentV3", "expectedStatus": 204},
