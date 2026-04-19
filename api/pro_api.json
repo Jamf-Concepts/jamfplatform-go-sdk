@@ -246,6 +246,24 @@
         ],
         "type": "object"
       },
+      "CeaTemplatesResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttributeTemplates"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "totalCount"
+        ],
+        "type": "object"
+      },
       "ChangePassword": {
         "properties": {
           "currentPassword": {
@@ -265,6 +283,156 @@
           "currentPassword",
           "newPassword"
         ],
+        "type": "object"
+      },
+      "ComputerExtensionAttributeSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttributes"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "totalCount"
+        ],
+        "type": "object"
+      },
+      "ComputerExtensionAttributeTemplates": {
+        "properties": {
+          "templateCategoryName": {
+            "description": "Template category name of the extension attribute.",
+            "example": "AntiVirus",
+            "type": "string"
+          },
+          "templateId": {
+            "description": "Unique Id for Computer Extension Attribute Template.",
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "templateName": {
+            "description": "Template display name of the extension attribute.",
+            "example": "ClamXav - Virus Definition Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "templateCategoryName",
+          "templateName"
+        ],
+        "type": "object"
+      },
+      "ComputerExtensionAttributes": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ExtensionAttributes"
+          },
+          {
+            "properties": {
+              "enabled": {
+                "default": true,
+                "description": "Enabled by default, but for inputType Script we can disable it as well. \u003cbr/\u003e Possible values are:\u003cbr/\u003e false \u003cbr/\u003e true",
+                "example": true,
+                "type": "boolean"
+              },
+              "inputType": {
+                "default": "TEXT",
+                "description": "Extension attributes collect inventory data by using an input type.The type of the Input used to populate the extension attribute.",
+                "enum": [
+                  "SCRIPT",
+                  "TEXT",
+                  "POPUP",
+                  "DIRECTORY_SERVICE_ATTRIBUTE_MAPPING"
+                ],
+                "type": "string"
+              },
+              "inventoryDisplayType": {
+                "default": "GENERAL",
+                "description": "Category in which to display the extension attribute in Jamf Pro.",
+                "enum": [
+                  "GENERAL",
+                  "HARDWARE",
+                  "OPERATING_SYSTEM",
+                  "USER_AND_LOCATION",
+                  "PURCHASING",
+                  "EXTENSION_ATTRIBUTES"
+                ],
+                "example": "GENERAL",
+                "type": "string"
+              },
+              "ldapAttributeMapping": {
+                "description": "Directory Service attribute use to populate the extension attribute. \u003cbr/\u003e Required when inputType is \"DIRECTORY_SERVICE_ATTRIBUTE_MAPPING\"",
+                "example": "ldapAttributeMapping",
+                "type": "string"
+              },
+              "ldapExtensionAttributeAllowed": {
+                "default": false,
+                "description": "Collect multiple values for this extension attribute. ldapExtensionAttributeAllowed is disabled by default, only for inputType 'DIRECTORY_SERVICE_ATTRIBUTE_MAPPING' it can be enabled. It's value cannot be modified during edit operation.\u003cbr/\u003e Possible values are:\u003cbr/\u003e false \u003cbr/\u003e true \u003cbr/\u003e",
+                "example": false,
+                "type": "boolean"
+              },
+              "manageExistingData": {
+                "description": "It is used to specify to either delete or retain the extension attributes values when inputType is Script and enabled is false.",
+                "enum": [
+                  "RETAIN",
+                  "DELETE"
+                ],
+                "example": "RETAIN",
+                "type": "string"
+              },
+              "popupMenuChoices": {
+                "description": "When added with list of choices while creating computer extension attributes these Pop-up menu can be displayed in inventory information. User can choose a value from the pop-up menu list when enrolling a computer any time using Jamf Pro. Provide popupMenuChoices only when inputType is 'POPUP'.",
+                "example": [
+                  "Test",
+                  "Popup"
+                ],
+                "items": {
+                  "description": "Popup Menu choices.",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "scriptContents": {
+                "description": "When we run this script it returns a data value each time a computer submits inventory to Jamf Pro. Provide scriptContents only when inputType is 'SCRIPT'.",
+                "example": "scriptContent",
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "inputType",
+              "inventoryDisplayType"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "ComputerGroup": {
+        "properties": {
+          "description": {
+            "example": "A group containing all managed computers",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "example": "All Managed Computers",
+            "type": "string"
+          },
+          "smartGroup": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
         "type": "object"
       },
       "Department": {
@@ -298,6 +466,48 @@
           "totalCount": {
             "example": 3,
             "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "DependencyObjectResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "properties": {
+                "hyperlink": {
+                  "description": "Link to dependent object or to page with list of dependent objects.",
+                  "example": "/smartMobileDeviceGroups.html",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Unique Id for Dependency Object.",
+                  "example": 1,
+                  "type": "integer"
+                },
+                "identifiableName": {
+                  "description": "Name of the dependent object.",
+                  "example": "identifiableName",
+                  "type": "string"
+                },
+                "nameLocalization": {
+                  "description": "Name of localization which display dependent object.",
+                  "example": "SMART_COMPUTER_GROUPS",
+                  "type": "string"
+                },
+                "objectId": {
+                  "description": "Object Type Id of the dependency object.",
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
             "type": "integer"
           }
         },
@@ -375,6 +585,41 @@
             "type": "array"
           }
         },
+        "type": "object"
+      },
+      "ExtensionAttributes": {
+        "properties": {
+          "dataType": {
+            "default": "STRING",
+            "description": "Type of data being collected.",
+            "enum": [
+              "INTEGER",
+              "STRING",
+              "DATE"
+            ],
+            "type": "string"
+          },
+          "description": {
+            "description": "Description for the extension attribute.",
+            "example": "Mobile Device Extension Attribute",
+            "type": "string"
+          },
+          "id": {
+            "description": "Unique Id for Mobile Device Extension Attribute.",
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name for the extension attribute.",
+            "example": "MobileDeviceExtensionAttribute",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dataType",
+          "name"
+        ],
         "type": "object"
       },
       "HistorySearchResults": {
@@ -2046,6 +2291,135 @@
         ],
         "type": "object"
       },
+      "SmartComputerGroupSearch": {
+        "properties": {
+          "description": {
+            "example": "My computer group description",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "membershipCount": {
+            "example": 231,
+            "type": "integer"
+          },
+          "name": {
+            "example": "My computer group",
+            "minLength": 1,
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SmartComputerGroupV2": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/SmartSearchCriterion"
+            },
+            "type": "array"
+          },
+          "description": {
+            "example": "New Group Description",
+            "type": "string"
+          },
+          "name": {
+            "example": "New Group Name",
+            "type": "string"
+          },
+          "siteId": {
+            "example": "-1",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "SmartGroupMembership": {
+        "description": "the ids of the computers that are members of the smart group",
+        "properties": {
+          "members": {
+            "example": [
+              1,
+              2,
+              3
+            ],
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "SmartGroupSearchResult": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SmartComputerGroupSearch"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "SmartSearchCriterion": {
+        "properties": {
+          "andOr": {
+            "example": "and",
+            "type": "string"
+          },
+          "closingParen": {
+            "example": false,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Account",
+            "type": "string"
+          },
+          "openingParen": {
+            "example": false,
+            "type": "boolean"
+          },
+          "priority": {
+            "example": 0,
+            "type": "integer"
+          },
+          "searchType": {
+            "example": "is",
+            "type": "string"
+          },
+          "value": {
+            "example": "test",
+            "type": "string"
+          }
+        },
+        "required": [
+          "andOr",
+          "name",
+          "searchType",
+          "value"
+        ],
+        "type": "object"
+      },
       "StartupStatus": {
         "properties": {
           "error": {
@@ -2144,6 +2518,126 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "StaticComputerGroup": {
+        "properties": {
+          "description": {
+            "example": "A test static computer group",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "example": "Test Static Computer Group",
+            "minLength": 1,
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "StaticComputerGroupAssignment": {
+        "properties": {
+          "assignments": {
+            "description": "Array of computer IDs to assign to the static group",
+            "items": {
+              "example": "1",
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "description": {
+            "example": "A test static computer group",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "example": "Test Static Computer Group",
+            "minLength": 1,
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "StaticComputerGroupSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/StaticComputerGroupSummary"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 2,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "results",
+          "totalCount"
+        ],
+        "type": "object"
+      },
+      "StaticComputerGroupSummary": {
+        "properties": {
+          "count": {
+            "example": 5,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "description": {
+            "example": "A test static computer group",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "example": "Test Static Computer Group",
+            "minLength": 1,
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
         "type": "object"
       },
       "V1Site": {
@@ -2919,6 +3413,742 @@
         ],
         "x-required-privileges": [
           "Update Categories"
+        ]
+      }
+    },
+    "/v1/computer-extension-attributes": {
+      "get": {
+        "description": "Retrieves All Computer Extension Attributes Configuration.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorts results by one or more criteria, following the format property:asc/desc.\u003cbr/\u003e Default sort is name:asc.\u003cbr/\u003e If using multiple criteria, separate with commas. Allows sort for id and name.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "name.asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc.\u003cbr/\u003e Can be combined with paging and sorting.\u003cbr/\u003e Fields allowed in the query: id, name \u003cbr/\u003e Default filter is an empty query and returns all results from the requested page.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerExtensionAttributeSearchResults"
+                }
+              }
+            },
+            "description": "Computer Extension Attribute objects has been fetched successfully."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Computer Extension Attribute objects could not be found. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client."
+          }
+        },
+        "summary": "Retrieve Computer Extension Attributes.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Read Computer Extension Attributes"
+        ]
+      },
+      "post": {
+        "description": "Create Computer Extension Attribute to collect extra inventory information.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerExtensionAttributes"
+              }
+            }
+          },
+          "description": "Computer Extension Attribute to be created.",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Computer Extension Attribute was successfully created."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request. The server could not understand the request because of invalid syntax. Possible reasons are:\u003c/br\u003e 1) Required fields are not provided in request body.\u003c/br\u003e 2) Fields which are not associated with provided inputType has some value.\u003c/br\u003e 3) Any values outside of the allowed range are included in the request body.\u003c/br\u003e 4) LDAP is not configured.\u003c/br\u003e 5) Error occured during database create operation.\u003c/br\u003e 6) Duplicate_Field"
+          }
+        },
+        "summary": "Create Computer Extension Attribute.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Create Computer Extension Attributes"
+        ]
+      }
+    },
+    "/v1/computer-extension-attributes/delete-multiple": {
+      "post": {
+        "description": "IDs of the Computer Extension Attribute to be deleted.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ids"
+              }
+            }
+          },
+          "description": "IDs of the Computer Extension Attribute to be deleted",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "All specified Computer Extension Attribute deleted successfully."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request. Returns error codes and IDs for any Computer Extension Attribute that were unable to be deleted. Possible reasons are:\u003c/br\u003e 1) The specified extension attribute id does not include a valid number.\u003c/br\u003e 2) The specified extension attribute id does not exist in Jamf Pro."
+          }
+        },
+        "summary": "Delete multiple Computer Extension Attribute at once.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Delete Computer Extension Attributes"
+        ]
+      }
+    },
+    "/v1/computer-extension-attributes/templates": {
+      "get": {
+        "description": "Retrieves All Computer Extension Attributes Templates.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorts results by one or more criteria, following the format property:asc/desc.\u003cbr/\u003e Default sort is templateName:asc.\u003cbr/\u003e If using multiple criteria, separate with commas. Allows sort for templateName and templateCategory.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "templateName.asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Filters results. Use RSQL format for queries. which allows filtering by multiple fields such as templateName, templateCategoryName.\u003cbr/\u003e Can be combined with paging and sorting.\u003cbr/\u003e Fields allowed in the query: templateName, templateCategoryName \u003cbr/\u003e Default filter is an empty query and returns all results from the requested page.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CeaTemplatesResults"
+                }
+              }
+            },
+            "description": "Computer Extension Attribute templates objects has been fetched successfully."
+          }
+        },
+        "summary": "Retrieve All Computer Extension Attributes Templates.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Read Computer Extension Attributes"
+        ]
+      }
+    },
+    "/v1/computer-extension-attributes/templates/{id}": {
+      "get": {
+        "description": "Gets specified Computer Extension Attribute Template object.",
+        "parameters": [
+          {
+            "description": "Unique Id of the Template.",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerExtensionAttributes"
+                }
+              }
+            },
+            "description": "Computer Extension Attribute Template object has been fetched successfully."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Computer Extension Attribute Template object could not be found. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client."
+          }
+        },
+        "summary": "Get specified Computer Extension Attribute Template object.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Read Computer Extension Attributes"
+        ]
+      }
+    },
+    "/v1/computer-extension-attributes/upload": {
+      "post": {
+        "description": "Uploads a Computer Extension Attribute.",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerExtensionAttributes"
+                }
+              }
+            },
+            "description": "Computer Extension Attribute object has been fetched successfully."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request. Possible reasons are:\u003c/br\u003e 1) Unsupported file extension. Acceptable format is xml.\u003c/br\u003e 2) Uploaded file should not be empty."
+          }
+        },
+        "summary": "Upload Computer Extension Attribute.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-action": true,
+        "x-required-privileges": [
+          "Create Computer Extension Attributes",
+          "Read Computer Extension Attributes"
+        ]
+      }
+    },
+    "/v1/computer-extension-attributes/{id}": {
+      "delete": {
+        "description": "ID of the Computer Extension Attribute to be deleted.",
+        "parameters": [
+          {
+            "description": "Unique ID of Computer Extension Attribute.",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Computer Extension Attribute deleted successfully."
+          },
+          "400": {
+            "description": "Bad Request. The server could not understand the request because of invalid syntax. Possible reason can be 'The specified extension attribute id does not include a valid number.'"
+          },
+          "404": {
+            "description": "Specified Computer Extension Attribute object could not be found. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client."
+          }
+        },
+        "summary": "Remove specified Computer Extension Attribute.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Delete Computer Extension Attributes"
+        ]
+      },
+      "get": {
+        "description": "Gets specified Computer Extension Attribute object.",
+        "parameters": [
+          {
+            "description": "Unique ID of Computer Extension Attribute.",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerExtensionAttributes"
+                }
+              }
+            },
+            "description": "Computer Extension Attribute object has been fetched successfully."
+          },
+          "400": {
+            "description": "Bad Request. The server could not understand the request because of invalid syntax. Possible reason can be 'The specified extension attribute id does not include a valid number.'"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Computer Extension Attribute object could not be found. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client."
+          }
+        },
+        "summary": "Get specified Computer Extension Attribute object.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Read Computer Extension Attributes"
+        ]
+      },
+      "put": {
+        "description": "Update specified Computer Extension Attribute object.",
+        "parameters": [
+          {
+            "description": "Unique ID of Computer Extension Attribute.",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerExtensionAttributes"
+              }
+            }
+          },
+          "description": "Computer Extension Attribute object to be updated. IDs defined in this body will be ignored.",
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerExtensionAttributes"
+                }
+              }
+            },
+            "description": "Computer Extension Attribute updated successfully."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request. Specified Computer Extension Attribute could not be updated due to bad request. Possible reasons are:\u003c/br\u003e 1) The specified extension attribute id does not include a valid number.\u003c/br\u003e 2) Duplicate_Field.\u003c/br\u003e 3) Required fields are not provided in request body.\u003c/br\u003e 4) Fields which are not associated with provided inputType has some value.\u003c/br\u003e 5) Any values outside of the allowed range are included in the request body.\u003c/br\u003e 6) LDAP is not configured.\u003c/br\u003e 7) Error occured during database update operation."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Computer Extension Attribute object does not exist. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client."
+          }
+        },
+        "summary": "Update specified Computer Extension Attribute object.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Update Computer Extension Attributes"
+        ]
+      }
+    },
+    "/v1/computer-extension-attributes/{id}/data-dependency": {
+      "get": {
+        "description": "Get smart group/advance search dependent objects for a specified computer extension attribute",
+        "parameters": [
+          {
+            "description": "Unique ID of computer extension attribute.",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DependencyObjectResults"
+                }
+              }
+            },
+            "description": "Fetches list of dependent objects for a specified computer extension attribute."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request. The server could not understand the request because of invalid syntax."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer extension attribute id were not found in database."
+          }
+        },
+        "summary": "Get smart group/advance search dependent objects for a specified computer extension attribute",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Read Computer Extension Attributes"
+        ]
+      }
+    },
+    "/v1/computer-extension-attributes/{id}/download": {
+      "get": {
+        "description": "Retrieves the specified Computer Extension Attribute in XML format based on the provided unique ID.",
+        "parameters": [
+          {
+            "description": "The unique ID of the Computer Extension Attribute to be downloaded.",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "example": "\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\u003cextensionAttribute\u003e\u003cdisplayName\u003eTesting\u003c/displayName\u003e\u003c/extensionAttribute\u003e",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The requested Computer Extension Attribute XML file was fetched successfully."
+          },
+          "400": {
+            "description": "Bad Request. The server could not understand the request because of invalid syntax. Possible reason can be 'The specified extension attribute id does not include a valid number.'"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Computer Extension Attribute object could not be found. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client."
+          }
+        },
+        "summary": "Download the specified Computer Extension Attribute.",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Read Computer Extension Attributes"
+        ]
+      }
+    },
+    "/v1/computer-extension-attributes/{id}/history": {
+      "get": {
+        "description": "Get specified Computer Extension Attribute history object",
+        "parameters": [
+          {
+            "description": "Instance ID of Computer Extension Attribute history",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorts results by one or more criteria, following the format property:asc/desc. Default sort is ID:asc. If using multiple criteria, separate with commas.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be combined with paging and sorting. Default filter is an empty query and returns all results from the requested page.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Computer Extension Attribute history were found."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request. Specified Computer Extension Attribute history object could not be found. Possible reason can be 'Provided id field is not string of positive numeric value or -1'."
+          }
+        },
+        "summary": "Get specified Computer Extension Attribute History object",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Read Computer Extension Attributes"
+        ]
+      },
+      "post": {
+        "description": "Add specified Computer Extension Attribute history object notes",
+        "parameters": [
+          {
+            "description": "Instance ID of Computer Extension Attribute history",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History note to be created",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Computer Extension Attribute history note created successfully."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request. Error creating history note. Possible reason can be 'Provided id field is not string of positive numeric value or -1'."
+          }
+        },
+        "summary": "Add specified Computer Extension Attribute history object notes",
+        "tags": [
+          "computer-extension-attributes"
+        ],
+        "x-required-privileges": [
+          "Update Computer Extension Attributes"
+        ]
+      }
+    },
+    "/v1/computer-groups": {
+      "get": {
+        "description": "Use it to get the list of all computer groups.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ComputerGroup"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "summary": "Returns the list of all computer groups\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Read Smart Computer Groups",
+          "Read Static Computer Groups"
         ]
       }
     },
@@ -4233,6 +5463,571 @@
         "x-rate-limit": true,
         "x-required-privileges": [
           "Change Password"
+        ]
+      }
+    },
+    "/v2/computer-groups/smart-group-membership/{id}": {
+      "get": {
+        "description": "Gets the membership of a Smart Computer Group\n",
+        "parameters": [
+          {
+            "description": "id of the Smart Computer Group",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartGroupMembership"
+                }
+              }
+            },
+            "description": "Successful response - Smart Computer Group membership retrieved"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Smart Computer Group with the specified id does not exist"
+          }
+        },
+        "summary": "Get the membership of a Smart Computer Group\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Read Smart Computer Groups"
+        ]
+      }
+    },
+    "/v2/computer-groups/smart-groups": {
+      "get": {
+        "description": "Search for Smart Computer Groups\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=name:asc",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter smart computer group collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: id, name, siteId. The siteId field can only be filtered by admins with full access. Any sited admin will have siteId filtered automatically. Example: name==\"*group*\"",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartGroupSearchResult"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Search for Smart Computer Groups\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Read Smart Computer Groups"
+        ]
+      },
+      "post": {
+        "description": "Creates a Smart Computer Group\n",
+        "parameters": [
+          {
+            "description": "Optional. Return platform identifiers instead of internal identifiers when set to true.",
+            "explode": true,
+            "in": "query",
+            "name": "platform",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmartComputerGroupV2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successful response - Smart Computer Group created"
+          }
+        },
+        "summary": "Create a Smart Computer Group\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Create Smart Computer Groups"
+        ]
+      }
+    },
+    "/v2/computer-groups/smart-groups/{id}": {
+      "delete": {
+        "description": "Remove specified Smart Computer Group\n",
+        "parameters": [
+          {
+            "description": "id of target Smart Computer Group",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful response - Smart Computer Group removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Target Smart Computer Group does not exist."
+          }
+        },
+        "summary": "Remove specified Smart Computer Group\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Delete Smart Computer Groups"
+        ]
+      },
+      "get": {
+        "description": "Get Smart Computer Group by Id\n",
+        "parameters": [
+          {
+            "description": "instance id of smart computer group",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartComputerGroupV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Smart Computer Group with the specified id does not exist"
+          }
+        },
+        "summary": "Get Smart Computer Group by Id\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Read Smart Computer Groups"
+        ]
+      },
+      "put": {
+        "description": "Updates a Smart Computer Group\n",
+        "parameters": [
+          {
+            "description": "id of target Smart Computer Group",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmartComputerGroupV2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartComputerGroupV2"
+                }
+              }
+            },
+            "description": "Successful response - Smart Computer Group updated"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Target Smart Computer Group does not exist"
+          }
+        },
+        "summary": "Update a Smart Computer Group\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Update Smart Computer Groups"
+        ]
+      }
+    },
+    "/v2/computer-groups/static-groups": {
+      "get": {
+        "description": "Search for Static Computer Groups\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=name:asc",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter static computer group collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: id, name, siteId. The siteId field can only be filtered by admins with full access. Any sited admin will have siteId filtered automatically. Example: name==\"*group*\"",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaticComputerGroupSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Search for Static Computer Groups\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Read Static Computer Groups"
+        ]
+      },
+      "post": {
+        "description": "Create membership of a static computer group.\n",
+        "parameters": [
+          {
+            "description": "Optional. Return platform identifiers instead of internal identifiers when set to true.",
+            "explode": true,
+            "in": "query",
+            "name": "platform",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaticComputerGroupAssignment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Static computer group created successfully"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Could not save static computer group."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Duplicated name in static computer group."
+          }
+        },
+        "summary": "Create membership of a static computer group.\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Create Static Computer Groups"
+        ]
+      }
+    },
+    "/v2/computer-groups/static-groups/{id}": {
+      "delete": {
+        "description": "Remove Static Computer Group by Id\n",
+        "parameters": [
+          {
+            "description": "instance id of static computer group",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Static Computer Group successfully removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Unable to delete static computer group with given id."
+          }
+        },
+        "summary": "Remove Static Computer Group by Id\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Delete Static Computer Groups"
+        ]
+      },
+      "get": {
+        "description": "Get Static Computer Group by Id\n",
+        "parameters": [
+          {
+            "description": "instance id of static computer group",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaticComputerGroup"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Static Computer Group with the specified id does not exist"
+          }
+        },
+        "summary": "Get Static Computer Group by Id\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Read Static Computer Groups"
+        ]
+      },
+      "put": {
+        "description": "Update membership of a static computer group.\n",
+        "parameters": [
+          {
+            "description": "instance id of a static computer group",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaticComputerGroupAssignment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaticComputerGroupAssignment"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "No static computer group found with the given id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Duplicated name in static computer group."
+          }
+        },
+        "summary": "Update membership of a static computer group.\n",
+        "tags": [
+          "computer-groups"
+        ],
+        "x-required-privileges": [
+          "Update Static Computer Groups"
         ]
       }
     },

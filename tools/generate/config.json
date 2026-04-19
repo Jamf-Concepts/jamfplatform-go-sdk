@@ -166,7 +166,34 @@
         {"op": "DELETE /v1/scripts/{id}", "name": "DeleteScriptV1"},
         {"op": "GET /v1/scripts/{id}/download", "name": "DownloadScriptV1"},
         {"op": "GET /v1/scripts/{id}/history", "name": "ListScriptHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
-        {"op": "POST /v1/scripts/{id}/history", "name": "CreateScriptHistoryNoteV1", "expectedStatus": 200}
+        {"op": "POST /v1/scripts/{id}/history", "name": "CreateScriptHistoryNoteV1", "expectedStatus": 200},
+
+        {"op": "GET /v1/computer-groups", "name": "ListComputerGroupsV1"},
+        {"op": "GET /v2/computer-groups/smart-groups", "name": "ListSmartComputerGroupsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v2/computer-groups/smart-groups", "name": "CreateSmartComputerGroupV2", "params": ["platform:bool"]},
+        {"op": "GET /v2/computer-groups/smart-groups/{id}", "name": "GetSmartComputerGroupV2"},
+        {"op": "PUT /v2/computer-groups/smart-groups/{id}", "name": "UpdateSmartComputerGroupV2", "expectedStatus": 202},
+        {"op": "DELETE /v2/computer-groups/smart-groups/{id}", "name": "DeleteSmartComputerGroupV2", "expectedStatus": 204},
+        {"op": "GET /v2/computer-groups/smart-group-membership/{id}", "name": "GetSmartComputerGroupMembershipV2"},
+        {"op": "GET /v2/computer-groups/static-groups", "name": "ListStaticComputerGroupsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v2/computer-groups/static-groups", "name": "CreateStaticComputerGroupV2", "params": ["platform:bool"]},
+        {"op": "GET /v2/computer-groups/static-groups/{id}", "name": "GetStaticComputerGroupV2"},
+        {"op": "PUT /v2/computer-groups/static-groups/{id}", "name": "UpdateStaticComputerGroupV2", "expectedStatus": 202},
+        {"op": "DELETE /v2/computer-groups/static-groups/{id}", "name": "DeleteStaticComputerGroupV2", "expectedStatus": 204},
+
+        {"op": "GET /v1/computer-extension-attributes", "name": "ListComputerExtensionAttributesV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/computer-extension-attributes", "name": "CreateComputerExtensionAttributeV1"},
+        {"op": "POST /v1/computer-extension-attributes/delete-multiple", "name": "DeleteMultipleComputerExtensionAttributesV1"},
+        {"op": "GET /v1/computer-extension-attributes/templates", "name": "ListComputerExtensionAttributeTemplatesV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/computer-extension-attributes/templates/{id}", "name": "GetComputerExtensionAttributeTemplateV1"},
+        {"op": "POST /v1/computer-extension-attributes/upload", "name": "UploadComputerExtensionAttributeV1"},
+        {"op": "GET /v1/computer-extension-attributes/{id}", "name": "GetComputerExtensionAttributeV1"},
+        {"op": "PUT /v1/computer-extension-attributes/{id}", "name": "UpdateComputerExtensionAttributeV1", "expectedStatus": 202},
+        {"op": "DELETE /v1/computer-extension-attributes/{id}", "name": "DeleteComputerExtensionAttributeV1"},
+        {"op": "GET /v1/computer-extension-attributes/{id}/data-dependency", "name": "GetComputerExtensionAttributeDataDependencyV1"},
+        {"op": "GET /v1/computer-extension-attributes/{id}/download", "name": "DownloadComputerExtensionAttributeV1"},
+        {"op": "GET /v1/computer-extension-attributes/{id}/history", "name": "ListComputerExtensionAttributeHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "POST /v1/computer-extension-attributes/{id}/history", "name": "CreateComputerExtensionAttributeHistoryNoteV1"}
       ]
     },
     {

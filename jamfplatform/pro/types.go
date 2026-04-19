@@ -55,12 +55,55 @@ type Category struct {
 	Priority int     `json:"priority"`
 }
 
+// CeaTemplatesResults represents a cea templates results.
+type CeaTemplatesResults struct {
+	Results    []ComputerExtensionAttributeTemplates `json:"results"`
+	TotalCount int                                   `json:"totalCount"`
+}
+
 // ChangePassword represents a change password.
 type ChangePassword struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	CurrentPassword string `json:"currentPassword"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	NewPassword string `json:"newPassword"`
+}
+
+// ComputerExtensionAttributeSearchResults represents a computer extension attribute search results.
+type ComputerExtensionAttributeSearchResults struct {
+	Results    []ComputerExtensionAttributes `json:"results"`
+	TotalCount int                           `json:"totalCount"`
+}
+
+// ComputerExtensionAttributeTemplates represents a computer extension attribute templates.
+type ComputerExtensionAttributeTemplates struct {
+	TemplateCategoryName string `json:"templateCategoryName"`
+	TemplateID           string `json:"templateId"`
+	TemplateName         string `json:"templateName"`
+}
+
+// ComputerExtensionAttributes represents a computer extension attributes.
+type ComputerExtensionAttributes struct {
+	DataType                      string   `json:"dataType"`
+	Description                   string   `json:"description"`
+	Enabled                       bool     `json:"enabled"`
+	ID                            string   `json:"id"`
+	InputType                     string   `json:"inputType"`
+	InventoryDisplayType          string   `json:"inventoryDisplayType"`
+	LdapAttributeMapping          string   `json:"ldapAttributeMapping"`
+	LdapExtensionAttributeAllowed bool     `json:"ldapExtensionAttributeAllowed"`
+	ManageExistingData            string   `json:"manageExistingData"`
+	Name                          string   `json:"name"`
+	PopupMenuChoices              []string `json:"popupMenuChoices"`
+	ScriptContents                *string  `json:"scriptContents,omitempty"`
+}
+
+// ComputerGroup represents a computer group.
+type ComputerGroup struct {
+	Description string `json:"description"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	SmartGroup  bool   `json:"smartGroup"`
 }
 
 // Department represents a department.
@@ -73,6 +116,21 @@ type Department struct {
 type DepartmentsSearchResults struct {
 	Results    []Department `json:"results"`
 	TotalCount int          `json:"totalCount"`
+}
+
+// DependencyObjectResults represents a dependency object results.
+type DependencyObjectResults struct {
+	Results    []DependencyObjectResultsResultsItem `json:"results"`
+	TotalCount int                                  `json:"totalCount"`
+}
+
+// DependencyObjectResultsResultsItem represents a dependency object results results item.
+type DependencyObjectResultsResultsItem struct {
+	Hyperlink        string `json:"hyperlink"`
+	ID               int    `json:"id"`
+	IdentifiableName string `json:"identifiableName"`
+	NameLocalization string `json:"nameLocalization"`
+	ObjectID         int    `json:"objectId"`
 }
 
 // EnrollmentMethodPrestage represents a enrollment method prestage.
@@ -94,6 +152,14 @@ type ExportParameters struct {
 	Page     *int           `json:"page,omitempty"`
 	PageSize *int           `json:"pageSize,omitempty"`
 	Sort     *[]string      `json:"sort,omitempty"`
+}
+
+// ExtensionAttributes represents a extension attributes.
+type ExtensionAttributes struct {
+	DataType    string  `json:"dataType"`
+	Description *string `json:"description,omitempty"`
+	ID          *string `json:"id,omitempty"`
+	Name        string  `json:"name"`
 }
 
 // HistorySearchResults represents a history search results.
@@ -683,6 +749,45 @@ type SiteObject struct {
 	SiteID     string `json:"siteId"`
 }
 
+// SmartComputerGroupSearch represents a smart computer group search.
+type SmartComputerGroupSearch struct {
+	Description     string `json:"description"`
+	ID              string `json:"id"`
+	MembershipCount int    `json:"membershipCount"`
+	Name            string `json:"name"`
+	SiteID          string `json:"siteId"`
+}
+
+// SmartComputerGroupV2 represents a smart computer group v2.
+type SmartComputerGroupV2 struct {
+	Criteria    *[]SmartSearchCriterion `json:"criteria,omitempty"`
+	Description *string                 `json:"description,omitempty"`
+	Name        string                  `json:"name"`
+	SiteID      *string                 `json:"siteId,omitempty"`
+}
+
+// SmartGroupMembership the ids of the computers that are members of the smart group.
+type SmartGroupMembership struct {
+	Members []int `json:"members"`
+}
+
+// SmartGroupSearchResult represents a smart group search result.
+type SmartGroupSearchResult struct {
+	Results    []SmartComputerGroupSearch `json:"results"`
+	TotalCount int                        `json:"totalCount"`
+}
+
+// SmartSearchCriterion represents a smart search criterion.
+type SmartSearchCriterion struct {
+	AndOr        string `json:"andOr"`
+	ClosingParen *bool  `json:"closingParen,omitempty"`
+	Name         string `json:"name"`
+	OpeningParen *bool  `json:"openingParen,omitempty"`
+	Priority     *int   `json:"priority,omitempty"`
+	SearchType   string `json:"searchType"`
+	Value        string `json:"value"`
+}
+
 // StartupStatus represents a startup status.
 type StartupStatus struct {
 	Error                   *string `json:"error,omitempty"`
@@ -695,6 +800,38 @@ type StartupStatus struct {
 	Warning                 *string `json:"warning,omitempty"`
 	WarningCode             *string `json:"warningCode,omitempty"`
 	WarningParam            *string `json:"warningParam,omitempty"`
+}
+
+// StaticComputerGroup represents a static computer group.
+type StaticComputerGroup struct {
+	Description *string `json:"description,omitempty"`
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	SiteID      *string `json:"siteId,omitempty"`
+}
+
+// StaticComputerGroupAssignment represents a static computer group assignment.
+type StaticComputerGroupAssignment struct {
+	Assignments *[]string `json:"assignments,omitempty"`
+	Description *string   `json:"description,omitempty"`
+	ID          *string   `json:"id,omitempty"`
+	Name        string    `json:"name"`
+	SiteID      *string   `json:"siteId,omitempty"`
+}
+
+// StaticComputerGroupSearchResults represents a static computer group search results.
+type StaticComputerGroupSearchResults struct {
+	Results    []StaticComputerGroupSummary `json:"results"`
+	TotalCount int                          `json:"totalCount"`
+}
+
+// StaticComputerGroupSummary represents a static computer group summary.
+type StaticComputerGroupSummary struct {
+	Count       int     `json:"count"`
+	Description *string `json:"description,omitempty"`
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	SiteID      *string `json:"siteId,omitempty"`
 }
 
 // V1Site represents a v1 site.
