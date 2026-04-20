@@ -7,6 +7,7 @@ package compliancebenchmarks
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -20,4 +21,30 @@ func (c *Client) ListBaselines(ctx context.Context) (*BaselinesResponse, error) 
 		return nil, fmt.Errorf("ListBaselines: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveBaselineIDByName looks up a Baseline by its title field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveBaselineIDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	listPath := prefix + "/baselines"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "baselines", "title", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveBaselineIDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveBaselineByName looks up a Baseline by its title field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveBaselineByName(ctx context.Context, name string) (*BaselineInfo, error) {
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	listPath := prefix + "/baselines"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "baselines", "title", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveBaselineByName(%s): %w", name, err)
+	}
+	var out BaselineInfo
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveBaselineByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

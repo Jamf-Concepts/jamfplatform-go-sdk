@@ -38,7 +38,7 @@ func TestResolveByNameFiltered_Match(t *testing.T) {
 		})
 	})
 
-	id, raw, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "name", "id", "alpha")
+	id, raw, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "id", "alpha")
 	if err != nil {
 		t.Fatalf("ResolveByNameFiltered: %v", err)
 	}
@@ -63,7 +63,7 @@ func TestResolveByNameFiltered_NotFound(t *testing.T) {
 		})
 	})
 
-	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "name", "id", "missing")
+	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "id", "missing")
 	if err == nil {
 		t.Fatalf("expected error for missing resource")
 	}
@@ -88,7 +88,7 @@ func TestResolveByNameFiltered_Ambiguous(t *testing.T) {
 		})
 	})
 
-	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "name", "id", "dup")
+	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "id", "dup")
 	if err == nil {
 		t.Fatalf("expected error for duplicate match")
 	}
@@ -111,7 +111,7 @@ func TestResolveByNameFiltered_ServerError(t *testing.T) {
 		_, _ = w.Write([]byte(`{"errors":[{"code":"OOPS","description":"server broke"}]}`))
 	})
 
-	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "name", "id", "alpha")
+	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "id", "alpha")
 	if err == nil {
 		t.Fatalf("expected error for 500")
 	}
@@ -123,7 +123,7 @@ func TestResolveByNameFiltered_ServerError(t *testing.T) {
 
 func TestResolveByNameFiltered_EmptyName(t *testing.T) {
 	c, _, _ := newTestClient(t)
-	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "name", "id", "")
+	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "id", "")
 	if err == nil {
 		t.Fatalf("expected error for empty name")
 	}
@@ -144,7 +144,7 @@ func TestResolveByNameFiltered_NameWithQuotes(t *testing.T) {
 		})
 	})
 
-	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "name", "id", `has"quote`)
+	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "id", `has"quote`)
 	if err != nil {
 		t.Fatalf("ResolveByNameFiltered: %v", err)
 	}
@@ -175,7 +175,7 @@ func TestResolveByNameClient_WithSearchParam(t *testing.T) {
 		})
 	})
 
-	id, _, err := c.ResolveByNameClient(context.Background(), "/api/blueprints/v1/blueprints", "search", "name", "id", "alpha")
+	id, _, err := c.ResolveByNameClient(context.Background(), "/api/blueprints/v1/blueprints", "search", "", "name", "id", "alpha")
 	if err != nil {
 		t.Fatalf("ResolveByNameClient: %v", err)
 	}
@@ -199,7 +199,7 @@ func TestResolveByNameClient_NoSearchParam(t *testing.T) {
 		})
 	})
 
-	id, _, err := c.ResolveByNameClient(context.Background(), "/api/v2/benchmarks", "", "title", "id", "CIS-2")
+	id, _, err := c.ResolveByNameClient(context.Background(), "/api/v2/benchmarks", "", "", "title", "id", "CIS-2")
 	if err != nil {
 		t.Fatalf("ResolveByNameClient: %v", err)
 	}
@@ -216,7 +216,7 @@ func TestResolveByNameClient_RawArrayResponse(t *testing.T) {
 		})
 	})
 
-	id, _, err := c.ResolveByNameClient(context.Background(), "/api/things", "", "name", "id", "thing")
+	id, _, err := c.ResolveByNameClient(context.Background(), "/api/things", "", "", "name", "id", "thing")
 	if err != nil {
 		t.Fatalf("ResolveByNameClient: %v", err)
 	}
@@ -231,7 +231,7 @@ func TestResolveByNameClient_NotFound(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(map[string]any{"results": []map[string]any{}})
 	})
 
-	_, _, err := c.ResolveByNameClient(context.Background(), "/api/blueprints/v1/blueprints", "search", "name", "id", "nope")
+	_, _, err := c.ResolveByNameClient(context.Background(), "/api/blueprints/v1/blueprints", "search", "", "name", "id", "nope")
 	apiErr := AsAPIError(err)
 	if apiErr == nil || !apiErr.HasStatus(http.StatusNotFound) {
 		t.Fatalf("expected APIResponseError(404), got %v", err)
@@ -249,7 +249,7 @@ func TestResolveByNameClient_Ambiguous(t *testing.T) {
 		})
 	})
 
-	_, _, err := c.ResolveByNameClient(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "id", "same")
+	_, _, err := c.ResolveByNameClient(context.Background(), "/api/blueprints/v1/blueprints", "", "", "name", "id", "same")
 	var amErr *AmbiguousMatchError
 	if !errors.As(err, &amErr) {
 		t.Fatalf("expected *AmbiguousMatchError, got %v", err)
@@ -261,7 +261,7 @@ func TestResolveByNameClient_Ambiguous(t *testing.T) {
 
 func TestResolveByNameClient_EmptyName(t *testing.T) {
 	c, _, _ := newTestClient(t)
-	_, _, err := c.ResolveByNameClient(context.Background(), "/api/x", "search", "name", "id", "")
+	_, _, err := c.ResolveByNameClient(context.Background(), "/api/x", "search", "", "name", "id", "")
 	if err == nil {
 		t.Fatalf("expected error for empty name")
 	}
@@ -282,7 +282,7 @@ func TestResolveByNameClient_PreservesExistingQuery(t *testing.T) {
 		})
 	})
 
-	_, _, err := c.ResolveByNameClient(context.Background(), "/api/x?sort=name", "search", "name", "id", "alpha")
+	_, _, err := c.ResolveByNameClient(context.Background(), "/api/x?sort=name", "search", "", "name", "id", "alpha")
 	if err != nil {
 		t.Fatalf("ResolveByNameClient: %v", err)
 	}
@@ -335,9 +335,19 @@ func TestExtractField(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestExtractListElements(t *testing.T) {
-	t.Run("paginated envelope", func(t *testing.T) {
+	t.Run("paginated envelope with default results field", func(t *testing.T) {
 		body := []byte(`{"totalCount": 2, "results": [{"id":"a"},{"id":"b"}]}`)
-		elems, err := extractListElements(body)
+		elems, err := extractListElements(body, "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(elems) != 2 {
+			t.Fatalf("got %d elements, want 2", len(elems))
+		}
+	})
+	t.Run("custom results field", func(t *testing.T) {
+		body := []byte(`{"benchmarks": [{"id":"a"},{"id":"b"}]}`)
+		elems, err := extractListElements(body, "benchmarks")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -347,7 +357,7 @@ func TestExtractListElements(t *testing.T) {
 	})
 	t.Run("raw array", func(t *testing.T) {
 		body := []byte(`[{"id":"a"},{"id":"b"},{"id":"c"}]`)
-		elems, err := extractListElements(body)
+		elems, err := extractListElements(body, "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -357,7 +367,7 @@ func TestExtractListElements(t *testing.T) {
 	})
 	t.Run("single object falls through to one-element slice", func(t *testing.T) {
 		body := []byte(`{"id":"solo","name":"x"}`)
-		elems, err := extractListElements(body)
+		elems, err := extractListElements(body, "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -366,7 +376,7 @@ func TestExtractListElements(t *testing.T) {
 		}
 	})
 	t.Run("empty body", func(t *testing.T) {
-		elems, err := extractListElements([]byte(""))
+		elems, err := extractListElements([]byte(""), "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -406,7 +416,7 @@ func TestResolveByNameFiltered_QueryEscaping(t *testing.T) {
 		fmt.Fprintln(w, `{"results":[{"id":"1","name":"has space"}]}`)
 	})
 
-	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "name", "id", "has space")
+	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "id", "has space")
 	if err != nil {
 		t.Fatalf("ResolveByNameFiltered: %v", err)
 	}

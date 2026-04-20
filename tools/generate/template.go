@@ -581,9 +581,9 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	listPath := prefix + "{{ .ResourcePath }}"
 {{- if eq .Resolver.Mode "filtered" }}
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- else }}
-	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- end }}
 	if err != nil {
 		return "", fmt.Errorf("{{ .Name }}(%s): %w", name, err)
@@ -598,9 +598,9 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.Ty
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	listPath := prefix + "{{ .ResourcePath }}"
 {{- if eq .Resolver.Mode "filtered" }}
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- else }}
-	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- end }}
 	if err != nil {
 		return nil, fmt.Errorf("{{ .Name }}(%s): %w", name, err)
@@ -917,10 +917,16 @@ func Test<% .Name %>(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
+<%- if .Resolver.ResultsField %>
+			"<% .Resolver.ResultsField %>": []map[string]any{
+				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
+			},
+<%- else %>
 			"results": []map[string]any{
 				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
 			},
 			"totalCount": 1,
+<%- end %>
 		})
 	})
 
@@ -942,10 +948,16 @@ func Test<% .Name %>(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
+<%- if .Resolver.ResultsField %>
+			"<% .Resolver.ResultsField %>": []map[string]any{
+				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
+			},
+<%- else %>
 			"results": []map[string]any{
 				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
 			},
 			"totalCount": 1,
+<%- end %>
 		})
 	})
 

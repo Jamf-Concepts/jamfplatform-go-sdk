@@ -7,6 +7,7 @@ package compliancebenchmarks
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -43,4 +44,30 @@ func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkRespons
 		return nil, fmt.Errorf("GetBenchmark(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveBenchmarkIDByName looks up a Benchmark by its title field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveBenchmarkIDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	listPath := prefix + "/benchmarks"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "benchmarks", "title", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveBenchmarkIDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveBenchmarkByName looks up a Benchmark by its title field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveBenchmarkByName(ctx context.Context, name string) (*BenchmarkV2, error) {
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	listPath := prefix + "/benchmarks"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "benchmarks", "title", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveBenchmarkByName(%s): %w", name, err)
+	}
+	var out BenchmarkV2
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveBenchmarkByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

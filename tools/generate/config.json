@@ -45,7 +45,8 @@
       "splitByTag": true,
       "specFile": "device_group_inventory_api.json",
       "operations": [
-        {"op": "GET /v1/device-groups", "name": "ListDeviceGroups", "pagination": "hasNext", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/device-groups", "name": "ListDeviceGroups", "pagination": "hasNext", "params": ["sort:[]string", "filter"],
+         "resolver": {"resourceType": "DeviceGroup", "nameField": "name", "idField": "id", "mode": "filtered", "typedReturn": "DeviceGroupListReadRepresentationV1"}},
         {"op": "POST /v1/device-groups", "name": "CreateDeviceGroup"},
         {"op": "GET /v1/device-groups/{id}", "name": "GetDeviceGroup"},
         {"op": "PATCH /v1/device-groups/{id}", "name": "UpdateDeviceGroup"},
@@ -87,11 +88,13 @@
       "splitByTag": true,
       "specFile": "compliance_benchmark_engine.json",
       "operations": [
-        {"op": "GET /v2/benchmarks", "name": "ListBenchmarks", "version": "v1"},
+        {"op": "GET /v2/benchmarks", "name": "ListBenchmarks", "version": "v1",
+         "resolver": {"resourceType": "Benchmark", "nameField": "title", "idField": "id", "mode": "clientFilter", "resultsField": "benchmarks", "typedReturn": "BenchmarkV2"}},
         {"op": "POST /v2/benchmarks", "name": "CreateBenchmark", "version": "v1"},
         {"op": "GET /v2/benchmarks/{id}", "name": "GetBenchmark", "version": "v1"},
         {"op": "DELETE /v1/benchmarks/{benchmarkId}", "name": "DeleteBenchmark"},
-        {"op": "GET /v1/baselines", "name": "ListBaselines"},
+        {"op": "GET /v1/baselines", "name": "ListBaselines",
+         "resolver": {"resourceType": "Baseline", "nameField": "title", "idField": "id", "mode": "clientFilter", "resultsField": "baselines", "typedReturn": "BaselineInfo"}},
         {"op": "GET /v1/rules", "name": "GetBaselineRules", "params": ["baselineId:string:baselineID"]}
       ]
     },

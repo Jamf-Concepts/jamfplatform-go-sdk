@@ -80,6 +80,7 @@ type GoResolver struct {
 	NameField    string
 	IDField      string
 	SearchParam  string // clientFilter only
+	ResultsField string // envelope key for the element array; empty → transport defaults to "results"
 	TypedReturn  string // Go type of the typed wrapper's return
 }
 

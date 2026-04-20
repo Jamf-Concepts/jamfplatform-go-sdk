@@ -79,6 +79,7 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 			NameField:    r.NameField,
 			IDField:      r.IDField,
 			SearchParam:  r.SearchParam,
+			ResultsField: r.ResultsField,
 			TypedReturn:  typedReturn,
 		}
 		// Base synthetic method — shared fields. The path comes from the

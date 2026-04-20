@@ -33,11 +33,15 @@ func (e *AmbiguousMatchError) Error() string {
 // element and the raw JSON bytes of that element so typed wrappers can
 // decode into concrete types without a second round-trip.
 //
+// resultsField names the envelope key holding the array of elements
+// ("results" for standard paginated responses, "benchmarks" for
+// compliance benchmarks, etc.). Empty defaults to "results".
+//
 // Not-found surfaces as *APIResponseError with StatusCode 404 — matches the
 // shape Classic's native /name/{name} endpoints produce naturally, so
 // consumers can check apiErr.HasStatus(404) uniformly across all three
 // resolver modes. Multiple matches surface as *AmbiguousMatchError.
-func (t *Transport) ResolveByNameFiltered(ctx context.Context, listPath, nameField, idField, name string) (string, json.RawMessage, error) {
+func (t *Transport) ResolveByNameFiltered(ctx context.Context, listPath, resultsField, nameField, idField, name string) (string, json.RawMessage, error) {
 	if name == "" {
 		return "", nil, fmt.Errorf("name must not be empty")
 	}
@@ -47,7 +51,7 @@ func (t *Transport) ResolveByNameFiltered(ctx context.Context, listPath, nameFie
 	if err != nil {
 		return "", nil, err
 	}
-	return resolveMatch(raw, nameField, idField, name, fullPath)
+	return resolveMatch(raw, resultsField, nameField, idField, name, fullPath)
 }
 
 // ResolveByNameClient looks up a resource by name via client-side exact
@@ -58,9 +62,13 @@ func (t *Transport) ResolveByNameFiltered(ctx context.Context, listPath, nameFie
 // server-side result set; matching is always re-applied client-side against
 // nameField so full-text hits that are not exact equals are dropped.
 //
+// resultsField names the envelope key holding the array of elements;
+// empty defaults to "results". See ResolveByNameFiltered for the full
+// envelope-handling contract.
+//
 // Error semantics match ResolveByNameFiltered: not-found surfaces as
 // *APIResponseError(404); ambiguity as *AmbiguousMatchError.
-func (t *Transport) ResolveByNameClient(ctx context.Context, listPath, searchParam, nameField, idField, name string) (string, json.RawMessage, error) {
+func (t *Transport) ResolveByNameClient(ctx context.Context, listPath, searchParam, resultsField, nameField, idField, name string) (string, json.RawMessage, error) {
 	if name == "" {
 		return "", nil, fmt.Errorf("name must not be empty")
 	}
@@ -72,7 +80,7 @@ func (t *Transport) ResolveByNameClient(ctx context.Context, listPath, searchPar
 	if err != nil {
 		return "", nil, err
 	}
-	return resolveMatch(raw, nameField, idField, name, fullPath)
+	return resolveMatch(raw, resultsField, nameField, idField, name, fullPath)
 }
 
 // getRaw fetches the response body bytes as-is by handing the transport a
@@ -96,8 +104,8 @@ func joinQuery(path, frag string) string {
 // resolveMatch walks a list response body and picks the single element whose
 // nameField equals name. Returns the idField value and the matched element's
 // raw bytes, or a typed error for the not-found / ambiguous cases.
-func resolveMatch(body []byte, nameField, idField, name, requestURL string) (string, json.RawMessage, error) {
-	elems, err := extractListElements(body)
+func resolveMatch(body []byte, resultsField, nameField, idField, name, requestURL string) (string, json.RawMessage, error) {
+	elems, err := extractListElements(body, resultsField)
 	if err != nil {
 		return "", nil, fmt.Errorf("parsing list response: %w", err)
 	}
@@ -155,20 +163,28 @@ func collectIDs(elems []json.RawMessage, idField string) []string {
 
 // extractListElements returns the element array of a list response. Accepts
 // three shapes:
-//   - paginated envelope: {"results": [...], "totalCount": N, ...}
+//   - paginated envelope keyed by resultsField: {"<resultsField>": [...], ...}
 //   - raw top-level array: [...]
 //   - single object: {...}  (returned as a one-element slice so matching applies uniformly)
-func extractListElements(body []byte) ([]json.RawMessage, error) {
+//
+// resultsField defaults to "results" when empty.
+func extractListElements(body []byte, resultsField string) ([]json.RawMessage, error) {
+	if resultsField == "" {
+		resultsField = "results"
+	}
 	trimmed := bytes.TrimSpace(body)
 	if len(trimmed) == 0 {
 		return nil, nil
 	}
 	if trimmed[0] == '{' {
-		var env struct {
-			Results []json.RawMessage `json:"results"`
-		}
-		if err := json.Unmarshal(trimmed, &env); err == nil && env.Results != nil {
-			return env.Results, nil
+		var env map[string]json.RawMessage
+		if err := json.Unmarshal(trimmed, &env); err == nil {
+			if rawArr, ok := env[resultsField]; ok {
+				var arr []json.RawMessage
+				if err := json.Unmarshal(rawArr, &arr); err == nil {
+					return arr, nil
+				}
+			}
 		}
 		return []json.RawMessage{append(json.RawMessage(nil), trimmed...)}, nil
 	}

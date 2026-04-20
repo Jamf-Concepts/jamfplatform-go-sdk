@@ -68,12 +68,13 @@ type OperationDef struct {
 // Resolve<ResourceType>IDByName (returns string ID) and
 // Resolve<ResourceType>ByName (returns the typed resource).
 type ResolverConfig struct {
-	ResourceType string `json:"resourceType"` // Go type name used in emitted method names (e.g. "Blueprint")
-	NameField    string `json:"nameField"`    // dot-notation JSON path for the name field on each list element (e.g. "name", "general.name", "title")
-	IDField      string `json:"idField"`      // dot-notation JSON path for the ID field (e.g. "id")
-	Mode         string `json:"mode"`         // "filtered" (server-side RSQL) or "clientFilter" (walk list in memory). "direct" reserved for proclassic by-name endpoints and handled in a later phase.
-	SearchParam  string `json:"searchParam,omitempty"` // clientFilter mode only: server-side search query key to narrow results (e.g. "search"). Empty → fetch full list.
-	TypedReturn  string `json:"typedReturn,omitempty"` // Go type returned by the typed wrapper (e.g. "BlueprintOverview"). Defaults to ResourceType when empty.
+	ResourceType string `json:"resourceType"`            // Go type name used in emitted method names (e.g. "Blueprint")
+	NameField    string `json:"nameField"`               // dot-notation JSON path for the name field on each list element (e.g. "name", "general.name", "title")
+	IDField      string `json:"idField"`                 // dot-notation JSON path for the ID field (e.g. "id")
+	Mode         string `json:"mode"`                    // "filtered" (server-side RSQL) or "clientFilter" (walk list in memory). "direct" reserved for proclassic by-name endpoints and handled in a later phase.
+	SearchParam  string `json:"searchParam,omitempty"`   // clientFilter mode only: server-side search query key to narrow results (e.g. "search"). Empty → fetch full list.
+	ResultsField string `json:"resultsField,omitempty"`  // envelope key containing the array of list elements. Empty defaults to "results"; set to e.g. "benchmarks" for non-standard wrappers.
+	TypedReturn  string `json:"typedReturn,omitempty"`   // Go type returned by the typed wrapper (e.g. "BlueprintOverview"). Defaults to ResourceType when empty.
 }
 
 // parseOp splits "GET /v1/devices/{id}" into method and path.

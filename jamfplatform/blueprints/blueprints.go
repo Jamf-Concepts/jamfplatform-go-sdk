@@ -157,7 +157,7 @@ func (c *Client) GetBlueprintComponent(ctx context.Context, identifier string) (
 func (c *Client) ResolveBlueprintIDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	listPath := prefix + "/blueprints"
-	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "search", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "search", "", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveBlueprintIDByName(%s): %w", name, err)
 	}
@@ -168,7 +168,7 @@ func (c *Client) ResolveBlueprintIDByName(ctx context.Context, name string) (str
 func (c *Client) ResolveBlueprintByName(ctx context.Context, name string) (*BlueprintOverview, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	listPath := prefix + "/blueprints"
-	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "search", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "search", "", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveBlueprintByName(%s): %w", name, err)
 	}
