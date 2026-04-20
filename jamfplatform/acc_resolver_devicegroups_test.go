@@ -102,35 +102,46 @@ func TestAcceptance_ResolveDeviceGroupIDByName_NotFound(t *testing.T) {
 	t.Logf("Not-found probe surfaced APIResponseError(404) as expected")
 }
 
+// TestAcceptance_ResolveDeviceGroup_Ambiguous exercises the ambiguity path
+// using the one dimension where the server permits duplicates: group name is
+// unique *within* a (GroupType, DeviceType) combination, but the same name
+// can exist on a SMART+COMPUTER group and a STATIC+COMPUTER group
+// simultaneously. Same applies across DeviceType (COMPUTER vs MOBILE).
+// Resolver only sees the name — so two groups sharing it must surface as
+// *AmbiguousMatchError with both IDs.
 func TestAcceptance_ResolveDeviceGroup_Ambiguous(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	dg := devicegroups.New(c)
 
 	shared := "sdk-acc-resolver-dg-dup-" + runSuffix()
-	firstID := createStaticTestGroup(t, dg, shared)
 
-	// Try to create a second group with the same name. If the server
-	// enforces uniqueness (4xx), the resolver has nothing to disambiguate
-	// — log and skip rather than failing the whole resolver path.
-	desc := "SDK acceptance test — duplicate-name probe"
+	// First: STATIC+COMPUTER.
+	staticID := createStaticTestGroup(t, dg, shared)
+
+	// Second: STATIC+MOBILE with the same name. Server enforces uniqueness
+	// within DeviceType (confirmed: even STATIC vs SMART within COMPUTER is
+	// rejected with 422), but a MOBILE group can coexist with a COMPUTER
+	// group of the same name.
+	desc := "SDK acceptance test — MOBILE duplicate-name probe"
 	empty := []string{}
 	resp, err := dg.CreateDeviceGroup(ctx, &devicegroups.DeviceGroupCreateRepresentationV1{
 		Name:        shared,
 		Description: &desc,
-		DeviceType:  "COMPUTER",
+		DeviceType:  "MOBILE",
 		GroupType:   "STATIC",
 		Members:     &empty,
 	})
 	if err != nil {
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-			t.Skipf("server rejects duplicate device-group names (%d) — nothing to disambiguate: %v", apiErr.StatusCode, apiErr.Summary())
+			t.Skipf("server rejects same-name across DeviceType dimension too (%d) — uniqueness is fully global on this tenant: %v", apiErr.StatusCode, apiErr.Summary())
 		}
 		skipOnServerError(t, err)
-		t.Fatalf("CreateDeviceGroup (duplicate) failed unexpectedly: %v", err)
+		t.Fatalf("CreateDeviceGroup (MOBILE duplicate) failed unexpectedly: %v", err)
 	}
 	cleanupDelete(t, "DeleteDeviceGroup", func() error { return dg.DeleteDeviceGroup(ctx, resp.ID) })
+	mobileID := resp.ID
 
 	_, err = dg.ResolveDeviceGroupIDByName(ctx, shared)
 	if err == nil {
@@ -143,17 +154,51 @@ func TestAcceptance_ResolveDeviceGroup_Ambiguous(t *testing.T) {
 	if len(amErr.Matches) < 2 {
 		t.Errorf("AmbiguousMatchError.Matches = %v, want at least 2", amErr.Matches)
 	}
-	foundFirst, foundSecond := false, false
+	foundComputer, foundMobile := false, false
 	for _, m := range amErr.Matches {
-		if m == firstID {
-			foundFirst = true
+		if m == staticID {
+			foundComputer = true
 		}
-		if m == resp.ID {
-			foundSecond = true
+		if m == mobileID {
+			foundMobile = true
 		}
 	}
-	if !foundFirst || !foundSecond {
-		t.Errorf("AmbiguousMatchError.Matches = %v, want to contain both %q and %q", amErr.Matches, firstID, resp.ID)
+	if !foundComputer || !foundMobile {
+		t.Errorf("AmbiguousMatchError.Matches = %v, want to contain both %q (COMPUTER) and %q (MOBILE)", amErr.Matches, staticID, mobileID)
 	}
-	t.Logf("Ambiguous device-group resolve surfaced %d matches: %v", len(amErr.Matches), amErr.Matches)
+	t.Logf("Ambiguous device-group resolve (COMPUTER + MOBILE) surfaced %d matches: %v", len(amErr.Matches), amErr.Matches)
+}
+
+// TestAcceptance_ResolveDeviceGroup_StaticUniqueWithinType confirms the
+// server's uniqueness scope: two STATIC+COMPUTER groups with the same name
+// are rejected, so ambiguity cannot arise from that dimension alone.
+// Documents the server behaviour so future regressions are visible.
+func TestAcceptance_ResolveDeviceGroup_StaticUniqueWithinType(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	dg := devicegroups.New(c)
+
+	shared := "sdk-acc-resolver-dg-within-type-" + runSuffix()
+	createStaticTestGroup(t, dg, shared)
+
+	desc := "SDK acceptance test — within-type uniqueness probe"
+	empty := []string{}
+	_, err := dg.CreateDeviceGroup(ctx, &devicegroups.DeviceGroupCreateRepresentationV1{
+		Name:        shared,
+		Description: &desc,
+		DeviceType:  "COMPUTER",
+		GroupType:   "STATIC",
+		Members:     &empty,
+	})
+	if err == nil {
+		t.Fatalf("expected server to reject duplicate STATIC+COMPUTER name %q, but it succeeded", shared)
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("expected *APIResponseError for duplicate STATIC+COMPUTER, got %T: %v", err, err)
+	}
+	if apiErr.StatusCode < 400 || apiErr.StatusCode >= 500 {
+		t.Fatalf("expected 4xx rejection, got %d: %v", apiErr.StatusCode, err)
+	}
+	t.Logf("Server rejects duplicate STATIC+COMPUTER name with %d as expected: %s", apiErr.StatusCode, apiErr.Summary())
 }
