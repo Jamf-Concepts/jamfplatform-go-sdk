@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -243,4 +244,30 @@ func (c *Client) DeletePackageManifestV1(ctx context.Context, id string) error {
 		return fmt.Errorf("DeletePackageManifestV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolvePackageV1IDByName looks up a PackageV1 by its packageName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolvePackageV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/packages"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePackageV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolvePackageV1ByName looks up a PackageV1 by its packageName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolvePackageV1ByName(ctx context.Context, name string) (*Package, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/packages"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolvePackageV1ByName(%s): %w", name, err)
+	}
+	var out Package
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolvePackageV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

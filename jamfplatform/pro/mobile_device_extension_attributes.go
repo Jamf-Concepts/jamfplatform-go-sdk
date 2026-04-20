@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -157,4 +158,30 @@ func (c *Client) ListDeviceExtensionAttributesPreview(ctx context.Context, selec
 		return nil, fmt.Errorf("ListDeviceExtensionAttributesPreview: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveMobileDeviceExtensionAttributeV1IDByName looks up a MobileDeviceExtensionAttributeV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMobileDeviceExtensionAttributeV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-extension-attributes"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceExtensionAttributeV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMobileDeviceExtensionAttributeV1ByName looks up a MobileDeviceExtensionAttributeV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMobileDeviceExtensionAttributeV1ByName(ctx context.Context, name string) (*MobileDeviceExtensionAttributes, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-extension-attributes"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceExtensionAttributeV1ByName(%s): %w", name, err)
+	}
+	var out MobileDeviceExtensionAttributes
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceExtensionAttributeV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

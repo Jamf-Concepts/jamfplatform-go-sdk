@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -255,4 +256,56 @@ func (c *Client) EraseMobileDeviceGroupV1(ctx context.Context, id string, reques
 		return fmt.Errorf("EraseMobileDeviceGroupV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveSmartMobileDeviceGroupV1IDByName looks up a SmartMobileDeviceGroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveSmartMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups/smart-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSmartMobileDeviceGroupV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveSmartMobileDeviceGroupV1ByName looks up a SmartMobileDeviceGroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveSmartMobileDeviceGroupV1ByName(ctx context.Context, name string) (*SmartGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups/smart-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV1ByName(%s): %w", name, err)
+	}
+	var out SmartGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveStaticMobileDeviceGroupV1IDByName looks up a StaticMobileDeviceGroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveStaticMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups/static-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveStaticMobileDeviceGroupV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveStaticMobileDeviceGroupV1ByName looks up a StaticMobileDeviceGroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveStaticMobileDeviceGroupV1ByName(ctx context.Context, name string) (*StaticGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups/static-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveStaticMobileDeviceGroupV1ByName(%s): %w", name, err)
+	}
+	var out StaticGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveStaticMobileDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

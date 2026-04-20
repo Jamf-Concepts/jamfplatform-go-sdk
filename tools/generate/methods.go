@@ -87,6 +87,7 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 			SearchParam:  r.SearchParam,
 			ResultsField: r.ResultsField,
 			TypedReturn:  typedReturn,
+			ExtraParams:  r.ExtraParams,
 			SourceMethod: opDef.Name,
 		}
 		if r.Mode == "direct" {

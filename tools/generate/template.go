@@ -100,6 +100,20 @@ var funcMap = template.FuncMap{
 		}
 		return "&" + t + "{}"
 	},
+	// resolverNameStub converts a dot-path nameField to a Go map literal entry
+	// for use in test stubs. "name" → `"name": "target"`;
+	// "general.name" → `"general": map[string]any{"name": "target"}`.
+	"resolverNameStub": func(nameField string) string {
+		parts := strings.Split(nameField, ".")
+		if len(parts) == 1 {
+			return fmt.Sprintf(`%q: "target"`, parts[0])
+		}
+		inner := fmt.Sprintf(`%q: "target"`, parts[len(parts)-1])
+		for i := len(parts) - 2; i >= 0; i-- {
+			inner = fmt.Sprintf(`%q: map[string]any{%s}`, parts[i], inner)
+		}
+		return inner
+	},
 	"testMultipartArgs": func(m GoMethod) string {
 		if len(m.MultipartFields) == 0 {
 			return ""
@@ -583,7 +597,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
-	listPath := prefix + "{{ .ResourcePath }}"
+	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
 {{- if eq .Resolver.Mode "filtered" }}
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- else }}
@@ -600,7 +614,7 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.TypedReturn }}, error) {
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
-	listPath := prefix + "{{ .ResourcePath }}"
+	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
 {{- if eq .Resolver.Mode "filtered" }}
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- else }}
@@ -948,11 +962,11 @@ func Test<% .Name %>(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 <%- if .Resolver.ResultsField %>
 			"<% .Resolver.ResultsField %>": []map[string]any{
-				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
+				{"<% .Resolver.IDField %>": "resolved-id", <% resolverNameStub .Resolver.NameField %>},
 			},
 <%- else %>
 			"results": []map[string]any{
-				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
+				{"<% .Resolver.IDField %>": "resolved-id", <% resolverNameStub .Resolver.NameField %>},
 			},
 			"totalCount": 1,
 <%- end %>
@@ -979,11 +993,11 @@ func Test<% .Name %>(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 <%- if .Resolver.ResultsField %>
 			"<% .Resolver.ResultsField %>": []map[string]any{
-				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
+				{"<% .Resolver.IDField %>": "resolved-id", <% resolverNameStub .Resolver.NameField %>},
 			},
 <%- else %>
 			"results": []map[string]any{
-				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
+				{"<% .Resolver.IDField %>": "resolved-id", <% resolverNameStub .Resolver.NameField %>},
 			},
 			"totalCount": 1,
 <%- end %>

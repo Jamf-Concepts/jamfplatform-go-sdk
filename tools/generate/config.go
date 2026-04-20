@@ -75,6 +75,7 @@ type ResolverConfig struct {
 	SearchParam  string `json:"searchParam,omitempty"`   // clientFilter mode only: server-side search query key to narrow results (e.g. "search"). Empty → fetch full list.
 	ResultsField string `json:"resultsField,omitempty"`  // envelope key containing the array of list elements. Empty defaults to "results"; set to e.g. "benchmarks" for non-standard wrappers.
 	TypedReturn  string `json:"typedReturn,omitempty"`   // Go type returned by the typed wrapper (e.g. "BlueprintOverview"). Defaults to ResourceType when empty.
+	ExtraParams  string `json:"extraParams,omitempty"`   // filtered mode only: additional query params appended to the list path before the filter (e.g. "section=GENERAL" for endpoints that require a section param to populate filterable fields).
 }
 
 // parseOp splits "GET /v1/devices/{id}" into method and path.

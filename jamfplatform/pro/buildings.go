@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -186,4 +187,30 @@ func (c *Client) ExportBuildingHistoryV1(ctx context.Context, id string, request
 		return nil, fmt.Errorf("ExportBuildingHistoryV1(%s): %w", id, err)
 	}
 	return result, nil
+}
+
+// ResolveBuildingV1IDByName looks up a BuildingV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveBuildingV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/buildings"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveBuildingV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveBuildingV1ByName looks up a BuildingV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveBuildingV1ByName(ctx context.Context, name string) (*Building, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/buildings"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveBuildingV1ByName(%s): %w", name, err)
+	}
+	var out Building
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveBuildingV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

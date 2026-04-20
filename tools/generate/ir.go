@@ -82,6 +82,7 @@ type GoResolver struct {
 	SearchParam  string // clientFilter only
 	ResultsField string // envelope key for the element array; empty → transport defaults to "results"
 	TypedReturn  string // Go type of the typed wrapper's return
+	ExtraParams  string // filtered mode only: appended to list path before filter (e.g. "section=GENERAL")
 	SourceMethod string // direct only: existing Get<X>ByName method the wrappers delegate to
 	// IDNilCheck and IDDeref are pre-computed expressions the direct-mode
 	// template emits verbatim. They cover the nested-ID case: Classic

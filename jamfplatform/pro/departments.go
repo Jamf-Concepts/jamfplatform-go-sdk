@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -138,4 +139,30 @@ func (c *Client) CreateDepartmentHistoryNoteV1(ctx context.Context, id string, r
 		return nil, fmt.Errorf("CreateDepartmentHistoryNoteV1(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveDepartmentV1IDByName looks up a DepartmentV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveDepartmentV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/departments"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDepartmentV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveDepartmentV1ByName looks up a DepartmentV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveDepartmentV1ByName(ctx context.Context, name string) (*Department, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/departments"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveDepartmentV1ByName(%s): %w", name, err)
+	}
+	var out Department
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveDepartmentV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }
