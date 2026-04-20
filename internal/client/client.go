@@ -15,14 +15,26 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"golang.org/x/oauth2/clientcredentials"
 )
+
+// isClassicPath reports whether an endpoint targets Jamf's Classic XML API
+// via the platform gateway. The path prefix sniff is the single source of
+// truth for codec selection: Classic paths marshal/unmarshal XML, everything
+// else uses JSON.
+func isClassicPath(path string) bool {
+	return strings.Contains(path, "/proclassic/")
+}
 
 // Logger is an interface for logging HTTP requests and responses.
 type Logger interface {
@@ -30,16 +42,20 @@ type Logger interface {
 	LogResponse(ctx context.Context, statusCode int, headers http.Header, body []byte)
 }
 
-// Client represents the main API client for Jamf Platform.
-type Client struct {
-	baseURL     string
-	httpClient  *http.Client
-	baseClient  *http.Client
-	oauthConfig *clientcredentials.Config
-	logger      Logger
-	userAgent   string
-	tokenCache  TokenCache
-	cacheKey    string
+// Transport represents the HTTP transport layer for the Jamf Platform API.
+// Sub-packages in jamfplatform/ construct service clients that wrap a Transport.
+type Transport struct {
+	baseURL         string
+	tenantID        string
+	httpClient      *http.Client
+	baseClient      *http.Client
+	oauthConfig     *clientcredentials.Config
+	logger          Logger
+	userAgent       string
+	tokenCache      TokenCache
+	cacheKey        string
+	cookieJar       http.CookieJar
+	deprecationSeen sync.Map // dedup runtime Deprecation header warnings
 }
 
 // PaginatedResponseRepresentation captures pagination metadata shared by multiple endpoints.
@@ -104,12 +120,15 @@ func (e *APIResponseError) Error() string {
 }
 
 // Option configures a Client.
-type Option func(*Client)
+type Option func(*Transport)
 
 // WithHTTPClient overrides the HTTP client used by the API client.
 func WithHTTPClient(httpClient *http.Client) Option {
-	return func(c *Client) {
+	return func(c *Transport) {
 		if httpClient != nil {
+			if httpClient.Jar == nil {
+				httpClient.Jar = newCookieJar()
+			}
 			c.baseClient = httpClient
 			c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient)
 		}
@@ -118,7 +137,7 @@ func WithHTTPClient(httpClient *http.Client) Option {
 
 // WithTokenCache sets a persistent token cache and its lookup key.
 func WithTokenCache(cache TokenCache, cacheKey string) Option {
-	return func(c *Client) {
+	return func(c *Transport) {
 		if cache != nil && cacheKey != "" {
 			c.tokenCache = cache
 			c.cacheKey = cacheKey
@@ -126,13 +145,29 @@ func WithTokenCache(cache TokenCache, cacheKey string) Option {
 	}
 }
 
-// NewClient creates a new Jamf Platform API client.
-func NewClient(baseURL, clientID, clientSecret string) *Client {
-	return NewClientWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")
+// WithTenantID sets the tenant ID used by TenantPrefix when building URLs.
+func WithTenantID(id string) Option {
+	return func(c *Transport) {
+		c.tenantID = id
+	}
 }
 
-// NewClientWithUserAgent creates a new Jamf Platform API client with a custom user agent string.
-func NewClientWithUserAgent(baseURL, clientID, clientSecret, userAgent string, opts ...Option) *Client {
+// WithCookieJar overrides the default in-memory cookie jar. Typically used to
+// install a persistent jar (e.g. FileCookieJar) so sticky-session cookies
+// survive across process invocations.
+func WithCookieJar(jar http.CookieJar) Option {
+	return func(c *Transport) {
+		c.cookieJar = jar
+	}
+}
+
+// NewTransport creates a new Jamf Platform API transport.
+func NewTransport(baseURL, clientID, clientSecret string) *Transport {
+	return NewTransportWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")
+}
+
+// NewTransportWithUserAgent creates a new Jamf Platform API transport with a custom user agent string.
+func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string, opts ...Option) *Transport {
 	oauthConfig := &clientcredentials.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -141,7 +176,7 @@ func NewClientWithUserAgent(baseURL, clientID, clientSecret, userAgent string, o
 
 	httpClient, baseClient := newOAuth2Client(oauthConfig, userAgent)
 
-	c := &Client{
+	c := &Transport{
 		baseURL:     baseURL,
 		httpClient:  httpClient,
 		baseClient:  baseClient,
@@ -154,110 +189,199 @@ func NewClientWithUserAgent(baseURL, clientID, clientSecret, userAgent string, o
 	if c.tokenCache != nil {
 		c.httpClient = newCachingOAuth2Client(c.oauthConfig, c.baseClient, c.tokenCache, c.cacheKey)
 	}
+	if c.cookieJar != nil {
+		c.httpClient.Jar = c.cookieJar
+		c.baseClient.Jar = c.cookieJar
+	}
 	return c
 }
 
 // BaseURL returns the base URL configured for the client.
-func (c *Client) BaseURL() string {
+func (c *Transport) BaseURL() string {
 	return c.baseURL
 }
 
+// TenantID returns the tenant ID configured on the transport.
+func (c *Transport) TenantID() string {
+	return c.tenantID
+}
+
+// TenantPrefix returns the /api/{namespace}/{version}/tenant/{tenantID} URL
+// prefix used by tenant-scoped resources. An empty version collapses the
+// segment for APIs that don't use a version in the URL (proclassic, Pro
+// preview paths).
+func (c *Transport) TenantPrefix(namespace, version string) string {
+	if version == "" {
+		return "/api/" + namespace + "/tenant/" + c.tenantID
+	}
+	return "/api/" + namespace + "/" + version + "/tenant/" + c.tenantID
+}
+
 // ValidateCredentials tests authentication by requesting an OAuth token.
-func (c *Client) ValidateCredentials(ctx context.Context) error {
+func (c *Transport) ValidateCredentials(ctx context.Context) error {
 	return validateCredentials(ctx, c.oauthConfig, c.baseClient)
 }
 
 // HTTPClient returns the underlying OAuth2-managed HTTP client for raw authenticated requests.
-func (c *Client) HTTPClient() *http.Client {
+func (c *Transport) HTTPClient() *http.Client {
 	return c.httpClient
 }
 
 // SetHTTPClient sets a custom base HTTP client (useful for testing).
-func (c *Client) SetHTTPClient(httpClient *http.Client) {
+func (c *Transport) SetHTTPClient(httpClient *http.Client) {
 	c.baseClient = httpClient
 	c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient)
 }
 
 // SetLogger sets the logger for the client.
-func (c *Client) SetLogger(logger Logger) {
+func (c *Transport) SetLogger(logger Logger) {
 	c.logger = logger
 }
 
 // SetUserAgent sets the User-Agent header value used for token and API requests.
-func (c *Client) SetUserAgent(ua string) {
+func (c *Transport) SetUserAgent(ua string) {
 	c.userAgent = ua
 	c.httpClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua)
 }
 
 // Do performs an authenticated API request and decodes the response.
 // It expects HTTP 200 OK as the success status.
-func (c *Client) Do(ctx context.Context, method, path string, body, result any) error {
+func (c *Transport) Do(ctx context.Context, method, path string, body, result any) error {
 	return c.DoExpect(ctx, method, path, body, http.StatusOK, result)
 }
 
 // DoExpect performs an authenticated API request expecting the given HTTP status.
-func (c *Client) DoExpect(ctx context.Context, method, path string, body any, expectedStatus int, result any) error {
-	resp, err := c.doRequest(ctx, method, path, body)
-	if err != nil {
-		return err
-	}
-	return c.handleResponse(ctx, resp, expectedStatus, result)
+func (c *Transport) DoExpect(ctx context.Context, method, path string, body any, expectedStatus int, result any) error {
+	return c.execute(ctx, method, path, body, "", nil, expectedStatus, result)
 }
 
 // DoWithContentType performs an authenticated API request with a custom Content-Type header.
 // It expects HTTP 200 OK as the success status.
-func (c *Client) DoWithContentType(ctx context.Context, method, path string, body any, contentType string, expectedStatus int, result any) error {
-	resp, err := c.doRequestWithContentType(ctx, method, path, body, contentType)
-	if err != nil {
-		return err
-	}
-	return c.handleResponse(ctx, resp, expectedStatus, result)
+func (c *Transport) DoWithContentType(ctx context.Context, method, path string, body any, contentType string, expectedStatus int, result any) error {
+	return c.execute(ctx, method, path, body, contentType, nil, expectedStatus, result)
 }
 
 // DoWithHeaders performs an authenticated API request with extra headers and decodes the response.
 // It expects HTTP 200 OK as the success status.
-func (c *Client) DoWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, result any) error {
+func (c *Transport) DoWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, result any) error {
 	return c.DoExpectWithHeaders(ctx, method, path, body, headers, http.StatusOK, result)
 }
 
 // DoExpectWithHeaders performs an authenticated API request with extra headers expecting the given HTTP status.
-func (c *Client) DoExpectWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, expectedStatus int, result any) error {
-	resp, err := c.doRequestFull(ctx, method, path, body, "", headers)
+func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, expectedStatus int, result any) error {
+	return c.execute(ctx, method, path, body, "", headers, expectedStatus, result)
+}
+
+// execute funnels every Do* variant through one place so the 429/Retry-After
+// retry and Deprecation-header logging live in a single hook point.
+func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any) error {
+	resp, classic, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
 	if err != nil {
 		return err
 	}
-	return c.handleResponse(ctx, resp, expectedStatus, result)
+	if resp.StatusCode == http.StatusTooManyRequests {
+		delay := parseRetryAfter(resp.Header.Get("Retry-After"), time.Now())
+		if delay > 0 && delay <= 60*time.Second {
+			_ = resp.Body.Close()
+			select {
+			case <-time.After(delay):
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+			resp, classic, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
+			if err != nil {
+				return err
+			}
+		}
+		// Out-of-policy Retry-After (missing, negative, or >60s) or retry
+		// also returned 429: fall through to handleResponse so the caller
+		// sees the server's actual error body + traceId, not a synthetic
+		// one. handleResponse builds an APIResponseError for any status !=
+		// expectedStatus, which 429 will be.
+	}
+	return c.handleResponse(ctx, resp, classic, expectedStatus, result)
+}
+
+// parseRetryAfter interprets a Retry-After header value as either seconds
+// (integer) or an HTTP-date. Returns 0 for empty/invalid values.
+func parseRetryAfter(v string, now time.Time) time.Duration {
+	if v == "" {
+		return 0
+	}
+	if secs, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
+		if secs < 0 {
+			return 0
+		}
+		return time.Duration(secs) * time.Second
+	}
+	if t, err := http.ParseTime(v); err == nil {
+		d := t.Sub(now)
+		if d < 0 {
+			return 0
+		}
+		return d
+	}
+	return 0
+}
+
+// logDeprecation logs once per (method, path) when a server response includes
+// a Deprecation header, so consumers see the notice even without a custom
+// Logger installed. Runtime signal in addition to spec-level // Deprecated:
+// godoc, which only catches endpoints marked in the spec at SDK build time.
+func (c *Transport) logDeprecation(resp *http.Response) {
+	if resp == nil || resp.Request == nil {
+		return
+	}
+	v := resp.Header.Get("Deprecation")
+	if v == "" {
+		return
+	}
+	key := resp.Request.Method + " " + resp.Request.URL.Path
+	if _, seen := c.deprecationSeen.LoadOrStore(key, struct{}{}); seen {
+		return
+	}
+	log.Printf("jamfplatform: endpoint %s returned Deprecation header: %s — migrate callers", key, v)
 }
 
 // buildURL constructs the full API URL from a relative endpoint.
-func (c *Client) buildURL(endpoint string) string {
+func (c *Transport) buildURL(endpoint string) string {
 	if len(endpoint) > 0 && endpoint[0] == '/' {
 		return c.baseURL + endpoint
 	}
 	return c.baseURL + "/" + endpoint
 }
 
-// doRequest performs an authenticated API request.
-func (c *Client) doRequest(ctx context.Context, method, endpoint string, body any) (*http.Response, error) {
-	return c.doRequestFull(ctx, method, endpoint, body, "", nil)
-}
-
-// doRequestWithContentType performs an authenticated API request with an optional content type override.
-func (c *Client) doRequestWithContentType(ctx context.Context, method, endpoint string, body any, contentType string) (*http.Response, error) {
-	return c.doRequestFull(ctx, method, endpoint, body, contentType, nil)
-}
-
-// doRequestFull performs an authenticated API request with optional content type and extra headers.
-func (c *Client) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header) (*http.Response, error) {
+// doRequestFull performs an authenticated API request with optional content
+// type and extra headers. Returns the response, the classic-codec flag
+// captured from the request URL (used by the caller to route XML vs JSON
+// unmarshal — avoids re-sniffing the response URL, which may have mutated
+// through redirects), and any transport error.
+func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header) (*http.Response, bool, error) {
 	var requestBodyBytes []byte
 
 	fullURL := c.buildURL(endpoint)
 
+	if err := checkDeniedPath(method, fullURL); err != nil {
+		return nil, false, err
+	}
+
+	classic := isClassicPath(fullURL)
+
 	if body != nil {
-		var err error
-		requestBodyBytes, err = json.Marshal(body)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal request body: %w", err)
+		// Raw byte bodies (e.g. Classic XML assembled by the caller) bypass
+		// codec selection — send verbatim.
+		if b, ok := body.([]byte); ok {
+			requestBodyBytes = b
+		} else {
+			var err error
+			if classic {
+				requestBodyBytes, err = xml.Marshal(body)
+			} else {
+				requestBodyBytes, err = json.Marshal(body)
+			}
+			if err != nil {
+				return nil, false, fmt.Errorf("failed to marshal request body: %w", err)
+			}
 		}
 	}
 
@@ -272,7 +396,7 @@ func (c *Client) doRequestFull(ctx context.Context, method, endpoint string, bod
 
 	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, false, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	for key, values := range extraHeaders {
@@ -281,9 +405,14 @@ func (c *Client) doRequestFull(ctx context.Context, method, endpoint string, bod
 		}
 	}
 
+	if classic {
+		req.Header.Set("Accept", "application/xml")
+	}
 	if requestBodyBytes != nil {
 		if contentType != "" {
 			req.Header.Set("Content-Type", contentType)
+		} else if classic {
+			req.Header.Set("Content-Type", "application/xml")
 		} else if method == http.MethodPatch {
 			req.Header.Set("Content-Type", "application/merge-patch+json")
 		} else {
@@ -293,15 +422,19 @@ func (c *Client) doRequestFull(ctx context.Context, method, endpoint string, bod
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("API request failed: %w", err)
+		return nil, false, fmt.Errorf("API request failed: %w", err)
 	}
 
-	return resp, nil
+	return resp, classic, nil
 }
 
 // handleResponse processes API responses and handles common error cases.
-func (c *Client) handleResponse(ctx context.Context, resp *http.Response, expectedStatus int, result any) error {
+// classic comes from the request URL captured by doRequestFull so codec
+// selection is stable across any redirect path rewriting.
+func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, classic bool, expectedStatus int, result any) error {
 	defer func() { _ = resp.Body.Close() }()
+
+	c.logDeprecation(resp)
 
 	body, readErr := io.ReadAll(resp.Body)
 	if readErr != nil {
@@ -331,7 +464,14 @@ func (c *Client) handleResponse(ctx context.Context, resp *http.Response, expect
 	}
 
 	if result != nil {
-		if err := json.Unmarshal(body, result); err != nil {
+		// Raw byte responses (e.g. text/csv exports) bypass decoding.
+		if bp, ok := result.(*[]byte); ok {
+			*bp = append((*bp)[:0], body...)
+		} else if classic {
+			if err := xml.Unmarshal(body, result); err != nil {
+				return fmt.Errorf("failed to decode XML response: %w", err)
+			}
+		} else if err := json.Unmarshal(body, result); err != nil {
 			return fmt.Errorf("failed to decode response: %w", err)
 		}
 	}

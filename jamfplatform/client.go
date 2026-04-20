@@ -5,7 +5,9 @@ package jamfplatform
 
 import (
 	"context"
+	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 	"golang.org/x/oauth2"
@@ -13,8 +15,7 @@ import (
 
 // Client provides typed methods for all Jamf Platform API operations.
 type Client struct {
-	transport *client.Client
-	tenantID  string
+	transport *client.Transport
 }
 
 // NewClient creates a new Jamf Platform API client.
@@ -40,15 +41,25 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	if cache != nil {
 		transportOpts = append(transportOpts, client.WithTokenCache(cache, client.CacheKey(baseURL, clientID)))
 	}
+	if cfg.cookieJarDir != "" {
+		jarPath := filepath.Join(cfg.cookieJarDir, "jamfplatform-cookies-"+client.CacheKey(baseURL, clientID))
+		if jar, err := client.NewFileCookieJar(jarPath); err == nil {
+			transportOpts = append(transportOpts, client.WithCookieJar(jar))
+		} else {
+			log.Printf("jamfplatform: WithFileCookieJar: failed to open %s: %v — falling back to in-memory jar", jarPath, err)
+		}
+	}
+	if cfg.tenantID != "" {
+		transportOpts = append(transportOpts, client.WithTenantID(cfg.tenantID))
+	}
 
-	transport := client.NewClientWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
+	transport := client.NewTransportWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
 	if cfg.logger != nil {
 		transport.SetLogger(cfg.logger)
 	}
 
 	return &Client{
 		transport: transport,
-		tenantID:  cfg.tenantID,
 	}
 }
 
@@ -67,14 +78,22 @@ func (c *Client) AccessToken(ctx context.Context) (*oauth2.Token, error) {
 	return c.transport.AccessToken(ctx)
 }
 
+// Transport returns the underlying transport used by sub-package clients in
+// jamfplatform/. Sub-package constructors (e.g. devices.New) call this to
+// share the authenticated HTTP layer.
+func (c *Client) Transport() *client.Transport {
+	return c.transport
+}
+
 // clientConfig holds configuration applied via Option functions.
 type clientConfig struct {
-	userAgent  string
-	httpClient *http.Client
-	logger     Logger
-	tenantID   string
-	tokenCache TokenCache
-	cacheDir   string
+	userAgent    string
+	httpClient   *http.Client
+	logger       Logger
+	tenantID     string
+	tokenCache   TokenCache
+	cacheDir     string
+	cookieJarDir string
 }
 
 // Option configures a Client.
@@ -117,6 +136,16 @@ func WithFileTokenCache(dir string) Option {
 	}
 }
 
+// WithFileCookieJar enables file-based cookie jar persistence in the given
+// directory. The cookie jar survives across process invocations so
+// sticky-session cookies keep pointing a CLI-style caller at the same app
+// node between runs.
+func WithFileCookieJar(dir string) Option {
+	return func(cfg *clientConfig) {
+		cfg.cookieJarDir = dir
+	}
+}
+
 // WithTenantID configures the tenant ID used to build API URL paths.
 // When set, all API paths include /tenant/{tenantID} in the URL.
 // When not set, legacy internal paths are used.
@@ -124,9 +153,4 @@ func WithTenantID(id string) Option {
 	return func(cfg *clientConfig) {
 		cfg.tenantID = id
 	}
-}
-
-// tenantPrefix returns the API path prefix for tenant-scoped resources.
-func (c *Client) tenantPrefix(namespace, version string) string {
-	return "/api/" + namespace + "/" + version + "/tenant/" + c.tenantID
 }

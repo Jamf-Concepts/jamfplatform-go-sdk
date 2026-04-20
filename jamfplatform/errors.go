@@ -8,8 +8,9 @@ package jamfplatform
 import "github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 
 var (
-	ErrAuthentication = client.ErrAuthentication
-	ErrNotFound       = client.ErrNotFound
+	ErrAuthentication   = client.ErrAuthentication
+	ErrNotFound         = client.ErrNotFound
+	ErrPathNotSupported = client.ErrPathNotSupported
 )
 
 type APIResponseError = client.APIResponseError

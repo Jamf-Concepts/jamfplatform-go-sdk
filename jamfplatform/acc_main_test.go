@@ -3,7 +3,7 @@
 
 //go:build acceptance
 
-package jamfplatform
+package jamfplatform_test
 
 import (
 	"os"

@@ -7,6 +7,7 @@ import "errors"
 
 // Sentinel errors returned by the client.
 var (
-	ErrAuthentication = errors.New("jamfplatform: authentication failed")
-	ErrNotFound       = errors.New("jamfplatform: resource not found")
+	ErrAuthentication   = errors.New("jamfplatform: authentication failed")
+	ErrNotFound         = errors.New("jamfplatform: resource not found")
+	ErrPathNotSupported = errors.New("jamfplatform: path not supported by SDK")
 )

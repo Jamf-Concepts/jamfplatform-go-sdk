@@ -34,10 +34,10 @@ func newTestServer(t *testing.T) (*httptest.Server, *http.ServeMux) {
 
 // newTestClient creates a Client pointed at a test server. Returns the client,
 // server, and mux so tests can register handlers.
-func newTestClient(t *testing.T) (*Client, *httptest.Server, *http.ServeMux) {
+func newTestClient(t *testing.T) (*Transport, *httptest.Server, *http.ServeMux) {
 	t.Helper()
 	srv, mux := newTestServer(t)
-	c := NewClient(srv.URL, "test-id", "test-secret")
+	c := NewTransport(srv.URL, "test-id", "test-secret")
 	return c, srv, mux
 }
 
@@ -241,7 +241,7 @@ func TestSentinelErrors(t *testing.T) {
 
 func TestValidateCredentials_Success(t *testing.T) {
 	srv, _ := newTestServer(t)
-	c := NewClient(srv.URL, "test-id", "test-secret")
+	c := NewTransport(srv.URL, "test-id", "test-secret")
 	if err := c.ValidateCredentials(context.Background()); err != nil {
 		t.Fatalf("ValidateCredentials failed: %v", err)
 	}
@@ -256,7 +256,7 @@ func TestValidateCredentials_Failure(t *testing.T) {
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
 
-	c := NewClient(srv.URL, "bad-id", "bad-secret")
+	c := NewTransport(srv.URL, "bad-id", "bad-secret")
 	err := c.ValidateCredentials(context.Background())
 	if err == nil {
 		t.Fatal("expected error for invalid credentials")
@@ -265,7 +265,7 @@ func TestValidateCredentials_Failure(t *testing.T) {
 
 func TestAccessToken_Success(t *testing.T) {
 	srv, _ := newTestServer(t)
-	c := NewClient(srv.URL, "test-id", "test-secret")
+	c := NewTransport(srv.URL, "test-id", "test-secret")
 	token, err := c.AccessToken(context.Background())
 	if err != nil {
 		t.Fatalf("AccessToken failed: %v", err)
@@ -406,7 +406,7 @@ func TestTokenCache_LoadHit(t *testing.T) {
 		},
 	}
 
-	c := NewClientWithUserAgent(srv.URL, "cid", "csecret", "test",
+	c := NewTransportWithUserAgent(srv.URL, "cid", "csecret", "test",
 		WithTokenCache(cache, "test-key"))
 
 	token, err := c.AccessToken(context.Background())
@@ -435,7 +435,7 @@ func TestTokenCache_LoadMiss(t *testing.T) {
 		},
 	}
 
-	c := NewClientWithUserAgent(srv.URL, "cid", "csecret", "test",
+	c := NewTransportWithUserAgent(srv.URL, "cid", "csecret", "test",
 		WithTokenCache(cache, "test-key"))
 
 	token, err := c.AccessToken(context.Background())
@@ -462,7 +462,7 @@ func TestTokenCache_StoreErrorIgnored(t *testing.T) {
 		},
 	}
 
-	c := NewClientWithUserAgent(srv.URL, "cid", "csecret", "test",
+	c := NewTransportWithUserAgent(srv.URL, "cid", "csecret", "test",
 		WithTokenCache(cache, "test-key"))
 
 	_, err := c.AccessToken(context.Background())
@@ -483,7 +483,7 @@ func TestTokenCache_ExpiredCacheEntry(t *testing.T) {
 		},
 	}
 
-	c := NewClientWithUserAgent(srv.URL, "cid", "csecret", "test",
+	c := NewTransportWithUserAgent(srv.URL, "cid", "csecret", "test",
 		WithTokenCache(cache, "test-key"))
 
 	token, err := c.AccessToken(context.Background())

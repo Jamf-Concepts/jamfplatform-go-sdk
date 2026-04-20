@@ -3,7 +3,7 @@
 
 //go:build acceptance
 
-package jamfplatform
+package jamfplatform_test
 
 import (
 	"context"
@@ -14,6 +14,10 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/compliancebenchmarks"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devicegroups"
 )
 
 // runSuffix computes a unique suffix (epoch timestamp) once for the entire test run.
@@ -22,7 +26,7 @@ var runSuffix = sync.OnceValue(func() string {
 })
 
 // initAcceptanceClient creates and validates the singleton acceptance client once.
-var initAcceptanceClient = sync.OnceValues(func() (*Client, error) {
+var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
 	baseURL := os.Getenv("JAMFPLATFORM_BASE_URL")
 	clientID := os.Getenv("JAMFPLATFORM_CLIENT_ID")
 	clientSecret := os.Getenv("JAMFPLATFORM_CLIENT_SECRET")
@@ -32,9 +36,9 @@ var initAcceptanceClient = sync.OnceValues(func() (*Client, error) {
 		return nil, fmt.Errorf("missing required environment variables (JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID)")
 	}
 
-	opts := []Option{WithTenantID(tenantID)}
+	opts := []jamfplatform.Option{jamfplatform.WithTenantID(tenantID)}
 
-	c := NewClient(baseURL, clientID, clientSecret, opts...)
+	c := jamfplatform.NewClient(baseURL, clientID, clientSecret, opts...)
 	if err := c.ValidateCredentials(context.Background()); err != nil {
 		return nil, fmt.Errorf("failed to validate credentials: %w", err)
 	}
@@ -43,7 +47,7 @@ var initAcceptanceClient = sync.OnceValues(func() (*Client, error) {
 })
 
 // accClient returns a live Jamf Platform API client, skipping the test if credentials are not set.
-func accClient(t *testing.T) *Client {
+func accClient(t *testing.T) *jamfplatform.Client {
 	t.Helper()
 	c, err := initAcceptanceClient()
 	if err != nil {
@@ -56,10 +60,24 @@ func accClient(t *testing.T) *Client {
 // Use instead of t.Fatalf for API calls that may hit transient server bugs.
 func skipOnServerError(t *testing.T, err error) {
 	t.Helper()
-	var apiErr *APIResponseError
+	var apiErr *jamfplatform.APIResponseError
 	if errors.As(err, &apiErr) && apiErr.StatusCode >= 500 {
 		t.Skipf("Skipping due to server error: %v", err)
 	}
+}
+
+// cleanupDelete registers a best-effort delete in t.Cleanup. Unlike
+// `_ = pc.DeleteXxx(...)`, it surfaces delete failures via t.Logf so a
+// server-side 5xx on cleanup doesn't silently leak a tenant record.
+// Errors are intentionally non-fatal: one failed cleanup must not
+// prevent other registered Cleanup hooks from running.
+func cleanupDelete(t *testing.T, label string, fn func() error) {
+	t.Helper()
+	t.Cleanup(func() {
+		if err := fn(); err != nil {
+			t.Logf("cleanup %s: %v", label, err)
+		}
+	})
 }
 
 // Smart group fixture — shared across all tests that need a device group scope.
@@ -86,8 +104,9 @@ func requireSmartGroupFixture(t *testing.T) string {
 
 		c := accClient(t)
 		ctx := context.Background()
+		dg := devicegroups.New(c)
 
-		groups, err := c.ListDeviceGroups(ctx, nil, fmt.Sprintf("name==%q", smartGroupFixtureName()))
+		groups, err := dg.ListDeviceGroups(ctx, nil, fmt.Sprintf("name==%q", smartGroupFixtureName()))
 		if err != nil {
 			smartGroupErr = fmt.Errorf("failed to look up fixture smart group: %w", err)
 			return
@@ -100,12 +119,12 @@ func requireSmartGroupFixture(t *testing.T) string {
 		}
 
 		fixtureDesc := "SDK acceptance test fixture — safe to delete"
-		resp, err := c.CreateDeviceGroup(ctx, &DeviceGroupCreateRepresentationV1{
+		resp, err := dg.CreateDeviceGroup(ctx, &devicegroups.DeviceGroupCreateRepresentationV1{
 			Name:        smartGroupFixtureName(),
 			Description: &fixtureDesc,
 			DeviceType:  "COMPUTER",
 			GroupType:   "SMART",
-			Criteria: &[]DeviceGroupCriteriaRepresentationV1{
+			Criteria: &[]devicegroups.DeviceGroupCriteriaRepresentationV1{
 				{
 					Order:          0,
 					AttributeName:  "Serial Number",
@@ -136,17 +155,18 @@ func cleanupSmartGroupFixture() {
 		return
 	}
 	if c, err := initAcceptanceClient(); err == nil {
-		_ = c.DeleteDeviceGroup(context.Background(), smartGroupID)
+		_ = devicegroups.New(c).DeleteDeviceGroup(context.Background(), smartGroupID)
 	}
 }
 
 // Benchmark cleanup helpers — handle async sync states and stuck DELETING.
 
-func ensureBenchmarkDeletedByID(t *testing.T, c *Client, ctx context.Context, benchmarkID string) {
+func ensureBenchmarkDeletedByID(t *testing.T, c *jamfplatform.Client, ctx context.Context, benchmarkID string) {
 	t.Helper()
+	cb := compliancebenchmarks.New(c)
 	waitForBenchmarkSyncState(t, c, ctx, benchmarkID)
 
-	if err := c.DeleteBenchmark(ctx, benchmarkID); err != nil {
+	if err := cb.DeleteBenchmark(ctx, benchmarkID); err != nil {
 		t.Logf("Warning: failed to delete benchmark %s: %v", benchmarkID, err)
 		return
 	}
@@ -156,7 +176,7 @@ func ensureBenchmarkDeletedByID(t *testing.T, c *Client, ctx context.Context, be
 	defer cancel()
 
 	lastDelete := time.Now()
-	err := PollUntil(deleteCtx, 2*time.Second, func(_ context.Context) (bool, error) {
+	err := jamfplatform.PollUntil(deleteCtx, 2*time.Second, func(_ context.Context) (bool, error) {
 		if _, found := benchmarkSyncState(c, ctx, benchmarkID); !found {
 			t.Logf("Benchmark %s fully deleted", benchmarkID)
 			return true, nil
@@ -164,7 +184,7 @@ func ensureBenchmarkDeletedByID(t *testing.T, c *Client, ctx context.Context, be
 		if time.Since(lastDelete) > 20*time.Second {
 			lastDelete = time.Now()
 			t.Logf("Retrying delete for stuck benchmark %s", benchmarkID)
-			_ = c.DeleteBenchmark(ctx, benchmarkID)
+			_ = cb.DeleteBenchmark(ctx, benchmarkID)
 		}
 		return false, nil
 	})
@@ -173,12 +193,12 @@ func ensureBenchmarkDeletedByID(t *testing.T, c *Client, ctx context.Context, be
 	}
 }
 
-func waitForBenchmarkSyncState(t *testing.T, c *Client, ctx context.Context, benchmarkID string) {
+func waitForBenchmarkSyncState(t *testing.T, c *jamfplatform.Client, ctx context.Context, benchmarkID string) {
 	t.Helper()
 	syncCtx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
-	err := PollUntil(syncCtx, 3*time.Second, func(_ context.Context) (bool, error) {
+	err := jamfplatform.PollUntil(syncCtx, 3*time.Second, func(_ context.Context) (bool, error) {
 		state, found := benchmarkSyncState(c, ctx, benchmarkID)
 		if !found {
 			t.Logf("Benchmark %s not found, may already be deleted", benchmarkID)
@@ -196,8 +216,9 @@ func waitForBenchmarkSyncState(t *testing.T, c *Client, ctx context.Context, ben
 	}
 }
 
-func benchmarkSyncState(c *Client, ctx context.Context, benchmarkID string) (string, bool) {
-	benchmarks, err := c.ListBenchmarks(ctx)
+func benchmarkSyncState(c *jamfplatform.Client, ctx context.Context, benchmarkID string) (string, bool) {
+	cb := compliancebenchmarks.New(c)
+	benchmarks, err := cb.ListBenchmarks(ctx)
 	if err != nil {
 		return "", false
 	}

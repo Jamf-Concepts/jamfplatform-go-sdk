@@ -3,17 +3,19 @@
 
 //go:build acceptance
 
-package jamfplatform
+package jamfplatform_test
 
 import (
 	"context"
 	"testing"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/compliancebenchmarks"
 )
 
 func TestAcceptance_ListBaselines(t *testing.T) {
 	c := accClient(t)
 
-	baselines, err := c.ListBaselines(context.Background())
+	baselines, err := compliancebenchmarks.New(c).ListBaselines(context.Background())
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListBaselines failed: %v", err)
@@ -31,8 +33,9 @@ func TestAcceptance_ListBaselines(t *testing.T) {
 func TestAcceptance_GetBaselineRules(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
+	cb := compliancebenchmarks.New(c)
 
-	baselines, err := c.ListBaselines(ctx)
+	baselines, err := cb.ListBaselines(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListBaselines failed: %v", err)
@@ -42,7 +45,7 @@ func TestAcceptance_GetBaselineRules(t *testing.T) {
 	}
 
 	baseline := baselines.Baselines[0]
-	rules, err := c.GetBaselineRules(ctx, baseline.BaselineID)
+	rules, err := cb.GetBaselineRules(ctx, baseline.BaselineID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetBaselineRules failed for %q: %v", baseline.BaselineID, err)
@@ -63,7 +66,7 @@ func TestAcceptance_GetBaselineRules(t *testing.T) {
 func TestAcceptance_ListBenchmarks(t *testing.T) {
 	c := accClient(t)
 
-	benchmarks, err := c.ListBenchmarks(context.Background())
+	benchmarks, err := compliancebenchmarks.New(c).ListBenchmarks(context.Background())
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListBenchmarks failed: %v", err)
@@ -77,8 +80,9 @@ func TestAcceptance_ListBenchmarks(t *testing.T) {
 func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
+	cb := compliancebenchmarks.New(c)
 
-	baselines, err := c.ListBaselines(ctx)
+	baselines, err := cb.ListBaselines(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListBaselines failed: %v", err)
@@ -90,7 +94,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
 	baseline := baselines.Baselines[0]
 
-	rules, err := c.GetBaselineRules(ctx, baseline.BaselineID)
+	rules, err := cb.GetBaselineRules(ctx, baseline.BaselineID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetBaselineRules failed: %v", err)
@@ -100,18 +104,18 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 	}
 
 	// Build rule requests — enable first 5 rules (or fewer), including ODV values
-	var ruleRequests []RuleRequest
+	var ruleRequests []compliancebenchmarks.RuleRequest
 	limit := 5
 	if len(rules.Rules) < limit {
 		limit = len(rules.Rules)
 	}
 	for _, r := range rules.Rules[:limit] {
-		rr := RuleRequest{
+		rr := compliancebenchmarks.RuleRequest{
 			ID:      r.ID,
 			Enabled: true,
 		}
 		if r.ODV != nil {
-			rr.ODV = &OdvRequest{Value: r.ODV.Value}
+			rr.ODV = &compliancebenchmarks.ODVRequest{Value: r.ODV.Value}
 		}
 		ruleRequests = append(ruleRequests, rr)
 	}
@@ -119,13 +123,13 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 	title := "sdk-acc-benchmark-" + runSuffix()
 	benchmarkDesc := "SDK acceptance test — safe to delete"
 
-	resp, err := c.CreateBenchmark(ctx, &BenchmarkRequestV2{
+	resp, err := cb.CreateBenchmark(ctx, &compliancebenchmarks.BenchmarkRequestV2{
 		Title:            title,
 		Description:      &benchmarkDesc,
 		SourceBaselineID: baseline.BaselineID,
 		Sources:          rules.Sources,
 		Rules:            ruleRequests,
-		Target:           TargetV2{DeviceGroups: []string{groupID}},
+		Target:           compliancebenchmarks.TargetV2{DeviceGroups: []string{groupID}},
 		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
@@ -141,7 +145,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 	// Wait for sync then verify
 	waitForBenchmarkSyncState(t, c, ctx, resp.BenchmarkID)
 
-	bm, err := c.GetBenchmark(ctx, resp.BenchmarkID)
+	bm, err := cb.GetBenchmark(ctx, resp.BenchmarkID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetBenchmark failed: %v", err)
@@ -158,8 +162,9 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
+	cb := compliancebenchmarks.New(c)
 
-	baselines, err := c.ListBaselines(ctx)
+	baselines, err := cb.ListBaselines(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListBaselines failed: %v", err)
@@ -171,7 +176,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
 	baseline := baselines.Baselines[0]
 
-	rules, err := c.GetBaselineRules(ctx, baseline.BaselineID)
+	rules, err := cb.GetBaselineRules(ctx, baseline.BaselineID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetBaselineRules failed: %v", err)
@@ -180,18 +185,18 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 		t.Skip("No rules available for baseline")
 	}
 
-	var ruleRequests []RuleRequest
+	var ruleRequests []compliancebenchmarks.RuleRequest
 	limit := 3
 	if len(rules.Rules) < limit {
 		limit = len(rules.Rules)
 	}
 	for _, r := range rules.Rules[:limit] {
-		rr := RuleRequest{
+		rr := compliancebenchmarks.RuleRequest{
 			ID:      r.ID,
 			Enabled: true,
 		}
 		if r.ODV != nil {
-			rr.ODV = &OdvRequest{Value: r.ODV.Value}
+			rr.ODV = &compliancebenchmarks.ODVRequest{Value: r.ODV.Value}
 		}
 		ruleRequests = append(ruleRequests, rr)
 	}
@@ -199,13 +204,13 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	title := "sdk-acc-reporting-" + runSuffix()
 	reportingDesc := "SDK acceptance test — reporting endpoints"
 
-	resp, err := c.CreateBenchmark(ctx, &BenchmarkRequestV2{
+	resp, err := cb.CreateBenchmark(ctx, &compliancebenchmarks.BenchmarkRequestV2{
 		Title:            title,
 		Description:      &reportingDesc,
 		SourceBaselineID: baseline.BaselineID,
 		Sources:          rules.Sources,
 		Rules:            ruleRequests,
-		Target:           TargetV2{DeviceGroups: []string{groupID}},
+		Target:           compliancebenchmarks.TargetV2{DeviceGroups: []string{groupID}},
 		EnforcementMode:  "MONITOR",
 	})
 	if err != nil {
@@ -218,7 +223,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	benchmarkID := resp.BenchmarkID
 
 	t.Run("RulesStats", func(t *testing.T) {
-		stats, err := c.ListBenchmarkRulesStats(ctx, benchmarkID, "", "")
+		stats, err := cb.ListBenchmarkRulesStats(ctx, benchmarkID, "", "")
 		if err != nil {
 			skipOnServerError(t, err)
 			t.Fatalf("ListBenchmarkRulesStats failed: %v", err)
@@ -230,7 +235,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	})
 
 	t.Run("RuleDevices", func(t *testing.T) {
-		stats, err := c.ListBenchmarkRulesStats(ctx, benchmarkID, "", "")
+		stats, err := cb.ListBenchmarkRulesStats(ctx, benchmarkID, "", "")
 		if err != nil {
 			skipOnServerError(t, err)
 			t.Fatalf("ListBenchmarkRulesStats failed: %v", err)
@@ -238,7 +243,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 		if len(stats) == 0 {
 			t.Skip("No rule stats — cannot query devices")
 		}
-		devices, err := c.ListBenchmarkRuleDevices(ctx, benchmarkID, stats[0].RuleID, "", "", "")
+		devices, err := cb.ListBenchmarkRuleDevices(ctx, benchmarkID, stats[0].RuleID, "", "", "")
 		if err != nil {
 			skipOnServerError(t, err)
 			t.Fatalf("ListBenchmarkRuleDevices failed: %v", err)
@@ -247,7 +252,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	})
 
 	t.Run("CompliancePercentage", func(t *testing.T) {
-		pct, err := c.GetBenchmarkCompliancePercentage(ctx, benchmarkID)
+		pct, err := cb.GetBenchmarkCompliancePercentage(ctx, benchmarkID)
 		if err != nil {
 			skipOnServerError(t, err)
 			t.Fatalf("GetBenchmarkCompliancePercentage failed: %v", err)

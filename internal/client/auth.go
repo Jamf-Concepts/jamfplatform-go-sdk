@@ -6,6 +6,7 @@ package client
 import (
 	"context"
 	"net/http"
+	"net/http/cookiejar"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -28,9 +29,22 @@ func (t *userAgentTransport) RoundTrip(req *http.Request) (*http.Response, error
 	return t.base.RoundTrip(req2)
 }
 
+// newCookieJar returns a default in-memory cookie jar. Jamf Cloud uses
+// sticky-session cookies to pin a client to a single app node so that
+// writes are visible on subsequent reads; without a jar the cookies are
+// silently dropped and reads can race against the cluster.
+// See https://developer.jamf.com/jamf-pro/docs/sticky-sessions-for-jamf-cloud.
+func newCookieJar() *cookiejar.Jar {
+	jar, _ := cookiejar.New(nil) // cookiejar.New only errors on invalid options; nil is valid.
+	return jar
+}
+
 // newOAuth2Client creates an HTTP client with automatic OAuth2 token management.
+// The base and OAuth2-wrapped clients share a cookie jar so cookies set during
+// token fetch (e.g. load-balancer session cookies) also apply to API calls.
 func newOAuth2Client(config *clientcredentials.Config, userAgent string) (oauthClient *http.Client, baseClient *http.Client) {
-	base := &http.Client{Timeout: defaultHTTPTimeout}
+	jar := newCookieJar()
+	base := &http.Client{Timeout: defaultHTTPTimeout, Jar: jar}
 
 	transport := http.DefaultTransport
 	if userAgent != "" {
@@ -42,13 +56,18 @@ func newOAuth2Client(config *clientcredentials.Config, userAgent string) (oauthC
 	base.Transport = transport
 
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
-	return config.Client(ctx), base
+	outer := config.Client(ctx)
+	outer.Jar = jar
+	return outer, base
 }
 
-// wrapWithOAuth2 wraps a base HTTP client with OAuth2 token management.
+// wrapWithOAuth2 wraps a base HTTP client with OAuth2 token management,
+// preserving the base client's cookie jar on the outer client.
 func wrapWithOAuth2(config *clientcredentials.Config, base *http.Client) *http.Client {
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
-	return config.Client(ctx)
+	outer := config.Client(ctx)
+	outer.Jar = base.Jar
+	return outer
 }
 
 // newCachingOAuth2Client creates an HTTP client whose OAuth2 token source is wrapped with a TokenCache.
@@ -65,6 +84,7 @@ func newCachingOAuth2Client(config *clientcredentials.Config, base *http.Client,
 			Base:   base.Transport,
 		},
 		Timeout: base.Timeout,
+		Jar:     base.Jar,
 	}
 }
 
@@ -77,14 +97,14 @@ func validateCredentials(ctx context.Context, config *clientcredentials.Config, 
 }
 
 // AccessToken returns a valid OAuth2 token from the client's credentials configuration.
-func (c *Client) AccessToken(ctx context.Context) (*oauth2.Token, error) {
+func (c *Transport) AccessToken(ctx context.Context) (*oauth2.Token, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, c.baseClient)
 	ts := c.tokenSource(ctx)
 	return ts.Token()
 }
 
 // tokenSource returns the appropriate TokenSource, wrapping with caching if configured.
-func (c *Client) tokenSource(ctx context.Context) oauth2.TokenSource {
+func (c *Transport) tokenSource(ctx context.Context) oauth2.TokenSource {
 	ts := c.oauthConfig.TokenSource(ctx)
 	if c.tokenCache == nil {
 		return ts

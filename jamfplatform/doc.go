@@ -5,23 +5,41 @@
 
 // Package jamfplatform provides a Go client for the Jamf Platform API.
 //
-// Create a client with [NewClient] and use the typed methods to manage
-// Jamf Platform resources such as blueprints, device groups, benchmarks, and devices.
+// Create a root client with [NewClient], then construct service clients
+// from the sub-packages under jamfplatform/ (devices, devicegroups,
+// deviceactions, blueprints, ddmreport, compliancebenchmarks, pro, ...)
+// to call typed methods.
 //
 //	c := jamfplatform.NewClient(
 //		"https://your-tenant.apigw.jamf.com",
 //		os.Getenv("JAMFPLATFORM_CLIENT_ID"),
 //		os.Getenv("JAMFPLATFORM_CLIENT_SECRET"),
+//		jamfplatform.WithTenantID(os.Getenv("JAMFPLATFORM_TENANT_ID")),
 //	)
 //
-//	devices, err := c.ListDevices(ctx, nil, "")
+//	ds, err := devices.New(c).ListDevices(ctx, nil, "")
 //
-// The client handles OAuth2 authentication and token refresh automatically.
+// The root client handles OAuth2 authentication and token refresh
+// automatically; each sub-package shares the same transport via its
+// [New] constructor.
 //
 // Error handling uses [*APIResponseError] for structured API errors:
 //
-//	device, err := c.GetDevice(ctx, id)
+//	d, err := devices.New(c).GetDevice(ctx, id)
 //	if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
 //		// handle not found
 //	}
+//
+// # Response headers
+//
+// Generated methods return the decoded body only. Response headers —
+// including Location on 201 Created, Retry-After on 429 (which the
+// transport already honors with a bounded single retry), and
+// Deprecation on soon-to-be-removed endpoints (logged automatically)
+// — are available to consumers via the [WithLogger] option. Install a
+// Logger whose LogResponse receives http.Header if you need to inspect
+// Location or any other per-request header.
+//
+// Note that the body returned by create endpoints already carries an
+// "href" field pointing at the new resource, equivalent to Location.
 package jamfplatform

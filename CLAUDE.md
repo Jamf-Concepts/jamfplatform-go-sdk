@@ -63,11 +63,63 @@ All API paths use `/api/{namespace}/{version}/tenant/{tenantId}/{resource}`. The
 
 `ErrAuthentication` and `ErrNotFound` are sentinel errors. `APIResponseError` has `HasStatus(code)` for status inspection. All re-exported from `internal/client`.
 
+## File organization
+
+- Every spec in `tools/generate/config.json` MUST set `"splitByTag": true`. The generator buckets methods by first OpenAPI tag into one file per tag (`<tag>.go` + `<tag>_test.go`); types pool into a shared `types.go`. Splitting by path would scatter CRUD for a single resource across many files; tag-split keeps each resource coherent.
+- Every spec MUST target a sub-package under `jamfplatform/` via `"package": "<name>"` — e.g. `devices`, `pro`, `proclassic`. Avoids name collisions across Jamf's API families (the same resource name exists in multiple APIs).
+- Sub-package names follow the namespace (kebab → snake → Go identifier). No invention.
+
+## API formats
+
+Two formats are supported, selected per-spec via `"format": "json"` (default) or `"format": "xml"`:
+
+- **JSON specs**: Platform + Pro. Transport marshals/unmarshals via `encoding/json`, emits structs with `json:"..."` tags, sets `Content-Type: application/json`.
+- **XML specs**: Classic (`proclassic.yaml`) is XML-only end-to-end. Transport detects `/proclassic/` in the URL path, switches to `encoding/xml`, sets both `Accept` and `Content-Type` to `application/xml`. Generated structs carry `xml:"..."` tags. Forcing the server to respond as JSON (via Accept: application/json) is technically supported but rejected for the SDK — we keep Classic entirely XML for consistency.
+
+## Schema handling
+
+- **Swagger 2.0**: upconverted in-memory via `openapi2conv.ToV3` before the rest of the generator runs. Paths whitelisted per-spec are pruned from the Swagger 2.0 document before conversion — openapi2conv rejects some Jamf Classic operations (multiple body params) that are outside any SDK whitelist anyway.
+- **Untyped operations**: Classic has 444 ops but 0 typed responses and only 6 typed request bodies in the raw spec. For these, `"requestType"` and `"responseType"` operation-level overrides in config name a schema from `definitions/` (now `components/schemas/` post-conversion) that the generator should wire through.
+- **allOf composition**: flattened — properties merged across composed schemas into one Go struct. Avoids Go embedding rules for OpenAPI's "base + extensions" pattern.
+- **oneOf + discriminator**: emits a union struct with one pointer field per variant plus `UnmarshalJSON`/`MarshalJSON` that dispatches on the discriminator property.
+
+## Field pointers — TF plugin framework first
+
+Every field in an XML spec (currently: Classic) is emitted as a pointer with `,omitempty`, regardless of the spec's `required:` or `nullable:` markers. JSON specs retain the usual heuristic (pointer when nullable, non-required non-scalar, or request-type non-required).
+
+Why: this SDK's primary consumer is the upcoming Terraform provider using the plugin framework, where three-state null/value semantics are load-bearing. Without pointers:
+
+- **Write-side ambiguity.** Config `name = null` (no change) vs `name = ""` (explicit clear) collapse to the same zero-string. Pointer distinguishes: `nil` → field omitted from XML request body → server untouched; `&""` → `<name></name>` → server clears.
+- **Read-side ambiguity.** Server-omitted field and server-returns-empty field both decode to zero-string. Pointer distinguishes: `nil` → map to `types.StringNull()` in state; `&""` → `types.StringValue("")`. Prevents recurring diffs when a Computed/Optional attribute flips between absent and empty between refreshes.
+- **Partial updates.** Plugin framework plan contains some attributes as null (user removed from config). Converting to SDK via `plan.Name.ValueStringPointer()` maps null → `nil` → field omitted. Clean intent preservation.
+- **Nested objects.** `*ComputerGeneral` distinguishes "server didn't return a `<general>` section" from "server returned an empty one". Matters for optional nested blocks.
+
+Cost: non-TF consumers of Classic pay a pointer-deref tax on every field access. Acceptable trade-off given the primary consumer.
+
+For JSON APIs (Platform, Pro), the spec-driven heuristic is sufficient — those specs mark required/nullable accurately enough, and JSON has explicit field-presence in responses.
+
 ## Conventions
 
 - MIT license. Copyright headers managed by HashiCorp `copywrite` (uses `--plan` flag, not `--check`).
-- Options pattern for client configuration: `WithTenantID`, `WithUserAgent`, `WithHTTPClient`, `WithLogger`, `WithFileTokenCache`.
+- Options pattern for client configuration: `WithTenantID`, `WithUserAgent`, `WithHTTPClient`, `WithLogger`, `WithFileTokenCache`, `WithFileCookieJar`.
 - Generated types use spec schema names directly. Pointer fields for nullable/optional JSON per spec annotations.
 - `url.PathEscape` for path parameters, `url.QueryEscape` for query parameters.
 - Error wrapping: `fmt.Errorf("MethodName(%s): %w", id, err)`.
-- Do not hand-edit generated files — modify the spec or generator config instead.
+- Do not hand-edit generated files — modify the generator config instead.
+- **Never add handwritten code to a generated-output sub-package** (e.g. `jamfplatform/proclassic/`, `jamfplatform/pro/`, `jamfplatform/devices/`). Every `.go` file in those directories must be written by `make generate`. Supplemental types needed as FieldTypeOverride targets (e.g. `BigInt`, `NotificationValue`) live in the generator as emitted static files (see `emitPkgXMLSupplements`) so they stay in lock-step with spec/override changes and can't drift out of sync. Adding `foo.go` to a generated package is a correctness hazard, not a shortcut — make the generator emit it.
+- **Never modify the OpenAPI specs under `testing/`**. They are the source-of-truth mirrors of Jamf's published specs. Spec quirks (typos, wrong types, polymorphic roots, missing fields) are fixed at the generator level — via config overrides, post-processing passes, or generator-emitted supplemental files — not by patching the spec and not by handwriting files in the target package. Specs must round-trip upstream changes cleanly; our fixups live in the generator so they stay attached to the code that needs them.
+- **Before every commit**, run `go fmt ./...` and `go fix ./...` on the tree. `go fmt` normalises whitespace/indentation; `go fix` rewrites deprecated stdlib usages (e.g. old `rand.Seed` → modern `math/rand/v2`). Both are idempotent on a clean tree; any diff they produce is formatting/API-migration hygiene that belongs with the functional change in the same commit, not as a follow-up "lint" commit.
+
+## Acceptance tests
+
+Every new generated method MUST get an acceptance test in `jamfplatform/acc_<pkg>_test.go` (external `jamfplatform_test` package, `//go:build acceptance`). Read-only endpoints (list, get) call directly and log shape. Mutating endpoints (create/update/delete) use a CRUD lifecycle pattern: `t.Cleanup` defers delete, test verifies round-trip.
+
+Be clever about destructive endpoints — don't run them against shared state. Examples:
+
+- **Password changes**: don't change the OAuth client's own credential. Either create a test user via `/v1/accounts` and change its password, or call with clearly-wrong values and assert the API rejects.
+- **Device actions** (erase, restart): target a known fixture device declared via env var (e.g. `JAMFPLATFORM_DEVICE_ID`) or skip when unset.
+- **Delete endpoints**: always pair with a preceding create in the same test; never delete pre-existing resources the tenant owns.
+
+When an endpoint can't be exercised safely, `t.Skip()` with a comment explaining why. A skipped test still documents the intent; a destructive test that corrupts the tenant costs more than the coverage is worth.
+
+**Never silently tolerate real errors to make a test pass.** If an endpoint rejects a request with 400/500, fetch the full response body (not just the status code) and understand what the server is actually objecting to. Acceptable reactions: fix the payload, add a `fieldTypeOverride` for a spec/server drift, or explicitly surface the bug (leave the test failing / skipped with the server's error text captured in a comment). Not acceptable: catching a category of status codes (`>= 400 && < 500`) as a generic escape hatch that quietly hides real bugs — the first time you see a 4xx you don't understand, print `err.Error()` and read it. 4xx-tolerance is justified only when the rejection is an expected property of the probe (e.g. bogus-id probes, unconfigured-integration probes) and that property is named in the log message. If a server bug blocks coverage, flag it to the user — don't paper over it.

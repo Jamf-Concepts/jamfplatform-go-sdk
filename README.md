@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
 )
 
 func main() {
@@ -35,11 +36,11 @@ func main() {
 	ctx := context.Background()
 
 	// List all devices
-	devices, err := client.ListDevices(ctx, nil, "")
+	ds, err := devices.New(client).ListDevices(ctx, nil, "")
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, d := range devices {
+	for _, d := range ds {
 		fmt.Printf("%s  %s  %s\n", d.ID, d.Name, d.SerialNumber)
 	}
 }
@@ -66,9 +67,14 @@ client := jamfplatform.NewClient(baseURL, clientID, clientSecret,
 ### Error handling
 
 ```go
-import "errors"
+import (
+	"errors"
 
-device, err := client.GetDevice(ctx, id)
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
+)
+
+device, err := devices.New(client).GetDevice(ctx, id)
 if errors.Is(err, jamfplatform.ErrNotFound) {
 	// handle not found
 }
@@ -89,7 +95,7 @@ filter := jamfplatform.BuildRSQLExpression([]jamfplatform.RSQLClause{
 	{Selector: "name", Operator: "==", Argument: "MacBook*"},
 	{Selector: "operatingSystemVersion", Operator: "=gt=", Argument: "15.0"},
 })
-devices, err := client.ListDevices(ctx, nil, filter)
+ds, err := devices.New(client).ListDevices(ctx, nil, filter)
 ```
 
 ### Async polling
@@ -100,8 +106,9 @@ For async operations (e.g. benchmark sync), use the `PollUntil` helper:
 ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 defer cancel()
 
+cb := compliancebenchmarks.New(client)
 err := jamfplatform.PollUntil(ctx, 5*time.Second, func(ctx context.Context) (bool, error) {
-	bm, err := client.GetBenchmark(ctx, id)
+	bm, err := cb.GetBenchmark(ctx, id)
 	if err != nil {
 		return false, err
 	}
@@ -111,17 +118,60 @@ err := jamfplatform.PollUntil(ctx, 5*time.Second, func(ctx context.Context) (boo
 
 ## API coverage
 
-| Domain | Methods |
-|--------|---------|
-| Devices | ListDevices, GetDevice, UpdateDevice, DeleteDevice, ListDeviceApplications, ListDevicesForUser |
-| Device Groups | ListDeviceGroups, GetDeviceGroup, CreateDeviceGroup, UpdateDeviceGroup, DeleteDeviceGroup, ListDeviceGroupMembers, UpdateDeviceGroupMembers, ListDeviceGroupsForDevice |
-| Device Actions | CheckInDevice, EraseDevice, RestartDevice, ShutdownDevice, UnmanageDevice |
-| Blueprints | ListBlueprints, GetBlueprint, CreateBlueprint, UpdateBlueprint, DeleteBlueprint, DeployBlueprint, UndeployBlueprint, GetBlueprintReport, ListBlueprintComponents, GetBlueprintComponent |
-| Compliance Benchmarks | ListBaselines, GetBaselineRules, ListBenchmarks, GetBenchmark, CreateBenchmark, DeleteBenchmark |
-| Benchmark Reporting | ListBenchmarkRulesStats, ListBenchmarkRuleDevices, GetBenchmarkCompliancePercentage |
-| DDM Declarations | GetDeviceDeclarationReport, ListDeclarationReportClients |
+Each API family lives in its own sub-package under `jamfplatform/`. Construct a service client with `<pkg>.New(rootClient)`.
 
-All list methods handle pagination automatically.
+| Sub-package | API |
+|---|---|
+| `jamfplatform/devices` | Platform device inventory |
+| `jamfplatform/devicegroups` | Platform device groups |
+| `jamfplatform/deviceactions` | Platform MDM commands (erase, restart, shutdown, unmanage, check-in) |
+| `jamfplatform/blueprints` | Platform blueprints + components |
+| `jamfplatform/ddmreport` | Platform declaration reporting |
+| `jamfplatform/compliancebenchmarks` | Platform compliance benchmarks |
+| `jamfplatform/pro` | Jamf Pro JSON API (buildings, packages, policies, MDM, enrollment, settings, PKI, App Installers, etc.) |
+| `jamfplatform/proclassic` | Jamf Classic XML API (computers, mobile devices, groups, profiles, policies, etc.) |
+
+All list methods handle pagination automatically. Pro's versioned endpoints emit version-suffixed Go methods (`ListBuildingsV1`, `GetCheckInSettingsV3`) so consumers pin to a specific API version. Exact method lists are generated from the OpenAPI specs under `testing/` — see the published specs in [`api/`](api/) for the current surface.
+
+### Classic (XML) example
+
+```go
+import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
+
+classic := proclassic.New(client)
+computer, err := classic.GetComputerByID(ctx, "42")
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(computer.General.Name, computer.Hardware.ModelIdentifier)
+```
+
+Classic is fully typed — the generator hoists nested XML sections (`general`, `hardware`, `purchasing`, etc.) into named structs and emits every field as a pointer so three-state null/value semantics round-trip cleanly (required for the upcoming Terraform provider).
+
+### Pro example
+
+```go
+import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
+
+p := pro.New(client)
+pkgs, err := p.ListPackagesV1(ctx, nil, "")
+if err != nil {
+    log.Fatal(err)
+}
+for _, pkg := range pkgs {
+    fmt.Println(pkg.ID, pkg.PackageName, pkg.FileName)
+}
+
+// Multipart .pkg upload
+f, _ := os.Open("my-app.pkg")
+defer f.Close()
+created, _ := p.CreatePackageV1(ctx, &pro.Package{
+    PackageName: "my-app",
+    FileName:    "my-app.pkg",
+    CategoryID:  "-1",
+})
+_, err = p.UploadPackageV1(ctx, created.ID, "my-app.pkg", f)
+```
 
 ## Code generation
 

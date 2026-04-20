@@ -3,36 +3,39 @@
 
 //go:build acceptance
 
-package jamfplatform
+package jamfplatform_test
 
 import (
 	"context"
 	"testing"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/ddmreport"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
 )
 
 func TestAcceptance_GetDeviceDeclarationReport(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 
-	devices, err := c.ListDevices(ctx, nil, "")
+	d, err := devices.New(c).ListDevices(ctx, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
-	if len(devices) == 0 {
+	if len(d) == 0 {
 		t.Skip("No devices available")
 	}
 
-	report, err := c.GetDeviceDeclarationReport(ctx, devices[0].ID)
+	report, err := ddmreport.New(c).GetDeviceDeclarationReport(ctx, d[0].ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceDeclarationReport failed: %v", err)
 	}
-	t.Logf("Device %s has %d channels", devices[0].ID, len(report.Channels))
+	t.Logf("Device %s has %d channels", d[0].ID, len(report.Channels))
 	for _, ch := range report.Channels {
 		t.Logf("  Channel %s: %d declarations, last report: %s", ch.Channel, len(ch.Declarations), ch.LastReportTime)
-		for _, d := range ch.Declarations {
-			t.Logf("    %s type=%s status=%s active=%v validity=%s", d.DeclarationIdentifier, d.Type, d.Status, d.Active, d.ValidityState)
+		for _, decl := range ch.Declarations {
+			t.Logf("    %s type=%s status=%s active=%v validity=%s", decl.DeclarationIdentifier, decl.Type, decl.Status, decl.Active, decl.ValidityState)
 		}
 	}
 }
@@ -40,18 +43,19 @@ func TestAcceptance_GetDeviceDeclarationReport(t *testing.T) {
 func TestAcceptance_ListDeclarationReportClients(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
+	dr := ddmreport.New(c)
 
 	// Get a device report first to find a declaration identifier to query
-	devices, err := c.ListDevices(ctx, nil, "")
+	d, err := devices.New(c).ListDevices(ctx, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDevices failed: %v", err)
 	}
-	if len(devices) == 0 {
+	if len(d) == 0 {
 		t.Skip("No devices available")
 	}
 
-	report, err := c.GetDeviceDeclarationReport(ctx, devices[0].ID)
+	report, err := dr.GetDeviceDeclarationReport(ctx, d[0].ID)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceDeclarationReport failed: %v", err)
@@ -68,7 +72,7 @@ func TestAcceptance_ListDeclarationReportClients(t *testing.T) {
 		t.Skip("No declarations found on any device channel")
 	}
 
-	clients, err := c.ListDeclarationReportClients(ctx, declID, nil)
+	clients, err := dr.ListDeclarationReportClients(ctx, declID, nil)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeclarationReportClients(%s) failed: %v", declID, err)
