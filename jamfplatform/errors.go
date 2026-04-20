@@ -7,10 +7,20 @@ package jamfplatform
 
 import "github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 
-var (
-	ErrAuthentication   = client.ErrAuthentication
-	ErrNotFound         = client.ErrNotFound
-	ErrPathNotSupported = client.ErrPathNotSupported
-)
-
+// APIResponseError is returned for any non-success HTTP status. Consumers
+// should inspect it via AsAPIError plus the accessor methods
+// (HasStatus/Details/FieldErrors/Summary) rather than string-matching
+// the Error() output. Non-HTTP errors (denylist refusal, context
+// cancellation, IO failures, etc.) surface as plain wrapped errors —
+// format them with err.Error().
 type APIResponseError = client.APIResponseError
+
+// ErrorDetail is a single structured error entry parsed from an API response
+// body. Consumers receive these via APIResponseError.Details() or
+// APIResponseError.FieldErrors().
+type ErrorDetail = client.Error
+
+// AsAPIError unwraps err and returns the underlying *APIResponseError if
+// present, otherwise nil. Shorthand for errors.As that saves callers from
+// managing the target pointer and importing the concrete error type.
+var AsAPIError = client.AsAPIError

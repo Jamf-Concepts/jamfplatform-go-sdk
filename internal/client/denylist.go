@@ -23,7 +23,7 @@ var deniedPathSuffixes = map[string]string{
 	"POST /oauth/token":           "authentication is managed by the platform gateway; the SDK handles OAuth2 client credentials automatically",
 }
 
-// checkDeniedPath returns ErrPathNotSupported if method+fullURL targets a
+// checkDeniedPath returns a formatted error if method+fullURL targets a
 // denied API path. Matching uses the URL tail after /tenant/{id}, so it
 // applies uniformly across namespace and version path segments.
 func checkDeniedPath(method, fullURL string) error {
@@ -41,7 +41,7 @@ func checkDeniedPath(method, fullURL string) error {
 	}
 	key := method + " " + suffix
 	if reason, ok := deniedPathSuffixes[key]; ok {
-		return fmt.Errorf("%w: %s %s — %s", ErrPathNotSupported, method, suffix, reason)
+		return fmt.Errorf("jamfplatform: path not supported by SDK: %s %s — %s", method, suffix, reason)
 	}
 	return nil
 }

@@ -5,8 +5,8 @@ package client
 
 import (
 	"context"
-	"errors"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -35,8 +35,8 @@ func TestCheckDeniedPath(t *testing.T) {
 				if err == nil {
 					t.Fatalf("expected error, got nil")
 				}
-				if !errors.Is(err, ErrPathNotSupported) {
-					t.Fatalf("expected ErrPathNotSupported, got %v", err)
+				if !strings.Contains(err.Error(), "path not supported") {
+					t.Fatalf("expected path-not-supported rejection, got %v", err)
 				}
 			} else if err != nil {
 				t.Fatalf("expected no error, got %v", err)
@@ -52,8 +52,8 @@ func TestDoRefusesDeniedPath(t *testing.T) {
 	if err == nil {
 		t.Fatalf("expected error calling denied path, got nil")
 	}
-	if !errors.Is(err, ErrPathNotSupported) {
-		t.Fatalf("expected ErrPathNotSupported, got %v", err)
+	if !strings.Contains(err.Error(), "path not supported") {
+		t.Fatalf("expected path-not-supported rejection, got %v", err)
 	}
 	_ = srv
 }

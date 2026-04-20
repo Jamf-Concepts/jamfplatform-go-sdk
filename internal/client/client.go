@@ -68,57 +68,6 @@ type PaginatedResponseRepresentation struct {
 	HasPrevious bool  `json:"hasPrevious"`
 }
 
-// ApiError represents an error response from the API.
-type ApiError struct {
-	HTTPStatus int     `json:"httpStatus"`
-	TraceID    string  `json:"traceId"`
-	Errors     []Error `json:"errors"`
-}
-
-// Error represents an individual error detail from an API response.
-type Error struct {
-	ID          string `json:"id,omitempty"`
-	Code        string `json:"code"`
-	Field       string `json:"field"`
-	Description string `json:"description"`
-}
-
-// APIResponseError represents an unexpected HTTP status returned by the Jamf Platform API.
-type APIResponseError struct {
-	StatusCode int
-	Method     string
-	URL        string
-	Body       string
-	TraceID    string
-	Errors     []Error
-}
-
-// HasStatus reports whether the error carries the given HTTP status code.
-func (e *APIResponseError) HasStatus(code int) bool {
-	return e.StatusCode == code
-}
-
-// Error formats the API response error as a human-readable string.
-func (e *APIResponseError) Error() string {
-	requestInfo := fmt.Sprintf("method=%s, url=%s", e.Method, e.URL)
-	statusText := http.StatusText(e.StatusCode)
-	statusDetail := strconv.Itoa(e.StatusCode)
-	if statusText != "" {
-		statusDetail = strconv.Itoa(e.StatusCode) + " " + statusText
-	}
-
-	if len(e.Errors) > 0 {
-		details := make([]string, len(e.Errors))
-		for i, err := range e.Errors {
-			details[i] = fmt.Sprintf("[%s] %s: %s", err.Code, err.Field, err.Description)
-		}
-		return fmt.Sprintf("API request failed with status %d, traceId %s (%s): %s",
-			e.StatusCode, e.TraceID, requestInfo, strings.Join(details, "; "))
-	}
-
-	return fmt.Sprintf("API request failed with status %s (%s): %s", statusDetail, requestInfo, e.Body)
-}
-
 // Option configures a Client.
 type Option func(*Transport)
 
@@ -454,11 +403,14 @@ func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, cla
 		}
 
 		var apiErr ApiError
-		if err := json.Unmarshal(body, &apiErr); err == nil && len(apiErr.Errors) > 0 {
-			respErr.StatusCode = apiErr.HTTPStatus
-			respErr.TraceID = apiErr.TraceID
+		_ = json.Unmarshal(body, &apiErr) // best-effort; non-JSON bodies leave apiErr zero
+		if len(apiErr.Errors) > 0 {
+			if apiErr.HTTPStatus > 0 {
+				respErr.StatusCode = apiErr.HTTPStatus
+			}
 			respErr.Errors = apiErr.Errors
 		}
+		respErr.TraceID = pickTraceID(apiErr.TraceID, resp.Header)
 
 		return respErr
 	}

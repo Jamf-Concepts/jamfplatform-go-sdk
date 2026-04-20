@@ -61,7 +61,26 @@ All API paths use `/api/{namespace}/{version}/tenant/{tenantId}/{resource}`. The
 
 ### Error handling
 
-`ErrAuthentication` and `ErrNotFound` are sentinel errors. `APIResponseError` has `HasStatus(code)` for status inspection. All re-exported from `internal/client`.
+The SDK exposes exactly one error type: `*APIResponseError`, returned for every non-success HTTP response. No sentinel errors — `errors.Is` on a sentinel was never honoured by the transport (dead pattern, removed). Non-HTTP errors (denylist refusal, context cancellation, IO failures) surface as plain wrapped errors; format them via `err.Error()`.
+
+Consumers inspect HTTP errors via the accessor API on `*APIResponseError`:
+- `HasStatus(code int) bool` — specific HTTP status check
+- `Details() []ErrorDetail` — raw structured details parsed from the response body
+- `FieldErrors() map[string][]string` — details bucketed by `Field`, suitable for attribute-level diagnostics (Terraform `AddAttributeError`, CLI per-field output)
+- `Summary() string` — single-line human-readable summary, falls back to status text when the body lacks structured details
+- `AsAPIError(err) *APIResponseError` — top-level unwrap, saves callers from managing `errors.As` target pointers
+
+`FieldErrors`/`Details` populate when the server returns a structured JSON error body (`{"errors": [{"code": "...", "field": "...", "description": "..."}]}`). `Summary()` always formats cleanly regardless of body shape.
+
+Empirical per-family behaviour (see `acc_api_errors_test.go` for the probes that validate this):
+
+- **Pro JSON** — full structure including `Field` attribution (`name`, `id`, etc.). Consumers can surface field-level diagnostics.
+- **Devices / DeviceGroups / Blueprints / DeviceActions** — structured details but `Field` is usually empty, so `FieldErrors` buckets everything under `""`. Description is still human-readable.
+- **Compliance Benchmarks / App Installer Titles 404s** — empty body or `errors: []`. `Details` is nil. `Summary` returns status text.
+- **Classic (proclassic)** — returns Tomcat's default HTML error page, not structured XML. `Details`/`FieldErrors` are empty. The HTML body is preserved in `APIResponseError.Body` for diagnostic display; do not HTML-scrape it in the transport.
+- **DDM Report** — never emits errors for unknown devices; returns an empty report payload instead. Error accessors don't apply.
+
+Rule for consumers doing field-attributed diagnostics (Terraform `AddAttributeError`, CLI per-field output): iterate `FieldErrors()` and fall through to a generic diagnostic when the field key is empty. That pattern works across every family.
 
 ## File organization
 
