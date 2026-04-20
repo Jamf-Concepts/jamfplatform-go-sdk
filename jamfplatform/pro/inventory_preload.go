@@ -29,6 +29,12 @@ func (c *Client) DownloadInventoryPreloadCsvV2(ctx context.Context) ([]byte, err
 }
 
 // UploadInventoryPreloadCsvV2 create one or more new Inventory Preload records using CSV.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadInventoryPreloadCsvV2(ctx context.Context, fileFilename string, file io.Reader) (*[]HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []HrefResponse
@@ -54,6 +60,12 @@ func (c *Client) DownloadInventoryPreloadCsvTemplateV2(ctx context.Context) ([]b
 }
 
 // ValidateInventoryPreloadCsvV2 validate a given CSV file.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) ValidateInventoryPreloadCsvV2(ctx context.Context, fileFilename string, file io.Reader) (*InventoryPreloadCsvValidationSuccess, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result InventoryPreloadCsvValidationSuccess

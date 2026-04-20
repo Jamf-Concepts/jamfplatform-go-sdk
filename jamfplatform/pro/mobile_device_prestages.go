@@ -187,6 +187,12 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV3(ctx context.Context, id s
 }
 
 // UploadMobileDevicePrestageAttachmentV3 add an attachment to a Mobile Device Prestage.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadMobileDevicePrestageAttachmentV3(ctx context.Context, id string, fileFilename string, file io.Reader) (*PrestageFileAttachmentV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result PrestageFileAttachmentV3

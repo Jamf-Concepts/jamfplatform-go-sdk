@@ -91,6 +91,12 @@ func (c *Client) DeletePackageV1(ctx context.Context, id string) error {
 }
 
 // UploadPackageV1 upload package.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadPackageV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -210,6 +216,12 @@ func (c *Client) ExportPackageHistoryV1(ctx context.Context, id string, request 
 }
 
 // UploadPackageManifestV1 add a manifest to a package.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadPackageManifestV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*Package, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Package

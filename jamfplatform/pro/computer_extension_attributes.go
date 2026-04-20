@@ -110,6 +110,12 @@ func (c *Client) GetComputerExtensionAttributeTemplateV1(ctx context.Context, id
 }
 
 // UploadComputerExtensionAttributeV1 upload Computer Extension Attribute.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadComputerExtensionAttributeV1(ctx context.Context, fileFilename string, file io.Reader) (*ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerExtensionAttributes
