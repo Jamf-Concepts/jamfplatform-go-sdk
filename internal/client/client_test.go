@@ -8,8 +8,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -347,6 +349,67 @@ func TestSetUserAgent(t *testing.T) {
 	err := c.Do(context.Background(), http.MethodGet, "/api/ua", nil, &result)
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestDoStream_Success(t *testing.T) {
+	c, _, mux := newTestClient(t)
+
+	// 8 MiB of A's — large enough to prove we're streaming, not buffering.
+	const size = 8 << 20
+	mux.HandleFunc("/api/download", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", size))
+		w.WriteHeader(http.StatusOK)
+		chunk := strings.Repeat("A", 64<<10)
+		for written := 0; written < size; written += len(chunk) {
+			_, _ = w.Write([]byte(chunk))
+		}
+	})
+
+	resp, err := c.DoStream(context.Background(), http.MethodGet, "/api/download", nil)
+	if err != nil {
+		t.Fatalf("DoStream: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.Header.Get("Content-Type") != "application/octet-stream" {
+		t.Errorf("Content-Type = %q", resp.Header.Get("Content-Type"))
+	}
+	n, err := io.Copy(io.Discard, resp.Body)
+	if err != nil {
+		t.Fatalf("drain body: %v", err)
+	}
+	if n != size {
+		t.Errorf("streamed %d bytes, want %d", n, size)
+	}
+}
+
+func TestDoStream_ErrorStatusBuffered(t *testing.T) {
+	c, _, mux := newTestClient(t)
+
+	mux.HandleFunc("/api/notfound", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte(`{"httpStatus":404,"errors":[{"code":"NOT_FOUND","description":"missing"}]}`))
+	})
+
+	resp, err := c.DoStream(context.Background(), http.MethodGet, "/api/notfound", nil)
+	if resp != nil {
+		t.Errorf("resp = %v, want nil on error", resp)
+	}
+	if err == nil {
+		t.Fatal("want error, got nil")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("err type = %T, want *APIResponseError", err)
+	}
+	if apiErr.StatusCode != 404 {
+		t.Errorf("StatusCode = %d, want 404", apiErr.StatusCode)
+	}
+	if !strings.Contains(apiErr.Body, "NOT_FOUND") {
+		t.Errorf("Body = %q, want substring NOT_FOUND", apiErr.Body)
 	}
 }
 
