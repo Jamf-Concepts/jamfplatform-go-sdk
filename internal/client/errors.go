@@ -36,9 +36,10 @@ func pickTraceID(bodyTraceID string, h http.Header) string {
 	return ""
 }
 
-// ApiError is the on-the-wire shape of an API error response body. Kept
-// unexported (lowercase accessors) because consumers should reach details
-// via APIResponseError, not via this intermediate shape.
+// ApiError is the on-the-wire shape of an API error response body. Not
+// re-exported from the public jamfplatform package — consumers reach
+// structured details via APIResponseError accessors, not via this
+// intermediate shape.
 type ApiError struct {
 	HTTPStatus int     `json:"httpStatus"`
 	TraceID    string  `json:"traceId"`

@@ -23,4 +23,6 @@ type ErrorDetail = client.Error
 // AsAPIError unwraps err and returns the underlying *APIResponseError if
 // present, otherwise nil. Shorthand for errors.As that saves callers from
 // managing the target pointer and importing the concrete error type.
-var AsAPIError = client.AsAPIError
+func AsAPIError(err error) *APIResponseError {
+	return client.AsAPIError(err)
+}
