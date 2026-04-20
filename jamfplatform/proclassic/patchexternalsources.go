@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetPatchExternalSourceByID finds a patch external source by ID.
@@ -95,4 +96,21 @@ func (c *Client) UpdatePatchExternalSourceByName(ctx context.Context, name strin
 		return fmt.Errorf("UpdatePatchExternalSourceByName(%s): %w", name, err)
 	}
 	return nil
+}
+
+// ResolvePatchExternalSourceIDByName looks up a PatchExternalSource by name via GetPatchExternalSourceByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolvePatchExternalSourceIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetPatchExternalSourceByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePatchExternalSourceIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolvePatchExternalSourceIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolvePatchExternalSourceByName looks up a PatchExternalSource by name. Alias for GetPatchExternalSourceByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolvePatchExternalSourceByName(ctx context.Context, name string) (*PatchExternalSource, error) {
+	return c.GetPatchExternalSourceByName(ctx, name)
 }

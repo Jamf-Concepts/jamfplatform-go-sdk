@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetClassicPackageByID finds packages by ID.
@@ -94,4 +95,21 @@ func (c *Client) UpdateClassicPackageByName(ctx context.Context, name string, re
 		return fmt.Errorf("UpdateClassicPackageByName(%s): %w", name, err)
 	}
 	return nil
+}
+
+// ResolveClassicPackageIDByName looks up a ClassicPackage by name via GetClassicPackageByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveClassicPackageIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetClassicPackageByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveClassicPackageIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveClassicPackageIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveClassicPackageByName looks up a ClassicPackage by name. Alias for GetClassicPackageByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveClassicPackageByName(ctx context.Context, name string) (*Package, error) {
+	return c.GetClassicPackageByName(ctx, name)
 }

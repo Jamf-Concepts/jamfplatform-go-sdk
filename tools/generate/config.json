@@ -1309,7 +1309,7 @@
         {"op": "PUT /scripts/name/{name}", "name": "UpdateScriptByName", "requestType": "script", "expectedStatus": 201},
         {"op": "DELETE /scripts/name/{name}", "name": "DeleteScriptByName"},
 
-        {"op": "GET /users/name/{name}", "name": "GetUserByName", "responseType": "user"},
+        {"op": "GET /users/name/{name}", "name": "GetUserByName", "responseType": "user", "resolver": {"resourceType": "User", "mode": "direct"}},
         {"op": "PUT /users/name/{name}", "name": "UpdateUserByName", "requestType": "user_post", "expectedStatus": 201},
         {"op": "DELETE /users/name/{name}", "name": "DeleteUserByName"},
         {"op": "GET /users/email/{email}", "name": "GetUserByEmail", "responseType": "user", "pathNames": {"email": "email"}},
@@ -1320,7 +1320,7 @@
         {"op": "PUT /directorybindings/name/{name}", "name": "UpdateDirectoryBindingByName", "requestType": "directory_binding", "expectedStatus": 201},
         {"op": "DELETE /directorybindings/name/{name}", "name": "DeleteDirectoryBindingByName"},
 
-        {"op": "GET /diskencryptionconfigurations/name/{name}", "name": "GetDiskEncryptionConfigurationByName", "responseType": "disk_encryption_configuration"},
+        {"op": "GET /diskencryptionconfigurations/name/{name}", "name": "GetDiskEncryptionConfigurationByName", "responseType": "disk_encryption_configuration", "resolver": {"resourceType": "DiskEncryptionConfiguration", "mode": "direct"}},
         {"op": "PUT /diskencryptionconfigurations/name/{name}", "name": "UpdateDiskEncryptionConfigurationByName", "requestType": "disk_encryption_configuration", "expectedStatus": 201},
         {"op": "DELETE /diskencryptionconfigurations/name/{name}", "name": "DeleteDiskEncryptionConfigurationByName"},
 
@@ -1332,7 +1332,7 @@
         {"op": "PUT /ibeacons/name/{name}", "name": "UpdateIBeaconByName", "requestType": "ibeacon", "expectedStatus": 201},
         {"op": "DELETE /ibeacons/name/{name}", "name": "DeleteIBeaconByName"},
 
-        {"op": "GET /ldapservers/name/{name}", "name": "GetLDAPServerByName", "responseType": "ldap_server"},
+        {"op": "GET /ldapservers/name/{name}", "name": "GetLDAPServerByName", "responseType": "ldap_server", "resolver": {"resourceType": "LDAPServer", "mode": "direct", "idField": "Connection.ID", "typedReturn": "LdapServer"}},
         {"op": "PUT /ldapservers/name/{name}", "name": "UpdateLDAPServerByName", "requestType": "ldap_server_post", "expectedStatus": 201},
         {"op": "DELETE /ldapservers/name/{name}", "name": "DeleteLDAPServerByName"},
 
@@ -1350,7 +1350,7 @@
 
         {"op": "GET /allowedfileextensions/extension/{extension}", "name": "GetAllowedFileExtensionByExtension", "responseType": "allowed_file_extension", "pathNames": {"extension": "extension"}},
 
-        {"op": "GET /softwareupdateservers/name/{name}", "name": "GetSoftwareUpdateServerByName", "responseType": "software_update_server"},
+        {"op": "GET /softwareupdateservers/name/{name}", "name": "GetSoftwareUpdateServerByName", "responseType": "software_update_server", "resolver": {"resourceType": "SoftwareUpdateServer", "mode": "direct"}},
         {"op": "PUT /softwareupdateservers/name/{name}", "name": "UpdateSoftwareUpdateServerByName", "requestType": "software_update_server", "expectedStatus": 201},
         {"op": "DELETE /softwareupdateservers/name/{name}", "name": "DeleteSoftwareUpdateServerByName"},
 
@@ -1381,10 +1381,10 @@
         {"op": "PUT /userextensionattributes/name/{name}", "name": "UpdateUserExtensionAttributeByName", "requestType": "user_extension_attribute", "expectedStatus": 201},
         {"op": "DELETE /userextensionattributes/name/{name}", "name": "DeleteUserExtensionAttributeByName"},
 
-        {"op": "GET /osxconfigurationprofiles/name/{name}", "name": "GetOSXConfigurationProfileByName", "responseType": "os_x_configuration_profile"},
+        {"op": "GET /osxconfigurationprofiles/name/{name}", "name": "GetOSXConfigurationProfileByName", "responseType": "os_x_configuration_profile", "resolver": {"resourceType": "OSXConfigurationProfile", "mode": "direct", "idField": "General.ID", "typedReturn": "OsXConfigurationProfile"}},
         {"op": "PUT /osxconfigurationprofiles/name/{name}", "name": "UpdateOSXConfigurationProfileByName", "requestType": "os_x_configuration_profile", "expectedStatus": 201},
         {"op": "DELETE /osxconfigurationprofiles/name/{name}", "name": "DeleteOSXConfigurationProfileByName"},
-        {"op": "GET /mobiledeviceconfigurationprofiles/name/{name}", "name": "GetMobileDeviceConfigurationProfileByName", "responseType": "mobile_device_configuration_profile"},
+        {"op": "GET /mobiledeviceconfigurationprofiles/name/{name}", "name": "GetMobileDeviceConfigurationProfileByName", "responseType": "mobile_device_configuration_profile", "resolver": {"resourceType": "MobileDeviceConfigurationProfile", "mode": "direct", "idField": "General.ID"}},
         {"op": "PUT /mobiledeviceconfigurationprofiles/name/{name}", "name": "UpdateMobileDeviceConfigurationProfileByName", "requestType": "mobile_device_configuration_profile", "expectedStatus": 201},
         {"op": "DELETE /mobiledeviceconfigurationprofiles/name/{name}", "name": "DeleteMobileDeviceConfigurationProfileByName"},
 
@@ -1404,20 +1404,20 @@
         {"op": "PUT /networksegments/name/{name}", "name": "UpdateNetworkSegmentByName", "requestType": "network_segment_post", "expectedStatus": 201},
         {"op": "DELETE /networksegments/name/{name}", "name": "DeleteNetworkSegmentByName"},
 
-        {"op": "GET /distributionpoints/name/{name}", "name": "GetDistributionPointByName", "responseType": "distribution_point"},
+        {"op": "GET /distributionpoints/name/{name}", "name": "GetDistributionPointByName", "responseType": "distribution_point", "resolver": {"resourceType": "DistributionPoint", "mode": "direct"}},
         {"op": "PUT /distributionpoints/name/{name}", "name": "UpdateDistributionPointByName", "requestType": "distribution_point_post", "expectedStatus": 201},
         {"op": "DELETE /distributionpoints/name/{name}", "name": "DeleteDistributionPointByName"},
 
-        {"op": "GET /mobiledeviceprovisioningprofiles/name/{name}", "name": "GetMobileDeviceProvisioningProfileByName", "responseType": "mobile_device_provisioning_profile"},
+        {"op": "GET /mobiledeviceprovisioningprofiles/name/{name}", "name": "GetMobileDeviceProvisioningProfileByName", "responseType": "mobile_device_provisioning_profile", "resolver": {"resourceType": "MobileDeviceProvisioningProfile", "mode": "direct", "idField": "General.ID"}},
         {"op": "DELETE /mobiledeviceprovisioningprofiles/name/{name}", "name": "DeleteMobileDeviceProvisioningProfileByName"},
         {"op": "GET /mobiledeviceprovisioningprofiles/uuid/{uuid}", "name": "GetMobileDeviceProvisioningProfileByUUID", "responseType": "mobile_device_provisioning_profile", "pathNames": {"uuid": "uuid"}},
         {"op": "DELETE /mobiledeviceprovisioningprofiles/uuid/{uuid}", "name": "DeleteMobileDeviceProvisioningProfileByUUID", "pathNames": {"uuid": "uuid"}},
 
-        {"op": "GET /mobiledeviceenrollmentprofiles/name/{name}", "name": "GetMobileDeviceEnrollmentProfileByName", "responseType": "mobile_device_enrollment_profile"},
+        {"op": "GET /mobiledeviceenrollmentprofiles/name/{name}", "name": "GetMobileDeviceEnrollmentProfileByName", "responseType": "mobile_device_enrollment_profile", "resolver": {"resourceType": "MobileDeviceEnrollmentProfile", "mode": "direct", "idField": "General.ID"}},
         {"op": "DELETE /mobiledeviceenrollmentprofiles/name/{name}", "name": "DeleteMobileDeviceEnrollmentProfileByName"},
         {"op": "GET /mobiledeviceenrollmentprofiles/invitation/{invitation}", "name": "GetMobileDeviceEnrollmentProfileByInvitation", "responseType": "mobile_device_enrollment_profile", "pathNames": {"invitation": "invitation"}},
 
-        {"op": "GET /accounts/groupname/{name}", "name": "GetAccountGroupByName", "responseType": "group"},
+        {"op": "GET /accounts/groupname/{name}", "name": "GetAccountGroupByName", "responseType": "group", "resolver": {"resourceType": "AccountGroup", "mode": "direct", "typedReturn": "Group"}},
         {"op": "PUT /accounts/groupname/{name}", "name": "UpdateAccountGroupByName", "requestType": "group", "expectedStatus": 201},
         {"op": "DELETE /accounts/groupname/{name}", "name": "DeleteAccountGroupByName"},
         {"op": "GET /accounts/username/{name}", "name": "GetAccountByUsername", "responseType": "account"},
@@ -1432,8 +1432,8 @@
         {"op": "PUT /removablemacaddresses/name/{name}", "name": "UpdateRemovableMacAddressByName", "requestType": "removable_mac_address", "expectedStatus": 201},
         {"op": "DELETE /removablemacaddresses/name/{name}", "name": "DeleteRemovableMacAddressByName"},
 
-        {"op": "GET /patchexternalsources/name/{name}", "name": "GetPatchExternalSourceByName", "responseType": "patch_external_source"},
-        {"op": "GET /patchinternalsources/name/{name}", "name": "GetPatchInternalSourceByName", "responseType": "patch_internal_source"},
+        {"op": "GET /patchexternalsources/name/{name}", "name": "GetPatchExternalSourceByName", "responseType": "patch_external_source", "resolver": {"resourceType": "PatchExternalSource", "mode": "direct"}},
+        {"op": "GET /patchinternalsources/name/{name}", "name": "GetPatchInternalSourceByName", "responseType": "patch_internal_source", "resolver": {"resourceType": "PatchInternalSource", "mode": "direct"}},
         {"op": "GET /patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}", "name": "ListPatchPoliciesBySoftwareTitleConfigID", "responseType": "patch_policy", "pathNames": {"softwaretitleconfigid": "softwareTitleConfigID"}},
 
         {"op": "GET /peripherals/id/{id}/subset/{subset}", "name": "GetPeripheralByIDSubset", "responseType": "peripheral", "pathNames": {"id": "id", "subset": "subset"}},
@@ -1608,7 +1608,7 @@
         {"op": "GET /osxconfigurationprofiles/id/{id}/subset/{subset}", "name": "GetOsxConfigurationProfileByIDSubset", "responseType": "os_x_configuration_profile", "pathNames": {"id": "id"}},
         {"op": "GET /osxconfigurationprofiles/name/{name}/subset/{subset}", "name": "GetOsxConfigurationProfileByNameSubset", "responseType": "os_x_configuration_profile"},
         {"op": "DELETE /packages/name/{name}", "name": "DeleteClassicPackageByName"},
-        {"op": "GET /packages/name/{name}", "name": "GetClassicPackageByName", "responseType": "package"},
+        {"op": "GET /packages/name/{name}", "name": "GetClassicPackageByName", "responseType": "package", "resolver": {"resourceType": "ClassicPackage", "mode": "direct", "typedReturn": "Package"}},
         {"op": "PUT /packages/name/{name}", "name": "UpdateClassicPackageByName", "requestType": "package", "expectedStatus": 201},
         {"op": "POST /patchexternalsources/name/{name}", "name": "CreatePatchExternalSourceByName", "requestType": "patch_external_source", "responseType": "patch_external_source", "expectedStatus": 201},
         {"op": "PUT /patchexternalsources/name/{name}", "name": "UpdatePatchExternalSourceByName", "requestType": "patch_external_source", "expectedStatus": 201},

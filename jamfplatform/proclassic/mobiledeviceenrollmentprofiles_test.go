@@ -298,3 +298,39 @@ func TestGetMobileDeviceEnrollmentProfileByNameSubset_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveMobileDeviceEnrollmentProfileIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceenrollmentprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mobile_device_enrollment_profile><general><id>42</id></general></mobile_device_enrollment_profile>")
+	})
+
+	id, err := c.ResolveMobileDeviceEnrollmentProfileIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveMobileDeviceEnrollmentProfileByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceenrollmentprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mobile_device_enrollment_profile><general><id>42</id></general></mobile_device_enrollment_profile>")
+	})
+
+	result, err := c.ResolveMobileDeviceEnrollmentProfileByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

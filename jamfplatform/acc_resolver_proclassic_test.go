@@ -1083,3 +1083,518 @@ func TestAcceptance_Classic_ResolvePolicyByName(t *testing.T) {
 		return p.General.ID
 	}, id)
 }
+
+func TestAcceptance_Classic_ResolveDiskEncryptionConfigurationByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-dec-" + runSuffix()
+	created, err := pc.CreateDiskEncryptionConfigurationByID(ctx, "0", &proclassic.DiskEncryptionConfiguration{
+		Name:                  classicStrPtr(name),
+		KeyType:               classicStrPtr("Individual"),
+		FileVaultEnabledUsers: classicStrPtr("Management Account"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateDiskEncryptionConfigurationByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteDiskEncryptionConfigurationByID", func() error {
+		return pc.DeleteDiskEncryptionConfigurationByID(ctx, intToStr(id))
+	})
+
+	gotID, err := pc.ResolveDiskEncryptionConfigurationIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveDiskEncryptionConfigurationIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveDiskEncryptionConfigurationIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveDiskEncryptionConfigurationByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveDiskEncryptionConfigurationByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveDiskEncryptionConfigurationByName", gotTyped, func(d *proclassic.DiskEncryptionConfiguration) *int { return d.ID }, id)
+
+	_, err = pc.ResolveDiskEncryptionConfigurationIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveDiskEncryptionConfigurationIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolveLDAPServerByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-ldap-" + runSuffix()
+	port := 389
+	created, err := pc.CreateLDAPServerByID(ctx, "0", &proclassic.LdapServerPost{
+		Connection: &proclassic.LdapServerPostConnection{
+			Name:               classicStrPtr(name),
+			Hostname:           classicStrPtr("ldap.example.test"),
+			Port:               &port,
+			ServerType:         classicStrPtr("Active Directory"),
+			AuthenticationType: classicStrPtr("none"),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateLDAPServerByID: %v", err)
+	}
+	if created == nil || (created.ID == nil && (created.Connection == nil || created.Connection.ID == nil)) {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := 0
+	if created.ID != nil {
+		id = *created.ID
+	} else {
+		id = *created.Connection.ID
+	}
+	cleanupDelete(t, "DeleteLDAPServerByID", func() error { return pc.DeleteLDAPServerByID(ctx, intToStr(id)) })
+
+	gotID, err := pc.ResolveLDAPServerIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveLDAPServerIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveLDAPServerIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveLDAPServerByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveLDAPServerByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveLDAPServerByName", gotTyped, func(l *proclassic.LdapServer) *int {
+		if l.Connection == nil {
+			return nil
+		}
+		return l.Connection.ID
+	}, id)
+
+	_, err = pc.ResolveLDAPServerIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveLDAPServerIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolveSoftwareUpdateServerByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-sus-" + runSuffix()
+	port := 8088
+	created, err := pc.CreateSoftwareUpdateServerByID(ctx, "0", &proclassic.SoftwareUpdateServer{
+		Name:      classicStrPtr(name),
+		IPAddress: classicStrPtr("sus.example.test"),
+		Port:      &port,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("forbidden on this tenant: %v", err)
+		}
+		t.Fatalf("CreateSoftwareUpdateServerByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteSoftwareUpdateServerByID", func() error {
+		return pc.DeleteSoftwareUpdateServerByID(ctx, intToStr(id))
+	})
+
+	gotID, err := pc.ResolveSoftwareUpdateServerIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveSoftwareUpdateServerIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveSoftwareUpdateServerIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveSoftwareUpdateServerByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveSoftwareUpdateServerByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveSoftwareUpdateServerByName", gotTyped, func(s *proclassic.SoftwareUpdateServer) *int { return s.ID }, id)
+
+	_, err = pc.ResolveSoftwareUpdateServerIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveSoftwareUpdateServerIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolveOSXConfigurationProfileByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-osxcp-" + runSuffix()
+	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
+		General: &proclassic.OsXConfigurationProfileGeneral{Name: classicStrPtr(name)},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateOSXConfigurationProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteOSXConfigurationProfileByID", func() error {
+		return pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id))
+	})
+
+	gotID, err := pc.ResolveOSXConfigurationProfileIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveOSXConfigurationProfileIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveOSXConfigurationProfileIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveOSXConfigurationProfileByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveOSXConfigurationProfileByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveOSXConfigurationProfileByName", gotTyped, func(p *proclassic.OsXConfigurationProfile) *int {
+		if p.General == nil {
+			return nil
+		}
+		return p.General.ID
+	}, id)
+
+	_, err = pc.ResolveOSXConfigurationProfileIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveOSXConfigurationProfileIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolveMobileDeviceConfigurationProfileByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-mdcp-" + runSuffix()
+	created, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
+		General: &proclassic.MobileDeviceConfigurationProfileGeneral{Name: classicStrPtr(name)},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateMobileDeviceConfigurationProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteMobileDeviceConfigurationProfileByID", func() error {
+		return pc.DeleteMobileDeviceConfigurationProfileByID(ctx, intToStr(id))
+	})
+
+	gotID, err := pc.ResolveMobileDeviceConfigurationProfileIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveMobileDeviceConfigurationProfileIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveMobileDeviceConfigurationProfileIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveMobileDeviceConfigurationProfileByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveMobileDeviceConfigurationProfileByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveMobileDeviceConfigurationProfileByName", gotTyped, func(p *proclassic.MobileDeviceConfigurationProfile) *int {
+		if p.General == nil {
+			return nil
+		}
+		return p.General.ID
+	}, id)
+
+	_, err = pc.ResolveMobileDeviceConfigurationProfileIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveMobileDeviceConfigurationProfileIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolveDistributionPointByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-dp-" + runSuffix()
+	noAuth := true
+	created, err := pc.CreateDistributionPointByID(ctx, "0", &proclassic.DistributionPointPost{
+		Name:                     classicStrPtr(name),
+		IPAddress:                classicStrPtr("dp.example.test"),
+		ShareName:                classicStrPtr("CasperShare"),
+		ReadOnlyUsername:         classicStrPtr("ro-user"),
+		ReadWriteUsername:        classicStrPtr("rw-user"),
+		NoAuthenticationRequired: &noAuth,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateDistributionPointByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteDistributionPointByID", func() error {
+		return pc.DeleteDistributionPointByID(ctx, intToStr(id))
+	})
+
+	gotID, err := pc.ResolveDistributionPointIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveDistributionPointIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveDistributionPointIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveDistributionPointByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveDistributionPointByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveDistributionPointByName", gotTyped, func(d *proclassic.DistributionPoint) *int { return d.ID }, id)
+
+	_, err = pc.ResolveDistributionPointIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveDistributionPointIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolveMobileDeviceEnrollmentProfileByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-mdep-" + runSuffix()
+	created, err := pc.CreateMobileDeviceEnrollmentProfileByID(ctx, "0", &proclassic.MobileDeviceEnrollmentProfilePost{
+		General: &proclassic.MobileDeviceEnrollmentProfilePostGeneral{Name: classicStrPtr(name)},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("forbidden on this tenant: %v", err)
+		}
+		t.Fatalf("CreateMobileDeviceEnrollmentProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteMobileDeviceEnrollmentProfileByID", func() error {
+		return pc.DeleteMobileDeviceEnrollmentProfileByID(ctx, intToStr(id))
+	})
+
+	gotID, err := pc.ResolveMobileDeviceEnrollmentProfileIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveMobileDeviceEnrollmentProfileIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveMobileDeviceEnrollmentProfileIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveMobileDeviceEnrollmentProfileByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveMobileDeviceEnrollmentProfileByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveMobileDeviceEnrollmentProfileByName", gotTyped, func(p *proclassic.MobileDeviceEnrollmentProfile) *int {
+		if p.General == nil {
+			return nil
+		}
+		return p.General.ID
+	}, id)
+
+	_, err = pc.ResolveMobileDeviceEnrollmentProfileIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveMobileDeviceEnrollmentProfileIDByName(unknown)", err)
+}
+
+// TestAcceptance_Classic_ResolveMobileDeviceProvisioningProfileByName probes
+// the resolver wiring with a not-found probe only — creating a real
+// provisioning profile requires an actual Apple-signed .mobileprovision blob.
+func TestAcceptance_Classic_ResolveMobileDeviceProvisioningProfileByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	_, err := pc.ResolveMobileDeviceProvisioningProfileIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveMobileDeviceProvisioningProfileIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolveClassicPackageByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-pkg-" + runSuffix()
+	filename := name + ".pkg"
+	created, err := pc.CreateClassicPackageByID(ctx, "0", &proclassic.Package{
+		Name:     classicStrPtr(name),
+		Filename: classicStrPtr(filename),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateClassicPackageByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteClassicPackageByID", func() error { return pc.DeleteClassicPackageByID(ctx, intToStr(id)) })
+
+	gotID, err := pc.ResolveClassicPackageIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveClassicPackageIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveClassicPackageIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveClassicPackageByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveClassicPackageByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveClassicPackageByName", gotTyped, func(p *proclassic.Package) *int { return p.ID }, id)
+
+	_, err = pc.ResolveClassicPackageIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveClassicPackageIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolvePatchExternalSourceByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-pes-" + runSuffix()
+	port := 443
+	sslEnabled := true
+	created, err := pc.CreatePatchExternalSourceByID(ctx, "0", &proclassic.PatchExternalSource{
+		Name:       classicStrPtr(name),
+		HostName:   classicStrPtr("patches.example.test"),
+		Port:       &port,
+		SslEnabled: &sslEnabled,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("forbidden on this tenant: %v", err)
+		}
+		t.Fatalf("CreatePatchExternalSourceByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeletePatchExternalSourceByID", func() error {
+		return pc.DeletePatchExternalSourceByID(ctx, intToStr(id))
+	})
+
+	gotID, err := pc.ResolvePatchExternalSourceIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolvePatchExternalSourceIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolvePatchExternalSourceIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolvePatchExternalSourceByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolvePatchExternalSourceByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolvePatchExternalSourceByName", gotTyped, func(p *proclassic.PatchExternalSource) *int { return p.ID }, id)
+
+	_, err = pc.ResolvePatchExternalSourceIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolvePatchExternalSourceIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolveAccountGroupByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-grp-" + runSuffix()
+	created, err := pc.CreateAccountGroupByID(ctx, "0", &proclassic.Group{
+		Name:         classicStrPtr(name),
+		AccessLevel:  classicStrPtr("Full Access"),
+		PrivilegeSet: classicStrPtr("Administrator"),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("forbidden on this tenant: %v", err)
+		}
+		t.Fatalf("CreateAccountGroupByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteAccountGroupByID", func() error { return pc.DeleteAccountGroupByID(ctx, intToStr(id)) })
+
+	gotID, err := pc.ResolveAccountGroupIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveAccountGroupIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveAccountGroupIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveAccountGroupByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveAccountGroupByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveAccountGroupByName", gotTyped, func(g *proclassic.Group) *int { return g.ID }, id)
+
+	_, err = pc.ResolveAccountGroupIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveAccountGroupIDByName(unknown)", err)
+}
+
+func TestAcceptance_Classic_ResolveUserByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-rsv-usr-" + runSuffix()
+	email := name + "@example.test"
+	created, err := pc.CreateUserByID(ctx, "0", &proclassic.UserPost{
+		Name:  classicStrPtr(name),
+		Email: classicStrPtr(email),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateUserByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteUserByID", func() error { return pc.DeleteUserByID(ctx, intToStr(id)) })
+
+	gotID, err := pc.ResolveUserIDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveUserIDByName: %v", err)
+	}
+	assertResolvedID(t, "ResolveUserIDByName", gotID, id)
+
+	gotTyped, err := pc.ResolveUserByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ResolveUserByName: %v", err)
+	}
+	assertResolvedTyped(t, "ResolveUserByName", gotTyped, func(u *proclassic.User) *int { return u.ID }, id)
+
+	_, err = pc.ResolveUserIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolveUserIDByName(unknown)", err)
+}
+
+// TestAcceptance_Classic_ResolvePatchInternalSourceByName probes the resolver
+// with a not-found lookup only — PatchInternalSource is read-only (list+get);
+// no create/delete available to build a fixture.
+func TestAcceptance_Classic_ResolvePatchInternalSourceByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	_, err := pc.ResolvePatchInternalSourceIDByName(ctx, "sdk-acc-nonexistent-"+runSuffix())
+	assertResolverNotFound(t, "ResolvePatchInternalSourceIDByName(unknown)", err)
+}

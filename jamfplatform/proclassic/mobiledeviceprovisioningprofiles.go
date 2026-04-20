@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetMobileDeviceProvisioningProfileByID finds a mobile device provisioning profiles by id.
@@ -150,4 +151,21 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByUUID(ctx context.Context
 		return nil, fmt.Errorf("UpdateMobileDeviceProvisioningProfileByUUID(%s): %w", uuid, err)
 	}
 	return &result, nil
+}
+
+// ResolveMobileDeviceProvisioningProfileIDByName looks up a MobileDeviceProvisioningProfile by name via GetMobileDeviceProvisioningProfileByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveMobileDeviceProvisioningProfileIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetMobileDeviceProvisioningProfileByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceProvisioningProfileIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveMobileDeviceProvisioningProfileIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveMobileDeviceProvisioningProfileByName looks up a MobileDeviceProvisioningProfile by name. Alias for GetMobileDeviceProvisioningProfileByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveMobileDeviceProvisioningProfileByName(ctx context.Context, name string) (*MobileDeviceProvisioningProfile, error) {
+	return c.GetMobileDeviceProvisioningProfileByName(ctx, name)
 }

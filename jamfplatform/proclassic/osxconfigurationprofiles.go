@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetOSXConfigurationProfileByID finds OS X configuration profiles by ID.
@@ -116,4 +117,21 @@ func (c *Client) GetOsxConfigurationProfileByNameSubset(ctx context.Context, nam
 		return nil, fmt.Errorf("GetOsxConfigurationProfileByNameSubset(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolveOSXConfigurationProfileIDByName looks up a OSXConfigurationProfile by name via GetOSXConfigurationProfileByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveOSXConfigurationProfileIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetOSXConfigurationProfileByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveOSXConfigurationProfileIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveOSXConfigurationProfileIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveOSXConfigurationProfileByName looks up a OSXConfigurationProfile by name. Alias for GetOSXConfigurationProfileByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveOSXConfigurationProfileByName(ctx context.Context, name string) (*OsXConfigurationProfile, error) {
+	return c.GetOSXConfigurationProfileByName(ctx, name)
 }

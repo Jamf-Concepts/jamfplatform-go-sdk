@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetUserByID finds users by ID.
@@ -125,4 +126,21 @@ func (c *Client) ListUsers(ctx context.Context) (*Users, error) {
 		return nil, fmt.Errorf("ListUsers: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveUserIDByName looks up a User by name via GetUserByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveUserIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetUserByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveUserIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveUserIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveUserByName looks up a User by name. Alias for GetUserByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveUserByName(ctx context.Context, name string) (*User, error) {
+	return c.GetUserByName(ctx, name)
 }

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetDistributionPointByID finds distribution points by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListDistributionPoints(ctx context.Context) (*DistributionPoint
 		return nil, fmt.Errorf("ListDistributionPoints: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveDistributionPointIDByName looks up a DistributionPoint by name via GetDistributionPointByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveDistributionPointIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetDistributionPointByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDistributionPointIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveDistributionPointIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveDistributionPointByName looks up a DistributionPoint by name. Alias for GetDistributionPointByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveDistributionPointByName(ctx context.Context, name string) (*DistributionPoint, error) {
+	return c.GetDistributionPointByName(ctx, name)
 }

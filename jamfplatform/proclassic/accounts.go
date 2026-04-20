@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetAccountByUserID finds accounts by ID.
@@ -167,4 +168,21 @@ func (c *Client) ListAccounts(ctx context.Context) (*Accounts, error) {
 		return nil, fmt.Errorf("ListAccounts: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveAccountGroupIDByName looks up a AccountGroup by name via GetAccountGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveAccountGroupIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetAccountGroupByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAccountGroupIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveAccountGroupIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveAccountGroupByName looks up a AccountGroup by name. Alias for GetAccountGroupByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveAccountGroupByName(ctx context.Context, name string) (*Group, error) {
+	return c.GetAccountGroupByName(ctx, name)
 }

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetSoftwareUpdateServerByID finds software update servers by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdate
 		return nil, fmt.Errorf("ListSoftwareUpdateServers: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveSoftwareUpdateServerIDByName looks up a SoftwareUpdateServer by name via GetSoftwareUpdateServerByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveSoftwareUpdateServerIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetSoftwareUpdateServerByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSoftwareUpdateServerIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveSoftwareUpdateServerIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveSoftwareUpdateServerByName looks up a SoftwareUpdateServer by name. Alias for GetSoftwareUpdateServerByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveSoftwareUpdateServerByName(ctx context.Context, name string) (*SoftwareUpdateServer, error) {
+	return c.GetSoftwareUpdateServerByName(ctx, name)
 }

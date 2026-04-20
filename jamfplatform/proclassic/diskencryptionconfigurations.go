@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetDiskEncryptionConfigurationByID finds disk encryption configurations by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListDiskEncryptionConfigurations(ctx context.Context) (*DiskEnc
 		return nil, fmt.Errorf("ListDiskEncryptionConfigurations: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveDiskEncryptionConfigurationIDByName looks up a DiskEncryptionConfiguration by name via GetDiskEncryptionConfigurationByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveDiskEncryptionConfigurationIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetDiskEncryptionConfigurationByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDiskEncryptionConfigurationIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveDiskEncryptionConfigurationIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveDiskEncryptionConfigurationByName looks up a DiskEncryptionConfiguration by name. Alias for GetDiskEncryptionConfigurationByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveDiskEncryptionConfigurationByName(ctx context.Context, name string) (*DiskEncryptionConfiguration, error) {
+	return c.GetDiskEncryptionConfigurationByName(ctx, name)
 }

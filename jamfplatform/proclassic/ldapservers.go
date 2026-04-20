@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetLDAPServerByID finds LDAP servers by ID.
@@ -160,4 +161,21 @@ func (c *Client) GetLDAPServerByNameUser(ctx context.Context, name string, user 
 		return nil, fmt.Errorf("GetLDAPServerByNameUser(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolveLDAPServerIDByName looks up a LDAPServer by name via GetLDAPServerByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveLDAPServerIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetLDAPServerByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveLDAPServerIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.Connection == nil || r.Connection.ID == nil {
+		return "", fmt.Errorf("ResolveLDAPServerIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.Connection.ID), nil
+}
+
+// ResolveLDAPServerByName looks up a LDAPServer by name. Alias for GetLDAPServerByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveLDAPServerByName(ctx context.Context, name string) (*LdapServer, error) {
+	return c.GetLDAPServerByName(ctx, name)
 }
