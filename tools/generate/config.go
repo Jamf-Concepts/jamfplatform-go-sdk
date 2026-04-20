@@ -60,6 +60,20 @@ type OperationDef struct {
 	RequestType    string            `json:"requestType,omitempty"`    // explicit request schema name (used when spec body is untyped, e.g. Classic)
 	ResponseType   string            `json:"responseType,omitempty"`   // explicit response schema name (same)
 	ExpectedStatus int               `json:"expectedStatus,omitempty"` // explicit success status code (default 200)
+	Resolver       *ResolverConfig   `json:"resolver,omitempty"`       // attach name->ID resolver emission to this operation (typically a List op)
+}
+
+// ResolverConfig declares a name->ID resolver the generator should emit
+// alongside the operation it attaches to. Produces two methods per resource:
+// Resolve<ResourceType>IDByName (returns string ID) and
+// Resolve<ResourceType>ByName (returns the typed resource).
+type ResolverConfig struct {
+	ResourceType string `json:"resourceType"` // Go type name used in emitted method names (e.g. "Blueprint")
+	NameField    string `json:"nameField"`    // dot-notation JSON path for the name field on each list element (e.g. "name", "general.name", "title")
+	IDField      string `json:"idField"`      // dot-notation JSON path for the ID field (e.g. "id")
+	Mode         string `json:"mode"`         // "filtered" (server-side RSQL) or "clientFilter" (walk list in memory). "direct" reserved for proclassic by-name endpoints and handled in a later phase.
+	SearchParam  string `json:"searchParam,omitempty"` // clientFilter mode only: server-side search query key to narrow results (e.g. "search"). Empty → fetch full list.
+	TypedReturn  string `json:"typedReturn,omitempty"` // Go type returned by the typed wrapper (e.g. "BlueprintOverview"). Defaults to ResourceType when empty.
 }
 
 // parseOp splits "GET /v1/devices/{id}" into method and path.

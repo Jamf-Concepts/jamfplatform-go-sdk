@@ -871,6 +871,11 @@ type APIResponseError = client.APIResponseError
 // APIResponseError.FieldErrors().
 type ErrorDetail = client.Error
 
+// AmbiguousMatchError is returned by Resolve<Resource>ByName methods when
+// multiple resources share the requested name. Matches carries the IDs of
+// all colliding resources so consumers can surface disambiguation options.
+type AmbiguousMatchError = client.AmbiguousMatchError
+
 // AsAPIError unwraps err and returns the underlying *APIResponseError if
 // present, otherwise nil. Shorthand for errors.As that saves callers from
 // managing the target pointer and importing the concrete error type.

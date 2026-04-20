@@ -25,7 +25,8 @@
       "splitByTag": true,
       "specFile": "blueprints_api.json",
       "operations": [
-        {"op": "GET /v1/blueprints", "name": "ListBlueprints", "pagination": "sizeCheck", "params": ["sort:[]string", "search"]},
+        {"op": "GET /v1/blueprints", "name": "ListBlueprints", "pagination": "sizeCheck", "params": ["sort:[]string", "search"],
+         "resolver": {"resourceType": "Blueprint", "nameField": "name", "idField": "id", "mode": "clientFilter", "searchParam": "search", "typedReturn": "BlueprintOverview"}},
         {"op": "POST /v1/blueprints", "name": "CreateBlueprint"},
         {"op": "GET /v1/blueprints/{blueprintId}", "name": "GetBlueprint"},
         {"op": "PATCH /v1/blueprints/{blueprintId}", "name": "UpdateBlueprint"},

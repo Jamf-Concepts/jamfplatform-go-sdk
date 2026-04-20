@@ -247,6 +247,10 @@ type {{ .Name }} = string
 {{ template "multipart" . }}
 {{- else if eq .Category "raw" }}
 {{ template "raw" . }}
+{{- else if eq .Category "resolverID" }}
+{{ template "resolverID" . }}
+{{- else if eq .Category "resolverTyped" }}
+{{ template "resolverTyped" . }}
 {{- else }}
 {{ template "action" . }}
 {{- end }}
@@ -570,6 +574,44 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 	})
 }
 {{ end }}
+
+{{- define "resolverID" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	listPath := prefix + "{{ .ResourcePath }}"
+{{- if eq .Resolver.Mode "filtered" }}
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- else }}
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- end }}
+	if err != nil {
+		return "", fmt.Errorf("{{ .Name }}(%s): %w", name, err)
+	}
+	return id, nil
+}
+{{ end }}
+
+{{- define "resolverTyped" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.TypedReturn }}, error) {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	listPath := prefix + "{{ .ResourcePath }}"
+{{- if eq .Resolver.Mode "filtered" }}
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- else }}
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- end }}
+	if err != nil {
+		return nil, fmt.Errorf("{{ .Name }}(%s): %w", name, err)
+	}
+	var out {{ .Resolver.TypedReturn }}
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("{{ .Name }}(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+{{ end }}
 `
 
 // ---------------------------------------------------------------------------
@@ -606,6 +648,10 @@ import (
 <% template "testMultipart" . %>
 <%- else if eq .Category "raw" %>
 <% template "testRaw" . %>
+<%- else if eq .Category "resolverID" %>
+<% template "testResolverID" . %>
+<%- else if eq .Category "resolverTyped" %>
+<% template "testResolverTyped" . %>
 <%- else %>
 <% template "testAction" . %>
 <%- end %>
@@ -859,6 +905,56 @@ func Test<% .Name %>(t *testing.T) {
 	}
 	if len(results) != 1 {
 		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+<% end %>
+
+<%- define "testResolverID" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.<% .Name %>(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+<% end %>
+
+<%- define "testResolverTyped" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"<% .Resolver.IDField %>": "resolved-id", "<% .Resolver.NameField %>": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.<% .Name %>(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
 	}
 }
 <% end %>

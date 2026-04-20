@@ -44,7 +44,7 @@ type GoField struct {
 type GoMethod struct {
 	Name             string
 	Comment          string
-	Category         string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart
+	Category         string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart, resolverID, resolverTyped
 	HTTPMethod       string
 	Namespace        string
 	Version          string
@@ -65,7 +65,22 @@ type GoMethod struct {
 	ReturnsSlice     bool
 	SpecPath         string
 	UnwrapResults    string
-	Format           string // carried from SpecDef so per-method templates can branch without $-scope
+	Format           string      // carried from SpecDef so per-method templates can branch without $-scope
+	Resolver         *GoResolver // populated on synthetic resolver methods (Category resolverID/resolverTyped)
+}
+
+// GoResolver carries the config needed by resolver method templates.
+// Populated on synthetic methods produced by appendResolverMethods; never
+// present on spec-derived methods. Namespace/Version/ResourcePath on the
+// parent GoMethod are inherited from the source (List) op and used to
+// build the list path the same way regular method templates do.
+type GoResolver struct {
+	ResourceType string // drives emitted method name suffix
+	Mode         string // "filtered" or "clientFilter"
+	NameField    string
+	IDField      string
+	SearchParam  string // clientFilter only
+	TypedReturn  string // Go type of the typed wrapper's return
 }
 
 type GoPathParam struct {

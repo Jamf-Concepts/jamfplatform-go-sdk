@@ -27,7 +27,87 @@ func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
 		}
 		methods = append(methods, m)
 	}
+	methods, err := appendResolverMethods(methods, spec)
+	if err != nil {
+		return nil, err
+	}
 	return methods, nil
+}
+
+// appendResolverMethods synthesizes one pair of resolver methods per
+// operation that carries a Resolver config. Each pair consists of:
+//
+//   - Resolve<ResourceType>IDByName(ctx, name) (string, error)
+//   - Resolve<ResourceType>ByName(ctx, name) (*<TypedReturn>, error)
+//
+// Synthetic methods inherit Namespace/Version/ResourcePath/Tag from the
+// source operation so they land in the same per-tag file and build the
+// list URL identically to the source List method.
+func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error) {
+	byName := make(map[string]*GoMethod, len(methods))
+	for i := range methods {
+		byName[methods[i].Name] = &methods[i]
+	}
+	out := append([]GoMethod(nil), methods...)
+	for _, opDef := range spec.Operations {
+		if opDef.Resolver == nil {
+			continue
+		}
+		r := opDef.Resolver
+		switch r.Mode {
+		case "filtered", "clientFilter":
+			// supported
+		case "", "direct":
+			return nil, fmt.Errorf("resolver on %s: mode %q not yet supported (supported: filtered, clientFilter)", opDef.Name, r.Mode)
+		default:
+			return nil, fmt.Errorf("resolver on %s: unknown mode %q", opDef.Name, r.Mode)
+		}
+		if r.ResourceType == "" || r.NameField == "" || r.IDField == "" {
+			return nil, fmt.Errorf("resolver on %s: resourceType, nameField, idField are all required", opDef.Name)
+		}
+		src, ok := byName[opDef.Name]
+		if !ok {
+			return nil, fmt.Errorf("resolver on %s: source operation not found in extracted methods", opDef.Name)
+		}
+		typedReturn := r.TypedReturn
+		if typedReturn == "" {
+			typedReturn = r.ResourceType
+		}
+		gr := &GoResolver{
+			ResourceType: r.ResourceType,
+			Mode:         r.Mode,
+			NameField:    r.NameField,
+			IDField:      r.IDField,
+			SearchParam:  r.SearchParam,
+			TypedReturn:  typedReturn,
+		}
+		// Base synthetic method — shared fields. The path comes from the
+		// source List op; the {name} placeholder in direct mode would live
+		// in ResourcePath but direct mode is rejected above, so no
+		// {name}-param stripping is needed here.
+		base := GoMethod{
+			Namespace:    src.Namespace,
+			Version:      src.Version,
+			Tag:          src.Tag,
+			Format:       src.Format,
+			ResourcePath: src.ResourcePath,
+			SpecPath:     src.SpecPath,
+			HTTPMethod:   http.MethodGet,
+			Resolver:     gr,
+		}
+		idMethod := base
+		idMethod.Name = "Resolve" + r.ResourceType + "IDByName"
+		idMethod.Category = "resolverID"
+		idMethod.Comment = idMethod.Name + " looks up a " + r.ResourceType + " by its " + r.NameField + " field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name."
+
+		typedMethod := base
+		typedMethod.Name = "Resolve" + r.ResourceType + "ByName"
+		typedMethod.Category = "resolverTyped"
+		typedMethod.Comment = typedMethod.Name + " looks up a " + r.ResourceType + " by its " + r.NameField + " field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical."
+
+		out = append(out, idMethod, typedMethod)
+	}
+	return out, nil
 }
 
 // extractMultipartFields walks a multipart/form-data request body schema's
