@@ -33,11 +33,14 @@ const (
 	responseHeaderTimeout = 60 * time.Second
 	// idleConnTimeout bounds how long a pooled idle connection lives.
 	idleConnTimeout = 90 * time.Second
-	// maxIdleConnsPerHost governs how many pooled connections per host
-	// the SDK may keep warm. Go's default is 2, which serializes
-	// terraform-style parallel operations (`-parallelism=10`) at the
-	// pool. 32 gives comfortable headroom without tying up ports.
-	maxIdleConnsPerHost = 32
+	// maxIdleConnsPerHost governs how many pooled HTTP/1.1 connections
+	// per host the SDK may keep warm. Go's default is 2, which
+	// serializes terraform-style parallel operations
+	// (`-parallelism=10`) at the pool. 10 matches default TF
+	// parallelism. HTTP/2 (which apigw.jamf.com supports) multiplexes
+	// on a single connection, so this ceiling only binds on the
+	// HTTP/1.1 fallback path.
+	maxIdleConnsPerHost = 10
 )
 
 // newTunedTransport returns a fresh *http.Transport tuned for the SDK's

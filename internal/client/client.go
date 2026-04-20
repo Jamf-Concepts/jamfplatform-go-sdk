@@ -221,69 +221,6 @@ func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string
 	return c.execute(ctx, method, path, body, "", headers, expectedStatus, result)
 }
 
-// DoStream performs an authenticated API request and returns the raw
-// *http.Response for the caller to stream. Intended for large download
-// bodies (exports, archive downloads, log pulls) where buffering the
-// whole payload into memory via io.ReadAll would OOM the process.
-//
-// The caller is responsible for closing resp.Body. Non-2xx responses are
-// turned into an *APIResponseError (with the error body buffered, since
-// there's no other sensible way to surface it) and resp is nil.
-//
-// 429/Retry-After handling matches Do: body is re-marshaled on retry so
-// the second request is byte-identical to the first.
-func (c *Transport) DoStream(ctx context.Context, method, path string, body any) (*http.Response, error) {
-	resp, _, err := c.doRequestFull(ctx, method, path, body, "", nil)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode == http.StatusTooManyRequests {
-		delay := parseRetryAfter(resp.Header.Get("Retry-After"), time.Now())
-		if delay > 0 && delay <= 60*time.Second {
-			_ = resp.Body.Close()
-			select {
-			case <-time.After(delay):
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-			resp, _, err = c.doRequestFull(ctx, method, path, body, "", nil)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	c.logDeprecation(resp)
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		defer func() { _ = resp.Body.Close() }()
-		errBody, _ := io.ReadAll(resp.Body)
-		if c.logger != nil {
-			c.logger.LogResponse(ctx, resp.StatusCode, resp.Header, errBody)
-		}
-		respErr := &APIResponseError{
-			StatusCode: resp.StatusCode,
-			Method:     resp.Request.Method,
-			URL:        resp.Request.URL.String(),
-			Body:       string(errBody),
-		}
-		var apiErr ApiError
-		_ = json.Unmarshal(errBody, &apiErr)
-		if len(apiErr.Errors) > 0 {
-			if apiErr.HTTPStatus > 0 {
-				respErr.StatusCode = apiErr.HTTPStatus
-			}
-			respErr.Errors = apiErr.Errors
-		}
-		respErr.TraceID = pickTraceID(apiErr.TraceID, resp.Header)
-		return nil, respErr
-	}
-
-	if c.logger != nil {
-		c.logger.LogResponse(ctx, resp.StatusCode, resp.Header, []byte("<streaming body>"))
-	}
-	return resp, nil
-}
-
 // execute funnels every Do* variant through one place so the 429/Retry-After
 // retry and Deprecation-header logging live in a single hook point.
 func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any) error {
