@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetUserGroupByID finds user groups by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListUserGroups(ctx context.Context) (*UserGroups, error) {
 		return nil, fmt.Errorf("ListUserGroups: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveUserGroupIDByName looks up a UserGroup by name via GetUserGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveUserGroupIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetUserGroupByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveUserGroupIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveUserGroupIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveUserGroupByName looks up a UserGroup by name. Alias for GetUserGroupByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveUserGroupByName(ctx context.Context, name string) (*UserGroup, error) {
+	return c.GetUserGroupByName(ctx, name)
 }

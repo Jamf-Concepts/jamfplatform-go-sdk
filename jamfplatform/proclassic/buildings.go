@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetBuildingByID finds buildings by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListBuildings(ctx context.Context) (*Buildings, error) {
 		return nil, fmt.Errorf("ListBuildings: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveBuildingIDByName looks up a Building by name via GetBuildingByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveBuildingIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetBuildingByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveBuildingIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveBuildingIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveBuildingByName looks up a Building by name. Alias for GetBuildingByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveBuildingByName(ctx context.Context, name string) (*Building, error) {
+	return c.GetBuildingByName(ctx, name)
 }

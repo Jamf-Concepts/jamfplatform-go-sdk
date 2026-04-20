@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetDirectoryBindingByID finds directory bindings by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListDirectoryBindings(ctx context.Context) (*DirectoryBindings,
 		return nil, fmt.Errorf("ListDirectoryBindings: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveDirectoryBindingIDByName looks up a DirectoryBinding by name via GetDirectoryBindingByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveDirectoryBindingIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetDirectoryBindingByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDirectoryBindingIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveDirectoryBindingIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveDirectoryBindingByName looks up a DirectoryBinding by name. Alias for GetDirectoryBindingByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveDirectoryBindingByName(ctx context.Context, name string) (*DirectoryBinding, error) {
+	return c.GetDirectoryBindingByName(ctx, name)
 }

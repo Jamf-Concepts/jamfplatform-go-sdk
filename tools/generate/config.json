@@ -1019,7 +1019,7 @@
         {"op": "DELETE /advancedusersearches/id/{id}", "name": "DeleteAdvancedUserSearchByID", "pathNames": {"id": "id"}},
 
         {"op": "GET /policies/id/{id}", "name": "GetPolicyByID", "responseType": "policy", "pathNames": {"id": "id"}},
-        {"op": "GET /policies/name/{name}", "name": "GetPolicyByName", "responseType": "policy"},
+        {"op": "GET /policies/name/{name}", "name": "GetPolicyByName", "responseType": "policy", "resolver": {"resourceType": "Policy", "mode": "direct", "idField": "General.ID"}},
         {"op": "POST /policies/id/{id}", "name": "CreatePolicyByID", "requestType": "policy_post", "responseType": "policy", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /policies/id/{id}", "name": "UpdatePolicyByID", "requestType": "policy_post", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "PUT /policies/name/{name}", "name": "UpdatePolicyByName", "requestType": "policy_post", "expectedStatus": 201},
@@ -1285,27 +1285,27 @@
         {"op": "PUT /vppinvitations/id/{id}", "name": "UpdateVPPInvitationByID", "requestType": "vpp_invitation", "pathNames": {"id": "id"}, "expectedStatus": 201},
         {"op": "DELETE /vppinvitations/id/{id}", "name": "DeleteVPPInvitationByID", "pathNames": {"id": "id"}},
 
-        {"op": "GET /buildings/name/{name}", "name": "GetBuildingByName", "responseType": "building"},
+        {"op": "GET /buildings/name/{name}", "name": "GetBuildingByName", "responseType": "building", "resolver": {"resourceType": "Building", "mode": "direct"}},
         {"op": "PUT /buildings/name/{name}", "name": "UpdateBuildingByName", "requestType": "building", "expectedStatus": 201},
         {"op": "DELETE /buildings/name/{name}", "name": "DeleteBuildingByName"},
 
-        {"op": "GET /categories/name/{name}", "name": "GetCategoryByName", "responseType": "category"},
+        {"op": "GET /categories/name/{name}", "name": "GetCategoryByName", "responseType": "category", "resolver": {"resourceType": "Category", "mode": "direct"}},
         {"op": "PUT /categories/name/{name}", "name": "UpdateCategoryByName", "requestType": "category", "expectedStatus": 201},
         {"op": "DELETE /categories/name/{name}", "name": "DeleteCategoryByName"},
 
-        {"op": "GET /classes/name/{name}", "name": "GetClassByName", "responseType": "class"},
+        {"op": "GET /classes/name/{name}", "name": "GetClassByName", "responseType": "class", "resolver": {"resourceType": "Class", "mode": "direct"}},
         {"op": "PUT /classes/name/{name}", "name": "UpdateClassByName", "requestType": "class_post", "expectedStatus": 201},
         {"op": "DELETE /classes/name/{name}", "name": "DeleteClassByName"},
 
-        {"op": "GET /departments/name/{name}", "name": "GetDepartmentByName", "responseType": "department"},
+        {"op": "GET /departments/name/{name}", "name": "GetDepartmentByName", "responseType": "department", "resolver": {"resourceType": "Department", "mode": "direct"}},
         {"op": "PUT /departments/name/{name}", "name": "UpdateDepartmentByName", "requestType": "department", "expectedStatus": 201},
         {"op": "DELETE /departments/name/{name}", "name": "DeleteDepartmentByName"},
 
-        {"op": "GET /sites/name/{name}", "name": "GetSiteByName", "responseType": "site"},
+        {"op": "GET /sites/name/{name}", "name": "GetSiteByName", "responseType": "site", "resolver": {"resourceType": "Site", "mode": "direct"}},
         {"op": "PUT /sites/name/{name}", "name": "UpdateSiteByName", "requestType": "site", "expectedStatus": 201},
         {"op": "DELETE /sites/name/{name}", "name": "DeleteSiteByName"},
 
-        {"op": "GET /scripts/name/{name}", "name": "GetScriptByName", "responseType": "script"},
+        {"op": "GET /scripts/name/{name}", "name": "GetScriptByName", "responseType": "script", "resolver": {"resourceType": "Script", "mode": "direct"}},
         {"op": "PUT /scripts/name/{name}", "name": "UpdateScriptByName", "requestType": "script", "expectedStatus": 201},
         {"op": "DELETE /scripts/name/{name}", "name": "DeleteScriptByName"},
 
@@ -1316,7 +1316,7 @@
         {"op": "PUT /users/email/{email}", "name": "UpdateUserByEmail", "requestType": "user_post", "pathNames": {"email": "email"}, "expectedStatus": 201},
         {"op": "DELETE /users/email/{email}", "name": "DeleteUserByEmail", "pathNames": {"email": "email"}},
 
-        {"op": "GET /directorybindings/name/{name}", "name": "GetDirectoryBindingByName", "responseType": "directory_binding"},
+        {"op": "GET /directorybindings/name/{name}", "name": "GetDirectoryBindingByName", "responseType": "directory_binding", "resolver": {"resourceType": "DirectoryBinding", "mode": "direct"}},
         {"op": "PUT /directorybindings/name/{name}", "name": "UpdateDirectoryBindingByName", "requestType": "directory_binding", "expectedStatus": 201},
         {"op": "DELETE /directorybindings/name/{name}", "name": "DeleteDirectoryBindingByName"},
 
@@ -1324,11 +1324,11 @@
         {"op": "PUT /diskencryptionconfigurations/name/{name}", "name": "UpdateDiskEncryptionConfigurationByName", "requestType": "disk_encryption_configuration", "expectedStatus": 201},
         {"op": "DELETE /diskencryptionconfigurations/name/{name}", "name": "DeleteDiskEncryptionConfigurationByName"},
 
-        {"op": "GET /dockitems/name/{name}", "name": "GetDockItemByName", "responseType": "dock_item"},
+        {"op": "GET /dockitems/name/{name}", "name": "GetDockItemByName", "responseType": "dock_item", "resolver": {"resourceType": "DockItem", "mode": "direct"}},
         {"op": "PUT /dockitems/name/{name}", "name": "UpdateDockItemByName", "requestType": "dock_item", "expectedStatus": 201},
         {"op": "DELETE /dockitems/name/{name}", "name": "DeleteDockItemByName"},
 
-        {"op": "GET /ibeacons/name/{name}", "name": "GetIBeaconByName", "responseType": "ibeacon"},
+        {"op": "GET /ibeacons/name/{name}", "name": "GetIBeaconByName", "responseType": "ibeacon", "resolver": {"resourceType": "IBeacon", "mode": "direct", "typedReturn": "Ibeacon"}},
         {"op": "PUT /ibeacons/name/{name}", "name": "UpdateIBeaconByName", "requestType": "ibeacon", "expectedStatus": 201},
         {"op": "DELETE /ibeacons/name/{name}", "name": "DeleteIBeaconByName"},
 
@@ -1336,15 +1336,15 @@
         {"op": "PUT /ldapservers/name/{name}", "name": "UpdateLDAPServerByName", "requestType": "ldap_server_post", "expectedStatus": 201},
         {"op": "DELETE /ldapservers/name/{name}", "name": "DeleteLDAPServerByName"},
 
-        {"op": "GET /licensedsoftware/name/{name}", "name": "GetLicensedSoftwareByName", "responseType": "licensed_software"},
+        {"op": "GET /licensedsoftware/name/{name}", "name": "GetLicensedSoftwareByName", "responseType": "licensed_software", "resolver": {"resourceType": "LicensedSoftware", "mode": "direct", "idField": "General.ID"}},
         {"op": "PUT /licensedsoftware/name/{name}", "name": "UpdateLicensedSoftwareByName", "requestType": "licensed_software", "expectedStatus": 201},
         {"op": "DELETE /licensedsoftware/name/{name}", "name": "DeleteLicensedSoftwareByName"},
 
-        {"op": "GET /restrictedsoftware/name/{name}", "name": "GetRestrictedSoftwareByName", "responseType": "restricted_software"},
+        {"op": "GET /restrictedsoftware/name/{name}", "name": "GetRestrictedSoftwareByName", "responseType": "restricted_software", "resolver": {"resourceType": "RestrictedSoftware", "mode": "direct", "idField": "General.ID"}},
         {"op": "PUT /restrictedsoftware/name/{name}", "name": "UpdateRestrictedSoftwareByName", "requestType": "restricted_software", "expectedStatus": 201},
         {"op": "DELETE /restrictedsoftware/name/{name}", "name": "DeleteRestrictedSoftwareByName"},
 
-        {"op": "GET /printers/name/{name}", "name": "GetPrinterByName", "responseType": "printer"},
+        {"op": "GET /printers/name/{name}", "name": "GetPrinterByName", "responseType": "printer", "resolver": {"resourceType": "Printer", "mode": "direct"}},
         {"op": "PUT /printers/name/{name}", "name": "UpdatePrinterByName", "requestType": "printer", "expectedStatus": 201},
         {"op": "DELETE /printers/name/{name}", "name": "DeletePrinterByName"},
 
@@ -1354,30 +1354,30 @@
         {"op": "PUT /softwareupdateservers/name/{name}", "name": "UpdateSoftwareUpdateServerByName", "requestType": "software_update_server", "expectedStatus": 201},
         {"op": "DELETE /softwareupdateservers/name/{name}", "name": "DeleteSoftwareUpdateServerByName"},
 
-        {"op": "GET /advancedcomputersearches/name/{name}", "name": "GetAdvancedComputerSearchByName", "responseType": "advanced_computer_search"},
+        {"op": "GET /advancedcomputersearches/name/{name}", "name": "GetAdvancedComputerSearchByName", "responseType": "advanced_computer_search", "resolver": {"resourceType": "AdvancedComputerSearch", "mode": "direct"}},
         {"op": "DELETE /advancedcomputersearches/name/{name}", "name": "DeleteAdvancedComputerSearchByName"},
-        {"op": "GET /advancedmobiledevicesearches/name/{name}", "name": "GetAdvancedMobileDeviceSearchByName", "responseType": "advanced_mobile_device_search"},
+        {"op": "GET /advancedmobiledevicesearches/name/{name}", "name": "GetAdvancedMobileDeviceSearchByName", "responseType": "advanced_mobile_device_search", "resolver": {"resourceType": "AdvancedMobileDeviceSearch", "mode": "direct"}},
         {"op": "DELETE /advancedmobiledevicesearches/name/{name}", "name": "DeleteAdvancedMobileDeviceSearchByName"},
-        {"op": "GET /advancedusersearches/name/{name}", "name": "GetAdvancedUserSearchByName", "responseType": "advanced_user_search"},
+        {"op": "GET /advancedusersearches/name/{name}", "name": "GetAdvancedUserSearchByName", "responseType": "advanced_user_search", "resolver": {"resourceType": "AdvancedUserSearch", "mode": "direct"}},
         {"op": "DELETE /advancedusersearches/name/{name}", "name": "DeleteAdvancedUserSearchByName"},
 
-        {"op": "GET /computergroups/name/{name}", "name": "GetComputerGroupByName", "responseType": "computer_group"},
+        {"op": "GET /computergroups/name/{name}", "name": "GetComputerGroupByName", "responseType": "computer_group", "resolver": {"resourceType": "ComputerGroup", "mode": "direct"}},
         {"op": "PUT /computergroups/name/{name}", "name": "UpdateComputerGroupByName", "requestType": "computer_group_post", "expectedStatus": 201},
         {"op": "DELETE /computergroups/name/{name}", "name": "DeleteComputerGroupByName"},
-        {"op": "GET /mobiledevicegroups/name/{name}", "name": "GetMobileDeviceGroupByName", "responseType": "mobile_device_group"},
+        {"op": "GET /mobiledevicegroups/name/{name}", "name": "GetMobileDeviceGroupByName", "responseType": "mobile_device_group", "resolver": {"resourceType": "MobileDeviceGroup", "mode": "direct"}},
         {"op": "PUT /mobiledevicegroups/name/{name}", "name": "UpdateMobileDeviceGroupByName", "requestType": "mobile_device_group", "expectedStatus": 201},
         {"op": "DELETE /mobiledevicegroups/name/{name}", "name": "DeleteMobileDeviceGroupByName"},
-        {"op": "GET /usergroups/name/{name}", "name": "GetUserGroupByName", "responseType": "user_group"},
+        {"op": "GET /usergroups/name/{name}", "name": "GetUserGroupByName", "responseType": "user_group", "resolver": {"resourceType": "UserGroup", "mode": "direct"}},
         {"op": "PUT /usergroups/name/{name}", "name": "UpdateUserGroupByName", "requestType": "user_group", "expectedStatus": 201},
         {"op": "DELETE /usergroups/name/{name}", "name": "DeleteUserGroupByName"},
 
-        {"op": "GET /computerextensionattributes/name/{name}", "name": "GetComputerExtensionAttributeByName", "responseType": "computer_extension_attribute"},
+        {"op": "GET /computerextensionattributes/name/{name}", "name": "GetComputerExtensionAttributeByName", "responseType": "computer_extension_attribute", "resolver": {"resourceType": "ComputerExtensionAttribute", "mode": "direct"}},
         {"op": "PUT /computerextensionattributes/name/{name}", "name": "UpdateComputerExtensionAttributeByName", "requestType": "computer_extension_attribute", "expectedStatus": 201},
         {"op": "DELETE /computerextensionattributes/name/{name}", "name": "DeleteComputerExtensionAttributeByName"},
-        {"op": "GET /mobiledeviceextensionattributes/name/{name}", "name": "GetMobileDeviceExtensionAttributeByName", "responseType": "mobile_device_extension_attribute"},
+        {"op": "GET /mobiledeviceextensionattributes/name/{name}", "name": "GetMobileDeviceExtensionAttributeByName", "responseType": "mobile_device_extension_attribute", "resolver": {"resourceType": "MobileDeviceExtensionAttribute", "mode": "direct"}},
         {"op": "PUT /mobiledeviceextensionattributes/name/{name}", "name": "UpdateMobileDeviceExtensionAttributeByName", "requestType": "mobile_device_extension_attribute", "expectedStatus": 201},
         {"op": "DELETE /mobiledeviceextensionattributes/name/{name}", "name": "DeleteMobileDeviceExtensionAttributeByName"},
-        {"op": "GET /userextensionattributes/name/{name}", "name": "GetUserExtensionAttributeByName", "responseType": "user_extension_attribute"},
+        {"op": "GET /userextensionattributes/name/{name}", "name": "GetUserExtensionAttributeByName", "responseType": "user_extension_attribute", "resolver": {"resourceType": "UserExtensionAttribute", "mode": "direct"}},
         {"op": "PUT /userextensionattributes/name/{name}", "name": "UpdateUserExtensionAttributeByName", "requestType": "user_extension_attribute", "expectedStatus": 201},
         {"op": "DELETE /userextensionattributes/name/{name}", "name": "DeleteUserExtensionAttributeByName"},
 
@@ -1388,19 +1388,19 @@
         {"op": "PUT /mobiledeviceconfigurationprofiles/name/{name}", "name": "UpdateMobileDeviceConfigurationProfileByName", "requestType": "mobile_device_configuration_profile", "expectedStatus": 201},
         {"op": "DELETE /mobiledeviceconfigurationprofiles/name/{name}", "name": "DeleteMobileDeviceConfigurationProfileByName"},
 
-        {"op": "GET /macapplications/name/{name}", "name": "GetMacApplicationByName", "responseType": "mac_application"},
+        {"op": "GET /macapplications/name/{name}", "name": "GetMacApplicationByName", "responseType": "mac_application", "resolver": {"resourceType": "MacApplication", "mode": "direct", "idField": "General.ID"}},
         {"op": "PUT /macapplications/name/{name}", "name": "UpdateMacApplicationByName", "requestType": "mac_application", "expectedStatus": 201},
         {"op": "DELETE /macapplications/name/{name}", "name": "DeleteMacApplicationByName"},
-        {"op": "GET /mobiledeviceapplications/name/{name}", "name": "GetMobileDeviceApplicationByName", "responseType": "mobile_device_application"},
+        {"op": "GET /mobiledeviceapplications/name/{name}", "name": "GetMobileDeviceApplicationByName", "responseType": "mobile_device_application", "resolver": {"resourceType": "MobileDeviceApplication", "mode": "direct", "idField": "General.ID"}},
         {"op": "PUT /mobiledeviceapplications/name/{name}", "name": "UpdateMobileDeviceApplicationByName", "requestType": "mobile_device_application", "expectedStatus": 201},
         {"op": "DELETE /mobiledeviceapplications/name/{name}", "name": "DeleteMobileDeviceApplicationByName"},
         {"op": "GET /mobiledeviceapplications/bundleid/{bundleid}", "name": "GetMobileDeviceApplicationByBundleID", "responseType": "mobile_device_application", "pathNames": {"bundleid": "bundleID"}},
 
-        {"op": "GET /ebooks/name/{name}", "name": "GetEbookByName", "responseType": "ebook"},
+        {"op": "GET /ebooks/name/{name}", "name": "GetEbookByName", "responseType": "ebook", "resolver": {"resourceType": "Ebook", "mode": "direct", "idField": "General.ID"}},
         {"op": "PUT /ebooks/name/{name}", "name": "UpdateEbookByName", "requestType": "ebook_post", "expectedStatus": 201},
         {"op": "DELETE /ebooks/name/{name}", "name": "DeleteEbookByName"},
 
-        {"op": "GET /networksegments/name/{name}", "name": "GetNetworkSegmentByName", "responseType": "network_segment"},
+        {"op": "GET /networksegments/name/{name}", "name": "GetNetworkSegmentByName", "responseType": "network_segment", "resolver": {"resourceType": "NetworkSegment", "mode": "direct"}},
         {"op": "PUT /networksegments/name/{name}", "name": "UpdateNetworkSegmentByName", "requestType": "network_segment_post", "expectedStatus": 201},
         {"op": "DELETE /networksegments/name/{name}", "name": "DeleteNetworkSegmentByName"},
 
@@ -1424,11 +1424,11 @@
         {"op": "PUT /accounts/username/{name}", "name": "UpdateAccountByUsername", "requestType": "account", "expectedStatus": 201},
         {"op": "DELETE /accounts/username/{name}", "name": "DeleteAccountByUsername"},
 
-        {"op": "GET /webhooks/name/{name}", "name": "GetWebhookByName", "responseType": "webhook"},
+        {"op": "GET /webhooks/name/{name}", "name": "GetWebhookByName", "responseType": "webhook", "resolver": {"resourceType": "Webhook", "mode": "direct"}},
         {"op": "PUT /webhooks/name/{name}", "name": "UpdateWebhookByName", "requestType": "webhook", "expectedStatus": 201},
         {"op": "DELETE /webhooks/name/{name}", "name": "DeleteWebhookByName"},
 
-        {"op": "GET /removablemacaddresses/name/{name}", "name": "GetRemovableMacAddressByName", "responseType": "removable_mac_address"},
+        {"op": "GET /removablemacaddresses/name/{name}", "name": "GetRemovableMacAddressByName", "responseType": "removable_mac_address", "resolver": {"resourceType": "RemovableMacAddress", "mode": "direct"}},
         {"op": "PUT /removablemacaddresses/name/{name}", "name": "UpdateRemovableMacAddressByName", "requestType": "removable_mac_address", "expectedStatus": 201},
         {"op": "DELETE /removablemacaddresses/name/{name}", "name": "DeleteRemovableMacAddressByName"},
 

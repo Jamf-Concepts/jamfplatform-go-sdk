@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetNetworkSegmentByID finds network segments by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListNetworkSegments(ctx context.Context) (*NetworkSegments, err
 		return nil, fmt.Errorf("ListNetworkSegments: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveNetworkSegmentIDByName looks up a NetworkSegment by name via GetNetworkSegmentByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveNetworkSegmentIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetNetworkSegmentByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveNetworkSegmentIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveNetworkSegmentIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveNetworkSegmentByName looks up a NetworkSegment by name. Alias for GetNetworkSegmentByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveNetworkSegmentByName(ctx context.Context, name string) (*NetworkSegment, error) {
+	return c.GetNetworkSegmentByName(ctx, name)
 }

@@ -55,15 +55,21 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 		}
 		r := opDef.Resolver
 		switch r.Mode {
-		case "filtered", "clientFilter":
+		case "filtered", "clientFilter", "direct":
 			// supported
-		case "", "direct":
-			return nil, fmt.Errorf("resolver on %s: mode %q not yet supported (supported: filtered, clientFilter)", opDef.Name, r.Mode)
+		case "":
+			return nil, fmt.Errorf("resolver on %s: mode required (filtered, clientFilter, or direct)", opDef.Name)
 		default:
 			return nil, fmt.Errorf("resolver on %s: unknown mode %q", opDef.Name, r.Mode)
 		}
-		if r.ResourceType == "" || r.NameField == "" || r.IDField == "" {
-			return nil, fmt.Errorf("resolver on %s: resourceType, nameField, idField are all required", opDef.Name)
+		if r.ResourceType == "" {
+			return nil, fmt.Errorf("resolver on %s: resourceType is required", opDef.Name)
+		}
+		// filtered/clientFilter require name/id field paths; direct mode
+		// doesn't — the typed source method already decodes the response
+		// and the ID is taken from the top-level *int ID field uniformly.
+		if r.Mode != "direct" && (r.NameField == "" || r.IDField == "") {
+			return nil, fmt.Errorf("resolver on %s: nameField and idField are required for mode %q", opDef.Name, r.Mode)
 		}
 		src, ok := byName[opDef.Name]
 		if !ok {
@@ -81,30 +87,67 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 			SearchParam:  r.SearchParam,
 			ResultsField: r.ResultsField,
 			TypedReturn:  typedReturn,
+			SourceMethod: opDef.Name,
 		}
-		// Base synthetic method — shared fields. The path comes from the
-		// source List op; the {name} placeholder in direct mode would live
-		// in ResourcePath but direct mode is rejected above, so no
-		// {name}-param stripping is needed here.
+		if r.Mode == "direct" {
+			// Pre-expand the Go field chain for direct-mode emission.
+			// Composite Classic resources return ID nested under General
+			// (policies, mac_application, ebook, …); flat resources have a
+			// top-level ID. The config's idField is a Go-struct dot-path —
+			// "ID" (default) or "General.ID" for composites. Generator
+			// emits per-step nil checks so the resolver surfaces a clean
+			// "response missing id" error instead of nil-derefing.
+			path := r.IDField
+			if path == "" {
+				path = "ID"
+			}
+			parts := strings.Split(path, ".")
+			checks := []string{"r == nil"}
+			expr := "r"
+			for _, p := range parts {
+				expr += "." + p
+				checks = append(checks, expr+" == nil")
+			}
+			gr.IDNilCheck = strings.Join(checks, " || ")
+			gr.IDDeref = "*" + expr
+			xmlBody := "42"
+			for i := len(parts) - 1; i >= 0; i-- {
+				tag := strings.ToLower(parts[i])
+				xmlBody = "<" + tag + ">" + xmlBody + "</" + tag + ">"
+			}
+			gr.IDTestInnerXML = xmlBody
+		}
+		// Base synthetic method — shared fields. ResourcePath/SpecPath
+		// come from the source op: a List op for filtered/clientFilter
+		// (no {name} placeholder), or the GetByName op for direct (which
+		// does carry {name}; the test-stub handler resolves that to
+		// "test-id" the same way typed GET stubs do).
 		base := GoMethod{
-			Namespace:    src.Namespace,
-			Version:      src.Version,
-			Tag:          src.Tag,
-			Format:       src.Format,
-			ResourcePath: src.ResourcePath,
-			SpecPath:     src.SpecPath,
-			HTTPMethod:   http.MethodGet,
-			Resolver:     gr,
+			Namespace:        src.Namespace,
+			Version:          src.Version,
+			Tag:              src.Tag,
+			Format:           src.Format,
+			ResourcePath:     src.ResourcePath,
+			SpecPath:         src.SpecPath,
+			HTTPMethod:       http.MethodGet,
+			ResponseWireName: src.ResponseWireName,
+			Resolver:         gr,
 		}
 		idMethod := base
 		idMethod.Name = "Resolve" + r.ResourceType + "IDByName"
-		idMethod.Category = "resolverID"
-		idMethod.Comment = idMethod.Name + " looks up a " + r.ResourceType + " by its " + r.NameField + " field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name."
-
 		typedMethod := base
 		typedMethod.Name = "Resolve" + r.ResourceType + "ByName"
-		typedMethod.Category = "resolverTyped"
-		typedMethod.Comment = typedMethod.Name + " looks up a " + r.ResourceType + " by its " + r.NameField + " field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical."
+		if r.Mode == "direct" {
+			idMethod.Category = "resolverIDDirect"
+			idMethod.Comment = idMethod.Name + " looks up a " + r.ResourceType + " by name via " + opDef.Name + " and returns its ID as a string. Returns an error when the underlying call returns a nil ID."
+			typedMethod.Category = "resolverTypedDirect"
+			typedMethod.Comment = typedMethod.Name + " looks up a " + r.ResourceType + " by name. Alias for " + opDef.Name + "; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode."
+		} else {
+			idMethod.Category = "resolverID"
+			idMethod.Comment = idMethod.Name + " looks up a " + r.ResourceType + " by its " + r.NameField + " field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name."
+			typedMethod.Category = "resolverTyped"
+			typedMethod.Comment = typedMethod.Name + " looks up a " + r.ResourceType + " by its " + r.NameField + " field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical."
+		}
 
 		out = append(out, idMethod, typedMethod)
 	}

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetRestrictedSoftwareByID finds restricted software by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListRestrictedSoftware(ctx context.Context) (*RestrictedSoftwar
 		return nil, fmt.Errorf("ListRestrictedSoftware: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveRestrictedSoftwareIDByName looks up a RestrictedSoftware by name via GetRestrictedSoftwareByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveRestrictedSoftwareIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetRestrictedSoftwareByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveRestrictedSoftwareIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveRestrictedSoftwareIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveRestrictedSoftwareByName looks up a RestrictedSoftware by name. Alias for GetRestrictedSoftwareByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveRestrictedSoftwareByName(ctx context.Context, name string) (*RestrictedSoftware, error) {
+	return c.GetRestrictedSoftwareByName(ctx, name)
 }

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetAdvancedComputerSearchByID finds computer searches by ID.
@@ -94,4 +95,21 @@ func (c *Client) UpdateAdvancedComputerSearchByName(ctx context.Context, name st
 		return fmt.Errorf("UpdateAdvancedComputerSearchByName(%s): %w", name, err)
 	}
 	return nil
+}
+
+// ResolveAdvancedComputerSearchIDByName looks up a AdvancedComputerSearch by name via GetAdvancedComputerSearchByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveAdvancedComputerSearchIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetAdvancedComputerSearchByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAdvancedComputerSearchIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveAdvancedComputerSearchIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveAdvancedComputerSearchByName looks up a AdvancedComputerSearch by name. Alias for GetAdvancedComputerSearchByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveAdvancedComputerSearchByName(ctx context.Context, name string) (*AdvancedComputerSearch, error) {
+	return c.GetAdvancedComputerSearchByName(ctx, name)
 }

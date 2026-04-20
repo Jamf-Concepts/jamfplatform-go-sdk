@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetEbookByID finds ebooks by ID.
@@ -116,4 +117,21 @@ func (c *Client) GetEbookByNameSubset(ctx context.Context, name string, subset s
 		return nil, fmt.Errorf("GetEbookByNameSubset(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolveEbookIDByName looks up a Ebook by name via GetEbookByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveEbookIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetEbookByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveEbookIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveEbookIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveEbookByName looks up a Ebook by name. Alias for GetEbookByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveEbookByName(ctx context.Context, name string) (*Ebook, error) {
+	return c.GetEbookByName(ctx, name)
 }

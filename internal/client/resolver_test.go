@@ -413,7 +413,9 @@ func TestResolveByNameFiltered_QueryEscaping(t *testing.T) {
 		if !strings.Contains(decoded, `name=="has space"`) {
 			t.Errorf("decoded query %q missing expected filter fragment", decoded)
 		}
-		fmt.Fprintln(w, `{"results":[{"id":"1","name":"has space"}]}`)
+		if _, err := fmt.Fprintln(w, `{"results":[{"id":"1","name":"has space"}]}`); err != nil {
+			t.Errorf("write response: %v", err)
+		}
 	})
 
 	_, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "id", "has space")

@@ -298,3 +298,39 @@ func TestGetPolicyByNameSubset_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolvePolicyIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<policy><general><id>42</id></general></policy>")
+	})
+
+	id, err := c.ResolvePolicyIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolvePolicyByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<policy><general><id>42</id></general></policy>")
+	})
+
+	result, err := c.ResolvePolicyByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

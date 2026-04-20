@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetLicensedSoftwareByID finds licensed software by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListLicensedSoftware(ctx context.Context) (*LicensedSoftwareAll
 		return nil, fmt.Errorf("ListLicensedSoftware: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveLicensedSoftwareIDByName looks up a LicensedSoftware by name via GetLicensedSoftwareByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveLicensedSoftwareIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetLicensedSoftwareByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveLicensedSoftwareIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveLicensedSoftwareIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveLicensedSoftwareByName looks up a LicensedSoftware by name. Alias for GetLicensedSoftwareByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveLicensedSoftwareByName(ctx context.Context, name string) (*LicensedSoftware, error) {
+	return c.GetLicensedSoftwareByName(ctx, name)
 }

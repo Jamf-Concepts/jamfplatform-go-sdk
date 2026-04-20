@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetDockItemByID finds dock items by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListDockItems(ctx context.Context) (*DockItems, error) {
 		return nil, fmt.Errorf("ListDockItems: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveDockItemIDByName looks up a DockItem by name via GetDockItemByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveDockItemIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetDockItemByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDockItemIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveDockItemIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveDockItemByName looks up a DockItem by name. Alias for GetDockItemByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveDockItemByName(ctx context.Context, name string) (*DockItem, error) {
+	return c.GetDockItemByName(ctx, name)
 }

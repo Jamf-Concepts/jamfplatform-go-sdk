@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetMobileDeviceExtensionAttributeByID finds mobile device extension attributes by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListMobileDeviceExtensionAttributes(ctx context.Context) (*Mobi
 		return nil, fmt.Errorf("ListMobileDeviceExtensionAttributes: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveMobileDeviceExtensionAttributeIDByName looks up a MobileDeviceExtensionAttribute by name via GetMobileDeviceExtensionAttributeByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveMobileDeviceExtensionAttributeIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetMobileDeviceExtensionAttributeByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceExtensionAttributeIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveMobileDeviceExtensionAttributeIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveMobileDeviceExtensionAttributeByName looks up a MobileDeviceExtensionAttribute by name. Alias for GetMobileDeviceExtensionAttributeByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveMobileDeviceExtensionAttributeByName(ctx context.Context, name string) (*MobileDeviceExtensionAttribute, error) {
+	return c.GetMobileDeviceExtensionAttributeByName(ctx, name)
 }

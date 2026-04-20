@@ -251,6 +251,10 @@ type {{ .Name }} = string
 {{ template "resolverID" . }}
 {{- else if eq .Category "resolverTyped" }}
 {{ template "resolverTyped" . }}
+{{- else if eq .Category "resolverIDDirect" }}
+{{ template "resolverIDDirect" . }}
+{{- else if eq .Category "resolverTypedDirect" }}
+{{ template "resolverTypedDirect" . }}
 {{- else }}
 {{ template "action" . }}
 {{- end }}
@@ -612,6 +616,27 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.Ty
 	return &out, nil
 }
 {{ end }}
+
+{{- define "resolverIDDirect" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
+	r, err := c.{{ .Resolver.SourceMethod }}(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("{{ .Name }}(%s): %w", name, err)
+	}
+	if {{ .Resolver.IDNilCheck }} {
+		return "", fmt.Errorf("{{ .Name }}(%s): response missing id", name)
+	}
+	return strconv.Itoa({{ .Resolver.IDDeref }}), nil
+}
+{{ end }}
+
+{{- define "resolverTypedDirect" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.TypedReturn }}, error) {
+	return c.{{ .Resolver.SourceMethod }}(ctx, name)
+}
+{{ end }}
 `
 
 // ---------------------------------------------------------------------------
@@ -652,6 +677,10 @@ import (
 <% template "testResolverID" . %>
 <%- else if eq .Category "resolverTyped" %>
 <% template "testResolverTyped" . %>
+<%- else if eq .Category "resolverIDDirect" %>
+<% template "testResolverIDDirect" . %>
+<%- else if eq .Category "resolverTypedDirect" %>
+<% template "testResolverTypedDirect" . %>
 <%- else %>
 <% template "testAction" . %>
 <%- end %>
@@ -962,6 +991,46 @@ func Test<% .Name %>(t *testing.T) {
 	})
 
 	result, err := c.<% .Name %>(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+<% end %>
+
+<%- define "testResolverIDDirect" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>><% .Resolver.IDTestInnerXML %></<% .ResponseWireName %>>")
+	})
+
+	id, err := c.<% .Name %>(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+<% end %>
+
+<%- define "testResolverTypedDirect" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>><% .Resolver.IDTestInnerXML %></<% .ResponseWireName %>>")
+	})
+
+	result, err := c.<% .Name %>(context.Background(), "test-id")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetAdvancedMobileDeviceSearchByID finds mobile device searches by ID.
@@ -94,4 +95,21 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 		return fmt.Errorf("UpdateAdvancedMobileDeviceSearchByName(%s): %w", name, err)
 	}
 	return nil
+}
+
+// ResolveAdvancedMobileDeviceSearchIDByName looks up a AdvancedMobileDeviceSearch by name via GetAdvancedMobileDeviceSearchByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveAdvancedMobileDeviceSearchIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetAdvancedMobileDeviceSearchByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAdvancedMobileDeviceSearchIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveAdvancedMobileDeviceSearchIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveAdvancedMobileDeviceSearchByName looks up a AdvancedMobileDeviceSearch by name. Alias for GetAdvancedMobileDeviceSearchByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveAdvancedMobileDeviceSearchByName(ctx context.Context, name string) (*AdvancedMobileDeviceSearch, error) {
+	return c.GetAdvancedMobileDeviceSearchByName(ctx, name)
 }

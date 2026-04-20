@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetCategoryByID finds categories by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListCategories(ctx context.Context) (*Categories, error) {
 		return nil, fmt.Errorf("ListCategories: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveCategoryIDByName looks up a Category by name via GetCategoryByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveCategoryIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetCategoryByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveCategoryIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveCategoryIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveCategoryByName looks up a Category by name. Alias for GetCategoryByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveCategoryByName(ctx context.Context, name string) (*Category, error) {
+	return c.GetCategoryByName(ctx, name)
 }

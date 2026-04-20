@@ -44,7 +44,7 @@ type GoField struct {
 type GoMethod struct {
 	Name             string
 	Comment          string
-	Category         string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart, resolverID, resolverTyped
+	Category         string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart, resolverID, resolverTyped, resolverIDDirect, resolverTypedDirect
 	HTTPMethod       string
 	Namespace        string
 	Version          string
@@ -72,16 +72,33 @@ type GoMethod struct {
 // GoResolver carries the config needed by resolver method templates.
 // Populated on synthetic methods produced by appendResolverMethods; never
 // present on spec-derived methods. Namespace/Version/ResourcePath on the
-// parent GoMethod are inherited from the source (List) op and used to
-// build the list path the same way regular method templates do.
+// parent GoMethod are inherited from the source op — the List op for
+// filtered/clientFilter, the GetByName op for direct.
 type GoResolver struct {
 	ResourceType string // drives emitted method name suffix
-	Mode         string // "filtered" or "clientFilter"
-	NameField    string
-	IDField      string
+	Mode         string // "filtered", "clientFilter", or "direct"
+	NameField    string // filtered/clientFilter only
+	IDField      string // filtered/clientFilter only
 	SearchParam  string // clientFilter only
 	ResultsField string // envelope key for the element array; empty → transport defaults to "results"
 	TypedReturn  string // Go type of the typed wrapper's return
+	SourceMethod string // direct only: existing Get<X>ByName method the wrappers delegate to
+	// IDNilCheck and IDDeref are pre-computed expressions the direct-mode
+	// template emits verbatim. They cover the nested-ID case: Classic
+	// responses for composite resources (policies, mac_application,
+	// ebook, …) populate only `<general><id>N</id></general>` on the wire,
+	// even when the Go struct also has a top-level ID *int. The config's
+	// idField path ("ID" or "General.ID") drives what Go field chain we
+	// walk; the generator expands the chain with nil guards per step so
+	// callers see "response missing id" rather than a nil-deref panic.
+	IDNilCheck string
+	IDDeref    string
+	// IDTestInnerXML is the XML body fragment the direct-mode test stub
+	// emits inside the response's wire-root element. Flat path ("ID")
+	// produces "<id>42</id>"; nested path ("General.ID") produces
+	// "<general><id>42</id></general>" so the typed decoder populates
+	// r.General.ID and the resolver's walk succeeds.
+	IDTestInnerXML string
 }
 
 type GoPathParam struct {

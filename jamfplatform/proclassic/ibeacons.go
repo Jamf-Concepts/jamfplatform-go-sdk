@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetIBeaconByID finds iBeacon regions by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
 		return nil, fmt.Errorf("ListIBeacons: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveIBeaconIDByName looks up a IBeacon by name via GetIBeaconByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveIBeaconIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetIBeaconByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveIBeaconIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveIBeaconIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveIBeaconByName looks up a IBeacon by name. Alias for GetIBeaconByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveIBeaconByName(ctx context.Context, name string) (*Ibeacon, error) {
+	return c.GetIBeaconByName(ctx, name)
 }

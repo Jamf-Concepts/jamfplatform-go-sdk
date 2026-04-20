@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetMobileDeviceGroupByID finds mobile device groups by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListMobileDeviceGroups(ctx context.Context) (*MobileDeviceGroup
 		return nil, fmt.Errorf("ListMobileDeviceGroups: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveMobileDeviceGroupIDByName looks up a MobileDeviceGroup by name via GetMobileDeviceGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveMobileDeviceGroupIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetMobileDeviceGroupByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceGroupIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveMobileDeviceGroupIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveMobileDeviceGroupByName looks up a MobileDeviceGroup by name. Alias for GetMobileDeviceGroupByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveMobileDeviceGroupByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
+	return c.GetMobileDeviceGroupByName(ctx, name)
 }

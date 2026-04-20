@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetWebhookByID finds webhooks by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListWebhooks(ctx context.Context) (*Webhooks, error) {
 		return nil, fmt.Errorf("ListWebhooks: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveWebhookIDByName looks up a Webhook by name via GetWebhookByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveWebhookIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetWebhookByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveWebhookIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveWebhookIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveWebhookByName looks up a Webhook by name. Alias for GetWebhookByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveWebhookByName(ctx context.Context, name string) (*Webhook, error) {
+	return c.GetWebhookByName(ctx, name)
 }

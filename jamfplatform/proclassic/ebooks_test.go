@@ -238,3 +238,39 @@ func TestGetEbookByNameSubset_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveEbookIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<ebook><general><id>42</id></general></ebook>")
+	})
+
+	id, err := c.ResolveEbookIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveEbookByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<ebook><general><id>42</id></general></ebook>")
+	})
+
+	result, err := c.ResolveEbookByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

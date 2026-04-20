@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetUserExtensionAttributeByID finds user extension attributes by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensio
 		return nil, fmt.Errorf("ListUserExtensionAttributes: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveUserExtensionAttributeIDByName looks up a UserExtensionAttribute by name via GetUserExtensionAttributeByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveUserExtensionAttributeIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetUserExtensionAttributeByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveUserExtensionAttributeIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveUserExtensionAttributeIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveUserExtensionAttributeByName looks up a UserExtensionAttribute by name. Alias for GetUserExtensionAttributeByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveUserExtensionAttributeByName(ctx context.Context, name string) (*UserExtensionAttribute, error) {
+	return c.GetUserExtensionAttributeByName(ctx, name)
 }

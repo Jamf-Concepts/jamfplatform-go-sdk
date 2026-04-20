@@ -178,3 +178,39 @@ func TestListRestrictedSoftware_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveRestrictedSoftwareIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/restrictedsoftware/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<restricted_software><general><id>42</id></general></restricted_software>")
+	})
+
+	id, err := c.ResolveRestrictedSoftwareIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveRestrictedSoftwareByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/restrictedsoftware/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<restricted_software><general><id>42</id></general></restricted_software>")
+	})
+
+	result, err := c.ResolveRestrictedSoftwareByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

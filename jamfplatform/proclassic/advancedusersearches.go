@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetAdvancedUserSearchByID finds user searches by ID.
@@ -94,4 +95,21 @@ func (c *Client) UpdateAdvancedUserSearchByName(ctx context.Context, name string
 		return fmt.Errorf("UpdateAdvancedUserSearchByName(%s): %w", name, err)
 	}
 	return nil
+}
+
+// ResolveAdvancedUserSearchIDByName looks up a AdvancedUserSearch by name via GetAdvancedUserSearchByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveAdvancedUserSearchIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetAdvancedUserSearchByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAdvancedUserSearchIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveAdvancedUserSearchIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveAdvancedUserSearchByName looks up a AdvancedUserSearch by name. Alias for GetAdvancedUserSearchByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveAdvancedUserSearchByName(ctx context.Context, name string) (*AdvancedUserSearch, error) {
+	return c.GetAdvancedUserSearchByName(ctx, name)
 }

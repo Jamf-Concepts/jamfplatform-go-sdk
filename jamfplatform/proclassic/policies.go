@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetPolicyByID finds policies by ID.
@@ -138,4 +139,21 @@ func (c *Client) GetPolicyByNameSubset(ctx context.Context, name string, subset 
 		return nil, fmt.Errorf("GetPolicyByNameSubset(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolvePolicyIDByName looks up a Policy by name via GetPolicyByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolvePolicyIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetPolicyByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePolicyIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolvePolicyIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolvePolicyByName looks up a Policy by name. Alias for GetPolicyByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolvePolicyByName(ctx context.Context, name string) (*Policy, error) {
+	return c.GetPolicyByName(ctx, name)
 }

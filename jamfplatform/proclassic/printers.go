@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetPrinterByID finds printers by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListPrinters(ctx context.Context) (*Printers, error) {
 		return nil, fmt.Errorf("ListPrinters: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolvePrinterIDByName looks up a Printer by name via GetPrinterByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolvePrinterIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetPrinterByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePrinterIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolvePrinterIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolvePrinterByName looks up a Printer by name. Alias for GetPrinterByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolvePrinterByName(ctx context.Context, name string) (*Printer, error) {
+	return c.GetPrinterByName(ctx, name)
 }

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetSiteByID finds sites by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListSites(ctx context.Context) (*Sites, error) {
 		return nil, fmt.Errorf("ListSites: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveSiteIDByName looks up a Site by name via GetSiteByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveSiteIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetSiteByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSiteIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveSiteIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveSiteByName looks up a Site by name. Alias for GetSiteByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveSiteByName(ctx context.Context, name string) (*Site, error) {
+	return c.GetSiteByName(ctx, name)
 }

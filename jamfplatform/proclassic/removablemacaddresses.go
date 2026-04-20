@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetRemovableMacAddressByID finds removable Mac addresses by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListRemovableMacAddresses(ctx context.Context) (*RemovableMacAd
 		return nil, fmt.Errorf("ListRemovableMacAddresses: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveRemovableMacAddressIDByName looks up a RemovableMacAddress by name via GetRemovableMacAddressByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveRemovableMacAddressIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetRemovableMacAddressByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveRemovableMacAddressIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveRemovableMacAddressIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveRemovableMacAddressByName looks up a RemovableMacAddress by name. Alias for GetRemovableMacAddressByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveRemovableMacAddressByName(ctx context.Context, name string) (*RemovableMacAddress, error) {
+	return c.GetRemovableMacAddressByName(ctx, name)
 }

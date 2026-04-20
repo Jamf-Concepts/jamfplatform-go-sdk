@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetClassByID finds classes by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListClasses(ctx context.Context) (*Classes, error) {
 		return nil, fmt.Errorf("ListClasses: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveClassIDByName looks up a Class by name via GetClassByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveClassIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetClassByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveClassIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveClassIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveClassByName looks up a Class by name. Alias for GetClassByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveClassByName(ctx context.Context, name string) (*Class, error) {
+	return c.GetClassByName(ctx, name)
 }

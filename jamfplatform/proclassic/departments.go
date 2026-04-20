@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetDepartmentByID finds departments by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListDepartments(ctx context.Context) (*Departments, error) {
 		return nil, fmt.Errorf("ListDepartments: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveDepartmentIDByName looks up a Department by name via GetDepartmentByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveDepartmentIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetDepartmentByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDepartmentIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveDepartmentIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveDepartmentByName looks up a Department by name. Alias for GetDepartmentByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveDepartmentByName(ctx context.Context, name string) (*Department, error) {
+	return c.GetDepartmentByName(ctx, name)
 }

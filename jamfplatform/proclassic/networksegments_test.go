@@ -178,3 +178,39 @@ func TestListNetworkSegments_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveNetworkSegmentIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/networksegments/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<network_segment><id>42</id></network_segment>")
+	})
+
+	id, err := c.ResolveNetworkSegmentIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveNetworkSegmentByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/networksegments/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<network_segment><id>42</id></network_segment>")
+	})
+
+	result, err := c.ResolveNetworkSegmentByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

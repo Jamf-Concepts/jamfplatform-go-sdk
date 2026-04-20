@@ -82,6 +82,16 @@ Empirical per-family behaviour (see `acc_api_errors_test.go` for the probes that
 
 Rule for consumers doing field-attributed diagnostics (Terraform `AddAttributeError`, CLI per-field output): iterate `FieldErrors()` and fall through to a generic diagnostic when the field key is empty. That pattern works across every family.
 
+### Name→ID resolvers
+
+Every resource that supports name-based lookup exposes two generator-emitted methods: `Resolve<X>IDByName(ctx, name) (string, error)` and `Resolve<X>ByName(ctx, name) (*<Type>, error)`. Attached via a `"resolver": {...}` block on an operation in `tools/generate/config.json`. Three modes selected per-resource by the shape the API actually supports:
+
+- `filtered` — list endpoint accepts RSQL equality (`filter=name=="x"`); transport issues one GET with `page-size=2`, ambiguity from `totalCount > 1`. Config: `{"mode": "filtered", "resourceType": "...", "nameField": "...", "idField": "..."}`. Attaches to the List op.
+- `clientFilter` — list endpoint has no RSQL or only substring `search`; fetches the list (optionally narrowed via `searchParam`), walks in memory for exact `nameField` match. Config adds `"searchParam": "search"` when the server offers it. Attaches to the List op.
+- `direct` — Classic-only. The spec already generates `Get<X>ByName`; the resolver wrappers just delegate and stringify the typed `*int` ID. Config: `{"mode": "direct", "resourceType": "..."}` — no name/id field paths needed because the typed method is authoritative. Attaches to the by-name GET op. `typedReturn` overrides only when the resource's Go struct differs from the resource name (e.g. `GetIBeaconByName` returns `*Ibeacon`, not `*IBeacon`).
+
+Error contract is identical across modes: not-found surfaces as `*APIResponseError` with `HasStatus(404)`; ambiguous matches (filtered/clientFilter only) surface as `*AmbiguousMatchError`. Consumers check these the same way regardless of which mode the resource uses.
+
 ## File organization
 
 - Every spec in `tools/generate/config.json` MUST set `"splitByTag": true`. The generator buckets methods by first OpenAPI tag into one file per tag (`<tag>.go` + `<tag>_test.go`); types pool into a shared `types.go`. Splitting by path would scatter CRUD for a single resource across many files; tag-split keeps each resource coherent.

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetScriptByID finds scripts by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListScripts(ctx context.Context) (*Scripts, error) {
 		return nil, fmt.Errorf("ListScripts: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveScriptIDByName looks up a Script by name via GetScriptByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveScriptIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetScriptByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveScriptIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveScriptIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveScriptByName looks up a Script by name. Alias for GetScriptByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveScriptByName(ctx context.Context, name string) (*Script, error) {
+	return c.GetScriptByName(ctx, name)
 }

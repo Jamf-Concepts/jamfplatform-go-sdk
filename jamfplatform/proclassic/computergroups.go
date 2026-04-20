@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetComputerGroupByID finds computer groups by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListComputerGroups(ctx context.Context) (*ComputerGroups, error
 		return nil, fmt.Errorf("ListComputerGroups: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveComputerGroupIDByName looks up a ComputerGroup by name via GetComputerGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveComputerGroupIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetComputerGroupByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerGroupIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveComputerGroupIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveComputerGroupByName looks up a ComputerGroup by name. Alias for GetComputerGroupByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveComputerGroupByName(ctx context.Context, name string) (*ComputerGroup, error) {
+	return c.GetComputerGroupByName(ctx, name)
 }

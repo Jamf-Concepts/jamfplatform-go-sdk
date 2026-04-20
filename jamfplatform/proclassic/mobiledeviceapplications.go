@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetMobileDeviceApplicationByID finds mobile device applications by ID.
@@ -178,4 +179,21 @@ func (c *Client) GetMobileDeviceApplicationByNameSubset(ctx context.Context, nam
 		return nil, fmt.Errorf("GetMobileDeviceApplicationByNameSubset(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolveMobileDeviceApplicationIDByName looks up a MobileDeviceApplication by name via GetMobileDeviceApplicationByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveMobileDeviceApplicationIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetMobileDeviceApplicationByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceApplicationIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveMobileDeviceApplicationIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveMobileDeviceApplicationByName looks up a MobileDeviceApplication by name. Alias for GetMobileDeviceApplicationByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveMobileDeviceApplicationByName(ctx context.Context, name string) (*MobileDeviceApplication, error) {
+	return c.GetMobileDeviceApplicationByName(ctx, name)
 }

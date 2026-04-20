@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetComputerExtensionAttributeByID finds computer extension attributes by ID.
@@ -94,4 +95,21 @@ func (c *Client) ListComputerExtensionAttributes(ctx context.Context) (*Computer
 		return nil, fmt.Errorf("ListComputerExtensionAttributes: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveComputerExtensionAttributeIDByName looks up a ComputerExtensionAttribute by name via GetComputerExtensionAttributeByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveComputerExtensionAttributeIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetComputerExtensionAttributeByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerExtensionAttributeIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveComputerExtensionAttributeIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveComputerExtensionAttributeByName looks up a ComputerExtensionAttribute by name. Alias for GetComputerExtensionAttributeByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveComputerExtensionAttributeByName(ctx context.Context, name string) (*ComputerExtensionAttribute, error) {
+	return c.GetComputerExtensionAttributeByName(ctx, name)
 }
