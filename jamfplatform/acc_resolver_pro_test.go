@@ -84,7 +84,7 @@ func TestAcceptance_ResolveBuildingV1_NotFound(t *testing.T) {
 func createTestCategory(t *testing.T, c *pro.Client, name string) string {
 	t.Helper()
 	ctx := context.Background()
-	resp, err := c.CreateCategoryV1(ctx, &pro.Category{Name: name})
+	resp, err := c.CreateCategoryV1(ctx, &pro.Category{Name: name, Priority: 9})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateCategoryV1(%q): %v", name, err)
@@ -422,7 +422,7 @@ func TestAcceptance_ResolveStaticComputerGroupV2_NotFound(t *testing.T) {
 func createTestSmartMobileDeviceGroup(t *testing.T, c *pro.Client, name string) string {
 	t.Helper()
 	ctx := context.Background()
-	resp, err := c.CreateSmartMobileDeviceGroupV1(ctx, &pro.SmartGroupAssignment{GroupName: name}, false)
+	resp, err := c.CreateSmartMobileDeviceGroupV1(ctx, &pro.SmartGroupAssignment{GroupName: name, SiteID: strPtr("-1")}, false)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateSmartMobileDeviceGroupV1(%q): %v", name, err)
@@ -486,7 +486,7 @@ func TestAcceptance_ResolveSmartMobileDeviceGroupV1_NotFound(t *testing.T) {
 func createTestStaticMobileDeviceGroup(t *testing.T, c *pro.Client, name string) string {
 	t.Helper()
 	ctx := context.Background()
-	resp, err := c.CreateStaticMobileDeviceGroupV1(ctx, &pro.StaticGroupAssignment{GroupName: name}, false)
+	resp, err := c.CreateStaticMobileDeviceGroupV1(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1")}, false)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateStaticMobileDeviceGroupV1(%q): %v", name, err)
@@ -556,10 +556,12 @@ func createTestComputerExtAttr(t *testing.T, c *pro.Client, name string) string 
 	manageExistingData := "DELETE_EXISTING_DATA"
 	resp, err := c.CreateComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                 name,
+		Enabled:              true, // server rejects false/omitted unless inputType is SCRIPT
 		DataType:             dataType,
 		InputType:            inputType,
 		InventoryDisplayType: inventoryDisplay,
 		ManageExistingData:   manageExistingData,
+		PopupMenuChoices:     []string{}, // server NPEs when field is null even for TEXT type
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -632,6 +634,7 @@ func createTestMobileDeviceExtAttr(t *testing.T, c *pro.Client, name string) str
 		DataType:             "STRING",
 		InputType:            "TEXT",
 		InventoryDisplayType: "GENERAL",
+		PopupMenuChoices:     []string{}, // server NPEs when field is null even for TEXT type
 	})
 	if err != nil {
 		skipOnServerError(t, err)
