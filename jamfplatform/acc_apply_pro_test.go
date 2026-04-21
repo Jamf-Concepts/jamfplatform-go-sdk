@@ -1468,24 +1468,40 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 	t.Run("MobileDevicePrestageV3", func(t *testing.T) {
 		name := "sdk-acc-apply-mobprestage-" + runSuffix()
 
+		strPtr := func(s string) *string { return &s }
+		boolPtr := func(b bool) *bool { return &b }
 		req := &pro.MobileDevicePrestageV3{
 			DisplayName:                            name,
 			DeviceEnrollmentProgramInstanceID:      depID,
 			DefaultPrestage:                        false,
-			Mandatory:                              false,
+			Mandatory:                              true,
 			MDMRemovable:                           true,
 			AutoAdvanceSetup:                       false,
 			AllowPairing:                           true,
 			MultiUser:                              false,
-			MaximumSharedAccounts:                  0,
+			Supervised:                             true,
+			MaximumSharedAccounts:                  10,
 			ConfigureDeviceBeforeSetupAssistant:    false,
 			RtsConfigProfileID:                     "-1",
+			Timezone:                               "UTC",
+			SendTimezone:                           false,
+			StorageQuotaSizeMegabytes:              1024,
+			UseStorageQuotaSize:                    false,
 			SkipSetupItems:                         map[string]bool{},
 			EnrollmentSiteID:                       "-1",
 			EnrollmentCustomizationID:              "0",
 			PrestageMinimumOsTargetVersionTypeIos:  "NO_ENFORCEMENT",
 			PrestageMinimumOsTargetVersionTypeIpad: "NO_ENFORCEMENT",
 			AnchorCertificates:                     []string{},
+			Names: &pro.MobileDevicePrestageNamesV3{
+				AssignNamesUsing:       strPtr("Default Names"),
+				DeviceNamePrefix:       strPtr(""),
+				DeviceNameSuffix:       strPtr(""),
+				DeviceNamingConfigured: boolPtr(false),
+				ManageNames:            boolPtr(false),
+				PrestageDeviceNames:    &[]pro.MobileDevicePrestageNameV3{},
+				SingleDeviceName:       strPtr(""),
+			},
 			LocationInformation: &pro.LocationInformationV3{
 				ID:           "-1",
 				VersionLock:  0,
@@ -1505,7 +1521,6 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		// 4. Apply creates
 		id, created, err := p.ApplyMobileDevicePrestageV3(ctx, req)
 		if err != nil {
-			skipOnServerError(t, err)
 			t.Fatalf("apply create: %v", err)
 		}
 		cleanupDelete(t, "MobileDevicePrestage "+id, func() error { return p.DeleteMobileDevicePrestageV3(ctx, id) })
@@ -1521,7 +1536,7 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		t.Logf("after create: versionLock=%d", got.VersionLock)
 
 		// 5. Apply updates — versionLock injection exercised
-		req.Mandatory = true // change something to force a real update
+		req.Mandatory = false // flip from true to force a real update
 		id2, created2, err := p.ApplyMobileDevicePrestageV3(ctx, req)
 		if err != nil {
 			t.Fatalf("apply update: %v", err)
