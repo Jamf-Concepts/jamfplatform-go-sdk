@@ -229,7 +229,7 @@ func (c *Client) ResolveComputerGroupV1ByName(ctx context.Context, name string) 
 func (c *Client) ResolveSmartComputerGroupV2IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	listPath := prefix + "/computer-groups/smart-groups"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveSmartComputerGroupV2IDByName(%s): %w", name, err)
 	}
@@ -240,7 +240,7 @@ func (c *Client) ResolveSmartComputerGroupV2IDByName(ctx context.Context, name s
 func (c *Client) ResolveSmartComputerGroupV2ByName(ctx context.Context, name string) (*SmartComputerGroupSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	listPath := prefix + "/computer-groups/smart-groups"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveSmartComputerGroupV2ByName(%s): %w", name, err)
 	}
@@ -255,7 +255,7 @@ func (c *Client) ResolveSmartComputerGroupV2ByName(ctx context.Context, name str
 func (c *Client) ResolveStaticComputerGroupV2IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	listPath := prefix + "/computer-groups/static-groups"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveStaticComputerGroupV2IDByName(%s): %w", name, err)
 	}
@@ -266,7 +266,7 @@ func (c *Client) ResolveStaticComputerGroupV2IDByName(ctx context.Context, name 
 func (c *Client) ResolveStaticComputerGroupV2ByName(ctx context.Context, name string) (*StaticComputerGroupSummary, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	listPath := prefix + "/computer-groups/static-groups"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveStaticComputerGroupV2ByName(%s): %w", name, err)
 	}

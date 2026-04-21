@@ -145,7 +145,7 @@ func (c *Client) CreateDepartmentHistoryNoteV1(ctx context.Context, id string, r
 func (c *Client) ResolveDepartmentV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/departments"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveDepartmentV1IDByName(%s): %w", name, err)
 	}
@@ -156,7 +156,7 @@ func (c *Client) ResolveDepartmentV1IDByName(ctx context.Context, name string) (
 func (c *Client) ResolveDepartmentV1ByName(ctx context.Context, name string) (*Department, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/departments"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveDepartmentV1ByName(%s): %w", name, err)
 	}

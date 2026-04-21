@@ -146,7 +146,7 @@ func (c *Client) CreateScriptHistoryNoteV1(ctx context.Context, id string, reque
 func (c *Client) ResolveScriptV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/scripts"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveScriptV1IDByName(%s): %w", name, err)
 	}
@@ -157,7 +157,7 @@ func (c *Client) ResolveScriptV1IDByName(ctx context.Context, name string) (stri
 func (c *Client) ResolveScriptV1ByName(ctx context.Context, name string) (*Script, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/scripts"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveScriptV1ByName(%s): %w", name, err)
 	}

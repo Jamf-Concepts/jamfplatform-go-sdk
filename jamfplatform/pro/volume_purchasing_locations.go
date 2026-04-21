@@ -185,7 +185,7 @@ func (c *Client) RevokeVolumePurchasingLocationLicensesV1(ctx context.Context, i
 func (c *Client) ResolveVolumePurchasingLocationV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/volume-purchasing-locations"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveVolumePurchasingLocationV1IDByName(%s): %w", name, err)
 	}
@@ -196,7 +196,7 @@ func (c *Client) ResolveVolumePurchasingLocationV1IDByName(ctx context.Context, 
 func (c *Client) ResolveVolumePurchasingLocationV1ByName(ctx context.Context, name string) (*VolumePurchasingLocation, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/volume-purchasing-locations"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveVolumePurchasingLocationV1ByName(%s): %w", name, err)
 	}

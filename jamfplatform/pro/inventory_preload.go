@@ -246,7 +246,7 @@ func (c *Client) DeleteInventoryPreloadRecordV2(ctx context.Context, id string) 
 func (c *Client) ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	listPath := prefix + "/inventory-preload/records"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "serialNumber", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveInventoryPreloadRecordV2IDBySerialNumber(%s): %w", name, err)
 	}
@@ -257,7 +257,7 @@ func (c *Client) ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx context.Con
 func (c *Client) ResolveInventoryPreloadRecordV2BySerialNumber(ctx context.Context, name string) (*InventoryPreloadRecordV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	listPath := prefix + "/inventory-preload/records"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "serialNumber", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveInventoryPreloadRecordV2BySerialNumber(%s): %w", name, err)
 	}

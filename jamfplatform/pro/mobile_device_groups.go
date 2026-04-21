@@ -288,7 +288,7 @@ func (c *Client) ResolveMobileDeviceGroupV1ByName(ctx context.Context, name stri
 func (c *Client) ResolveSmartMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups/smart-groups"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupId", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveSmartMobileDeviceGroupV1IDByName(%s): %w", name, err)
 	}
@@ -299,7 +299,7 @@ func (c *Client) ResolveSmartMobileDeviceGroupV1IDByName(ctx context.Context, na
 func (c *Client) ResolveSmartMobileDeviceGroupV1ByName(ctx context.Context, name string) (*SmartGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups/smart-groups"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupId", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV1ByName(%s): %w", name, err)
 	}
@@ -314,7 +314,7 @@ func (c *Client) ResolveSmartMobileDeviceGroupV1ByName(ctx context.Context, name
 func (c *Client) ResolveStaticMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups/static-groups"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupId", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveStaticMobileDeviceGroupV1IDByName(%s): %w", name, err)
 	}
@@ -325,7 +325,7 @@ func (c *Client) ResolveStaticMobileDeviceGroupV1IDByName(ctx context.Context, n
 func (c *Client) ResolveStaticMobileDeviceGroupV1ByName(ctx context.Context, name string) (*StaticGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups/static-groups"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupId", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveStaticMobileDeviceGroupV1ByName(%s): %w", name, err)
 	}

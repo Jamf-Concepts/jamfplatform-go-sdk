@@ -2371,3 +2371,318 @@ func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2ByName_Existing(t *t
 	}
 	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
 }
+
+// ─── ComputerInventoryV3 alternate resolvers ───────────────────────────────
+
+func TestAcceptance_ResolveComputerInventoryV3IDBySerialNumber_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveComputerInventoryV3IDBySerialNumber(context.Background(), "SDKNOTEXIST"+runSuffix())
+	requireNotFoundErr(t, "ResolveComputerInventoryV3IDBySerialNumber", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveComputerInventoryV3IDBySerialNumber_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	computers, err := c.ListComputersInventoryV3(ctx, []string{"HARDWARE"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListComputersInventoryV3: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("no computers — skipping")
+	}
+	first := computers[0]
+	if first.Hardware == nil || first.Hardware.SerialNumber == "" {
+		t.Skip("first computer has no serial number — skipping")
+	}
+	gotID, err := c.ResolveComputerInventoryV3IDBySerialNumber(ctx, first.Hardware.SerialNumber)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved serial %q → %s ✓", first.Hardware.SerialNumber, gotID)
+}
+
+func TestAcceptance_ResolveComputerInventoryV3BySerialNumber_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	computers, err := c.ListComputersInventoryV3(ctx, []string{"HARDWARE"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListComputersInventoryV3: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("no computers — skipping")
+	}
+	first := computers[0]
+	if first.Hardware == nil || first.Hardware.SerialNumber == "" {
+		t.Skip("first computer has no serial number — skipping")
+	}
+	got, err := c.ResolveComputerInventoryV3BySerialNumber(ctx, first.Hardware.SerialNumber)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.ID != first.ID {
+		t.Errorf("typed ID = %q, want %q", got.ID, first.ID)
+	}
+	t.Logf("resolved typed serial %q → %s ✓", first.Hardware.SerialNumber, got.ID)
+}
+
+func TestAcceptance_ResolveComputerInventoryV3IDByUDID_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveComputerInventoryV3IDByUDID(context.Background(), "00000000-0000-0000-0000-000000000000")
+	requireNotFoundErr(t, "ResolveComputerInventoryV3IDByUDID", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveComputerInventoryV3IDByUDID_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	computers, err := c.ListComputersInventoryV3(ctx, []string{"GENERAL"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListComputersInventoryV3: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("no computers — skipping")
+	}
+	first := computers[0]
+	if first.UDID == "" {
+		t.Skip("first computer has no UDID — skipping")
+	}
+	gotID, err := c.ResolveComputerInventoryV3IDByUDID(ctx, first.UDID)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved UDID %q → %s ✓", first.UDID, gotID)
+}
+
+// ─── MobileDeviceDetailV2 resolvers ─────────────────────────────────────────
+// Enrolled devices, not created via API. Read-only probe.
+// The list returns a discriminated union (MobileDeviceResponse). Fields
+// like displayName, serialNumber, and UDID are nested inside the variant
+// (General/Hardware), but the RSQL filter and raw-JSON resolver access
+// them at the top level of each result element.
+
+// mobileDeviceFields extracts common identifiers from a MobileDeviceResponse union.
+func mobileDeviceFields(m pro.MobileDeviceResponse) (displayName, serial, udid, mobileDeviceID string) {
+	switch {
+	case m.IOS != nil:
+		mobileDeviceID = m.IOS.MobileDeviceID
+		if m.IOS.General != nil {
+			displayName = m.IOS.General.DisplayName
+			udid = m.IOS.General.UDID
+		}
+		if m.IOS.Hardware != nil {
+			serial = m.IOS.Hardware.SerialNumber
+		}
+	case m.TvOS != nil:
+		mobileDeviceID = m.TvOS.MobileDeviceID
+		if m.TvOS.General != nil {
+			displayName = m.TvOS.General.DisplayName
+			udid = m.TvOS.General.UDID
+		}
+		if m.TvOS.Hardware != nil {
+			serial = m.TvOS.Hardware.SerialNumber
+		}
+	case m.WatchOS != nil:
+		mobileDeviceID = m.WatchOS.MobileDeviceID
+		if m.WatchOS.General != nil {
+			displayName = m.WatchOS.General.DisplayName
+			udid = m.WatchOS.General.UDID
+		}
+		if m.WatchOS.Hardware != nil {
+			serial = m.WatchOS.Hardware.SerialNumber
+		}
+	}
+	return
+}
+
+func TestAcceptance_ResolveMobileDeviceDetailV2IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveMobileDeviceDetailV2IDByName(context.Background(), "sdk-does-not-exist-mobile-"+runSuffix())
+	requireNotFoundErr(t, "ResolveMobileDeviceDetailV2IDByName", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveMobileDeviceDetailV2IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	mobiles, err := c.ListMobileDevicesDetailV2(ctx, []string{"GENERAL"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListMobileDevicesDetailV2: %v", err)
+	}
+	if len(mobiles) == 0 {
+		t.Skip("no mobile devices — skipping")
+	}
+	// Find a device whose displayName is unique (not duplicated across devices).
+	// Also prefer pure ASCII names since Unicode chars may break RSQL filtering.
+	nameCounts := make(map[string]int)
+	nameToID := make(map[string]string)
+	for _, m := range mobiles {
+		dn, _, _, id := mobileDeviceFields(m)
+		if dn == "" || id == "" {
+			continue
+		}
+		nameCounts[dn]++
+		nameToID[dn] = id
+	}
+	var displayName, mobileDeviceID string
+	for dn, count := range nameCounts {
+		if count == 1 {
+			displayName, mobileDeviceID = dn, nameToID[dn]
+			break
+		}
+	}
+	if displayName == "" {
+		t.Skip("no mobile device with unique displayName — skipping")
+	}
+	gotID, err := c.ResolveMobileDeviceDetailV2IDByName(ctx, displayName)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != mobileDeviceID {
+		t.Errorf("resolved id = %q, want %q", gotID, mobileDeviceID)
+	}
+	t.Logf("resolved %q → %s ✓", displayName, gotID)
+}
+
+func TestAcceptance_ResolveMobileDeviceDetailV2IDBySerialNumber_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveMobileDeviceDetailV2IDBySerialNumber(context.Background(), "SDKNOTEXIST"+runSuffix())
+	requireNotFoundErr(t, "ResolveMobileDeviceDetailV2IDBySerialNumber", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveMobileDeviceDetailV2IDBySerialNumber_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	mobiles, err := c.ListMobileDevicesDetailV2(ctx, []string{"HARDWARE"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListMobileDevicesDetailV2: %v", err)
+	}
+	if len(mobiles) == 0 {
+		t.Skip("no mobile devices — skipping")
+	}
+	var serial, mobileDeviceID string
+	for _, m := range mobiles {
+		_, s, _, id := mobileDeviceFields(m)
+		if s != "" && id != "" {
+			serial, mobileDeviceID = s, id
+			break
+		}
+	}
+	if serial == "" {
+		t.Skip("no mobile device with serial number — skipping")
+	}
+	gotID, err := c.ResolveMobileDeviceDetailV2IDBySerialNumber(ctx, serial)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != mobileDeviceID {
+		t.Errorf("resolved id = %q, want %q", gotID, mobileDeviceID)
+	}
+	t.Logf("resolved serial %q → %s ✓", serial, gotID)
+}
+
+func TestAcceptance_ResolveMobileDeviceDetailV2IDByUDID_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveMobileDeviceDetailV2IDByUDID(context.Background(), "00000000-0000-0000-0000-000000000000")
+	requireNotFoundErr(t, "ResolveMobileDeviceDetailV2IDByUDID", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveMobileDeviceDetailV2IDByUDID_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	mobiles, err := c.ListMobileDevicesDetailV2(ctx, []string{"GENERAL"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListMobileDevicesDetailV2: %v", err)
+	}
+	if len(mobiles) == 0 {
+		t.Skip("no mobile devices — skipping")
+	}
+	var udid, mobileDeviceID string
+	for _, m := range mobiles {
+		_, _, u, id := mobileDeviceFields(m)
+		if u != "" && id != "" {
+			udid, mobileDeviceID = u, id
+			break
+		}
+	}
+	if udid == "" {
+		t.Skip("no mobile device with UDID — skipping")
+	}
+	gotID, err := c.ResolveMobileDeviceDetailV2IDByUDID(ctx, udid)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != mobileDeviceID {
+		t.Errorf("resolved id = %q, want %q", gotID, mobileDeviceID)
+	}
+	t.Logf("resolved UDID %q → %s ✓", udid, gotID)
+}
+
+// ─── RemoteAdminConfiguration (TeamViewer) ──────────────────────────────────
+// No create/delete endpoint. Read-only probe.
+
+func TestAcceptance_ResolveRemoteAdminConfigurationPreview_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveRemoteAdminConfigurationPreviewIDByName(context.Background(), "sdk-does-not-exist-teamviewer-"+runSuffix())
+	requireNotFoundErr(t, "ResolveRemoteAdminConfigurationPreviewIDByName", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveRemoteAdminConfigurationPreview_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	configs, err := c.ListRemoteAdminConfigurations(ctx)
+	if err != nil {
+		t.Fatalf("ListRemoteAdminConfigurations: %v", err)
+	}
+	if len(configs) == 0 {
+		t.Skip("no remote admin configurations — skipping")
+	}
+	first := configs[0]
+	gotID, err := c.ResolveRemoteAdminConfigurationPreviewIDByName(ctx, first.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved %q → %s ✓", first.DisplayName, gotID)
+}
+
+func TestAcceptance_ResolveRemoteAdminConfigurationPreview_Typed(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	configs, err := c.ListRemoteAdminConfigurations(ctx)
+	if err != nil {
+		t.Fatalf("ListRemoteAdminConfigurations: %v", err)
+	}
+	if len(configs) == 0 {
+		t.Skip("no remote admin configurations — skipping")
+	}
+	first := configs[0]
+	got, err := c.ResolveRemoteAdminConfigurationPreviewByName(ctx, first.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.ID != first.ID {
+		t.Errorf("typed ID = %q, want %q", got.ID, first.ID)
+	}
+	if got.DisplayName != first.DisplayName {
+		t.Errorf("typed DisplayName = %q, want %q", got.DisplayName, first.DisplayName)
+	}
+	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
+}

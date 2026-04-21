@@ -83,7 +83,7 @@ func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
 func (c *Client) ResolveAccountV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/accounts"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveAccountV1IDByName(%s): %w", name, err)
 	}
@@ -94,7 +94,7 @@ func (c *Client) ResolveAccountV1IDByName(ctx context.Context, name string) (str
 func (c *Client) ResolveAccountV1ByName(ctx context.Context, name string) (*Account, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/accounts"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveAccountV1ByName(%s): %w", name, err)
 	}

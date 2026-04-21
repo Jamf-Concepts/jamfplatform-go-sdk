@@ -71,6 +71,7 @@ type OperationDef struct {
 type ResolverConfig struct {
 	ResourceType string `json:"resourceType"`            // Go type name used in emitted method names (e.g. "Blueprint")
 	NameField    string `json:"nameField"`               // dot-notation JSON path for the name field on each list element (e.g. "name", "general.name", "title")
+	MatchField   string `json:"matchField,omitempty"`    // optional: dot-notation JSON path for client-side match verification when it differs from nameField (e.g. RSQL uses "displayName" but response nests it at "general.displayName"). Empty defaults to nameField.
 	IDField      string `json:"idField"`                 // dot-notation JSON path for the ID field (e.g. "id")
 	IDNumeric    bool   `json:"idNumeric,omitempty"`     // when true, the ID field is a number in JSON (int in Go); test stubs emit numeric IDs
 	Mode         string `json:"mode"`                    // "filtered" (server-side RSQL) or "clientFilter" (walk list in memory). "direct" reserved for proclassic by-name endpoints and handled in a later phase.

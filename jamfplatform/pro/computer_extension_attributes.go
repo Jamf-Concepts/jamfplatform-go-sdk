@@ -229,7 +229,7 @@ func (c *Client) CreateComputerExtensionAttributeHistoryNoteV1(ctx context.Conte
 func (c *Client) ResolveComputerExtensionAttributeV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/computer-extension-attributes"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveComputerExtensionAttributeV1IDByName(%s): %w", name, err)
 	}
@@ -240,7 +240,7 @@ func (c *Client) ResolveComputerExtensionAttributeV1IDByName(ctx context.Context
 func (c *Client) ResolveComputerExtensionAttributeV1ByName(ctx context.Context, name string) (*ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/computer-extension-attributes"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveComputerExtensionAttributeV1ByName(%s): %w", name, err)
 	}

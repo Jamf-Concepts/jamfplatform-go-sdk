@@ -77,7 +77,8 @@ type GoMethod struct {
 type GoResolver struct {
 	ResourceType string // drives emitted method name suffix
 	Mode         string // "filtered", "clientFilter", or "direct"
-	NameField    string // filtered/clientFilter only
+	NameField    string // filtered/clientFilter only — used in RSQL filter expression
+	MatchField   string // client-side match verification path; equals NameField when the RSQL field matches the JSON response path
 	IDField      string // filtered/clientFilter only
 	IDNumeric    bool   // when true, test stubs emit numeric ID values (42 instead of "resolved-id")
 	SearchParam  string // clientFilter only

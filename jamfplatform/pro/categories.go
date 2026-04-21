@@ -145,7 +145,7 @@ func (c *Client) CreateCategoryHistoryNoteV1(ctx context.Context, id string, req
 func (c *Client) ResolveCategoryV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/categories"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveCategoryV1IDByName(%s): %w", name, err)
 	}
@@ -156,7 +156,7 @@ func (c *Client) ResolveCategoryV1IDByName(ctx context.Context, name string) (st
 func (c *Client) ResolveCategoryV1ByName(ctx context.Context, name string) (*Category, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/categories"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveCategoryV1ByName(%s): %w", name, err)
 	}

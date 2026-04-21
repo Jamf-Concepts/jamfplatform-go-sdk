@@ -419,6 +419,37 @@
             "section:[]string",
             "sort:[]string",
             "filter"
+          ],
+          "resolver": {
+            "resourceType": "MobileDeviceDetailV2",
+            "nameField": "displayName",
+            "idField": "mobileDeviceId",
+            "mode": "filtered",
+            "typedReturn": "MobileDeviceResponse",
+            "matchField": "general.displayName",
+            "extraParams": "section=GENERAL"
+          },
+          "resolvers": [
+            {
+              "resourceType": "MobileDeviceDetailV2",
+              "nameField": "serialNumber",
+              "idField": "mobileDeviceId",
+              "mode": "filtered",
+              "typedReturn": "MobileDeviceResponse",
+              "byField": "BySerialNumber",
+              "matchField": "hardware.serialNumber",
+              "extraParams": "section=HARDWARE"
+            },
+            {
+              "resourceType": "MobileDeviceDetailV2",
+              "nameField": "udid",
+              "idField": "mobileDeviceId",
+              "mode": "filtered",
+              "typedReturn": "MobileDeviceResponse",
+              "byField": "ByUDID",
+              "matchField": "general.udid",
+              "extraParams": "section=GENERAL"
+            }
           ]
         },
         {
@@ -1323,7 +1354,26 @@
             "mode": "filtered",
             "extraParams": "section=GENERAL",
             "typedReturn": "ComputerInventoryV3"
-          }
+          },
+          "resolvers": [
+            {
+              "resourceType": "ComputerInventoryV3",
+              "nameField": "hardware.serialNumber",
+              "idField": "id",
+              "mode": "filtered",
+              "extraParams": "section=HARDWARE",
+              "typedReturn": "ComputerInventoryV3",
+              "byField": "BySerialNumber"
+            },
+            {
+              "resourceType": "ComputerInventoryV3",
+              "nameField": "udid",
+              "idField": "id",
+              "mode": "filtered",
+              "typedReturn": "ComputerInventoryV3",
+              "byField": "ByUDID"
+            }
+          ]
         },
         {
           "op": "POST /v3/computers-inventory",
@@ -3957,7 +4007,14 @@
         {
           "op": "GET /preview/remote-administration-configurations",
           "name": "ListRemoteAdminConfigurations",
-          "pagination": "totalCount"
+          "pagination": "totalCount",
+          "resolver": {
+            "resourceType": "RemoteAdminConfigurationPreview",
+            "nameField": "displayName",
+            "idField": "id",
+            "mode": "clientFilter",
+            "typedReturn": "RemoteAdministrationResponse"
+          }
         },
         {
           "op": "POST /preview/remote-administration-configurations/team-viewer",

@@ -614,7 +614,7 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
 {{- if eq .Resolver.Mode "filtered" }}
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.MatchField }}", "{{ .Resolver.IDField }}", name)
 {{- else if .Resolver.Paginated }}
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- else }}
@@ -633,7 +633,7 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.Ty
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
 {{- if eq .Resolver.Mode "filtered" }}
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.MatchField }}", "{{ .Resolver.IDField }}", name)
 {{- else if .Resolver.Paginated }}
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- else }}
@@ -981,11 +981,11 @@ func Test<% .Name %>(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 <%- if .Resolver.ResultsField %>
 			"<% .Resolver.ResultsField %>": []map[string]any{
-				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.NameField %>},
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.MatchField %>},
 			},
 <%- else %>
 			"results": []map[string]any{
-				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.NameField %>},
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.MatchField %>},
 			},
 			"totalCount": 1,
 <%- end %>
@@ -1012,11 +1012,11 @@ func Test<% .Name %>(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 <%- if .Resolver.ResultsField %>
 			"<% .Resolver.ResultsField %>": []map[string]any{
-				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.NameField %>},
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.MatchField %>},
 			},
 <%- else %>
 			"results": []map[string]any{
-				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.NameField %>},
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.MatchField %>},
 			},
 			"totalCount": 1,
 <%- end %>

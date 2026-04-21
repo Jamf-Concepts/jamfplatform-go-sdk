@@ -250,7 +250,7 @@ func (c *Client) DeletePackageManifestV1(ctx context.Context, id string) error {
 func (c *Client) ResolvePackageV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/packages"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "packageName", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolvePackageV1IDByName(%s): %w", name, err)
 	}
@@ -261,7 +261,7 @@ func (c *Client) ResolvePackageV1IDByName(ctx context.Context, name string) (str
 func (c *Client) ResolvePackageV1ByName(ctx context.Context, name string) (*Package, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/packages"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "packageName", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolvePackageV1ByName(%s): %w", name, err)
 	}

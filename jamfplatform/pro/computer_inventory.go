@@ -235,7 +235,7 @@ func (c *Client) GetComputerRecoveryLockPasswordV3(ctx context.Context, id strin
 func (c *Client) ResolveComputerInventoryV3IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveComputerInventoryV3IDByName(%s): %w", name, err)
 	}
@@ -246,13 +246,65 @@ func (c *Client) ResolveComputerInventoryV3IDByName(ctx context.Context, name st
 func (c *Client) ResolveComputerInventoryV3ByName(ctx context.Context, name string) (*ComputerInventoryV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveComputerInventoryV3ByName(%s): %w", name, err)
 	}
 	var out ComputerInventoryV3
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveComputerInventoryV3ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveComputerInventoryV3IDBySerialNumber looks up a ComputerInventoryV3 by its hardware.serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveComputerInventoryV3IDBySerialNumber(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computers-inventory?section=HARDWARE"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerInventoryV3IDBySerialNumber(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveComputerInventoryV3BySerialNumber looks up a ComputerInventoryV3 by its hardware.serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveComputerInventoryV3BySerialNumber(ctx context.Context, name string) (*ComputerInventoryV3, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computers-inventory?section=HARDWARE"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveComputerInventoryV3BySerialNumber(%s): %w", name, err)
+	}
+	var out ComputerInventoryV3
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveComputerInventoryV3BySerialNumber(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveComputerInventoryV3IDByUDID looks up a ComputerInventoryV3 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveComputerInventoryV3IDByUDID(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computers-inventory"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerInventoryV3IDByUDID(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveComputerInventoryV3ByUDID looks up a ComputerInventoryV3 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveComputerInventoryV3ByUDID(ctx context.Context, name string) (*ComputerInventoryV3, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computers-inventory"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveComputerInventoryV3ByUDID(%s): %w", name, err)
+	}
+	var out ComputerInventoryV3
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveComputerInventoryV3ByUDID(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
 }

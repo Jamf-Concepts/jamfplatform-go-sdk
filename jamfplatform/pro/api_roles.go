@@ -94,7 +94,7 @@ func (c *Client) DeleteApiRoleV1(ctx context.Context, id string) error {
 func (c *Client) ResolveApiRoleV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/api-roles"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "displayName", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveApiRoleV1IDByName(%s): %w", name, err)
 	}
@@ -105,7 +105,7 @@ func (c *Client) ResolveApiRoleV1IDByName(ctx context.Context, name string) (str
 func (c *Client) ResolveApiRoleV1ByName(ctx context.Context, name string) (*ApiRole, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/api-roles"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "displayName", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveApiRoleV1ByName(%s): %w", name, err)
 	}

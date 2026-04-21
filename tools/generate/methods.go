@@ -89,10 +89,15 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 		if byField == "" {
 			byField = "ByName"
 		}
+		matchField := r.MatchField
+		if matchField == "" {
+			matchField = r.NameField
+		}
 		gr := &GoResolver{
 			ResourceType: r.ResourceType,
 			Mode:         r.Mode,
 			NameField:    r.NameField,
+			MatchField:   matchField,
 			IDField:      r.IDField,
 			IDNumeric:    r.IDNumeric,
 			SearchParam:  r.SearchParam,

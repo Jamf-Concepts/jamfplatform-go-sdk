@@ -41,7 +41,7 @@ func (e *AmbiguousMatchError) Error() string {
 // shape Classic's native /name/{name} endpoints produce naturally, so
 // consumers can check apiErr.HasStatus(404) uniformly across all three
 // resolver modes. Multiple matches surface as *AmbiguousMatchError.
-func (t *Transport) ResolveByNameFiltered(ctx context.Context, listPath, resultsField, nameField, idField, name string) (string, json.RawMessage, error) {
+func (t *Transport) ResolveByNameFiltered(ctx context.Context, listPath, resultsField, nameField, matchField, idField, name string) (string, json.RawMessage, error) {
 	if name == "" {
 		return "", nil, fmt.Errorf("name must not be empty")
 	}
@@ -51,7 +51,7 @@ func (t *Transport) ResolveByNameFiltered(ctx context.Context, listPath, results
 	if err != nil {
 		return "", nil, err
 	}
-	return resolveMatch(raw, resultsField, nameField, idField, name, fullPath)
+	return resolveMatch(raw, resultsField, matchField, idField, name, fullPath)
 }
 
 // ResolveByNameClient looks up a resource by name via client-side exact

@@ -105,7 +105,7 @@ func (c *Client) RotateApiIntegrationClientCredentialsV1(ctx context.Context, id
 func (c *Client) ResolveApiIntegrationV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/api-integrations"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "displayName", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveApiIntegrationV1IDByName(%s): %w", name, err)
 	}
@@ -116,7 +116,7 @@ func (c *Client) ResolveApiIntegrationV1IDByName(ctx context.Context, name strin
 func (c *Client) ResolveApiIntegrationV1ByName(ctx context.Context, name string) (*ApiIntegrationResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/api-integrations"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "displayName", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveApiIntegrationV1ByName(%s): %w", name, err)
 	}

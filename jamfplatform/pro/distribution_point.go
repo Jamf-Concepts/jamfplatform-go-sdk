@@ -156,7 +156,7 @@ func (c *Client) CreateDistributionPointHistoryNoteV1(ctx context.Context, id st
 func (c *Client) ResolveDistributionPointV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/distribution-points"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveDistributionPointV1IDByName(%s): %w", name, err)
 	}
@@ -167,7 +167,7 @@ func (c *Client) ResolveDistributionPointV1IDByName(ctx context.Context, name st
 func (c *Client) ResolveDistributionPointV1ByName(ctx context.Context, name string) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/distribution-points"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveDistributionPointV1ByName(%s): %w", name, err)
 	}

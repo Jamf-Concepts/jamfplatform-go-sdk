@@ -112,7 +112,7 @@ func (c *Client) RemovePatchPolicyFromDashboardV2(ctx context.Context, id string
 func (c *Client) ResolvePatchPolicyV2IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	listPath := prefix + "/patch-policies"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "policyName", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "policyName", "policyName", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolvePatchPolicyV2IDByName(%s): %w", name, err)
 	}
@@ -123,7 +123,7 @@ func (c *Client) ResolvePatchPolicyV2IDByName(ctx context.Context, name string) 
 func (c *Client) ResolvePatchPolicyV2ByName(ctx context.Context, name string) (*PatchPolicyListView, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	listPath := prefix + "/patch-policies"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "policyName", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "policyName", "policyName", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolvePatchPolicyV2ByName(%s): %w", name, err)
 	}

@@ -117,7 +117,7 @@ func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, reques
 func (c *Client) ResolveDeviceGroupIDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	listPath := prefix + "/device-groups"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveDeviceGroupIDByName(%s): %w", name, err)
 	}
@@ -128,7 +128,7 @@ func (c *Client) ResolveDeviceGroupIDByName(ctx context.Context, name string) (s
 func (c *Client) ResolveDeviceGroupByName(ctx context.Context, name string) (*DeviceGroupListReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	listPath := prefix + "/device-groups"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveDeviceGroupByName(%s): %w", name, err)
 	}

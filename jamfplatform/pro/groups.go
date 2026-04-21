@@ -82,7 +82,7 @@ func (c *Client) PatchGroupV1(ctx context.Context, id string, request *GroupUpda
 func (c *Client) ResolveGroupV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/groups"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupPlatformId", name)
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveGroupV1IDByName(%s): %w", name, err)
 	}
@@ -93,7 +93,7 @@ func (c *Client) ResolveGroupV1IDByName(ctx context.Context, name string) (strin
 func (c *Client) ResolveGroupV1ByName(ctx context.Context, name string) (*GroupDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/groups"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupPlatformId", name)
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveGroupV1ByName(%s): %w", name, err)
 	}
