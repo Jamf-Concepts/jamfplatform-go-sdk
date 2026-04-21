@@ -1861,6 +1861,20 @@ type CreatePathV2 struct {
 	Scope string `json:"scope"`
 }
 
+// Credentials represents a credentials.
+type Credentials struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	AccessKeyID string `json:"accessKeyID"`
+	BucketName  string `json:"bucketName"`
+	Expiration  int64  `json:"expiration"`
+	Path        string `json:"path"`
+	Region      string `json:"region"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	SecretAccessKey string `json:"secretAccessKey"`
+	SessionToken    string `json:"sessionToken"`
+	UUID            string `json:"uuid"`
+}
+
 // CsaTenantIDInfo represents a csa tenant i d info.
 type CsaTenantIDInfo struct {
 	TenantID *string `json:"tenantId,omitempty"`
@@ -2322,6 +2336,11 @@ type DockItem struct {
 	Type     string  `json:"type"`
 }
 
+// DownloadURL The URL to download a file from.
+type DownloadURL struct {
+	URI string `json:"uri"`
+}
+
 // DssDeclaration represents a dss declaration.
 type DssDeclaration struct {
 	Group       *string `json:"group,omitempty"`
@@ -2701,6 +2720,15 @@ type ExternalRecipient struct {
 type FileAttachmentV3 struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+// FileData Metadata pertaining to the file.
+type FileData struct {
+	FileName string `json:"fileName"`
+	Length   int    `json:"length"`
+	Md5      string `json:"md5"`
+	Region   string `json:"region"`
+	Sha3     string `json:"sha3"`
 }
 
 // FileTransferItem represents a file transfer item.

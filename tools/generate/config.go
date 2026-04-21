@@ -60,6 +60,7 @@ type OperationDef struct {
 	RequestType    string            `json:"requestType,omitempty"`    // explicit request schema name (used when spec body is untyped, e.g. Classic)
 	ResponseType   string            `json:"responseType,omitempty"`   // explicit response schema name (same)
 	ExpectedStatus int               `json:"expectedStatus,omitempty"` // explicit success status code (default 200)
+	Deprecated     bool              `json:"deprecated,omitempty"`     // when true, keeps the operation even when SkipDeprecated is set at spec level — used for endpoints that are deprecated but still needed in the SDK surface
 	Resolver       *ResolverConfig   `json:"resolver,omitempty"`       // attach name->ID resolver emission to this operation (typically a List op)
 	Resolvers      []ResolverConfig  `json:"resolvers,omitempty"`      // attach multiple resolvers to one operation (e.g. resolve device by name AND by serialNumber)
 }

@@ -2907,6 +2907,41 @@
           "name": "GetCloudDistributionPointUploadCapabilityV1"
         },
         {
+          "op": "GET /v1/jcds/files",
+          "name": "ListJCDSFilesV1",
+          "deprecated": true
+        },
+        {
+          "op": "POST /v1/jcds/files",
+          "name": "InitiateJCDSUploadV1",
+          "deprecated": true
+        },
+        {
+          "op": "GET /v1/jcds/files/{fileName}",
+          "name": "GetJCDSFileDownloadURLV1",
+          "deprecated": true
+        },
+        {
+          "op": "DELETE /v1/jcds/files/{fileName}",
+          "name": "DeleteJCDSFileV1",
+          "expectedStatus": 204,
+          "deprecated": true
+        },
+        {
+          "op": "POST /v1/jcds/refresh-inventory",
+          "name": "RefreshJCDSInventoryV1",
+          "expectedStatus": 204,
+          "params": [
+            "file-name:string:fileName"
+          ],
+          "deprecated": true
+        },
+        {
+          "op": "POST /v1/jcds/renew-credentials",
+          "name": "RenewJCDSCredentialsV1",
+          "deprecated": true
+        },
+        {
           "op": "GET /v1/distribution-points",
           "name": "ListDistributionPointsV1",
           "pagination": "totalCount",

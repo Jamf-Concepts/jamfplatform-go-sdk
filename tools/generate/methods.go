@@ -608,10 +608,16 @@ func isRateLimited(op *openapi3.Operation) bool {
 
 // dropDeprecatedOps returns spec.Operations with any operations whose spec
 // marks them deprecated removed. Logs each drop so the curator can see why
-// the generated surface shrank.
+// the generated surface shrank. Operations with Deprecated=true in config
+// are kept regardless — this allows explicitly including deprecated endpoints
+// that the SDK still needs to expose.
 func dropDeprecatedOps(doc *openapi3.T, spec SpecDef) []OperationDef {
 	kept := make([]OperationDef, 0, len(spec.Operations))
 	for _, opDef := range spec.Operations {
+		if opDef.Deprecated {
+			kept = append(kept, opDef)
+			continue
+		}
 		httpMethod, specPath := opDef.parseOp()
 		pathItem := doc.Paths.Find(specPath)
 		if pathItem == nil {
