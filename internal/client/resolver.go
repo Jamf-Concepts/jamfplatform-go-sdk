@@ -127,9 +127,12 @@ func (t *Transport) ResolveByNameClientPaged(ctx context.Context, listPath, sear
 			allMatches = append(allMatches, el)
 		}
 
-		// Two or more matches already found — ambiguity is certain.
+		// Two or more matches already found — check if they're truly distinct.
 		if len(allMatches) > 1 {
-			return "", nil, &AmbiguousMatchError{Name: name, Matches: collectIDs(allMatches, idField)}
+			deduped := deduplicateByID(allMatches, idField)
+			if len(deduped) > 1 {
+				return "", nil, &AmbiguousMatchError{Name: name, Matches: collectIDs(deduped, idField)}
+			}
 		}
 
 		// Fewer elements than page size means this was the last page.
@@ -157,7 +160,19 @@ func (t *Transport) ResolveByNameClientPaged(ctx context.Context, listPath, sear
 		}
 		return id, allMatches[0], nil
 	default:
-		return "", nil, &AmbiguousMatchError{Name: name, Matches: collectIDs(allMatches, idField)}
+		deduped := deduplicateByID(allMatches, idField)
+		if len(deduped) == 1 {
+			var obj map[string]any
+			if err := json.Unmarshal(deduped[0], &obj); err != nil {
+				return "", nil, fmt.Errorf("decoding matched element: %w", err)
+			}
+			id, ok := extractField(obj, idField)
+			if !ok {
+				return "", deduped[0], fmt.Errorf("matched element has no %s field", idField)
+			}
+			return id, deduped[0], nil
+		}
+		return "", nil, &AmbiguousMatchError{Name: name, Matches: collectIDs(deduped, idField)}
 	}
 }
 
@@ -218,6 +233,21 @@ func resolveMatch(body []byte, resultsField, nameField, idField, name, requestUR
 		}
 		return id, matches[0], nil
 	default:
+		// Deduplicate by ID — some endpoints return the same resource
+		// more than once (e.g. App Installer deployments scoped to
+		// multiple groups). Only truly distinct IDs are ambiguous.
+		matches = deduplicateByID(matches, idField)
+		if len(matches) == 1 {
+			var obj map[string]any
+			if err := json.Unmarshal(matches[0], &obj); err != nil {
+				return "", nil, fmt.Errorf("decoding matched element: %w", err)
+			}
+			id, ok := extractField(obj, idField)
+			if !ok {
+				return "", matches[0], fmt.Errorf("matched element has no %s field", idField)
+			}
+			return id, matches[0], nil
+		}
 		return "", nil, &AmbiguousMatchError{Name: name, Matches: collectIDs(matches, idField)}
 	}
 }
@@ -237,6 +267,33 @@ func collectIDs(elems []json.RawMessage, idField string) []string {
 		}
 	}
 	return ids
+}
+
+// deduplicateByID removes duplicate matches that share the same idField
+// value, keeping the first occurrence. Some endpoints return the same
+// resource more than once (e.g. scoped to multiple groups); these are not
+// truly ambiguous.
+func deduplicateByID(elems []json.RawMessage, idField string) []json.RawMessage {
+	seen := make(map[string]bool, len(elems))
+	out := make([]json.RawMessage, 0, len(elems))
+	for _, el := range elems {
+		var obj map[string]any
+		if err := json.Unmarshal(el, &obj); err != nil {
+			out = append(out, el) // can't decode → keep as-is
+			continue
+		}
+		id, ok := extractField(obj, idField)
+		if !ok {
+			out = append(out, el) // no ID → keep as-is
+			continue
+		}
+		if seen[id] {
+			continue
+		}
+		seen[id] = true
+		out = append(out, el)
+	}
+	return out
 }
 
 // extractListElements returns the element array of a list response. Accepts

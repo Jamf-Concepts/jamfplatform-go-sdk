@@ -104,6 +104,29 @@ func TestResolveByNameFiltered_Ambiguous(t *testing.T) {
 	}
 }
 
+// Server returns the same resource twice (same ID) — should resolve
+// successfully, not report ambiguity.
+func TestResolveByNameFiltered_DuplicateSameID(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/blueprints/v1/blueprints", func(w http.ResponseWriter, _ *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"totalCount": 2,
+			"results": []map[string]any{
+				{"id": "bp-1", "name": "dup"},
+				{"id": "bp-1", "name": "dup"},
+			},
+		})
+	})
+
+	id, _, err := c.ResolveByNameFiltered(context.Background(), "/api/blueprints/v1/blueprints", "", "name", "name", "id", "dup")
+	if err != nil {
+		t.Fatalf("expected success for same-ID duplicates, got: %v", err)
+	}
+	if id != "bp-1" {
+		t.Errorf("id = %q, want bp-1", id)
+	}
+}
+
 func TestResolveByNameFiltered_ServerError(t *testing.T) {
 	c, _, mux := newTestClient(t)
 	mux.HandleFunc("/api/blueprints/v1/blueprints", func(w http.ResponseWriter, _ *http.Request) {
@@ -543,6 +566,53 @@ func TestResolveByNameClientPaged_AmbiguousAcrossPages(t *testing.T) {
 	}
 	if len(ambig.Matches) != 2 {
 		t.Errorf("matches = %d, want 2", len(ambig.Matches))
+	}
+}
+
+// Server returns same resource twice on the same page — should resolve
+// successfully, not report ambiguity.
+func TestResolveByNameClientPaged_DuplicateSameIDSamePage(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/pro/v1/items", func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = fmt.Fprintln(w, `{"results":[{"id":"1","name":"dup"},{"id":"1","name":"dup"}]}`)
+	})
+
+	id, _, err := c.ResolveByNameClientPaged(context.Background(), "/api/pro/v1/items", "", "", "name", "id", "dup")
+	if err != nil {
+		t.Fatalf("expected success for same-ID duplicates, got: %v", err)
+	}
+	if id != "1" {
+		t.Errorf("id = %q, want 1", id)
+	}
+}
+
+// Server returns same resource on different pages — should resolve
+// successfully, not report ambiguity.
+func TestResolveByNameClientPaged_DuplicateSameIDAcrossPages(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/pro/v1/items", func(w http.ResponseWriter, r *http.Request) {
+		page := r.URL.Query().Get("page")
+		switch page {
+		case "0":
+			items := make([]map[string]any, 100)
+			for i := range items {
+				items[i] = map[string]any{"id": fmt.Sprintf("%d", i), "name": fmt.Sprintf("item-%d", i)}
+			}
+			items[50] = map[string]any{"id": "42", "name": "dup"}
+			_ = json.NewEncoder(w).Encode(map[string]any{"results": items})
+		case "1":
+			_, _ = fmt.Fprintln(w, `{"results":[{"id":"42","name":"dup"}]}`)
+		default:
+			t.Errorf("unexpected page %s", page)
+		}
+	})
+
+	id, _, err := c.ResolveByNameClientPaged(context.Background(), "/api/pro/v1/items", "", "", "name", "id", "dup")
+	if err != nil {
+		t.Fatalf("expected success for same-ID duplicates across pages, got: %v", err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
 	}
 }
 
