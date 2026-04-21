@@ -144,6 +144,18 @@ type GoApply struct {
 	GetType     string // Go type for the GET response (e.g. "GetComputerPrestageV3")
 	SameGetUpdatePath bool // true when GET and Update share the same URL (need combined handler in tests)
 
+	// Token-upload mode — for resources created via token upload (e.g. DEP instances).
+	TokenUploadMode       bool   // true when Apply uses upload-token create + optional token replace on update
+	TokenUploadMethod     string // method that uploads token to create the resource
+	TokenReplaceMethod    string // method that re-uploads token to an existing resource
+	TokenRequestType      string // Go type for the token request (e.g. "DeviceEnrollmentToken")
+	TokenUploadNS         string // namespace for upload
+	TokenUploadVer        string // version for upload
+	TokenUploadPath       string // path for upload endpoint
+	TokenReplaceNS        string // namespace for replace
+	TokenReplaceVer       string // version for replace
+	TokenReplacePath      string // path for replace endpoint
+
 	// Test generation paths (pre-computed from the source ops).
 	ListNamespace string // namespace for the list/resolver call
 	ListVersion   string // version for the list/resolver call

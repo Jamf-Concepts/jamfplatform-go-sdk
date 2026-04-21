@@ -184,6 +184,34 @@ var funcMap = template.FuncMap{
 		}
 		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.GetNS, a.GetVer, path)
 	},
+	// applyTokenUploadPath builds the test-server handler path for the token
+	// upload endpoint used to create resources in tokenUploadMode.
+	"applyTokenUploadPath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.TokenUploadPath, "test-id")
+		if a.TokenUploadVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.TokenUploadNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.TokenUploadNS, a.TokenUploadVer, path)
+	},
+	// applyTokenReplacePath builds the test-server handler path for the token
+	// replace endpoint used to re-upload tokens on update in tokenUploadMode.
+	"applyTokenReplacePath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.TokenReplacePath, "existing-id")
+		if a.TokenReplaceVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.TokenReplaceNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.TokenReplaceNS, a.TokenReplaceVer, path)
+	},
+	// applyTokenCreateUpdatePath builds the test-server handler path for the
+	// metadata update endpoint in the token-upload create test. Uses "new-id"
+	// as the path parameter since the upload response returns that ID.
+	"applyTokenCreateUpdatePath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.UpdatePath, "new-id")
+		if a.UpdateVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.UpdateNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.UpdateNS, a.UpdateVer, path)
+	},
 	// applyCreateStatus returns the HTTP status code for test create responses.
 	"applyCreateStatus": func(a *GoApply) int {
 		if a.CreateStatus != 0 {
@@ -758,6 +786,66 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.Ty
 {{- define "apply" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType }}{{ .Apply.ExtraArgs }}) (string, bool, error) {
+{{- if .Apply.TokenUploadMode }}
+{{- /* ---------- Token-upload mode ---------- */}}
+{{- if .Apply.NameIsPointer }}
+	var name string
+	if request.{{ .Apply.NameGoField }} != nil {
+		name = *request.{{ .Apply.NameGoField }}
+	}
+{{- else }}
+	name := request.{{ .Apply.NameGoField }}
+{{- end }}
+	if name == "" {
+		return "", false, fmt.Errorf("{{ .Name }}: {{ .Apply.NameLeafField }} must not be empty")
+	}
+	id, err := c.{{ .Apply.ResolverMethod }}(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			if token == "" {
+				return "", false, fmt.Errorf("{{ .Name }}: create requires a non-empty token")
+			}
+			tokenBytes, decodeErr := base64.StdEncoding.DecodeString(token)
+			if decodeErr != nil {
+				return "", false, fmt.Errorf("{{ .Name }}: decode token: %w", decodeErr)
+			}
+			tokenReq := &{{ .Apply.TokenRequestType }}{EncodedToken: &tokenBytes}
+			resp, createErr := c.{{ .Apply.TokenUploadMethod }}(ctx, tokenReq)
+			if createErr != nil {
+				return "", false, fmt.Errorf("{{ .Name }}: create: %w", createErr)
+			}
+			// Update metadata on the newly created resource.
+			_, updateErr := c.{{ .Apply.UpdateMethod }}(ctx, resp.ID, request)
+			if updateErr != nil {
+				return "", false, fmt.Errorf("{{ .Name }}: update metadata after create(%s): %w", resp.ID, updateErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("{{ .Name }}: resolve: %w", err)
+	}
+	// Update path: optionally re-upload token, then always update metadata.
+	if token != "" {
+		tokenBytes, decodeErr := base64.StdEncoding.DecodeString(token)
+		if decodeErr != nil {
+			return "", false, fmt.Errorf("{{ .Name }}: decode token: %w", decodeErr)
+		}
+		tokenReq := &{{ .Apply.TokenRequestType }}{EncodedToken: &tokenBytes}
+		_, replaceErr := c.{{ .Apply.TokenReplaceMethod }}(ctx, id, tokenReq)
+		if replaceErr != nil {
+			return "", false, fmt.Errorf("{{ .Name }}: replace token(%s): %w", id, replaceErr)
+		}
+	}
+{{- if .Apply.UpdateReturnsVal }}
+	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
+{{- else }}
+	err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
+{{- end }}
+	if err != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: update(%s): %w", id, err)
+	}
+	return id, false, nil
+{{- else }}
+{{- /* ---------- Standard mode ---------- */}}
 {{- if .Apply.NameNested }}
 	var name string
 	if request.{{ .Apply.NameParentField }} != nil && request.{{ .Apply.NameGoField }} != nil {
@@ -837,6 +925,7 @@ func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType
 		return "", false, fmt.Errorf("{{ .Name }}: update(%s): %w", id, err)
 	}
 	return id, false, nil
+{{- end }}
 }
 {{ end }}
 `
@@ -1247,7 +1336,43 @@ func Test<% .Name %>(t *testing.T) {
 <%- define "testApply" %>
 func Test<% .Name %>_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-<%- if .Apply.ClassicCreate %>
+<%- if .Apply.TokenUploadMode %>
+	// List returns no matches → resolver returns 404 → apply creates via token upload.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []any{},
+			"totalCount": 0,
+		})
+	})
+	// Token upload creates the resource.
+	mux.HandleFunc("<% applyTokenUploadPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{
+			"id":   "new-id",
+			"href": "/new-id",
+		})
+	})
+	// Metadata update after creation.
+	mux.HandleFunc("<% applyTokenCreateUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "new-id", "name": "target"})
+	})
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "new-id" {
+		t.Errorf("id = %q, want new-id", id)
+	}
+<%- else if .Apply.ClassicCreate %>
 	// Classic direct resolver: GetByName returns 404 → apply creates.
 	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -1300,6 +1425,7 @@ func Test<% .Name %>_Create(t *testing.T) {
 		})
 	})
 <%- end %>
+<%- if not .Apply.TokenUploadMode %>
 
 	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
 	if err != nil {
@@ -1317,11 +1443,44 @@ func Test<% .Name %>_Create(t *testing.T) {
 		t.Errorf("id = %q, want <% applyTestCreateIDExpected .Apply %>", id)
 	}
 <%- end %>
+<%- end %>
 }
 
 func Test<% .Name %>_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-<%- if .Apply.ClassicCreate %>
+<%- if .Apply.TokenUploadMode %>
+	// List returns a match → resolver succeeds → apply updates with token replace + metadata.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"<% .Apply.ListIDField %>": "existing-id", "<% .Apply.ListNameField %>": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	// Token replace (re-upload).
+	mux.HandleFunc("<% applyTokenReplacePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "name": "target"})
+	})
+	// Metadata update.
+	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "name": "target"})
+	})
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
+	}
+<%- else if .Apply.ClassicCreate %>
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
 	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {

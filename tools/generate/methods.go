@@ -422,6 +422,38 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 					ga.GetPath == updateM.ResourcePath
 			}
 
+			// Token-upload mode: wire up the upload/replace operations.
+			if ac.TokenUploadMode {
+				if ac.TokenUploadCreateOp == "" || ac.TokenReplaceOp == "" {
+					return nil, fmt.Errorf("apply on %s: tokenUploadMode requires tokenUploadCreateOp and tokenReplaceOp", r.ResourceType)
+				}
+				uploadM, ok := byName[ac.TokenUploadCreateOp]
+				if !ok {
+					return nil, fmt.Errorf("apply on %s: tokenUploadCreateOp %q not found", r.ResourceType, ac.TokenUploadCreateOp)
+				}
+				replaceM, ok := byName[ac.TokenReplaceOp]
+				if !ok {
+					return nil, fmt.Errorf("apply on %s: tokenReplaceOp %q not found", r.ResourceType, ac.TokenReplaceOp)
+				}
+				ga.TokenUploadMode = true
+				ga.TokenUploadMethod = ac.TokenUploadCreateOp
+				ga.TokenReplaceMethod = ac.TokenReplaceOp
+				ga.TokenRequestType = uploadM.RequestType
+				ga.TokenUploadNS = uploadM.Namespace
+				ga.TokenUploadVer = uploadM.Version
+				ga.TokenUploadPath = uploadM.ResourcePath
+				ga.TokenReplaceNS = replaceM.Namespace
+				ga.TokenReplaceVer = replaceM.Version
+				ga.TokenReplacePath = replaceM.ResourcePath
+				// Token-upload Apply always takes an extra `token string` arg.
+				ga.ExtraArgs = ", token string"
+				ga.ExtraCallArgs = ""                 // token is used inline, not forwarded to create
+				ga.ExtraTestCallArgs = `, "dGVzdA=="` // base64("test") — valid token for unit tests
+				// In token-upload mode, the Apply method's request type is the
+				// update op's type (the metadata), not the create op's (the token).
+				ga.RequestType = updateM.RequestType
+			}
+
 			// Classic test stubs need XML wire names for resolver and create responses.
 			if classicCreate {
 				ga.ClassicResolverWireName = src.ResponseWireName

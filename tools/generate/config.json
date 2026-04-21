@@ -1635,7 +1635,16 @@
             "nameField": "name",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "DeviceEnrollmentInstance"
+            "typedReturn": "DeviceEnrollmentInstance",
+            "apply": {
+              "createOp": "UploadDeviceEnrollmentTokenV1",
+              "updateOp": "UpdateDeviceEnrollmentV1",
+              "deleteOp": "DeleteDeviceEnrollmentV1",
+              "nameGoField": "Name",
+              "tokenUploadMode": true,
+              "tokenUploadCreateOp": "UploadDeviceEnrollmentTokenV1",
+              "tokenReplaceOp": "ReplaceDeviceEnrollmentTokenV1"
+            }
           }
         },
         {

@@ -94,6 +94,13 @@ type ApplyConfig struct {
 	UpdateType  string `json:"updateType,omitempty"`  // Go type for the update request when it differs from create (triggers JSON round-trip conversion)
 	GetOp       string `json:"getOp,omitempty"`       // GET operation name for fetching current resource (required when versionLock is true)
 	VersionLock bool   `json:"versionLock,omitempty"` // when true, zeros VersionLock on create and fetches+injects current VersionLock on update
+
+	// Token-upload mode: for resources created via token upload (e.g. DEP).
+	// The Apply method takes (ctx, request, token) where token is optional on update.
+	// Create path: upload token → then update metadata. Update path: optionally re-upload token, then update metadata.
+	TokenUploadMode     bool   `json:"tokenUploadMode,omitempty"`     // enables token-upload apply mode
+	TokenUploadCreateOp string `json:"tokenUploadCreateOp,omitempty"` // op that uploads token to create the resource (e.g. "UploadDeviceEnrollmentTokenV1")
+	TokenReplaceOp      string `json:"tokenReplaceOp,omitempty"`      // op that re-uploads token to an existing resource (e.g. "ReplaceDeviceEnrollmentTokenV1")
 }
 
 // parseOp splits "GET /v1/devices/{id}" into method and path.

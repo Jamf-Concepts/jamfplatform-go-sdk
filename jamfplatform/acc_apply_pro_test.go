@@ -8,7 +8,9 @@ package jamfplatform_test
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -1566,4 +1568,84 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 			t.Fatal("expected 404 after delete")
 		}
 	})
+}
+
+// ---------- DeviceEnrollmentV1 (token-upload Apply) ----------
+
+func TestAcceptance_ApplyDeviceEnrollmentV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	token := strings.Join(strings.Fields(os.Getenv("JAMFPLATFORM_DEP_TOKEN")), "")
+	if token == "" {
+		t.Skip("JAMFPLATFORM_DEP_TOKEN not set — DEP-token-dependent test skipped")
+	}
+
+	name := "sdk-acc-apply-dep-" + runSuffix()
+	supID := "-1"
+
+	// 1. Apply creates (uploads token + sets metadata name)
+	id, created, err := p.ApplyDeviceEnrollmentV1(ctx, &pro.DeviceEnrollmentInstance{
+		Name:                  name,
+		SupervisionIdentityID: &supID,
+	}, token)
+	if err != nil {
+		t.Fatalf("apply create: %v", err)
+	}
+	cleanupDelete(t, "DeviceEnrollment "+id, func() error { return p.DeleteDeviceEnrollmentV1(ctx, id) })
+	if !created {
+		t.Error("expected created = true on first apply")
+	}
+	t.Logf("created DEP enrollment id=%s", id)
+
+	// Verify the name was set via metadata update.
+	got, err := p.GetDeviceEnrollmentV1(ctx, id)
+	if err != nil {
+		t.Fatalf("get after create: %v", err)
+	}
+	if got.Name != name {
+		t.Errorf("name = %q, want %q", got.Name, name)
+	}
+
+	// 2. Apply updates (token empty = skip re-upload, just metadata update)
+	// Keep the same name (it's the resolver key) but change supervisionIdentityId.
+	newSupID := "-1"
+	id2, created2, err := p.ApplyDeviceEnrollmentV1(ctx, &pro.DeviceEnrollmentInstance{
+		Name:                  name,
+		SupervisionIdentityID: &newSupID,
+	}, "")
+	if err != nil {
+		t.Fatalf("apply update: %v", err)
+	}
+	if created2 {
+		t.Error("expected created = false on second apply")
+	}
+	if id2 != id {
+		t.Errorf("id changed: %s → %s", id, id2)
+	}
+
+	// Verify the name is still set correctly.
+	got2, err := p.GetDeviceEnrollmentV1(ctx, id)
+	if err != nil {
+		t.Fatalf("get after update: %v", err)
+	}
+	if got2.Name != name {
+		t.Errorf("name = %q, want %q", got2.Name, name)
+	}
+	t.Logf("updated DEP enrollment id=%s, name=%q", id, got2.Name)
+
+	// 3. Delete
+	if err := p.DeleteDeviceEnrollmentV1(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+
+	// 4. Resolve not found
+	_, err = p.ResolveDeviceEnrollmentV1IDByName(ctx, name)
+	if err == nil {
+		t.Fatal("expected 404 after delete")
+	}
+	if apiErr := jamfplatform.AsAPIError(err); apiErr == nil || !apiErr.HasStatus(404) {
+		t.Fatalf("expected 404, got: %v", err)
+	}
 }

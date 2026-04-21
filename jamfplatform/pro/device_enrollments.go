@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -218,4 +219,53 @@ func (c *Client) ResolveDeviceEnrollmentV1ByName(ctx context.Context, name strin
 		return nil, fmt.Errorf("ResolveDeviceEnrollmentV1ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
+}
+
+// ApplyDeviceEnrollmentV1 creates or updates a DeviceEnrollmentV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyDeviceEnrollmentV1(ctx context.Context, request *DeviceEnrollmentInstance, token string) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: Name must not be empty")
+	}
+	id, err := c.ResolveDeviceEnrollmentV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			if token == "" {
+				return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: create requires a non-empty token")
+			}
+			tokenBytes, decodeErr := base64.StdEncoding.DecodeString(token)
+			if decodeErr != nil {
+				return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: decode token: %w", decodeErr)
+			}
+			tokenReq := &DeviceEnrollmentToken{EncodedToken: &tokenBytes}
+			resp, createErr := c.UploadDeviceEnrollmentTokenV1(ctx, tokenReq)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: create: %w", createErr)
+			}
+			// Update metadata on the newly created resource.
+			_, updateErr := c.UpdateDeviceEnrollmentV1(ctx, resp.ID, request)
+			if updateErr != nil {
+				return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: update metadata after create(%s): %w", resp.ID, updateErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: resolve: %w", err)
+	}
+	// Update path: optionally re-upload token, then always update metadata.
+	if token != "" {
+		tokenBytes, decodeErr := base64.StdEncoding.DecodeString(token)
+		if decodeErr != nil {
+			return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: decode token: %w", decodeErr)
+		}
+		tokenReq := &DeviceEnrollmentToken{EncodedToken: &tokenBytes}
+		_, replaceErr := c.ReplaceDeviceEnrollmentTokenV1(ctx, id, tokenReq)
+		if replaceErr != nil {
+			return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: replace token(%s): %w", id, replaceErr)
+		}
+	}
+	_, err = c.UpdateDeviceEnrollmentV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

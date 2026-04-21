@@ -375,3 +375,77 @@ func TestResolveDeviceEnrollmentV1ByName(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 }
+
+func TestApplyDeviceEnrollmentV1_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns no matches → resolver returns 404 → apply creates via token upload.
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []any{},
+			"totalCount": 0,
+		})
+	})
+	// Token upload creates the resource.
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/upload-token", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{
+			"id":   "new-id",
+			"href": "/new-id",
+		})
+	})
+	// Metadata update after creation.
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/new-id", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "new-id", "name": "target"})
+	})
+
+	id, created, err := c.ApplyDeviceEnrollmentV1(context.Background(), &DeviceEnrollmentInstance{Name: "target"}, "dGVzdA==")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "new-id" {
+		t.Errorf("id = %q, want new-id", id)
+	}
+}
+
+func TestApplyDeviceEnrollmentV1_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns a match → resolver succeeds → apply updates with token replace + metadata.
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "existing-id", "name": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	// Token replace (re-upload).
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/existing-id/upload-token", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "name": "target"})
+	})
+	// Metadata update.
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/existing-id", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "name": "target"})
+	})
+
+	id, created, err := c.ApplyDeviceEnrollmentV1(context.Background(), &DeviceEnrollmentInstance{Name: "target"}, "dGVzdA==")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
+	}
+}
