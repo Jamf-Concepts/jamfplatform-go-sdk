@@ -1582,7 +1582,13 @@
             "idField": "id",
             "mode": "filtered",
             "typedReturn": "InventoryPreloadRecordV2",
-            "byField": "BySerialNumber"
+            "byField": "BySerialNumber",
+            "apply": {
+              "createOp": "CreateInventoryPreloadRecordV2",
+              "updateOp": "UpdateInventoryPreloadRecordV2",
+              "deleteOp": "DeleteInventoryPreloadRecordV2",
+              "nameGoField": "SerialNumber"
+            }
           }
         },
         {
@@ -4883,7 +4889,13 @@
           "resolver": {
             "resourceType": "Policy",
             "mode": "direct",
-            "idField": "General.ID"
+            "idField": "General.ID",
+            "apply": {
+              "createOp": "CreatePolicyByID",
+              "updateOp": "UpdatePolicyByID",
+              "deleteOp": "DeletePolicyByID",
+              "nameGoField": "General.Name"
+            }
           }
         },
         {
@@ -6588,7 +6600,13 @@
           "responseType": "building",
           "resolver": {
             "resourceType": "Building",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateBuildingByID",
+              "updateOp": "UpdateBuildingByID",
+              "deleteOp": "DeleteBuildingByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6607,7 +6625,13 @@
           "responseType": "category",
           "resolver": {
             "resourceType": "Category",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateCategoryByID",
+              "updateOp": "UpdateCategoryByID",
+              "deleteOp": "DeleteCategoryByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6626,7 +6650,13 @@
           "responseType": "class",
           "resolver": {
             "resourceType": "Class",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateClassByID",
+              "updateOp": "UpdateClassByID",
+              "deleteOp": "DeleteClassByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6645,7 +6675,13 @@
           "responseType": "department",
           "resolver": {
             "resourceType": "Department",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateDepartmentByID",
+              "updateOp": "UpdateDepartmentByID",
+              "deleteOp": "DeleteDepartmentByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6664,7 +6700,13 @@
           "responseType": "site",
           "resolver": {
             "resourceType": "Site",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateSiteByID",
+              "updateOp": "UpdateSiteByID",
+              "deleteOp": "DeleteSiteByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6683,7 +6725,13 @@
           "responseType": "script",
           "resolver": {
             "resourceType": "Script",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateScriptByID",
+              "updateOp": "UpdateScriptByID",
+              "deleteOp": "DeleteScriptByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6702,7 +6750,13 @@
           "responseType": "user",
           "resolver": {
             "resourceType": "User",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateUserByID",
+              "updateOp": "UpdateUserByID",
+              "deleteOp": "DeleteUserByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6745,7 +6799,13 @@
           "responseType": "directory_binding",
           "resolver": {
             "resourceType": "DirectoryBinding",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateDirectoryBindingByID",
+              "updateOp": "UpdateDirectoryBindingByID",
+              "deleteOp": "DeleteDirectoryBindingByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6764,7 +6824,13 @@
           "responseType": "disk_encryption_configuration",
           "resolver": {
             "resourceType": "DiskEncryptionConfiguration",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateDiskEncryptionConfigurationByID",
+              "updateOp": "UpdateDiskEncryptionConfigurationByID",
+              "deleteOp": "DeleteDiskEncryptionConfigurationByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6783,7 +6849,13 @@
           "responseType": "dock_item",
           "resolver": {
             "resourceType": "DockItem",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateDockItemByID",
+              "updateOp": "UpdateDockItemByID",
+              "deleteOp": "DeleteDockItemByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6803,7 +6875,13 @@
           "resolver": {
             "resourceType": "IBeacon",
             "mode": "direct",
-            "typedReturn": "Ibeacon"
+            "typedReturn": "Ibeacon",
+            "apply": {
+              "createOp": "CreateIBeaconByID",
+              "updateOp": "UpdateIBeaconByID",
+              "deleteOp": "DeleteIBeaconByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6824,7 +6902,13 @@
             "resourceType": "LDAPServer",
             "mode": "direct",
             "idField": "Connection.ID",
-            "typedReturn": "LdapServer"
+            "typedReturn": "LdapServer",
+            "apply": {
+              "createOp": "CreateLDAPServerByID",
+              "updateOp": "UpdateLDAPServerByID",
+              "deleteOp": "DeleteLDAPServerByID",
+              "nameGoField": "Connection.Name"
+            }
           }
         },
         {
@@ -6844,7 +6928,13 @@
           "resolver": {
             "resourceType": "LicensedSoftware",
             "mode": "direct",
-            "idField": "General.ID"
+            "idField": "General.ID",
+            "apply": {
+              "createOp": "CreateLicensedSoftwareByID",
+              "updateOp": "UpdateLicensedSoftwareByID",
+              "deleteOp": "DeleteLicensedSoftwareByID",
+              "nameGoField": "General.Name"
+            }
           }
         },
         {
@@ -6864,7 +6954,13 @@
           "resolver": {
             "resourceType": "RestrictedSoftware",
             "mode": "direct",
-            "idField": "General.ID"
+            "idField": "General.ID",
+            "apply": {
+              "createOp": "CreateRestrictedSoftwareByID",
+              "updateOp": "UpdateRestrictedSoftwareByID",
+              "deleteOp": "DeleteRestrictedSoftwareByID",
+              "nameGoField": "General.Name"
+            }
           }
         },
         {
@@ -6883,7 +6979,13 @@
           "responseType": "printer",
           "resolver": {
             "resourceType": "Printer",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreatePrinterByID",
+              "updateOp": "UpdatePrinterByID",
+              "deleteOp": "DeletePrinterByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6910,7 +7012,13 @@
           "responseType": "software_update_server",
           "resolver": {
             "resourceType": "SoftwareUpdateServer",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateSoftwareUpdateServerByID",
+              "updateOp": "UpdateSoftwareUpdateServerByID",
+              "deleteOp": "DeleteSoftwareUpdateServerByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6929,7 +7037,13 @@
           "responseType": "advanced_computer_search",
           "resolver": {
             "resourceType": "AdvancedComputerSearch",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateAdvancedComputerSearchByID",
+              "updateOp": "UpdateAdvancedComputerSearchByID",
+              "deleteOp": "DeleteAdvancedComputerSearchByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6942,7 +7056,13 @@
           "responseType": "advanced_mobile_device_search",
           "resolver": {
             "resourceType": "AdvancedMobileDeviceSearch",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateAdvancedMobileDeviceSearchByID",
+              "updateOp": "UpdateAdvancedMobileDeviceSearchByID",
+              "deleteOp": "DeleteAdvancedMobileDeviceSearchByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6955,7 +7075,13 @@
           "responseType": "advanced_user_search",
           "resolver": {
             "resourceType": "AdvancedUserSearch",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateAdvancedUserSearchByID",
+              "updateOp": "UpdateAdvancedUserSearchByID",
+              "deleteOp": "DeleteAdvancedUserSearchByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6968,7 +7094,13 @@
           "responseType": "computer_group",
           "resolver": {
             "resourceType": "ComputerGroup",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateComputerGroupByID",
+              "updateOp": "UpdateComputerGroupByID",
+              "deleteOp": "DeleteComputerGroupByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -6987,7 +7119,13 @@
           "responseType": "mobile_device_group",
           "resolver": {
             "resourceType": "MobileDeviceGroup",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateMobileDeviceGroupByID",
+              "updateOp": "UpdateMobileDeviceGroupByID",
+              "deleteOp": "DeleteMobileDeviceGroupByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7006,7 +7144,13 @@
           "responseType": "user_group",
           "resolver": {
             "resourceType": "UserGroup",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateUserGroupByID",
+              "updateOp": "UpdateUserGroupByID",
+              "deleteOp": "DeleteUserGroupByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7025,7 +7169,13 @@
           "responseType": "computer_extension_attribute",
           "resolver": {
             "resourceType": "ComputerExtensionAttribute",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateComputerExtensionAttributeByID",
+              "updateOp": "UpdateComputerExtensionAttributeByID",
+              "deleteOp": "DeleteComputerExtensionAttributeByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7044,7 +7194,13 @@
           "responseType": "mobile_device_extension_attribute",
           "resolver": {
             "resourceType": "MobileDeviceExtensionAttribute",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateMobileDeviceExtensionAttributeByID",
+              "updateOp": "UpdateMobileDeviceExtensionAttributeByID",
+              "deleteOp": "DeleteMobileDeviceExtensionAttributeByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7063,7 +7219,13 @@
           "responseType": "user_extension_attribute",
           "resolver": {
             "resourceType": "UserExtensionAttribute",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateUserExtensionAttributeByID",
+              "updateOp": "UpdateUserExtensionAttributeByID",
+              "deleteOp": "DeleteUserExtensionAttributeByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7084,7 +7246,13 @@
             "resourceType": "OSXConfigurationProfile",
             "mode": "direct",
             "idField": "General.ID",
-            "typedReturn": "OsXConfigurationProfile"
+            "typedReturn": "OsXConfigurationProfile",
+            "apply": {
+              "createOp": "CreateOSXConfigurationProfileByID",
+              "updateOp": "UpdateOSXConfigurationProfileByID",
+              "deleteOp": "DeleteOSXConfigurationProfileByID",
+              "nameGoField": "General.Name"
+            }
           }
         },
         {
@@ -7104,7 +7272,13 @@
           "resolver": {
             "resourceType": "MobileDeviceConfigurationProfile",
             "mode": "direct",
-            "idField": "General.ID"
+            "idField": "General.ID",
+            "apply": {
+              "createOp": "CreateMobileDeviceConfigurationProfileByID",
+              "updateOp": "UpdateMobileDeviceConfigurationProfileByID",
+              "deleteOp": "DeleteMobileDeviceConfigurationProfileByID",
+              "nameGoField": "General.Name"
+            }
           }
         },
         {
@@ -7124,7 +7298,13 @@
           "resolver": {
             "resourceType": "MacApplication",
             "mode": "direct",
-            "idField": "General.ID"
+            "idField": "General.ID",
+            "apply": {
+              "createOp": "CreateMacApplicationByID",
+              "updateOp": "UpdateMacApplicationByID",
+              "deleteOp": "DeleteMacApplicationByID",
+              "nameGoField": "General.Name"
+            }
           }
         },
         {
@@ -7144,7 +7324,13 @@
           "resolver": {
             "resourceType": "MobileDeviceApplication",
             "mode": "direct",
-            "idField": "General.ID"
+            "idField": "General.ID",
+            "apply": {
+              "createOp": "CreateMobileDeviceApplicationByID",
+              "updateOp": "UpdateMobileDeviceApplicationByID",
+              "deleteOp": "DeleteMobileDeviceApplicationByID",
+              "nameGoField": "General.DisplayName"
+            }
           }
         },
         {
@@ -7172,7 +7358,13 @@
           "resolver": {
             "resourceType": "Ebook",
             "mode": "direct",
-            "idField": "General.ID"
+            "idField": "General.ID",
+            "apply": {
+              "createOp": "CreateEbookByID",
+              "updateOp": "UpdateEbookByID",
+              "deleteOp": "DeleteEbookByID",
+              "nameGoField": "General.Name"
+            }
           }
         },
         {
@@ -7191,7 +7383,13 @@
           "responseType": "network_segment",
           "resolver": {
             "resourceType": "NetworkSegment",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateNetworkSegmentByID",
+              "updateOp": "UpdateNetworkSegmentByID",
+              "deleteOp": "DeleteNetworkSegmentByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7210,7 +7408,13 @@
           "responseType": "distribution_point",
           "resolver": {
             "resourceType": "DistributionPoint",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateDistributionPointByID",
+              "updateOp": "UpdateDistributionPointByID",
+              "deleteOp": "DeleteDistributionPointByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7230,7 +7434,13 @@
           "resolver": {
             "resourceType": "MobileDeviceProvisioningProfile",
             "mode": "direct",
-            "idField": "General.ID"
+            "idField": "General.ID",
+            "apply": {
+              "createOp": "CreateMobileDeviceProvisioningProfileByID",
+              "updateOp": "UpdateMobileDeviceProvisioningProfileByID",
+              "deleteOp": "DeleteMobileDeviceProvisioningProfileByID",
+              "nameGoField": "General.Name"
+            }
           }
         },
         {
@@ -7259,7 +7469,13 @@
           "resolver": {
             "resourceType": "MobileDeviceEnrollmentProfile",
             "mode": "direct",
-            "idField": "General.ID"
+            "idField": "General.ID",
+            "apply": {
+              "createOp": "CreateMobileDeviceEnrollmentProfileByID",
+              "updateOp": "UpdateMobileDeviceEnrollmentProfileByID",
+              "deleteOp": "DeleteMobileDeviceEnrollmentProfileByID",
+              "nameGoField": "General.Name"
+            }
           }
         },
         {
@@ -7281,7 +7497,13 @@
           "resolver": {
             "resourceType": "AccountGroup",
             "mode": "direct",
-            "typedReturn": "Group"
+            "typedReturn": "Group",
+            "apply": {
+              "createOp": "CreateAccountGroupByID",
+              "updateOp": "UpdateAccountGroupByID",
+              "deleteOp": "DeleteAccountGroupByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7315,7 +7537,13 @@
           "responseType": "webhook",
           "resolver": {
             "resourceType": "Webhook",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateWebhookByID",
+              "updateOp": "UpdateWebhookByID",
+              "deleteOp": "DeleteWebhookByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7334,7 +7562,13 @@
           "responseType": "removable_mac_address",
           "resolver": {
             "resourceType": "RemovableMacAddress",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreateRemovableMacAddressByID",
+              "updateOp": "UpdateRemovableMacAddressByID",
+              "deleteOp": "DeleteRemovableMacAddressByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -7353,7 +7587,13 @@
           "responseType": "patch_external_source",
           "resolver": {
             "resourceType": "PatchExternalSource",
-            "mode": "direct"
+            "mode": "direct",
+            "apply": {
+              "createOp": "CreatePatchExternalSourceByID",
+              "updateOp": "UpdatePatchExternalSourceByID",
+              "deleteOp": "DeletePatchExternalSourceByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -8298,7 +8538,13 @@
           "resolver": {
             "resourceType": "ClassicPackage",
             "mode": "direct",
-            "typedReturn": "Package"
+            "typedReturn": "Package",
+            "apply": {
+              "createOp": "CreateClassicPackageByID",
+              "updateOp": "UpdateClassicPackageByID",
+              "deleteOp": "DeleteClassicPackageByID",
+              "nameGoField": "Name"
+            }
           }
         },
         {

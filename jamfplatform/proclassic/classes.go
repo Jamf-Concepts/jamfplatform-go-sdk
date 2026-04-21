@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetClassByID finds classes by ID.
@@ -112,4 +114,31 @@ func (c *Client) ResolveClassIDByName(ctx context.Context, name string) (string,
 // ResolveClassByName looks up a Class by name. Alias for GetClassByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolveClassByName(ctx context.Context, name string) (*Class, error) {
 	return c.GetClassByName(ctx, name)
+}
+
+// ApplyClass creates or updates a Class by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyClass(ctx context.Context, request *ClassPost) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyClass: Name must not be empty")
+	}
+	id, err := c.ResolveClassIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateClassByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyClass: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyClass: resolve: %w", err)
+	}
+	err = c.UpdateClassByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyClass: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

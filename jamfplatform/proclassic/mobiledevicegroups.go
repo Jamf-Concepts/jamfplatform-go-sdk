@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetMobileDeviceGroupByID finds mobile device groups by ID.
@@ -112,4 +114,31 @@ func (c *Client) ResolveMobileDeviceGroupIDByName(ctx context.Context, name stri
 // ResolveMobileDeviceGroupByName looks up a MobileDeviceGroup by name. Alias for GetMobileDeviceGroupByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolveMobileDeviceGroupByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
 	return c.GetMobileDeviceGroupByName(ctx, name)
+}
+
+// ApplyMobileDeviceGroup creates or updates a MobileDeviceGroup by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyMobileDeviceGroup(ctx context.Context, request *MobileDeviceGroup) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyMobileDeviceGroup: Name must not be empty")
+	}
+	id, err := c.ResolveMobileDeviceGroupIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateMobileDeviceGroupByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyMobileDeviceGroup: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyMobileDeviceGroup: resolve: %w", err)
+	}
+	err = c.UpdateMobileDeviceGroupByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyMobileDeviceGroup: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

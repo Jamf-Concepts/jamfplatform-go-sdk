@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetDistributionPointByID finds distribution points by ID.
@@ -112,4 +114,31 @@ func (c *Client) ResolveDistributionPointIDByName(ctx context.Context, name stri
 // ResolveDistributionPointByName looks up a DistributionPoint by name. Alias for GetDistributionPointByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolveDistributionPointByName(ctx context.Context, name string) (*DistributionPoint, error) {
 	return c.GetDistributionPointByName(ctx, name)
+}
+
+// ApplyDistributionPoint creates or updates a DistributionPoint by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyDistributionPoint(ctx context.Context, request *DistributionPointPost) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyDistributionPoint: Name must not be empty")
+	}
+	id, err := c.ResolveDistributionPointIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateDistributionPointByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyDistributionPoint: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyDistributionPoint: resolve: %w", err)
+	}
+	err = c.UpdateDistributionPointByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyDistributionPoint: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

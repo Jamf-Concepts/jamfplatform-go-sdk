@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetPrinterByID finds printers by ID.
@@ -112,4 +114,31 @@ func (c *Client) ResolvePrinterIDByName(ctx context.Context, name string) (strin
 // ResolvePrinterByName looks up a Printer by name. Alias for GetPrinterByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolvePrinterByName(ctx context.Context, name string) (*Printer, error) {
 	return c.GetPrinterByName(ctx, name)
+}
+
+// ApplyPrinter creates or updates a Printer by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyPrinter(ctx context.Context, request *Printer) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyPrinter: Name must not be empty")
+	}
+	id, err := c.ResolvePrinterIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreatePrinterByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyPrinter: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyPrinter: resolve: %w", err)
+	}
+	err = c.UpdatePrinterByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyPrinter: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

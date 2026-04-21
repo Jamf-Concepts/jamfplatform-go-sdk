@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetLicensedSoftwareByID finds licensed software by ID.
@@ -112,4 +114,31 @@ func (c *Client) ResolveLicensedSoftwareIDByName(ctx context.Context, name strin
 // ResolveLicensedSoftwareByName looks up a LicensedSoftware by name. Alias for GetLicensedSoftwareByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolveLicensedSoftwareByName(ctx context.Context, name string) (*LicensedSoftware, error) {
 	return c.GetLicensedSoftwareByName(ctx, name)
+}
+
+// ApplyLicensedSoftware creates or updates a LicensedSoftware by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyLicensedSoftware(ctx context.Context, request *LicensedSoftware) (string, bool, error) {
+	var name string
+	if request.General != nil && request.General.Name != nil {
+		name = *request.General.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyLicensedSoftware: Name must not be empty")
+	}
+	id, err := c.ResolveLicensedSoftwareIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateLicensedSoftwareByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyLicensedSoftware: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyLicensedSoftware: resolve: %w", err)
+	}
+	err = c.UpdateLicensedSoftwareByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyLicensedSoftware: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

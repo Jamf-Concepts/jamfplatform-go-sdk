@@ -114,6 +114,9 @@ type GoApply struct {
 	ResourceType     string // "BuildingV1"
 	RequestType      string // Go type for the request parameter (e.g. "Building")
 	NameGoField      string // Go struct field path to extract name (e.g. "Name", "DisplayName")
+	NameParentField  string // non-empty for nested paths: "General" when NameGoField is "General.Name"
+	NameParentType   string // Go type for the parent struct: "PolicyGeneral" when NameGoField is "General.Name"
+	NameLeafField    string // leaf field name for nested paths: "Name" when NameGoField is "General.Name"; equals NameGoField when flat
 	ResolverMethod   string // "ResolveBuildingV1IDByName"
 	CreateMethod     string // "CreateBuildingV1"
 	UpdateMethod     string // "UpdateBuildingV1"
@@ -126,6 +129,7 @@ type GoApply struct {
 	ExtraTestCallArgs string // additional create call args with literal zero values for tests, e.g. ", false"
 	ClassicCreate    bool   // true for classic API: Create takes (ctx, "0", request) instead of (ctx, request)
 	NameIsPointer    bool   // true when the name field is a pointer (Classic XML types)
+	NameNested       bool   // true when the name is inside a nested struct (e.g. General.Name)
 
 	// Test generation paths (pre-computed from the source ops).
 	ListNamespace string // namespace for the list/resolver call
@@ -142,6 +146,11 @@ type GoApply struct {
 	UpdatePath    string // resource path for update endpoint (e.g. "/buildings/{id}")
 	UpdateStatus  int    // expected HTTP status for update response
 	SameListCreatePath bool // true when list and create share the same URL (need combined handler in tests)
+
+	// Classic (XML) test generation fields — only set when ClassicCreate is true.
+	ClassicResolverWireName    string // XML root element for the resolver's GetByName response (e.g. "computer_extension_attribute")
+	ClassicResolverIDInnerXML  string // inner XML for ID in resolver response (e.g. "<id>42</id>" or "<general><id>42</id></general>")
+	ClassicCreateWireName      string // XML root element for the create response (e.g. "computer_extension_attribute")
 }
 
 type GoPathParam struct {

@@ -267,3 +267,27 @@ func (c *Client) ResolveInventoryPreloadRecordV2BySerialNumber(ctx context.Conte
 	}
 	return &out, nil
 }
+
+// ApplyInventoryPreloadRecordV2 creates or updates a InventoryPreloadRecordV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyInventoryPreloadRecordV2(ctx context.Context, request *InventoryPreloadRecordV2) (string, bool, error) {
+	name := request.SerialNumber
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyInventoryPreloadRecordV2: SerialNumber must not be empty")
+	}
+	id, err := c.ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateInventoryPreloadRecordV2(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyInventoryPreloadRecordV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyInventoryPreloadRecordV2: resolve: %w", err)
+	}
+	_, err = c.UpdateInventoryPreloadRecordV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyInventoryPreloadRecordV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

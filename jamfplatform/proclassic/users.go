@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetUserByID finds users by ID.
@@ -143,4 +145,31 @@ func (c *Client) ResolveUserIDByName(ctx context.Context, name string) (string, 
 // ResolveUserByName looks up a User by name. Alias for GetUserByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolveUserByName(ctx context.Context, name string) (*User, error) {
 	return c.GetUserByName(ctx, name)
+}
+
+// ApplyUser creates or updates a User by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyUser(ctx context.Context, request *UserPost) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyUser: Name must not be empty")
+	}
+	id, err := c.ResolveUserIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateUserByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyUser: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyUser: resolve: %w", err)
+	}
+	err = c.UpdateUserByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyUser: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

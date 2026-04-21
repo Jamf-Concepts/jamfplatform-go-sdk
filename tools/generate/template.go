@@ -153,7 +153,11 @@ var funcMap = template.FuncMap{
 	},
 	// applyCreatePath builds the test-server handler path for the create endpoint.
 	"applyCreatePath": func(a *GoApply) string {
-		path := pathParamRe.ReplaceAllString(a.CreatePath, "test-id")
+		replacement := "test-id"
+		if a.ClassicCreate {
+			replacement = "0"
+		}
+		path := pathParamRe.ReplaceAllString(a.CreatePath, replacement)
 		if a.CreateVer == "" {
 			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.CreateNS, path)
 		}
@@ -161,7 +165,11 @@ var funcMap = template.FuncMap{
 	},
 	// applyUpdatePath builds the test-server handler path for the update endpoint.
 	"applyUpdatePath": func(a *GoApply) string {
-		path := pathParamRe.ReplaceAllString(a.UpdatePath, "existing-id")
+		replacement := "existing-id"
+		if a.ClassicCreate {
+			replacement = "42"
+		}
+		path := pathParamRe.ReplaceAllString(a.UpdatePath, replacement)
 		if a.UpdateVer == "" {
 			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.UpdateNS, path)
 		}
@@ -183,8 +191,12 @@ var funcMap = template.FuncMap{
 	},
 	// applyRequestExpr returns a Go expression for the request struct literal
 	// with the name field populated to "target". Handles both pointer and
-	// non-pointer name fields.
+	// non-pointer name fields, and nested fields (e.g. General.Name).
 	"applyRequestExpr": func(a *GoApply) string {
+		if a.NameNested {
+			// e.g. &Policy{General: &PolicyGeneral{Name: ptrStr("target")}}
+			return fmt.Sprintf("&%s{%s: &%s{%s: ptrStr(\"target\")}}", a.RequestType, a.NameParentField, a.NameParentType, a.NameLeafField)
+		}
 		if a.NameIsPointer {
 			return fmt.Sprintf("&%s{%s: ptrStr(\"target\")}", a.RequestType, a.NameGoField)
 		}
@@ -737,7 +749,12 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.Ty
 {{- define "apply" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType }}{{ .Apply.ExtraArgs }}) (string, bool, error) {
-{{- if .Apply.NameIsPointer }}
+{{- if .Apply.NameNested }}
+	var name string
+	if request.{{ .Apply.NameParentField }} != nil && request.{{ .Apply.NameGoField }} != nil {
+		name = *request.{{ .Apply.NameGoField }}
+	}
+{{- else if .Apply.NameIsPointer }}
 	var name string
 	if request.{{ .Apply.NameGoField }} != nil {
 		name = *request.{{ .Apply.NameGoField }}
@@ -746,7 +763,7 @@ func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType
 	name := request.{{ .Apply.NameGoField }}
 {{- end }}
 	if name == "" {
-		return "", false, fmt.Errorf("{{ .Name }}: {{ .Apply.NameGoField }} must not be empty")
+		return "", false, fmt.Errorf("{{ .Name }}: {{ .Apply.NameLeafField }} must not be empty")
 	}
 	id, err := c.{{ .Apply.ResolverMethod }}(ctx, name)
 	if err != nil {
@@ -1182,7 +1199,21 @@ func Test<% .Name %>(t *testing.T) {
 <%- define "testApply" %>
 func Test<% .Name %>_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-<%- if .Apply.SameListCreatePath %>
+<%- if .Apply.ClassicCreate %>
+	// Classic direct resolver: GetByName returns 404 → apply creates.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+	mux.HandleFunc("<% applyCreatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, <% applyCreateStatus .Apply %>, "<<% .Apply.ClassicCreateWireName %>><id>42</id></<% .Apply.ClassicCreateWireName %>>")
+	})
+<%- else if .Apply.SameListCreatePath %>
 	// List and create share the same path — single handler dispatches on method.
 	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -1192,16 +1223,10 @@ func Test<% .Name %>_Create(t *testing.T) {
 				"totalCount": 0,
 			})
 		case http.MethodPost:
-<%- if .Apply.ClassicCreate %>
-			w.Header().Set("Content-Type", "application/xml")
-			w.WriteHeader(<% applyCreateStatus .Apply %>)
-			_, _ = fmt.Fprint(w, "<?xml version=\"1.0\" encoding=\"UTF-8\"?><id>42</id>")
-<%- else %>
 			writeJSON(t, w, <% applyCreateStatus .Apply %>, map[string]any{
 				"id":   <% applyTestCreateIDJSON .Apply %>,
 				"href": "/new-id",
 			})
-<%- end %>
 		default:
 			t.Errorf("unexpected method %s", r.Method)
 		}
@@ -1217,16 +1242,6 @@ func Test<% .Name %>_Create(t *testing.T) {
 			"totalCount": 0,
 		})
 	})
-<%- if .Apply.ClassicCreate %>
-	mux.HandleFunc("<% applyCreatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		w.Header().Set("Content-Type", "application/xml")
-		w.WriteHeader(<% applyCreateStatus .Apply %>)
-		_, _ = fmt.Fprint(w, "<?xml version=\"1.0\" encoding=\"UTF-8\"?><id>42</id>")
-	})
-<%- else %>
 	mux.HandleFunc("<% applyCreatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
@@ -1236,7 +1251,6 @@ func Test<% .Name %>_Create(t *testing.T) {
 			"href": "/new-id",
 		})
 	})
-<%- end %>
 <%- end %>
 
 	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
@@ -1259,6 +1273,33 @@ func Test<% .Name %>_Create(t *testing.T) {
 
 func Test<% .Name %>_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+<%- if .Apply.ClassicCreate %>
+	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<<% .Apply.ClassicResolverWireName %>><% .Apply.ClassicResolverIDInnerXML %></<% .Apply.ClassicResolverWireName %>>")
+	})
+	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+<%- if .Apply.UpdateReturnsVal %>
+		writeXML(t, w, <% applyUpdateStatus .Apply %>, "<<% .Apply.ClassicCreateWireName %>><% .Apply.ClassicResolverIDInnerXML %></<% .Apply.ClassicCreateWireName %>>")
+<%- else %>
+		w.WriteHeader(<% applyUpdateStatus .Apply %>)
+<%- end %>
+	})
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+<%- else %>
 	// List returns a match → resolver succeeds → apply updates.
 	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -1293,6 +1334,7 @@ func Test<% .Name %>_Update(t *testing.T) {
 	if id != "existing-id" {
 		t.Errorf("id = %q, want existing-id", id)
 	}
+<%- end %>
 }
 <% end %>
 `

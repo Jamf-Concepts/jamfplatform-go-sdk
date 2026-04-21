@@ -220,16 +220,21 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 			}
 			// Determine how to extract ID from create response.
 			createReturnID := "resp.ID"
-			switch createM.ResponseType {
-			case "HrefResponse", "AppInstallerDeploymentHrefResponse":
-				createReturnID = "resp.ID"
-			default:
-				// Non-HrefResponse: check if the response has a string or int ID.
-				// The resolver's IDNumeric flag tells us.
-				if r.IDNumeric {
-					createReturnID = "strconv.Itoa(resp.ID)"
-				} else {
+			if spec.Format == "xml" {
+				// Classic: ID is *int
+				createReturnID = `fmt.Sprintf("%d", *resp.ID)`
+			} else {
+				switch createM.ResponseType {
+				case "HrefResponse", "AppInstallerDeploymentHrefResponse":
 					createReturnID = "resp.ID"
+				default:
+					// Non-HrefResponse: check if the response has a string or int ID.
+					// The resolver's IDNumeric flag tells us.
+					if r.IDNumeric {
+						createReturnID = "strconv.Itoa(resp.ID)"
+					} else {
+						createReturnID = "resp.ID"
+					}
 				}
 			}
 			// Determine if Update returns a value or just error.
@@ -260,8 +265,48 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 			// check whether the field is in the schema's required list —
 			// non-required scalars become pointers per schema.go logic.
 			nameIsPointer := spec.Format == "xml"
-			if !nameIsPointer {
-				if schemaRef, ok := doc.Components.Schemas[requestType]; ok && schemaRef != nil && schemaRef.Value != nil {
+			nameNested := strings.Contains(ac.NameGoField, ".")
+			nameParentField := ""
+			nameParentType := ""
+			nameLeafField := ac.NameGoField
+
+			// findSchema looks up a schema by Go type name. The schema map
+			// is keyed by spec name (e.g. "ebook_post"), but we have the Go
+			// name (e.g. "EbookPost"). Try direct lookup first, then iterate.
+			findSchema := func(goName string) *openapi3.SchemaRef {
+				if ref, ok := doc.Components.Schemas[goName]; ok {
+					return ref
+				}
+				for specName, ref := range doc.Components.Schemas {
+					if goTypeName(specName) == goName {
+						return ref
+					}
+				}
+				return nil
+			}
+
+			if nameNested {
+				parts := strings.SplitN(ac.NameGoField, ".", 2)
+				nameParentField = parts[0]
+				nameLeafField = parts[1]
+				// Resolve the parent field's Go type from the schema.
+				if schemaRef := findSchema(requestType); schemaRef != nil && schemaRef.Value != nil {
+					for pname, pref := range schemaRef.Value.Properties {
+						if exportedGoName(pname) == nameParentField {
+							if pref != nil && pref.Ref != "" {
+								// Extract schema name from $ref like "#/components/schemas/PolicyGeneral"
+								refParts := strings.Split(pref.Ref, "/")
+								nameParentType = goTypeName(refParts[len(refParts)-1])
+							} else if pref != nil && pref.Value != nil && pref.Value.Title != "" {
+								nameParentType = goTypeName(pref.Value.Title)
+							}
+							break
+						}
+					}
+				}
+			}
+			if !nameIsPointer && !nameNested {
+				if schemaRef := findSchema(requestType); schemaRef != nil && schemaRef.Value != nil {
 					// Map Go field name → JSON property name via the same
 					// exportedGoName conversion the schema emitter uses.
 					nameJSONField := ""
@@ -285,8 +330,13 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 					}
 				}
 			}
-			// Resolver method name (always the ByName variant).
-			resolverMethod := "Resolve" + r.ResourceType + "IDByName"
+			// Resolver method name — typically ByName, but uses the
+			// resolver's byField suffix when present (e.g. BySerialNumber).
+			byField := "ByName"
+			if r.ByField != "" {
+				byField = r.ByField
+			}
+			resolverMethod := "Resolve" + r.ResourceType + "ID" + byField
 			// Delete method (for test generation).
 			deleteMethod := ac.DeleteOp
 
@@ -300,6 +350,9 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				ResourceType:     r.ResourceType,
 				RequestType:      requestType,
 				NameGoField:      ac.NameGoField,
+				NameParentField:  nameParentField,
+				NameParentType:   nameParentType,
+				NameLeafField:    nameLeafField,
 				ResolverMethod:   resolverMethod,
 				CreateMethod:     ac.CreateOp,
 				UpdateMethod:     ac.UpdateOp,
@@ -312,6 +365,7 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				ExtraTestCallArgs: extraTestCallArgs,
 				ClassicCreate:    classicCreate,
 				NameIsPointer:    nameIsPointer,
+				NameNested:       nameNested,
 				// Test generation paths.
 				ListNamespace: src.Namespace,
 				ListVersion:   src.Version,
@@ -334,6 +388,25 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 			ga.SameListCreatePath = ga.ListNamespace == ga.CreateNS &&
 				ga.ListVersion == ga.CreateVer &&
 				ga.ListPath == ga.CreatePath
+
+			// Classic test stubs need XML wire names for resolver and create responses.
+			if classicCreate {
+				ga.ClassicResolverWireName = src.ResponseWireName
+				ga.ClassicCreateWireName = createM.ResponseWireName
+				// Compute the inner XML for the ID field in the resolver response.
+				// Mirrors the logic in the resolver's IDTestInnerXML computation.
+				idPath := r.IDField
+				if idPath == "" {
+					idPath = "ID"
+				}
+				idParts := strings.Split(idPath, ".")
+				idXML := "42"
+				for i := len(idParts) - 1; i >= 0; i-- {
+					tag := strings.ToLower(idParts[i])
+					idXML = "<" + tag + ">" + idXML + "</" + tag + ">"
+				}
+				ga.ClassicResolverIDInnerXML = idXML
+			}
 
 			m := GoMethod{
 				Name:      "Apply" + r.ResourceType,

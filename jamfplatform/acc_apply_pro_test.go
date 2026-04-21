@@ -260,8 +260,8 @@ func TestAcceptance_ApplyApiIntegrationV1(t *testing.T) {
 	enabled := true
 
 	id, created, err := p.ApplyApiIntegrationV1(ctx, &pro.ApiIntegrationRequest{
-		DisplayName:        name,
-		Enabled:            &enabled,
+		DisplayName:         name,
+		Enabled:             &enabled,
 		AuthorizationScopes: []string{roleName},
 	})
 	if err != nil {
@@ -273,8 +273,8 @@ func TestAcceptance_ApplyApiIntegrationV1(t *testing.T) {
 	}
 
 	id2, created2, err := p.ApplyApiIntegrationV1(ctx, &pro.ApiIntegrationRequest{
-		DisplayName:        name,
-		Enabled:            &enabled,
+		DisplayName:         name,
+		Enabled:             &enabled,
 		AuthorizationScopes: []string{roleName},
 	})
 	if err != nil {
@@ -604,14 +604,14 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 
 	principal := true
 	id, created, err := p.ApplyDistributionPointV1(ctx, &pro.DistributionPoint{
-		Name:                     name,
+		Name:                      name,
 		FileSharingConnectionType: "SMB",
-		ServerName:               "test-server.example.com",
-		ShareName:                strPtr("share"),
-		ReadOnlyUsername:         strPtr("rouser"),
-		ReadOnlyPassword:         strPtr("ropass"),
-		ReadWriteUsername:        strPtr("rwuser"),
-		ReadWritePassword:        strPtr("rwpass"),
+		ServerName:                "test-server.example.com",
+		ShareName:                 strPtr("share"),
+		ReadOnlyUsername:          strPtr("rouser"),
+		ReadOnlyPassword:          strPtr("ropass"),
+		ReadWriteUsername:         strPtr("rwuser"),
+		ReadWritePassword:         strPtr("rwpass"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -622,15 +622,15 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 	}
 
 	id2, created2, err := p.ApplyDistributionPointV1(ctx, &pro.DistributionPoint{
-		Name:                     name,
+		Name:                      name,
 		FileSharingConnectionType: "SMB",
-		ServerName:               "test-server-updated.example.com",
-		ShareName:                strPtr("share"),
-		ReadOnlyUsername:         strPtr("rouser"),
-		ReadOnlyPassword:         strPtr("ropass"),
-		ReadWriteUsername:        strPtr("rwuser"),
-		ReadWritePassword:        strPtr("rwpass"),
-		Principal:                &principal,
+		ServerName:                "test-server-updated.example.com",
+		ShareName:                 strPtr("share"),
+		ReadOnlyUsername:          strPtr("rouser"),
+		ReadOnlyPassword:          strPtr("ropass"),
+		ReadWriteUsername:         strPtr("rwuser"),
+		ReadWritePassword:         strPtr("rwpass"),
+		Principal:                 &principal,
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)

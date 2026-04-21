@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetWebhookByID finds webhooks by ID.
@@ -112,4 +114,31 @@ func (c *Client) ResolveWebhookIDByName(ctx context.Context, name string) (strin
 // ResolveWebhookByName looks up a Webhook by name. Alias for GetWebhookByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolveWebhookByName(ctx context.Context, name string) (*Webhook, error) {
 	return c.GetWebhookByName(ctx, name)
+}
+
+// ApplyWebhook creates or updates a Webhook by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyWebhook(ctx context.Context, request *Webhook) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyWebhook: Name must not be empty")
+	}
+	id, err := c.ResolveWebhookIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateWebhookByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyWebhook: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyWebhook: resolve: %w", err)
+	}
+	err = c.UpdateWebhookByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyWebhook: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

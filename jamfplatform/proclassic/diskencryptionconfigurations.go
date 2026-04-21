@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetDiskEncryptionConfigurationByID finds disk encryption configurations by ID.
@@ -112,4 +114,31 @@ func (c *Client) ResolveDiskEncryptionConfigurationIDByName(ctx context.Context,
 // ResolveDiskEncryptionConfigurationByName looks up a DiskEncryptionConfiguration by name. Alias for GetDiskEncryptionConfigurationByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolveDiskEncryptionConfigurationByName(ctx context.Context, name string) (*DiskEncryptionConfiguration, error) {
 	return c.GetDiskEncryptionConfigurationByName(ctx, name)
+}
+
+// ApplyDiskEncryptionConfiguration creates or updates a DiskEncryptionConfiguration by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyDiskEncryptionConfiguration(ctx context.Context, request *DiskEncryptionConfiguration) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyDiskEncryptionConfiguration: Name must not be empty")
+	}
+	id, err := c.ResolveDiskEncryptionConfigurationIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateDiskEncryptionConfigurationByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyDiskEncryptionConfiguration: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyDiskEncryptionConfiguration: resolve: %w", err)
+	}
+	err = c.UpdateDiskEncryptionConfigurationByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyDiskEncryptionConfiguration: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

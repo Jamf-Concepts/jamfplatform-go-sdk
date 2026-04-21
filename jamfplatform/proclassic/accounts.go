@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetAccountByUserID finds accounts by ID.
@@ -185,4 +187,31 @@ func (c *Client) ResolveAccountGroupIDByName(ctx context.Context, name string) (
 // ResolveAccountGroupByName looks up a AccountGroup by name. Alias for GetAccountGroupByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolveAccountGroupByName(ctx context.Context, name string) (*Group, error) {
 	return c.GetAccountGroupByName(ctx, name)
+}
+
+// ApplyAccountGroup creates or updates a AccountGroup by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyAccountGroup(ctx context.Context, request *Group) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyAccountGroup: Name must not be empty")
+	}
+	id, err := c.ResolveAccountGroupIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateAccountGroupByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyAccountGroup: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyAccountGroup: resolve: %w", err)
+	}
+	err = c.UpdateAccountGroupByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyAccountGroup: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

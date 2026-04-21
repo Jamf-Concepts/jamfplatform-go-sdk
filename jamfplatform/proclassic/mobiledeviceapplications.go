@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetMobileDeviceApplicationByID finds mobile device applications by ID.
@@ -196,4 +198,31 @@ func (c *Client) ResolveMobileDeviceApplicationIDByName(ctx context.Context, nam
 // ResolveMobileDeviceApplicationByName looks up a MobileDeviceApplication by name. Alias for GetMobileDeviceApplicationByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
 func (c *Client) ResolveMobileDeviceApplicationByName(ctx context.Context, name string) (*MobileDeviceApplication, error) {
 	return c.GetMobileDeviceApplicationByName(ctx, name)
+}
+
+// ApplyMobileDeviceApplication creates or updates a MobileDeviceApplication by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyMobileDeviceApplication(ctx context.Context, request *MobileDeviceApplication) (string, bool, error) {
+	var name string
+	if request.General != nil && request.General.DisplayName != nil {
+		name = *request.General.DisplayName
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyMobileDeviceApplication: DisplayName must not be empty")
+	}
+	id, err := c.ResolveMobileDeviceApplicationIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateMobileDeviceApplicationByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyMobileDeviceApplication: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyMobileDeviceApplication: resolve: %w", err)
+	}
+	err = c.UpdateMobileDeviceApplicationByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyMobileDeviceApplication: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }
