@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -84,4 +85,30 @@ func (c *Client) DeleteMacOSBrandingConfigurationV1(ctx context.Context, id stri
 		return fmt.Errorf("DeleteMacOSBrandingConfigurationV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveMacOSBrandingConfigurationV1IDByName looks up a MacOSBrandingConfigurationV1 by its brandingName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMacOSBrandingConfigurationV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/self-service/branding/macos"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "brandingName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMacOSBrandingConfigurationV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMacOSBrandingConfigurationV1ByName looks up a MacOSBrandingConfigurationV1 by its brandingName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMacOSBrandingConfigurationV1ByName(ctx context.Context, name string) (*MacOsBrandingConfiguration, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/self-service/branding/macos"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "brandingName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMacOSBrandingConfigurationV1ByName(%s): %w", name, err)
+	}
+	var out MacOsBrandingConfiguration
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMacOSBrandingConfigurationV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

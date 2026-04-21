@@ -85,6 +85,7 @@ type GoResolver struct {
 	TypedReturn  string // Go type of the typed wrapper's return
 	ExtraParams  string // filtered mode only: appended to list path before filter (e.g. "section=GENERAL")
 	Paginated    bool   // clientFilter only: source list op is paginated — use paged transport walk
+	ByField      string // suffix override: "BySerialNumber" → ResolveDeviceIDBySerialNumber. Empty → "ByName"
 	SourceMethod string // direct only: existing Get<X>ByName method the wrappers delegate to
 	// IDNilCheck and IDDeref are pre-computed expressions the direct-mode
 	// template emits verbatim. They cover the nested-ID case: Classic

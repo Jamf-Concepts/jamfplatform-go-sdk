@@ -1460,3 +1460,914 @@ func TestAcceptance_ResolveEnrollmentCustomizationV2_Lifecycle(t *testing.T) {
 	requireNotFoundErr(t, "post-delete", err)
 	t.Log("lifecycle complete ✓")
 }
+
+// ─── ApiRoles ───────────────────────────────────────────────────────────────
+
+func TestAcceptance_ResolveApiRoleV1_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-role-" + runSuffix()
+
+	// Step 1: Not found
+	_, err := c.ResolveApiRoleV1IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+	t.Log("step 1: not-found ✓")
+
+	// Step 2: Create
+	resp, err := c.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{DisplayName: name, Privileges: []string{"Read Buildings"}})
+	if err != nil {
+		t.Fatalf("CreateApiRoleV1: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteApiRoleV1(ctx, id1) })
+	t.Logf("step 2: created %s", id1)
+
+	// Step 3: Resolve ID
+	gotID, err := c.ResolveApiRoleV1IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveApiRoleV1IDByName: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+	t.Logf("step 3: resolve ID %q → %s ✓", name, gotID)
+
+	// Step 4: Resolve typed
+	got, err := c.ResolveApiRoleV1ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveApiRoleV1ByName: %v", err)
+	}
+	if got == nil || got.DisplayName != name {
+		t.Errorf("typed DisplayName = %v, want %q", got, name)
+	}
+	t.Log("step 4: resolve typed ✓")
+
+	// Step 5: Attempt duplicate
+	id2, dupCreated := tryCreateDuplicate(t, "api role", func() (string, error) {
+		r, e := c.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{DisplayName: name, Privileges: []string{"Read Buildings"}})
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteApiRoleV1(ctx, id) })
+
+	// Step 6: Ambiguous
+	if dupCreated {
+		_, err = c.ResolveApiRoleV1IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("step 6: ambiguous with IDs %s, %s ✓", id1, id2)
+
+		if err := c.DeleteApiRoleV1(ctx, id2); err != nil {
+			t.Logf("early delete dup: %v", err)
+		}
+	}
+
+	// Step 7: Delete original
+	if err := c.DeleteApiRoleV1(ctx, id1); err != nil {
+		t.Fatalf("delete original: %v", err)
+	}
+
+	// Step 8: Not found after delete
+	_, err = c.ResolveApiRoleV1IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("step 8: not-found after delete ✓")
+}
+
+// ─── AdvancedUserContentSearches ────────────────────────────────────────────
+
+func TestAcceptance_ResolveAdvancedUserContentSearchV1_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-aucs-" + runSuffix()
+
+	// Step 1: Not found
+	_, err := c.ResolveAdvancedUserContentSearchV1IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+	t.Log("step 1: not-found ✓")
+
+	// Step 2: Create
+	resp, err := c.CreateAdvancedUserContentSearchV1(ctx, &pro.AdvancedUserContentSearch{Name: name})
+	if err != nil {
+		t.Fatalf("CreateAdvancedUserContentSearchV1: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteAdvancedUserContentSearchV1(ctx, id1) })
+	t.Logf("step 2: created %s", id1)
+
+	// Step 3: Resolve ID
+	gotID, err := c.ResolveAdvancedUserContentSearchV1IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveAdvancedUserContentSearchV1IDByName: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+	t.Logf("step 3: resolve ID %q → %s ✓", name, gotID)
+
+	// Step 4: Resolve typed
+	got, err := c.ResolveAdvancedUserContentSearchV1ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveAdvancedUserContentSearchV1ByName: %v", err)
+	}
+	if got == nil || got.Name != name {
+		t.Errorf("typed Name = %v, want %q", got, name)
+	}
+	t.Log("step 4: resolve typed ✓")
+
+	// Step 5: Attempt duplicate
+	id2, dupCreated := tryCreateDuplicate(t, "advanced user content search", func() (string, error) {
+		r, e := c.CreateAdvancedUserContentSearchV1(ctx, &pro.AdvancedUserContentSearch{Name: name})
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteAdvancedUserContentSearchV1(ctx, id) })
+
+	// Step 6: Ambiguous
+	if dupCreated {
+		_, err = c.ResolveAdvancedUserContentSearchV1IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("step 6: ambiguous with IDs %s, %s ✓", id1, id2)
+
+		if err := c.DeleteAdvancedUserContentSearchV1(ctx, id2); err != nil {
+			t.Logf("early delete dup: %v", err)
+		}
+	}
+
+	// Step 7: Delete original
+	if err := c.DeleteAdvancedUserContentSearchV1(ctx, id1); err != nil {
+		t.Fatalf("delete original: %v", err)
+	}
+
+	// Step 8: Not found after delete
+	_, err = c.ResolveAdvancedUserContentSearchV1IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("step 8: not-found after delete ✓")
+}
+
+// ─── InventoryPreloadRecords ────────────────────────────────────────────────
+
+func TestAcceptance_ResolveInventoryPreloadRecordV2_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	suffix := runSuffix()
+	if len(suffix) > 6 {
+		suffix = suffix[:6]
+	}
+	serial := "SDKACCRIP" + suffix
+
+	// Step 1: Not found
+	_, err := c.ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx, serial)
+	requireNotFoundErr(t, "pre-create", err)
+	t.Log("step 1: not-found ✓")
+
+	// Step 2: Create
+	resp, err := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: "Computer"})
+	if err != nil {
+		t.Fatalf("CreateInventoryPreloadRecordV2: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteInventoryPreloadRecordV2(ctx, id1) })
+	t.Logf("step 2: created %s (serial=%s)", id1, serial)
+
+	// Step 3: Resolve ID
+	gotID, err := c.ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx, serial)
+	if err != nil {
+		t.Fatalf("ResolveInventoryPreloadRecordV2IDBySerialNumber: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+	t.Logf("step 3: resolve ID %q → %s ✓", serial, gotID)
+
+	// Step 4: Resolve typed
+	got, err := c.ResolveInventoryPreloadRecordV2BySerialNumber(ctx, serial)
+	if err != nil {
+		t.Fatalf("ResolveInventoryPreloadRecordV2BySerialNumber: %v", err)
+	}
+	if got == nil || got.SerialNumber != serial {
+		t.Errorf("typed SerialNumber = %v, want %q", got, serial)
+	}
+	t.Log("step 4: resolve typed ✓")
+
+	// Step 5: Attempt duplicate — inventory preload keyed by serial, so duplicate should be rejected
+	id2, dupCreated := tryCreateDuplicate(t, "inventory preload record", func() (string, error) {
+		r, e := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: "Computer"})
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteInventoryPreloadRecordV2(ctx, id) })
+
+	// Step 6: Ambiguous
+	if dupCreated {
+		_, err = c.ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx, serial)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("step 6: ambiguous with IDs %s, %s ✓", id1, id2)
+
+		if err := c.DeleteInventoryPreloadRecordV2(ctx, id2); err != nil {
+			t.Logf("early delete dup: %v", err)
+		}
+	}
+
+	// Step 7: Delete original
+	if err := c.DeleteInventoryPreloadRecordV2(ctx, id1); err != nil {
+		t.Fatalf("delete original: %v", err)
+	}
+
+	// Step 8: Not found after delete
+	_, err = c.ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx, serial)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("step 8: not-found after delete ✓")
+}
+
+// ─── EnrollmentAccessGroups ─────────────────────────────────────────────────
+
+func TestAcceptance_ResolveEnrollmentAccessGroupV3_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-eag-" + runSuffix()
+
+	// Step 1: Not found
+	_, err := c.ResolveEnrollmentAccessGroupV3IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+	t.Log("step 1: not-found ✓")
+
+	// Step 2: Create — requires LDAP; may fail if not configured
+	resp, err := c.CreateEnrollmentAccessGroupV3(ctx, &pro.EnrollmentAccessGroupPreview{Name: name, GroupID: "1", LdapServerID: "1"})
+	if err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+			t.Skipf("create rejected (LDAP probably not configured): %s", apiErr.Summary())
+		}
+		t.Fatalf("CreateEnrollmentAccessGroupV3: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteEnrollmentAccessGroupV3(ctx, id1) })
+	t.Logf("step 2: created %s", id1)
+
+	// Step 3: Resolve ID
+	gotID, err := c.ResolveEnrollmentAccessGroupV3IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveEnrollmentAccessGroupV3IDByName: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+	t.Logf("step 3: resolve ID %q → %s ✓", name, gotID)
+
+	// Step 4: Resolve typed
+	got, err := c.ResolveEnrollmentAccessGroupV3ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveEnrollmentAccessGroupV3ByName: %v", err)
+	}
+	if got == nil || got.Name != name {
+		t.Errorf("typed Name = %v, want %q", got, name)
+	}
+	t.Log("step 4: resolve typed ✓")
+
+	// Step 5: Attempt duplicate
+	id2, dupCreated := tryCreateDuplicate(t, "enrollment access group", func() (string, error) {
+		r, e := c.CreateEnrollmentAccessGroupV3(ctx, &pro.EnrollmentAccessGroupPreview{Name: name, GroupID: "1", LdapServerID: "1"})
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteEnrollmentAccessGroupV3(ctx, id) })
+
+	// Step 6: Ambiguous
+	if dupCreated {
+		_, err = c.ResolveEnrollmentAccessGroupV3IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("step 6: ambiguous with IDs %s, %s ✓", id1, id2)
+
+		if err := c.DeleteEnrollmentAccessGroupV3(ctx, id2); err != nil {
+			t.Logf("early delete dup: %v", err)
+		}
+	}
+
+	// Step 7: Delete original
+	if err := c.DeleteEnrollmentAccessGroupV3(ctx, id1); err != nil {
+		t.Fatalf("delete original: %v", err)
+	}
+
+	// Step 8: Not found after delete
+	_, err = c.ResolveEnrollmentAccessGroupV3IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("step 8: not-found after delete ✓")
+}
+
+// ─── ReturnToServiceConfigurations ──────────────────────────────────────────
+
+// ReturnToServiceConfiguration requires a valid wifiProfileId (config profile) for create.
+// Read-only probe: verify not-found, then resolve any existing config if present.
+
+func TestAcceptance_ResolveReturnToServiceConfigurationV1IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveReturnToServiceConfigurationV1IDByName(context.Background(), "sdk-does-not-exist-rts-"+runSuffix())
+	if err == nil {
+		t.Fatal("expected not-found error, got nil")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
+	}
+	t.Log("not-found ✓")
+}
+
+func TestAcceptance_ResolveReturnToServiceConfigurationV1IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	result, err := c.ListReturnToServiceConfigurationsV1(ctx)
+	if err != nil {
+		t.Fatalf("list: %v", err)
+	}
+	if result == nil || len(result.Results) == 0 {
+		t.Skip("no return-to-service configurations — skipping")
+	}
+	first := result.Results[0]
+	gotID, err := c.ResolveReturnToServiceConfigurationV1IDByName(ctx, first.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved %q → %s ✓", first.DisplayName, gotID)
+}
+
+func TestAcceptance_ResolveReturnToServiceConfigurationV1ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	result, err := c.ListReturnToServiceConfigurationsV1(ctx)
+	if err != nil {
+		t.Fatalf("list: %v", err)
+	}
+	if result == nil || len(result.Results) == 0 {
+		t.Skip("no return-to-service configurations — skipping")
+	}
+	first := result.Results[0]
+	got, err := c.ResolveReturnToServiceConfigurationV1ByName(ctx, first.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil || got.DisplayName != first.DisplayName {
+		t.Errorf("typed DisplayName = %v, want %q", got, first.DisplayName)
+	}
+	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
+}
+
+// ─── IOSBrandingConfigurations ──────────────────────────────────────────────
+
+func TestAcceptance_ResolveIOSBrandingConfigurationV1_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-iosb-" + runSuffix()
+
+	// Step 1: Not found
+	_, err := c.ResolveIOSBrandingConfigurationV1IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+	t.Log("step 1: not-found ✓")
+
+	// Step 2: Create
+	resp, err := c.CreateIOSBrandingConfigurationV1(ctx, &pro.IosBrandingConfiguration{
+		BrandingName:              name,
+		BrandingNameColorCode:     "000000",
+		HeaderBackgroundColorCode: "ffffff",
+		MenuIconColorCode:         "333333",
+		StatusBarTextColor:        "DARK",
+	})
+	if err != nil {
+		t.Fatalf("CreateIOSBrandingConfigurationV1: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteIOSBrandingConfigurationV1(ctx, id1) })
+	t.Logf("step 2: created %s", id1)
+
+	// Step 3: Resolve ID
+	gotID, err := c.ResolveIOSBrandingConfigurationV1IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveIOSBrandingConfigurationV1IDByName: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+	t.Logf("step 3: resolve ID %q → %s ✓", name, gotID)
+
+	// Step 4: Resolve typed
+	got, err := c.ResolveIOSBrandingConfigurationV1ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveIOSBrandingConfigurationV1ByName: %v", err)
+	}
+	if got == nil || got.BrandingName != name {
+		t.Errorf("typed BrandingName = %v, want %q", got, name)
+	}
+	t.Log("step 4: resolve typed ✓")
+
+	// Step 5: Attempt duplicate
+	id2, dupCreated := tryCreateDuplicate(t, "iOS branding configuration", func() (string, error) {
+		r, e := c.CreateIOSBrandingConfigurationV1(ctx, &pro.IosBrandingConfiguration{
+			BrandingName:              name,
+			BrandingNameColorCode:     "000000",
+			HeaderBackgroundColorCode: "ffffff",
+			MenuIconColorCode:         "333333",
+			StatusBarTextColor:        "DARK",
+		})
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteIOSBrandingConfigurationV1(ctx, id) })
+
+	// Step 6: Ambiguous
+	if dupCreated {
+		_, err = c.ResolveIOSBrandingConfigurationV1IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("step 6: ambiguous with IDs %s, %s ✓", id1, id2)
+
+		if err := c.DeleteIOSBrandingConfigurationV1(ctx, id2); err != nil {
+			t.Logf("early delete dup: %v", err)
+		}
+	}
+
+	// Step 7: Delete original
+	if err := c.DeleteIOSBrandingConfigurationV1(ctx, id1); err != nil {
+		t.Fatalf("delete original: %v", err)
+	}
+
+	// Step 8: Not found after delete
+	_, err = c.ResolveIOSBrandingConfigurationV1IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("step 8: not-found after delete ✓")
+}
+
+// ─── MacOSBrandingConfigurations ────────────────────────────────────────────
+
+func TestAcceptance_ResolveMacOSBrandingConfigurationV1_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-macb-" + runSuffix()
+
+	// Step 1: Not found
+	_, err := c.ResolveMacOSBrandingConfigurationV1IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+	t.Log("step 1: not-found ✓")
+
+	// Step 2: Create
+	resp, err := c.CreateMacOSBrandingConfigurationV1(ctx, &pro.MacOsBrandingConfiguration{BrandingName: &name})
+	if err != nil {
+		t.Fatalf("CreateMacOSBrandingConfigurationV1: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteMacOSBrandingConfigurationV1(ctx, id1) })
+	t.Logf("step 2: created %s", id1)
+
+	// Step 3: Resolve ID
+	gotID, err := c.ResolveMacOSBrandingConfigurationV1IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveMacOSBrandingConfigurationV1IDByName: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+	t.Logf("step 3: resolve ID %q → %s ✓", name, gotID)
+
+	// Step 4: Resolve typed
+	got, err := c.ResolveMacOSBrandingConfigurationV1ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveMacOSBrandingConfigurationV1ByName: %v", err)
+	}
+	if got == nil || got.BrandingName == nil || *got.BrandingName != name {
+		t.Errorf("typed BrandingName = %v, want %q", got, name)
+	}
+	t.Log("step 4: resolve typed ✓")
+
+	// Step 5: Attempt duplicate
+	id2, dupCreated := tryCreateDuplicate(t, "macOS branding configuration", func() (string, error) {
+		r, e := c.CreateMacOSBrandingConfigurationV1(ctx, &pro.MacOsBrandingConfiguration{BrandingName: &name})
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteMacOSBrandingConfigurationV1(ctx, id) })
+
+	// Step 6: Ambiguous
+	if dupCreated {
+		_, err = c.ResolveMacOSBrandingConfigurationV1IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("step 6: ambiguous with IDs %s, %s ✓", id1, id2)
+
+		if err := c.DeleteMacOSBrandingConfigurationV1(ctx, id2); err != nil {
+			t.Logf("early delete dup: %v", err)
+		}
+	}
+
+	// Step 7: Delete original
+	if err := c.DeleteMacOSBrandingConfigurationV1(ctx, id1); err != nil {
+		t.Fatalf("delete original: %v", err)
+	}
+
+	// Step 8: Not found after delete
+	_, err = c.ResolveMacOSBrandingConfigurationV1IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("step 8: not-found after delete ✓")
+}
+
+// ─── VolumePurchasingSubscriptions ──────────────────────────────────────────
+
+func TestAcceptance_ResolveVolumePurchasingSubscriptionV1_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-vps-" + runSuffix()
+
+	// Step 1: Not found
+	_, err := c.ResolveVolumePurchasingSubscriptionV1IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+	t.Log("step 1: not-found ✓")
+
+	// Step 2: Create
+	resp, err := c.CreateVolumePurchasingSubscriptionV1(ctx, &pro.VolumePurchasingSubscriptionBase{Name: name})
+	if err != nil {
+		t.Fatalf("CreateVolumePurchasingSubscriptionV1: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteVolumePurchasingSubscriptionV1(ctx, id1) })
+	t.Logf("step 2: created %s", id1)
+
+	// Step 3: Resolve ID
+	gotID, err := c.ResolveVolumePurchasingSubscriptionV1IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveVolumePurchasingSubscriptionV1IDByName: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+	t.Logf("step 3: resolve ID %q → %s ✓", name, gotID)
+
+	// Step 4: Resolve typed
+	got, err := c.ResolveVolumePurchasingSubscriptionV1ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("ResolveVolumePurchasingSubscriptionV1ByName: %v", err)
+	}
+	if got == nil || got.Name != name {
+		t.Errorf("typed Name = %v, want %q", got, name)
+	}
+	t.Log("step 4: resolve typed ✓")
+
+	// Step 5: Attempt duplicate
+	id2, dupCreated := tryCreateDuplicate(t, "volume purchasing subscription", func() (string, error) {
+		r, e := c.CreateVolumePurchasingSubscriptionV1(ctx, &pro.VolumePurchasingSubscriptionBase{Name: name})
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteVolumePurchasingSubscriptionV1(ctx, id) })
+
+	// Step 6: Ambiguous
+	if dupCreated {
+		_, err = c.ResolveVolumePurchasingSubscriptionV1IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("step 6: ambiguous with IDs %s, %s ✓", id1, id2)
+
+		if err := c.DeleteVolumePurchasingSubscriptionV1(ctx, id2); err != nil {
+			t.Logf("early delete dup: %v", err)
+		}
+	}
+
+	// Step 7: Delete original
+	if err := c.DeleteVolumePurchasingSubscriptionV1(ctx, id1); err != nil {
+		t.Fatalf("delete original: %v", err)
+	}
+
+	// Step 8: Not found after delete
+	_, err = c.ResolveVolumePurchasingSubscriptionV1IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("step 8: not-found after delete ✓")
+}
+
+// ─── AppInstallerDeployments (read-only) ────────────────────────────────────
+
+func TestAcceptance_ResolveAppInstallerDeploymentV1IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveAppInstallerDeploymentV1IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
+	if err == nil {
+		t.Fatal("expected not-found error, got nil")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
+	}
+	t.Log("not-found ✓")
+}
+
+func TestAcceptance_ResolveAppInstallerDeploymentV1IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListAppInstallerDeploymentsV1(ctx)
+	if err != nil {
+		t.Fatalf("ListAppInstallerDeploymentsV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no app installer deployments in tenant — skipping")
+	}
+	first := items[0]
+	gotID, err := c.ResolveAppInstallerDeploymentV1IDByName(ctx, first.Name)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved %q → %s ✓", first.Name, gotID)
+}
+
+func TestAcceptance_ResolveAppInstallerDeploymentV1ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListAppInstallerDeploymentsV1(ctx)
+	if err != nil {
+		t.Fatalf("ListAppInstallerDeploymentsV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no app installer deployments in tenant — skipping")
+	}
+	first := items[0]
+	got, err := c.ResolveAppInstallerDeploymentV1ByName(ctx, first.Name)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.Name == nil || *got.Name != first.Name {
+		t.Errorf("typed Name = %v, want %q", got.Name, first.Name)
+	}
+	t.Logf("resolved typed %q → %s ✓", first.Name, func() string {
+		if got.ID != nil {
+			return *got.ID
+		}
+		return "<nil>"
+	}())
+}
+
+// ─── AppInstallerTitles (read-only) ─────────────────────────────────────────
+
+func TestAcceptance_ResolveAppInstallerTitleV1IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveAppInstallerTitleV1IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
+	if err == nil {
+		t.Fatal("expected not-found error, got nil")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
+	}
+	t.Log("not-found ✓")
+}
+
+func TestAcceptance_ResolveAppInstallerTitleV1IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListAppInstallerTitlesV1(ctx)
+	if err != nil {
+		t.Fatalf("ListAppInstallerTitlesV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no app installer titles in tenant — skipping")
+	}
+	first := items[0]
+	gotID, err := c.ResolveAppInstallerTitleV1IDByName(ctx, first.TitleName)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved %q → %s ✓", first.TitleName, gotID)
+}
+
+func TestAcceptance_ResolveAppInstallerTitleV1ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListAppInstallerTitlesV1(ctx)
+	if err != nil {
+		t.Fatalf("ListAppInstallerTitlesV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no app installer titles in tenant — skipping")
+	}
+	first := items[0]
+	got, err := c.ResolveAppInstallerTitleV1ByName(ctx, first.TitleName)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.TitleName != first.TitleName {
+		t.Errorf("typed TitleName = %q, want %q", got.TitleName, first.TitleName)
+	}
+	t.Logf("resolved typed %q → %s ✓", first.TitleName, got.ID)
+}
+
+// ─── CloudIdp (read-only) ───────────────────────────────────────────────────
+
+func TestAcceptance_ResolveCloudIdpV1IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveCloudIdpV1IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
+	if err == nil {
+		t.Fatal("expected not-found error, got nil")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
+	}
+	t.Log("not-found ✓")
+}
+
+func TestAcceptance_ResolveCloudIdpV1IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListCloudIdpV1(ctx, nil)
+	if err != nil {
+		t.Fatalf("ListCloudIdpV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no cloud IdPs in tenant — skipping")
+	}
+	first := items[0]
+	gotID, err := c.ResolveCloudIdpV1IDByName(ctx, first.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved %q → %s ✓", first.DisplayName, gotID)
+}
+
+func TestAcceptance_ResolveCloudIdpV1ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListCloudIdpV1(ctx, nil)
+	if err != nil {
+		t.Fatalf("ListCloudIdpV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no cloud IdPs in tenant — skipping")
+	}
+	first := items[0]
+	got, err := c.ResolveCloudIdpV1ByName(ctx, first.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.DisplayName != first.DisplayName {
+		t.Errorf("typed DisplayName = %q, want %q", got.DisplayName, first.DisplayName)
+	}
+	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
+}
+
+// ─── DeviceEnrollments (read-only) ──────────────────────────────────────────
+
+func TestAcceptance_ResolveDeviceEnrollmentV1IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveDeviceEnrollmentV1IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
+	if err == nil {
+		t.Fatal("expected not-found error, got nil")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
+	}
+	t.Log("not-found ✓")
+}
+
+func TestAcceptance_ResolveDeviceEnrollmentV1IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListDeviceEnrollmentsV1(ctx, nil)
+	if err != nil {
+		t.Fatalf("ListDeviceEnrollmentsV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no device enrollments in tenant — skipping")
+	}
+	first := items[0]
+	var firstID string
+	if first.ID != nil {
+		firstID = *first.ID
+	} else {
+		t.Fatal("first device enrollment has nil ID")
+	}
+	gotID, err := c.ResolveDeviceEnrollmentV1IDByName(ctx, first.Name)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != firstID {
+		t.Errorf("resolved id = %q, want %q", gotID, firstID)
+	}
+	t.Logf("resolved %q → %s ✓", first.Name, gotID)
+}
+
+func TestAcceptance_ResolveDeviceEnrollmentV1ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListDeviceEnrollmentsV1(ctx, nil)
+	if err != nil {
+		t.Fatalf("ListDeviceEnrollmentsV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no device enrollments in tenant — skipping")
+	}
+	first := items[0]
+	got, err := c.ResolveDeviceEnrollmentV1ByName(ctx, first.Name)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.Name != first.Name {
+		t.Errorf("typed Name = %q, want %q", got.Name, first.Name)
+	}
+	var gotID string
+	if got.ID != nil {
+		gotID = *got.ID
+	}
+	t.Logf("resolved typed %q → %s ✓", first.Name, gotID)
+}
+
+// ─── PatchSoftwareTitleConfigurations (read-only) ───────────────────────────
+
+func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolvePatchSoftwareTitleConfigurationV2IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
+	if err == nil {
+		t.Fatal("expected not-found error, got nil")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
+	}
+	t.Log("not-found ✓")
+}
+
+func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListPatchSoftwareTitleConfigurationsV2(ctx)
+	if err != nil {
+		t.Fatalf("ListPatchSoftwareTitleConfigurationsV2: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no patch software title configurations in tenant — skipping")
+	}
+	first := items[0]
+	gotID, err := c.ResolvePatchSoftwareTitleConfigurationV2IDByName(ctx, first.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved %q → %s ✓", first.DisplayName, gotID)
+}
+
+func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListPatchSoftwareTitleConfigurationsV2(ctx)
+	if err != nil {
+		t.Fatalf("ListPatchSoftwareTitleConfigurationsV2: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no patch software title configurations in tenant — skipping")
+	}
+	first := items[0]
+	got, err := c.ResolvePatchSoftwareTitleConfigurationV2ByName(ctx, first.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.DisplayName != first.DisplayName {
+		t.Errorf("typed DisplayName = %q, want %q", got.DisplayName, first.DisplayName)
+	}
+	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
+}

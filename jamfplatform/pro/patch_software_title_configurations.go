@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -265,4 +266,30 @@ func (c *Client) ListPatchSoftwareTitlePatchSummaryVersionsV2(ctx context.Contex
 		return nil, fmt.Errorf("ListPatchSoftwareTitlePatchSummaryVersionsV2(%s): %w", id, err)
 	}
 	return result, nil
+}
+
+// ResolvePatchSoftwareTitleConfigurationV2IDByName looks up a PatchSoftwareTitleConfigurationV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolvePatchSoftwareTitleConfigurationV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/patch-software-title-configurations"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePatchSoftwareTitleConfigurationV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolvePatchSoftwareTitleConfigurationV2ByName looks up a PatchSoftwareTitleConfigurationV2 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolvePatchSoftwareTitleConfigurationV2ByName(ctx context.Context, name string) (*PatchSoftwareTitleConfiguration, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/patch-software-title-configurations"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolvePatchSoftwareTitleConfigurationV2ByName(%s): %w", name, err)
+	}
+	var out PatchSoftwareTitleConfiguration
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolvePatchSoftwareTitleConfigurationV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -80,4 +81,30 @@ func (c *Client) DeleteAppInstallerDeploymentV1(ctx context.Context, id string) 
 		return fmt.Errorf("DeleteAppInstallerDeploymentV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveAppInstallerDeploymentV1IDByName looks up a AppInstallerDeploymentV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveAppInstallerDeploymentV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/app-installers/deployments"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAppInstallerDeploymentV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveAppInstallerDeploymentV1ByName looks up a AppInstallerDeploymentV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveAppInstallerDeploymentV1ByName(ctx context.Context, name string) (*AppInstallerDeployment, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/app-installers/deployments"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveAppInstallerDeploymentV1ByName(%s): %w", name, err)
+	}
+	var out AppInstallerDeployment
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveAppInstallerDeploymentV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

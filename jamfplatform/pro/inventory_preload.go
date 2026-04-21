@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -239,4 +240,30 @@ func (c *Client) DeleteInventoryPreloadRecordV2(ctx context.Context, id string) 
 		return fmt.Errorf("DeleteInventoryPreloadRecordV2(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveInventoryPreloadRecordV2IDBySerialNumber looks up a InventoryPreloadRecordV2 by its serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/inventory-preload/records"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveInventoryPreloadRecordV2IDBySerialNumber(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveInventoryPreloadRecordV2BySerialNumber looks up a InventoryPreloadRecordV2 by its serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveInventoryPreloadRecordV2BySerialNumber(ctx context.Context, name string) (*InventoryPreloadRecordV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/inventory-preload/records"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveInventoryPreloadRecordV2BySerialNumber(%s): %w", name, err)
+	}
+	var out InventoryPreloadRecordV2
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveInventoryPreloadRecordV2BySerialNumber(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

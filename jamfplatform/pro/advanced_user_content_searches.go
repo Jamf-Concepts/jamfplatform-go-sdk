@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -64,4 +65,30 @@ func (c *Client) DeleteAdvancedUserContentSearchV1(ctx context.Context, id strin
 		return fmt.Errorf("DeleteAdvancedUserContentSearchV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveAdvancedUserContentSearchV1IDByName looks up a AdvancedUserContentSearchV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveAdvancedUserContentSearchV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/advanced-user-content-searches"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAdvancedUserContentSearchV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveAdvancedUserContentSearchV1ByName looks up a AdvancedUserContentSearchV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveAdvancedUserContentSearchV1ByName(ctx context.Context, name string) (*AdvancedUserContentSearch, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/advanced-user-content-searches"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveAdvancedUserContentSearchV1ByName(%s): %w", name, err)
+	}
+	var out AdvancedUserContentSearch
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveAdvancedUserContentSearchV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

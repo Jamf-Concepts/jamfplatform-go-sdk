@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -64,4 +65,30 @@ func (c *Client) DeleteReturnToServiceConfigurationV1(ctx context.Context, id st
 		return fmt.Errorf("DeleteReturnToServiceConfigurationV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveReturnToServiceConfigurationV1IDByName looks up a ReturnToServiceConfigurationV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveReturnToServiceConfigurationV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/return-to-service"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveReturnToServiceConfigurationV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveReturnToServiceConfigurationV1ByName looks up a ReturnToServiceConfigurationV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveReturnToServiceConfigurationV1ByName(ctx context.Context, name string) (*ReturnToServiceConfiguration, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/return-to-service"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveReturnToServiceConfigurationV1ByName(%s): %w", name, err)
+	}
+	var out ReturnToServiceConfiguration
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveReturnToServiceConfigurationV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

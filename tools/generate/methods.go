@@ -50,10 +50,16 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 	}
 	out := append([]GoMethod(nil), methods...)
 	for _, opDef := range spec.Operations {
-		if opDef.Resolver == nil {
+		// Merge singular and plural resolver configs into one slice.
+		var resolvers []ResolverConfig
+		if opDef.Resolver != nil {
+			resolvers = append(resolvers, *opDef.Resolver)
+		}
+		resolvers = append(resolvers, opDef.Resolvers...)
+		if len(resolvers) == 0 {
 			continue
 		}
-		r := opDef.Resolver
+		for _, r := range resolvers {
 		switch r.Mode {
 		case "filtered", "clientFilter", "direct":
 			// supported
@@ -79,6 +85,10 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 		if typedReturn == "" {
 			typedReturn = r.ResourceType
 		}
+		byField := r.ByField
+		if byField == "" {
+			byField = "ByName"
+		}
 		gr := &GoResolver{
 			ResourceType: r.ResourceType,
 			Mode:         r.Mode,
@@ -90,6 +100,7 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 			TypedReturn:  typedReturn,
 			ExtraParams:  r.ExtraParams,
 			Paginated:    r.Mode == "clientFilter" && opDef.Pagination != "",
+			ByField:      byField,
 			SourceMethod: opDef.Name,
 		}
 		if r.Mode == "direct" {
@@ -137,9 +148,9 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 			Resolver:         gr,
 		}
 		idMethod := base
-		idMethod.Name = "Resolve" + r.ResourceType + "IDByName"
+		idMethod.Name = "Resolve" + r.ResourceType + "ID" + byField
 		typedMethod := base
-		typedMethod.Name = "Resolve" + r.ResourceType + "ByName"
+		typedMethod.Name = "Resolve" + r.ResourceType + byField
 		if r.Mode == "direct" {
 			idMethod.Category = "resolverIDDirect"
 			idMethod.Comment = idMethod.Name + " looks up a " + r.ResourceType + " by name via " + opDef.Name + " and returns its ID as a string. Returns an error when the underlying call returns a nil ID."
@@ -153,6 +164,7 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 		}
 
 		out = append(out, idMethod, typedMethod)
+		} // end for resolvers
 	}
 	return out, nil
 }

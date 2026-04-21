@@ -61,6 +61,7 @@ type OperationDef struct {
 	ResponseType   string            `json:"responseType,omitempty"`   // explicit response schema name (same)
 	ExpectedStatus int               `json:"expectedStatus,omitempty"` // explicit success status code (default 200)
 	Resolver       *ResolverConfig   `json:"resolver,omitempty"`       // attach name->ID resolver emission to this operation (typically a List op)
+	Resolvers      []ResolverConfig  `json:"resolvers,omitempty"`      // attach multiple resolvers to one operation (e.g. resolve device by name AND by serialNumber)
 }
 
 // ResolverConfig declares a name->ID resolver the generator should emit
@@ -77,6 +78,7 @@ type ResolverConfig struct {
 	ResultsField string `json:"resultsField,omitempty"`  // envelope key containing the array of list elements. Empty defaults to "results"; set to e.g. "benchmarks" for non-standard wrappers.
 	TypedReturn  string `json:"typedReturn,omitempty"`   // Go type returned by the typed wrapper (e.g. "BlueprintOverview"). Defaults to ResourceType when empty.
 	ExtraParams  string `json:"extraParams,omitempty"`   // filtered mode only: additional query params appended to the list path before the filter (e.g. "section=GENERAL" for endpoints that require a section param to populate filterable fields).
+	ByField      string `json:"byField,omitempty"`       // override the "ByName" suffix in method names (e.g. "BySerialNumber" emits ResolveDeviceIDBySerialNumber). Empty defaults to "ByName".
 }
 
 // parseOp splits "GET /v1/devices/{id}" into method and path.

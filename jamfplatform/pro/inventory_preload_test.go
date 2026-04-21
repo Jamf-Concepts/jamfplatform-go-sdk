@@ -334,3 +334,49 @@ func TestDeleteInventoryPreloadRecordV2(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestResolveInventoryPreloadRecordV2IDBySerialNumber(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "serialNumber": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveInventoryPreloadRecordV2IDBySerialNumber(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveInventoryPreloadRecordV2BySerialNumber(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "serialNumber": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveInventoryPreloadRecordV2BySerialNumber(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
