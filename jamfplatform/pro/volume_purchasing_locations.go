@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -178,4 +179,30 @@ func (c *Client) RevokeVolumePurchasingLocationLicensesV1(ctx context.Context, i
 		return fmt.Errorf("RevokeVolumePurchasingLocationLicensesV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveVolumePurchasingLocationV1IDByName looks up a VolumePurchasingLocationV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveVolumePurchasingLocationV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/volume-purchasing-locations"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveVolumePurchasingLocationV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveVolumePurchasingLocationV1ByName looks up a VolumePurchasingLocationV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveVolumePurchasingLocationV1ByName(ctx context.Context, name string) (*VolumePurchasingLocation, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/volume-purchasing-locations"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveVolumePurchasingLocationV1ByName(%s): %w", name, err)
+	}
+	var out VolumePurchasingLocation
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveVolumePurchasingLocationV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

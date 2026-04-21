@@ -7,6 +7,7 @@ package devices
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -103,4 +104,30 @@ func (c *Client) ListDeviceApplications(ctx context.Context, id string, sort []s
 		}
 		return result.Results, result.HasNext, nil
 	})
+}
+
+// ResolveDeviceIDByName looks up a Device by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveDeviceIDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("devices", "v1")
+	listPath := prefix + "/devices"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDeviceIDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveDeviceByName looks up a Device by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveDeviceByName(ctx context.Context, name string) (*DeviceListReadRepresentationV1, error) {
+	prefix := c.transport.TenantPrefix("devices", "v1")
+	listPath := prefix + "/devices"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveDeviceByName(%s): %w", name, err)
+	}
+	var out DeviceListReadRepresentationV1
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveDeviceByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

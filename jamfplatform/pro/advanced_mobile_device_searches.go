@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -98,4 +99,30 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchV1(ctx context.Context, id stri
 		return fmt.Errorf("DeleteAdvancedMobileDeviceSearchV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveAdvancedMobileDeviceSearchV1IDByName looks up a AdvancedMobileDeviceSearchV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveAdvancedMobileDeviceSearchV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/advanced-mobile-device-searches"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAdvancedMobileDeviceSearchV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveAdvancedMobileDeviceSearchV1ByName looks up a AdvancedMobileDeviceSearchV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveAdvancedMobileDeviceSearchV1ByName(ctx context.Context, name string) (*AdvancedSearch, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/advanced-mobile-device-searches"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveAdvancedMobileDeviceSearchV1ByName(%s): %w", name, err)
+	}
+	var out AdvancedSearch
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveAdvancedMobileDeviceSearchV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

@@ -423,3 +423,151 @@ func TestResolveByNameFiltered_QueryEscaping(t *testing.T) {
 		t.Fatalf("ResolveByNameFiltered: %v", err)
 	}
 }
+
+// ---------------------------------------------------------------------------
+// ResolveByNameClientPaged
+// ---------------------------------------------------------------------------
+
+func TestResolveByNameClientPaged_MatchFirstPage(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/pro/v1/prestages", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("page") != "0" {
+			t.Errorf("expected page=0, got %s", r.URL.Query().Get("page"))
+		}
+		_, _ = fmt.Fprintln(w, `{"results":[{"id":"1","displayName":"alpha"},{"id":"2","displayName":"beta"}]}`)
+	})
+
+	id, _, err := c.ResolveByNameClientPaged(context.Background(), "/api/pro/v1/prestages", "", "", "displayName", "id", "alpha")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if id != "1" {
+		t.Errorf("id = %q, want 1", id)
+	}
+}
+
+func TestResolveByNameClientPaged_MatchSecondPage(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	callCount := 0
+	mux.HandleFunc("/api/pro/v1/items", func(w http.ResponseWriter, r *http.Request) {
+		page := r.URL.Query().Get("page")
+		callCount++
+		switch page {
+		case "0":
+			// Return exactly pageSize (100) items so paging continues.
+			items := make([]map[string]any, 100)
+			for i := range items {
+				items[i] = map[string]any{"id": fmt.Sprintf("%d", i), "name": fmt.Sprintf("item-%d", i)}
+			}
+			resp := map[string]any{"results": items}
+			_ = json.NewEncoder(w).Encode(resp)
+		case "1":
+			_, _ = fmt.Fprintln(w, `{"results":[{"id":"200","name":"target"}]}`)
+		default:
+			t.Errorf("unexpected page %s", page)
+		}
+	})
+
+	id, _, err := c.ResolveByNameClientPaged(context.Background(), "/api/pro/v1/items", "", "", "name", "id", "target")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if id != "200" {
+		t.Errorf("id = %q, want 200", id)
+	}
+	if callCount != 2 {
+		t.Errorf("callCount = %d, want 2", callCount)
+	}
+}
+
+func TestResolveByNameClientPaged_NotFound(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/pro/v1/items", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintln(w, `{"results":[{"id":"1","name":"other"}]}`)
+	})
+
+	_, _, err := c.ResolveByNameClientPaged(context.Background(), "/api/pro/v1/items", "", "", "name", "id", "missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) || apiErr.StatusCode != http.StatusNotFound {
+		t.Errorf("err = %v, want 404 APIResponseError", err)
+	}
+}
+
+func TestResolveByNameClientPaged_AmbiguousSamePage(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/pro/v1/items", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintln(w, `{"results":[{"id":"1","name":"dup"},{"id":"2","name":"dup"}]}`)
+	})
+
+	_, _, err := c.ResolveByNameClientPaged(context.Background(), "/api/pro/v1/items", "", "", "name", "id", "dup")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	var ambig *AmbiguousMatchError
+	if !errors.As(err, &ambig) {
+		t.Errorf("err type = %T, want *AmbiguousMatchError", err)
+	}
+}
+
+func TestResolveByNameClientPaged_AmbiguousAcrossPages(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/pro/v1/items", func(w http.ResponseWriter, r *http.Request) {
+		page := r.URL.Query().Get("page")
+		switch page {
+		case "0":
+			// Return exactly 100 items; one matches.
+			items := make([]map[string]any, 100)
+			for i := range items {
+				items[i] = map[string]any{"id": fmt.Sprintf("%d", i), "name": fmt.Sprintf("item-%d", i)}
+			}
+			items[50] = map[string]any{"id": "50", "name": "dup"}
+			resp := map[string]any{"results": items}
+			_ = json.NewEncoder(w).Encode(resp)
+		case "1":
+			_, _ = fmt.Fprintln(w, `{"results":[{"id":"200","name":"dup"}]}`)
+		default:
+			t.Errorf("unexpected page %s", page)
+		}
+	})
+
+	_, _, err := c.ResolveByNameClientPaged(context.Background(), "/api/pro/v1/items", "", "", "name", "id", "dup")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	var ambig *AmbiguousMatchError
+	if !errors.As(err, &ambig) {
+		t.Errorf("err type = %T, want *AmbiguousMatchError", err)
+	}
+	if len(ambig.Matches) != 2 {
+		t.Errorf("matches = %d, want 2", len(ambig.Matches))
+	}
+}
+
+func TestResolveByNameClientPaged_EmptyName(t *testing.T) {
+	c, _, _ := newTestClient(t)
+	_, _, err := c.ResolveByNameClientPaged(context.Background(), "/api/x", "", "", "name", "id", "")
+	if err == nil {
+		t.Fatalf("expected error for empty name")
+	}
+}
+
+func TestResolveByNameClientPaged_WithSearchParam(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	mux.HandleFunc("/api/pro/v1/items", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.URL.Query().Get("search"); got != "target" {
+			t.Errorf("search = %q, want target", got)
+		}
+		_, _ = fmt.Fprintln(w, `{"results":[{"id":"1","name":"target"}]}`)
+	})
+
+	id, _, err := c.ResolveByNameClientPaged(context.Background(), "/api/pro/v1/items", "search", "", "name", "id", "target")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if id != "1" {
+		t.Errorf("id = %q, want 1", id)
+	}
+}

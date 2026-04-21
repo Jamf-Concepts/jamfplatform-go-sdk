@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -139,4 +140,30 @@ func (c *Client) DeleteComputerPrestageV3(ctx context.Context, id string) error 
 		return fmt.Errorf("DeleteComputerPrestageV3(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveComputerPrestageV3IDByName looks up a ComputerPrestageV3 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveComputerPrestageV3IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computer-prestages"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerPrestageV3IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveComputerPrestageV3ByName looks up a ComputerPrestageV3 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveComputerPrestageV3ByName(ctx context.Context, name string) (*ComputerPrestageV3, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computer-prestages"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveComputerPrestageV3ByName(%s): %w", name, err)
+	}
+	var out ComputerPrestageV3
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveComputerPrestageV3ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

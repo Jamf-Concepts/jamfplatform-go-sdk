@@ -83,6 +83,84 @@ func (t *Transport) ResolveByNameClient(ctx context.Context, listPath, searchPar
 	return resolveMatch(raw, resultsField, nameField, idField, name, fullPath)
 }
 
+// ResolveByNameClientPaged looks up a resource by name via client-side exact
+// matching across all pages of a paginated list endpoint. Use when the List
+// endpoint returns paginated results but supports no RSQL filter for
+// server-side equality matching. Fetches pages sequentially until all
+// results are examined, accumulating exact-match hits on nameField.
+//
+// Error semantics match ResolveByNameFiltered: not-found surfaces as
+// *APIResponseError(404); ambiguity as *AmbiguousMatchError. Early exit
+// once two or more matches are found (ambiguity is certain).
+func (t *Transport) ResolveByNameClientPaged(ctx context.Context, listPath, searchParam, resultsField, nameField, idField, name string) (string, json.RawMessage, error) {
+	if name == "" {
+		return "", nil, fmt.Errorf("name must not be empty")
+	}
+
+	const pageSize = 100
+	var allMatches []json.RawMessage
+
+	for page := 0; ; page++ {
+		fullPath := joinQuery(listPath, fmt.Sprintf("page=%d&page-size=%d", page, pageSize))
+		if searchParam != "" {
+			fullPath = joinQuery(fullPath, url.QueryEscape(searchParam)+"="+url.QueryEscape(name))
+		}
+		raw, err := t.getRaw(ctx, fullPath)
+		if err != nil {
+			return "", nil, err
+		}
+
+		elems, err := extractListElements(raw, resultsField)
+		if err != nil {
+			return "", nil, fmt.Errorf("parsing list response: %w", err)
+		}
+
+		for _, el := range elems {
+			var obj map[string]any
+			if err := json.Unmarshal(el, &obj); err != nil {
+				continue
+			}
+			v, ok := extractField(obj, nameField)
+			if !ok || v != name {
+				continue
+			}
+			allMatches = append(allMatches, el)
+		}
+
+		// Two or more matches already found — ambiguity is certain.
+		if len(allMatches) > 1 {
+			return "", nil, &AmbiguousMatchError{Name: name, Matches: collectIDs(allMatches, idField)}
+		}
+
+		// Fewer elements than page size means this was the last page.
+		if len(elems) < pageSize {
+			break
+		}
+	}
+
+	switch len(allMatches) {
+	case 0:
+		return "", nil, &APIResponseError{
+			StatusCode: http.StatusNotFound,
+			Method:     http.MethodGet,
+			URL:        listPath,
+			Body:       fmt.Sprintf("no resource found with %s == %q", nameField, name),
+		}
+	case 1:
+		var obj map[string]any
+		if err := json.Unmarshal(allMatches[0], &obj); err != nil {
+			return "", nil, fmt.Errorf("decoding matched element: %w", err)
+		}
+		id, ok := extractField(obj, idField)
+		if !ok {
+			return "", allMatches[0], fmt.Errorf("matched element has no %s field", idField)
+		}
+		return id, allMatches[0], nil
+	default:
+		return "", nil, &AmbiguousMatchError{Name: name, Matches: collectIDs(allMatches, idField)}
+	}
+}
+
 // getRaw fetches the response body bytes as-is by handing the transport a
 // *[]byte target (see handleResponse's raw-bytes passthrough).
 func (t *Transport) getRaw(ctx context.Context, path string) ([]byte, error) {

@@ -199,6 +199,32 @@ func (c *Client) DeleteStaticComputerGroupV2(ctx context.Context, id string) err
 	return nil
 }
 
+// ResolveComputerGroupV1IDByName looks up a ComputerGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveComputerGroupV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/computer-groups"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerGroupV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveComputerGroupV1ByName looks up a ComputerGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveComputerGroupV1ByName(ctx context.Context, name string) (*ComputerGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/computer-groups"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveComputerGroupV1ByName(%s): %w", name, err)
+	}
+	var out ComputerGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveComputerGroupV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
 // ResolveSmartComputerGroupV2IDByName looks up a SmartComputerGroupV2 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveSmartComputerGroupV2IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")

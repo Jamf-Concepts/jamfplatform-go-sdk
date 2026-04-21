@@ -84,10 +84,12 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 			Mode:         r.Mode,
 			NameField:    r.NameField,
 			IDField:      r.IDField,
+			IDNumeric:    r.IDNumeric,
 			SearchParam:  r.SearchParam,
 			ResultsField: r.ResultsField,
 			TypedReturn:  typedReturn,
 			ExtraParams:  r.ExtraParams,
+			Paginated:    r.Mode == "clientFilter" && opDef.Pagination != "",
 			SourceMethod: opDef.Name,
 		}
 		if r.Mode == "direct" {

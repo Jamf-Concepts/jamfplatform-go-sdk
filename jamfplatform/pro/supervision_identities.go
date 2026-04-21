@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -106,4 +107,30 @@ func (c *Client) UploadSupervisionIdentityV1(ctx context.Context, request *Super
 		return nil, fmt.Errorf("UploadSupervisionIdentityV1: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveSupervisionIdentityV1IDByName looks up a SupervisionIdentityV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveSupervisionIdentityV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/supervision-identities"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSupervisionIdentityV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveSupervisionIdentityV1ByName looks up a SupervisionIdentityV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveSupervisionIdentityV1ByName(ctx context.Context, name string) (*SupervisionIdentity, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/supervision-identities"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveSupervisionIdentityV1ByName(%s): %w", name, err)
+	}
+	var out SupervisionIdentity
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveSupervisionIdentityV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

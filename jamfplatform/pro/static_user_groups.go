@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -32,4 +33,30 @@ func (c *Client) GetStaticUserGroupV1(ctx context.Context, id string) (*StaticUs
 		return nil, fmt.Errorf("GetStaticUserGroupV1(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveStaticUserGroupV1IDByName looks up a StaticUserGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveStaticUserGroupV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/static-user-groups"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveStaticUserGroupV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveStaticUserGroupV1ByName looks up a StaticUserGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveStaticUserGroupV1ByName(ctx context.Context, name string) (*StaticUserGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/static-user-groups"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveStaticUserGroupV1ByName(%s): %w", name, err)
+	}
+	var out StaticUserGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveStaticUserGroupV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

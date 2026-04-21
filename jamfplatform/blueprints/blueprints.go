@@ -157,7 +157,7 @@ func (c *Client) GetBlueprintComponent(ctx context.Context, identifier string) (
 func (c *Client) ResolveBlueprintIDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	listPath := prefix + "/blueprints"
-	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "search", "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "search", "", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveBlueprintIDByName(%s): %w", name, err)
 	}
@@ -168,13 +168,39 @@ func (c *Client) ResolveBlueprintIDByName(ctx context.Context, name string) (str
 func (c *Client) ResolveBlueprintByName(ctx context.Context, name string) (*BlueprintOverview, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	listPath := prefix + "/blueprints"
-	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "search", "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "search", "", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveBlueprintByName(%s): %w", name, err)
 	}
 	var out BlueprintOverview
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveBlueprintByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveBlueprintComponentIDByName looks up a BlueprintComponent by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveBlueprintComponentIDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	listPath := prefix + "/blueprint-components"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "identifier", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveBlueprintComponentIDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveBlueprintComponentByName looks up a BlueprintComponent by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveBlueprintComponentByName(ctx context.Context, name string) (*ComponentDescription, error) {
+	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	listPath := prefix + "/blueprint-components"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "identifier", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveBlueprintComponentByName(%s): %w", name, err)
+	}
+	var out ComponentDescription
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveBlueprintComponentByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
 }

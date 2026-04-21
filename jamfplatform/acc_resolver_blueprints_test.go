@@ -26,7 +26,6 @@ func TestAcceptance_ResolveBlueprintIDByName(t *testing.T) {
 
 	got, err := bp.ResolveBlueprintIDByName(ctx, name)
 	if err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("ResolveBlueprintIDByName(%q): %v", name, err)
 	}
 	if got != fixture.ID {
@@ -46,7 +45,6 @@ func TestAcceptance_ResolveBlueprintByName(t *testing.T) {
 
 	got, err := bp.ResolveBlueprintByName(ctx, name)
 	if err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("ResolveBlueprintByName(%q): %v", name, err)
 	}
 	if got == nil {
@@ -105,7 +103,6 @@ func TestAcceptance_ResolveBlueprint_SimilarNames(t *testing.T) {
 	// share the prefix.
 	id, err := bp.ResolveBlueprintIDByName(ctx, baseName)
 	if err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("ResolveBlueprintIDByName(%q): %v", baseName, err)
 	}
 	if id != base.ID {
@@ -143,7 +140,6 @@ func TestAcceptance_ResolveBlueprint_Ambiguous(t *testing.T) {
 		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
 			t.Skipf("server rejects duplicate blueprint names (%d) — uniqueness enforced server-side, nothing for resolver to disambiguate: %v", apiErr.StatusCode, apiErr.Summary())
 		}
-		skipOnServerError(t, err)
 		t.Fatalf("CreateBlueprint (duplicate) failed unexpectedly: %v", err)
 	}
 	cleanupDelete(t, "DeleteBlueprint", func() error { return bp.DeleteBlueprint(ctx, resp.ID) })
@@ -176,4 +172,73 @@ func TestAcceptance_ResolveBlueprint_Ambiguous(t *testing.T) {
 		t.Errorf("AmbiguousMatchError.Matches = %v, want to contain both %q and %q", amErr.Matches, first.ID, resp.ID)
 	}
 	t.Logf("Ambiguous resolve surfaced %d matches as expected: %v", len(amErr.Matches), amErr.Matches)
+}
+
+// ─── Blueprint Components ──────────────────────────────────────────────────
+// Components are platform-managed — no create/delete. Read-only probe.
+
+func TestAcceptance_ResolveBlueprintComponentIDByName_NotFound(t *testing.T) {
+	c := accClient(t)
+	bp := blueprints.New(c)
+	_, err := bp.ResolveBlueprintComponentIDByName(context.Background(), "sdk-does-not-exist-bpc-"+runSuffix())
+	if err == nil {
+		t.Fatal("expected not-found error, got nil")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
+	}
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveBlueprintComponentIDByName_Existing(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	bp := blueprints.New(c)
+
+	components, err := bp.ListBlueprintComponents(ctx)
+	if err != nil {
+		t.Fatalf("ListBlueprintComponents: %v", err)
+	}
+	if len(components) == 0 {
+		t.Skip("no blueprint components — skipping")
+	}
+	first := components[0]
+	gotID, err := bp.ResolveBlueprintComponentIDByName(ctx, first.Name)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.Identifier {
+		t.Errorf("resolved id = %q, want %q", gotID, first.Identifier)
+	}
+	t.Logf("resolved %q → %s ✓", first.Name, gotID)
+}
+
+func TestAcceptance_ResolveBlueprintComponentByName_Existing(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	bp := blueprints.New(c)
+
+	components, err := bp.ListBlueprintComponents(ctx)
+	if err != nil {
+		t.Fatalf("ListBlueprintComponents: %v", err)
+	}
+	if len(components) == 0 {
+		t.Skip("no blueprint components — skipping")
+	}
+	first := components[0]
+	got, err := bp.ResolveBlueprintComponentByName(ctx, first.Name)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.Identifier != first.Identifier {
+		t.Errorf("typed Identifier = %q, want %q", got.Identifier, first.Identifier)
+	}
+	if got.Name != first.Name {
+		t.Errorf("typed Name = %q, want %q", got.Name, first.Name)
+	}
+	t.Logf("resolved typed %q → %s ✓", first.Name, got.Identifier)
 }

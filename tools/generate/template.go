@@ -114,6 +114,21 @@ var funcMap = template.FuncMap{
 		}
 		return inner
 	},
+	// resolverIDStub returns the test stub value for the ID field.
+	// Numeric IDs emit 42 (unquoted); string IDs emit "resolved-id".
+	"resolverIDStub": func(r *GoResolver) string {
+		if r.IDNumeric {
+			return fmt.Sprintf(`%q: 42`, r.IDField)
+		}
+		return fmt.Sprintf(`%q: "resolved-id"`, r.IDField)
+	},
+	// resolverExpectedID returns the expected ID string for test assertions.
+	"resolverExpectedID": func(r *GoResolver) string {
+		if r.IDNumeric {
+			return "42"
+		}
+		return "resolved-id"
+	},
 	"testMultipartArgs": func(m GoMethod) string {
 		if len(m.MultipartFields) == 0 {
 			return ""
@@ -600,6 +615,8 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
 	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
 {{- if eq .Resolver.Mode "filtered" }}
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- else if .Resolver.Paginated }}
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- else }}
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- end }}
@@ -617,6 +634,8 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.Ty
 	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
 {{- if eq .Resolver.Mode "filtered" }}
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- else if .Resolver.Paginated }}
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- else }}
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
 {{- end }}
@@ -962,11 +981,11 @@ func Test<% .Name %>(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 <%- if .Resolver.ResultsField %>
 			"<% .Resolver.ResultsField %>": []map[string]any{
-				{"<% .Resolver.IDField %>": "resolved-id", <% resolverNameStub .Resolver.NameField %>},
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.NameField %>},
 			},
 <%- else %>
 			"results": []map[string]any{
-				{"<% .Resolver.IDField %>": "resolved-id", <% resolverNameStub .Resolver.NameField %>},
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.NameField %>},
 			},
 			"totalCount": 1,
 <%- end %>
@@ -977,8 +996,8 @@ func Test<% .Name %>(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if id != "resolved-id" {
-		t.Errorf("id = %q, want resolved-id", id)
+	if id != "<% resolverExpectedID .Resolver %>" {
+		t.Errorf("id = %q, want <% resolverExpectedID .Resolver %>", id)
 	}
 }
 <% end %>
@@ -993,11 +1012,11 @@ func Test<% .Name %>(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, map[string]any{
 <%- if .Resolver.ResultsField %>
 			"<% .Resolver.ResultsField %>": []map[string]any{
-				{"<% .Resolver.IDField %>": "resolved-id", <% resolverNameStub .Resolver.NameField %>},
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.NameField %>},
 			},
 <%- else %>
 			"results": []map[string]any{
-				{"<% .Resolver.IDField %>": "resolved-id", <% resolverNameStub .Resolver.NameField %>},
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.NameField %>},
 			},
 			"totalCount": 1,
 <%- end %>

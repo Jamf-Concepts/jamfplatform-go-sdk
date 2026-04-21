@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -348,4 +349,30 @@ func (c *Client) ListEnrollmentCustomizationPrestagesV2(ctx context.Context, id 
 		return nil, fmt.Errorf("ListEnrollmentCustomizationPrestagesV2(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveEnrollmentCustomizationV2IDByName looks up a EnrollmentCustomizationV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveEnrollmentCustomizationV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/enrollment-customizations"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveEnrollmentCustomizationV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveEnrollmentCustomizationV2ByName looks up a EnrollmentCustomizationV2 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveEnrollmentCustomizationV2ByName(ctx context.Context, name string) (*EnrollmentCustomizationV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/enrollment-customizations"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveEnrollmentCustomizationV2ByName(%s): %w", name, err)
+	}
+	var out EnrollmentCustomizationV2
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveEnrollmentCustomizationV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

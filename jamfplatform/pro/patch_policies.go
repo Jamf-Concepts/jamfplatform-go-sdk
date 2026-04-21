@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -105,4 +106,30 @@ func (c *Client) RemovePatchPolicyFromDashboardV2(ctx context.Context, id string
 		return fmt.Errorf("RemovePatchPolicyFromDashboardV2(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolvePatchPolicyV2IDByName looks up a PatchPolicyV2 by its policyName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolvePatchPolicyV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/patch-policies"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "policyName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePatchPolicyV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolvePatchPolicyV2ByName looks up a PatchPolicyV2 by its policyName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolvePatchPolicyV2ByName(ctx context.Context, name string) (*PatchPolicyListView, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/patch-policies"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "policyName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolvePatchPolicyV2ByName(%s): %w", name, err)
+	}
+	var out PatchPolicyListView
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolvePatchPolicyV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

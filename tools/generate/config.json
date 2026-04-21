@@ -10,7 +10,8 @@
       "splitByTag": true,
       "specFile": "device_inventory_api.json",
       "operations": [
-        {"op": "GET /v1/devices", "name": "ListDevices", "pagination": "hasNext", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/devices", "name": "ListDevices", "pagination": "hasNext", "params": ["sort:[]string", "filter"],
+         "resolver": {"resourceType": "Device", "nameField": "name", "idField": "id", "mode": "filtered", "typedReturn": "DeviceListReadRepresentationV1"}},
         {"op": "GET /v1/devices/{id}", "name": "GetDevice"},
         {"op": "PATCH /v1/devices/{id}", "name": "UpdateDevice"},
         {"op": "DELETE /v1/devices/{id}", "name": "DeleteDevice"},
@@ -34,7 +35,8 @@
         {"op": "POST /v1/blueprints/{blueprintId}/deploy", "name": "DeployBlueprint"},
         {"op": "POST /v1/blueprints/{blueprintId}/undeploy", "name": "UndeployBlueprint"},
         {"op": "GET /v1/blueprints/{blueprintId}/report", "name": "GetBlueprintReport"},
-        {"op": "GET /v1/blueprint-components", "name": "ListBlueprintComponents", "pagination": "sizeCheck"},
+        {"op": "GET /v1/blueprint-components", "name": "ListBlueprintComponents", "pagination": "sizeCheck",
+         "resolver": {"resourceType": "BlueprintComponent", "nameField": "name", "idField": "identifier", "mode": "clientFilter", "typedReturn": "ComponentDescription"}},
         {"op": "GET /v1/blueprint-components/{identifier}", "name": "GetBlueprintComponent"}
       ]
     },
@@ -170,7 +172,8 @@
         {"op": "GET /v1/departments/{id}/history", "name": "ListDepartmentHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v1/departments/{id}/history", "name": "CreateDepartmentHistoryNoteV1"},
 
-        {"op": "GET /v1/sites", "name": "ListSitesV1"},
+        {"op": "GET /v1/sites", "name": "ListSitesV1",
+         "resolver": {"resourceType": "SiteV1", "nameField": "name", "idField": "id", "mode": "clientFilter", "typedReturn": "V1Site"}},
         {"op": "GET /v1/sites/{id}/objects", "name": "ListSiteObjectsV1", "pagination": "rawArray", "params": ["sort:[]string", "filter"]},
 
         {"op": "GET /v1/scripts", "name": "ListScriptsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"],
@@ -183,7 +186,8 @@
         {"op": "GET /v1/scripts/{id}/history", "name": "ListScriptHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v1/scripts/{id}/history", "name": "CreateScriptHistoryNoteV1", "expectedStatus": 200},
 
-        {"op": "GET /v1/computer-groups", "name": "ListComputerGroupsV1"},
+        {"op": "GET /v1/computer-groups", "name": "ListComputerGroupsV1",
+         "resolver": {"resourceType": "ComputerGroupV1", "nameField": "name", "idField": "id", "mode": "clientFilter", "typedReturn": "ComputerGroup"}},
         {"op": "GET /v2/computer-groups/smart-groups", "name": "ListSmartComputerGroupsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"],
          "resolver": {"resourceType": "SmartComputerGroupV2", "nameField": "name", "idField": "id", "mode": "filtered", "typedReturn": "SmartComputerGroupSearch"}},
         {"op": "POST /v2/computer-groups/smart-groups", "name": "CreateSmartComputerGroupV2", "params": ["platform:bool"]},
@@ -213,7 +217,8 @@
         {"op": "GET /v1/computer-extension-attributes/{id}/history", "name": "ListComputerExtensionAttributeHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v1/computer-extension-attributes/{id}/history", "name": "CreateComputerExtensionAttributeHistoryNoteV1"},
 
-        {"op": "GET /v1/advanced-mobile-device-searches", "name": "ListAdvancedMobileDeviceSearchesV1"},
+        {"op": "GET /v1/advanced-mobile-device-searches", "name": "ListAdvancedMobileDeviceSearchesV1",
+         "resolver": {"resourceType": "AdvancedMobileDeviceSearchV1", "nameField": "name", "idField": "id", "mode": "clientFilter", "typedReturn": "AdvancedSearch"}},
         {"op": "POST /v1/advanced-mobile-device-searches", "name": "CreateAdvancedMobileDeviceSearchV1"},
         {"op": "POST /v1/advanced-mobile-device-searches/delete-multiple", "name": "DeleteMultipleAdvancedMobileDeviceSearchesV1"},
         {"op": "GET /v1/advanced-mobile-device-searches/choices", "name": "ListAdvancedMobileDeviceSearchChoicesV1", "params": ["criteria", "site", "contains"]},
@@ -231,7 +236,8 @@
         {"op": "GET /v1/mobile-device-extension-attributes/{id}/history", "name": "ListMobileDeviceExtensionAttributeHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v1/mobile-device-extension-attributes/{id}/history", "name": "CreateMobileDeviceExtensionAttributeHistoryNoteV1"},
 
-        {"op": "GET /v1/mobile-device-groups", "name": "ListMobileDeviceGroupsV1"},
+        {"op": "GET /v1/mobile-device-groups", "name": "ListMobileDeviceGroupsV1",
+         "resolver": {"resourceType": "MobileDeviceGroupV1", "nameField": "name", "idField": "id", "idNumeric": true, "mode": "clientFilter", "typedReturn": "MobileDeviceGroup"}},
         {"op": "GET /v1/mobile-device-groups/smart-groups", "name": "ListSmartMobileDeviceGroupsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"],
          "resolver": {"resourceType": "SmartMobileDeviceGroupV1", "nameField": "groupName", "idField": "groupId", "mode": "filtered", "typedReturn": "SmartGroup"}},
         {"op": "POST /v1/mobile-device-groups/smart-groups", "name": "CreateSmartMobileDeviceGroupV1", "params": ["platform:bool"]},
@@ -268,7 +274,8 @@
         {"op": "DELETE /v1/groups/{id}", "name": "DeleteGroupV1", "expectedStatus": 204},
         {"op": "PATCH /v1/groups/{id}", "name": "PatchGroupV1"},
 
-        {"op": "GET /v1/users", "name": "ListUsersV1", "pagination": "hasNext", "params": ["sort:[]string", "filter", "platform:bool"]},
+        {"op": "GET /v1/users", "name": "ListUsersV1", "pagination": "hasNext", "params": ["sort:[]string", "filter", "platform:bool"],
+         "resolver": {"resourceType": "UserV1", "nameField": "username", "idField": "id", "mode": "filtered", "typedReturn": "User"}},
         {"op": "POST /v1/users", "name": "CreateUserV1", "params": ["platform:bool"]},
         {"op": "GET /v1/users/{id}", "name": "GetUserV1", "params": ["platform:bool"]},
         {"op": "PUT /v1/users/{id}", "name": "UpdateUserV1"},
@@ -279,7 +286,8 @@
 
         {"op": "POST /v2/patch-management-accept-disclaimer", "name": "AcceptPatchManagementDisclaimerV2"},
 
-        {"op": "GET /v2/patch-policies", "name": "ListPatchPoliciesV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v2/patch-policies", "name": "ListPatchPoliciesV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"],
+         "resolver": {"resourceType": "PatchPolicyV2", "nameField": "policyName", "idField": "id", "mode": "filtered", "typedReturn": "PatchPolicyListView"}},
         {"op": "GET /v2/patch-policies/policy-details", "name": "ListPatchPolicyDetailsV2", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "GET /v2/patch-policies/{id}/dashboard", "name": "GetPatchPolicyDashboardStatusV2"},
         {"op": "POST /v2/patch-policies/{id}/dashboard", "name": "AddPatchPolicyToDashboardV2"},
@@ -369,7 +377,8 @@
         {"op": "PUT /v2/computer-prestages/{id}/scope", "name": "ReplaceComputerPrestageScopeV2"},
         {"op": "POST /v2/computer-prestages/{id}/scope", "name": "AddToComputerPrestageScopeV2"},
         {"op": "POST /v2/computer-prestages/{id}/scope/delete-multiple", "name": "RemoveFromComputerPrestageScopeV2"},
-        {"op": "GET /v3/computer-prestages", "name": "ListComputerPrestagesV3", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v3/computer-prestages", "name": "ListComputerPrestagesV3", "pagination": "totalCount", "params": ["sort:[]string"],
+         "resolver": {"resourceType": "ComputerPrestageV3", "nameField": "displayName", "idField": "id", "mode": "clientFilter"}},
         {"op": "POST /v3/computer-prestages", "name": "CreateComputerPrestageV3"},
         {"op": "GET /v3/computer-prestages/{id}", "name": "GetComputerPrestageV3"},
         {"op": "PUT /v3/computer-prestages/{id}", "name": "UpdateComputerPrestageV3"},
@@ -383,7 +392,8 @@
         {"op": "POST /v2/mobile-device-prestages/{id}/scope/delete-multiple", "name": "RemoveFromMobileDevicePrestageScopeV2"},
         {"op": "GET /v2/mobile-device-prestages/{id}/syncs", "name": "ListMobileDevicePrestageSyncsV2"},
         {"op": "GET /v2/mobile-device-prestages/{id}/syncs/latest", "name": "GetLatestMobileDevicePrestageSyncV2"},
-        {"op": "GET /v3/mobile-device-prestages", "name": "ListMobileDevicePrestagesV3", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v3/mobile-device-prestages", "name": "ListMobileDevicePrestagesV3", "pagination": "totalCount", "params": ["sort:[]string"],
+         "resolver": {"resourceType": "MobileDevicePrestageV3", "nameField": "displayName", "idField": "id", "mode": "clientFilter"}},
         {"op": "POST /v3/mobile-device-prestages", "name": "CreateMobileDevicePrestageV3"},
         {"op": "GET /v3/mobile-device-prestages/{id}", "name": "GetMobileDevicePrestageV3"},
         {"op": "PUT /v3/mobile-device-prestages/{id}", "name": "UpdateMobileDevicePrestageV3"},
@@ -447,7 +457,8 @@
         {"op": "DELETE /v1/enrollment-customization/{id}/text/{panel-id}", "name": "DeleteEnrollmentCustomizationTextPanelV1", "expectedStatus": 204},
         {"op": "GET /v1/enrollment-customization/{id}/text/{panel-id}/markdown", "name": "GetEnrollmentCustomizationTextPanelMarkdownV1"},
 
-        {"op": "GET /v2/enrollment-customizations", "name": "ListEnrollmentCustomizationsV2", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v2/enrollment-customizations", "name": "ListEnrollmentCustomizationsV2", "pagination": "totalCount", "params": ["sort:[]string"],
+         "resolver": {"resourceType": "EnrollmentCustomizationV2", "nameField": "displayName", "idField": "id", "mode": "clientFilter"}},
         {"op": "POST /v2/enrollment-customizations", "name": "CreateEnrollmentCustomizationV2"},
         {"op": "POST /v2/enrollment-customizations/images", "name": "UploadEnrollmentCustomizationImageV2", "expectedStatus": 200},
         {"op": "GET /v2/enrollment-customizations/images/{id}", "name": "DownloadEnrollmentCustomizationImageV2"},
@@ -505,7 +516,8 @@
 
         {"op": "GET /v1/auth", "name": "GetAuthorizationV1"},
 
-        {"op": "GET /v1/api-integrations", "name": "ListApiIntegrationsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/api-integrations", "name": "ListApiIntegrationsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"],
+         "resolver": {"resourceType": "ApiIntegrationV1", "nameField": "displayName", "idField": "id", "idNumeric": true, "mode": "filtered", "typedReturn": "ApiIntegrationResponse"}},
         {"op": "POST /v1/api-integrations", "name": "CreateApiIntegrationV1", "expectedStatus": 200},
         {"op": "GET /v1/api-integrations/{id}", "name": "GetApiIntegrationV1"},
         {"op": "PUT /v1/api-integrations/{id}", "name": "UpdateApiIntegrationV1"},
@@ -620,7 +632,8 @@
         {"op": "GET /v1/cloud-distribution-point/test-connection", "name": "TestCloudDistributionPointConnectionV1"},
         {"op": "GET /v1/cloud-distribution-point/upload-capability", "name": "GetCloudDistributionPointUploadCapabilityV1"},
 
-        {"op": "GET /v1/distribution-points", "name": "ListDistributionPointsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/distribution-points", "name": "ListDistributionPointsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"],
+         "resolver": {"resourceType": "DistributionPointV1", "nameField": "name", "idField": "id", "mode": "filtered", "typedReturn": "DistributionPoint"}},
         {"op": "POST /v1/distribution-points", "name": "CreateDistributionPointV1"},
         {"op": "POST /v1/distribution-points/delete-multiple", "name": "DeleteMultipleDistributionPointsV1"},
         {"op": "GET /v1/distribution-points/{id}", "name": "GetDistributionPointV1"},
@@ -630,7 +643,8 @@
         {"op": "GET /v1/distribution-points/{id}/history", "name": "ListDistributionPointHistoryV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
         {"op": "POST /v1/distribution-points/{id}/history", "name": "CreateDistributionPointHistoryNoteV1"},
 
-        {"op": "GET /v1/volume-purchasing-locations", "name": "ListVolumePurchasingLocationsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/volume-purchasing-locations", "name": "ListVolumePurchasingLocationsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"],
+         "resolver": {"resourceType": "VolumePurchasingLocationV1", "nameField": "name", "idField": "id", "mode": "filtered", "typedReturn": "VolumePurchasingLocation"}},
         {"op": "POST /v1/volume-purchasing-locations", "name": "CreateVolumePurchasingLocationV1"},
         {"op": "GET /v1/volume-purchasing-locations/{id}", "name": "GetVolumePurchasingLocationV1"},
         {"op": "DELETE /v1/volume-purchasing-locations/{id}", "name": "DeleteVolumePurchasingLocationV1", "expectedStatus": 204},
@@ -763,7 +777,8 @@
         {"op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/password", "name": "GetLAPSAccountGuidPasswordV2", "pathNames": {"clientManagementId": "clientManagementID"}},
         {"op": "PUT /v2/local-admin-password/{clientManagementId}/set-password", "name": "SetLAPSPasswordV2", "pathNames": {"clientManagementId": "clientManagementID"}},
 
-        {"op": "GET /v1/supervision-identities", "name": "ListSupervisionIdentitiesV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v1/supervision-identities", "name": "ListSupervisionIdentitiesV1", "pagination": "totalCount", "params": ["sort:[]string"],
+         "resolver": {"resourceType": "SupervisionIdentityV1", "nameField": "displayName", "idField": "id", "idNumeric": true, "mode": "clientFilter", "typedReturn": "SupervisionIdentity"}},
         {"op": "POST /v1/supervision-identities", "name": "CreateSupervisionIdentityV1", "expectedStatus": 200},
         {"op": "GET /v1/supervision-identities/{id}", "name": "GetSupervisionIdentityV1"},
         {"op": "PUT /v1/supervision-identities/{id}", "name": "UpdateSupervisionIdentityV1"},
@@ -844,14 +859,16 @@
         {"op": "GET /v1/scheduler/jobs/{jobKey}/triggers", "name": "GetSchedulerJobTriggersV1", "params": ["sort:[]string", "filter"]},
         {"op": "GET /v1/scheduler/summary", "name": "GetSchedulerSummaryV1"},
 
-        {"op": "GET /v1/ebooks", "name": "ListEbooksV1", "pagination": "totalCount", "params": ["sort:[]string"]},
+        {"op": "GET /v1/ebooks", "name": "ListEbooksV1", "pagination": "totalCount", "params": ["sort:[]string"],
+         "resolver": {"resourceType": "EbookV1", "nameField": "name", "idField": "id", "mode": "clientFilter", "typedReturn": "Ebook"}},
         {"op": "GET /v1/ebooks/{id}", "name": "GetEbookV1"},
         {"op": "GET /v1/ebooks/{id}/scope", "name": "GetEbookScopeV1"},
 
         {"op": "GET /v1/slasa", "name": "GetSlasaAcceptanceV1"},
         {"op": "POST /v1/slasa", "name": "AcceptSlasaV1", "expectedStatus": 204},
 
-        {"op": "GET /v1/accounts", "name": "ListAccountsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"]},
+        {"op": "GET /v1/accounts", "name": "ListAccountsV1", "pagination": "totalCount", "params": ["sort:[]string", "filter"],
+         "resolver": {"resourceType": "AccountV1", "nameField": "username", "idField": "id", "idNumeric": true, "mode": "filtered", "typedReturn": "Account"}},
         {"op": "POST /v1/accounts", "name": "CreateAccountV1", "expectedStatus": 201},
         {"op": "GET /v1/accounts/{id}", "name": "GetAccountV1"},
         {"op": "DELETE /v1/accounts/{id}", "name": "DeleteAccountV1", "expectedStatus": 204},
@@ -883,7 +900,8 @@
         {"op": "GET /v1/app-store-country-codes", "name": "ListAppStoreCountryCodesV1"},
         {"op": "GET /v1/jamf-package", "name": "ListJamfPackagesV1", "params": ["application"]},
         {"op": "GET /v2/jamf-package", "name": "GetJamfPackageV2", "params": ["application"]},
-        {"op": "GET /v1/static-user-groups", "name": "ListStaticUserGroupsV1"},
+        {"op": "GET /v1/static-user-groups", "name": "ListStaticUserGroupsV1",
+         "resolver": {"resourceType": "StaticUserGroupV1", "nameField": "name", "idField": "id", "idNumeric": true, "mode": "clientFilter", "typedReturn": "StaticUserGroup"}},
         {"op": "GET /v1/static-user-groups/{id}", "name": "GetStaticUserGroupV1"},
         {"op": "GET /devices/extensionAttributes", "name": "ListDeviceExtensionAttributesPreview", "params": ["select:string:selectAttr"]},
         {"op": "GET /v1/devices/{id}/groups", "name": "GetDeviceGroupsForDeviceV1"},

@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -149,4 +150,30 @@ func (c *Client) CreateDistributionPointHistoryNoteV1(ctx context.Context, id st
 		return nil, fmt.Errorf("CreateDistributionPointHistoryNoteV1(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveDistributionPointV1IDByName looks up a DistributionPointV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveDistributionPointV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/distribution-points"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDistributionPointV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveDistributionPointV1ByName looks up a DistributionPointV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveDistributionPointV1ByName(ctx context.Context, name string) (*DistributionPoint, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/distribution-points"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveDistributionPointV1ByName(%s): %w", name, err)
+	}
+	var out DistributionPoint
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveDistributionPointV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

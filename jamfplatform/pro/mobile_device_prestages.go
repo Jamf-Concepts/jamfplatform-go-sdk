@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -252,4 +253,30 @@ func (c *Client) CreateMobileDevicePrestageHistoryNoteV3(ctx context.Context, id
 		return nil, fmt.Errorf("CreateMobileDevicePrestageHistoryNoteV3(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveMobileDevicePrestageV3IDByName looks up a MobileDevicePrestageV3 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMobileDevicePrestageV3IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/mobile-device-prestages"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDevicePrestageV3IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMobileDevicePrestageV3ByName looks up a MobileDevicePrestageV3 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMobileDevicePrestageV3ByName(ctx context.Context, name string) (*MobileDevicePrestageV3, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/mobile-device-prestages"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMobileDevicePrestageV3ByName(%s): %w", name, err)
+	}
+	var out MobileDevicePrestageV3
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMobileDevicePrestageV3ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }
