@@ -359,3 +359,42 @@ func (c *Client) ApplySmartMobileDeviceGroupV1(ctx context.Context, request *Sma
 	}
 	return id, false, nil
 }
+
+// ApplyStaticMobileDeviceGroupV1 creates or updates a StaticMobileDeviceGroupV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyStaticMobileDeviceGroupV1(ctx context.Context, request *StaticGroupAssignment, platform bool) (string, bool, error) {
+	name := request.GroupName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: GroupName must not be empty")
+	}
+	id, err := c.ResolveStaticMobileDeviceGroupV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateStaticMobileDeviceGroupV1(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: resolve: %w", err)
+	}
+	// Fetch current membership to preserve existing devices in the patch.
+	membership, memberErr := c.ListStaticMobileDeviceGroupMembershipV1(ctx, id, nil, "")
+	if memberErr != nil {
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: fetch membership(%s): %w", id, memberErr)
+	}
+	assignments := make([]Assignment, 0, len(membership))
+	for _, m := range membership {
+		mid := m.MobileDeviceID
+		sel := true
+		assignments = append(assignments, Assignment{
+			MobileDeviceID: &mid,
+			Selected:       &sel,
+		})
+	}
+	request.Assignments = &assignments
+	_, err = c.PatchStaticMobileDeviceGroupV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

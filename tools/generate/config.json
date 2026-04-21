@@ -1049,7 +1049,21 @@
             "nameField": "groupName",
             "idField": "groupId",
             "mode": "filtered",
-            "typedReturn": "StaticGroup"
+            "typedReturn": "StaticGroup",
+            "apply": {
+              "createOp": "CreateStaticMobileDeviceGroupV1",
+              "updateOp": "PatchStaticMobileDeviceGroupV1",
+              "deleteOp": "DeleteStaticMobileDeviceGroupV1",
+              "nameGoField": "GroupName",
+              "membershipPreFetch": {
+                "fetchOp": "ListStaticMobileDeviceGroupMembershipV1",
+                "sourceIdField": "MobileDeviceID",
+                "assignmentType": "Assignment",
+                "assignmentIdField": "MobileDeviceID",
+                "requestField": "Assignments",
+                "assignmentFieldIsSlicePtr": true
+              }
+            }
           }
         },
         {

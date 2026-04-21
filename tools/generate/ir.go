@@ -156,6 +156,19 @@ type GoApply struct {
 	TokenReplaceVer       string // version for replace
 	TokenReplacePath      string // path for replace endpoint
 
+	// Membership pre-fetch mode — fetch current members before patch.
+	MembershipPreFetch          bool   // true when Apply must fetch membership before patch
+	MembershipFetchMethod       string // "ListStaticMobileDeviceGroupMembershipV1"
+	MembershipFetchExtraArgs    string // ", nil, \"\"" — zero-value extra params for the fetch call
+	MembershipFetchNS           string // "pro"
+	MembershipFetchVer          string // "v1"
+	MembershipFetchPath         string // "/mobile-device-groups/static-group-membership/{id}"
+	MembershipSourceIDField     string // field on each result item (e.g. "MobileDeviceID")
+	MembershipAssignmentType    string // Go type for each assignment item (e.g. "Assignment")
+	MembershipAssignmentIDField string // ID field on assignment type (e.g. "MobileDeviceID")
+	MembershipRequestField      string // field on request to inject into (e.g. "Assignments")
+	MembershipRequestFieldIsPtr bool   // true when request.Assignments is *[]T
+
 	// Test generation paths (pre-computed from the source ops).
 	ListNamespace string // namespace for the list/resolver call
 	ListVersion   string // version for the list/resolver call

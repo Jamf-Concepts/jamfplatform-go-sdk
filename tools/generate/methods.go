@@ -458,6 +458,41 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				ga.RequestType = updateM.RequestType
 			}
 
+			// Membership pre-fetch mode: fetch current membership before patch.
+			if ac.MembershipPreFetch != nil {
+				mpf := ac.MembershipPreFetch
+				fetchM, ok := byName[mpf.FetchOp]
+				if !ok {
+					return nil, fmt.Errorf("apply on %s: membershipPreFetch fetchOp %q not found", r.ResourceType, mpf.FetchOp)
+				}
+				// Build zero-value extra call args from the fetch op's query params.
+				var extraFetchArgs strings.Builder
+				for _, qp := range fetchM.QueryParams {
+					extraFetchArgs.WriteString(", ")
+					switch {
+					case strings.HasPrefix(qp.Type, "[]"):
+						extraFetchArgs.WriteString("nil")
+					case qp.Type == "bool":
+						extraFetchArgs.WriteString("false")
+					case qp.Type == "int" || qp.Type == "int64":
+						extraFetchArgs.WriteString("0")
+					default:
+						extraFetchArgs.WriteString(`""`)
+					}
+				}
+				ga.MembershipPreFetch = true
+				ga.MembershipFetchMethod = mpf.FetchOp
+				ga.MembershipFetchExtraArgs = extraFetchArgs.String()
+				ga.MembershipFetchNS = fetchM.Namespace
+				ga.MembershipFetchVer = fetchM.Version
+				ga.MembershipFetchPath = fetchM.ResourcePath
+				ga.MembershipSourceIDField = mpf.SourceIDField
+				ga.MembershipAssignmentType = mpf.AssignmentType
+				ga.MembershipAssignmentIDField = mpf.AssignmentIDField
+				ga.MembershipRequestField = mpf.RequestField
+				ga.MembershipRequestFieldIsPtr = mpf.AssignmentFieldIsPtr
+			}
+
 			// Classic test stubs need XML wire names for resolver and create responses.
 			if classicCreate {
 				ga.ClassicResolverWireName = src.ResponseWireName

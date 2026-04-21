@@ -92,6 +92,48 @@ Every resource that supports name-based lookup exposes two generator-emitted met
 
 Error contract is identical across modes: not-found surfaces as `*APIResponseError` with `HasStatus(404)`; ambiguous matches (filtered/clientFilter only) surface as `*AmbiguousMatchError`. Consumers check these the same way regardless of which mode the resource uses.
 
+### Apply (upsert) methods
+
+`Apply<ResourceType>(ctx, request, ...) (id string, created bool, error)` — emitted alongside a resolver when the resolver block includes an `"apply": {...}` key. On call: resolves the name; if 404 → creates; if found → updates. Returns the resource ID, a `created` flag, and any error.
+
+Apply methods are declared entirely in `config.json` — never hand-code them. Modes, selected per resource:
+
+**Standard** (no extra keys) — single request type shared between create and update:
+```json
+"apply": {"createOp": "CreateBuildingV1", "updateOp": "UpdateBuildingV1", "deleteOp": "DeleteBuildingV1", "nameGoField": "Name"}
+```
+
+**`updateType`** — create and update ops take different Go types; generator JSON-round-trips create request → update type:
+```json
+"apply": {"createOp": "...", "updateOp": "...", "nameGoField": "...", "updateType": "ComputerPrestageUpdateV3"}
+```
+
+**`versionLock`** — for prestages; on create, zeroes all `VersionLock` fields; on update, GETs the current resource and injects its `versionLock` value into the update request before PATCHing:
+```json
+"apply": {"createOp": "...", "updateOp": "...", "getOp": "GetComputerPrestageV3", "nameGoField": "...", "updateType": "...", "versionLock": true}
+```
+
+**`tokenUploadMode`** — for DEP enrollment instances; create path uploads an encoded token first, then updates metadata; update path optionally re-uploads the token. Apply signature gains a trailing `token string` arg:
+```json
+"apply": {"createOp": "...", "updateOp": "...", "nameGoField": "...", "tokenUploadMode": true, "tokenUploadCreateOp": "UploadDeviceEnrollmentTokenV1", "tokenReplaceOp": "ReplaceDeviceEnrollmentTokenV1"}
+```
+
+**`membershipPreFetch`** — for resources whose PATCH requires the current member list to be re-specified (e.g. static mobile device groups, where omitting existing members from `assignments` removes them). On update: fetches current membership via a list op, maps each member's ID into an `Assignment`-like struct with `Selected=true`, injects into `request.Assignments` before calling the patch op:
+```json
+"apply": {
+  "createOp": "...", "updateOp": "...", "nameGoField": "...",
+  "membershipPreFetch": {
+    "fetchOp": "ListStaticMobileDeviceGroupMembershipV1",
+    "sourceIdField": "MobileDeviceID",
+    "assignmentType": "Assignment",
+    "assignmentIdField": "MobileDeviceID",
+    "requestField": "Assignments",
+    "assignmentFieldIsSlicePtr": true
+  }
+}
+```
+`assignmentFieldIsSlicePtr: true` when the request field is `*[]T` (pointer-to-slice) rather than `[]T`. The generated `Assignment` item always uses pointer fields (`MobileDeviceID *string`, `Selected *bool`); the template emits `&mid` and `&sel` accordingly.
+
 ## File organization
 
 - Every spec in `tools/generate/config.json` MUST set `"splitByTag": true`. The generator buckets methods by first OpenAPI tag into one file per tag (`<tag>.go` + `<tag>_test.go`); types pool into a shared `types.go`. Splitting by path would scatter CRUD for a single resource across many files; tag-split keeps each resource coherent.

@@ -202,6 +202,15 @@ var funcMap = template.FuncMap{
 		}
 		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.TokenReplaceNS, a.TokenReplaceVer, path)
 	},
+	// applyMembershipFetchPath builds the test-server handler path for the
+	// membership list endpoint used in membershipPreFetch apply mode.
+	"applyMembershipFetchPath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.MembershipFetchPath, "existing-id")
+		if a.MembershipFetchVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.MembershipFetchNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.MembershipFetchNS, a.MembershipFetchVer, path)
+	},
 	// applyTokenCreateUpdatePath builds the test-server handler path for the
 	// metadata update endpoint in the token-upload create test. Uses "new-id"
 	// as the path parameter since the upload response returns that ID.
@@ -915,6 +924,27 @@ func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType
 {{- end }}
 {{- end }}
 {{- else }}
+{{- if .Apply.MembershipPreFetch }}
+	// Fetch current membership to preserve existing devices in the patch.
+	membership, memberErr := c.{{ .Apply.MembershipFetchMethod }}(ctx, id{{ .Apply.MembershipFetchExtraArgs }})
+	if memberErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: fetch membership(%s): %w", id, memberErr)
+	}
+	assignments := make([]{{ .Apply.MembershipAssignmentType }}, 0, len(membership))
+	for _, m := range membership {
+		mid := m.{{ .Apply.MembershipSourceIDField }}
+		sel := true
+		assignments = append(assignments, {{ .Apply.MembershipAssignmentType }}{
+			{{ .Apply.MembershipAssignmentIDField }}: &mid,
+			Selected: &sel,
+		})
+	}
+{{- if .Apply.MembershipRequestFieldIsPtr }}
+	request.{{ .Apply.MembershipRequestField }} = &assignments
+{{- else }}
+	request.{{ .Apply.MembershipRequestField }} = assignments
+{{- end }}
+{{- end }}
 {{- if .Apply.UpdateReturnsVal }}
 	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
 {{- else }}
@@ -1553,6 +1583,19 @@ func Test<% .Name %>_Update(t *testing.T) {
 	})
 <%- end %>
 <%- else %>
+<%- if .Apply.MembershipPreFetch %>
+	// Membership pre-fetch handler: returns a single device so the Apply method
+	// has current membership to inject into the patch request.
+	mux.HandleFunc("<% applyMembershipFetchPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{"mobileDeviceId": "d1"}},
+			"totalCount": 1,
+		})
+	})
+<%- end %>
 	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
 <%- if .Apply.UpdateReturnsVal %>
 <%- if .Apply.IDNumeric %>

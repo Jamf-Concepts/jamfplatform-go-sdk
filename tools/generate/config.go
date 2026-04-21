@@ -102,6 +102,23 @@ type ApplyConfig struct {
 	TokenUploadMode     bool   `json:"tokenUploadMode,omitempty"`     // enables token-upload apply mode
 	TokenUploadCreateOp string `json:"tokenUploadCreateOp,omitempty"` // op that uploads token to create the resource (e.g. "UploadDeviceEnrollmentTokenV1")
 	TokenReplaceOp      string `json:"tokenReplaceOp,omitempty"`      // op that re-uploads token to an existing resource (e.g. "ReplaceDeviceEnrollmentTokenV1")
+
+	// MembershipPreFetch mode: for resources whose PATCH requires the current
+	// member list to be re-specified (e.g. static mobile device groups). On
+	// update, the Apply method fetches current membership via a list op, maps
+	// each member's ID into an Assignment-like struct with Selected=true, and
+	// injects the result into the request before calling the patch op.
+	MembershipPreFetch *MembershipPreFetchConfig `json:"membershipPreFetch,omitempty"`
+}
+
+// MembershipPreFetchConfig controls the membership pre-fetch step in Apply.
+type MembershipPreFetchConfig struct {
+	FetchOp              string `json:"fetchOp"`                        // list op to call for current membership (e.g. "ListStaticMobileDeviceGroupMembershipV1")
+	SourceIDField        string `json:"sourceIdField"`                  // field on each result item (e.g. "MobileDeviceID")
+	AssignmentType       string `json:"assignmentType"`                 // Go type for assignments (e.g. "Assignment")
+	AssignmentIDField    string `json:"assignmentIdField"`              // ID field on assignment type (e.g. "MobileDeviceID")
+	RequestField         string `json:"requestField"`                   // field on request to inject into (e.g. "Assignments")
+	AssignmentFieldIsPtr bool   `json:"assignmentFieldIsSlicePtr,omitempty"` // true when request field is *[]T rather than []T
 }
 
 // parseOp splits "GET /v1/devices/{id}" into method and path.
