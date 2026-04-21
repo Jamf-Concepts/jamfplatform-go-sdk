@@ -74,6 +74,7 @@ type ResolverConfig struct {
 	MatchField   string `json:"matchField,omitempty"`    // optional: dot-notation JSON path for client-side match verification when it differs from nameField (e.g. RSQL uses "displayName" but response nests it at "general.displayName"). Empty defaults to nameField.
 	IDField      string `json:"idField"`                 // dot-notation JSON path for the ID field (e.g. "id")
 	IDNumeric    bool   `json:"idNumeric,omitempty"`     // when true, the ID field is a number in JSON (int in Go); test stubs emit numeric IDs
+	IDPointer    bool   `json:"idPointer,omitempty"`     // when true, the ID field is a pointer (*int) in Go; overrides IDNumeric's strconv.Itoa to use fmt.Sprintf with dereference
 	Mode         string `json:"mode"`                    // "filtered" (server-side RSQL) or "clientFilter" (walk list in memory). "direct" reserved for proclassic by-name endpoints and handled in a later phase.
 	SearchParam  string `json:"searchParam,omitempty"`   // clientFilter mode only: server-side search query key to narrow results (e.g. "search"). Empty → fetch full list.
 	ResultsField string `json:"resultsField,omitempty"`  // envelope key containing the array of list elements. Empty defaults to "results"; set to e.g. "benchmarks" for non-standard wrappers.

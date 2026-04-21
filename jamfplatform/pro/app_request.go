@@ -7,9 +7,12 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListAppRequestFormInputFieldsV1 search for Form Input Fields.
@@ -97,4 +100,54 @@ func (c *Client) UpdateAppRequestSettingsV1(ctx context.Context, request *AppReq
 		return nil, fmt.Errorf("UpdateAppRequestSettingsV1: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveAppRequestFormInputFieldV1IDByName looks up a AppRequestFormInputFieldV1 by its title field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveAppRequestFormInputFieldV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/app-request/form-input-fields"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "title", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAppRequestFormInputFieldV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveAppRequestFormInputFieldV1ByName looks up a AppRequestFormInputFieldV1 by its title field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveAppRequestFormInputFieldV1ByName(ctx context.Context, name string) (*AppRequestFormInputField, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/app-request/form-input-fields"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "title", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveAppRequestFormInputFieldV1ByName(%s): %w", name, err)
+	}
+	var out AppRequestFormInputField
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveAppRequestFormInputFieldV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyAppRequestFormInputFieldV1 creates or updates a AppRequestFormInputFieldV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyAppRequestFormInputFieldV1(ctx context.Context, request *AppRequestFormInputField) (string, bool, error) {
+	name := request.Title
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyAppRequestFormInputFieldV1: Title must not be empty")
+	}
+	id, err := c.ResolveAppRequestFormInputFieldV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateAppRequestFormInputFieldV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyAppRequestFormInputFieldV1: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyAppRequestFormInputFieldV1: resolve: %w", err)
+	}
+	_, err = c.UpdateAppRequestFormInputFieldV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyAppRequestFormInputFieldV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

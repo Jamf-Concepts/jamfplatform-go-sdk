@@ -338,6 +338,32 @@ func (c *Client) ResolveEnrollmentAccessGroupV3ByName(ctx context.Context, name 
 	return &out, nil
 }
 
+// ResolveEnrollmentLanguageV3IDByName looks up a EnrollmentLanguageV3 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveEnrollmentLanguageV3IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/enrollment/languages"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "languageCode", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveEnrollmentLanguageV3IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveEnrollmentLanguageV3ByName looks up a EnrollmentLanguageV3 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveEnrollmentLanguageV3ByName(ctx context.Context, name string) (*EnrollmentProcessTextObject, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/enrollment/languages"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "languageCode", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveEnrollmentLanguageV3ByName(%s): %w", name, err)
+	}
+	var out EnrollmentProcessTextObject
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveEnrollmentLanguageV3ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
 // ApplyEnrollmentAccessGroupV3 creates or updates a EnrollmentAccessGroupV3 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
 func (c *Client) ApplyEnrollmentAccessGroupV3(ctx context.Context, request *EnrollmentAccessGroupPreview) (string, bool, error) {
 	name := request.Name

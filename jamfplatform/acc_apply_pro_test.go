@@ -1649,3 +1649,59 @@ func TestAcceptance_ApplyDeviceEnrollmentV1(t *testing.T) {
 		t.Fatalf("expected 404, got: %v", err)
 	}
 }
+
+// ---------- AppRequestFormInputFieldV1 ----------
+
+func TestAcceptance_ApplyAppRequestFormInputFieldV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	title := "sdk-acc-apply-appfield-" + runSuffix()
+
+	// 1. Apply creates
+	id, created, err := p.ApplyAppRequestFormInputFieldV1(ctx, &pro.AppRequestFormInputField{
+		Title:    title,
+		Priority: 1,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("apply create: %v", err)
+	}
+	cleanupDelete(t, "AppRequestFormInputField "+id, func() error { return p.DeleteAppRequestFormInputFieldV1(ctx, id) })
+	if !created {
+		t.Error("expected created = true on first apply")
+	}
+	t.Logf("created app-request field id=%s", id)
+
+	// 2. Apply updates
+	desc := "updated description"
+	id2, created2, err := p.ApplyAppRequestFormInputFieldV1(ctx, &pro.AppRequestFormInputField{
+		Title:       title,
+		Priority:    2,
+		Description: &desc,
+	})
+	if err != nil {
+		t.Fatalf("apply update: %v", err)
+	}
+	if created2 {
+		t.Error("expected created = false on second apply")
+	}
+	if id2 != id {
+		t.Errorf("id changed: %s → %s", id, id2)
+	}
+
+	// 3. Delete
+	if err := p.DeleteAppRequestFormInputFieldV1(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+
+	// 4. Resolve not found
+	_, err = p.ResolveAppRequestFormInputFieldV1IDByName(ctx, title)
+	if err == nil {
+		t.Fatal("expected 404 after delete")
+	}
+	if apiErr := jamfplatform.AsAPIError(err); apiErr == nil || !apiErr.HasStatus(404) {
+		t.Fatalf("expected 404, got: %v", err)
+	}
+}

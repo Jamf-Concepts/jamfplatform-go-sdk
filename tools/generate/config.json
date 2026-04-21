@@ -1944,7 +1944,14 @@
           "pagination": "totalCount",
           "params": [
             "sort:[]string"
-          ]
+          ],
+          "resolver": {
+            "resourceType": "EnrollmentLanguageV3",
+            "nameField": "name",
+            "idField": "languageCode",
+            "mode": "clientFilter",
+            "typedReturn": "EnrollmentProcessTextObject"
+          }
         },
         {
           "op": "POST /v3/enrollment/languages/delete-multiple",
@@ -3080,7 +3087,16 @@
           "params": [
             "sort:[]string",
             "filter"
-          ]
+          ],
+          "resolver": {
+            "resourceType": "JamfConnectConfigProfileV1",
+            "nameField": "profileName",
+            "idField": "profileId",
+            "idNumeric": true,
+            "idPointer": true,
+            "mode": "clientFilter",
+            "typedReturn": "LinkedConnectProfile"
+          }
         },
         {
           "op": "PUT /v1/jamf-connect/config-profiles/{id}",
@@ -3805,7 +3821,22 @@
         },
         {
           "op": "GET /v1/app-request/form-input-fields",
-          "name": "ListAppRequestFormInputFieldsV1"
+          "name": "ListAppRequestFormInputFieldsV1",
+          "resolver": {
+            "resourceType": "AppRequestFormInputFieldV1",
+            "nameField": "title",
+            "idField": "id",
+            "idNumeric": true,
+            "idPointer": true,
+            "mode": "clientFilter",
+            "typedReturn": "AppRequestFormInputField",
+            "apply": {
+              "createOp": "CreateAppRequestFormInputFieldV1",
+              "updateOp": "UpdateAppRequestFormInputFieldV1",
+              "deleteOp": "DeleteAppRequestFormInputFieldV1",
+              "nameGoField": "Title"
+            }
+          }
         },
         {
           "op": "POST /v1/app-request/form-input-fields",

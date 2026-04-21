@@ -231,7 +231,11 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 					// Non-HrefResponse: check if the response has a string or int ID.
 					// The resolver's IDNumeric flag tells us.
 					if r.IDNumeric {
-						createReturnID = "strconv.Itoa(resp.ID)"
+						if r.IDPointer {
+							createReturnID = `fmt.Sprintf("%d", *resp.ID)`
+						} else {
+							createReturnID = "strconv.Itoa(resp.ID)"
+						}
 					} else {
 						createReturnID = "resp.ID"
 					}

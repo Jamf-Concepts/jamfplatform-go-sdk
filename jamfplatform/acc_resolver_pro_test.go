@@ -2686,3 +2686,194 @@ func TestAcceptance_ResolveRemoteAdminConfigurationPreview_Typed(t *testing.T) {
 	}
 	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
 }
+
+// ─── JamfConnectConfigProfile (read-only) ───────────────────────────────────
+
+func TestAcceptance_ResolveJamfConnectConfigProfileV1IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveJamfConnectConfigProfileV1IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
+	if err == nil {
+		t.Fatal("expected not-found error, got nil")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
+	}
+	t.Log("not-found ✓")
+}
+
+func TestAcceptance_ResolveJamfConnectConfigProfileV1IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListJamfConnectConfigProfilesV1(ctx, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListJamfConnectConfigProfilesV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no Jamf Connect config profiles in tenant — skipping")
+	}
+	first := items[0]
+	if first.ProfileName == nil || first.ProfileID == nil {
+		t.Skip("first profile has nil name or id — skipping")
+	}
+	gotID, err := c.ResolveJamfConnectConfigProfileV1IDByName(ctx, *first.ProfileName)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	wantID := strconv.Itoa(*first.ProfileID)
+	if gotID != wantID {
+		t.Errorf("resolved id = %q, want %q", gotID, wantID)
+	}
+	t.Logf("resolved %q → %s ✓", *first.ProfileName, gotID)
+}
+
+func TestAcceptance_ResolveJamfConnectConfigProfileV1ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListJamfConnectConfigProfilesV1(ctx, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListJamfConnectConfigProfilesV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no Jamf Connect config profiles in tenant — skipping")
+	}
+	first := items[0]
+	if first.ProfileName == nil {
+		t.Skip("first profile has nil name — skipping")
+	}
+	got, err := c.ResolveJamfConnectConfigProfileV1ByName(ctx, *first.ProfileName)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.ProfileName == nil || *got.ProfileName != *first.ProfileName {
+		t.Errorf("typed ProfileName = %v, want %q", got.ProfileName, *first.ProfileName)
+	}
+	t.Logf("resolved typed %q ✓", *first.ProfileName)
+}
+
+// ─── EnrollmentLanguage (read-only — languages are tenant-managed) ──────────
+
+func TestAcceptance_ResolveEnrollmentLanguageV3IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveEnrollmentLanguageV3IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
+	if err == nil {
+		t.Fatal("expected not-found error, got nil")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
+	}
+	t.Log("not-found ✓")
+}
+
+func TestAcceptance_ResolveEnrollmentLanguageV3IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListEnrollmentLanguagesV3(ctx, nil)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListEnrollmentLanguagesV3: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no enrollment languages in tenant — skipping")
+	}
+	first := items[0]
+	if first.Name == nil || first.LanguageCode == nil {
+		t.Skip("first language has nil name or languageCode — skipping")
+	}
+	gotID, err := c.ResolveEnrollmentLanguageV3IDByName(ctx, *first.Name)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != *first.LanguageCode {
+		t.Errorf("resolved id = %q, want %q", gotID, *first.LanguageCode)
+	}
+	t.Logf("resolved %q → %s ✓", *first.Name, gotID)
+}
+
+func TestAcceptance_ResolveEnrollmentLanguageV3ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	items, err := c.ListEnrollmentLanguagesV3(ctx, nil)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListEnrollmentLanguagesV3: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no enrollment languages in tenant — skipping")
+	}
+	first := items[0]
+	if first.Name == nil {
+		t.Skip("first language has nil name — skipping")
+	}
+	got, err := c.ResolveEnrollmentLanguageV3ByName(ctx, *first.Name)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.Name == nil || *got.Name != *first.Name {
+		t.Errorf("typed Name = %v, want %q", got.Name, *first.Name)
+	}
+	t.Logf("resolved typed %q → %s ✓", *first.Name, *got.LanguageCode)
+}
+
+// ─── AppRequestFormInputField (CRUD lifecycle) ──────────────────────────────
+
+func TestAcceptance_ResolveAppRequestFormInputFieldV1_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	title := "sdk-acc-res-appfield-" + runSuffix()
+
+	// Step 1: Not found
+	_, err := c.ResolveAppRequestFormInputFieldV1IDByName(ctx, title)
+	requireNotFoundErr(t, "pre-create", err)
+	t.Log("step 1: not-found ✓")
+
+	// Step 2: Create
+	created, err := c.CreateAppRequestFormInputFieldV1(ctx, &pro.AppRequestFormInputField{
+		Title:    title,
+		Priority: 1,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateAppRequestFormInputFieldV1: %v", err)
+	}
+	if created.ID == nil {
+		t.Fatal("created field has nil ID")
+	}
+	id := strconv.Itoa(*created.ID)
+	t.Cleanup(func() { _ = c.DeleteAppRequestFormInputFieldV1(ctx, id) })
+	t.Logf("step 2: created %s", id)
+
+	// Step 3: Resolve ID
+	gotID, err := c.ResolveAppRequestFormInputFieldV1IDByName(ctx, title)
+	if err != nil {
+		t.Fatalf("ResolveAppRequestFormInputFieldV1IDByName: %v", err)
+	}
+	if gotID != id {
+		t.Errorf("resolve ID = %q, want %q", gotID, id)
+	}
+	t.Logf("step 3: resolve ID %q → %s ✓", title, gotID)
+
+	// Step 4: Resolve typed
+	got, err := c.ResolveAppRequestFormInputFieldV1ByName(ctx, title)
+	if err != nil {
+		t.Fatalf("ResolveAppRequestFormInputFieldV1ByName: %v", err)
+	}
+	if got == nil || got.Title != title {
+		t.Errorf("typed Title = %v, want %q", got, title)
+	}
+	t.Logf("step 4: resolve typed %q ✓", title)
+}

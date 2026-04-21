@@ -550,6 +550,52 @@ func TestResolveEnrollmentAccessGroupV3ByName(t *testing.T) {
 	}
 }
 
+func TestResolveEnrollmentLanguageV3IDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v3/tenant/t-test/enrollment/languages", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"languageCode": "resolved-id", "name": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveEnrollmentLanguageV3IDByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveEnrollmentLanguageV3ByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v3/tenant/t-test/enrollment/languages", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"languageCode": "resolved-id", "name": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveEnrollmentLanguageV3ByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestApplyEnrollmentAccessGroupV3_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
