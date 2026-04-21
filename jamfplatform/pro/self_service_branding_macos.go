@@ -112,3 +112,30 @@ func (c *Client) ResolveMacOSBrandingConfigurationV1ByName(ctx context.Context, 
 	}
 	return &out, nil
 }
+
+// ApplyMacOSBrandingConfigurationV1 creates or updates a MacOSBrandingConfigurationV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyMacOSBrandingConfigurationV1(ctx context.Context, request *MacOsBrandingConfiguration) (string, bool, error) {
+	var name string
+	if request.BrandingName != nil {
+		name = *request.BrandingName
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyMacOSBrandingConfigurationV1: BrandingName must not be empty")
+	}
+	id, err := c.ResolveMacOSBrandingConfigurationV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateMacOSBrandingConfigurationV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyMacOSBrandingConfigurationV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyMacOSBrandingConfigurationV1: resolve: %w", err)
+	}
+	_, err = c.UpdateMacOSBrandingConfigurationV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyMacOSBrandingConfigurationV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

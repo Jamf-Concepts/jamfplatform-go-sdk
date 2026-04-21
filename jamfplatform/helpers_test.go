@@ -51,3 +51,5 @@ func readJSON(t *testing.T, r *http.Request, v any) {
 		t.Fatalf("readJSON: %v", err)
 	}
 }
+
+func ptrStr(s string) *string { return &s }

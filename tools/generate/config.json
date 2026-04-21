@@ -372,7 +372,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "Building"
+            "typedReturn": "Building",
+            "apply": {
+              "createOp": "CreateBuildingV1",
+              "updateOp": "UpdateBuildingV1",
+              "deleteOp": "DeleteBuildingV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -465,7 +471,13 @@
             "nameField": "packageName",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "Package"
+            "typedReturn": "Package",
+            "apply": {
+              "createOp": "CreatePackageV1",
+              "updateOp": "UpdatePackageV1",
+              "deleteOp": "DeletePackageV1",
+              "nameGoField": "PackageName"
+            }
           }
         },
         {
@@ -501,7 +513,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "Category"
+            "typedReturn": "Category",
+            "apply": {
+              "createOp": "CreateCategoryV1",
+              "updateOp": "UpdateCategoryV1",
+              "deleteOp": "DeleteCategoryV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -551,7 +569,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "Department"
+            "typedReturn": "Department",
+            "apply": {
+              "createOp": "CreateDepartmentV1",
+              "updateOp": "UpdateDepartmentV1",
+              "deleteOp": "DeleteDepartmentV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -620,7 +644,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "Script"
+            "typedReturn": "Script",
+            "apply": {
+              "createOp": "CreateScriptV1",
+              "updateOp": "UpdateScriptV1",
+              "deleteOp": "DeleteScriptV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -681,7 +711,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "SmartComputerGroupSearch"
+            "typedReturn": "SmartComputerGroupSearch",
+            "apply": {
+              "createOp": "CreateSmartComputerGroupV2",
+              "updateOp": "UpdateSmartComputerGroupV2",
+              "deleteOp": "DeleteSmartComputerGroupV2",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -722,7 +758,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "StaticComputerGroupSummary"
+            "typedReturn": "StaticComputerGroupSummary",
+            "apply": {
+              "createOp": "CreateStaticComputerGroupV2",
+              "updateOp": "UpdateStaticComputerGroupV2",
+              "deleteOp": "DeleteStaticComputerGroupV2",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -759,7 +801,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "ComputerExtensionAttributes"
+            "typedReturn": "ComputerExtensionAttributes",
+            "apply": {
+              "createOp": "CreateComputerExtensionAttributeV1",
+              "updateOp": "UpdateComputerExtensionAttributeV1",
+              "deleteOp": "DeleteComputerExtensionAttributeV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -829,7 +877,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "AdvancedSearch"
+            "typedReturn": "AdvancedSearch",
+            "apply": {
+              "createOp": "CreateAdvancedMobileDeviceSearchV1",
+              "updateOp": "UpdateAdvancedMobileDeviceSearchV1",
+              "deleteOp": "DeleteAdvancedMobileDeviceSearchV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -875,7 +929,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "MobileDeviceExtensionAttributes"
+            "typedReturn": "MobileDeviceExtensionAttributes",
+            "apply": {
+              "createOp": "CreateMobileDeviceExtensionAttributeV1",
+              "updateOp": "UpdateMobileDeviceExtensionAttributeV1",
+              "deleteOp": "DeleteMobileDeviceExtensionAttributeV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -937,7 +997,13 @@
             "nameField": "groupName",
             "idField": "groupId",
             "mode": "filtered",
-            "typedReturn": "SmartGroup"
+            "typedReturn": "SmartGroup",
+            "apply": {
+              "createOp": "CreateSmartMobileDeviceGroupV1",
+              "updateOp": "UpdateSmartMobileDeviceGroupV1",
+              "deleteOp": "DeleteSmartMobileDeviceGroupV1",
+              "nameGoField": "GroupName"
+            }
           }
         },
         {
@@ -1065,7 +1131,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "AdvancedUserContentSearch"
+            "typedReturn": "AdvancedUserContentSearch",
+            "apply": {
+              "createOp": "CreateAdvancedUserContentSearchV1",
+              "updateOp": "UpdateAdvancedUserContentSearchV1",
+              "deleteOp": "DeleteAdvancedUserContentSearchV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -1128,7 +1200,13 @@
             "nameField": "username",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "User"
+            "typedReturn": "User",
+            "apply": {
+              "createOp": "CreateUserV1",
+              "updateOp": "UpdateUserV1",
+              "deleteOp": "DeleteUserV1",
+              "nameGoField": "Username"
+            }
           }
         },
         {
@@ -1786,7 +1864,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "EnrollmentAccessGroupPreview"
+            "typedReturn": "EnrollmentAccessGroupPreview",
+            "apply": {
+              "createOp": "CreateEnrollmentAccessGroupV3",
+              "updateOp": "UpdateEnrollmentAccessGroupV3",
+              "deleteOp": "DeleteEnrollmentAccessGroupV3",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -1987,7 +2071,13 @@
             "resourceType": "EnrollmentCustomizationV2",
             "nameField": "displayName",
             "idField": "id",
-            "mode": "clientFilter"
+            "mode": "clientFilter",
+            "apply": {
+              "createOp": "CreateEnrollmentCustomizationV2",
+              "updateOp": "UpdateEnrollmentCustomizationV2",
+              "deleteOp": "DeleteEnrollmentCustomizationV2",
+              "nameGoField": "DisplayName"
+            }
           }
         },
         {
@@ -2222,7 +2312,13 @@
             "nameField": "displayName",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "ReturnToServiceConfiguration"
+            "typedReturn": "ReturnToServiceConfiguration",
+            "apply": {
+              "createOp": "CreateReturnToServiceConfigurationV1",
+              "updateOp": "UpdateReturnToServiceConfigurationV1",
+              "deleteOp": "DeleteReturnToServiceConfigurationV1",
+              "nameGoField": "DisplayName"
+            }
           }
         },
         {
@@ -2260,7 +2356,13 @@
             "idField": "id",
             "idNumeric": true,
             "mode": "filtered",
-            "typedReturn": "ApiIntegrationResponse"
+            "typedReturn": "ApiIntegrationResponse",
+            "apply": {
+              "createOp": "CreateApiIntegrationV1",
+              "updateOp": "UpdateApiIntegrationV1",
+              "deleteOp": "DeleteApiIntegrationV1",
+              "nameGoField": "DisplayName"
+            }
           }
         },
         {
@@ -2298,7 +2400,13 @@
             "nameField": "displayName",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "ApiRole"
+            "typedReturn": "ApiRole",
+            "apply": {
+              "createOp": "CreateApiRoleV1",
+              "updateOp": "UpdateApiRoleV1",
+              "deleteOp": "DeleteApiRoleV1",
+              "nameGoField": "DisplayName"
+            }
           }
         },
         {
@@ -2750,7 +2858,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "DistributionPoint"
+            "typedReturn": "DistributionPoint",
+            "apply": {
+              "createOp": "CreateDistributionPointV1",
+              "updateOp": "UpdateDistributionPointV1",
+              "deleteOp": "DeleteDistributionPointV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -2868,7 +2982,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "VolumePurchasingSubscription"
+            "typedReturn": "VolumePurchasingSubscription",
+            "apply": {
+              "createOp": "CreateVolumePurchasingSubscriptionV1",
+              "updateOp": "UpdateVolumePurchasingSubscriptionV1",
+              "deleteOp": "DeleteVolumePurchasingSubscriptionV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {
@@ -3470,7 +3590,13 @@
             "nameField": "brandingName",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "IosBrandingConfiguration"
+            "typedReturn": "IosBrandingConfiguration",
+            "apply": {
+              "createOp": "CreateIOSBrandingConfigurationV1",
+              "updateOp": "UpdateIOSBrandingConfigurationV1",
+              "deleteOp": "DeleteIOSBrandingConfigurationV1",
+              "nameGoField": "BrandingName"
+            }
           }
         },
         {
@@ -3503,7 +3629,13 @@
             "nameField": "brandingName",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "MacOsBrandingConfiguration"
+            "typedReturn": "MacOsBrandingConfiguration",
+            "apply": {
+              "createOp": "CreateMacOSBrandingConfigurationV1",
+              "updateOp": "UpdateMacOSBrandingConfigurationV1",
+              "deleteOp": "DeleteMacOSBrandingConfigurationV1",
+              "nameGoField": "BrandingName"
+            }
           }
         },
         {
@@ -8261,7 +8393,13 @@
             "nameField": "name",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "AppInstallerDeployment"
+            "typedReturn": "AppInstallerDeployment",
+            "apply": {
+              "createOp": "CreateAppInstallerDeploymentV1",
+              "updateOp": "UpdateAppInstallerDeploymentV1",
+              "deleteOp": "DeleteAppInstallerDeploymentV1",
+              "nameGoField": "Name"
+            }
           }
         },
         {

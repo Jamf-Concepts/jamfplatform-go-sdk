@@ -153,3 +153,27 @@ func (c *Client) ResolveVolumePurchasingSubscriptionV1ByName(ctx context.Context
 	}
 	return &out, nil
 }
+
+// ApplyVolumePurchasingSubscriptionV1 creates or updates a VolumePurchasingSubscriptionV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyVolumePurchasingSubscriptionV1(ctx context.Context, request *VolumePurchasingSubscriptionBase) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingSubscriptionV1: Name must not be empty")
+	}
+	id, err := c.ResolveVolumePurchasingSubscriptionV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateVolumePurchasingSubscriptionV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyVolumePurchasingSubscriptionV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyVolumePurchasingSubscriptionV1: resolve: %w", err)
+	}
+	_, err = c.UpdateVolumePurchasingSubscriptionV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingSubscriptionV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

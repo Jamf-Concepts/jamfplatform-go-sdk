@@ -57,6 +57,8 @@ func readJSON(t *testing.T, r *http.Request, v any) {
 	}
 }
 
+func ptrStr(s string) *string { return &s }
+
 func writeXML(t *testing.T, w http.ResponseWriter, status int, body string) {
 	t.Helper()
 	w.Header().Set("Content-Type", "application/xml")

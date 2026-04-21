@@ -774,7 +774,9 @@ func readJSON(t *testing.T, r *http.Request, v any) {
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
 		t.Fatalf("readJSON: %%v", err)
 	}
-}%s
+}
+
+func ptrStr(s string) *string { return &s }%s
 `, pkgName, cfg.Module, xmlHelpers)
 	outPath := filepath.Join(pkgDir, "helpers_test.go")
 	formatted, err := imports.Process(outPath, []byte(src), &imports.Options{Comments: true})
@@ -995,6 +997,8 @@ func readJSON(t *testing.T, r *http.Request, v any) {
 		t.Fatalf("readJSON: %%v", err)
 	}
 }
+
+func ptrStr(s string) *string { return &s }
 `, pkg),
 	}
 

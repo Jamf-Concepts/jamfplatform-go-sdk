@@ -276,3 +276,51 @@ func (c *Client) ResolveStaticComputerGroupV2ByName(ctx context.Context, name st
 	}
 	return &out, nil
 }
+
+// ApplySmartComputerGroupV2 creates or updates a SmartComputerGroupV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplySmartComputerGroupV2(ctx context.Context, request *SmartComputerGroupV2, platform bool) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplySmartComputerGroupV2: Name must not be empty")
+	}
+	id, err := c.ResolveSmartComputerGroupV2IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateSmartComputerGroupV2(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplySmartComputerGroupV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplySmartComputerGroupV2: resolve: %w", err)
+	}
+	_, err = c.UpdateSmartComputerGroupV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplySmartComputerGroupV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}
+
+// ApplyStaticComputerGroupV2 creates or updates a StaticComputerGroupV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyStaticComputerGroupV2(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyStaticComputerGroupV2: Name must not be empty")
+	}
+	id, err := c.ResolveStaticComputerGroupV2IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateStaticComputerGroupV2(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyStaticComputerGroupV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyStaticComputerGroupV2: resolve: %w", err)
+	}
+	_, err = c.UpdateStaticComputerGroupV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyStaticComputerGroupV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

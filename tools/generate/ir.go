@@ -44,7 +44,7 @@ type GoField struct {
 type GoMethod struct {
 	Name             string
 	Comment          string
-	Category         string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart, resolverID, resolverTyped, resolverIDDirect, resolverTypedDirect
+	Category         string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart, resolverID, resolverTyped, resolverIDDirect, resolverTypedDirect, apply
 	HTTPMethod       string
 	Namespace        string
 	Version          string
@@ -67,6 +67,7 @@ type GoMethod struct {
 	UnwrapResults    string
 	Format           string      // carried from SpecDef so per-method templates can branch without $-scope
 	Resolver         *GoResolver // populated on synthetic resolver methods (Category resolverID/resolverTyped)
+	Apply            *GoApply    // populated on synthetic apply (upsert) methods
 }
 
 // GoResolver carries the config needed by resolver method templates.
@@ -104,6 +105,43 @@ type GoResolver struct {
 	// "<general><id>42</id></general>" so the typed decoder populates
 	// r.General.ID and the resolver's walk succeeds.
 	IDTestInnerXML string
+}
+
+// GoApply carries the config needed by the apply (upsert) method template.
+// Populated on synthetic methods produced by appendApplyMethods; never
+// present on spec-derived methods.
+type GoApply struct {
+	ResourceType     string // "BuildingV1"
+	RequestType      string // Go type for the request parameter (e.g. "Building")
+	NameGoField      string // Go struct field path to extract name (e.g. "Name", "DisplayName")
+	ResolverMethod   string // "ResolveBuildingV1IDByName"
+	CreateMethod     string // "CreateBuildingV1"
+	UpdateMethod     string // "UpdateBuildingV1"
+	DeleteMethod     string // "DeleteBuildingV1" (for test generation only)
+	CreateReturnID   string // expression to extract ID from create response: "resp.ID" for HrefResponse, "strconv.Itoa(resp.ID)" for int, "fmt.Sprintf(\"%d\", *resp.ID)" for *int
+	IDNumeric        bool   // true when the create response ID is int (test mock should use numeric JSON)
+	UpdateReturnsVal bool   // true when Update returns (*T, error), false for error-only
+	ExtraArgs         string // additional method signature args, e.g. ", platform bool"
+	ExtraCallArgs     string // additional create call args, e.g. ", platform"
+	ExtraTestCallArgs string // additional create call args with literal zero values for tests, e.g. ", false"
+	ClassicCreate    bool   // true for classic API: Create takes (ctx, "0", request) instead of (ctx, request)
+	NameIsPointer    bool   // true when the name field is a pointer (Classic XML types)
+
+	// Test generation paths (pre-computed from the source ops).
+	ListNamespace string // namespace for the list/resolver call
+	ListVersion   string // version for the list/resolver call
+	ListPath      string // resource path for the list endpoint
+	ListNameField string // JSON name field for resolver response stubs
+	ListIDField   string // JSON id field for resolver response stubs
+	CreateNS      string // namespace for create
+	CreateVer     string // version for create
+	CreatePath    string // resource path for create endpoint (e.g. "/buildings")
+	CreateStatus  int    // expected HTTP status for create response
+	UpdateNS      string // namespace for update
+	UpdateVer     string // version for update
+	UpdatePath    string // resource path for update endpoint (e.g. "/buildings/{id}")
+	UpdateStatus  int    // expected HTTP status for update response
+	SameListCreatePath bool // true when list and create share the same URL (need combined handler in tests)
 }
 
 type GoPathParam struct {

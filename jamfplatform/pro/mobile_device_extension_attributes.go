@@ -185,3 +185,27 @@ func (c *Client) ResolveMobileDeviceExtensionAttributeV1ByName(ctx context.Conte
 	}
 	return &out, nil
 }
+
+// ApplyMobileDeviceExtensionAttributeV1 creates or updates a MobileDeviceExtensionAttributeV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyMobileDeviceExtensionAttributeV1(ctx context.Context, request *MobileDeviceExtensionAttributes) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyMobileDeviceExtensionAttributeV1: Name must not be empty")
+	}
+	id, err := c.ResolveMobileDeviceExtensionAttributeV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateMobileDeviceExtensionAttributeV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyMobileDeviceExtensionAttributeV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyMobileDeviceExtensionAttributeV1: resolve: %w", err)
+	}
+	_, err = c.UpdateMobileDeviceExtensionAttributeV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyMobileDeviceExtensionAttributeV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

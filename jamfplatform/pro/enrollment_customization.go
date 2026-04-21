@@ -376,3 +376,27 @@ func (c *Client) ResolveEnrollmentCustomizationV2ByName(ctx context.Context, nam
 	}
 	return &out, nil
 }
+
+// ApplyEnrollmentCustomizationV2 creates or updates a EnrollmentCustomizationV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyEnrollmentCustomizationV2(ctx context.Context, request *EnrollmentCustomizationV2) (string, bool, error) {
+	name := request.DisplayName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyEnrollmentCustomizationV2: DisplayName must not be empty")
+	}
+	id, err := c.ResolveEnrollmentCustomizationV2IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateEnrollmentCustomizationV2(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyEnrollmentCustomizationV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyEnrollmentCustomizationV2: resolve: %w", err)
+	}
+	_, err = c.UpdateEnrollmentCustomizationV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyEnrollmentCustomizationV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

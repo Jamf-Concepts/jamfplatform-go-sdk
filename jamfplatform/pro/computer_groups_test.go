@@ -430,3 +430,127 @@ func TestResolveStaticComputerGroupV2ByName(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 }
+
+func TestApplySmartComputerGroupV2_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List and create share the same path — single handler dispatches on method.
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    []any{},
+				"totalCount": 0,
+			})
+		case http.MethodPost:
+			writeJSON(t, w, 201, map[string]any{
+				"id":   "new-id",
+				"href": "/new-id",
+			})
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+
+	id, created, err := c.ApplySmartComputerGroupV2(context.Background(), &SmartComputerGroupV2{Name: "target"}, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "new-id" {
+		t.Errorf("id = %q, want new-id", id)
+	}
+}
+
+func TestApplySmartComputerGroupV2_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns a match → resolver succeeds → apply updates.
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "existing-id", "name": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-groups/smart-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, 202, map[string]any{"id": "existing-id"})
+	})
+
+	id, created, err := c.ApplySmartComputerGroupV2(context.Background(), &SmartComputerGroupV2{Name: "target"}, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
+	}
+}
+
+func TestApplyStaticComputerGroupV2_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List and create share the same path — single handler dispatches on method.
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    []any{},
+				"totalCount": 0,
+			})
+		case http.MethodPost:
+			writeJSON(t, w, 201, map[string]any{
+				"id":   "new-id",
+				"href": "/new-id",
+			})
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+
+	id, created, err := c.ApplyStaticComputerGroupV2(context.Background(), &StaticComputerGroupAssignment{Name: "target"}, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "new-id" {
+		t.Errorf("id = %q, want new-id", id)
+	}
+}
+
+func TestApplyStaticComputerGroupV2_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns a match → resolver succeeds → apply updates.
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "existing-id", "name": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-groups/static-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, 202, map[string]any{"id": "existing-id"})
+	})
+
+	id, created, err := c.ApplyStaticComputerGroupV2(context.Background(), &StaticComputerGroupAssignment{Name: "target"}, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
+	}
+}

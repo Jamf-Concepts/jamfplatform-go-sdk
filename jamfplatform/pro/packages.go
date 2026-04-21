@@ -271,3 +271,27 @@ func (c *Client) ResolvePackageV1ByName(ctx context.Context, name string) (*Pack
 	}
 	return &out, nil
 }
+
+// ApplyPackageV1 creates or updates a PackageV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyPackageV1(ctx context.Context, request *Package) (string, bool, error) {
+	name := request.PackageName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyPackageV1: PackageName must not be empty")
+	}
+	id, err := c.ResolvePackageV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreatePackageV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyPackageV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyPackageV1: resolve: %w", err)
+	}
+	_, err = c.UpdatePackageV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyPackageV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

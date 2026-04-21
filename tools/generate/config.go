@@ -80,6 +80,17 @@ type ResolverConfig struct {
 	TypedReturn  string `json:"typedReturn,omitempty"`   // Go type returned by the typed wrapper (e.g. "BlueprintOverview"). Defaults to ResourceType when empty.
 	ExtraParams  string `json:"extraParams,omitempty"`   // filtered mode only: additional query params appended to the list path before the filter (e.g. "section=GENERAL" for endpoints that require a section param to populate filterable fields).
 	ByField      string `json:"byField,omitempty"`       // override the "ByName" suffix in method names (e.g. "BySerialNumber" emits ResolveDeviceIDBySerialNumber). Empty defaults to "ByName".
+	Apply        *ApplyConfig `json:"apply,omitempty"`   // when set, generates an Apply<ResourceType> upsert method that resolves by name, then creates or updates
+}
+
+// ApplyConfig declares an upsert method the generator should emit alongside
+// a resolver. Apply<ResourceType>(ctx, request) resolves the name, creates
+// if not found (404), or updates if found.
+type ApplyConfig struct {
+	CreateOp    string `json:"createOp"`              // name of the Create operation (e.g. "CreateBuildingV1")
+	UpdateOp    string `json:"updateOp"`              // name of the Update operation (e.g. "UpdateBuildingV1")
+	DeleteOp    string `json:"deleteOp,omitempty"`    // name of the Delete operation (for test generation)
+	NameGoField string `json:"nameGoField"`           // Go struct field path to extract the name (e.g. "Name", "DisplayName")
 }
 
 // parseOp splits "GET /v1/devices/{id}" into method and path.

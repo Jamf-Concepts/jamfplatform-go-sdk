@@ -108,3 +108,30 @@ func (c *Client) ResolveAppInstallerDeploymentV1ByName(ctx context.Context, name
 	}
 	return &out, nil
 }
+
+// ApplyAppInstallerDeploymentV1 creates or updates a AppInstallerDeploymentV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeployment) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: Name must not be empty")
+	}
+	id, err := c.ResolveAppInstallerDeploymentV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateAppInstallerDeploymentV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: resolve: %w", err)
+	}
+	_, err = c.UpdateAppInstallerDeploymentV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

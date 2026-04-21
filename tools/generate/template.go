@@ -143,6 +143,67 @@ var funcMap = template.FuncMap{
 		}
 		return ", " + strings.Join(args, ", ")
 	},
+	// applyListPath builds the test-server handler path for the list endpoint
+	// used by the apply method's resolver call.
+	"applyListPath": func(a *GoApply) string {
+		if a.ListVersion == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.ListNamespace, a.ListPath)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.ListNamespace, a.ListVersion, a.ListPath)
+	},
+	// applyCreatePath builds the test-server handler path for the create endpoint.
+	"applyCreatePath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.CreatePath, "test-id")
+		if a.CreateVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.CreateNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.CreateNS, a.CreateVer, path)
+	},
+	// applyUpdatePath builds the test-server handler path for the update endpoint.
+	"applyUpdatePath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.UpdatePath, "existing-id")
+		if a.UpdateVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.UpdateNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.UpdateNS, a.UpdateVer, path)
+	},
+	// applyCreateStatus returns the HTTP status code for test create responses.
+	"applyCreateStatus": func(a *GoApply) int {
+		if a.CreateStatus != 0 {
+			return a.CreateStatus
+		}
+		return 201
+	},
+	// applyUpdateStatus returns the HTTP status code for test update responses.
+	"applyUpdateStatus": func(a *GoApply) int {
+		if a.UpdateStatus != 0 {
+			return a.UpdateStatus
+		}
+		return 200
+	},
+	// applyRequestExpr returns a Go expression for the request struct literal
+	// with the name field populated to "target". Handles both pointer and
+	// non-pointer name fields.
+	"applyRequestExpr": func(a *GoApply) string {
+		if a.NameIsPointer {
+			return fmt.Sprintf("&%s{%s: ptrStr(\"target\")}", a.RequestType, a.NameGoField)
+		}
+		return fmt.Sprintf("&%s{%s: \"target\"}", a.RequestType, a.NameGoField)
+	},
+	// applyTestCreateIDJSON returns the JSON value for the mock create response ID.
+	"applyTestCreateIDJSON": func(a *GoApply) string {
+		if a.IDNumeric {
+			return "42"
+		}
+		return `"new-id"`
+	},
+	// applyTestCreateIDExpected returns the expected string ID after create.
+	"applyTestCreateIDExpected": func(a *GoApply) string {
+		if a.IDNumeric {
+			return "42"
+		}
+		return "new-id"
+	},
 }
 
 var sourceTmpl = template.Must(template.New("source").Funcs(funcMap).Parse(sourceTemplate))
@@ -284,6 +345,8 @@ type {{ .Name }} = string
 {{ template "resolverIDDirect" . }}
 {{- else if eq .Category "resolverTypedDirect" }}
 {{ template "resolverTypedDirect" . }}
+{{- else if eq .Category "apply" }}
+{{ template "apply" . }}
 {{- else }}
 {{ template "action" . }}
 {{- end }}
@@ -670,6 +733,47 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.Ty
 	return c.{{ .Resolver.SourceMethod }}(ctx, name)
 }
 {{ end }}
+
+{{- define "apply" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType }}{{ .Apply.ExtraArgs }}) (string, bool, error) {
+{{- if .Apply.NameIsPointer }}
+	var name string
+	if request.{{ .Apply.NameGoField }} != nil {
+		name = *request.{{ .Apply.NameGoField }}
+	}
+{{- else }}
+	name := request.{{ .Apply.NameGoField }}
+{{- end }}
+	if name == "" {
+		return "", false, fmt.Errorf("{{ .Name }}: {{ .Apply.NameGoField }} must not be empty")
+	}
+	id, err := c.{{ .Apply.ResolverMethod }}(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+{{- if .Apply.ClassicCreate }}
+			resp, createErr := c.{{ .Apply.CreateMethod }}(ctx, "0", request)
+{{- else }}
+			resp, createErr := c.{{ .Apply.CreateMethod }}(ctx, request{{ .Apply.ExtraCallArgs }})
+{{- end }}
+			if createErr != nil {
+				return "", false, fmt.Errorf("{{ .Name }}: create: %w", createErr)
+			}
+			return {{ .Apply.CreateReturnID }}, true, nil
+		}
+		return "", false, fmt.Errorf("{{ .Name }}: resolve: %w", err)
+	}
+{{- if .Apply.UpdateReturnsVal }}
+	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
+{{- else }}
+	err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
+{{- end }}
+	if err != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}
+{{ end }}
 `
 
 // ---------------------------------------------------------------------------
@@ -714,6 +818,8 @@ import (
 <% template "testResolverIDDirect" . %>
 <%- else if eq .Category "resolverTypedDirect" %>
 <% template "testResolverTypedDirect" . %>
+<%- else if eq .Category "apply" %>
+<% template "testApply" . %>
 <%- else %>
 <% template "testAction" . %>
 <%- end %>
@@ -1069,6 +1175,123 @@ func Test<% .Name %>(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+<% end %>
+
+<%- define "testApply" %>
+func Test<% .Name %>_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+<%- if .Apply.SameListCreatePath %>
+	// List and create share the same path — single handler dispatches on method.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    []any{},
+				"totalCount": 0,
+			})
+		case http.MethodPost:
+<%- if .Apply.ClassicCreate %>
+			w.Header().Set("Content-Type", "application/xml")
+			w.WriteHeader(<% applyCreateStatus .Apply %>)
+			_, _ = fmt.Fprint(w, "<?xml version=\"1.0\" encoding=\"UTF-8\"?><id>42</id>")
+<%- else %>
+			writeJSON(t, w, <% applyCreateStatus .Apply %>, map[string]any{
+				"id":   <% applyTestCreateIDJSON .Apply %>,
+				"href": "/new-id",
+			})
+<%- end %>
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+<%- else %>
+	// List returns no matches → resolver returns 404 → apply creates.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []any{},
+			"totalCount": 0,
+		})
+	})
+<%- if .Apply.ClassicCreate %>
+	mux.HandleFunc("<% applyCreatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.Header().Set("Content-Type", "application/xml")
+		w.WriteHeader(<% applyCreateStatus .Apply %>)
+		_, _ = fmt.Fprint(w, "<?xml version=\"1.0\" encoding=\"UTF-8\"?><id>42</id>")
+	})
+<%- else %>
+	mux.HandleFunc("<% applyCreatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, <% applyCreateStatus .Apply %>, map[string]any{
+			"id":   <% applyTestCreateIDJSON .Apply %>,
+			"href": "/new-id",
+		})
+	})
+<%- end %>
+<%- end %>
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+<%- if .Apply.ClassicCreate %>
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+<%- else %>
+	if id != "<% applyTestCreateIDExpected .Apply %>" {
+		t.Errorf("id = %q, want <% applyTestCreateIDExpected .Apply %>", id)
+	}
+<%- end %>
+}
+
+func Test<% .Name %>_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns a match → resolver succeeds → apply updates.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"<% .Apply.ListIDField %>": "existing-id", "<% .Apply.ListNameField %>": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+<%- if .Apply.UpdateReturnsVal %>
+<%- if .Apply.IDNumeric %>
+		writeJSON(t, w, <% applyUpdateStatus .Apply %>, map[string]any{"id": 99})
+<%- else %>
+		writeJSON(t, w, <% applyUpdateStatus .Apply %>, map[string]any{"id": "existing-id"})
+<%- end %>
+<%- else %>
+		w.WriteHeader(<% applyUpdateStatus .Apply %>)
+<%- end %>
+	})
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
 	}
 }
 <% end %>

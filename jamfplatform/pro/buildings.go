@@ -214,3 +214,27 @@ func (c *Client) ResolveBuildingV1ByName(ctx context.Context, name string) (*Bui
 	}
 	return &out, nil
 }
+
+// ApplyBuildingV1 creates or updates a BuildingV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyBuildingV1(ctx context.Context, request *Building) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyBuildingV1: Name must not be empty")
+	}
+	id, err := c.ResolveBuildingV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateBuildingV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyBuildingV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyBuildingV1: resolve: %w", err)
+	}
+	_, err = c.UpdateBuildingV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyBuildingV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

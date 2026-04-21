@@ -31,6 +31,10 @@ func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
 	if err != nil {
 		return nil, err
 	}
+	methods, err = appendApplyMethods(doc, methods, spec)
+	if err != nil {
+		return nil, err
+	}
 	return methods, nil
 }
 
@@ -170,6 +174,179 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 
 		out = append(out, idMethod, typedMethod)
 		} // end for resolvers
+	}
+	return out, nil
+}
+
+// appendApplyMethods synthesizes an Apply<ResourceType> upsert method for
+// each resolver that has an Apply config block. The Apply method:
+//  1. Extracts the name from the request struct
+//  2. Calls Resolve<ResourceType>IDByName
+//  3. If 404: calls Create, returns (newID, true, nil)
+//  4. If found: calls Update with the resolved ID, returns (existingID, false, nil)
+//  5. Ambiguous/other errors propagate as-is
+func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]GoMethod, error) {
+	byName := make(map[string]*GoMethod, len(methods))
+	for i := range methods {
+		byName[methods[i].Name] = &methods[i]
+	}
+	out := append([]GoMethod(nil), methods...)
+	for _, opDef := range spec.Operations {
+		var resolvers []ResolverConfig
+		if opDef.Resolver != nil {
+			resolvers = append(resolvers, *opDef.Resolver)
+		}
+		resolvers = append(resolvers, opDef.Resolvers...)
+		for _, r := range resolvers {
+			if r.Apply == nil {
+				continue
+			}
+			ac := r.Apply
+			if ac.CreateOp == "" || ac.UpdateOp == "" || ac.NameGoField == "" {
+				return nil, fmt.Errorf("apply on %s/%s: createOp, updateOp, and nameGoField are required", opDef.Name, r.ResourceType)
+			}
+			createM, ok := byName[ac.CreateOp]
+			if !ok {
+				return nil, fmt.Errorf("apply on %s: createOp %q not found", r.ResourceType, ac.CreateOp)
+			}
+			updateM, ok := byName[ac.UpdateOp]
+			if !ok {
+				return nil, fmt.Errorf("apply on %s: updateOp %q not found", r.ResourceType, ac.UpdateOp)
+			}
+			// Determine request type from the Create method.
+			requestType := createM.RequestType
+			if requestType == "" {
+				return nil, fmt.Errorf("apply on %s: createOp %q has no request type", r.ResourceType, ac.CreateOp)
+			}
+			// Determine how to extract ID from create response.
+			createReturnID := "resp.ID"
+			switch createM.ResponseType {
+			case "HrefResponse", "AppInstallerDeploymentHrefResponse":
+				createReturnID = "resp.ID"
+			default:
+				// Non-HrefResponse: check if the response has a string or int ID.
+				// The resolver's IDNumeric flag tells us.
+				if r.IDNumeric {
+					createReturnID = "strconv.Itoa(resp.ID)"
+				} else {
+					createReturnID = "resp.ID"
+				}
+			}
+			// Determine if Update returns a value or just error.
+			updateReturnsVal := updateM.ResponseType != ""
+			// Determine extra args from Create's query params.
+			var extraArgs, extraCallArgs, extraTestCallArgs string
+			for _, qp := range createM.QueryParams {
+				goType := qp.Type
+				if goType == "" {
+					goType = "string"
+				}
+				extraArgs += ", " + qp.Go + " " + goType
+				extraCallArgs += ", " + qp.Go
+				// Literal zero value for test calls.
+				switch goType {
+				case "bool":
+					extraTestCallArgs += ", false"
+				case "int", "int64":
+					extraTestCallArgs += ", 0"
+				default:
+					extraTestCallArgs += ", \"\""
+				}
+			}
+			// Determine if this is a Classic create (takes id as first path param).
+			classicCreate := spec.Format == "xml"
+			// Determine whether the name field is a pointer on the generated
+			// Go struct. XML specs always pointer-ify; for JSON specs we
+			// check whether the field is in the schema's required list —
+			// non-required scalars become pointers per schema.go logic.
+			nameIsPointer := spec.Format == "xml"
+			if !nameIsPointer {
+				if schemaRef, ok := doc.Components.Schemas[requestType]; ok && schemaRef != nil && schemaRef.Value != nil {
+					// Map Go field name → JSON property name via the same
+					// exportedGoName conversion the schema emitter uses.
+					nameJSONField := ""
+					for pname := range schemaRef.Value.Properties {
+						if exportedGoName(pname) == ac.NameGoField {
+							nameJSONField = pname
+							break
+						}
+					}
+					if nameJSONField != "" {
+						isRequired := false
+						for _, req := range schemaRef.Value.Required {
+							if req == nameJSONField {
+								isRequired = true
+								break
+							}
+						}
+						if !isRequired {
+							nameIsPointer = true
+						}
+					}
+				}
+			}
+			// Resolver method name (always the ByName variant).
+			resolverMethod := "Resolve" + r.ResourceType + "IDByName"
+			// Delete method (for test generation).
+			deleteMethod := ac.DeleteOp
+
+			// Inherit tag/namespace/version from the source list operation.
+			src := byName[opDef.Name]
+			if src == nil {
+				return nil, fmt.Errorf("apply on %s: source op %q not found", r.ResourceType, opDef.Name)
+			}
+
+			ga := &GoApply{
+				ResourceType:     r.ResourceType,
+				RequestType:      requestType,
+				NameGoField:      ac.NameGoField,
+				ResolverMethod:   resolverMethod,
+				CreateMethod:     ac.CreateOp,
+				UpdateMethod:     ac.UpdateOp,
+				DeleteMethod:     deleteMethod,
+				CreateReturnID:    createReturnID,
+				IDNumeric:         r.IDNumeric,
+				UpdateReturnsVal: updateReturnsVal,
+				ExtraArgs:        extraArgs,
+				ExtraCallArgs:     extraCallArgs,
+				ExtraTestCallArgs: extraTestCallArgs,
+				ClassicCreate:    classicCreate,
+				NameIsPointer:    nameIsPointer,
+				// Test generation paths.
+				ListNamespace: src.Namespace,
+				ListVersion:   src.Version,
+				ListPath:      src.ResourcePath,
+				ListNameField: r.NameField,
+				ListIDField:   r.IDField,
+				CreateNS:      createM.Namespace,
+				CreateVer:     createM.Version,
+				CreatePath:    createM.ResourcePath,
+				CreateStatus:  createM.ExpectedStatus,
+				UpdateNS:      updateM.Namespace,
+				UpdateVer:     updateM.Version,
+				UpdatePath:    updateM.ResourcePath,
+				UpdateStatus:  updateM.ExpectedStatus,
+			}
+			// Check if list and create share the same URL (both path and
+			// namespace/version match). When true, the test template must
+			// register a single mux handler that dispatches on HTTP method
+			// instead of two separate handlers that would panic.
+			ga.SameListCreatePath = ga.ListNamespace == ga.CreateNS &&
+				ga.ListVersion == ga.CreateVer &&
+				ga.ListPath == ga.CreatePath
+
+			m := GoMethod{
+				Name:      "Apply" + r.ResourceType,
+				Category:  "apply",
+				Comment:   "Apply" + r.ResourceType + " creates or updates a " + r.ResourceType + " by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.",
+				Tag:       src.Tag,
+				Namespace: src.Namespace,
+				Version:   src.Version,
+				Format:    src.Format,
+				Apply:     ga,
+			}
+			out = append(out, m)
+		}
 	}
 	return out, nil
 }

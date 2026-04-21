@@ -166,3 +166,27 @@ func (c *Client) ResolveDepartmentV1ByName(ctx context.Context, name string) (*D
 	}
 	return &out, nil
 }
+
+// ApplyDepartmentV1 creates or updates a DepartmentV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyDepartmentV1(ctx context.Context, request *Department) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyDepartmentV1: Name must not be empty")
+	}
+	id, err := c.ResolveDepartmentV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateDepartmentV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyDepartmentV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyDepartmentV1: resolve: %w", err)
+	}
+	_, err = c.UpdateDepartmentV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyDepartmentV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

@@ -337,3 +337,27 @@ func (c *Client) ResolveEnrollmentAccessGroupV3ByName(ctx context.Context, name 
 	}
 	return &out, nil
 }
+
+// ApplyEnrollmentAccessGroupV3 creates or updates a EnrollmentAccessGroupV3 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyEnrollmentAccessGroupV3(ctx context.Context, request *EnrollmentAccessGroupPreview) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyEnrollmentAccessGroupV3: Name must not be empty")
+	}
+	id, err := c.ResolveEnrollmentAccessGroupV3IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateEnrollmentAccessGroupV3(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyEnrollmentAccessGroupV3: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyEnrollmentAccessGroupV3: resolve: %w", err)
+	}
+	_, err = c.UpdateEnrollmentAccessGroupV3(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyEnrollmentAccessGroupV3: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

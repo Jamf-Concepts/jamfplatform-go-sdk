@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListAdvancedUserContentSearchesV1 get All Advanced User Content Search objects.
@@ -91,4 +93,28 @@ func (c *Client) ResolveAdvancedUserContentSearchV1ByName(ctx context.Context, n
 		return nil, fmt.Errorf("ResolveAdvancedUserContentSearchV1ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
+}
+
+// ApplyAdvancedUserContentSearchV1 creates or updates a AdvancedUserContentSearchV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyAdvancedUserContentSearchV1(ctx context.Context, request *AdvancedUserContentSearch) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyAdvancedUserContentSearchV1: Name must not be empty")
+	}
+	id, err := c.ResolveAdvancedUserContentSearchV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateAdvancedUserContentSearchV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyAdvancedUserContentSearchV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyAdvancedUserContentSearchV1: resolve: %w", err)
+	}
+	_, err = c.UpdateAdvancedUserContentSearchV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyAdvancedUserContentSearchV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }
