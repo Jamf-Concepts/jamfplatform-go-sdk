@@ -206,3 +206,39 @@ func (c *Client) ResolveVolumePurchasingLocationV1ByName(ctx context.Context, na
 	}
 	return &out, nil
 }
+
+// ApplyVolumePurchasingLocationV1 creates or updates a VolumePurchasingLocationV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyVolumePurchasingLocationV1(ctx context.Context, request *VolumePurchasingLocationPost) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: Name must not be empty")
+	}
+	id, err := c.ResolveVolumePurchasingLocationV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateVolumePurchasingLocationV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: resolve: %w", err)
+	}
+	// Convert create request to update type via JSON round-trip.
+	data, marshalErr := json.Marshal(request)
+	if marshalErr != nil {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: marshal for update(%s): %w", id, marshalErr)
+	}
+	var updateReq VolumePurchasingLocationPatch
+	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: unmarshal for update(%s): %w", id, unmarshalErr)
+	}
+	_, err = c.UpdateVolumePurchasingLocationV1(ctx, id, &updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

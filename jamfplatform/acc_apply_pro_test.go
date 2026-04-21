@@ -1164,3 +1164,391 @@ func TestAcceptance_ApplyUserV1(t *testing.T) {
 }
 
 // ---------- helpers ----------
+
+// ---------- PatchSoftwareTitleConfigurationV2 ----------
+
+func TestAcceptance_ApplyPatchSoftwareTitleConfigurationV2(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	// Patch software title configurations require a valid softwareTitleId,
+	// which depends on an external patch source (e.g. Jamf's built-in patch
+	// management definitions). List existing configs to find one, or skip.
+	existing, err := p.ListPatchSoftwareTitleConfigurationsV2(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListPatchSoftwareTitleConfigurationsV2: %v", err)
+	}
+	if len(existing) == 0 {
+		t.Skip("tenant has no patch software title configurations — cannot determine softwareTitleId for Apply test")
+	}
+
+	// Use the first config's softwareTitleId for the new config.
+	ref := existing[0]
+	softwareTitleID := ref.SoftwareTitleID
+	t.Logf("using softwareTitleId=%s from existing config %s (%s)", softwareTitleID, ref.ID, ref.DisplayName)
+
+	name := "sdk-acc-apply-patchtitle-" + runSuffix()
+
+	// 1. Apply creates
+	id, created, err := p.ApplyPatchSoftwareTitleConfigurationV2(ctx, &pro.PatchSoftwareTitleConfigurationBase{
+		DisplayName:     name,
+		SoftwareTitleID: softwareTitleID,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("apply create: %v", err)
+	}
+	cleanupDelete(t, "PatchSoftwareTitleConfig "+id, func() error { return p.DeletePatchSoftwareTitleConfigurationV2(ctx, id) })
+	if !created {
+		t.Error("expected created = true on first apply")
+	}
+	t.Logf("created patch software title config id=%s", id)
+
+	// 2. Apply updates (JSON round-trip: PatchSoftwareTitleConfigurationBase → PatchSoftwareTitleConfigurationPatch)
+	id2, created2, err := p.ApplyPatchSoftwareTitleConfigurationV2(ctx, &pro.PatchSoftwareTitleConfigurationBase{
+		DisplayName:     name,
+		SoftwareTitleID: softwareTitleID,
+	})
+	if err != nil {
+		t.Fatalf("apply update: %v", err)
+	}
+	if created2 {
+		t.Error("expected created = false on second apply")
+	}
+	if id2 != id {
+		t.Errorf("id mismatch: first=%s second=%s", id, id2)
+	}
+
+	// 3. Delete + verify 404
+	if err := p.DeletePatchSoftwareTitleConfigurationV2(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = p.ResolvePatchSoftwareTitleConfigurationV2IDByName(ctx, name)
+	if err == nil {
+		t.Fatal("expected 404 after delete")
+	}
+}
+
+// ---------- SupervisionIdentityV1 ----------
+
+func TestAcceptance_ApplySupervisionIdentityV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	name := "sdk-acc-apply-supervision-" + runSuffix()
+
+	// 1. Apply creates (SupervisionIdentityCreate has Password; update type SupervisionIdentityUpdate doesn't)
+	id, created, err := p.ApplySupervisionIdentityV1(ctx, &pro.SupervisionIdentityCreate{
+		DisplayName: name,
+		Password:    "sdk-acc-test-pwd",
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("apply create: %v", err)
+	}
+	cleanupDelete(t, "SupervisionIdentity "+id, func() error { return p.DeleteSupervisionIdentityV1(ctx, id) })
+	if !created {
+		t.Error("expected created = true on first apply")
+	}
+	t.Logf("created supervision identity id=%s", id)
+
+	// 2. Apply updates
+	id2, created2, err := p.ApplySupervisionIdentityV1(ctx, &pro.SupervisionIdentityCreate{
+		DisplayName: name,
+		Password:    "sdk-acc-test-pwd-2",
+	})
+	if err != nil {
+		t.Fatalf("apply update: %v", err)
+	}
+	if created2 {
+		t.Error("expected created = false on second apply")
+	}
+	if id2 != id {
+		t.Errorf("id mismatch: first=%s second=%s", id, id2)
+	}
+
+	// 3. Delete + verify 404
+	if err := p.DeleteSupervisionIdentityV1(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = p.ResolveSupervisionIdentityV1IDByName(ctx, name)
+	if err == nil {
+		t.Fatal("expected 404 after delete")
+	}
+}
+
+// ---------- VolumePurchasingLocationV1 ----------
+
+func TestAcceptance_ApplyVolumePurchasingLocationV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	token := vppToken(t) // skips if JAMFPLATFORM_VPP_TOKEN not set
+	name := "sdk-acc-apply-vpl-" + runSuffix()
+
+	// 1. Apply creates (VolumePurchasingLocationPost has ServiceToken; update type VolumePurchasingLocationPatch doesn't require it)
+	id, created, err := p.ApplyVolumePurchasingLocationV1(ctx, &pro.VolumePurchasingLocationPost{
+		Name:         &name,
+		ServiceToken: token,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("apply create: %v", err)
+	}
+	cleanupDelete(t, "VolumePurchasingLocation "+id, func() error { return p.DeleteVolumePurchasingLocationV1(ctx, id) })
+	if !created {
+		t.Error("expected created = true on first apply")
+	}
+	t.Logf("created volume purchasing location id=%s", id)
+
+	// 2. Apply updates
+	id2, created2, err := p.ApplyVolumePurchasingLocationV1(ctx, &pro.VolumePurchasingLocationPost{
+		Name:         &name,
+		ServiceToken: token,
+	})
+	if err != nil {
+		t.Fatalf("apply update: %v", err)
+	}
+	if created2 {
+		t.Error("expected created = false on second apply")
+	}
+	if id2 != id {
+		t.Errorf("id mismatch: first=%s second=%s", id, id2)
+	}
+
+	// 3. Delete + verify 404
+	if err := p.DeleteVolumePurchasingLocationV1(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = p.ResolveVolumePurchasingLocationV1IDByName(ctx, name)
+	if err == nil {
+		t.Fatal("expected 404 after delete")
+	}
+}
+
+// ---------- Prestage Apply (Computer + Mobile, shared DEP token) ----------
+
+// TestAcceptance_ApplyPrestages exercises both ComputerPrestageV3 and
+// MobileDevicePrestageV3 Apply lifecycle sharing a single DEP token:
+//  1. Upload DEP token
+//  2. Apply computer prestage (create)
+//  3. Apply computer prestage (update)
+//  4. Apply mobile device prestage (create)
+//  5. Apply mobile device prestage (update)
+//  6. Delete both prestages
+//  7. Delete DEP token (via t.Cleanup registered by createDepInstance)
+func TestAcceptance_ApplyPrestages(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	// 1. Upload DEP token — shared by both prestage sub-tests.
+	depID := createDepInstance(t, "apply-prestages")
+	t.Logf("DEP instance %s ready", depID)
+
+	emptyStr := ""
+	falseVal := false
+	zeroStr := "0"
+	zeroVersion := 0
+	prefillCustom := "CUSTOM"
+	userAccountAdmin := "ADMINISTRATOR"
+
+	t.Run("ComputerPrestageV3", func(t *testing.T) {
+		name := "sdk-acc-apply-compprestage-" + runSuffix()
+
+		req := &pro.PostComputerPrestageV3{
+			DisplayName:                       name,
+			DeviceEnrollmentProgramInstanceID: depID,
+			AccountSettings: &pro.AccountSettingsRequest{
+				ID:                                      &zeroStr,
+				VersionLock:                             &zeroVersion,
+				PayloadConfigured:                       &falseVal,
+				HiddenAdminAccount:                      &falseVal,
+				LocalAdminAccountEnabled:                &falseVal,
+				LocalUserManaged:                        &falseVal,
+				AdminUsername:                           &emptyStr,
+				PrefillAccountFullName:                  &emptyStr,
+				PrefillAccountUserName:                  &emptyStr,
+				PrefillPrimaryAccountInfoFeatureEnabled: &falseVal,
+				PrefillType:                             &prefillCustom,
+				PreventPrefillInfoFromModification:      &falseVal,
+				UserAccountType:                         &userAccountAdmin,
+			},
+			DefaultPrestage:                    false,
+			Mandatory:                          false,
+			MDMRemovable:                       true,
+			AutoAdvanceSetup:                   false,
+			PreventActivationLock:              false,
+			EnableDeviceBasedActivationLock:    false,
+			InstallProfilesDuringSetup:         false,
+			KeepExistingSiteMembership:         false,
+			KeepExistingLocationInformation:    false,
+			RequireAuthentication:              false,
+			EnableRecoveryLock:                 false,
+			RotateRecoveryLockPassword:         false,
+			RecoveryLockPasswordType:           "MANUAL",
+			EnrollmentSiteID:                   "-1",
+			CustomPackageDistributionPointID:   "-1",
+			EnrollmentCustomizationID:          "0",
+			PrestageMinimumOsTargetVersionType: "NO_ENFORCEMENT",
+			SkipSetupItems:                     map[string]bool{},
+			AnchorCertificates:                 []string{},
+			CustomPackageIds:                   []string{},
+			PrestageInstalledProfileIds:        []string{},
+			LocationInformation: &pro.LocationInformationV2{
+				ID:           "-1",
+				VersionLock:  0,
+				DepartmentID: "-1",
+				BuildingID:   "-1",
+			},
+			PurchasingInformation: &pro.PrestagePurchasingInformationV2{
+				ID:           "-1",
+				VersionLock:  0,
+				Purchased:    true,
+				LeaseDate:    "1970-01-01",
+				PoDate:       "1970-01-01",
+				WarrantyDate: "1970-01-01",
+			},
+		}
+
+		// 2. Apply creates
+		id, created, err := p.ApplyComputerPrestageV3(ctx, req)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("apply create: %v", err)
+		}
+		cleanupDelete(t, "ComputerPrestage "+id, func() error { return p.DeleteComputerPrestageV3(ctx, id) })
+		if !created {
+			t.Error("expected created = true on first apply")
+		}
+		t.Logf("created computer prestage id=%s", id)
+
+		got, err := p.GetComputerPrestageV3(ctx, id)
+		if err != nil {
+			t.Fatalf("get after create: %v", err)
+		}
+		t.Logf("after create: versionLock=%d", got.VersionLock)
+
+		// 3. Apply updates — versionLock injection exercised
+		req.Mandatory = true // change something to force a real update
+		id2, created2, err := p.ApplyComputerPrestageV3(ctx, req)
+		if err != nil {
+			t.Fatalf("apply update: %v", err)
+		}
+		if created2 {
+			t.Error("expected created = false on second apply")
+		}
+		if id2 != id {
+			t.Errorf("id mismatch: first=%s second=%s", id, id2)
+		}
+
+		got2, err := p.GetComputerPrestageV3(ctx, id)
+		if err != nil {
+			t.Fatalf("get after update: %v", err)
+		}
+		if got2.VersionLock <= got.VersionLock {
+			t.Errorf("versionLock did not advance: was %d, now %d", got.VersionLock, got2.VersionLock)
+		}
+		t.Logf("after update: versionLock=%d", got2.VersionLock)
+
+		// 6. Delete + verify 404
+		if err := p.DeleteComputerPrestageV3(ctx, id); err != nil {
+			t.Fatalf("delete: %v", err)
+		}
+		_, err = p.ResolveComputerPrestageV3IDByName(ctx, name)
+		if err == nil {
+			t.Fatal("expected 404 after delete")
+		}
+	})
+
+	t.Run("MobileDevicePrestageV3", func(t *testing.T) {
+		name := "sdk-acc-apply-mobprestage-" + runSuffix()
+
+		req := &pro.MobileDevicePrestageV3{
+			DisplayName:                            name,
+			DeviceEnrollmentProgramInstanceID:      depID,
+			DefaultPrestage:                        false,
+			Mandatory:                              false,
+			MDMRemovable:                           true,
+			AutoAdvanceSetup:                       false,
+			AllowPairing:                           true,
+			MultiUser:                              false,
+			MaximumSharedAccounts:                  0,
+			ConfigureDeviceBeforeSetupAssistant:    false,
+			RtsConfigProfileID:                     "-1",
+			SkipSetupItems:                         map[string]bool{},
+			EnrollmentSiteID:                       "-1",
+			EnrollmentCustomizationID:              "0",
+			PrestageMinimumOsTargetVersionTypeIos:  "NO_ENFORCEMENT",
+			PrestageMinimumOsTargetVersionTypeIpad: "NO_ENFORCEMENT",
+			AnchorCertificates:                     []string{},
+			LocationInformation: &pro.LocationInformationV3{
+				ID:           "-1",
+				VersionLock:  0,
+				DepartmentID: "-1",
+				BuildingID:   "-1",
+			},
+			PurchasingInformation: &pro.PrestagePurchasingInformationV3{
+				ID:           "-1",
+				VersionLock:  0,
+				Purchased:    true,
+				LeaseDate:    "1970-01-01",
+				PoDate:       "1970-01-01",
+				WarrantyDate: "1970-01-01",
+			},
+		}
+
+		// 4. Apply creates
+		id, created, err := p.ApplyMobileDevicePrestageV3(ctx, req)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("apply create: %v", err)
+		}
+		cleanupDelete(t, "MobileDevicePrestage "+id, func() error { return p.DeleteMobileDevicePrestageV3(ctx, id) })
+		if !created {
+			t.Error("expected created = true on first apply")
+		}
+		t.Logf("created mobile device prestage id=%s", id)
+
+		got, err := p.GetMobileDevicePrestageV3(ctx, id)
+		if err != nil {
+			t.Fatalf("get after create: %v", err)
+		}
+		t.Logf("after create: versionLock=%d", got.VersionLock)
+
+		// 5. Apply updates — versionLock injection exercised
+		req.Mandatory = true // change something to force a real update
+		id2, created2, err := p.ApplyMobileDevicePrestageV3(ctx, req)
+		if err != nil {
+			t.Fatalf("apply update: %v", err)
+		}
+		if created2 {
+			t.Error("expected created = false on second apply")
+		}
+		if id2 != id {
+			t.Errorf("id mismatch: first=%s second=%s", id, id2)
+		}
+
+		got2, err := p.GetMobileDevicePrestageV3(ctx, id)
+		if err != nil {
+			t.Fatalf("get after update: %v", err)
+		}
+		if got2.VersionLock <= got.VersionLock {
+			t.Errorf("versionLock did not advance: was %d, now %d", got.VersionLock, got2.VersionLock)
+		}
+		t.Logf("after update: versionLock=%d", got2.VersionLock)
+
+		// 6. Delete + verify 404
+		if err := p.DeleteMobileDevicePrestageV3(ctx, id); err != nil {
+			t.Fatalf("delete: %v", err)
+		}
+		_, err = p.ResolveMobileDevicePrestageV3IDByName(ctx, name)
+		if err == nil {
+			t.Fatal("expected 404 after delete")
+		}
+	})
+}

@@ -167,3 +167,39 @@ func (c *Client) ResolveComputerPrestageV3ByName(ctx context.Context, name strin
 	}
 	return &out, nil
 }
+
+// ApplyComputerPrestageV3 creates or updates a ComputerPrestageV3 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyComputerPrestageV3(ctx context.Context, request *PostComputerPrestageV3) (string, bool, error) {
+	name := request.DisplayName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: DisplayName must not be empty")
+	}
+	id, err := c.ResolveComputerPrestageV3IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			zeroVersionLock(request)
+			resp, createErr := c.CreateComputerPrestageV3(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyComputerPrestageV3: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: resolve: %w", err)
+	}
+	// Fetch current resource to extract versionLock values for optimistic locking.
+	current, getErr := c.GetComputerPrestageV3(ctx, id)
+	if getErr != nil {
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: get for versionLock(%s): %w", id, getErr)
+	}
+	// Convert create request to update type via JSON round-trip,
+	// then inject current versionLock values from the fetched resource.
+	updateReq, convErr := convertAndInjectVersionLock[PutComputerPrestageV3, GetComputerPrestageV3](request, current)
+	if convErr != nil {
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: convert for update(%s): %w", id, convErr)
+	}
+	_, err = c.UpdateComputerPrestageV3(ctx, id, updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}

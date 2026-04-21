@@ -131,6 +131,19 @@ type GoApply struct {
 	NameIsPointer    bool   // true when the name field is a pointer (Classic XML types)
 	NameNested       bool   // true when the name is inside a nested struct (e.g. General.Name)
 
+	// UpdateType support — when the update operation takes a different Go type than create.
+	UpdateType        string // Go type for the update request (empty = same as RequestType)
+	HasUpdateType     bool   // true when UpdateType is set (different create/update types)
+
+	// Optimistic locking (versionLock) — for prestages.
+	VersionLock bool   // true when create must zero VersionLock fields and update must GET→inject them
+	GetMethod   string // GET operation name (e.g. "GetComputerPrestageV3") — required when VersionLock is true
+	GetNS       string // namespace for get
+	GetVer      string // version for get
+	GetPath     string // resource path for get endpoint
+	GetType     string // Go type for the GET response (e.g. "GetComputerPrestageV3")
+	SameGetUpdatePath bool // true when GET and Update share the same URL (need combined handler in tests)
+
 	// Test generation paths (pre-computed from the source ops).
 	ListNamespace string // namespace for the list/resolver call
 	ListVersion   string // version for the list/resolver call

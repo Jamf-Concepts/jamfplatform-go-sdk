@@ -175,6 +175,15 @@ var funcMap = template.FuncMap{
 		}
 		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.UpdateNS, a.UpdateVer, path)
 	},
+	// applyGetPath builds the test-server handler path for the get endpoint
+	// used by versionLock-enabled apply methods.
+	"applyGetPath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.GetPath, "existing-id")
+		if a.GetVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.GetNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.GetNS, a.GetVer, path)
+	},
 	// applyCreateStatus returns the HTTP status code for test create responses.
 	"applyCreateStatus": func(a *GoApply) int {
 		if a.CreateStatus != 0 {
@@ -768,6 +777,9 @@ func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType
 	id, err := c.{{ .Apply.ResolverMethod }}(ctx, name)
 	if err != nil {
 		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+{{- if .Apply.VersionLock }}
+			zeroVersionLock(request)
+{{- end }}
 {{- if .Apply.ClassicCreate }}
 			resp, createErr := c.{{ .Apply.CreateMethod }}(ctx, "0", request)
 {{- else }}
@@ -780,10 +792,46 @@ func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType
 		}
 		return "", false, fmt.Errorf("{{ .Name }}: resolve: %w", err)
 	}
+{{- if .Apply.HasUpdateType }}
+{{- if .Apply.VersionLock }}
+	// Fetch current resource to extract versionLock values for optimistic locking.
+	current, getErr := c.{{ .Apply.GetMethod }}(ctx, id)
+	if getErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: get for versionLock(%s): %w", id, getErr)
+	}
+	// Convert create request to update type via JSON round-trip,
+	// then inject current versionLock values from the fetched resource.
+	updateReq, convErr := convertAndInjectVersionLock[{{ .Apply.UpdateType }}, {{ .Apply.GetType }}](request, current)
+	if convErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: convert for update(%s): %w", id, convErr)
+	}
+{{- if .Apply.UpdateReturnsVal }}
+	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, updateReq)
+{{- else }}
+	err = c.{{ .Apply.UpdateMethod }}(ctx, id, updateReq)
+{{- end }}
+{{- else }}
+	// Convert create request to update type via JSON round-trip.
+	data, marshalErr := json.Marshal(request)
+	if marshalErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: marshal for update(%s): %w", id, marshalErr)
+	}
+	var updateReq {{ .Apply.UpdateType }}
+	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: unmarshal for update(%s): %w", id, unmarshalErr)
+	}
+{{- if .Apply.UpdateReturnsVal }}
+	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, &updateReq)
+{{- else }}
+	err = c.{{ .Apply.UpdateMethod }}(ctx, id, &updateReq)
+{{- end }}
+{{- end }}
+{{- else }}
 {{- if .Apply.UpdateReturnsVal }}
 	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
 {{- else }}
 	err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
+{{- end }}
 {{- end }}
 	if err != nil {
 		return "", false, fmt.Errorf("{{ .Name }}: update(%s): %w", id, err)
@@ -1312,6 +1360,40 @@ func Test<% .Name %>_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
+<%- if .Apply.VersionLock %>
+<%- if .Apply.SameGetUpdatePath %>
+	// GET (versionLock fetch) and Update share the same path — dispatch on method.
+	mux.HandleFunc("<% applyGetPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "versionLock": 5})
+		case http.MethodPut, http.MethodPatch:
+<%- if .Apply.UpdateReturnsVal %>
+			writeJSON(t, w, <% applyUpdateStatus .Apply %>, map[string]any{"id": "existing-id"})
+<%- else %>
+			w.WriteHeader(<% applyUpdateStatus .Apply %>)
+<%- end %>
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+<%- else %>
+	// GET handler for versionLock fetch.
+	mux.HandleFunc("<% applyGetPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "versionLock": 5})
+	})
+	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+<%- if .Apply.UpdateReturnsVal %>
+		writeJSON(t, w, <% applyUpdateStatus .Apply %>, map[string]any{"id": "existing-id"})
+<%- else %>
+		w.WriteHeader(<% applyUpdateStatus .Apply %>)
+<%- end %>
+	})
+<%- end %>
+<%- else %>
 	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
 <%- if .Apply.UpdateReturnsVal %>
 <%- if .Apply.IDNumeric %>
@@ -1323,6 +1405,7 @@ func Test<% .Name %>_Update(t *testing.T) {
 		w.WriteHeader(<% applyUpdateStatus .Apply %>)
 <%- end %>
 	})
+<%- end %>
 
 	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
 	if err != nil {

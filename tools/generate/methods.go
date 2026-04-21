@@ -389,6 +389,39 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				ga.ListVersion == ga.CreateVer &&
 				ga.ListPath == ga.CreatePath
 
+			// UpdateType: when the update operation takes a different Go
+			// type than the create operation, record it for template use.
+			// The template will JSON-marshal the create request and unmarshal
+			// into the update type on the update path.
+			if ac.UpdateType != "" {
+				ga.UpdateType = ac.UpdateType
+				ga.HasUpdateType = true
+			}
+
+			// VersionLock: optimistic locking for prestages. On create,
+			// zero all VersionLock fields recursively. On update, GET the
+			// current resource to extract VersionLock values, then inject
+			// them into the update request.
+			if ac.VersionLock {
+				if ac.GetOp == "" {
+					return nil, fmt.Errorf("apply on %s: versionLock requires getOp", r.ResourceType)
+				}
+				getM, ok := byName[ac.GetOp]
+				if !ok {
+					return nil, fmt.Errorf("apply on %s: getOp %q not found", r.ResourceType, ac.GetOp)
+				}
+				ga.VersionLock = true
+				ga.GetMethod = ac.GetOp
+				ga.GetNS = getM.Namespace
+				ga.GetVer = getM.Version
+				ga.GetPath = getM.ResourcePath
+				ga.GetType = getM.ResponseType
+				// Check if GET and Update share the same URL path.
+				ga.SameGetUpdatePath = ga.GetNS == ga.UpdateNS &&
+					ga.GetVer == ga.UpdateVer &&
+					ga.GetPath == updateM.ResourcePath
+			}
+
 			// Classic test stubs need XML wire names for resolver and create responses.
 			if classicCreate {
 				ga.ClassicResolverWireName = src.ResponseWireName

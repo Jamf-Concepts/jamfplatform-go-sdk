@@ -1320,7 +1320,14 @@
             "nameField": "displayName",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "PatchSoftwareTitleConfiguration"
+            "typedReturn": "PatchSoftwareTitleConfiguration",
+            "apply": {
+              "createOp": "CreatePatchSoftwareTitleConfigurationV2",
+              "updateOp": "UpdatePatchSoftwareTitleConfigurationV2",
+              "deleteOp": "DeletePatchSoftwareTitleConfigurationV2",
+              "nameGoField": "DisplayName",
+              "updateType": "PatchSoftwareTitleConfigurationPatch"
+            }
           }
         },
         {
@@ -1720,7 +1727,16 @@
             "resourceType": "ComputerPrestageV3",
             "nameField": "displayName",
             "idField": "id",
-            "mode": "clientFilter"
+            "mode": "clientFilter",
+            "apply": {
+              "createOp": "CreateComputerPrestageV3",
+              "updateOp": "UpdateComputerPrestageV3",
+              "deleteOp": "DeleteComputerPrestageV3",
+              "nameGoField": "DisplayName",
+              "updateType": "PutComputerPrestageV3",
+              "getOp": "GetComputerPrestageV3",
+              "versionLock": true
+            }
           }
         },
         {
@@ -1783,7 +1799,16 @@
             "resourceType": "MobileDevicePrestageV3",
             "nameField": "displayName",
             "idField": "id",
-            "mode": "clientFilter"
+            "mode": "clientFilter",
+            "apply": {
+              "createOp": "CreateMobileDevicePrestageV3",
+              "updateOp": "UpdateMobileDevicePrestageV3",
+              "deleteOp": "DeleteMobileDevicePrestageV3",
+              "nameGoField": "DisplayName",
+              "updateType": "PutMobileDevicePrestageV3",
+              "getOp": "GetMobileDevicePrestageV3",
+              "versionLock": true
+            }
           }
         },
         {
@@ -2924,7 +2949,14 @@
             "nameField": "name",
             "idField": "id",
             "mode": "filtered",
-            "typedReturn": "VolumePurchasingLocation"
+            "typedReturn": "VolumePurchasingLocation",
+            "apply": {
+              "createOp": "CreateVolumePurchasingLocationV1",
+              "updateOp": "UpdateVolumePurchasingLocationV1",
+              "deleteOp": "DeleteVolumePurchasingLocationV1",
+              "nameGoField": "Name",
+              "updateType": "VolumePurchasingLocationPatch"
+            }
           }
         },
         {
@@ -3554,7 +3586,14 @@
             "idField": "id",
             "idNumeric": true,
             "mode": "clientFilter",
-            "typedReturn": "SupervisionIdentity"
+            "typedReturn": "SupervisionIdentity",
+            "apply": {
+              "createOp": "CreateSupervisionIdentityV1",
+              "updateOp": "UpdateSupervisionIdentityV1",
+              "deleteOp": "DeleteSupervisionIdentityV1",
+              "nameGoField": "DisplayName",
+              "updateType": "SupervisionIdentityUpdate"
+            }
           }
         },
         {

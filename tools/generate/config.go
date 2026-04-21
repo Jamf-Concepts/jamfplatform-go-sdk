@@ -91,6 +91,9 @@ type ApplyConfig struct {
 	UpdateOp    string `json:"updateOp"`              // name of the Update operation (e.g. "UpdateBuildingV1")
 	DeleteOp    string `json:"deleteOp,omitempty"`    // name of the Delete operation (for test generation)
 	NameGoField string `json:"nameGoField"`           // Go struct field path to extract the name (e.g. "Name", "DisplayName")
+	UpdateType  string `json:"updateType,omitempty"`  // Go type for the update request when it differs from create (triggers JSON round-trip conversion)
+	GetOp       string `json:"getOp,omitempty"`       // GET operation name for fetching current resource (required when versionLock is true)
+	VersionLock bool   `json:"versionLock,omitempty"` // when true, zeros VersionLock on create and fetches+injects current VersionLock on update
 }
 
 // parseOp splits "GET /v1/devices/{id}" into method and path.
