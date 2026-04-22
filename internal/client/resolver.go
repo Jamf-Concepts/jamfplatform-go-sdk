@@ -321,6 +321,12 @@ func extractListElements(body []byte, resultsField string) ([]json.RawMessage, e
 				}
 			}
 		}
+		// resultsField was absent or not an array. Treat the whole object as
+		// a single-element slice so matching applies uniformly. This is
+		// intentional for direct-mode resolvers whose by-name endpoint returns
+		// one resource object rather than a list envelope. If you hit this path
+		// unexpectedly, check that resultsField in the resolver config matches
+		// the actual envelope key (e.g. "benchmarks" vs "results").
 		return []json.RawMessage{append(json.RawMessage(nil), trimmed...)}, nil
 	}
 	var arr []json.RawMessage

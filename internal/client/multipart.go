@@ -57,10 +57,15 @@ func (c *Transport) DoMultipart(ctx context.Context, method, path string, fields
 	if err != nil {
 		return err
 	}
-	// Retry once on 429 if all file parts are rewindable.
+	// Retry once on 429 if all file parts are rewindable and the server
+	// provides a Retry-After delay. The ctx bounds the total wait — callers
+	// that want a hard ceiling pass a deadline context. We do not cap the
+	// delay ourselves: a server-specified Retry-After of >N seconds is a
+	// real signal and silently skipping the retry would surface a 429 error
+	// with no indication that a retry was possible.
 	if resp.StatusCode == http.StatusTooManyRequests && multipartRewindable(fields) {
 		delay := parseRetryAfter(resp.Header.Get("Retry-After"), time.Now())
-		if delay > 0 && delay <= 60*time.Second {
+		if delay > 0 {
 			_ = resp.Body.Close()
 			if err := rewindMultipart(fields); err != nil {
 				return err
@@ -141,7 +146,8 @@ func (c *Transport) handleMultipartResponse(ctx context.Context, resp *http.Resp
 			Body:       string(body),
 		}
 		var apiErr ApiError
-		if err := json.Unmarshal(body, &apiErr); err == nil && len(apiErr.Errors) > 0 {
+		_ = json.Unmarshal(body, &apiErr) // best-effort; non-JSON bodies leave apiErr zero
+		if len(apiErr.Errors) > 0 {
 			if apiErr.HTTPStatus > 0 {
 				respErr.StatusCode = apiErr.HTTPStatus
 			}
