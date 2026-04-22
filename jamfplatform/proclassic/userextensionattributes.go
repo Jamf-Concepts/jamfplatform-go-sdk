@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetUserExtensionAttributeByID finds user extension attributes by ID.
@@ -94,4 +97,48 @@ func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensio
 		return nil, fmt.Errorf("ListUserExtensionAttributes: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveUserExtensionAttributeIDByName looks up a UserExtensionAttribute by name via GetUserExtensionAttributeByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveUserExtensionAttributeIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetUserExtensionAttributeByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveUserExtensionAttributeIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveUserExtensionAttributeIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveUserExtensionAttributeByName looks up a UserExtensionAttribute by name. Alias for GetUserExtensionAttributeByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveUserExtensionAttributeByName(ctx context.Context, name string) (*UserExtensionAttribute, error) {
+	return c.GetUserExtensionAttributeByName(ctx, name)
+}
+
+// ApplyUserExtensionAttribute creates or updates a UserExtensionAttribute by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyUserExtensionAttribute(ctx context.Context, request *UserExtensionAttribute) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyUserExtensionAttribute: Name must not be empty")
+	}
+	id, err := c.ResolveUserExtensionAttributeIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateUserExtensionAttributeByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyUserExtensionAttribute: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyUserExtensionAttribute: resolve: %w", err)
+	}
+	err = c.UpdateUserExtensionAttributeByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyUserExtensionAttribute: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

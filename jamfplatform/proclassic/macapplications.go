@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetMacApplicationByID finds mac applications by ID.
@@ -116,4 +119,48 @@ func (c *Client) GetMacApplicationByNameSubset(ctx context.Context, name string,
 		return nil, fmt.Errorf("GetMacApplicationByNameSubset(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolveMacApplicationIDByName looks up a MacApplication by name via GetMacApplicationByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveMacApplicationIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetMacApplicationByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMacApplicationIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveMacApplicationIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveMacApplicationByName looks up a MacApplication by name. Alias for GetMacApplicationByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveMacApplicationByName(ctx context.Context, name string) (*MacApplication, error) {
+	return c.GetMacApplicationByName(ctx, name)
+}
+
+// ApplyMacApplication creates or updates a MacApplication by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyMacApplication(ctx context.Context, request *MacApplication) (string, bool, error) {
+	var name string
+	if request.General != nil && request.General.Name != nil {
+		name = *request.General.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyMacApplication: Name must not be empty")
+	}
+	id, err := c.ResolveMacApplicationIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateMacApplicationByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyMacApplication: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyMacApplication: resolve: %w", err)
+	}
+	err = c.UpdateMacApplicationByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyMacApplication: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

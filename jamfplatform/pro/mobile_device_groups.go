@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -255,4 +256,145 @@ func (c *Client) EraseMobileDeviceGroupV1(ctx context.Context, id string, reques
 		return fmt.Errorf("EraseMobileDeviceGroupV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveMobileDeviceGroupV1IDByName looks up a MobileDeviceGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceGroupV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMobileDeviceGroupV1ByName looks up a MobileDeviceGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMobileDeviceGroupV1ByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceGroupV1ByName(%s): %w", name, err)
+	}
+	var out MobileDeviceGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveSmartMobileDeviceGroupV1IDByName looks up a SmartMobileDeviceGroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveSmartMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups/smart-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSmartMobileDeviceGroupV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveSmartMobileDeviceGroupV1ByName looks up a SmartMobileDeviceGroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveSmartMobileDeviceGroupV1ByName(ctx context.Context, name string) (*SmartGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups/smart-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV1ByName(%s): %w", name, err)
+	}
+	var out SmartGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveStaticMobileDeviceGroupV1IDByName looks up a StaticMobileDeviceGroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveStaticMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups/static-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveStaticMobileDeviceGroupV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveStaticMobileDeviceGroupV1ByName looks up a StaticMobileDeviceGroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveStaticMobileDeviceGroupV1ByName(ctx context.Context, name string) (*StaticGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/mobile-device-groups/static-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveStaticMobileDeviceGroupV1ByName(%s): %w", name, err)
+	}
+	var out StaticGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveStaticMobileDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplySmartMobileDeviceGroupV1 creates or updates a SmartMobileDeviceGroupV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplySmartMobileDeviceGroupV1(ctx context.Context, request *SmartGroupAssignment, platform bool) (string, bool, error) {
+	name := request.GroupName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV1: GroupName must not be empty")
+	}
+	id, err := c.ResolveSmartMobileDeviceGroupV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateSmartMobileDeviceGroupV1(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV1: resolve: %w", err)
+	}
+	_, err = c.UpdateSmartMobileDeviceGroupV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}
+
+// ApplyStaticMobileDeviceGroupV1 creates or updates a StaticMobileDeviceGroupV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyStaticMobileDeviceGroupV1(ctx context.Context, request *StaticGroupAssignment, platform bool) (string, bool, error) {
+	name := request.GroupName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: GroupName must not be empty")
+	}
+	id, err := c.ResolveStaticMobileDeviceGroupV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateStaticMobileDeviceGroupV1(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: resolve: %w", err)
+	}
+	// Fetch current membership to preserve existing devices in the patch.
+	membership, memberErr := c.ListStaticMobileDeviceGroupMembershipV1(ctx, id, nil, "")
+	if memberErr != nil {
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: fetch membership(%s): %w", id, memberErr)
+	}
+	assignments := make([]Assignment, 0, len(membership))
+	for _, m := range membership {
+		mid := m.MobileDeviceID
+		sel := true
+		assignments = append(assignments, Assignment{
+			MobileDeviceID: &mid,
+			Selected:       &sel,
+		})
+	}
+	request.Assignments = &assignments
+	_, err = c.PatchStaticMobileDeviceGroupV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

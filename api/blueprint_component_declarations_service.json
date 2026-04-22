@@ -1,0 +1,3123 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "Bearer token": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Service background tasks",
+      "description": "Service background tasks component"
+    },
+    {
+      "name": "Safari settings",
+      "description": "Safari settings component"
+    },
+    {
+      "name": "Software Update Settings",
+      "description": "Software Update Settings component"
+    },
+    {
+      "name": "Free-form declarations",
+      "description": "Free-form declarations component"
+    },
+    {
+      "name": "Safari extension settings",
+      "description": "Safari extension settings component"
+    },
+    {
+      "name": "Service configuration files",
+      "description": "Service configuration files component"
+    },
+    {
+      "name": "Audio accessory settings",
+      "description": "Audio accessory settings component"
+    },
+    {
+      "name": "Disk Management settings",
+      "description": "Disk management settings component"
+    },
+    {
+      "name": "Passcode settings",
+      "description": "Passcode settings component"
+    },
+    {
+      "name": "Math settings",
+      "description": "Math settings component"
+    },
+    {
+      "name": "Safari bookmarks",
+      "description": "Safari bookmarks component"
+    }
+  ],
+  "paths": {
+    "/v1/components/software-update-settings/validate": {
+      "post": {
+        "tags": [
+          "Software Update Settings"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestSoftwareUpdateSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/software-update-settings/translate": {
+      "post": {
+        "tags": [
+          "Software Update Settings"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestSoftwareUpdateSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/software-update-settings/cleanup": {
+      "post": {
+        "tags": [
+          "Software Update Settings"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/service-configuration-files/validate": {
+      "post": {
+        "tags": [
+          "Service configuration files"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_1",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestServicesConfigurationFilesConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/service-configuration-files/translate": {
+      "post": {
+        "tags": [
+          "Service configuration files"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_1",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestServicesConfigurationFilesConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/service-configuration-files/cleanup": {
+      "post": {
+        "tags": [
+          "Service configuration files"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_1",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/service-background-tasks/validate": {
+      "post": {
+        "tags": [
+          "Service background tasks"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_2",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestServicesBackgroundTasksConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/service-background-tasks/translate": {
+      "post": {
+        "tags": [
+          "Service background tasks"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_2",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestServicesBackgroundTasksConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/service-background-tasks/cleanup": {
+      "post": {
+        "tags": [
+          "Service background tasks"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_2",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/safari-settings/validate": {
+      "post": {
+        "tags": [
+          "Safari settings"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_3",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestSafariSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/safari-settings/translate": {
+      "post": {
+        "tags": [
+          "Safari settings"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_3",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestSafariSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/safari-settings/cleanup": {
+      "post": {
+        "tags": [
+          "Safari settings"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_3",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/safari-extensions/validate": {
+      "post": {
+        "tags": [
+          "Safari extension settings"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_4",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestSafariExtensionsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/safari-extensions/translate": {
+      "post": {
+        "tags": [
+          "Safari extension settings"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_4",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestSafariExtensionsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/safari-extensions/cleanup": {
+      "post": {
+        "tags": [
+          "Safari extension settings"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_4",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/safari-bookmarks/validate": {
+      "post": {
+        "tags": [
+          "Safari bookmarks"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_5",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestSafariBookmarksConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/safari-bookmarks/translate": {
+      "post": {
+        "tags": [
+          "Safari bookmarks"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_5",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestSafariBookmarksConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/safari-bookmarks/cleanup": {
+      "post": {
+        "tags": [
+          "Safari bookmarks"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_5",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/passcode/validate": {
+      "post": {
+        "tags": [
+          "Passcode settings"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_6",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestPasscodeSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/passcode/translate": {
+      "post": {
+        "tags": [
+          "Passcode settings"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_6",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestPasscodeSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/passcode/cleanup": {
+      "post": {
+        "tags": [
+          "Passcode settings"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_6",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/math-settings/validate": {
+      "post": {
+        "tags": [
+          "Math settings"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_7",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestMathSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/math-settings/translate": {
+      "post": {
+        "tags": [
+          "Math settings"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_7",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestMathSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/math-settings/cleanup": {
+      "post": {
+        "tags": [
+          "Math settings"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_7",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/free-form/validate": {
+      "post": {
+        "tags": [
+          "Free-form declarations"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_8",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestFreeFormConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/free-form/translate": {
+      "post": {
+        "tags": [
+          "Free-form declarations"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_8",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestFreeFormConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/free-form/cleanup": {
+      "post": {
+        "tags": [
+          "Free-form declarations"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_8",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/disk-management/validate": {
+      "post": {
+        "tags": [
+          "Disk Management settings"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_9",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestDiskManagementSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/disk-management/translate": {
+      "post": {
+        "tags": [
+          "Disk Management settings"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_9",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestDiskManagementSettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/disk-management/cleanup": {
+      "post": {
+        "tags": [
+          "Disk Management settings"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_9",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/components/audio-accessory-settings/validate": {
+      "post": {
+        "tags": [
+          "Audio accessory settings"
+        ],
+        "summary": "Validate component configuration",
+        "description": "Validate component configuration and return validation errors",
+        "operationId": "validate_10",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequestAudioAccessorySettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/audio-accessory-settings/translate": {
+      "post": {
+        "tags": [
+          "Audio accessory settings"
+        ],
+        "summary": "Translate component configuration",
+        "description": "Translate component configuration to deployable objects and return identifier of generated objects.",
+        "operationId": "handleTranslate_10",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRequestAudioAccessorySettingsConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/components/audio-accessory-settings/cleanup": {
+      "post": {
+        "tags": [
+          "Audio accessory settings"
+        ],
+        "summary": "Cleanup component data",
+        "description": "Cleanup component data that were created during translation.",
+        "operationId": "cleanup_10",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error specific code",
+            "example": "NOT_NULL"
+          },
+          "path": {
+            "type": "string",
+            "description": "Property path with validation error",
+            "example": "configuration.targetOSVersion"
+          },
+          "message": {
+            "type": "string",
+            "description": "A general description of error for troubleshooting/debugging",
+            "example": "must not be null"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "path"
+        ]
+      },
+      "ValidationResult": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "description": "An array of validation errors",
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        },
+        "required": [
+          "errors"
+        ]
+      },
+      "AutomaticAction": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "string",
+            "enum": [
+              "Allowed",
+              "AlwaysOn",
+              "AlwaysOff"
+            ]
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Value"
+        ]
+      },
+      "AutomaticActions": {
+        "type": "object",
+        "properties": {
+          "Download": {
+            "$ref": "#/components/schemas/AutomaticAction"
+          },
+          "InstallOSUpdates": {
+            "$ref": "#/components/schemas/AutomaticAction"
+          },
+          "InstallSecurityUpdate": {
+            "$ref": "#/components/schemas/AutomaticAction"
+          }
+        }
+      },
+      "Beta": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "$ref": "#/components/schemas/BetaSettings"
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        }
+      },
+      "BetaProgram": {
+        "type": "object",
+        "properties": {
+          "Token": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1
+          },
+          "Description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1
+          }
+        },
+        "required": [
+          "Description",
+          "Token"
+        ]
+      },
+      "BetaSettings": {
+        "type": "object",
+        "properties": {
+          "ProgramEnrollment": {
+            "type": "string",
+            "enum": [
+              "Allowed",
+              "AlwaysOn",
+              "AlwaysOff"
+            ]
+          },
+          "OfferPrograms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BetaProgram"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          },
+          "RequireProgram": {
+            "$ref": "#/components/schemas/BetaProgram"
+          }
+        },
+        "required": [
+          "ProgramEnrollment"
+        ]
+      },
+      "Deferrals": {
+        "type": "object",
+        "properties": {
+          "CombinedPeriodInDays": {
+            "$ref": "#/components/schemas/OptionalPeriodInDays"
+          },
+          "MajorPeriodInDays": {
+            "$ref": "#/components/schemas/OptionalPeriodInDays"
+          },
+          "MinorPeriodInDays": {
+            "$ref": "#/components/schemas/OptionalPeriodInDays"
+          },
+          "SystemPeriodInDays": {
+            "$ref": "#/components/schemas/OptionalPeriodInDays"
+          }
+        }
+      },
+      "OptionalPeriodInDays": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 90,
+            "minimum": 1
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        }
+      },
+      "OptionallyEnabled": {
+        "type": "object",
+        "properties": {
+          "Enabled": {
+            "type": "boolean"
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Enabled"
+        ]
+      },
+      "RapidSecurityResponse": {
+        "type": "object",
+        "properties": {
+          "Enable": {
+            "$ref": "#/components/schemas/OptionallyEnabled"
+          },
+          "EnableRollback": {
+            "$ref": "#/components/schemas/OptionallyEnabled"
+          }
+        }
+      },
+      "RecommendedCadence": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "string",
+            "enum": [
+              "All",
+              "Oldest",
+              "Newest"
+            ]
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Value"
+        ]
+      },
+      "SoftwareUpdateSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "AllowStandardUserOSUpdates": {
+            "$ref": "#/components/schemas/OptionallyEnabled"
+          },
+          "Notifications": {
+            "$ref": "#/components/schemas/OptionallyEnabled"
+          },
+          "RecommendedCadence": {
+            "$ref": "#/components/schemas/RecommendedCadence"
+          },
+          "AutomaticActions": {
+            "$ref": "#/components/schemas/AutomaticActions"
+          },
+          "Deferrals": {
+            "$ref": "#/components/schemas/Deferrals"
+          },
+          "RapidSecurityResponse": {
+            "$ref": "#/components/schemas/RapidSecurityResponse"
+          },
+          "Beta": {
+            "$ref": "#/components/schemas/Beta"
+          }
+        }
+      },
+      "ValidationRequestSoftwareUpdateSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SoftwareUpdateSettingsConfiguration",
+            "description": "Component configuration"
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "DeployableObjectIdentifier": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Deployable object type",
+            "enum": [
+              "DSS"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "Deployable object ID",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "TranslateRequestSoftwareUpdateSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SoftwareUpdateSettingsConfiguration",
+            "description": "Component configurations"
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "DeployableObjectDetail": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Deployable object type",
+            "enum": [
+              "DSS"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "Deployable object ID",
+            "minLength": 1
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Declaration identifier. Required for ASSET declaration type, for other types the identifier is automatically generated by Blueprint engine."
+          },
+          "versionHash": {
+            "type": "string",
+            "description": "Deployable object version hash",
+            "minLength": 1
+          },
+          "declarationType": {
+            "type": "string",
+            "default": "CONFIGURATION",
+            "description": "Declaration type",
+            "enum": [
+              "CONFIGURATION",
+              "ASSET"
+            ]
+          },
+          "channelType": {
+            "type": "string",
+            "default": "SYSTEM",
+            "description": "Channel type",
+            "enum": [
+              "SYSTEM",
+              "USER"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "versionHash"
+        ]
+      },
+      "TranslateResponse": {
+        "type": "object",
+        "properties": {
+          "deployableObjects": {
+            "type": "array",
+            "description": "Created deployable objects",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectDetail"
+            }
+          }
+        },
+        "required": [
+          "deployableObjects"
+        ]
+      },
+      "CleanupRequest": {
+        "type": "object",
+        "properties": {
+          "deployableObjects": {
+            "type": "array",
+            "description": "Existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "deployableObjects"
+        ]
+      },
+      "AssetDataAuthentication": {
+        "type": "object",
+        "properties": {
+          "Type": {
+            "type": "string",
+            "description": "Type of authentication",
+            "enum": [
+              "MDM",
+              "None"
+            ]
+          }
+        },
+        "required": [
+          "Type"
+        ]
+      },
+      "AssetDataReference": {
+        "type": "object",
+        "description": "A reference to arbitrary data with a specific media type.",
+        "properties": {
+          "ContentType": {
+            "type": "string",
+            "description": "The media type that describes the data."
+          },
+          "DataURL": {
+            "type": "string",
+            "description": "The URL that hosts the credential data. The URL must start with 'https://'."
+          },
+          "Hash-SHA-256": {
+            "type": "string",
+            "description": "A SHA-256 hash of the data at the 'DataURL'.",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "Size": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The size of the data at the 'DataURL'."
+          }
+        },
+        "required": [
+          "DataURL"
+        ]
+      },
+      "DataAssetReference": {
+        "type": "object",
+        "properties": {
+          "Authentication": {
+            "$ref": "#/components/schemas/AssetDataAuthentication",
+            "description": "The server authentication details"
+          },
+          "Reference": {
+            "$ref": "#/components/schemas/AssetDataReference",
+            "description": "The external reference"
+          }
+        },
+        "required": [
+          "Reference"
+        ]
+      },
+      "ServiceConfigurationFilesConfiguration": {
+        "type": "object",
+        "description": "Specifies managed configuration files for services",
+        "properties": {
+          "DataAssetReference": {
+            "$ref": "#/components/schemas/DataAssetReference",
+            "description": "Data Asset Reference"
+          },
+          "ServiceType": {
+            "type": "string",
+            "description": "The identifier of the system service with managed configuration files.",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "DataAssetReference",
+          "ServiceType"
+        ]
+      },
+      "ServicesConfigurationFilesConfiguration": {
+        "type": "object",
+        "properties": {
+          "serviceConfigFiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceConfigurationFilesConfiguration"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "serviceConfigFiles"
+        ]
+      },
+      "ValidationRequestServicesConfigurationFilesConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/ServicesConfigurationFilesConfiguration",
+            "description": "Component configuration"
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestServicesConfigurationFilesConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/ServicesConfigurationFilesConfiguration",
+            "description": "Component configurations"
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "LaunchdItem": {
+        "type": "object",
+        "properties": {
+          "FileAssetReference": {
+            "$ref": "#/components/schemas/DataAssetReference"
+          },
+          "Context": {
+            "type": "string",
+            "enum": [
+              "daemon",
+              "agent"
+            ]
+          }
+        },
+        "required": [
+          "Context",
+          "FileAssetReference"
+        ]
+      },
+      "ServiceBackgroundTasksConfiguration": {
+        "type": "object",
+        "properties": {
+          "TaskType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "TaskDescription": {
+            "type": "string"
+          },
+          "ExecutableAssetReference": {
+            "$ref": "#/components/schemas/DataAssetReference"
+          },
+          "LaunchdConfigurations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LaunchdItem"
+            }
+          }
+        },
+        "required": [
+          "TaskType"
+        ]
+      },
+      "ServicesBackgroundTasksConfiguration": {
+        "type": "object",
+        "properties": {
+          "backgroundTasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceBackgroundTasksConfiguration"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "backgroundTasks"
+        ]
+      },
+      "ValidationRequestServicesBackgroundTasksConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/ServicesBackgroundTasksConfiguration",
+            "description": "Component configuration"
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestServicesBackgroundTasksConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/ServicesBackgroundTasksConfiguration",
+            "description": "Component configurations"
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "AcceptCookies": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "string",
+            "description": "The policy Safari uses for managing cookies",
+            "enum": [
+              "Never",
+              "CurrentWebsite",
+              "VisitedWebsites",
+              "Always"
+            ]
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "AllowDisablingFraudWarning": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "If false, the system forces fraud warnings on in Safari"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "AllowHistoryClearing": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "If false, the system disables clearing history in Safari"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "AllowJavaScript": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "If false, the system disables JavaScript in Safari"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "AllowPopups": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "If false, the system disables popups in Safari"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "AllowPrivateBrowsing": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "If false, the system disables private browsing in Safari"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "AllowSummary": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "If false, the system disables summarization of content in Safari"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "NewTabStartPage": {
+        "type": "object",
+        "properties": {
+          "PageType": {
+            "type": "string",
+            "description": "Sets the start page type in Safari",
+            "enum": [
+              "Start",
+              "Home",
+              "Extension"
+            ]
+          },
+          "HomepageURL": {
+            "type": "string",
+            "description": "The URL of the homepage which needs to start with https:// or http://",
+            "example": "https://example.com"
+          },
+          "ExtensionIdentifier": {
+            "type": "string",
+            "description": "The composed identifier of the extension that provides the start page",
+            "example": "com.example.extension (ABC1234567)",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9\\-]*(?:\\.[a-zA-Z0-9\\-]+)+ \\([A-Z0-9]{10}\\)$"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "PageType"
+        ]
+      },
+      "SafariSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "AcceptCookies": {
+            "$ref": "#/components/schemas/AcceptCookies",
+            "description": "The policy Safari uses for managing cookies"
+          },
+          "AllowDisablingFraudWarning": {
+            "$ref": "#/components/schemas/AllowDisablingFraudWarning",
+            "description": "If false, the system forces fraud warnings on in Safari"
+          },
+          "AllowHistoryClearing": {
+            "$ref": "#/components/schemas/AllowHistoryClearing",
+            "description": "If false, the system disables clearing history in Safari"
+          },
+          "AllowJavaScript": {
+            "$ref": "#/components/schemas/AllowJavaScript",
+            "description": "If false, the system disables JavaScript in Safari"
+          },
+          "AllowPrivateBrowsing": {
+            "$ref": "#/components/schemas/AllowPrivateBrowsing",
+            "description": "If false, the system disables private browsing in Safari"
+          },
+          "AllowPopups": {
+            "$ref": "#/components/schemas/AllowPopups",
+            "description": "If false, the system disables popups in Safari"
+          },
+          "AllowSummary": {
+            "$ref": "#/components/schemas/AllowSummary",
+            "description": "If false, the system disables summarization of content in Safari"
+          },
+          "NewTabStartPage": {
+            "$ref": "#/components/schemas/NewTabStartPage",
+            "description": "Sets the start page for new tabs in Safari"
+          }
+        }
+      },
+      "ValidationRequestSafariSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SafariSettingsConfiguration",
+            "description": "Component configuration"
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestSafariSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SafariSettingsConfiguration",
+            "description": "Component configurations"
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "ManagedExtension": {
+        "type": "object",
+        "properties": {
+          "AllowedDomains": {
+            "type": "array",
+            "description": "Allowed domains",
+            "items": {
+              "$ref": "#/components/schemas/ManagedExtensionDomain"
+            }
+          },
+          "DeniedDomains": {
+            "type": "array",
+            "description": "Denied domains",
+            "items": {
+              "$ref": "#/components/schemas/ManagedExtensionDomain"
+            }
+          },
+          "PrivateBrowsing": {
+            "type": "string",
+            "description": "Private Browsing state",
+            "enum": [
+              "Allowed",
+              "AlwaysOn",
+              "AlwaysOff"
+            ]
+          },
+          "State": {
+            "type": "string",
+            "description": "Extension state",
+            "enum": [
+              "Allowed",
+              "AlwaysOn",
+              "AlwaysOff"
+            ]
+          }
+        }
+      },
+      "ManagedExtensionDomain": {
+        "type": "object",
+        "properties": {
+          "Domain": {
+            "type": "string",
+            "description": "Domain",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "Domain"
+        ]
+      },
+      "SafariExtensionsConfiguration": {
+        "type": "object",
+        "properties": {
+          "ManagedExtensions": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ManagedExtension"
+            }
+          }
+        },
+        "required": [
+          "ManagedExtensions"
+        ]
+      },
+      "ValidationRequestSafariExtensionsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SafariExtensionsConfiguration",
+            "description": "Component configuration"
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestSafariExtensionsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SafariExtensionsConfiguration",
+            "description": "Component configurations"
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "BookmarkGroup": {
+        "type": "object",
+        "properties": {
+          "GroupIdentifier": {
+            "type": "string",
+            "description": "A string that specifies the unique identifier for this group of managed bookmarks",
+            "minLength": 1
+          },
+          "Title": {
+            "type": "string",
+            "description": "The name of the bookmarks folder",
+            "minLength": 1
+          },
+          "Bookmarks": {
+            "type": "array",
+            "description": "A list of bookmarks",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FolderBookmarkItem"
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "Bookmarks",
+          "GroupIdentifier",
+          "Title"
+        ]
+      },
+      "BookmarkItem": {
+        "discriminator": {
+          "propertyName": "Type"
+        },
+        "properties": {
+          "Type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Type"
+        ]
+      },
+      "FolderBookmarkItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BookmarkItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "Title": {
+                "type": "string",
+                "description": "The title of the folder shown in Safari",
+                "minLength": 1
+              },
+              "Folder": {
+                "type": "array",
+                "description": "An array of bookmarks for each bookmark in the folder",
+                "items": {
+                  "$ref": "#/components/schemas/UrlBookmarkItem"
+                }
+              }
+            }
+          }
+        ],
+        "required": [
+          "Title"
+        ]
+      },
+      "SafariBookmarksConfiguration": {
+        "type": "object",
+        "properties": {
+          "ManagedBookmarks": {
+            "type": "array",
+            "description": "A dictionary that specifies a set of managed bookmarks",
+            "items": {
+              "$ref": "#/components/schemas/BookmarkGroup"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "ManagedBookmarks"
+        ]
+      },
+      "UrlBookmarkItem": {
+        "type": "object",
+        "properties": {
+          "Title": {
+            "type": "string",
+            "description": "The title of the bookmark shown in Safari",
+            "minLength": 1
+          },
+          "URL": {
+            "type": "string",
+            "description": "The URL for the bookmark item",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "Title",
+          "URL"
+        ]
+      },
+      "ValidationRequestSafariBookmarksConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SafariBookmarksConfiguration",
+            "description": "Component configuration"
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestSafariBookmarksConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SafariBookmarksConfiguration",
+            "description": "Component configurations"
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "ChangeAtNextAuth": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "Change at next auth"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "CustomRegex": {
+        "type": "object",
+        "properties": {
+          "Regex": {
+            "type": "string",
+            "description": "Regular expression",
+            "example": "[0-9]{16}",
+            "maxLength": 2048,
+            "minLength": 0
+          },
+          "Description": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Map of OS language ID to a localized description. Use the special `default` key for languages that the dictionary doesn't contain.",
+            "example": {
+              "en-US": "Must be 16 digits long."
+            }
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "FailedAttemptsResetInMinutes": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Failed attempts reset in minutes",
+            "example": 5,
+            "minimum": 0
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "MaximumFailedAttempts": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "integer",
+            "format": "int32",
+            "default": 11,
+            "description": "Maximum failed attempts",
+            "example": 10,
+            "maximum": 11,
+            "minimum": 2
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "MaximumGracePeriodInMinutes": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Maximum grace period in minutes",
+            "example": 2,
+            "minimum": 0
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "MaximumInactivityInMinutes": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Maximum inactivity in minutes",
+            "example": 10,
+            "maximum": 15,
+            "minimum": 0
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "MaximumPasscodeAgeInDays": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Maximum passcode age in days",
+            "example": 14,
+            "maximum": 730,
+            "minimum": 0
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "MinimumComplexCharacters": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "integer",
+            "format": "int32",
+            "default": 0,
+            "description": "Minimum complex characters",
+            "example": 1,
+            "maximum": 4,
+            "minimum": 0
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "MinimumLength": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "integer",
+            "format": "int32",
+            "default": 0,
+            "description": "Minimum length",
+            "example": 8,
+            "maximum": 16,
+            "minimum": 0
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "PasscodeReuseLimit": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Passcode reuse limit",
+            "example": 10,
+            "maximum": 50,
+            "minimum": 1
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "PasscodeSettingsConfiguration": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "version"
+        },
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PasscodeSettingsConfigurationV1": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PasscodeSettingsConfiguration"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "ChangeAtNextAuth": {
+                "type": "boolean",
+                "description": "Change at next auth"
+              },
+              "CustomRegex": {
+                "$ref": "#/components/schemas/CustomRegex",
+                "description": "Custom regular expression"
+              },
+              "FailedAttemptsResetInMinutes": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Failed attempts reset in minutes",
+                "minimum": 0
+              },
+              "MaximumFailedAttempts": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Maximum failed attempts",
+                "maximum": 11,
+                "minimum": 2
+              },
+              "MaximumGracePeriodInMinutes": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Maximum grace period in minutes",
+                "minimum": 0
+              },
+              "MaximumInactivityInMinutes": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Maximum inactivity in minutes",
+                "maximum": 15,
+                "minimum": 0
+              },
+              "MaximumPasscodeAgeInDays": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Maximum passcode age in days",
+                "maximum": 730,
+                "minimum": 0
+              },
+              "MinimumComplexCharacters": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Minimum complex characters",
+                "maximum": 4,
+                "minimum": 0
+              },
+              "MinimumLength": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Minimum length",
+                "maximum": 16,
+                "minimum": 0
+              },
+              "PasscodeReuseLimit": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Passcode reuse limit",
+                "maximum": 50,
+                "minimum": 1
+              },
+              "RequireAlphanumericPasscode": {
+                "type": "boolean",
+                "description": "Require alphanumeric passcode"
+              },
+              "RequireComplexPasscode": {
+                "type": "boolean",
+                "description": "Require complex passcode"
+              },
+              "RequirePasscode": {
+                "type": "boolean",
+                "description": "Require passcode"
+              },
+              "version": {
+                "type": "integer",
+                "format": "int32",
+                "const": 1
+              }
+            }
+          }
+        ],
+        "deprecated": true
+      },
+      "PasscodeSettingsConfigurationV2": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PasscodeSettingsConfiguration"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "ChangeAtNextAuth": {
+                "$ref": "#/components/schemas/ChangeAtNextAuth"
+              },
+              "CustomRegex": {
+                "$ref": "#/components/schemas/CustomRegex"
+              },
+              "FailedAttemptsResetInMinutes": {
+                "$ref": "#/components/schemas/FailedAttemptsResetInMinutes"
+              },
+              "MaximumFailedAttempts": {
+                "$ref": "#/components/schemas/MaximumFailedAttempts"
+              },
+              "MaximumGracePeriodInMinutes": {
+                "$ref": "#/components/schemas/MaximumGracePeriodInMinutes"
+              },
+              "MaximumInactivityInMinutes": {
+                "$ref": "#/components/schemas/MaximumInactivityInMinutes"
+              },
+              "MaximumPasscodeAgeInDays": {
+                "$ref": "#/components/schemas/MaximumPasscodeAgeInDays"
+              },
+              "MinimumComplexCharacters": {
+                "$ref": "#/components/schemas/MinimumComplexCharacters"
+              },
+              "MinimumLength": {
+                "$ref": "#/components/schemas/MinimumLength"
+              },
+              "PasscodeReuseLimit": {
+                "$ref": "#/components/schemas/PasscodeReuseLimit"
+              },
+              "RequireAlphanumericPasscode": {
+                "$ref": "#/components/schemas/RequireAlphanumericPasscode"
+              },
+              "RequireComplexPasscode": {
+                "$ref": "#/components/schemas/RequireComplexPasscode"
+              },
+              "RequirePasscode": {
+                "$ref": "#/components/schemas/RequirePasscode"
+              },
+              "version": {
+                "type": "integer",
+                "format": "int32",
+                "const": 2
+              }
+            }
+          }
+        ],
+        "required": [
+          "version"
+        ]
+      },
+      "RequireAlphanumericPasscode": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "Require alphanumeric passcode"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "RequireComplexPasscode": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "Require complex passcode"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "RequirePasscode": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "boolean",
+            "description": "Require passcode"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "ValidationRequestPasscodeSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "description": "Component configuration",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PasscodeSettingsConfigurationV1"
+              },
+              {
+                "$ref": "#/components/schemas/PasscodeSettingsConfigurationV2"
+              }
+            ]
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestPasscodeSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "description": "Component configurations",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PasscodeSettingsConfigurationV1"
+              },
+              {
+                "$ref": "#/components/schemas/PasscodeSettingsConfigurationV2"
+              }
+            ]
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "BasicMode": {
+        "type": "object",
+        "properties": {
+          "AddSquareRoot": {
+            "type": "boolean",
+            "description": "Add the square root button to the basic calculator by replacing the +/- button."
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "AddSquareRoot"
+        ]
+      },
+      "Calculator": {
+        "type": "object",
+        "properties": {
+          "BasicMode": {
+            "$ref": "#/components/schemas/BasicMode",
+            "description": "If present, configures the basic mode of the calculator. Basic mode is always enabled."
+          },
+          "ScientificMode": {
+            "$ref": "#/components/schemas/ScientificMode",
+            "description": "If present, configures the scientific mode of the calculator. If not present, scientific mode is enabled."
+          },
+          "ProgrammerMode": {
+            "$ref": "#/components/schemas/ProgrammerMode",
+            "description": "If present, configures the programmer mode of the calculator. If not present, programmer mode is enabled."
+          },
+          "MathNotesMode": {
+            "$ref": "#/components/schemas/MathNotesMode",
+            "description": "If present, configures the Math Notes mode of the calculator. If not present, math notes mode is enabled."
+          },
+          "InputModes": {
+            "$ref": "#/components/schemas/InputModes",
+            "description": "If present, controls global input options of the calculator. If not present, all input modes are enabled."
+          }
+        }
+      },
+      "InputModes": {
+        "type": "object",
+        "properties": {
+          "UnitConversion": {
+            "type": "boolean",
+            "description": "Configures whether unit conversions are enabled."
+          },
+          "RPN": {
+            "type": "boolean",
+            "description": "Configures whether RPN input is enabled."
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "RPN",
+          "UnitConversion"
+        ]
+      },
+      "MathNotesMode": {
+        "type": "object",
+        "properties": {
+          "Enabled": {
+            "type": "boolean",
+            "description": "Controls whether the mode is enabled."
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Enabled"
+        ]
+      },
+      "MathSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "Calculator": {
+            "$ref": "#/components/schemas/Calculator",
+            "description": "If present, configures the built-in Calculator app."
+          },
+          "SystemBehavior": {
+            "$ref": "#/components/schemas/SystemBehavior",
+            "description": "If present, configures math behavior in the system."
+          }
+        }
+      },
+      "ProgrammerMode": {
+        "type": "object",
+        "properties": {
+          "Enabled": {
+            "type": "boolean",
+            "description": "Controls whether the mode is enabled."
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Enabled"
+        ]
+      },
+      "ScientificMode": {
+        "type": "object",
+        "properties": {
+          "Enabled": {
+            "type": "boolean",
+            "description": "Controls whether the mode is enabled."
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Enabled"
+        ]
+      },
+      "SystemBehavior": {
+        "type": "object",
+        "properties": {
+          "KeyboardSuggestions": {
+            "type": "boolean",
+            "description": "Controls whether keyboard suggestions include math solutions."
+          },
+          "MathNotes": {
+            "type": "boolean",
+            "description": "Controls whether Math Notes is allowed in other apps such as Notes."
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "KeyboardSuggestions",
+          "MathNotes"
+        ]
+      },
+      "ValidationRequestMathSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/MathSettingsConfiguration",
+            "description": "Component configuration"
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestMathSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/MathSettingsConfiguration",
+            "description": "Component configurations"
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "Declaration": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "CONFIGURATION",
+              "ASSET"
+            ]
+          },
+          "payload": {
+            "$ref": "#/components/schemas/JsonNode"
+          }
+        },
+        "required": [
+          "kind",
+          "payload",
+          "type"
+        ]
+      },
+      "FreeFormConfiguration": {
+        "type": "object",
+        "properties": {
+          "declarations": {
+            "type": "array",
+            "description": "Declaration configurations",
+            "items": {
+              "$ref": "#/components/schemas/Declaration"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "declarations"
+        ]
+      },
+      "JsonNode": {},
+      "ValidationRequestFreeFormConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/FreeFormConfiguration",
+            "description": "Component configuration"
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestFreeFormConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/FreeFormConfiguration",
+            "description": "Component configurations"
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "DiskManagementSettingsConfiguration": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "version"
+        },
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DiskManagementSettingsConfigurationV1": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DiskManagementSettingsConfiguration"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "Restrictions": {
+                "$ref": "#/components/schemas/RestrictionsV1",
+                "description": "Restrictions for disk management settings"
+              },
+              "version": {
+                "type": "integer",
+                "format": "int32",
+                "const": 1
+              }
+            }
+          }
+        ],
+        "deprecated": true
+      },
+      "DiskManagementSettingsConfigurationV2": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DiskManagementSettingsConfiguration"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "Restrictions": {
+                "$ref": "#/components/schemas/RestrictionsV2",
+                "description": "Restrictions for disk management settings"
+              },
+              "version": {
+                "type": "integer",
+                "format": "int32",
+                "const": 2
+              }
+            }
+          }
+        ],
+        "required": [
+          "version"
+        ]
+      },
+      "RestrictionsV1": {
+        "type": "object",
+        "properties": {
+          "ExternalStorage": {
+            "type": "string",
+            "description": "Storage mode for external storage",
+            "enum": [
+              "Allowed",
+              "Disallowed",
+              "ReadOnly"
+            ]
+          },
+          "NetworkStorage": {
+            "type": "string",
+            "description": "Storage mode for network storage",
+            "enum": [
+              "Allowed",
+              "Disallowed",
+              "ReadOnly"
+            ]
+          }
+        }
+      },
+      "RestrictionsV2": {
+        "type": "object",
+        "properties": {
+          "ExternalStorage": {
+            "$ref": "#/components/schemas/StorageModeV2",
+            "description": "Storage mode for external storage"
+          },
+          "NetworkStorage": {
+            "$ref": "#/components/schemas/StorageModeV2",
+            "description": "Storage mode for network storage"
+          }
+        }
+      },
+      "StorageModeV2": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "string",
+            "description": "Controls whether the mode is enabled.",
+            "enum": [
+              "Allowed",
+              "Disallowed",
+              "ReadOnly"
+            ]
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Value"
+        ]
+      },
+      "ValidationRequestDiskManagementSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "description": "Component configuration",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DiskManagementSettingsConfigurationV1"
+              },
+              {
+                "$ref": "#/components/schemas/DiskManagementSettingsConfigurationV2"
+              }
+            ]
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestDiskManagementSettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "description": "Component configurations",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DiskManagementSettingsConfigurationV1"
+              },
+              {
+                "$ref": "#/components/schemas/DiskManagementSettingsConfigurationV2"
+              }
+            ]
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "AudioAccessorySettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "TemporaryPairing": {
+            "$ref": "#/components/schemas/TemporaryPairing",
+            "description": "A dictionary that describes audio accessory temporary pairing behavior."
+          }
+        }
+      },
+      "Configuration": {
+        "type": "object",
+        "properties": {
+          "UnpairingTime": {
+            "$ref": "#/components/schemas/UnpairingTime",
+            "description": "A dictionary that describes when the device automatically unpairs temporarily paired audio accessories."
+          }
+        },
+        "required": [
+          "UnpairingTime"
+        ]
+      },
+      "TemporaryPairing": {
+        "type": "object",
+        "properties": {
+          "Disabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, temporary pairing of audio accessories is disabled."
+          },
+          "Configuration": {
+            "$ref": "#/components/schemas/Configuration",
+            "description": "A dictionary providing configuration for temporary pairing. Required if Disabled isn't present or is false."
+          },
+          "Included": {
+            "type": "boolean",
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "writeOnly": true
+          }
+        }
+      },
+      "UnpairingTime": {
+        "type": "object",
+        "properties": {
+          "Policy": {
+            "type": "string",
+            "description": "A string that specifies the device's unpairing policy.",
+            "enum": [
+              "None",
+              "Hour"
+            ]
+          },
+          "Hour": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The local time hour (24-hour clock) when the device automatically unpairs temporarily paired audio accessories. Required when setting the Policy key to Hour.",
+            "maximum": 23,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "Policy"
+        ]
+      },
+      "ValidationRequestAudioAccessorySettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/AudioAccessorySettingsConfiguration",
+            "description": "Component configuration"
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      },
+      "TranslateRequestAudioAccessorySettingsConfiguration": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/AudioAccessorySettingsConfiguration",
+            "description": "Component configurations"
+          },
+          "declarationIdentifierPrefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Declaration identifier prefix"
+          },
+          "currentDeployableObjects": {
+            "type": "array",
+            "description": "Currently existing deployable objects for this component",
+            "items": {
+              "$ref": "#/components/schemas/DeployableObjectIdentifier"
+            }
+          }
+        },
+        "required": [
+          "configuration"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "Bearer token": {
+        "type": "http",
+        "scheme": "Bearer"
+      }
+    }
+  }
+}

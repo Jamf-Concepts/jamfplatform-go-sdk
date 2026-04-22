@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -149,4 +150,54 @@ func (c *Client) CreateDistributionPointHistoryNoteV1(ctx context.Context, id st
 		return nil, fmt.Errorf("CreateDistributionPointHistoryNoteV1(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveDistributionPointV1IDByName looks up a DistributionPointV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveDistributionPointV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/distribution-points"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDistributionPointV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveDistributionPointV1ByName looks up a DistributionPointV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveDistributionPointV1ByName(ctx context.Context, name string) (*DistributionPoint, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/distribution-points"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveDistributionPointV1ByName(%s): %w", name, err)
+	}
+	var out DistributionPoint
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveDistributionPointV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyDistributionPointV1 creates or updates a DistributionPointV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyDistributionPointV1(ctx context.Context, request *DistributionPoint) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyDistributionPointV1: Name must not be empty")
+	}
+	id, err := c.ResolveDistributionPointV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateDistributionPointV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyDistributionPointV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyDistributionPointV1: resolve: %w", err)
+	}
+	_, err = c.UpdateDistributionPointV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyDistributionPointV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

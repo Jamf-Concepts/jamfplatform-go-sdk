@@ -226,19 +226,6 @@ func TestBaseURL(t *testing.T) {
 	}
 }
 
-func TestSentinelErrors(t *testing.T) {
-	if ErrAuthentication == nil {
-		t.Fatal("ErrAuthentication is nil")
-	}
-	if ErrNotFound == nil {
-		t.Fatal("ErrNotFound is nil")
-	}
-	// Verify they have distinct messages
-	if ErrAuthentication.Error() == ErrNotFound.Error() {
-		t.Error("ErrAuthentication and ErrNotFound have the same message")
-	}
-}
-
 func TestValidateCredentials_Success(t *testing.T) {
 	srv, _ := newTestServer(t)
 	c := NewTransport(srv.URL, "test-id", "test-secret")

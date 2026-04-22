@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -146,4 +147,30 @@ func (c *Client) CreateJamfConnectHistoryNoteV1(ctx context.Context, request *Ob
 		return nil, fmt.Errorf("CreateJamfConnectHistoryNoteV1: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveJamfConnectConfigProfileV1IDByName looks up a JamfConnectConfigProfileV1 by its profileName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveJamfConnectConfigProfileV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/jamf-connect/config-profiles"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "profileName", "profileId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveJamfConnectConfigProfileV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveJamfConnectConfigProfileV1ByName looks up a JamfConnectConfigProfileV1 by its profileName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveJamfConnectConfigProfileV1ByName(ctx context.Context, name string) (*LinkedConnectProfile, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/jamf-connect/config-profiles"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "profileName", "profileId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveJamfConnectConfigProfileV1ByName(%s): %w", name, err)
+	}
+	var out LinkedConnectProfile
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveJamfConnectConfigProfileV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

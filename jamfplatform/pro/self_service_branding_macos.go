@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -84,4 +85,57 @@ func (c *Client) DeleteMacOSBrandingConfigurationV1(ctx context.Context, id stri
 		return fmt.Errorf("DeleteMacOSBrandingConfigurationV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveMacOSBrandingConfigurationV1IDByName looks up a MacOSBrandingConfigurationV1 by its brandingName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMacOSBrandingConfigurationV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/self-service/branding/macos"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "brandingName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMacOSBrandingConfigurationV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMacOSBrandingConfigurationV1ByName looks up a MacOSBrandingConfigurationV1 by its brandingName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMacOSBrandingConfigurationV1ByName(ctx context.Context, name string) (*MacOsBrandingConfiguration, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/self-service/branding/macos"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "brandingName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMacOSBrandingConfigurationV1ByName(%s): %w", name, err)
+	}
+	var out MacOsBrandingConfiguration
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMacOSBrandingConfigurationV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyMacOSBrandingConfigurationV1 creates or updates a MacOSBrandingConfigurationV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyMacOSBrandingConfigurationV1(ctx context.Context, request *MacOsBrandingConfiguration) (string, bool, error) {
+	var name string
+	if request.BrandingName != nil {
+		name = *request.BrandingName
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyMacOSBrandingConfigurationV1: BrandingName must not be empty")
+	}
+	id, err := c.ResolveMacOSBrandingConfigurationV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateMacOSBrandingConfigurationV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyMacOSBrandingConfigurationV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyMacOSBrandingConfigurationV1: resolve: %w", err)
+	}
+	_, err = c.UpdateMacOSBrandingConfigurationV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyMacOSBrandingConfigurationV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

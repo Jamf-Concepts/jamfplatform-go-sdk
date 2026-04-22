@@ -100,6 +100,35 @@ var funcMap = template.FuncMap{
 		}
 		return "&" + t + "{}"
 	},
+	// resolverNameStub converts a dot-path nameField to a Go map literal entry
+	// for use in test stubs. "name" → `"name": "target"`;
+	// "general.name" → `"general": map[string]any{"name": "target"}`.
+	"resolverNameStub": func(nameField string) string {
+		parts := strings.Split(nameField, ".")
+		if len(parts) == 1 {
+			return fmt.Sprintf(`%q: "target"`, parts[0])
+		}
+		inner := fmt.Sprintf(`%q: "target"`, parts[len(parts)-1])
+		for i := len(parts) - 2; i >= 0; i-- {
+			inner = fmt.Sprintf(`%q: map[string]any{%s}`, parts[i], inner)
+		}
+		return inner
+	},
+	// resolverIDStub returns the test stub value for the ID field.
+	// Numeric IDs emit 42 (unquoted); string IDs emit "resolved-id".
+	"resolverIDStub": func(r *GoResolver) string {
+		if r.IDNumeric {
+			return fmt.Sprintf(`%q: 42`, r.IDField)
+		}
+		return fmt.Sprintf(`%q: "resolved-id"`, r.IDField)
+	},
+	// resolverExpectedID returns the expected ID string for test assertions.
+	"resolverExpectedID": func(r *GoResolver) string {
+		if r.IDNumeric {
+			return "42"
+		}
+		return "resolved-id"
+	},
 	"testMultipartArgs": func(m GoMethod) string {
 		if len(m.MultipartFields) == 0 {
 			return ""
@@ -113,6 +142,125 @@ var funcMap = template.FuncMap{
 			}
 		}
 		return ", " + strings.Join(args, ", ")
+	},
+	// applyListPath builds the test-server handler path for the list endpoint
+	// used by the apply method's resolver call.
+	"applyListPath": func(a *GoApply) string {
+		if a.ListVersion == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.ListNamespace, a.ListPath)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.ListNamespace, a.ListVersion, a.ListPath)
+	},
+	// applyCreatePath builds the test-server handler path for the create endpoint.
+	"applyCreatePath": func(a *GoApply) string {
+		replacement := "test-id"
+		if a.ClassicCreate {
+			replacement = "0"
+		}
+		path := pathParamRe.ReplaceAllString(a.CreatePath, replacement)
+		if a.CreateVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.CreateNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.CreateNS, a.CreateVer, path)
+	},
+	// applyUpdatePath builds the test-server handler path for the update endpoint.
+	"applyUpdatePath": func(a *GoApply) string {
+		replacement := "existing-id"
+		if a.ClassicCreate {
+			replacement = "42"
+		}
+		path := pathParamRe.ReplaceAllString(a.UpdatePath, replacement)
+		if a.UpdateVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.UpdateNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.UpdateNS, a.UpdateVer, path)
+	},
+	// applyGetPath builds the test-server handler path for the get endpoint
+	// used by versionLock-enabled apply methods.
+	"applyGetPath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.GetPath, "existing-id")
+		if a.GetVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.GetNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.GetNS, a.GetVer, path)
+	},
+	// applyTokenUploadPath builds the test-server handler path for the token
+	// upload endpoint used to create resources in tokenUploadMode.
+	"applyTokenUploadPath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.TokenUploadPath, "test-id")
+		if a.TokenUploadVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.TokenUploadNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.TokenUploadNS, a.TokenUploadVer, path)
+	},
+	// applyTokenReplacePath builds the test-server handler path for the token
+	// replace endpoint used to re-upload tokens on update in tokenUploadMode.
+	"applyTokenReplacePath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.TokenReplacePath, "existing-id")
+		if a.TokenReplaceVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.TokenReplaceNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.TokenReplaceNS, a.TokenReplaceVer, path)
+	},
+	// applyMembershipFetchPath builds the test-server handler path for the
+	// membership list endpoint used in membershipPreFetch apply mode.
+	"applyMembershipFetchPath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.MembershipFetchPath, "existing-id")
+		if a.MembershipFetchVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.MembershipFetchNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.MembershipFetchNS, a.MembershipFetchVer, path)
+	},
+	// applyTokenCreateUpdatePath builds the test-server handler path for the
+	// metadata update endpoint in the token-upload create test. Uses "new-id"
+	// as the path parameter since the upload response returns that ID.
+	"applyTokenCreateUpdatePath": func(a *GoApply) string {
+		path := pathParamRe.ReplaceAllString(a.UpdatePath, "new-id")
+		if a.UpdateVer == "" {
+			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.UpdateNS, path)
+		}
+		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.UpdateNS, a.UpdateVer, path)
+	},
+	// applyCreateStatus returns the HTTP status code for test create responses.
+	"applyCreateStatus": func(a *GoApply) int {
+		if a.CreateStatus != 0 {
+			return a.CreateStatus
+		}
+		return 201
+	},
+	// applyUpdateStatus returns the HTTP status code for test update responses.
+	"applyUpdateStatus": func(a *GoApply) int {
+		if a.UpdateStatus != 0 {
+			return a.UpdateStatus
+		}
+		return 200
+	},
+	// applyRequestExpr returns a Go expression for the request struct literal
+	// with the name field populated to "target". Handles both pointer and
+	// non-pointer name fields, and nested fields (e.g. General.Name).
+	"applyRequestExpr": func(a *GoApply) string {
+		if a.NameNested {
+			// e.g. &Policy{General: &PolicyGeneral{Name: ptrStr("target")}}
+			return fmt.Sprintf("&%s{%s: &%s{%s: ptrStr(\"target\")}}", a.RequestType, a.NameParentField, a.NameParentType, a.NameLeafField)
+		}
+		if a.NameIsPointer {
+			return fmt.Sprintf("&%s{%s: ptrStr(\"target\")}", a.RequestType, a.NameGoField)
+		}
+		return fmt.Sprintf("&%s{%s: \"target\"}", a.RequestType, a.NameGoField)
+	},
+	// applyTestCreateIDJSON returns the JSON value for the mock create response ID.
+	"applyTestCreateIDJSON": func(a *GoApply) string {
+		if a.IDNumeric {
+			return "42"
+		}
+		return `"new-id"`
+	},
+	// applyTestCreateIDExpected returns the expected string ID after create.
+	"applyTestCreateIDExpected": func(a *GoApply) string {
+		if a.IDNumeric {
+			return "42"
+		}
+		return "new-id"
 	},
 }
 
@@ -247,6 +395,16 @@ type {{ .Name }} = string
 {{ template "multipart" . }}
 {{- else if eq .Category "raw" }}
 {{ template "raw" . }}
+{{- else if eq .Category "resolverID" }}
+{{ template "resolverID" . }}
+{{- else if eq .Category "resolverTyped" }}
+{{ template "resolverTyped" . }}
+{{- else if eq .Category "resolverIDDirect" }}
+{{ template "resolverIDDirect" . }}
+{{- else if eq .Category "resolverTypedDirect" }}
+{{ template "resolverTypedDirect" . }}
+{{- else if eq .Category "apply" }}
+{{ template "apply" . }}
 {{- else }}
 {{ template "action" . }}
 {{- end }}
@@ -388,6 +546,12 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 
 {{- define "multipart" }}
 // {{ .Comment }}
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 {{- if .ResponseType }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .MultipartFields }}{{ if .IsFile }}, {{ .GoName }}Filename string, {{ .GoName }} io.Reader{{ else }}, {{ .GoName }} {{ .Type }}{{ end }}{{ end }}) (*{{ .ResponseType }}, error) {
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
@@ -564,6 +728,236 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 	})
 }
 {{ end }}
+
+{{- define "resolverID" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
+{{- if eq .Resolver.Mode "filtered" }}
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.MatchField }}", "{{ .Resolver.IDField }}", name)
+{{- else if .Resolver.Paginated }}
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- else }}
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- end }}
+	if err != nil {
+		return "", fmt.Errorf("{{ .Name }}(%s): %w", name, err)
+	}
+	return id, nil
+}
+{{ end }}
+
+{{- define "resolverTyped" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.TypedReturn }}, error) {
+	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
+{{- if eq .Resolver.Mode "filtered" }}
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.MatchField }}", "{{ .Resolver.IDField }}", name)
+{{- else if .Resolver.Paginated }}
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- else }}
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "{{ .Resolver.SearchParam }}", "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.IDField }}", name)
+{{- end }}
+	if err != nil {
+		return nil, fmt.Errorf("{{ .Name }}(%s): %w", name, err)
+	}
+	var out {{ .Resolver.TypedReturn }}
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("{{ .Name }}(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+{{ end }}
+
+{{- define "resolverIDDirect" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
+	r, err := c.{{ .Resolver.SourceMethod }}(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("{{ .Name }}(%s): %w", name, err)
+	}
+	if {{ .Resolver.IDNilCheck }} {
+		return "", fmt.Errorf("{{ .Name }}(%s): response missing id", name)
+	}
+	return strconv.Itoa({{ .Resolver.IDDeref }}), nil
+}
+{{ end }}
+
+{{- define "resolverTypedDirect" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.TypedReturn }}, error) {
+	return c.{{ .Resolver.SourceMethod }}(ctx, name)
+}
+{{ end }}
+
+{{- define "apply" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType }}{{ .Apply.ExtraArgs }}) (string, bool, error) {
+{{- if .Apply.TokenUploadMode }}
+{{- /* ---------- Token-upload mode ---------- */}}
+{{- if .Apply.NameIsPointer }}
+	var name string
+	if request.{{ .Apply.NameGoField }} != nil {
+		name = *request.{{ .Apply.NameGoField }}
+	}
+{{- else }}
+	name := request.{{ .Apply.NameGoField }}
+{{- end }}
+	if name == "" {
+		return "", false, fmt.Errorf("{{ .Name }}: {{ .Apply.NameLeafField }} must not be empty")
+	}
+	id, err := c.{{ .Apply.ResolverMethod }}(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			if token == "" {
+				return "", false, fmt.Errorf("{{ .Name }}: create requires a non-empty token")
+			}
+			tokenBytes, decodeErr := base64.StdEncoding.DecodeString(token)
+			if decodeErr != nil {
+				return "", false, fmt.Errorf("{{ .Name }}: decode token: %w", decodeErr)
+			}
+			tokenReq := &{{ .Apply.TokenRequestType }}{EncodedToken: &tokenBytes}
+			resp, createErr := c.{{ .Apply.TokenUploadMethod }}(ctx, tokenReq)
+			if createErr != nil {
+				return "", false, fmt.Errorf("{{ .Name }}: create: %w", createErr)
+			}
+			// Update metadata on the newly created resource.
+			_, updateErr := c.{{ .Apply.UpdateMethod }}(ctx, resp.ID, request)
+			if updateErr != nil {
+				return "", false, fmt.Errorf("{{ .Name }}: update metadata after create(%s): %w", resp.ID, updateErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("{{ .Name }}: resolve: %w", err)
+	}
+	// Update path: optionally re-upload token, then always update metadata.
+	if token != "" {
+		tokenBytes, decodeErr := base64.StdEncoding.DecodeString(token)
+		if decodeErr != nil {
+			return "", false, fmt.Errorf("{{ .Name }}: decode token: %w", decodeErr)
+		}
+		tokenReq := &{{ .Apply.TokenRequestType }}{EncodedToken: &tokenBytes}
+		_, replaceErr := c.{{ .Apply.TokenReplaceMethod }}(ctx, id, tokenReq)
+		if replaceErr != nil {
+			return "", false, fmt.Errorf("{{ .Name }}: replace token(%s): %w", id, replaceErr)
+		}
+	}
+{{- if .Apply.UpdateReturnsVal }}
+	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
+{{- else }}
+	err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
+{{- end }}
+	if err != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: update(%s): %w", id, err)
+	}
+	return id, false, nil
+{{- else }}
+{{- /* ---------- Standard mode ---------- */}}
+{{- if .Apply.NameNested }}
+	var name string
+	if request.{{ .Apply.NameParentField }} != nil && request.{{ .Apply.NameGoField }} != nil {
+		name = *request.{{ .Apply.NameGoField }}
+	}
+{{- else if .Apply.NameIsPointer }}
+	var name string
+	if request.{{ .Apply.NameGoField }} != nil {
+		name = *request.{{ .Apply.NameGoField }}
+	}
+{{- else }}
+	name := request.{{ .Apply.NameGoField }}
+{{- end }}
+	if name == "" {
+		return "", false, fmt.Errorf("{{ .Name }}: {{ .Apply.NameLeafField }} must not be empty")
+	}
+	id, err := c.{{ .Apply.ResolverMethod }}(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+{{- if .Apply.VersionLock }}
+			zeroVersionLock(request)
+{{- end }}
+{{- if .Apply.ClassicCreate }}
+			resp, createErr := c.{{ .Apply.CreateMethod }}(ctx, "0", request)
+{{- else }}
+			resp, createErr := c.{{ .Apply.CreateMethod }}(ctx, request{{ .Apply.ExtraCallArgs }})
+{{- end }}
+			if createErr != nil {
+				return "", false, fmt.Errorf("{{ .Name }}: create: %w", createErr)
+			}
+			return {{ .Apply.CreateReturnID }}, true, nil
+		}
+		return "", false, fmt.Errorf("{{ .Name }}: resolve: %w", err)
+	}
+{{- if .Apply.HasUpdateType }}
+{{- if .Apply.VersionLock }}
+	// Fetch current resource to extract versionLock values for optimistic locking.
+	current, getErr := c.{{ .Apply.GetMethod }}(ctx, id)
+	if getErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: get for versionLock(%s): %w", id, getErr)
+	}
+	// Convert create request to update type via JSON round-trip,
+	// then inject current versionLock values from the fetched resource.
+	updateReq, convErr := convertAndInjectVersionLock[{{ .Apply.UpdateType }}, {{ .Apply.GetType }}](request, current)
+	if convErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: convert for update(%s): %w", id, convErr)
+	}
+{{- if .Apply.UpdateReturnsVal }}
+	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, updateReq)
+{{- else }}
+	err = c.{{ .Apply.UpdateMethod }}(ctx, id, updateReq)
+{{- end }}
+{{- else }}
+	// Convert create request to update type via JSON round-trip.
+	data, marshalErr := json.Marshal(request)
+	if marshalErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: marshal for update(%s): %w", id, marshalErr)
+	}
+	var updateReq {{ .Apply.UpdateType }}
+	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: unmarshal for update(%s): %w", id, unmarshalErr)
+	}
+{{- if .Apply.UpdateReturnsVal }}
+	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, &updateReq)
+{{- else }}
+	err = c.{{ .Apply.UpdateMethod }}(ctx, id, &updateReq)
+{{- end }}
+{{- end }}
+{{- else }}
+{{- if .Apply.MembershipPreFetch }}
+	// Fetch current membership to preserve existing devices in the patch.
+	membership, memberErr := c.{{ .Apply.MembershipFetchMethod }}(ctx, id{{ .Apply.MembershipFetchExtraArgs }})
+	if memberErr != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: fetch membership(%s): %w", id, memberErr)
+	}
+	assignments := make([]{{ .Apply.MembershipAssignmentType }}, 0, len(membership))
+	for _, m := range membership {
+		mid := m.{{ .Apply.MembershipSourceIDField }}
+		sel := true
+		assignments = append(assignments, {{ .Apply.MembershipAssignmentType }}{
+			{{ .Apply.MembershipAssignmentIDField }}: &mid,
+			Selected: &sel,
+		})
+	}
+{{- if .Apply.MembershipRequestFieldIsPtr }}
+	request.{{ .Apply.MembershipRequestField }} = &assignments
+{{- else }}
+	request.{{ .Apply.MembershipRequestField }} = assignments
+{{- end }}
+{{- end }}
+{{- if .Apply.UpdateReturnsVal }}
+	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
+{{- else }}
+	err = c.{{ .Apply.UpdateMethod }}(ctx, id, request)
+{{- end }}
+{{- end }}
+	if err != nil {
+		return "", false, fmt.Errorf("{{ .Name }}: update(%s): %w", id, err)
+	}
+	return id, false, nil
+{{- end }}
+}
+{{ end }}
 `
 
 // ---------------------------------------------------------------------------
@@ -600,6 +994,16 @@ import (
 <% template "testMultipart" . %>
 <%- else if eq .Category "raw" %>
 <% template "testRaw" . %>
+<%- else if eq .Category "resolverID" %>
+<% template "testResolverID" . %>
+<%- else if eq .Category "resolverTyped" %>
+<% template "testResolverTyped" . %>
+<%- else if eq .Category "resolverIDDirect" %>
+<% template "testResolverIDDirect" . %>
+<%- else if eq .Category "resolverTypedDirect" %>
+<% template "testResolverTypedDirect" . %>
+<%- else if eq .Category "apply" %>
+<% template "testApply" . %>
 <%- else %>
 <% template "testAction" . %>
 <%- end %>
@@ -854,6 +1258,368 @@ func Test<% .Name %>(t *testing.T) {
 	if len(results) != 1 {
 		t.Fatalf("len = %d, want 1", len(results))
 	}
+}
+<% end %>
+
+<%- define "testResolverID" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+<%- if .Resolver.ResultsField %>
+			"<% .Resolver.ResultsField %>": []map[string]any{
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.MatchField %>},
+			},
+<%- else %>
+			"results": []map[string]any{
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.MatchField %>},
+			},
+			"totalCount": 1,
+<%- end %>
+		})
+	})
+
+	id, err := c.<% .Name %>(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "<% resolverExpectedID .Resolver %>" {
+		t.Errorf("id = %q, want <% resolverExpectedID .Resolver %>", id)
+	}
+}
+<% end %>
+
+<%- define "testResolverTyped" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+<%- if .Resolver.ResultsField %>
+			"<% .Resolver.ResultsField %>": []map[string]any{
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.MatchField %>},
+			},
+<%- else %>
+			"results": []map[string]any{
+				{<% resolverIDStub .Resolver %>, <% resolverNameStub .Resolver.MatchField %>},
+			},
+			"totalCount": 1,
+<%- end %>
+		})
+	})
+
+	result, err := c.<% .Name %>(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+<% end %>
+
+<%- define "testResolverIDDirect" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>><% .Resolver.IDTestInnerXML %></<% .ResponseWireName %>>")
+	})
+
+	id, err := c.<% .Name %>(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+<% end %>
+
+<%- define "testResolverTypedDirect" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>><% .Resolver.IDTestInnerXML %></<% .ResponseWireName %>>")
+	})
+
+	result, err := c.<% .Name %>(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+<% end %>
+
+<%- define "testApply" %>
+func Test<% .Name %>_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+<%- if .Apply.TokenUploadMode %>
+	// List returns no matches → resolver returns 404 → apply creates via token upload.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []any{},
+			"totalCount": 0,
+		})
+	})
+	// Token upload creates the resource.
+	mux.HandleFunc("<% applyTokenUploadPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{
+			"id":   "new-id",
+			"href": "/new-id",
+		})
+	})
+	// Metadata update after creation.
+	mux.HandleFunc("<% applyTokenCreateUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "new-id", "name": "target"})
+	})
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "new-id" {
+		t.Errorf("id = %q, want new-id", id)
+	}
+<%- else if .Apply.ClassicCreate %>
+	// Classic direct resolver: GetByName returns 404 → apply creates.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+	mux.HandleFunc("<% applyCreatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, <% applyCreateStatus .Apply %>, "<<% .Apply.ClassicCreateWireName %>><id>42</id></<% .Apply.ClassicCreateWireName %>>")
+	})
+<%- else if .Apply.SameListCreatePath %>
+	// List and create share the same path — single handler dispatches on method.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    []any{},
+				"totalCount": 0,
+			})
+		case http.MethodPost:
+			writeJSON(t, w, <% applyCreateStatus .Apply %>, map[string]any{
+				"id":   <% applyTestCreateIDJSON .Apply %>,
+				"href": "/new-id",
+			})
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+<%- else %>
+	// List returns no matches → resolver returns 404 → apply creates.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []any{},
+			"totalCount": 0,
+		})
+	})
+	mux.HandleFunc("<% applyCreatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, <% applyCreateStatus .Apply %>, map[string]any{
+			"id":   <% applyTestCreateIDJSON .Apply %>,
+			"href": "/new-id",
+		})
+	})
+<%- end %>
+<%- if not .Apply.TokenUploadMode %>
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+<%- if .Apply.ClassicCreate %>
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+<%- else %>
+	if id != "<% applyTestCreateIDExpected .Apply %>" {
+		t.Errorf("id = %q, want <% applyTestCreateIDExpected .Apply %>", id)
+	}
+<%- end %>
+<%- end %>
+}
+
+func Test<% .Name %>_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+<%- if .Apply.TokenUploadMode %>
+	// List returns a match → resolver succeeds → apply updates with token replace + metadata.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"<% .Apply.ListIDField %>": "existing-id", "<% .Apply.ListNameField %>": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	// Token replace (re-upload).
+	mux.HandleFunc("<% applyTokenReplacePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "name": "target"})
+	})
+	// Metadata update.
+	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "name": "target"})
+	})
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
+	}
+<%- else if .Apply.ClassicCreate %>
+	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<<% .Apply.ClassicResolverWireName %>><% .Apply.ClassicResolverIDInnerXML %></<% .Apply.ClassicResolverWireName %>>")
+	})
+	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+<%- if .Apply.UpdateReturnsVal %>
+		writeXML(t, w, <% applyUpdateStatus .Apply %>, "<<% .Apply.ClassicCreateWireName %>><% .Apply.ClassicResolverIDInnerXML %></<% .Apply.ClassicCreateWireName %>>")
+<%- else %>
+		w.WriteHeader(<% applyUpdateStatus .Apply %>)
+<%- end %>
+	})
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+<%- else %>
+	// List returns a match → resolver succeeds → apply updates.
+	mux.HandleFunc("<% applyListPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"<% .Apply.ListIDField %>": "existing-id", "<% .Apply.ListNameField %>": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+<%- if .Apply.VersionLock %>
+<%- if .Apply.SameGetUpdatePath %>
+	// GET (versionLock fetch) and Update share the same path — dispatch on method.
+	mux.HandleFunc("<% applyGetPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "versionLock": 5})
+		case http.MethodPut, http.MethodPatch:
+<%- if .Apply.UpdateReturnsVal %>
+			writeJSON(t, w, <% applyUpdateStatus .Apply %>, map[string]any{"id": "existing-id"})
+<%- else %>
+			w.WriteHeader(<% applyUpdateStatus .Apply %>)
+<%- end %>
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+<%- else %>
+	// GET handler for versionLock fetch.
+	mux.HandleFunc("<% applyGetPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "versionLock": 5})
+	})
+	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+<%- if .Apply.UpdateReturnsVal %>
+		writeJSON(t, w, <% applyUpdateStatus .Apply %>, map[string]any{"id": "existing-id"})
+<%- else %>
+		w.WriteHeader(<% applyUpdateStatus .Apply %>)
+<%- end %>
+	})
+<%- end %>
+<%- else %>
+<%- if .Apply.MembershipPreFetch %>
+	// Membership pre-fetch handler: returns a single device so the Apply method
+	// has current membership to inject into the patch request.
+	mux.HandleFunc("<% applyMembershipFetchPath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{"mobileDeviceId": "d1"}},
+			"totalCount": 1,
+		})
+	})
+<%- end %>
+	mux.HandleFunc("<% applyUpdatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
+<%- if .Apply.UpdateReturnsVal %>
+<%- if .Apply.IDNumeric %>
+		writeJSON(t, w, <% applyUpdateStatus .Apply %>, map[string]any{"id": 99})
+<%- else %>
+		writeJSON(t, w, <% applyUpdateStatus .Apply %>, map[string]any{"id": "existing-id"})
+<%- end %>
+<%- else %>
+		w.WriteHeader(<% applyUpdateStatus .Apply %>)
+<%- end %>
+	})
+<%- end %>
+
+	id, created, err := c.<% .Name %>(context.Background(), <% applyRequestExpr .Apply %><% .Apply.ExtraTestCallArgs %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
+	}
+<%- end %>
 }
 <% end %>
 `

@@ -286,12 +286,34 @@ type loadedSpec struct {
 //   - <spec>_test.go  matching unit tests
 //   - helpers_test.go test-only shims (testServer, WithTenantID alias, etc.)
 //
+// When all specs in the package are typesOnly, the output is limited to:
+//   - types.go        all schemas from the spec (not just operation-referenced)
+//   - types_test.go   JSON round-trip tests for each struct type
+//
 // Types deduplicate within the package only — sub-packages do not share type
 // namespace with the root or with each other.
+//
+// pkgName may contain slashes (e.g. "bpcomponents/swupdate") to create nested
+// directories. The Go package declaration uses only the last path segment.
 func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec) error {
 	pkgDir := filepath.Join(root, "jamfplatform", pkgName)
 	if err := os.MkdirAll(pkgDir, 0755); err != nil {
 		return fmt.Errorf("creating package dir: %w", err)
+	}
+
+	// The Go package name is the last segment of a potentially slashed path.
+	goPkgName := filepath.Base(pkgName)
+
+	allTypesOnly := true
+	for _, ls := range specs {
+		if !ls.spec.TypesOnly {
+			allTypesOnly = false
+			break
+		}
+	}
+
+	if allTypesOnly {
+		return processPackageTypesOnly(root, cfg, pkgDir, goPkgName, specs)
 	}
 
 	type specWithMethods struct {
@@ -353,23 +375,23 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		}
 	}
 
-	if err := emitPkgClient(pkgDir, cfg, pkgName); err != nil {
+	if err := emitPkgClient(pkgDir, cfg, goPkgName); err != nil {
 		return err
 	}
 
-	typesGF := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
+	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
 	if err := emitTemplated(sourceTmpl, typesGF, filepath.Join(pkgDir, "types.go")); err != nil {
 		return err
 	}
 
 	for _, sm := range allSpecs {
 		if sm.spec.SplitByTag {
-			if err := emitMethodsByTag(pkgDir, cfg, pkgName, sm.spec, sm.methods); err != nil {
+			if err := emitMethodsByTag(pkgDir, cfg, goPkgName, sm.spec, sm.methods); err != nil {
 				return err
 			}
 			continue
 		}
-		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: sm.spec.Format, Methods: sm.methods}
+		mf := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: sm.spec.Format, Methods: sm.methods}
 		if err := emitTemplated(sourceTmpl, mf, filepath.Join(pkgDir, sm.baseName+".go")); err != nil {
 			return err
 		}
@@ -378,12 +400,162 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		}
 	}
 
-	if err := emitPkgHelpersTest(pkgDir, cfg, pkgName, pkgFormat); err != nil {
+	if err := emitPkgHelpersTest(pkgDir, cfg, goPkgName, pkgFormat); err != nil {
 		return err
 	}
-	if err := emitPkgXMLSupplements(pkgDir, pkgName, pkgFormat); err != nil {
+	if err := emitPkgXMLSupplements(pkgDir, goPkgName, pkgFormat); err != nil {
 		return err
 	}
+
+	// Emit versionLock helpers if any Apply method uses optimistic locking.
+	hasVersionLock := false
+	for _, sm := range allSpecs {
+		for _, m := range sm.methods {
+			if m.Apply != nil && m.Apply.VersionLock {
+				hasVersionLock = true
+				break
+			}
+		}
+		if hasVersionLock {
+			break
+		}
+	}
+	if hasVersionLock {
+		if err := emitPkgVersionLockHelpers(pkgDir, cfg, goPkgName); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// processPackageTypesOnly emits a types-only sub-package: types.go with all
+// schemas from the spec, and types_test.go with JSON round-trip tests. No
+// client struct, no method files, no test helpers.
+func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, specs []loadedSpec) error {
+	pkgEmitted := make(map[string]bool)
+	var allTypes []GoType
+	pkgFormat := ""
+
+	for _, ls := range specs {
+		doc, err := loadSpec(ls.specPath, nil)
+		if err != nil {
+			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
+		}
+		applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+		hoistInlineObjects(doc)
+
+		refs := collectAllSchemas(doc)
+		for name := range refs {
+			if pkgEmitted[name] {
+				delete(refs, name)
+			}
+		}
+		currentFieldOverrides = ls.spec.FieldTypeOverrides
+		suppressWriteOnly = true
+		types := extractTypes(doc, refs, ls.spec.Format)
+		suppressWriteOnly = false
+		currentFieldOverrides = nil
+		for _, t := range types {
+			pkgEmitted[t.Name] = true
+		}
+		allTypes = append(allTypes, types...)
+		if pkgFormat == "" {
+			pkgFormat = ls.spec.Format
+		}
+	}
+
+	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
+	if err := emitTemplated(sourceTmpl, typesGF, filepath.Join(pkgDir, "types.go")); err != nil {
+		return err
+	}
+	if err := emitTypesOnlyTest(pkgDir, goPkgName, allTypes); err != nil {
+		return err
+	}
+	return nil
+}
+
+// emitTypesOnlyTest writes a types_test.go file with JSON round-trip tests
+// for each struct type in a types-only package. Each test constructs a
+// zero-value instance, marshals it to JSON, then unmarshals back — proving
+// the generated struct tags and any custom marshal/unmarshal methods work
+// correctly. Discriminator types get a per-variant round-trip test that
+// verifies the correct variant pointer is populated after unmarshaling.
+func emitTypesOnlyTest(pkgDir, pkgName string, types []GoType) error {
+	var buf bytes.Buffer
+	fmt.Fprintf(&buf, `// Code generated by tools/generate; DO NOT EDIT.
+
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package %s
+
+import (
+	"encoding/json"
+	"testing"
+)
+`, pkgName)
+
+	for _, t := range types {
+		if t.AliasTarget != "" || t.IsRawJSON {
+			continue
+		}
+		if t.Discriminator != nil {
+			// Per-variant round-trip test for discriminator (union) types.
+			for _, v := range t.Discriminator.Variants {
+				fmt.Fprintf(&buf, `
+func TestRoundTrip_%s_%s(t *testing.T) {
+	original := %s{%s: "%s", %s: &%s{}}
+	data, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("marshal: %%v", err)
+	}
+	var decoded %s
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		t.Fatalf("unmarshal: %%v", err)
+	}
+	if decoded.%s != "%s" {
+		t.Errorf("discriminator = %%q, want %%q", decoded.%s, "%s")
+	}
+	if decoded.%s == nil {
+		t.Fatal("expected variant %s to be non-nil")
+	}
+}
+`, t.Name, v.FieldName,
+					t.Name, t.Discriminator.GoFieldName, v.Value, v.FieldName, v.TypeName,
+					t.Name,
+					t.Discriminator.GoFieldName, v.Value, t.Discriminator.GoFieldName, v.Value,
+					v.FieldName, v.FieldName)
+			}
+			continue
+		}
+		if len(t.Fields) == 0 {
+			// Enum string types — no fields, just verify it compiles.
+			continue
+		}
+		fmt.Fprintf(&buf, `
+func TestRoundTrip_%s(t *testing.T) {
+	original := %s{}
+	data, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("marshal: %%v", err)
+	}
+	var decoded %s
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		t.Fatalf("unmarshal: %%v", err)
+	}
+}
+`, t.Name, t.Name, t.Name)
+	}
+
+	outPath := filepath.Join(pkgDir, "types_test.go")
+	formatted, err := formatGo("types_test.go", buf.Bytes())
+	if err != nil {
+		return fmt.Errorf("formatting types_test.go: %w\n---raw---\n%s", err, buf.String())
+	}
+	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+		return fmt.Errorf("writing %s: %w", outPath, err)
+	}
+	log.Printf("wrote %s", outPath)
 	return nil
 }
 
@@ -545,6 +717,135 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 	formatted, err := formatGo("xml_helpers.go", []byte(src))
 	if err != nil {
 		return fmt.Errorf("formatting xml_helpers.go: %w", err)
+	}
+	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+		return fmt.Errorf("writing %s: %w", outPath, err)
+	}
+	log.Printf("wrote %s", outPath)
+	return nil
+}
+
+// emitPkgVersionLockHelpers writes version_lock_helpers.go into packages
+// that have Apply methods with optimistic locking. The file provides two
+// runtime helpers:
+//   - zeroVersionLock(v any): recursively zeros all VersionLock int fields
+//     on a struct pointer (used on create to satisfy the Jamf API requirement)
+//   - convertAndInjectVersionLock[U, G any](src, current): JSON round-trips
+//     the create request into the update type, then injects VersionLock
+//     values from the GET response (used on update to satisfy optimistic locking)
+func emitPkgVersionLockHelpers(pkgDir string, cfg Config, pkgName string) error {
+	src := fmt.Sprintf(`// Code generated by tools/generate; DO NOT EDIT.
+
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package %s
+
+import (
+	"encoding/json"
+	"fmt"
+	"reflect"
+)
+
+// zeroVersionLock recursively walks v (must be a pointer to a struct)
+// and sets every field named "VersionLock" of type int to 0. This
+// satisfies the Jamf API requirement that all versionLock fields be
+// zero on resource creation.
+func zeroVersionLock(v any) {
+	rv := reflect.ValueOf(v)
+	if rv.Kind() == reflect.Ptr {
+		rv = rv.Elem()
+	}
+	if rv.Kind() != reflect.Struct {
+		return
+	}
+	rt := rv.Type()
+	for i := 0; i < rv.NumField(); i++ {
+		f := rv.Field(i)
+		ft := rt.Field(i)
+		if ft.Name == "VersionLock" && f.Kind() == reflect.Int && f.CanSet() {
+			f.SetInt(0)
+			continue
+		}
+		switch f.Kind() {
+		case reflect.Struct:
+			zeroVersionLock(f.Addr().Interface())
+		case reflect.Ptr:
+			if !f.IsNil() && f.Elem().Kind() == reflect.Struct {
+				zeroVersionLock(f.Interface())
+			}
+		}
+	}
+}
+
+// convertAndInjectVersionLock converts a create request (src) to update
+// type U via JSON round-trip, then injects all VersionLock field values
+// from the current GET response (current) into the resulting update request.
+// This implements the optimistic locking requirement: the update request
+// must carry the current versionLock values so the server can detect
+// concurrent modifications.
+func convertAndInjectVersionLock[U any, G any](src any, current *G) (*U, error) {
+	data, err := json.Marshal(src)
+	if err != nil {
+		return nil, fmt.Errorf("marshal for update: %%w", err)
+	}
+	var updateReq U
+	if err := json.Unmarshal(data, &updateReq); err != nil {
+		return nil, fmt.Errorf("unmarshal for update: %%w", err)
+	}
+	injectVersionLock(reflect.ValueOf(&updateReq).Elem(), reflect.ValueOf(current).Elem())
+	return &updateReq, nil
+}
+
+// injectVersionLock recursively copies VersionLock field values from src
+// into dst. Both must be struct values. Fields are matched by name; if a
+// VersionLock field exists in both, the src value is copied to dst.
+func injectVersionLock(dst, src reflect.Value) {
+	if dst.Kind() == reflect.Ptr {
+		if dst.IsNil() {
+			return
+		}
+		dst = dst.Elem()
+	}
+	if src.Kind() == reflect.Ptr {
+		if src.IsNil() {
+			return
+		}
+		src = src.Elem()
+	}
+	if dst.Kind() != reflect.Struct || src.Kind() != reflect.Struct {
+		return
+	}
+	dstType := dst.Type()
+	for i := 0; i < dst.NumField(); i++ {
+		df := dst.Field(i)
+		dft := dstType.Field(i)
+		if dft.Name == "VersionLock" && df.Kind() == reflect.Int && df.CanSet() {
+			sf := src.FieldByName("VersionLock")
+			if sf.IsValid() && sf.Kind() == reflect.Int {
+				df.SetInt(sf.Int())
+			}
+			continue
+		}
+		sf := src.FieldByName(dft.Name)
+		if !sf.IsValid() {
+			continue
+		}
+		switch df.Kind() {
+		case reflect.Struct:
+			injectVersionLock(df, sf)
+		case reflect.Ptr:
+			if !df.IsNil() {
+				injectVersionLock(df, sf)
+			}
+		}
+	}
+}
+`, pkgName)
+	outPath := filepath.Join(pkgDir, "version_lock_helpers.go")
+	formatted, err := formatGo("version_lock_helpers.go", []byte(src))
+	if err != nil {
+		return fmt.Errorf("formatting version_lock_helpers.go: %w", err)
 	}
 	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
@@ -774,7 +1075,9 @@ func readJSON(t *testing.T, r *http.Request, v any) {
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
 		t.Fatalf("readJSON: %%v", err)
 	}
-}%s
+}
+
+func ptrStr(s string) *string { return &s }%s
 `, pkgName, cfg.Module, xmlHelpers)
 	outPath := filepath.Join(pkgDir, "helpers_test.go")
 	formatted, err := imports.Process(outPath, []byte(src), &imports.Options{Comments: true})
@@ -858,13 +1161,30 @@ package %s
 
 import "%s/internal/client"
 
-var (
-	ErrAuthentication   = client.ErrAuthentication
-	ErrNotFound         = client.ErrNotFound
-	ErrPathNotSupported = client.ErrPathNotSupported
-)
-
+// APIResponseError is returned for any non-success HTTP status. Consumers
+// should inspect it via AsAPIError plus the accessor methods
+// (HasStatus/Details/FieldErrors/Summary) rather than string-matching
+// the Error() output. Non-HTTP errors (denylist refusal, context
+// cancellation, IO failures, etc.) surface as plain wrapped errors —
+// format them with err.Error().
 type APIResponseError = client.APIResponseError
+
+// ErrorDetail is a single structured error entry parsed from an API response
+// body. Consumers receive these via APIResponseError.Details() or
+// APIResponseError.FieldErrors().
+type ErrorDetail = client.Error
+
+// AmbiguousMatchError is returned by Resolve<Resource>ByName methods when
+// multiple resources share the requested name. Matches carries the IDs of
+// all colliding resources so consumers can surface disambiguation options.
+type AmbiguousMatchError = client.AmbiguousMatchError
+
+// AsAPIError unwraps err and returns the underlying *APIResponseError if
+// present, otherwise nil. Shorthand for errors.As that saves callers from
+// managing the target pointer and importing the concrete error type.
+func AsAPIError(err error) *APIResponseError {
+	return client.AsAPIError(err)
+}
 `, pkg, mod),
 
 		"jamfplatform/rsql.go": fmt.Sprintf(`// Code generated by tools/generate; DO NOT EDIT.
@@ -978,6 +1298,8 @@ func readJSON(t *testing.T, r *http.Request, v any) {
 		t.Fatalf("readJSON: %%v", err)
 	}
 }
+
+func ptrStr(s string) *string { return &s }
 `, pkg),
 	}
 

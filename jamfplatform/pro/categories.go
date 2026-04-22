@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -138,4 +139,54 @@ func (c *Client) CreateCategoryHistoryNoteV1(ctx context.Context, id string, req
 		return nil, fmt.Errorf("CreateCategoryHistoryNoteV1(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveCategoryV1IDByName looks up a CategoryV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveCategoryV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/categories"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveCategoryV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveCategoryV1ByName looks up a CategoryV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveCategoryV1ByName(ctx context.Context, name string) (*Category, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/categories"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveCategoryV1ByName(%s): %w", name, err)
+	}
+	var out Category
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveCategoryV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyCategoryV1 creates or updates a CategoryV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyCategoryV1(ctx context.Context, request *Category) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyCategoryV1: Name must not be empty")
+	}
+	id, err := c.ResolveCategoryV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateCategoryV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyCategoryV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyCategoryV1: resolve: %w", err)
+	}
+	_, err = c.UpdateCategoryV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyCategoryV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

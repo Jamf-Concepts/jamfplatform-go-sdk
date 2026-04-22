@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetSoftwareUpdateServerByID finds software update servers by ID.
@@ -94,4 +97,48 @@ func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdate
 		return nil, fmt.Errorf("ListSoftwareUpdateServers: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveSoftwareUpdateServerIDByName looks up a SoftwareUpdateServer by name via GetSoftwareUpdateServerByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveSoftwareUpdateServerIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetSoftwareUpdateServerByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSoftwareUpdateServerIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveSoftwareUpdateServerIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveSoftwareUpdateServerByName looks up a SoftwareUpdateServer by name. Alias for GetSoftwareUpdateServerByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveSoftwareUpdateServerByName(ctx context.Context, name string) (*SoftwareUpdateServer, error) {
+	return c.GetSoftwareUpdateServerByName(ctx, name)
+}
+
+// ApplySoftwareUpdateServer creates or updates a SoftwareUpdateServer by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplySoftwareUpdateServer(ctx context.Context, request *SoftwareUpdateServer) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplySoftwareUpdateServer: Name must not be empty")
+	}
+	id, err := c.ResolveSoftwareUpdateServerIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateSoftwareUpdateServerByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplySoftwareUpdateServer: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplySoftwareUpdateServer: resolve: %w", err)
+	}
+	err = c.UpdateSoftwareUpdateServerByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplySoftwareUpdateServer: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

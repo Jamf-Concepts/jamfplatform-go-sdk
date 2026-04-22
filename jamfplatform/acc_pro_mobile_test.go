@@ -158,11 +158,11 @@ func TestAcceptance_Pro_Mobile_MDEACRUD(t *testing.T) {
 	// to the API team). TEXT is simplest for round-tripping.
 	created, err := p.CreateMobileDeviceExtensionAttributeV1(ctx, &pro.MobileDeviceExtensionAttributes{
 		Name:                 name,
-		Description:          "SDK acceptance test fixture",
+		Description:          ptr("SDK acceptance test fixture"),
 		InputType:            "TEXT",
 		InventoryDisplayType: "GENERAL",
 		DataType:             "STRING",
-		PopupMenuChoices:     []string{},
+		PopupMenuChoices:     &[]string{},
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -182,7 +182,7 @@ func TestAcceptance_Pro_Mobile_MDEACRUD(t *testing.T) {
 		t.Errorf("Name = %q, want %q", got.Name, name)
 	}
 
-	got.Description = "updated"
+	got.Description = ptr("updated")
 	if _, err := p.UpdateMobileDeviceExtensionAttributeV1(ctx, created.ID, got); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateMobileDeviceExtensionAttributeV1(%s): %v", created.ID, err)

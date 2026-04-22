@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -102,4 +103,57 @@ func (c *Client) DeleteUserV1(ctx context.Context, id string) error {
 		return fmt.Errorf("DeleteUserV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveUserV1IDByName looks up a UserV1 by its username field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveUserV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/users"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveUserV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveUserV1ByName looks up a UserV1 by its username field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveUserV1ByName(ctx context.Context, name string) (*User, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/users"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveUserV1ByName(%s): %w", name, err)
+	}
+	var out User
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveUserV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyUserV1 creates or updates a UserV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyUserV1(ctx context.Context, request *UserInventory, platform bool) (string, bool, error) {
+	var name string
+	if request.Username != nil {
+		name = *request.Username
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyUserV1: Username must not be empty")
+	}
+	id, err := c.ResolveUserV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateUserV1(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyUserV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyUserV1: resolve: %w", err)
+	}
+	err = c.UpdateUserV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyUserV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

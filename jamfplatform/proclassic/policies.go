@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetPolicyByID finds policies by ID.
@@ -138,4 +141,48 @@ func (c *Client) GetPolicyByNameSubset(ctx context.Context, name string, subset 
 		return nil, fmt.Errorf("GetPolicyByNameSubset(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolvePolicyIDByName looks up a Policy by name via GetPolicyByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolvePolicyIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetPolicyByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePolicyIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolvePolicyIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolvePolicyByName looks up a Policy by name. Alias for GetPolicyByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolvePolicyByName(ctx context.Context, name string) (*Policy, error) {
+	return c.GetPolicyByName(ctx, name)
+}
+
+// ApplyPolicy creates or updates a Policy by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyPolicy(ctx context.Context, request *PolicyPost) (string, bool, error) {
+	var name string
+	if request.General != nil && request.General.Name != nil {
+		name = *request.General.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyPolicy: Name must not be empty")
+	}
+	id, err := c.ResolvePolicyIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreatePolicyByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyPolicy: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyPolicy: resolve: %w", err)
+	}
+	err = c.UpdatePolicyByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyPolicy: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

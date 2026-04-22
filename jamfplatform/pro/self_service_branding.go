@@ -15,6 +15,12 @@ import (
 )
 
 // UploadBrandingImageV1 upload an image.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadBrandingImageV1(ctx context.Context, fileFilename string, file io.Reader) (*BrandingImageURL, error) {
 	prefix := c.transport.TenantPrefix("pro", "")
 	var result BrandingImageURL

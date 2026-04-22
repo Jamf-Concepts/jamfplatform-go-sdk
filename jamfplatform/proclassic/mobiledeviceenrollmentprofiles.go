@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetMobileDeviceEnrollmentProfileByID finds mobile device enrollment profiles by ID.
@@ -147,4 +150,48 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByNameSubset(ctx context.Contex
 		return nil, fmt.Errorf("GetMobileDeviceEnrollmentProfileByNameSubset(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolveMobileDeviceEnrollmentProfileIDByName looks up a MobileDeviceEnrollmentProfile by name via GetMobileDeviceEnrollmentProfileByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveMobileDeviceEnrollmentProfileIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetMobileDeviceEnrollmentProfileByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceEnrollmentProfileIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveMobileDeviceEnrollmentProfileIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveMobileDeviceEnrollmentProfileByName looks up a MobileDeviceEnrollmentProfile by name. Alias for GetMobileDeviceEnrollmentProfileByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveMobileDeviceEnrollmentProfileByName(ctx context.Context, name string) (*MobileDeviceEnrollmentProfile, error) {
+	return c.GetMobileDeviceEnrollmentProfileByName(ctx, name)
+}
+
+// ApplyMobileDeviceEnrollmentProfile creates or updates a MobileDeviceEnrollmentProfile by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyMobileDeviceEnrollmentProfile(ctx context.Context, request *MobileDeviceEnrollmentProfilePost) (string, bool, error) {
+	var name string
+	if request.General != nil && request.General.Name != nil {
+		name = *request.General.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyMobileDeviceEnrollmentProfile: Name must not be empty")
+	}
+	id, err := c.ResolveMobileDeviceEnrollmentProfileIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateMobileDeviceEnrollmentProfileByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyMobileDeviceEnrollmentProfile: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyMobileDeviceEnrollmentProfile: resolve: %w", err)
+	}
+	err = c.UpdateMobileDeviceEnrollmentProfileByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyMobileDeviceEnrollmentProfile: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

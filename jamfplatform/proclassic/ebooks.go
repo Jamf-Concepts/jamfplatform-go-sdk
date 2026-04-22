@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetEbookByID finds ebooks by ID.
@@ -116,4 +119,48 @@ func (c *Client) GetEbookByNameSubset(ctx context.Context, name string, subset s
 		return nil, fmt.Errorf("GetEbookByNameSubset(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolveEbookIDByName looks up a Ebook by name via GetEbookByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveEbookIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetEbookByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveEbookIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveEbookIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveEbookByName looks up a Ebook by name. Alias for GetEbookByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveEbookByName(ctx context.Context, name string) (*Ebook, error) {
+	return c.GetEbookByName(ctx, name)
+}
+
+// ApplyEbook creates or updates a Ebook by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyEbook(ctx context.Context, request *EbookPost) (string, bool, error) {
+	var name string
+	if request.General != nil && request.General.Name != nil {
+		name = *request.General.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyEbook: Name must not be empty")
+	}
+	id, err := c.ResolveEbookIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateEbookByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyEbook: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyEbook: resolve: %w", err)
+	}
+	err = c.UpdateEbookByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyEbook: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

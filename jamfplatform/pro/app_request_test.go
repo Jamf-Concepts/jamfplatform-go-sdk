@@ -199,3 +199,111 @@ func TestUpdateAppRequestSettingsV1(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 }
+
+func TestResolveAppRequestFormInputFieldV1IDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": 42, "title": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveAppRequestFormInputFieldV1IDByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveAppRequestFormInputFieldV1ByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": 42, "title": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveAppRequestFormInputFieldV1ByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestApplyAppRequestFormInputFieldV1_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List and create share the same path — single handler dispatches on method.
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    []any{},
+				"totalCount": 0,
+			})
+		case http.MethodPost:
+			writeJSON(t, w, 200, map[string]any{
+				"id":   42,
+				"href": "/new-id",
+			})
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+
+	id, created, err := c.ApplyAppRequestFormInputFieldV1(context.Background(), &AppRequestFormInputField{Title: "target"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestApplyAppRequestFormInputFieldV1_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns a match → resolver succeeds → apply updates.
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "existing-id", "title": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-request/form-input-fields/existing-id", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, 200, map[string]any{"id": 99})
+	})
+
+	id, created, err := c.ApplyAppRequestFormInputFieldV1(context.Background(), &AppRequestFormInputField{Title: "target"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
+	}
+}

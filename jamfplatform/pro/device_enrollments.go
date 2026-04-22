@@ -7,6 +7,8 @@ package pro
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -191,4 +193,79 @@ func (c *Client) ReplaceDeviceEnrollmentTokenV1(ctx context.Context, id string, 
 		return nil, fmt.Errorf("ReplaceDeviceEnrollmentTokenV1(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveDeviceEnrollmentV1IDByName looks up a DeviceEnrollmentV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveDeviceEnrollmentV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/device-enrollments"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDeviceEnrollmentV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveDeviceEnrollmentV1ByName looks up a DeviceEnrollmentV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveDeviceEnrollmentV1ByName(ctx context.Context, name string) (*DeviceEnrollmentInstance, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/device-enrollments"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveDeviceEnrollmentV1ByName(%s): %w", name, err)
+	}
+	var out DeviceEnrollmentInstance
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveDeviceEnrollmentV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyDeviceEnrollmentV1 creates or updates a DeviceEnrollmentV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyDeviceEnrollmentV1(ctx context.Context, request *DeviceEnrollmentInstance, token string) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: Name must not be empty")
+	}
+	id, err := c.ResolveDeviceEnrollmentV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			if token == "" {
+				return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: create requires a non-empty token")
+			}
+			tokenBytes, decodeErr := base64.StdEncoding.DecodeString(token)
+			if decodeErr != nil {
+				return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: decode token: %w", decodeErr)
+			}
+			tokenReq := &DeviceEnrollmentToken{EncodedToken: &tokenBytes}
+			resp, createErr := c.UploadDeviceEnrollmentTokenV1(ctx, tokenReq)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: create: %w", createErr)
+			}
+			// Update metadata on the newly created resource.
+			_, updateErr := c.UpdateDeviceEnrollmentV1(ctx, resp.ID, request)
+			if updateErr != nil {
+				return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: update metadata after create(%s): %w", resp.ID, updateErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: resolve: %w", err)
+	}
+	// Update path: optionally re-upload token, then always update metadata.
+	if token != "" {
+		tokenBytes, decodeErr := base64.StdEncoding.DecodeString(token)
+		if decodeErr != nil {
+			return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: decode token: %w", decodeErr)
+		}
+		tokenReq := &DeviceEnrollmentToken{EncodedToken: &tokenBytes}
+		_, replaceErr := c.ReplaceDeviceEnrollmentTokenV1(ctx, id, tokenReq)
+		if replaceErr != nil {
+			return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: replace token(%s): %w", id, replaceErr)
+		}
+	}
+	_, err = c.UpdateDeviceEnrollmentV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyDeviceEnrollmentV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

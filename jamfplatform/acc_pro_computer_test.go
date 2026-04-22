@@ -212,7 +212,7 @@ func TestAcceptance_Pro_Computer_ListCEATemplatesV1(t *testing.T) {
 			skipOnServerError(t, err)
 			t.Fatalf("GetComputerExtensionAttributeTemplateV1(%s): %v", tplID, err)
 		}
-		t.Logf("Template %s: name=%q dataType=%s", tpl.ID, tpl.Name, tpl.DataType)
+		t.Logf("Template %s: name=%q dataType=%s", derefStrPtr(tpl.ID), tpl.Name, tpl.DataType)
 	}
 }
 
@@ -226,13 +226,13 @@ func TestAcceptance_Pro_Computer_CEACRUD(t *testing.T) {
 
 	created, err := p.CreateComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                 name,
-		Description:          "SDK acceptance test fixture",
-		Enabled:              true,
+		Description:          ptr("SDK acceptance test fixture"),
+		Enabled:              ptr(true),
 		InputType:            "SCRIPT",
 		InventoryDisplayType: "GENERAL",
 		DataType:             "STRING",
 		ScriptContents:       ptr(script),
-		PopupMenuChoices:     []string{},
+		PopupMenuChoices:     &[]string{},
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -253,7 +253,7 @@ func TestAcceptance_Pro_Computer_CEACRUD(t *testing.T) {
 		t.Errorf("Name = %q, want %q", got.Name, name)
 	}
 
-	got.Description = "updated"
+	got.Description = ptr("updated")
 	if _, err := p.UpdateComputerExtensionAttributeV1(ctx, created.ID, got); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateComputerExtensionAttributeV1(%s): %v", created.ID, err)
@@ -325,13 +325,13 @@ func TestAcceptance_Pro_Computer_DeleteMultipleCEAV1(t *testing.T) {
 	for _, tag := range []string{"a", "b"} {
 		resp, err := p.CreateComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 			Name:                 "sdk-acc-cea-bulk-" + suffix + "-" + tag,
-			Description:          "SDK acceptance bulk-delete fixture",
-			Enabled:              true,
+			Description:          ptr("SDK acceptance bulk-delete fixture"),
+			Enabled:              ptr(true),
 			InputType:            "SCRIPT",
 			InventoryDisplayType: "GENERAL",
 			DataType:             "STRING",
 			ScriptContents:       ptr("#!/bin/sh\necho bulk\n"),
-			PopupMenuChoices:     []string{},
+			PopupMenuChoices:     &[]string{},
 		})
 		if err != nil {
 			skipOnServerError(t, err)
@@ -385,12 +385,12 @@ echo sdk-acc-upload-value</script>
 		// rather than leak on unusual server responses.
 		t.Skipf("UploadComputerExtensionAttributeV1 rejected fixture: %v", err)
 	}
-	if resp.ID != "" {
-		id := resp.ID
+	if resp.ID != nil && *resp.ID != "" {
+		id := *resp.ID
 		cleanupDelete(t, "DeleteComputerExtensionAttributeV1(uploaded)", func() error {
 			return p.DeleteComputerExtensionAttributeV1(ctx, id)
 		})
-		t.Logf("Uploaded CEA %s name=%q", resp.ID, resp.Name)
+		t.Logf("Uploaded CEA %s name=%q", *resp.ID, resp.Name)
 	} else {
 		t.Logf("UploadComputerExtensionAttributeV1 succeeded but returned no id; body: %+v", resp)
 	}

@@ -297,6 +297,20 @@ type schemaUsage struct {
 	isResponse bool
 }
 
+// collectAllSchemas returns all component schemas in the doc, marked as both
+// request and response. Used in typesOnly mode where every schema should be
+// emitted regardless of operation references.
+func collectAllSchemas(doc *openapi3.T) map[string]*schemaUsage {
+	all := make(map[string]*schemaUsage)
+	if doc.Components == nil || doc.Components.Schemas == nil {
+		return all
+	}
+	for name := range doc.Components.Schemas {
+		all[name] = &schemaUsage{isRequest: true, isResponse: true}
+	}
+	return all
+}
+
 // collectReferencedSchemas walks all whitelisted operations in a spec and
 // transitively collects every schema name referenced by request bodies,
 // responses, and their nested properties, tracking request vs response usage.
@@ -397,6 +411,10 @@ func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]*schemaU
 // the schema walker already relies on package-level helpers.
 var currentFieldOverrides map[string]string
 
+// suppressWriteOnly suppresses write-only comments during type extraction.
+// Set to true for typesOnly specs where the writeOnly annotation is misleading.
+var suppressWriteOnly bool
+
 func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string) []GoType {
 	names := sortedKeys(doc.Components.Schemas)
 	var types []GoType
@@ -415,7 +433,7 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 		// allOf composition without an explicit type: merge properties from
 		// each composed schema into a single flat struct.
 		if len(schema.AllOf) > 0 && (schema.Type == nil || !schema.Type.Is("object")) {
-			t := schemaToGoType(name, schema, false, format)
+			t := schemaToGoType(name, schema, usage.isRequest, format)
 			t.XMLName = xmlName
 			types = append(types, t)
 			continue
@@ -428,6 +446,14 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 				t := schemaToGoType(name, schema, usage.isRequest, format)
 				t.XMLName = xmlName
 				types = append(types, t)
+			} else if len(schema.AllOf) == 0 && len(schema.OneOf) == 0 && len(schema.AnyOf) == 0 {
+				// Completely empty schema (e.g. JsonNode: {}) — no type, no
+				// properties, no composition. Treat as freeform → json.RawMessage.
+				comment := name + " represents a freeform JSON value."
+				if schema.Description != "" {
+					comment = name + " " + lowerFirst(cleanComment(schema.Description))
+				}
+				types = append(types, GoType{Name: name, Comment: comment, IsRawJSON: true})
 			}
 			continue
 		}
@@ -867,7 +893,7 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 		}
 
 		var fieldComment string
-		if prop != nil && (prop.WriteOnly || prop.Format == "password") {
+		if !suppressWriteOnly && prop != nil && (prop.WriteOnly || prop.Format == "password") {
 			fieldComment = "Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update."
 		}
 

@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -162,4 +163,82 @@ func (c *Client) UnmanageMobileDeviceV2(ctx context.Context, id string) (*Unmana
 		return nil, fmt.Errorf("UnmanageMobileDeviceV2(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveMobileDeviceDetailV2IDByName looks up a MobileDeviceDetailV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMobileDeviceDetailV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-devices/detail?section=GENERAL"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "general.displayName", "mobileDeviceId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceDetailV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMobileDeviceDetailV2ByName looks up a MobileDeviceDetailV2 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMobileDeviceDetailV2ByName(ctx context.Context, name string) (*MobileDeviceResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-devices/detail?section=GENERAL"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "general.displayName", "mobileDeviceId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceDetailV2ByName(%s): %w", name, err)
+	}
+	var out MobileDeviceResponse
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceDetailV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveMobileDeviceDetailV2IDBySerialNumber looks up a MobileDeviceDetailV2 by its serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMobileDeviceDetailV2IDBySerialNumber(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-devices/detail?section=HARDWARE"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "hardware.serialNumber", "mobileDeviceId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceDetailV2IDBySerialNumber(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMobileDeviceDetailV2BySerialNumber looks up a MobileDeviceDetailV2 by its serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMobileDeviceDetailV2BySerialNumber(ctx context.Context, name string) (*MobileDeviceResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-devices/detail?section=HARDWARE"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "hardware.serialNumber", "mobileDeviceId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceDetailV2BySerialNumber(%s): %w", name, err)
+	}
+	var out MobileDeviceResponse
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceDetailV2BySerialNumber(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveMobileDeviceDetailV2IDByUDID looks up a MobileDeviceDetailV2 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMobileDeviceDetailV2IDByUDID(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-devices/detail?section=GENERAL"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "general.udid", "mobileDeviceId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceDetailV2IDByUDID(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMobileDeviceDetailV2ByUDID looks up a MobileDeviceDetailV2 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMobileDeviceDetailV2ByUDID(ctx context.Context, name string) (*MobileDeviceResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-devices/detail?section=GENERAL"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "general.udid", "mobileDeviceId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceDetailV2ByUDID(%s): %w", name, err)
+	}
+	var out MobileDeviceResponse
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceDetailV2ByUDID(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

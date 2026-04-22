@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -29,6 +30,12 @@ func (c *Client) DownloadInventoryPreloadCsvV2(ctx context.Context) ([]byte, err
 }
 
 // UploadInventoryPreloadCsvV2 create one or more new Inventory Preload records using CSV.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadInventoryPreloadCsvV2(ctx context.Context, fileFilename string, file io.Reader) (*[]HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []HrefResponse
@@ -54,6 +61,12 @@ func (c *Client) DownloadInventoryPreloadCsvTemplateV2(ctx context.Context) ([]b
 }
 
 // ValidateInventoryPreloadCsvV2 validate a given CSV file.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) ValidateInventoryPreloadCsvV2(ctx context.Context, fileFilename string, file io.Reader) (*InventoryPreloadCsvValidationSuccess, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result InventoryPreloadCsvValidationSuccess
@@ -227,4 +240,54 @@ func (c *Client) DeleteInventoryPreloadRecordV2(ctx context.Context, id string) 
 		return fmt.Errorf("DeleteInventoryPreloadRecordV2(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveInventoryPreloadRecordV2IDBySerialNumber looks up a InventoryPreloadRecordV2 by its serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/inventory-preload/records"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "serialNumber", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveInventoryPreloadRecordV2IDBySerialNumber(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveInventoryPreloadRecordV2BySerialNumber looks up a InventoryPreloadRecordV2 by its serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveInventoryPreloadRecordV2BySerialNumber(ctx context.Context, name string) (*InventoryPreloadRecordV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/inventory-preload/records"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "serialNumber", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveInventoryPreloadRecordV2BySerialNumber(%s): %w", name, err)
+	}
+	var out InventoryPreloadRecordV2
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveInventoryPreloadRecordV2BySerialNumber(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyInventoryPreloadRecordV2 creates or updates a InventoryPreloadRecordV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyInventoryPreloadRecordV2(ctx context.Context, request *InventoryPreloadRecordV2) (string, bool, error) {
+	name := request.SerialNumber
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyInventoryPreloadRecordV2: SerialNumber must not be empty")
+	}
+	id, err := c.ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateInventoryPreloadRecordV2(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyInventoryPreloadRecordV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyInventoryPreloadRecordV2: resolve: %w", err)
+	}
+	_, err = c.UpdateInventoryPreloadRecordV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyInventoryPreloadRecordV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

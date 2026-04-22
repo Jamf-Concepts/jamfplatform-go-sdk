@@ -283,3 +283,92 @@ func TestUpdateMobileDeviceProvisioningProfileByUUID(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 }
+
+func TestResolveMobileDeviceProvisioningProfileIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mobile_device_provisioning_profile><general><id>42</id></general></mobile_device_provisioning_profile>")
+	})
+
+	id, err := c.ResolveMobileDeviceProvisioningProfileIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveMobileDeviceProvisioningProfileByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mobile_device_provisioning_profile><general><id>42</id></general></mobile_device_provisioning_profile>")
+	})
+
+	result, err := c.ResolveMobileDeviceProvisioningProfileByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestApplyMobileDeviceProvisioningProfile_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns 404 → apply creates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/id/0", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, 201, "<mobile_device_provisioning_profile><id>42</id></mobile_device_provisioning_profile>")
+	})
+
+	id, created, err := c.ApplyMobileDeviceProvisioningProfile(context.Background(), &MobileDeviceProvisioningProfile{General: &MobileDeviceProvisioningProfileGeneral{Name: ptrStr("target")}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestApplyMobileDeviceProvisioningProfile_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mobile_device_provisioning_profile><general><id>42</id></general></mobile_device_provisioning_profile>")
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/id/42", func(w http.ResponseWriter, r *http.Request) {
+		writeXML(t, w, 201, "<mobile_device_provisioning_profile><general><id>42</id></general></mobile_device_provisioning_profile>")
+	})
+
+	id, created, err := c.ApplyMobileDeviceProvisioningProfile(context.Background(), &MobileDeviceProvisioningProfile{General: &MobileDeviceProvisioningProfileGeneral{Name: ptrStr("target")}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}

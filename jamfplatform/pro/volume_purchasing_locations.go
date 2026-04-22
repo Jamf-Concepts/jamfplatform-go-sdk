@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -178,4 +179,66 @@ func (c *Client) RevokeVolumePurchasingLocationLicensesV1(ctx context.Context, i
 		return fmt.Errorf("RevokeVolumePurchasingLocationLicensesV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveVolumePurchasingLocationV1IDByName looks up a VolumePurchasingLocationV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveVolumePurchasingLocationV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/volume-purchasing-locations"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveVolumePurchasingLocationV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveVolumePurchasingLocationV1ByName looks up a VolumePurchasingLocationV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveVolumePurchasingLocationV1ByName(ctx context.Context, name string) (*VolumePurchasingLocation, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/volume-purchasing-locations"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveVolumePurchasingLocationV1ByName(%s): %w", name, err)
+	}
+	var out VolumePurchasingLocation
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveVolumePurchasingLocationV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyVolumePurchasingLocationV1 creates or updates a VolumePurchasingLocationV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyVolumePurchasingLocationV1(ctx context.Context, request *VolumePurchasingLocationPost) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: Name must not be empty")
+	}
+	id, err := c.ResolveVolumePurchasingLocationV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateVolumePurchasingLocationV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: resolve: %w", err)
+	}
+	// Convert create request to update type via JSON round-trip.
+	data, marshalErr := json.Marshal(request)
+	if marshalErr != nil {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: marshal for update(%s): %w", id, marshalErr)
+	}
+	var updateReq VolumePurchasingLocationPatch
+	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: unmarshal for update(%s): %w", id, unmarshalErr)
+	}
+	_, err = c.UpdateVolumePurchasingLocationV1(ctx, id, &updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyVolumePurchasingLocationV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

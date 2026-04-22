@@ -637,3 +637,111 @@ func TestListEnrollmentCustomizationPrestagesV2_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveEnrollmentCustomizationV2IDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "displayName": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveEnrollmentCustomizationV2IDByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveEnrollmentCustomizationV2ByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "displayName": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveEnrollmentCustomizationV2ByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestApplyEnrollmentCustomizationV2_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List and create share the same path — single handler dispatches on method.
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    []any{},
+				"totalCount": 0,
+			})
+		case http.MethodPost:
+			writeJSON(t, w, 201, map[string]any{
+				"id":   "new-id",
+				"href": "/new-id",
+			})
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+
+	id, created, err := c.ApplyEnrollmentCustomizationV2(context.Background(), &EnrollmentCustomizationV2{DisplayName: "target"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "new-id" {
+		t.Errorf("id = %q, want new-id", id)
+	}
+}
+
+func TestApplyEnrollmentCustomizationV2_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns a match → resolver succeeds → apply updates.
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "existing-id", "displayName": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/enrollment-customizations/existing-id", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
+	})
+
+	id, created, err := c.ApplyEnrollmentCustomizationV2(context.Background(), &EnrollmentCustomizationV2{DisplayName: "target"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
+	}
+}

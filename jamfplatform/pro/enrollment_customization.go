@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -239,6 +240,12 @@ func (c *Client) CreateEnrollmentCustomizationV2(ctx context.Context, request *E
 }
 
 // UploadEnrollmentCustomizationImageV2 upload an image.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadEnrollmentCustomizationImageV2(ctx context.Context, fileFilename string, file io.Reader) (*BrandingImageURL, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result BrandingImageURL
@@ -342,4 +349,54 @@ func (c *Client) ListEnrollmentCustomizationPrestagesV2(ctx context.Context, id 
 		return nil, fmt.Errorf("ListEnrollmentCustomizationPrestagesV2(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveEnrollmentCustomizationV2IDByName looks up a EnrollmentCustomizationV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveEnrollmentCustomizationV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/enrollment-customizations"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveEnrollmentCustomizationV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveEnrollmentCustomizationV2ByName looks up a EnrollmentCustomizationV2 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveEnrollmentCustomizationV2ByName(ctx context.Context, name string) (*EnrollmentCustomizationV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/enrollment-customizations"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveEnrollmentCustomizationV2ByName(%s): %w", name, err)
+	}
+	var out EnrollmentCustomizationV2
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveEnrollmentCustomizationV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyEnrollmentCustomizationV2 creates or updates a EnrollmentCustomizationV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyEnrollmentCustomizationV2(ctx context.Context, request *EnrollmentCustomizationV2) (string, bool, error) {
+	name := request.DisplayName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyEnrollmentCustomizationV2: DisplayName must not be empty")
+	}
+	id, err := c.ResolveEnrollmentCustomizationV2IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateEnrollmentCustomizationV2(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyEnrollmentCustomizationV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyEnrollmentCustomizationV2: resolve: %w", err)
+	}
+	_, err = c.UpdateEnrollmentCustomizationV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyEnrollmentCustomizationV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

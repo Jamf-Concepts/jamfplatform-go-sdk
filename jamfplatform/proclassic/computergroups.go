@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetComputerGroupByID finds computer groups by ID.
@@ -94,4 +97,48 @@ func (c *Client) ListComputerGroups(ctx context.Context) (*ComputerGroups, error
 		return nil, fmt.Errorf("ListComputerGroups: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveComputerGroupIDByName looks up a ComputerGroup by name via GetComputerGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveComputerGroupIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetComputerGroupByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerGroupIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveComputerGroupIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveComputerGroupByName looks up a ComputerGroup by name. Alias for GetComputerGroupByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveComputerGroupByName(ctx context.Context, name string) (*ComputerGroup, error) {
+	return c.GetComputerGroupByName(ctx, name)
+}
+
+// ApplyComputerGroup creates or updates a ComputerGroup by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyComputerGroup(ctx context.Context, request *ComputerGroupPost) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyComputerGroup: Name must not be empty")
+	}
+	id, err := c.ResolveComputerGroupIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateComputerGroupByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyComputerGroup: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyComputerGroup: resolve: %w", err)
+	}
+	err = c.UpdateComputerGroupByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyComputerGroup: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -76,4 +77,30 @@ func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
 		return fmt.Errorf("DeleteAccountV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveAccountV1IDByName looks up a AccountV1 by its username field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveAccountV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/accounts"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAccountV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveAccountV1ByName looks up a AccountV1 by its username field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveAccountV1ByName(ctx context.Context, name string) (*Account, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/accounts"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveAccountV1ByName(%s): %w", name, err)
+	}
+	var out Account
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveAccountV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

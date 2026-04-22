@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -138,4 +139,54 @@ func (c *Client) CreateDepartmentHistoryNoteV1(ctx context.Context, id string, r
 		return nil, fmt.Errorf("CreateDepartmentHistoryNoteV1(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveDepartmentV1IDByName looks up a DepartmentV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveDepartmentV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/departments"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDepartmentV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveDepartmentV1ByName looks up a DepartmentV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveDepartmentV1ByName(ctx context.Context, name string) (*Department, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/departments"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveDepartmentV1ByName(%s): %w", name, err)
+	}
+	var out Department
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveDepartmentV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyDepartmentV1 creates or updates a DepartmentV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyDepartmentV1(ctx context.Context, request *Department) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyDepartmentV1: Name must not be empty")
+	}
+	id, err := c.ResolveDepartmentV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateDepartmentV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyDepartmentV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyDepartmentV1: resolve: %w", err)
+	}
+	_, err = c.UpdateDepartmentV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyDepartmentV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

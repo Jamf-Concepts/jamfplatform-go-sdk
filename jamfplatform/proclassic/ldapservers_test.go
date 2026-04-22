@@ -358,3 +358,92 @@ func TestGetLDAPServerByNameUser_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveLDAPServerIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ldapservers/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<ldap_server><connection><id>42</id></connection></ldap_server>")
+	})
+
+	id, err := c.ResolveLDAPServerIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveLDAPServerByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ldapservers/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<ldap_server><connection><id>42</id></connection></ldap_server>")
+	})
+
+	result, err := c.ResolveLDAPServerByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestApplyLDAPServer_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns 404 → apply creates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ldapservers/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ldapservers/id/0", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, 201, "<ldap_server><id>42</id></ldap_server>")
+	})
+
+	id, created, err := c.ApplyLDAPServer(context.Background(), &LdapServerPost{Connection: &LdapServerPostConnection{Name: ptrStr("target")}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestApplyLDAPServer_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ldapservers/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<ldap_server><connection><id>42</id></connection></ldap_server>")
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ldapservers/id/42", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(201)
+	})
+
+	id, created, err := c.ApplyLDAPServer(context.Background(), &LdapServerPost{Connection: &LdapServerPostConnection{Name: ptrStr("target")}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}

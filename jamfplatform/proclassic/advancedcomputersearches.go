@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetAdvancedComputerSearchByID finds computer searches by ID.
@@ -94,4 +97,48 @@ func (c *Client) UpdateAdvancedComputerSearchByName(ctx context.Context, name st
 		return fmt.Errorf("UpdateAdvancedComputerSearchByName(%s): %w", name, err)
 	}
 	return nil
+}
+
+// ResolveAdvancedComputerSearchIDByName looks up a AdvancedComputerSearch by name via GetAdvancedComputerSearchByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveAdvancedComputerSearchIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetAdvancedComputerSearchByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAdvancedComputerSearchIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveAdvancedComputerSearchIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveAdvancedComputerSearchByName looks up a AdvancedComputerSearch by name. Alias for GetAdvancedComputerSearchByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveAdvancedComputerSearchByName(ctx context.Context, name string) (*AdvancedComputerSearch, error) {
+	return c.GetAdvancedComputerSearchByName(ctx, name)
+}
+
+// ApplyAdvancedComputerSearch creates or updates a AdvancedComputerSearch by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyAdvancedComputerSearch(ctx context.Context, request *AdvancedComputerSearch) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyAdvancedComputerSearch: Name must not be empty")
+	}
+	id, err := c.ResolveAdvancedComputerSearchIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateAdvancedComputerSearchByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyAdvancedComputerSearch: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyAdvancedComputerSearch: resolve: %w", err)
+	}
+	err = c.UpdateAdvancedComputerSearchByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyAdvancedComputerSearch: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

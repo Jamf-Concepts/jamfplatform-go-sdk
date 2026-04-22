@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetPatchInternalSourceByID finds a patch internal source by ID.
@@ -43,4 +44,21 @@ func (c *Client) ListPatchInternalSources(ctx context.Context) (*PatchInternalSo
 		return nil, fmt.Errorf("ListPatchInternalSources: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolvePatchInternalSourceIDByName looks up a PatchInternalSource by name via GetPatchInternalSourceByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolvePatchInternalSourceIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetPatchInternalSourceByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePatchInternalSourceIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolvePatchInternalSourceIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolvePatchInternalSourceByName looks up a PatchInternalSource by name. Alias for GetPatchInternalSourceByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolvePatchInternalSourceByName(ctx context.Context, name string) (*PatchInternalSource, error) {
+	return c.GetPatchInternalSourceByName(ctx, name)
 }

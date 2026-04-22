@@ -7,9 +7,12 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListAdvancedMobileDeviceSearchesV1 get Advanced Search objects.
@@ -98,4 +101,54 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchV1(ctx context.Context, id stri
 		return fmt.Errorf("DeleteAdvancedMobileDeviceSearchV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveAdvancedMobileDeviceSearchV1IDByName looks up a AdvancedMobileDeviceSearchV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveAdvancedMobileDeviceSearchV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/advanced-mobile-device-searches"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAdvancedMobileDeviceSearchV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveAdvancedMobileDeviceSearchV1ByName looks up a AdvancedMobileDeviceSearchV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveAdvancedMobileDeviceSearchV1ByName(ctx context.Context, name string) (*AdvancedSearch, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/advanced-mobile-device-searches"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveAdvancedMobileDeviceSearchV1ByName(%s): %w", name, err)
+	}
+	var out AdvancedSearch
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveAdvancedMobileDeviceSearchV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyAdvancedMobileDeviceSearchV1 creates or updates a AdvancedMobileDeviceSearchV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyAdvancedMobileDeviceSearchV1(ctx context.Context, request *AdvancedSearch) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyAdvancedMobileDeviceSearchV1: Name must not be empty")
+	}
+	id, err := c.ResolveAdvancedMobileDeviceSearchV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateAdvancedMobileDeviceSearchV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyAdvancedMobileDeviceSearchV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyAdvancedMobileDeviceSearchV1: resolve: %w", err)
+	}
+	_, err = c.UpdateAdvancedMobileDeviceSearchV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyAdvancedMobileDeviceSearchV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

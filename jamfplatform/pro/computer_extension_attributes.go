@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -110,6 +111,12 @@ func (c *Client) GetComputerExtensionAttributeTemplateV1(ctx context.Context, id
 }
 
 // UploadComputerExtensionAttributeV1 upload Computer Extension Attribute.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadComputerExtensionAttributeV1(ctx context.Context, fileFilename string, file io.Reader) (*ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerExtensionAttributes
@@ -216,4 +223,54 @@ func (c *Client) CreateComputerExtensionAttributeHistoryNoteV1(ctx context.Conte
 		return nil, fmt.Errorf("CreateComputerExtensionAttributeHistoryNoteV1(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveComputerExtensionAttributeV1IDByName looks up a ComputerExtensionAttributeV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveComputerExtensionAttributeV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/computer-extension-attributes"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerExtensionAttributeV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveComputerExtensionAttributeV1ByName looks up a ComputerExtensionAttributeV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveComputerExtensionAttributeV1ByName(ctx context.Context, name string) (*ComputerExtensionAttributes, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/computer-extension-attributes"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveComputerExtensionAttributeV1ByName(%s): %w", name, err)
+	}
+	var out ComputerExtensionAttributes
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveComputerExtensionAttributeV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyComputerExtensionAttributeV1 creates or updates a ComputerExtensionAttributeV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyComputerExtensionAttributeV1(ctx context.Context, request *ComputerExtensionAttributes) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyComputerExtensionAttributeV1: Name must not be empty")
+	}
+	id, err := c.ResolveComputerExtensionAttributeV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateComputerExtensionAttributeV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyComputerExtensionAttributeV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyComputerExtensionAttributeV1: resolve: %w", err)
+	}
+	_, err = c.UpdateComputerExtensionAttributeV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyComputerExtensionAttributeV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

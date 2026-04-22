@@ -7,6 +7,8 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -36,4 +38,30 @@ func (c *Client) ListRemoteAdminConfigurations(ctx context.Context) ([]RemoteAdm
 		hasNext := (page+1)*pageSize < result.TotalCount
 		return result.Results, hasNext, nil
 	})
+}
+
+// ResolveRemoteAdminConfigurationPreviewIDByName looks up a RemoteAdminConfigurationPreview by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveRemoteAdminConfigurationPreviewIDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "")
+	listPath := prefix + "/preview/remote-administration-configurations"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveRemoteAdminConfigurationPreviewIDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveRemoteAdminConfigurationPreviewByName looks up a RemoteAdminConfigurationPreview by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveRemoteAdminConfigurationPreviewByName(ctx context.Context, name string) (*RemoteAdministrationResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "")
+	listPath := prefix + "/preview/remote-administration-configurations"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveRemoteAdminConfigurationPreviewByName(%s): %w", name, err)
+	}
+	var out RemoteAdministrationResponse
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveRemoteAdminConfigurationPreviewByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }

@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -80,4 +81,57 @@ func (c *Client) DeleteAppInstallerDeploymentV1(ctx context.Context, id string) 
 		return fmt.Errorf("DeleteAppInstallerDeploymentV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveAppInstallerDeploymentV1IDByName looks up a AppInstallerDeploymentV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveAppInstallerDeploymentV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/app-installers/deployments"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAppInstallerDeploymentV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveAppInstallerDeploymentV1ByName looks up a AppInstallerDeploymentV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveAppInstallerDeploymentV1ByName(ctx context.Context, name string) (*AppInstallerDeployment, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/app-installers/deployments"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveAppInstallerDeploymentV1ByName(%s): %w", name, err)
+	}
+	var out AppInstallerDeployment
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveAppInstallerDeploymentV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyAppInstallerDeploymentV1 creates or updates a AppInstallerDeploymentV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeployment) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: Name must not be empty")
+	}
+	id, err := c.ResolveAppInstallerDeploymentV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateAppInstallerDeploymentV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: resolve: %w", err)
+	}
+	_, err = c.UpdateAppInstallerDeploymentV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

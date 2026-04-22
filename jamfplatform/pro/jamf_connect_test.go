@@ -142,3 +142,49 @@ func TestCreateJamfConnectHistoryNoteV1(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 }
+
+func TestResolveJamfConnectConfigProfileV1IDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-connect/config-profiles", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"profileId": 42, "profileName": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveJamfConnectConfigProfileV1IDByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveJamfConnectConfigProfileV1ByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-connect/config-profiles", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"profileId": 42, "profileName": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveJamfConnectConfigProfileV1ByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

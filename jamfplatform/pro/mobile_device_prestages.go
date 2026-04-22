@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -187,6 +188,12 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV3(ctx context.Context, id s
 }
 
 // UploadMobileDevicePrestageAttachmentV3 add an attachment to a Mobile Device Prestage.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadMobileDevicePrestageAttachmentV3(ctx context.Context, id string, fileFilename string, file io.Reader) (*PrestageFileAttachmentV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result PrestageFileAttachmentV3
@@ -246,4 +253,66 @@ func (c *Client) CreateMobileDevicePrestageHistoryNoteV3(ctx context.Context, id
 		return nil, fmt.Errorf("CreateMobileDevicePrestageHistoryNoteV3(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ResolveMobileDevicePrestageV3IDByName looks up a MobileDevicePrestageV3 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMobileDevicePrestageV3IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/mobile-device-prestages"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDevicePrestageV3IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMobileDevicePrestageV3ByName looks up a MobileDevicePrestageV3 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMobileDevicePrestageV3ByName(ctx context.Context, name string) (*MobileDevicePrestageV3, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/mobile-device-prestages"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMobileDevicePrestageV3ByName(%s): %w", name, err)
+	}
+	var out MobileDevicePrestageV3
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMobileDevicePrestageV3ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyMobileDevicePrestageV3 creates or updates a MobileDevicePrestageV3 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyMobileDevicePrestageV3(ctx context.Context, request *MobileDevicePrestageV3) (string, bool, error) {
+	name := request.DisplayName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV3: DisplayName must not be empty")
+	}
+	id, err := c.ResolveMobileDevicePrestageV3IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			zeroVersionLock(request)
+			resp, createErr := c.CreateMobileDevicePrestageV3(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyMobileDevicePrestageV3: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV3: resolve: %w", err)
+	}
+	// Fetch current resource to extract versionLock values for optimistic locking.
+	current, getErr := c.GetMobileDevicePrestageV3(ctx, id)
+	if getErr != nil {
+		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV3: get for versionLock(%s): %w", id, getErr)
+	}
+	// Convert create request to update type via JSON round-trip,
+	// then inject current versionLock values from the fetched resource.
+	updateReq, convErr := convertAndInjectVersionLock[PutMobileDevicePrestageV3, GetMobileDevicePrestageV3](request, current)
+	if convErr != nil {
+		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV3: convert for update(%s): %w", id, convErr)
+	}
+	_, err = c.UpdateMobileDevicePrestageV3(ctx, id, updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV3: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetUserGroupByID finds user groups by ID.
@@ -94,4 +97,48 @@ func (c *Client) ListUserGroups(ctx context.Context) (*UserGroups, error) {
 		return nil, fmt.Errorf("ListUserGroups: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveUserGroupIDByName looks up a UserGroup by name via GetUserGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveUserGroupIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetUserGroupByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveUserGroupIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveUserGroupIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveUserGroupByName looks up a UserGroup by name. Alias for GetUserGroupByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveUserGroupByName(ctx context.Context, name string) (*UserGroup, error) {
+	return c.GetUserGroupByName(ctx, name)
+}
+
+// ApplyUserGroup creates or updates a UserGroup by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyUserGroup(ctx context.Context, request *UserGroup) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyUserGroup: Name must not be empty")
+	}
+	id, err := c.ResolveUserGroupIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateUserGroupByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyUserGroup: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyUserGroup: resolve: %w", err)
+	}
+	err = c.UpdateUserGroupByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyUserGroup: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

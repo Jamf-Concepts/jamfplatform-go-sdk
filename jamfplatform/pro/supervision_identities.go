@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -106,4 +107,63 @@ func (c *Client) UploadSupervisionIdentityV1(ctx context.Context, request *Super
 		return nil, fmt.Errorf("UploadSupervisionIdentityV1: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveSupervisionIdentityV1IDByName looks up a SupervisionIdentityV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveSupervisionIdentityV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/supervision-identities"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSupervisionIdentityV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveSupervisionIdentityV1ByName looks up a SupervisionIdentityV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveSupervisionIdentityV1ByName(ctx context.Context, name string) (*SupervisionIdentity, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/supervision-identities"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveSupervisionIdentityV1ByName(%s): %w", name, err)
+	}
+	var out SupervisionIdentity
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveSupervisionIdentityV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplySupervisionIdentityV1 creates or updates a SupervisionIdentityV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplySupervisionIdentityV1(ctx context.Context, request *SupervisionIdentityCreate) (string, bool, error) {
+	name := request.DisplayName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplySupervisionIdentityV1: DisplayName must not be empty")
+	}
+	id, err := c.ResolveSupervisionIdentityV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateSupervisionIdentityV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplySupervisionIdentityV1: create: %w", createErr)
+			}
+			return strconv.Itoa(resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplySupervisionIdentityV1: resolve: %w", err)
+	}
+	// Convert create request to update type via JSON round-trip.
+	data, marshalErr := json.Marshal(request)
+	if marshalErr != nil {
+		return "", false, fmt.Errorf("ApplySupervisionIdentityV1: marshal for update(%s): %w", id, marshalErr)
+	}
+	var updateReq SupervisionIdentityUpdate
+	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
+		return "", false, fmt.Errorf("ApplySupervisionIdentityV1: unmarshal for update(%s): %w", id, unmarshalErr)
+	}
+	_, err = c.UpdateSupervisionIdentityV1(ctx, id, &updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplySupervisionIdentityV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

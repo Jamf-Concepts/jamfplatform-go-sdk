@@ -178,3 +178,92 @@ func TestListIBeacons_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveIBeaconIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<ibeacon><id>42</id></ibeacon>")
+	})
+
+	id, err := c.ResolveIBeaconIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveIBeaconByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<ibeacon><id>42</id></ibeacon>")
+	})
+
+	result, err := c.ResolveIBeaconByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestApplyIBeacon_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns 404 → apply creates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/id/0", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, 201, "<ibeacon><id>42</id></ibeacon>")
+	})
+
+	id, created, err := c.ApplyIBeacon(context.Background(), &Ibeacon{Name: ptrStr("target")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestApplyIBeacon_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<ibeacon><id>42</id></ibeacon>")
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/ibeacons/id/42", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(201)
+	})
+
+	id, created, err := c.ApplyIBeacon(context.Background(), &Ibeacon{Name: ptrStr("target")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}

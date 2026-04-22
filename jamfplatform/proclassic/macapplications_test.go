@@ -238,3 +238,92 @@ func TestGetMacApplicationByNameSubset_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveMacApplicationIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/macapplications/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mac_application><general><id>42</id></general></mac_application>")
+	})
+
+	id, err := c.ResolveMacApplicationIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveMacApplicationByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/macapplications/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mac_application><general><id>42</id></general></mac_application>")
+	})
+
+	result, err := c.ResolveMacApplicationByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestApplyMacApplication_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns 404 → apply creates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/macapplications/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/macapplications/id/0", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, 201, "<mac_application><id>42</id></mac_application>")
+	})
+
+	id, created, err := c.ApplyMacApplication(context.Background(), &MacApplication{General: &MacApplicationGeneral{Name: ptrStr("target")}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestApplyMacApplication_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/macapplications/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mac_application><general><id>42</id></general></mac_application>")
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/macapplications/id/42", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(201)
+	})
+
+	id, created, err := c.ApplyMacApplication(context.Background(), &MacApplication{General: &MacApplicationGeneral{Name: ptrStr("target")}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}

@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetCategoryByID finds categories by ID.
@@ -94,4 +97,48 @@ func (c *Client) ListCategories(ctx context.Context) (*Categories, error) {
 		return nil, fmt.Errorf("ListCategories: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveCategoryIDByName looks up a Category by name via GetCategoryByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveCategoryIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetCategoryByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveCategoryIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveCategoryIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveCategoryByName looks up a Category by name. Alias for GetCategoryByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveCategoryByName(ctx context.Context, name string) (*Category, error) {
+	return c.GetCategoryByName(ctx, name)
+}
+
+// ApplyCategory creates or updates a Category by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyCategory(ctx context.Context, request *Category) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyCategory: Name must not be empty")
+	}
+	id, err := c.ResolveCategoryIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateCategoryByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyCategory: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyCategory: resolve: %w", err)
+	}
+	err = c.UpdateCategoryByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyCategory: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

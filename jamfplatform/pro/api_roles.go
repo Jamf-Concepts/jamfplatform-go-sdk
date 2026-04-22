@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -87,4 +88,54 @@ func (c *Client) DeleteApiRoleV1(ctx context.Context, id string) error {
 		return fmt.Errorf("DeleteApiRoleV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveApiRoleV1IDByName looks up a ApiRoleV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveApiRoleV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/api-roles"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveApiRoleV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveApiRoleV1ByName looks up a ApiRoleV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveApiRoleV1ByName(ctx context.Context, name string) (*ApiRole, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/api-roles"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveApiRoleV1ByName(%s): %w", name, err)
+	}
+	var out ApiRole
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveApiRoleV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyApiRoleV1 creates or updates a ApiRoleV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyApiRoleV1(ctx context.Context, request *ApiRoleRequest) (string, bool, error) {
+	name := request.DisplayName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyApiRoleV1: DisplayName must not be empty")
+	}
+	id, err := c.ResolveApiRoleV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateApiRoleV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyApiRoleV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyApiRoleV1: resolve: %w", err)
+	}
+	_, err = c.UpdateApiRoleV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyApiRoleV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

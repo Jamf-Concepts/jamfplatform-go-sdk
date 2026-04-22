@@ -212,7 +212,7 @@ func TestAcceptance_Pro_EnrollmentCustomization_TextPanelCRUDV1(t *testing.T) {
 		DisplayName:        "sdk-acc text panel",
 		Title:              "Welcome",
 		Body:               "sdk-acc test panel body",
-		Subtext:            "",
+		Subtext:            ptr(""),
 		BackButtonText:     "Back",
 		ContinueButtonText: "Continue",
 		Rank:               1,
@@ -252,7 +252,7 @@ func TestAcceptance_Pro_EnrollmentCustomization_TextPanelCRUDV1(t *testing.T) {
 		DisplayName:        "sdk-acc text panel (updated)",
 		Title:              "Welcome updated",
 		Body:               "updated body",
-		Subtext:            "",
+		Subtext:            ptr(""),
 		BackButtonText:     "Back",
 		ContinueButtonText: "Continue",
 		Rank:               1,
@@ -315,7 +315,7 @@ func TestAcceptance_Pro_EnrollmentCustomization_LdapPanelCRUDV1(t *testing.T) {
 		UsernameLabel:      "Username",
 		PasswordLabel:      "Password",
 		Rank:               1,
-		LdapGroupAccess:    []pro.EnrollmentCustomizationLdapGroupAccess{},
+		LdapGroupAccess:    &[]pro.EnrollmentCustomizationLdapGroupAccess{},
 	})
 	if err != nil {
 		var apiErr *jamfplatform.APIResponseError

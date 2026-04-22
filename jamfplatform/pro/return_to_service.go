@@ -7,9 +7,12 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListReturnToServiceConfigurationsV1 get all Return to Service Configurations.
@@ -64,4 +67,57 @@ func (c *Client) DeleteReturnToServiceConfigurationV1(ctx context.Context, id st
 		return fmt.Errorf("DeleteReturnToServiceConfigurationV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveReturnToServiceConfigurationV1IDByName looks up a ReturnToServiceConfigurationV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveReturnToServiceConfigurationV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/return-to-service"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveReturnToServiceConfigurationV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveReturnToServiceConfigurationV1ByName looks up a ReturnToServiceConfigurationV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveReturnToServiceConfigurationV1ByName(ctx context.Context, name string) (*ReturnToServiceConfiguration, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/return-to-service"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveReturnToServiceConfigurationV1ByName(%s): %w", name, err)
+	}
+	var out ReturnToServiceConfiguration
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveReturnToServiceConfigurationV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyReturnToServiceConfigurationV1 creates or updates a ReturnToServiceConfigurationV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyReturnToServiceConfigurationV1(ctx context.Context, request *ReturnToServiceConfigurationRequest) (string, bool, error) {
+	var name string
+	if request.DisplayName != nil {
+		name = *request.DisplayName
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyReturnToServiceConfigurationV1: DisplayName must not be empty")
+	}
+	id, err := c.ResolveReturnToServiceConfigurationV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateReturnToServiceConfigurationV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyReturnToServiceConfigurationV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyReturnToServiceConfigurationV1: resolve: %w", err)
+	}
+	_, err = c.UpdateReturnToServiceConfigurationV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyReturnToServiceConfigurationV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

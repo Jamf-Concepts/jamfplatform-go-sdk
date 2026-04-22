@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetAdvancedMobileDeviceSearchByID finds mobile device searches by ID.
@@ -94,4 +97,48 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 		return fmt.Errorf("UpdateAdvancedMobileDeviceSearchByName(%s): %w", name, err)
 	}
 	return nil
+}
+
+// ResolveAdvancedMobileDeviceSearchIDByName looks up a AdvancedMobileDeviceSearch by name via GetAdvancedMobileDeviceSearchByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveAdvancedMobileDeviceSearchIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetAdvancedMobileDeviceSearchByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveAdvancedMobileDeviceSearchIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveAdvancedMobileDeviceSearchIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveAdvancedMobileDeviceSearchByName looks up a AdvancedMobileDeviceSearch by name. Alias for GetAdvancedMobileDeviceSearchByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveAdvancedMobileDeviceSearchByName(ctx context.Context, name string) (*AdvancedMobileDeviceSearch, error) {
+	return c.GetAdvancedMobileDeviceSearchByName(ctx, name)
+}
+
+// ApplyAdvancedMobileDeviceSearch creates or updates a AdvancedMobileDeviceSearch by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyAdvancedMobileDeviceSearch(ctx context.Context, request *AdvancedMobileDeviceSearch) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyAdvancedMobileDeviceSearch: Name must not be empty")
+	}
+	id, err := c.ResolveAdvancedMobileDeviceSearchIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateAdvancedMobileDeviceSearchByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyAdvancedMobileDeviceSearch: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyAdvancedMobileDeviceSearch: resolve: %w", err)
+	}
+	err = c.UpdateAdvancedMobileDeviceSearchByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyAdvancedMobileDeviceSearch: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

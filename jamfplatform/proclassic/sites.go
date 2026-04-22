@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetSiteByID finds sites by ID.
@@ -94,4 +97,48 @@ func (c *Client) ListSites(ctx context.Context) (*Sites, error) {
 		return nil, fmt.Errorf("ListSites: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveSiteIDByName looks up a Site by name via GetSiteByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveSiteIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetSiteByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSiteIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveSiteIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveSiteByName looks up a Site by name. Alias for GetSiteByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveSiteByName(ctx context.Context, name string) (*Site, error) {
+	return c.GetSiteByName(ctx, name)
+}
+
+// ApplySite creates or updates a Site by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplySite(ctx context.Context, request *Site) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplySite: Name must not be empty")
+	}
+	id, err := c.ResolveSiteIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateSiteByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplySite: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplySite: resolve: %w", err)
+	}
+	err = c.UpdateSiteByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplySite: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

@@ -214,3 +214,141 @@ func TestUnmanageMobileDeviceV2_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveMobileDeviceDetailV2IDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"mobileDeviceId": "resolved-id", "general": map[string]any{"displayName": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveMobileDeviceDetailV2IDByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveMobileDeviceDetailV2ByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"mobileDeviceId": "resolved-id", "general": map[string]any{"displayName": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveMobileDeviceDetailV2ByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestResolveMobileDeviceDetailV2IDBySerialNumber(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"mobileDeviceId": "resolved-id", "hardware": map[string]any{"serialNumber": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveMobileDeviceDetailV2IDBySerialNumber(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveMobileDeviceDetailV2BySerialNumber(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"mobileDeviceId": "resolved-id", "hardware": map[string]any{"serialNumber": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveMobileDeviceDetailV2BySerialNumber(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestResolveMobileDeviceDetailV2IDByUDID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"mobileDeviceId": "resolved-id", "general": map[string]any{"udid": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveMobileDeviceDetailV2IDByUDID(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveMobileDeviceDetailV2ByUDID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"mobileDeviceId": "resolved-id", "general": map[string]any{"udid": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveMobileDeviceDetailV2ByUDID(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

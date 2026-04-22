@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetPatchExternalSourceByID finds a patch external source by ID.
@@ -95,4 +98,48 @@ func (c *Client) UpdatePatchExternalSourceByName(ctx context.Context, name strin
 		return fmt.Errorf("UpdatePatchExternalSourceByName(%s): %w", name, err)
 	}
 	return nil
+}
+
+// ResolvePatchExternalSourceIDByName looks up a PatchExternalSource by name via GetPatchExternalSourceByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolvePatchExternalSourceIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetPatchExternalSourceByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePatchExternalSourceIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolvePatchExternalSourceIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolvePatchExternalSourceByName looks up a PatchExternalSource by name. Alias for GetPatchExternalSourceByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolvePatchExternalSourceByName(ctx context.Context, name string) (*PatchExternalSource, error) {
+	return c.GetPatchExternalSourceByName(ctx, name)
+}
+
+// ApplyPatchExternalSource creates or updates a PatchExternalSource by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyPatchExternalSource(ctx context.Context, request *PatchExternalSource) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyPatchExternalSource: Name must not be empty")
+	}
+	id, err := c.ResolvePatchExternalSourceIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreatePatchExternalSourceByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyPatchExternalSource: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyPatchExternalSource: resolve: %w", err)
+	}
+	err = c.UpdatePatchExternalSourceByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyPatchExternalSource: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetNetworkSegmentByID finds network segments by ID.
@@ -94,4 +97,48 @@ func (c *Client) ListNetworkSegments(ctx context.Context) (*NetworkSegments, err
 		return nil, fmt.Errorf("ListNetworkSegments: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveNetworkSegmentIDByName looks up a NetworkSegment by name via GetNetworkSegmentByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveNetworkSegmentIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetNetworkSegmentByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveNetworkSegmentIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveNetworkSegmentIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveNetworkSegmentByName looks up a NetworkSegment by name. Alias for GetNetworkSegmentByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveNetworkSegmentByName(ctx context.Context, name string) (*NetworkSegment, error) {
+	return c.GetNetworkSegmentByName(ctx, name)
+}
+
+// ApplyNetworkSegment creates or updates a NetworkSegment by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyNetworkSegment(ctx context.Context, request *NetworkSegmentPost) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyNetworkSegment: Name must not be empty")
+	}
+	id, err := c.ResolveNetworkSegmentIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateNetworkSegmentByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyNetworkSegment: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyNetworkSegment: resolve: %w", err)
+	}
+	err = c.UpdateNetworkSegmentByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyNetworkSegment: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

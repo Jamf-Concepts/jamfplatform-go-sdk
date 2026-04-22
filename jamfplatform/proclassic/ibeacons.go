@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetIBeaconByID finds iBeacon regions by ID.
@@ -94,4 +97,48 @@ func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
 		return nil, fmt.Errorf("ListIBeacons: %w", err)
 	}
 	return &result, nil
+}
+
+// ResolveIBeaconIDByName looks up a IBeacon by name via GetIBeaconByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveIBeaconIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetIBeaconByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveIBeaconIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.ID == nil {
+		return "", fmt.Errorf("ResolveIBeaconIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.ID), nil
+}
+
+// ResolveIBeaconByName looks up a IBeacon by name. Alias for GetIBeaconByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveIBeaconByName(ctx context.Context, name string) (*Ibeacon, error) {
+	return c.GetIBeaconByName(ctx, name)
+}
+
+// ApplyIBeacon creates or updates a IBeacon by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyIBeacon(ctx context.Context, request *Ibeacon) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyIBeacon: Name must not be empty")
+	}
+	id, err := c.ResolveIBeaconIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateIBeaconByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyIBeacon: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyIBeacon: resolve: %w", err)
+	}
+	err = c.UpdateIBeaconByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyIBeacon: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

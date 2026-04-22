@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -196,4 +197,130 @@ func (c *Client) DeleteStaticComputerGroupV2(ctx context.Context, id string) err
 		return fmt.Errorf("DeleteStaticComputerGroupV2(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveComputerGroupV1IDByName looks up a ComputerGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveComputerGroupV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/computer-groups"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerGroupV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveComputerGroupV1ByName looks up a ComputerGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveComputerGroupV1ByName(ctx context.Context, name string) (*ComputerGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/computer-groups"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveComputerGroupV1ByName(%s): %w", name, err)
+	}
+	var out ComputerGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveComputerGroupV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveSmartComputerGroupV2IDByName looks up a SmartComputerGroupV2 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveSmartComputerGroupV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/computer-groups/smart-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSmartComputerGroupV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveSmartComputerGroupV2ByName looks up a SmartComputerGroupV2 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveSmartComputerGroupV2ByName(ctx context.Context, name string) (*SmartComputerGroupSearch, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/computer-groups/smart-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveSmartComputerGroupV2ByName(%s): %w", name, err)
+	}
+	var out SmartComputerGroupSearch
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveSmartComputerGroupV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveStaticComputerGroupV2IDByName looks up a StaticComputerGroupV2 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveStaticComputerGroupV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/computer-groups/static-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveStaticComputerGroupV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveStaticComputerGroupV2ByName looks up a StaticComputerGroupV2 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveStaticComputerGroupV2ByName(ctx context.Context, name string) (*StaticComputerGroupSummary, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/computer-groups/static-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveStaticComputerGroupV2ByName(%s): %w", name, err)
+	}
+	var out StaticComputerGroupSummary
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveStaticComputerGroupV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplySmartComputerGroupV2 creates or updates a SmartComputerGroupV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplySmartComputerGroupV2(ctx context.Context, request *SmartComputerGroupV2, platform bool) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplySmartComputerGroupV2: Name must not be empty")
+	}
+	id, err := c.ResolveSmartComputerGroupV2IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateSmartComputerGroupV2(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplySmartComputerGroupV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplySmartComputerGroupV2: resolve: %w", err)
+	}
+	_, err = c.UpdateSmartComputerGroupV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplySmartComputerGroupV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}
+
+// ApplyStaticComputerGroupV2 creates or updates a StaticComputerGroupV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyStaticComputerGroupV2(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyStaticComputerGroupV2: Name must not be empty")
+	}
+	id, err := c.ResolveStaticComputerGroupV2IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateStaticComputerGroupV2(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyStaticComputerGroupV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyStaticComputerGroupV2: resolve: %w", err)
+	}
+	_, err = c.UpdateStaticComputerGroupV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyStaticComputerGroupV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

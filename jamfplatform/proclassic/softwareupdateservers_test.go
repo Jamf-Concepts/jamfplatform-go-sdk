@@ -178,3 +178,92 @@ func TestListSoftwareUpdateServers_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestResolveSoftwareUpdateServerIDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/softwareupdateservers/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<software_update_server><id>42</id></software_update_server>")
+	})
+
+	id, err := c.ResolveSoftwareUpdateServerIDByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestResolveSoftwareUpdateServerByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/softwareupdateservers/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<software_update_server><id>42</id></software_update_server>")
+	})
+
+	result, err := c.ResolveSoftwareUpdateServerByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestApplySoftwareUpdateServer_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns 404 → apply creates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/softwareupdateservers/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/softwareupdateservers/id/0", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeXML(t, w, 201, "<software_update_server><id>42</id></software_update_server>")
+	})
+
+	id, created, err := c.ApplySoftwareUpdateServer(context.Background(), &SoftwareUpdateServer{Name: ptrStr("target")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}
+
+func TestApplySoftwareUpdateServer_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
+	mux.HandleFunc("/api/proclassic/tenant/t-test/softwareupdateservers/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<software_update_server><id>42</id></software_update_server>")
+	})
+	mux.HandleFunc("/api/proclassic/tenant/t-test/softwareupdateservers/id/42", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(201)
+	})
+
+	id, created, err := c.ApplySoftwareUpdateServer(context.Background(), &SoftwareUpdateServer{Name: ptrStr("target")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "42" {
+		t.Errorf("id = %q, want 42", id)
+	}
+}

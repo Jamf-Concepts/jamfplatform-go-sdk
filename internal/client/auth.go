@@ -5,6 +5,7 @@ package client
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"time"
@@ -13,8 +14,61 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-// defaultHTTPTimeout is the default timeout for HTTP requests.
-const defaultHTTPTimeout = 30 * time.Second
+// Per-phase HTTP timeouts. We deliberately do NOT set http.Client.Timeout —
+// that's a whole-request deadline that caps body transfer, which kills any
+// realistic package upload and silently overrides caller-supplied context
+// deadlines (e.g. Terraform's `timeouts { create = "45m" }` block). Body
+// transfer time is bounded solely by the caller's ctx; these phase
+// timeouts exist to fail fast on dead networks, not healthy long transfers.
+const (
+	// dialTimeout bounds TCP connection establishment. 10s is generous
+	// for well-connected cloud endpoints but catches blackholed hosts.
+	dialTimeout = 10 * time.Second
+	// tlsHandshakeTimeout bounds the TLS handshake after dial.
+	tlsHandshakeTimeout = 10 * time.Second
+	// responseHeaderTimeout bounds server time-to-first-byte after the
+	// full request body has been written. Uploads that legitimately take
+	// hours are unaffected; only servers that accept the body then hang
+	// are killed.
+	responseHeaderTimeout = 60 * time.Second
+	// idleConnTimeout bounds how long a pooled idle connection lives.
+	idleConnTimeout = 90 * time.Second
+	// maxIdleConnsPerHost governs how many pooled HTTP/1.1 connections
+	// per host the SDK may keep warm. Go's default is 2, which
+	// serializes terraform-style parallel operations
+	// (`-parallelism=10`) at the pool. 10 matches default TF
+	// parallelism. HTTP/2 (which apigw.jamf.com supports) multiplexes
+	// on a single connection, so this ceiling only binds on the
+	// HTTP/1.1 fallback path.
+	maxIdleConnsPerHost = 10
+)
+
+// newTunedTransport returns a fresh *http.Transport tuned for the SDK's
+// typical workload: large uploads (multi-GB packages), bursts of small
+// reads (Terraform refresh), HTTP/2 multiplexing where the gateway
+// supports it. Not shared across Transport instances — every SDK client
+// gets its own pool so multi-tenant usage is isolated.
+func newTunedTransport() *http.Transport {
+	return &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   dialTimeout,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          100,
+		MaxIdleConnsPerHost:   maxIdleConnsPerHost,
+		IdleConnTimeout:       idleConnTimeout,
+		TLSHandshakeTimeout:   tlsHandshakeTimeout,
+		ExpectContinueTimeout: 1 * time.Second,
+		ResponseHeaderTimeout: responseHeaderTimeout,
+		// Larger socket buffers reduce syscalls on big bodies. Package
+		// upload is the driver — 1 MiB write buffer pairs with the 1 MiB
+		// io.CopyBuffer in multipart.go.
+		WriteBufferSize: 1 << 20,
+		ReadBufferSize:  1 << 16,
+	}
+}
 
 // userAgentTransport wraps an http.RoundTripper to add a User-Agent header to all requests.
 type userAgentTransport struct {
@@ -42,18 +96,17 @@ func newCookieJar() *cookiejar.Jar {
 // newOAuth2Client creates an HTTP client with automatic OAuth2 token management.
 // The base and OAuth2-wrapped clients share a cookie jar so cookies set during
 // token fetch (e.g. load-balancer session cookies) also apply to API calls.
+// No Client.Timeout is set — callers bound request lifetime via ctx; the
+// underlying Transport bounds each network phase individually.
 func newOAuth2Client(config *clientcredentials.Config, userAgent string) (oauthClient *http.Client, baseClient *http.Client) {
 	jar := newCookieJar()
-	base := &http.Client{Timeout: defaultHTTPTimeout, Jar: jar}
+	base := &http.Client{Jar: jar}
 
-	transport := http.DefaultTransport
+	var rt http.RoundTripper = newTunedTransport()
 	if userAgent != "" {
-		transport = &userAgentTransport{
-			base:      http.DefaultTransport,
-			userAgent: userAgent,
-		}
+		rt = &userAgentTransport{base: rt, userAgent: userAgent}
 	}
-	base.Transport = transport
+	base.Transport = rt
 
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
 	outer := config.Client(ctx)

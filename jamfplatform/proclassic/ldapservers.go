@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetLDAPServerByID finds LDAP servers by ID.
@@ -160,4 +163,48 @@ func (c *Client) GetLDAPServerByNameUser(ctx context.Context, name string, user 
 		return nil, fmt.Errorf("GetLDAPServerByNameUser(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolveLDAPServerIDByName looks up a LDAPServer by name via GetLDAPServerByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveLDAPServerIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetLDAPServerByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveLDAPServerIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.Connection == nil || r.Connection.ID == nil {
+		return "", fmt.Errorf("ResolveLDAPServerIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.Connection.ID), nil
+}
+
+// ResolveLDAPServerByName looks up a LDAPServer by name. Alias for GetLDAPServerByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveLDAPServerByName(ctx context.Context, name string) (*LdapServer, error) {
+	return c.GetLDAPServerByName(ctx, name)
+}
+
+// ApplyLDAPServer creates or updates a LDAPServer by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyLDAPServer(ctx context.Context, request *LdapServerPost) (string, bool, error) {
+	var name string
+	if request.Connection != nil && request.Connection.Name != nil {
+		name = *request.Connection.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyLDAPServer: Name must not be empty")
+	}
+	id, err := c.ResolveLDAPServerIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateLDAPServerByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyLDAPServer: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyLDAPServer: resolve: %w", err)
+	}
+	err = c.UpdateLDAPServerByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyLDAPServer: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

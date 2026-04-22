@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -139,4 +140,66 @@ func (c *Client) DeleteComputerPrestageV3(ctx context.Context, id string) error 
 		return fmt.Errorf("DeleteComputerPrestageV3(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveComputerPrestageV3IDByName looks up a ComputerPrestageV3 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveComputerPrestageV3IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computer-prestages"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveComputerPrestageV3IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveComputerPrestageV3ByName looks up a ComputerPrestageV3 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveComputerPrestageV3ByName(ctx context.Context, name string) (*ComputerPrestageV3, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computer-prestages"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveComputerPrestageV3ByName(%s): %w", name, err)
+	}
+	var out ComputerPrestageV3
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveComputerPrestageV3ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyComputerPrestageV3 creates or updates a ComputerPrestageV3 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyComputerPrestageV3(ctx context.Context, request *PostComputerPrestageV3) (string, bool, error) {
+	name := request.DisplayName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: DisplayName must not be empty")
+	}
+	id, err := c.ResolveComputerPrestageV3IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			zeroVersionLock(request)
+			resp, createErr := c.CreateComputerPrestageV3(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyComputerPrestageV3: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: resolve: %w", err)
+	}
+	// Fetch current resource to extract versionLock values for optimistic locking.
+	current, getErr := c.GetComputerPrestageV3(ctx, id)
+	if getErr != nil {
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: get for versionLock(%s): %w", id, getErr)
+	}
+	// Convert create request to update type via JSON round-trip,
+	// then inject current versionLock values from the fetched resource.
+	updateReq, convErr := convertAndInjectVersionLock[PutComputerPrestageV3, GetComputerPrestageV3](request, current)
+	if convErr != nil {
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: convert for update(%s): %w", id, convErr)
+	}
+	_, err = c.UpdateComputerPrestageV3(ctx, id, updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyComputerPrestageV3: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

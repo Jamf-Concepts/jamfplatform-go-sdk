@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetOSXConfigurationProfileByID finds OS X configuration profiles by ID.
@@ -116,4 +119,48 @@ func (c *Client) GetOsxConfigurationProfileByNameSubset(ctx context.Context, nam
 		return nil, fmt.Errorf("GetOsxConfigurationProfileByNameSubset(%s): %w", name, err)
 	}
 	return &result, nil
+}
+
+// ResolveOSXConfigurationProfileIDByName looks up a OSXConfigurationProfile by name via GetOSXConfigurationProfileByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
+func (c *Client) ResolveOSXConfigurationProfileIDByName(ctx context.Context, name string) (string, error) {
+	r, err := c.GetOSXConfigurationProfileByName(ctx, name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveOSXConfigurationProfileIDByName(%s): %w", name, err)
+	}
+	if r == nil || r.General == nil || r.General.ID == nil {
+		return "", fmt.Errorf("ResolveOSXConfigurationProfileIDByName(%s): response missing id", name)
+	}
+	return strconv.Itoa(*r.General.ID), nil
+}
+
+// ResolveOSXConfigurationProfileByName looks up a OSXConfigurationProfile by name. Alias for GetOSXConfigurationProfileByName; present so callers can use the same Resolve<X>ByName spelling across all resources regardless of resolver mode.
+func (c *Client) ResolveOSXConfigurationProfileByName(ctx context.Context, name string) (*OsXConfigurationProfile, error) {
+	return c.GetOSXConfigurationProfileByName(ctx, name)
+}
+
+// ApplyOSXConfigurationProfile creates or updates a OSXConfigurationProfile by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyOSXConfigurationProfile(ctx context.Context, request *OsXConfigurationProfile) (string, bool, error) {
+	var name string
+	if request.General != nil && request.General.Name != nil {
+		name = *request.General.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyOSXConfigurationProfile: Name must not be empty")
+	}
+	id, err := c.ResolveOSXConfigurationProfileIDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateOSXConfigurationProfileByID(ctx, "0", request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyOSXConfigurationProfile: create: %w", createErr)
+			}
+			return fmt.Sprintf("%d", *resp.ID), true, nil
+		}
+		return "", false, fmt.Errorf("ApplyOSXConfigurationProfile: resolve: %w", err)
+	}
+	err = c.UpdateOSXConfigurationProfileByID(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyOSXConfigurationProfile: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

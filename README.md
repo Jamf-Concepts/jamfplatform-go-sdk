@@ -66,25 +66,45 @@ client := jamfplatform.NewClient(baseURL, clientID, clientSecret,
 
 ### Error handling
 
+Any non-success HTTP response surfaces as `*jamfplatform.APIResponseError`.
+Inspect it via the accessor methods; for non-HTTP errors (denylist refusal,
+context cancellation, IO failures) `err.Error()` carries a formatted message.
+
 ```go
 import (
-	"errors"
-
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
 )
 
 device, err := devices.New(client).GetDevice(ctx, id)
-if errors.Is(err, jamfplatform.ErrNotFound) {
-	// handle not found
-}
-
-// Or inspect the full API error
-var apiErr *jamfplatform.APIResponseError
-if errors.As(err, &apiErr) {
-	fmt.Println(apiErr.StatusCode, apiErr.TraceID)
+if apiErr := jamfplatform.AsAPIError(err); apiErr != nil {
+	switch {
+	case apiErr.HasStatus(404):
+		// handle not found
+	case apiErr.StatusCode >= 400 && apiErr.StatusCode < 500:
+		// surface field-level validation errors
+		for field, msgs := range apiErr.FieldErrors() {
+			for _, msg := range msgs {
+				fmt.Printf("  %s: %s\n", field, msg)
+			}
+		}
+	default:
+		fmt.Println(apiErr.Summary())
+	}
 }
 ```
+
+Accessors on `*APIResponseError`:
+
+- `HasStatus(code)` — check for a specific HTTP status.
+- `Details()` — raw `[]ErrorDetail` parsed from the response body.
+- `FieldErrors()` — details bucketed by field name for attribute-level diagnostics.
+- `Summary()` — single-line human-readable summary for logs or CLI output.
+- `AsAPIError(err)` — top-level unwrap, returns `*APIResponseError` or `nil`.
+
+Pro JSON endpoints populate `Details`/`FieldErrors` with server-returned
+validation info. Classic XML and other non-JSON error bodies may leave those
+empty; `Summary()` always formats cleanly regardless.
 
 ### RSQL filters
 

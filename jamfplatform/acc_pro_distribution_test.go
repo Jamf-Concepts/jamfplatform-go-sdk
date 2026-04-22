@@ -150,7 +150,7 @@ func TestAcceptance_Pro_Distribution_CloudDistributionPointLifecycleV1(t *testin
 			t.Logf("cleanup: CDP 404 — restoring snapshot")
 		}
 		restore := *snapshot
-		restore.InventoryID = ""
+		restore.InventoryID = ptr("")
 		if _, err := p.CreateCloudDistributionPointV1(context.Background(), &restore); err != nil {
 			t.Logf("cleanup restore CDP: %v", err)
 			return
@@ -175,13 +175,13 @@ func TestAcceptance_Pro_Distribution_CloudDistributionPointLifecycleV1(t *testin
 
 	// 2. Re-create CDP from the snapshot (JCDS mode preserved).
 	recreate := *snapshot
-	recreate.InventoryID = ""
+	recreate.InventoryID = ptr("")
 	recreated, err := p.CreateCloudDistributionPointV1(ctx, &recreate)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateCloudDistributionPointV1: %v", err)
 	}
-	t.Logf("CDP re-created: cdnType=%s master=%v inventoryId=%s", recreated.CdnType, recreated.Master, recreated.InventoryID)
+	t.Logf("CDP re-created: cdnType=%s master=%v inventoryId=%s", recreated.CdnType, recreated.Master, derefStrPtr(recreated.InventoryID))
 
 	// 3. PATCH identity — re-send the current body. JAMF_CLOUD mode
 	// rejects most patch payloads ("not applicable for this CDN type")

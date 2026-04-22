@@ -7,6 +7,7 @@ package pro
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -91,6 +92,12 @@ func (c *Client) DeletePackageV1(ctx context.Context, id string) error {
 }
 
 // UploadPackageV1 upload package.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadPackageV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -210,6 +217,12 @@ func (c *Client) ExportPackageHistoryV1(ctx context.Context, id string, request 
 }
 
 // UploadPackageManifestV1 add a manifest to a package.
+//
+// For file parts, pass an *os.File or *bytes.Reader (anything that
+// implements io.Seeker) so the SDK can precompute an exact
+// Content-Length and retry once on a 429/Retry-After. A plain
+// io.Reader is accepted too but the upload falls back to chunked
+// transfer encoding and is not retried on 429.
 func (c *Client) UploadPackageManifestV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*Package, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Package
@@ -231,4 +244,54 @@ func (c *Client) DeletePackageManifestV1(ctx context.Context, id string) error {
 		return fmt.Errorf("DeletePackageManifestV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolvePackageV1IDByName looks up a PackageV1 by its packageName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolvePackageV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/packages"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "packageName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePackageV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolvePackageV1ByName looks up a PackageV1 by its packageName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolvePackageV1ByName(ctx context.Context, name string) (*Package, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	listPath := prefix + "/packages"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "packageName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolvePackageV1ByName(%s): %w", name, err)
+	}
+	var out Package
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolvePackageV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyPackageV1 creates or updates a PackageV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyPackageV1(ctx context.Context, request *Package) (string, bool, error) {
+	name := request.PackageName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyPackageV1: PackageName must not be empty")
+	}
+	id, err := c.ResolvePackageV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreatePackageV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyPackageV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyPackageV1: resolve: %w", err)
+	}
+	_, err = c.UpdatePackageV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyPackageV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

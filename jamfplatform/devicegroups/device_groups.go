@@ -7,6 +7,7 @@ package devicegroups
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -110,4 +111,30 @@ func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, reques
 		return fmt.Errorf("UpdateDeviceGroupMembers(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveDeviceGroupIDByName looks up a DeviceGroup by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveDeviceGroupIDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	listPath := prefix + "/device-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDeviceGroupIDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveDeviceGroupByName looks up a DeviceGroup by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveDeviceGroupByName(ctx context.Context, name string) (*DeviceGroupListReadRepresentationV1, error) {
+	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	listPath := prefix + "/device-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveDeviceGroupByName(%s): %w", name, err)
+	}
+	var out DeviceGroupListReadRepresentationV1
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveDeviceGroupByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }
