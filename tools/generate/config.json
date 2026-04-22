@@ -8801,14 +8801,16 @@
       "namespace": "bpcomponents",
       "package": "bpcomponents/swupdate",
       "typesOnly": true,
-      "splitByTag": true
+      "splitByTag": true,
+      "specFile": "blueprint_component_sw_update_service.json"
     },
     {
       "file": "testing/blueprint-component-declarations-service.json",
       "namespace": "bpcomponents",
       "package": "bpcomponents/declarations",
       "typesOnly": true,
-      "splitByTag": true
+      "splitByTag": true,
+      "specFile": "blueprint_component_declarations_service.json"
     }
   ]
 }

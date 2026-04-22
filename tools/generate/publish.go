@@ -23,9 +23,23 @@ func publishSpecs(root string, cfg Config) error {
 	}
 
 	for _, spec := range cfg.Specs {
-		// Types-only specs are internal service schemas not part of the
-		// published API surface — skip them.
+		// Types-only specs have no operations to filter — publish the
+		// source file verbatim so CI can use it as a fallback when the
+		// private testing/ specs are absent.
 		if spec.TypesOnly {
+			if spec.SpecFile == "" {
+				continue
+			}
+			src := filepath.Join(root, spec.File)
+			data, err := os.ReadFile(src)
+			if err != nil {
+				return fmt.Errorf("reading typesOnly spec %s: %w", spec.File, err)
+			}
+			outPath := filepath.Join(outDir, spec.SpecFile)
+			if err := os.WriteFile(outPath, data, 0644); err != nil {
+				return fmt.Errorf("writing %s: %w", outPath, err)
+			}
+			log.Printf("wrote %s/%s", cfg.SpecDir, spec.SpecFile)
 			continue
 		}
 		doc, err := loadSpec(filepath.Join(root, spec.File), allowedOpsSet(spec))
