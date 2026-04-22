@@ -23,6 +23,11 @@ func publishSpecs(root string, cfg Config) error {
 	}
 
 	for _, spec := range cfg.Specs {
+		// Types-only specs are internal service schemas not part of the
+		// published API surface — skip them.
+		if spec.TypesOnly {
+			continue
+		}
 		doc, err := loadSpec(filepath.Join(root, spec.File), allowedOpsSet(spec))
 		if err != nil {
 			return fmt.Errorf("loading %s: %w", spec.File, err)

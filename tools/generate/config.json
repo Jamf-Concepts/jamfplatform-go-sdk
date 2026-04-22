@@ -8795,6 +8795,20 @@
           "expectedStatus": 204
         }
       ]
+    },
+    {
+      "file": "testing/blueprint-component-sw-update-service.json",
+      "namespace": "bpcomponents",
+      "package": "bpcomponents/swupdate",
+      "typesOnly": true,
+      "splitByTag": true
+    },
+    {
+      "file": "testing/blueprint-component-declarations-service.json",
+      "namespace": "bpcomponents",
+      "package": "bpcomponents/declarations",
+      "typesOnly": true,
+      "splitByTag": true
     }
   ]
 }

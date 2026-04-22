@@ -447,6 +447,13 @@ func TestAcceptance_Pro_Core_ScriptHistoryV1(t *testing.T) {
 
 func ptr[T any](v T) *T { return &v }
 
+func derefStrPtr(p *string) string {
+	if p == nil {
+		return ""
+	}
+	return *p
+}
+
 // --- dock-items ---------------------------------------------------------
 
 func TestAcceptance_Pro_Core_DockItemCRUDV1(t *testing.T) {

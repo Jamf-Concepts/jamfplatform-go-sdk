@@ -306,17 +306,21 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 	p := pro.New(c)
 
 	name := "sdk-acc-apply-cea-" + runSuffix()
+	boolTrue := true
+	boolFalse := false
+	emptyStr := ""
+	emptySlice := []string{}
 
 	id, created, err := p.ApplyComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                          name,
-		Enabled:                       true,
+		Enabled:                       &boolTrue,
 		DataType:                      "STRING",
 		InputType:                     "TEXT",
 		InventoryDisplayType:          "GENERAL",
-		Description:                   "SDK acceptance test",
-		LdapAttributeMapping:          "",
-		LdapExtensionAttributeAllowed: false,
-		PopupMenuChoices:              []string{},
+		Description:                   strPtr("SDK acceptance test"),
+		LdapAttributeMapping:          &emptyStr,
+		LdapExtensionAttributeAllowed: &boolFalse,
+		PopupMenuChoices:              &emptySlice,
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -328,14 +332,14 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 
 	id2, created2, err := p.ApplyComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                          name,
-		Enabled:                       true,
+		Enabled:                       &boolTrue,
 		DataType:                      "STRING",
 		InputType:                     "TEXT",
 		InventoryDisplayType:          "GENERAL",
-		Description:                   "SDK acceptance test updated",
-		LdapAttributeMapping:          "",
-		LdapExtensionAttributeAllowed: false,
-		PopupMenuChoices:              []string{},
+		Description:                   strPtr("SDK acceptance test updated"),
+		LdapAttributeMapping:          &emptyStr,
+		LdapExtensionAttributeAllowed: &boolFalse,
+		PopupMenuChoices:              &emptySlice,
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -370,10 +374,10 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 		DataType:                      "STRING",
 		InputType:                     "TEXT",
 		InventoryDisplayType:          "GENERAL",
-		Description:                   "SDK acceptance test",
-		LdapAttributeMapping:          "",
-		LdapExtensionAttributeAllowed: false,
-		PopupMenuChoices:              []string{},
+		Description:                   ptr("SDK acceptance test"),
+		LdapAttributeMapping:          ptr(""),
+		LdapExtensionAttributeAllowed: ptr(false),
+		PopupMenuChoices:              &[]string{},
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -388,10 +392,10 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 		DataType:                      "STRING",
 		InputType:                     "TEXT",
 		InventoryDisplayType:          "GENERAL",
-		Description:                   "SDK acceptance test updated",
-		LdapAttributeMapping:          "",
-		LdapExtensionAttributeAllowed: false,
-		PopupMenuChoices:              []string{},
+		Description:                   ptr("SDK acceptance test updated"),
+		LdapAttributeMapping:          ptr(""),
+		LdapExtensionAttributeAllowed: ptr(false),
+		PopupMenuChoices:              &[]string{},
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -1390,24 +1394,24 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 			KeepExistingSiteMembership:         false,
 			KeepExistingLocationInformation:    false,
 			RequireAuthentication:              false,
-			EnableRecoveryLock:                 false,
-			RotateRecoveryLockPassword:         false,
-			RecoveryLockPasswordType:           "MANUAL",
+			EnableRecoveryLock:                 &falseVal,
+			RotateRecoveryLockPassword:         &falseVal,
+			RecoveryLockPasswordType:           ptr("MANUAL"),
 			EnrollmentSiteID:                   "-1",
 			CustomPackageDistributionPointID:   "-1",
-			EnrollmentCustomizationID:          "0",
-			PrestageMinimumOsTargetVersionType: "NO_ENFORCEMENT",
-			SkipSetupItems:                     map[string]bool{},
-			AnchorCertificates:                 []string{},
+			EnrollmentCustomizationID:          &zeroStr,
+			PrestageMinimumOsTargetVersionType: ptr("NO_ENFORCEMENT"),
+			SkipSetupItems:                     &map[string]bool{},
+			AnchorCertificates:                 &[]string{},
 			CustomPackageIds:                   []string{},
 			PrestageInstalledProfileIds:        []string{},
-			LocationInformation: &pro.LocationInformationV2{
+			LocationInformation: pro.LocationInformationV2{
 				ID:           "-1",
 				VersionLock:  0,
 				DepartmentID: "-1",
 				BuildingID:   "-1",
 			},
-			PurchasingInformation: &pro.PrestagePurchasingInformationV2{
+			PurchasingInformation: pro.PrestagePurchasingInformationV2{
 				ID:           "-1",
 				VersionLock:  0,
 				Purchased:    true,
@@ -1484,17 +1488,17 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 			Supervised:                             true,
 			MaximumSharedAccounts:                  10,
 			ConfigureDeviceBeforeSetupAssistant:    false,
-			RtsConfigProfileID:                     "-1",
+			RtsConfigProfileID:                     strPtr("-1"),
 			Timezone:                               "UTC",
 			SendTimezone:                           false,
 			StorageQuotaSizeMegabytes:              1024,
 			UseStorageQuotaSize:                    false,
-			SkipSetupItems:                         map[string]bool{},
+			SkipSetupItems:                         &map[string]bool{},
 			EnrollmentSiteID:                       "-1",
-			EnrollmentCustomizationID:              "0",
-			PrestageMinimumOsTargetVersionTypeIos:  "NO_ENFORCEMENT",
-			PrestageMinimumOsTargetVersionTypeIpad: "NO_ENFORCEMENT",
-			AnchorCertificates:                     []string{},
+			EnrollmentCustomizationID:              strPtr("0"),
+			PrestageMinimumOsTargetVersionTypeIos:  strPtr("NO_ENFORCEMENT"),
+			PrestageMinimumOsTargetVersionTypeIpad: strPtr("NO_ENFORCEMENT"),
+			AnchorCertificates:                     &[]string{},
 			Names: &pro.MobileDevicePrestageNamesV3{
 				AssignNamesUsing:       strPtr("Default Names"),
 				DeviceNamePrefix:       strPtr(""),
@@ -1504,13 +1508,13 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 				PrestageDeviceNames:    &[]pro.MobileDevicePrestageNameV3{},
 				SingleDeviceName:       strPtr(""),
 			},
-			LocationInformation: &pro.LocationInformationV3{
+			LocationInformation: pro.LocationInformationV3{
 				ID:           "-1",
 				VersionLock:  0,
 				DepartmentID: "-1",
 				BuildingID:   "-1",
 			},
-			PurchasingInformation: &pro.PrestagePurchasingInformationV3{
+			PurchasingInformation: pro.PrestagePurchasingInformationV3{
 				ID:           "-1",
 				VersionLock:  0,
 				Purchased:    true,

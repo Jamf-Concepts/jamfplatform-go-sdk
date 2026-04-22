@@ -28,6 +28,7 @@ type SpecDef struct {
 	SplitByTag         bool                         `json:"splitByTag,omitempty"` // emit one methods file per OpenAPI tag instead of one per spec
 	Format             string                       `json:"format,omitempty"`     // "json" (default) or "xml" — drives struct tag style and transport codec
 	RawBody            bool                         `json:"rawBody,omitempty"`    // generate methods that take/return []byte instead of typed structs; consumer owns marshaling (used for Classic where spec has no useful types)
+	TypesOnly          bool                         `json:"typesOnly,omitempty"` // generate only Go types from all schemas — no client methods, no method tests, no client.go; used for specs that define types consumed in other API payloads (e.g. blueprint component configurations)
 	Operations         []OperationDef               `json:"operations"`
 	ExcludePaths       []string                     `json:"excludePaths,omitempty"`       // "METHOD /path" entries the generator must refuse to include
 	SkipDeprecated     bool                         `json:"skipDeprecated,omitempty"`     // omit operations marked deprecated in the spec
@@ -161,6 +162,9 @@ type ExtraParam struct {
 // either the entry should be removed from one side or the other.
 func validateConfig(cfg Config) error {
 	for _, spec := range cfg.Specs {
+		if spec.TypesOnly && len(spec.Operations) > 0 {
+			return fmt.Errorf("spec %q: typesOnly specs must not declare operations", spec.File)
+		}
 		excluded := make(map[string]bool, len(spec.ExcludePaths))
 		for _, p := range spec.ExcludePaths {
 			norm := normalizeOpKey(p)

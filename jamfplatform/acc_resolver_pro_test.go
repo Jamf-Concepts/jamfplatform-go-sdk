@@ -560,9 +560,9 @@ func TestAcceptance_ResolveComputerExtensionAttributeV1_Lifecycle(t *testing.T) 
 
 	newCEA := func(n string) *pro.ComputerExtensionAttributes {
 		return &pro.ComputerExtensionAttributes{
-			Name: n, Enabled: true, DataType: "STRING", InputType: "TEXT",
-			InventoryDisplayType: "GENERAL", ManageExistingData: "DELETE_EXISTING_DATA",
-			PopupMenuChoices: []string{},
+			Name: n, Enabled: ptr(true), DataType: "STRING", InputType: "TEXT",
+			InventoryDisplayType: "GENERAL", ManageExistingData: ptr("DELETE_EXISTING_DATA"),
+			PopupMenuChoices: &[]string{},
 		}
 	}
 	resp, err := c.CreateComputerExtensionAttributeV1(ctx, newCEA(name))
@@ -629,7 +629,7 @@ func TestAcceptance_ResolveMobileDeviceExtensionAttributeV1_Lifecycle(t *testing
 	newMDEA := func(n string) *pro.MobileDeviceExtensionAttributes {
 		return &pro.MobileDeviceExtensionAttributes{
 			Name: n, DataType: "STRING", InputType: "TEXT",
-			InventoryDisplayType: "GENERAL", PopupMenuChoices: []string{},
+			InventoryDisplayType: "GENERAL", PopupMenuChoices: &[]string{},
 		}
 	}
 	resp, err := c.CreateMobileDeviceExtensionAttributeV1(ctx, newMDEA(name))

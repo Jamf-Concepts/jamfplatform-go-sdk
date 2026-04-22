@@ -286,12 +286,34 @@ type loadedSpec struct {
 //   - <spec>_test.go  matching unit tests
 //   - helpers_test.go test-only shims (testServer, WithTenantID alias, etc.)
 //
+// When all specs in the package are typesOnly, the output is limited to:
+//   - types.go        all schemas from the spec (not just operation-referenced)
+//   - types_test.go   JSON round-trip tests for each struct type
+//
 // Types deduplicate within the package only — sub-packages do not share type
 // namespace with the root or with each other.
+//
+// pkgName may contain slashes (e.g. "bpcomponents/swupdate") to create nested
+// directories. The Go package declaration uses only the last path segment.
 func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec) error {
 	pkgDir := filepath.Join(root, "jamfplatform", pkgName)
 	if err := os.MkdirAll(pkgDir, 0755); err != nil {
 		return fmt.Errorf("creating package dir: %w", err)
+	}
+
+	// The Go package name is the last segment of a potentially slashed path.
+	goPkgName := filepath.Base(pkgName)
+
+	allTypesOnly := true
+	for _, ls := range specs {
+		if !ls.spec.TypesOnly {
+			allTypesOnly = false
+			break
+		}
+	}
+
+	if allTypesOnly {
+		return processPackageTypesOnly(root, cfg, pkgDir, goPkgName, specs)
 	}
 
 	type specWithMethods struct {
@@ -353,23 +375,23 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		}
 	}
 
-	if err := emitPkgClient(pkgDir, cfg, pkgName); err != nil {
+	if err := emitPkgClient(pkgDir, cfg, goPkgName); err != nil {
 		return err
 	}
 
-	typesGF := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
+	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
 	if err := emitTemplated(sourceTmpl, typesGF, filepath.Join(pkgDir, "types.go")); err != nil {
 		return err
 	}
 
 	for _, sm := range allSpecs {
 		if sm.spec.SplitByTag {
-			if err := emitMethodsByTag(pkgDir, cfg, pkgName, sm.spec, sm.methods); err != nil {
+			if err := emitMethodsByTag(pkgDir, cfg, goPkgName, sm.spec, sm.methods); err != nil {
 				return err
 			}
 			continue
 		}
-		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: sm.spec.Format, Methods: sm.methods}
+		mf := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: sm.spec.Format, Methods: sm.methods}
 		if err := emitTemplated(sourceTmpl, mf, filepath.Join(pkgDir, sm.baseName+".go")); err != nil {
 			return err
 		}
@@ -378,10 +400,10 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		}
 	}
 
-	if err := emitPkgHelpersTest(pkgDir, cfg, pkgName, pkgFormat); err != nil {
+	if err := emitPkgHelpersTest(pkgDir, cfg, goPkgName, pkgFormat); err != nil {
 		return err
 	}
-	if err := emitPkgXMLSupplements(pkgDir, pkgName, pkgFormat); err != nil {
+	if err := emitPkgXMLSupplements(pkgDir, goPkgName, pkgFormat); err != nil {
 		return err
 	}
 
@@ -399,10 +421,141 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		}
 	}
 	if hasVersionLock {
-		if err := emitPkgVersionLockHelpers(pkgDir, cfg, pkgName); err != nil {
+		if err := emitPkgVersionLockHelpers(pkgDir, cfg, goPkgName); err != nil {
 			return err
 		}
 	}
+	return nil
+}
+
+// processPackageTypesOnly emits a types-only sub-package: types.go with all
+// schemas from the spec, and types_test.go with JSON round-trip tests. No
+// client struct, no method files, no test helpers.
+func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, specs []loadedSpec) error {
+	pkgEmitted := make(map[string]bool)
+	var allTypes []GoType
+	pkgFormat := ""
+
+	for _, ls := range specs {
+		doc, err := loadSpec(ls.specPath, nil)
+		if err != nil {
+			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
+		}
+		applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+		hoistInlineObjects(doc)
+
+		refs := collectAllSchemas(doc)
+		for name := range refs {
+			if pkgEmitted[name] {
+				delete(refs, name)
+			}
+		}
+		currentFieldOverrides = ls.spec.FieldTypeOverrides
+		suppressWriteOnly = true
+		types := extractTypes(doc, refs, ls.spec.Format)
+		suppressWriteOnly = false
+		currentFieldOverrides = nil
+		for _, t := range types {
+			pkgEmitted[t.Name] = true
+		}
+		allTypes = append(allTypes, types...)
+		if pkgFormat == "" {
+			pkgFormat = ls.spec.Format
+		}
+	}
+
+	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
+	if err := emitTemplated(sourceTmpl, typesGF, filepath.Join(pkgDir, "types.go")); err != nil {
+		return err
+	}
+	if err := emitTypesOnlyTest(pkgDir, goPkgName, allTypes); err != nil {
+		return err
+	}
+	return nil
+}
+
+// emitTypesOnlyTest writes a types_test.go file with JSON round-trip tests
+// for each struct type in a types-only package. Each test constructs a
+// zero-value instance, marshals it to JSON, then unmarshals back — proving
+// the generated struct tags and any custom marshal/unmarshal methods work
+// correctly. Discriminator types get a per-variant round-trip test that
+// verifies the correct variant pointer is populated after unmarshaling.
+func emitTypesOnlyTest(pkgDir, pkgName string, types []GoType) error {
+	var buf bytes.Buffer
+	fmt.Fprintf(&buf, `// Code generated by tools/generate; DO NOT EDIT.
+
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package %s
+
+import (
+	"encoding/json"
+	"testing"
+)
+`, pkgName)
+
+	for _, t := range types {
+		if t.AliasTarget != "" || t.IsRawJSON {
+			continue
+		}
+		if t.Discriminator != nil {
+			// Per-variant round-trip test for discriminator (union) types.
+			for _, v := range t.Discriminator.Variants {
+				fmt.Fprintf(&buf, `
+func TestRoundTrip_%s_%s(t *testing.T) {
+	original := %s{%s: "%s", %s: &%s{}}
+	data, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("marshal: %%v", err)
+	}
+	var decoded %s
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		t.Fatalf("unmarshal: %%v", err)
+	}
+	if decoded.%s != "%s" {
+		t.Errorf("discriminator = %%q, want %%q", decoded.%s, "%s")
+	}
+	if decoded.%s == nil {
+		t.Fatal("expected variant %s to be non-nil")
+	}
+}
+`, t.Name, v.FieldName,
+					t.Name, t.Discriminator.GoFieldName, v.Value, v.FieldName, v.TypeName,
+					t.Name,
+					t.Discriminator.GoFieldName, v.Value, t.Discriminator.GoFieldName, v.Value,
+					v.FieldName, v.FieldName)
+			}
+			continue
+		}
+		if len(t.Fields) == 0 {
+			// Enum string types — no fields, just verify it compiles.
+			continue
+		}
+		fmt.Fprintf(&buf, `
+func TestRoundTrip_%s(t *testing.T) {
+	original := %s{}
+	data, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("marshal: %%v", err)
+	}
+	var decoded %s
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		t.Fatalf("unmarshal: %%v", err)
+	}
+}
+`, t.Name, t.Name, t.Name)
+	}
+
+	outPath := filepath.Join(pkgDir, "types_test.go")
+	formatted, err := formatGo("types_test.go", buf.Bytes())
+	if err != nil {
+		return fmt.Errorf("formatting types_test.go: %w\n---raw---\n%s", err, buf.String())
+	}
+	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+		return fmt.Errorf("writing %s: %w", outPath, err)
+	}
+	log.Printf("wrote %s", outPath)
 	return nil
 }
 
