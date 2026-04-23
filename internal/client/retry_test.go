@@ -12,6 +12,215 @@ import (
 	"time"
 )
 
+// --- 4xx retry tests ---
+
+func TestRetryOn4xx_DefaultOff(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	var calls atomic.Int32
+	mux.HandleFunc("/api/eventual", func(w http.ResponseWriter, _ *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusBadRequest)
+	})
+
+	err := c.Do(context.Background(), http.MethodDelete, "/api/eventual", nil, nil)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if calls.Load() != 1 {
+		t.Errorf("expected exactly 1 call (no retry by default), got %d", calls.Load())
+	}
+}
+
+func TestRetryOn4xx_SuccessFirstAttempt(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	var calls atomic.Int32
+	mux.HandleFunc("/api/ok", func(w http.ResponseWriter, _ *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusOK)
+	})
+
+	err := c.Do(context.Background(), http.MethodGet, "/api/ok", nil, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if calls.Load() != 1 {
+		t.Errorf("expected 1 call (no retry on success), got %d", calls.Load())
+	}
+}
+
+func TestRetryOn4xx_RetryThenSucceed(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	var calls atomic.Int32
+	mux.HandleFunc("/api/eventual", func(w http.ResponseWriter, _ *http.Request) {
+		n := calls.Add(1)
+		if n == 1 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	start := time.Now()
+	err := c.DoExpect(context.Background(), http.MethodDelete, "/api/eventual", nil, http.StatusNoContent, nil)
+	elapsed := time.Since(start)
+
+	if err != nil {
+		t.Fatalf("expected success after retry, got: %v", err)
+	}
+	if calls.Load() != 2 {
+		t.Errorf("expected 2 calls (initial + one retry), got %d", calls.Load())
+	}
+	if elapsed < 1500*time.Millisecond {
+		t.Errorf("expected ~2s backoff before retry, got %v", elapsed)
+	}
+}
+
+func TestRetryOn4xx_401NotRetried(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	var calls atomic.Int32
+	mux.HandleFunc("/api/auth", func(w http.ResponseWriter, _ *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusUnauthorized)
+	})
+
+	err := c.Do(context.Background(), http.MethodGet, "/api/auth", nil, nil)
+	if err == nil {
+		t.Fatal("expected error for 401")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusUnauthorized) {
+		t.Fatalf("expected APIResponseError(401), got %v", err)
+	}
+	if calls.Load() != 1 {
+		t.Errorf("expected exactly 1 call (401 not retried), got %d", calls.Load())
+	}
+}
+
+func TestRetryOn4xx_403NotRetried(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	var calls atomic.Int32
+	mux.HandleFunc("/api/forbidden", func(w http.ResponseWriter, _ *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusForbidden)
+	})
+
+	err := c.Do(context.Background(), http.MethodGet, "/api/forbidden", nil, nil)
+	if err == nil {
+		t.Fatal("expected error for 403")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusForbidden) {
+		t.Fatalf("expected APIResponseError(403), got %v", err)
+	}
+	if calls.Load() != 1 {
+		t.Errorf("expected exactly 1 call (403 not retried), got %d", calls.Load())
+	}
+}
+
+func TestRetryOn4xx_5xxNotRetried(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	var calls atomic.Int32
+	mux.HandleFunc("/api/server-error", func(w http.ResponseWriter, _ *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	err := c.Do(context.Background(), http.MethodGet, "/api/server-error", nil, nil)
+	if err == nil {
+		t.Fatal("expected error for 500")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusInternalServerError) {
+		t.Fatalf("expected APIResponseError(500), got %v", err)
+	}
+	if calls.Load() != 1 {
+		t.Errorf("expected exactly 1 call (5xx not retried), got %d", calls.Load())
+	}
+}
+
+func TestRetryOn4xx_ContextCancelled(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	mux.HandleFunc("/api/eventual", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer cancel()
+
+	err := c.Do(ctx, http.MethodDelete, "/api/eventual", nil, nil)
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("expected DeadlineExceeded, got: %v", err)
+	}
+}
+
+func TestRetryOn4xx_ExponentialBackoff(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	var calls atomic.Int32
+	// Fail with 400 twice, succeed on the third call.
+	mux.HandleFunc("/api/multi", func(w http.ResponseWriter, _ *http.Request) {
+		n := calls.Add(1)
+		if n < 3 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	start := time.Now()
+	err := c.DoExpect(context.Background(), http.MethodDelete, "/api/multi", nil, http.StatusNoContent, nil)
+	elapsed := time.Since(start)
+
+	if err != nil {
+		t.Fatalf("expected success after 2 retries, got: %v", err)
+	}
+	if calls.Load() != 3 {
+		t.Errorf("expected 3 calls, got %d", calls.Load())
+	}
+	// First backoff 2s, second backoff 4s → total ≥ 6s.
+	if elapsed < 5*time.Second {
+		t.Errorf("expected ≥6s total (2s+4s backoffs), got %v", elapsed)
+	}
+}
+
+func TestRetryOn4xx_WithOption(t *testing.T) {
+	srv, _ := newTestServer(t)
+	c := NewTransportWithUserAgent(srv.URL, "id", "secret", "test", WithRetryOn4xx(true))
+	if !c.retryOn4xx {
+		t.Error("retryOn4xx should be true when WithRetryOn4xx(true) is applied")
+	}
+}
+
+func TestIs4xxRetryable(t *testing.T) {
+	cases := []struct {
+		status int
+		want   bool
+	}{
+		{400, true},
+		{404, true},
+		{409, true},
+		{422, true},
+		{499, true},
+		{401, false},
+		{403, false},
+		{200, false},
+		{301, false},
+		{500, false},
+		{502, false},
+	}
+	for _, tc := range cases {
+		if got := is4xxRetryable(tc.status); got != tc.want {
+			t.Errorf("is4xxRetryable(%d) = %v, want %v", tc.status, got, tc.want)
+		}
+	}
+}
+
 func TestRetryAfter_IntegerSeconds(t *testing.T) {
 	c, srv, mux := newTestClient(t)
 	var calls atomic.Int32
