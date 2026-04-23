@@ -56,6 +56,7 @@ type Transport struct {
 	cacheKey        string
 	cookieJar       http.CookieJar
 	deprecationSeen sync.Map // dedup runtime Deprecation header warnings
+	retryOn4xx      bool
 }
 
 // PaginatedResponseRepresentation captures pagination metadata shared by multiple endpoints.
@@ -108,6 +109,25 @@ func WithCookieJar(jar http.CookieJar) Option {
 	return func(c *Transport) {
 		c.cookieJar = jar
 	}
+}
+
+// WithRetryOn4xx opts the transport into retrying unexpected 4xx responses
+// (400–499, excluding 401 and 403) with exponential backoff. This handles
+// eventual-consistency windows where a dependent resource deletion hasn't
+// propagated yet. Backoff starts at 2s, caps at 10s; context timeout is the
+// only bound on retry duration. Default is off.
+func WithRetryOn4xx(enabled bool) Option {
+	return func(c *Transport) {
+		c.retryOn4xx = enabled
+	}
+}
+
+// is4xxRetryable reports whether a status code warrants a 4xx retry attempt.
+// 401 and 403 are excluded: retrying auth failures is futile and risks rate-limiting.
+func is4xxRetryable(status int) bool {
+	return status >= 400 && status < 500 &&
+		status != http.StatusUnauthorized &&
+		status != http.StatusForbidden
 }
 
 // NewTransport creates a new Jamf Platform API transport.
@@ -222,7 +242,8 @@ func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string
 }
 
 // execute funnels every Do* variant through one place so the 429/Retry-After
-// retry and Deprecation-header logging live in a single hook point.
+// retry, 4xx eventual-consistency retry, and Deprecation-header logging live
+// in a single hook point.
 func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any) error {
 	resp, classic, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
 	if err != nil {
@@ -248,6 +269,30 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 		// one. handleResponse builds an APIResponseError for any status !=
 		// expectedStatus, which 429 will be.
 	}
+
+	if c.retryOn4xx {
+		const maxBackoff = 10 * time.Second
+		backoff := 2 * time.Second
+		for resp.StatusCode != expectedStatus && is4xxRetryable(resp.StatusCode) {
+			status := resp.StatusCode
+			_ = resp.Body.Close()
+			log.Printf("jamfplatform: retrying %s %s after %s (status %d — eventual consistency)", method, path, backoff, status)
+			select {
+			case <-time.After(backoff):
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+			resp, classic, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
+			if err != nil {
+				return err
+			}
+			backoff *= 2
+			if backoff > maxBackoff {
+				backoff = maxBackoff
+			}
+		}
+	}
+
 	return c.handleResponse(ctx, resp, classic, expectedStatus, result)
 }
 

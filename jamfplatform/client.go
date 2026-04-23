@@ -52,6 +52,9 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	if cfg.tenantID != "" {
 		transportOpts = append(transportOpts, client.WithTenantID(cfg.tenantID))
 	}
+	if cfg.retryOn4xx {
+		transportOpts = append(transportOpts, client.WithRetryOn4xx(true))
+	}
 
 	transport := client.NewTransportWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
 	if cfg.logger != nil {
@@ -94,6 +97,7 @@ type clientConfig struct {
 	tokenCache   TokenCache
 	cacheDir     string
 	cookieJarDir string
+	retryOn4xx   bool
 }
 
 // Option configures a Client.
@@ -152,5 +156,17 @@ func WithFileCookieJar(dir string) Option {
 func WithTenantID(id string) Option {
 	return func(cfg *clientConfig) {
 		cfg.tenantID = id
+	}
+}
+
+// WithRetryOn4xx opts the client into retrying unexpected 4xx responses
+// (400–499, excluding 401 and 403) with exponential backoff. Intended for
+// API families that exhibit eventual consistency — e.g. a device-group DELETE
+// returning 400 HAS_DEPENDENCIES immediately after the referencing blueprint
+// was deleted. Backoff starts at 2s, caps at 10s; context timeout is the only
+// bound. Default is off.
+func WithRetryOn4xx(enabled bool) Option {
+	return func(cfg *clientConfig) {
+		cfg.retryOn4xx = enabled
 	}
 }
