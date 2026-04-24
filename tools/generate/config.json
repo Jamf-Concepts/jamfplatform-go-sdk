@@ -209,30 +209,30 @@
       ]
     },
     {
-      "file": "testing/deviceaction.yaml",
+      "file": "testing/device-management-actions-api.json",
       "namespace": "device-actions",
       "package": "deviceactions",
       "splitByTag": true,
       "specFile": "device_management_action_api.json",
       "operations": [
         {
-          "op": "POST /v1/devices/{id}/check-in",
+          "op": "POST /v1/tenant/{tenantId}/devices/{id}/check-in",
           "name": "CheckInDevice"
         },
         {
-          "op": "POST /v1/devices/{id}/erase",
+          "op": "POST /v1/tenant/{tenantId}/devices/{id}/erase",
           "name": "EraseDevice"
         },
         {
-          "op": "POST /v1/devices/{id}/restart",
+          "op": "POST /v1/tenant/{tenantId}/devices/{id}/restart",
           "name": "RestartDevice"
         },
         {
-          "op": "POST /v1/devices/{id}/shutdown",
+          "op": "POST /v1/tenant/{tenantId}/devices/{id}/shutdown",
           "name": "ShutdownDevice"
         },
         {
-          "op": "POST /v1/devices/{id}/unmanage",
+          "op": "POST /v1/tenant/{tenantId}/devices/{id}/unmanage",
           "name": "UnmanageDevice"
         }
       ]
