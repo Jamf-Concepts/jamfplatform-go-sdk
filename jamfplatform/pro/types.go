@@ -439,7 +439,7 @@ type AuthorizationV1 struct {
 	Account            *AuthAccountV1      `json:"account,omitempty"`
 	AccountGroups      []AccountGroup      `json:"accountGroups"`
 	AuthenticationType *AuthenticationType `json:"authenticationType,omitempty"`
-	Sites              []V1Site            `json:"sites"`
+	Sites              []V1SiteBase        `json:"sites"`
 }
 
 // AvailableOsUpdates represents a available os updates.
@@ -875,7 +875,10 @@ type CloudLdapServerUpdate struct {
 // CloudResponse represents a cloud response.
 type CloudResponse struct {
 	CloudInstance                  bool `json:"cloudInstance"`
+	FedRampInstance                bool `json:"fedRampInstance"`
+	FipsEnabled                    bool `json:"fipsEnabled"`
 	GovCloudInstance               bool `json:"govCloudInstance"`
+	HighComplianceInstance         bool `json:"highComplianceInstance"`
 	ManagedServiceProviderInstance bool `json:"managedServiceProviderInstance"`
 	RampInstance                   bool `json:"rampInstance"`
 }
@@ -1183,7 +1186,7 @@ type ComputerGeneral struct {
 	Platform                                 string                       `json:"platform"`
 	RemoteManagement                         *ComputerRemoteManagement    `json:"remoteManagement,omitempty"`
 	ReportDate                               *time.Time                   `json:"reportDate,omitempty"`
-	Site                                     *V1Site                      `json:"site,omitempty"`
+	Site                                     *V1SiteBase                  `json:"site,omitempty"`
 	Supervised                               bool                         `json:"supervised"`
 	UserApprovedMDM                          bool                         `json:"userApprovedMdm"`
 }
@@ -3615,6 +3618,8 @@ type LoginContent struct {
 	ActionText              string `json:"actionText"`
 	DisclaimerHeading       string `json:"disclaimerHeading"`
 	DisclaimerMainText      string `json:"disclaimerMainText"`
+	FedRampInstance         bool   `json:"fedRampInstance"`
+	HighComplianceInstance  bool   `json:"highComplianceInstance"`
 	IncludeCustomDisclaimer bool   `json:"includeCustomDisclaimer"`
 	RampInstance            bool   `json:"rampInstance"`
 }
@@ -3949,7 +3954,7 @@ type MobileDeviceDetailsGetV2 struct {
 	OsSupplementalBuildVersion         string                       `json:"osSupplementalBuildVersion"`
 	OsVersion                          string                       `json:"osVersion"`
 	SerialNumber                       string                       `json:"serialNumber"`
-	Site                               *V1Site                      `json:"site,omitempty"`
+	Site                               *V1SiteBase                  `json:"site,omitempty"`
 	SoftwareUpdateDeviceID             string                       `json:"softwareUpdateDeviceId"`
 	TimeZone                           string                       `json:"timeZone"`
 	Tvos                               *TvOsDetails                 `json:"tvos,omitempty"`
@@ -3985,7 +3990,7 @@ type MobileDeviceDetailsV2 struct {
 	OsSupplementalBuildVersion         string                 `json:"osSupplementalBuildVersion"`
 	OsVersion                          string                 `json:"osVersion"`
 	SerialNumber                       string                 `json:"serialNumber"`
-	Site                               *V1Site                `json:"site,omitempty"`
+	Site                               *V1SiteBase            `json:"site,omitempty"`
 	SoftwareUpdateDeviceID             string                 `json:"softwareUpdateDeviceId"`
 	TimeZone                           string                 `json:"timeZone"`
 	Tvos                               *TvOsDetails           `json:"tvos,omitempty"`
@@ -6394,6 +6399,13 @@ type UserTestSearchResponse struct {
 
 // V1Site represents a v1 site.
 type V1Site struct {
+	DivisionID *string `json:"divisionId,omitempty"`
+	ID         string  `json:"id"`
+	Name       string  `json:"name"`
+}
+
+// V1SiteBase represents a v1 site base.
+type V1SiteBase struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }

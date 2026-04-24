@@ -236,6 +236,8 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 						} else {
 							createReturnID = "strconv.Itoa(resp.ID)"
 						}
+					} else if r.IDPointer {
+						createReturnID = "*resp.ID"
 					} else {
 						createReturnID = "resp.ID"
 					}

@@ -100,6 +100,24 @@ func TestDeleteAccountV1(t *testing.T) {
 	}
 }
 
+func TestUpdateAccountV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/accounts/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.UpdateAccountV1(context.Background(), "test-id", &UserAccount{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestResolveAccountV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v1/tenant/t-test/accounts", func(w http.ResponseWriter, r *http.Request) {
@@ -108,7 +126,7 @@ func TestResolveAccountV1IDByName(t *testing.T) {
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results": []map[string]any{
-				{"id": 42, "username": "target"},
+				{"id": "resolved-id", "username": "target"},
 			},
 			"totalCount": 1,
 		})
@@ -118,8 +136,8 @@ func TestResolveAccountV1IDByName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if id != "42" {
-		t.Errorf("id = %q, want 42", id)
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
 	}
 }
 
@@ -131,7 +149,7 @@ func TestResolveAccountV1ByName(t *testing.T) {
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results": []map[string]any{
-				{"id": 42, "username": "target"},
+				{"id": "resolved-id", "username": "target"},
 			},
 			"totalCount": 1,
 		})
@@ -143,5 +161,67 @@ func TestResolveAccountV1ByName(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestApplyAccountV1_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List and create share the same path — single handler dispatches on method.
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/accounts", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    []any{},
+				"totalCount": 0,
+			})
+		case http.MethodPost:
+			writeJSON(t, w, 201, map[string]any{
+				"id":   "new-id",
+				"href": "/new-id",
+			})
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+
+	id, created, err := c.ApplyAccountV1(context.Background(), &UserAccount{Username: ptrStr("target")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "new-id" {
+		t.Errorf("id = %q, want new-id", id)
+	}
+}
+
+func TestApplyAccountV1_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns a match → resolver succeeds → apply updates.
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/accounts", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "existing-id", "username": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/accounts/existing-id", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
+	})
+
+	id, created, err := c.ApplyAccountV1(context.Background(), &UserAccount{Username: ptrStr("target")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
 	}
 }

@@ -79,6 +79,17 @@ func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
 	return nil
 }
 
+// UpdateAccountV1 updates the user account.
+func (c *Client) UpdateAccountV1(ctx context.Context, id string, request *UserAccount) (*UserAccount, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result UserAccount
+	endpoint := fmt.Sprintf("%s/accounts/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateAccountV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // ResolveAccountV1IDByName looks up a AccountV1 by its username field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveAccountV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -91,16 +102,43 @@ func (c *Client) ResolveAccountV1IDByName(ctx context.Context, name string) (str
 }
 
 // ResolveAccountV1ByName looks up a AccountV1 by its username field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveAccountV1ByName(ctx context.Context, name string) (*Account, error) {
+func (c *Client) ResolveAccountV1ByName(ctx context.Context, name string) (*UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/accounts"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveAccountV1ByName(%s): %w", name, err)
 	}
-	var out Account
+	var out UserAccount
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveAccountV1ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
+}
+
+// ApplyAccountV1 creates or updates a AccountV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyAccountV1(ctx context.Context, request *UserAccount) (string, bool, error) {
+	var name string
+	if request.Username != nil {
+		name = *request.Username
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyAccountV1: Username must not be empty")
+	}
+	id, err := c.ResolveAccountV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateAccountV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyAccountV1: create: %w", createErr)
+			}
+			return *resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyAccountV1: resolve: %w", err)
+	}
+	_, err = c.UpdateAccountV1(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyAccountV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

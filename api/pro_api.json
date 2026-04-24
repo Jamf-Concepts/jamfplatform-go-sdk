@@ -1680,7 +1680,7 @@
           },
           "sites": {
             "items": {
-              "$ref": "#/components/schemas/V1Site"
+              "$ref": "#/components/schemas/V1SiteBase"
             },
             "type": "array"
           }
@@ -2711,7 +2711,7 @@
                 "type": "integer"
               },
               "uploadUrl": {
-                "description": "The URL used to upload files to Akamai's NetStorage. This field is required when the **cdnType** is set to **Akamai(AKAMAI)**. \nIt specifies where content should be uploaded to Akamai’s cloud storage before being distributed via their CDN. The upload typically uses FTP or SFTP.\n",
+                "description": "The URL used to upload files to Akamai's NetStorage. This field is required when the **cdnType** is set to **Akamai(AKAMAI)**. \nIt specifies where content should be uploaded to Akamaiâ€™s cloud storage before being distributed via their CDN. The upload typically uses FTP or SFTP.\n",
                 "example": "ftp://mycompany.upload.akamai.com",
                 "type": "string"
               },
@@ -3283,8 +3283,23 @@
             "example": true,
             "type": "boolean"
           },
+          "fedRampInstance": {
+            "description": "Information whether this instance is a FedRAMP instance",
+            "example": false,
+            "type": "boolean"
+          },
+          "fipsEnabled": {
+            "description": "Information whether this instance has FIPS enabled",
+            "example": false,
+            "type": "boolean"
+          },
           "govCloudInstance": {
             "example": true,
+            "type": "boolean"
+          },
+          "highComplianceInstance": {
+            "description": "Information whether this instance is a High Compliance instance",
+            "example": false,
             "type": "boolean"
           },
           "managedServiceProviderInstance": {
@@ -4536,7 +4551,7 @@
             "type": "string"
           },
           "site": {
-            "$ref": "#/components/schemas/V1Site"
+            "$ref": "#/components/schemas/V1SiteBase"
           },
           "supervised": {
             "example": true,
@@ -4736,7 +4751,7 @@
           },
           "batteryHealth": {
             "default": "UNKNOWN",
-            "description": "- NON_GENUINE: The battery isn’t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldn’t determine battery health information.\n- UNSUPPORTED: The device doesn’t support battery health reporting.\n",
+            "description": "- NON_GENUINE: The battery isnâ€™t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldnâ€™t determine battery health information.\n- UNSUPPORTED: The device doesnâ€™t support battery health reporting.\n",
             "enum": [
               "NON_GENUINE",
               "NORMAL",
@@ -4895,7 +4910,7 @@
           },
           "batteryHealth": {
             "default": "UNKNOWN",
-            "description": "- NON_GENUINE: The battery isn’t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldn’t determine battery health information.\n- UNSUPPORTED: The device doesn’t support battery health reporting.\n",
+            "description": "- NON_GENUINE: The battery isnâ€™t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldnâ€™t determine battery health information.\n- UNSUPPORTED: The device doesnâ€™t support battery health reporting.\n",
             "enum": [
               "NON_GENUINE",
               "NORMAL",
@@ -7631,7 +7646,7 @@
           },
           "batteryHealth": {
             "default": "UNKNOWN",
-            "description": "- NON_GENUINE: The battery isn’t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldn’t determine battery health information.\n- UNSUPPORTED: The device doesn’t support battery health reporting.\n",
+            "description": "- NON_GENUINE: The battery isnâ€™t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldnâ€™t determine battery health information.\n- UNSUPPORTED: The device doesnâ€™t support battery health reporting.\n",
             "enum": [
               "NON_GENUINE",
               "NORMAL",
@@ -9872,7 +9887,7 @@
             "properties": {
               "disallowProximitySetup": {
                 "default": false,
-                "description": "If true, disable Proximity Setup on the next reboot and skip the pane in Setup Assistant. This value is available in iOS 11 and later. Prior to iOS 14, don’t use this option with any other option.",
+                "description": "If true, disable Proximity Setup on the next reboot and skip the pane in Setup Assistant. This value is available in iOS 11 and later. Prior to iOS 14, donâ€™t use this option with any other option.",
                 "example": true,
                 "type": "boolean"
               },
@@ -11147,7 +11162,7 @@
           },
           "batteryHealth": {
             "default": "UNKNOWN",
-            "description": "- NON_GENUINE: The battery isn’t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldn’t determine battery health information.\n- UNSUPPORTED: The device doesn’t support battery health reporting.\n",
+            "description": "- NON_GENUINE: The battery isnâ€™t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldnâ€™t determine battery health information.\n- UNSUPPORTED: The device doesnâ€™t support battery health reporting.\n",
             "enum": [
               "NON_GENUINE",
               "NORMAL",
@@ -12817,6 +12832,14 @@
             "example": "Login disclaimer main text",
             "type": "string"
           },
+          "fedRampInstance": {
+            "example": false,
+            "type": "boolean"
+          },
+          "highComplianceInstance": {
+            "example": false,
+            "type": "boolean"
+          },
           "includeCustomDisclaimer": {
             "example": true,
             "type": "boolean"
@@ -13495,7 +13518,7 @@
                 "STOP_MIRRORING": "#/components/schemas/StopMirroringCommand",
                 "UNLOCK_USER_ACCOUNT": "#/components/schemas/UnlockUserAccountCommand",
                 "VALIDATE_APPLICATIONS": "#/components/schemas/ValidateApplicationsCommand",
-                "VALIDATE_RECOVERY_LOCK": "#/components/schemas/VerifyRecoveryLockCommand"
+                "VERIFY_RECOVERY_LOCK": "#/components/schemas/VerifyRecoveryLockCommand"
               },
               "propertyName": "commandType"
             },
@@ -13669,7 +13692,7 @@
           "STOP_MIRRORING",
           "UNLOCK_USER_ACCOUNT",
           "VALIDATE_APPLICATIONS",
-          "VALIDATE_RECOVERY_LOCK"
+          "VERIFY_RECOVERY_LOCK"
         ],
         "example": "ENABLE_LOST_MODE",
         "type": "string"
@@ -14049,7 +14072,7 @@
             "type": "string"
           },
           "enforceName": {
-            "description": "Enforce the mobile device name. Device must be supervised. If set to true, Jamf Pro will revert the Mobile Device Name to the ‘name’ value each time the device checks in.",
+            "description": "Enforce the mobile device name. Device must be supervised. If set to true, Jamf Pro will revert the Mobile Device Name to the â€˜nameâ€™ value each time the device checks in.",
             "example": false,
             "type": "boolean"
           },
@@ -14134,7 +14157,7 @@
             "type": "string"
           },
           "site": {
-            "$ref": "#/components/schemas/V1Site"
+            "$ref": "#/components/schemas/V1SiteBase"
           },
           "softwareUpdateDeviceId": {
             "example": "J132AP",
@@ -14498,7 +14521,7 @@
           },
           "batteryHealth": {
             "default": "UNKNOWN",
-            "description": "- NON_GENUINE: The battery isn’t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldn’t determine battery health information.\n- UNSUPPORTED: The device doesn’t support battery health reporting.\n",
+            "description": "- NON_GENUINE: The battery isnâ€™t a genuine Apple battery.\n- NORMAL: The battery is operating normally.\n- SERVICE_RECOMMENDED: The system recommends battery service.\n- UNKNOWN: The system couldnâ€™t determine battery health information.\n- UNSUPPORTED: The device doesnâ€™t support battery health reporting.\n",
             "enum": [
               "NON_GENUINE",
               "NORMAL",
@@ -15900,7 +15923,8 @@
           "APP_INSTALLERS_APP_TITLE_REMOVED",
           "APP_INSTALLERS_DEPLOYMENT_INSTALLATION_FAILED",
           "SAML_RESPONSE_ASSERTION_SIGNING_REQUIRED",
-          "DIRECTORY_CACHE_AWAITING_SYNC"
+          "DIRECTORY_CACHE_AWAITING_SYNC",
+          "PSSO_EXTERNAL_URL_UNAVAILABLE"
         ],
         "type": "string"
       },
@@ -18344,7 +18368,7 @@
           {
             "properties": {
               "destinationDeviceId": {
-                "description": "The hardware address of the destination device to which the screen will be mirrored. This value isn’t case-sensitive. Required if destinationName is not provided.",
+                "description": "The hardware address of the destination device to which the screen will be mirrored. This value isnâ€™t case-sensitive. Required if destinationName is not provided.",
                 "example": "xx:xx:xx:xx:xx",
                 "type": "string"
               },
@@ -21026,7 +21050,7 @@
             "type": "string"
           },
           "enforceName": {
-            "description": "Enforce the mobile device name. Device must be supervised. If set to true, Jamf Pro will revert the Mobile Device Name to the ‘name’ value each time the device checks in.",
+            "description": "Enforce the mobile device name. Device must be supervised. If set to true, Jamf Pro will revert the Mobile Device Name to the â€˜nameâ€™ value each time the device checks in.",
             "example": true,
             "type": "boolean"
           },
@@ -21460,6 +21484,25 @@
         "type": "object"
       },
       "V1Site": {
+        "properties": {
+          "divisionId": {
+            "description": "Platform division identifier (UUID) for this site.",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "Eau Claire",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "V1SiteBase": {
         "properties": {
           "id": {
             "example": "1",
@@ -23277,6 +23320,60 @@
         "x-authentication-required": true,
         "x-required-privileges": [
           "Read Accounts"
+        ]
+      },
+      "put": {
+        "description": "Updates the user account for the given id.\n",
+        "parameters": [
+          {
+            "description": "id of target account",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAccount"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            },
+            "description": "Successful response - Jamf Pro user account updated"
+          },
+          "400": {
+            "description": "Bad Request - validation failure"
+          },
+          "404": {
+            "description": "Not Found - user account does not exist"
+          }
+        },
+        "summary": "Updates the user account.\n",
+        "tags": [
+          "accounts"
+        ],
+        "x-action": true,
+        "x-authentication-required": true,
+        "x-rate-limit": false,
+        "x-required-privileges": [
+          "Update Accounts"
         ]
       }
     },
@@ -32287,7 +32384,7 @@
             "style": "form"
           },
           {
-            "description": "Query in the RSQL format, allowing to filter group collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: groupName, groupDescription, groupType, isSmart. This param can be combined with paging and sorting. When using groupType in the filter, the value must be either \"MOBILE\" or \"COMPUTER\" but not both. When using groupType in the filter, the value is case sensitive. When using groupType in the filter, it will exclude groups of the other type regardless of or/and conditionals. Example: filter=groupName==\"*Managed*\" and isSmart==\"true\" Example: filter=groupType==\"COMPUTER\" and groupDescription==\"*Admin*\"",
+            "description": "Query in the RSQL format, allowing to filter group collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: groupPlatformId, groupName, groupDescription, groupType, isSmart. This param can be combined with paging and sorting. When using groupPlatformId in the filter, the supported operators are: =in= (match any in list), =out= (exclude all in list). When using groupType in the filter, the value must be either \"MOBILE\" or \"COMPUTER\" but not both. When using groupType in the filter, the value is case sensitive. When using groupType in the filter, it will exclude groups of the other type regardless of or/and conditionals. Example: filter=groupPlatformId=in=('uuid1','uuid2','uuid3') Example: filter=groupName==\"*Managed*\" and isSmart==\"true\" Example: filter=groupType==\"COMPUTER\" and groupDescription==\"*Admin*\"",
             "explode": true,
             "in": "query",
             "name": "filter",
@@ -34186,6 +34283,9 @@
               }
             },
             "description": "Up to 100 latest session history items"
+          },
+          "404": {
+            "description": "Jamf Remote Assist is not available on this instance."
           }
         },
         "summary": "Gets session history items.\n",
@@ -34232,7 +34332,7 @@
                 }
               }
             },
-            "description": "Session with given id does not exist"
+            "description": "Session history item not found. This may occur when the session with the given id does not exist, or when Jamf Remote Assist is not available on this instance."
           }
         },
         "summary": "Gets single session history item.\n",
@@ -48067,6 +48167,9 @@
               }
             },
             "description": "Up to 100 latest session history items"
+          },
+          "404": {
+            "description": "Jamf Remote Assist is not available on this instance."
           }
         },
         "summary": "Gets session history items.\n",
@@ -48112,6 +48215,9 @@
               }
             },
             "description": "Export fields specified incorrectly - non-existing column or duplicate on the list."
+          },
+          "404": {
+            "description": "Jamf Remote Assist is not available on this instance."
           },
           "503": {
             "content": {
@@ -48169,7 +48275,7 @@
                 }
               }
             },
-            "description": "Session with given id does not exist"
+            "description": "Session history item not found. This may occur when the session with the given id does not exist, or when Jamf Remote Assist is not available on this instance."
           }
         },
         "summary": "Gets single session history item.\n",
@@ -48245,6 +48351,7 @@
           "local-admin-password"
         ],
         "x-required-privileges": [
+          "Read User-Initiated Enrollment",
           "Update Local Admin Password Settings"
         ]
       },
@@ -54177,6 +54284,9 @@
           },
           "400": {
             "description": "SSO object don't exist or is already disabled"
+          },
+          "409": {
+            "description": "SSO cannot be disabled due to existing dependencies to it. This might happen if there are enrollment customizations depending on it or if SSO is the only authentication method available for the users."
           }
         },
         "summary": "Disable SSO\n",

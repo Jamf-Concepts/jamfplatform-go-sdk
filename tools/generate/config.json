@@ -4114,9 +4114,15 @@
             "resourceType": "AccountV1",
             "nameField": "username",
             "idField": "id",
-            "idNumeric": true,
+            "idPointer": true,
             "mode": "filtered",
-            "typedReturn": "Account"
+            "typedReturn": "UserAccount",
+            "apply": {
+              "createOp": "CreateAccountV1",
+              "updateOp": "UpdateAccountV1",
+              "deleteOp": "DeleteAccountV1",
+              "nameGoField": "Username"
+            }
           }
         },
         {
@@ -4132,6 +4138,10 @@
           "op": "DELETE /v1/accounts/{id}",
           "name": "DeleteAccountV1",
           "expectedStatus": 204
+        },
+        {
+          "op": "PUT /v1/accounts/{id}",
+          "name": "UpdateAccountV1"
         },
         {
           "op": "GET /user",
