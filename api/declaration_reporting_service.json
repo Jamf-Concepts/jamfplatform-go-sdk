@@ -1,5 +1,19 @@
 {
   "components": {
+    "parameters": {
+      "tenantId": {
+        "description": "The tenant UUID identifier",
+        "in": "path",
+        "name": "tenantId",
+        "required": true,
+        "schema": {
+          "example": "e77c1408-10c8-4007-b177-abc9157fbcaa",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "type": "string"
+        }
+      }
+    },
     "schemas": {
       "ApiErrorDto": {
         "properties": {
@@ -208,9 +222,9 @@
             "description": "The installation status of the declaration",
             "enum": [
               "PENDING",
-              "SUCCESSFUL",
-              "AWAITING_SYNC",
-              "UNSUCCESSFUL",
+              "INSTALLED",
+              "AWAIT_SYNC",
+              "ERROR",
               "UNKNOWN"
             ],
             "example": "PENDING",
@@ -294,19 +308,40 @@
         ],
         "type": "object"
       }
+    },
+    "securitySchemes": {
+      "OAuth2ClientCredentials": {
+        "description": "Obtain an access token by calling the API Gateway's token endpoint using the OAuth2 client-credentials flow.",
+        "flows": {
+          "clientCredentials": {
+            "scopes": {},
+            "tokenUrl": "https://{region}.apigw.jamf.com/oauth2/token"
+          }
+        },
+        "type": "oauth2"
+      }
     }
   },
   "info": {
-    "title": "declaration-reporting-service",
+    "contact": {
+      "name": "Jamf Developer",
+      "url": "https://developer.jamf.com"
+    },
+    "description": "API for accessing device and declaration status reports",
+    "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
+    "title": "Declaration Reporting Service API",
     "version": "1.0.0"
   },
   "openapi": "3.1.0",
   "paths": {
-    "/v1/declarations/{declarationIdentifier}": {
+    "/v1/tenant/{tenantId}/declarations/{declarationIdentifier}": {
       "get": {
-        "description": "Get a declaration report containing all the devices and users currently reporting the provided declarationId. Supports pagination.",
+        "description": "Get a declaration report containing all the devices and users currently reporting the provided declarationIdentifier. Supports pagination.\n\n**Required Permissions:** `read:pro:declaration-reporting`, `read:school:declaration-reporting`",
         "operationId": "getDeclarationReport",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "The declarationIdentifier present on a status report",
             "example": "179a77b6-aafb-45be-83de-915f531e4e39",
@@ -391,17 +426,30 @@
             "description": "Too many requests - bulkhead limit reached"
           }
         },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
         "summary": "Get declaration report devices",
         "tags": [
-          "declaration report"
+          "declaration-reports"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:declaration-reporting",
+          "read:school:declaration-reporting"
         ]
       }
     },
-    "/v1/devices/{deviceId}": {
+    "/v1/tenant/{tenantId}/devices/{deviceId}": {
       "get": {
-        "description": "Get a device report containing all the declarations reported for the provided deviceId.",
+        "description": "Get a device report containing all the declarations reported for the provided deviceId.\n\n**Required Permissions:** `read:pro:declaration-reporting`, `read:school:declaration-reporting`",
         "operationId": "getDeviceReport",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "The platform deviceId",
             "example": "179a77b6-aafb-45be-83de-915f531e4e39",
@@ -455,17 +503,43 @@
             "description": "Too many requests - bulkhead limit reached"
           }
         },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
         "summary": "Get device report declarations",
         "tags": [
-          "device report"
+          "device-reports"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:declaration-reporting",
+          "read:school:declaration-reporting"
         ]
       }
     }
   },
+  "security": [
+    {
+      "OAuth2ClientCredentials": []
+    }
+  ],
   "servers": [
     {
-      "description": "Generated server url",
-      "url": "http://localhost:8080"
+      "description": "Jamf Beta API Gateway - prod",
+      "url": "https://{region}.apigw.jamf.com/api/ddm/report",
+      "variables": {
+        "region": {
+          "default": "us",
+          "description": "Geographic deployment region",
+          "enum": [
+            "us",
+            "eu",
+            "apac"
+          ]
+        }
+      }
     }
   ],
   "tags": [

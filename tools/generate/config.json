@@ -238,18 +238,18 @@
       ]
     },
     {
-      "file": "testing/declarations.json",
+      "file": "testing/Declaration-reporting-openapi.json",
       "namespace": "ddm/report",
       "package": "ddmreport",
       "splitByTag": true,
       "specFile": "declaration_reporting_service.json",
       "operations": [
         {
-          "op": "GET /v1/devices/{deviceId}",
+          "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}",
           "name": "GetDeviceDeclarationReport"
         },
         {
-          "op": "GET /v1/declarations/{declarationIdentifier}",
+          "op": "GET /v1/tenant/{tenantId}/declarations/{declarationIdentifier}",
           "name": "ListDeclarationReportClients",
           "pagination": "totalCount",
           "pageSizeParam": "size",
