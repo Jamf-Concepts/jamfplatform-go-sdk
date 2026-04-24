@@ -151,14 +151,14 @@
       }
     },
     {
-      "file": "testing/devicegroups.yaml",
+      "file": "testing/device-groups-api.json",
       "namespace": "device-groups",
       "package": "devicegroups",
       "splitByTag": true,
       "specFile": "device_group_inventory_api.json",
       "operations": [
         {
-          "op": "GET /v1/device-groups",
+          "op": "GET /v1/tenant/{tenantId}/device-groups",
           "name": "ListDeviceGroups",
           "pagination": "hasNext",
           "params": [
@@ -174,32 +174,32 @@
           }
         },
         {
-          "op": "POST /v1/device-groups",
+          "op": "POST /v1/tenant/{tenantId}/device-groups",
           "name": "CreateDeviceGroup"
         },
         {
-          "op": "GET /v1/device-groups/{id}",
+          "op": "GET /v1/tenant/{tenantId}/device-groups/{id}",
           "name": "GetDeviceGroup"
         },
         {
-          "op": "PATCH /v1/device-groups/{id}",
+          "op": "PATCH /v1/tenant/{tenantId}/device-groups/{id}",
           "name": "UpdateDeviceGroup"
         },
         {
-          "op": "DELETE /v1/device-groups/{id}",
+          "op": "DELETE /v1/tenant/{tenantId}/device-groups/{id}",
           "name": "DeleteDeviceGroup"
         },
         {
-          "op": "GET /v1/device-groups/{id}/members",
+          "op": "GET /v1/tenant/{tenantId}/device-groups/{id}/members",
           "name": "ListDeviceGroupMembers",
           "unwrapResults": "[]string"
         },
         {
-          "op": "PATCH /v1/device-groups/{id}/members",
+          "op": "PATCH /v1/tenant/{tenantId}/device-groups/{id}/members",
           "name": "UpdateDeviceGroupMembers"
         },
         {
-          "op": "GET /v1/devices/{id}/device-groups",
+          "op": "GET /v1/tenant/{tenantId}/devices/{id}/device-groups",
           "name": "ListDeviceGroupsForDevice",
           "pathNames": {
             "id": "deviceID"
