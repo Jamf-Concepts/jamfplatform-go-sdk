@@ -309,18 +309,9 @@
           "params": [
             "baselineId:string:baselineID"
           ]
-        }
-      ]
-    },
-    {
-      "file": "testing/benchmarks-report.yaml",
-      "namespace": "compliance-benchmarks",
-      "package": "compliancebenchmarks",
-      "splitByTag": true,
-      "specFile": "compliance_benchmarks_reporting_api.json",
-      "operations": [
+        },
         {
-          "op": "GET /v1/benchmarks/{id}/rules",
+          "op": "GET /v1/tenant/{tenantId}/benchmarks/{id}/rules",
           "name": "ListBenchmarkRulesStats",
           "pagination": "sizeCheck",
           "params": [
@@ -329,7 +320,7 @@
           ]
         },
         {
-          "op": "GET /v1/benchmarks/{id}/devices",
+          "op": "GET /v1/tenant/{tenantId}/benchmarks/{id}/devices",
           "name": "ListBenchmarkRuleDevices",
           "pagination": "sizeCheck",
           "params": [
@@ -340,7 +331,7 @@
           ]
         },
         {
-          "op": "GET /v1/benchmarks/{benchmarkId}/compliance-percentage",
+          "op": "GET /v1/tenant/{tenantId}/benchmarks/{id}/compliance-percentage",
           "name": "GetBenchmarkCompliancePercentage"
         }
       ]
