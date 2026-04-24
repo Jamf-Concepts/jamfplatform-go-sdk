@@ -99,6 +99,16 @@ func (c *Client) ListRemovableMacAddresses(ctx context.Context) (*RemovableMacAd
 	return &result, nil
 }
 
+// CreateRemovableMacAddressByName creates a new removable Mac address by ID.
+func (c *Client) CreateRemovableMacAddressByName(ctx context.Context, name string, request *RemovableMacAddress) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateRemovableMacAddressByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveRemovableMacAddressIDByName looks up a RemovableMacAddress by name via GetRemovableMacAddressByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveRemovableMacAddressIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetRemovableMacAddressByName(ctx, name)

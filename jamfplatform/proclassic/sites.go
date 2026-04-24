@@ -99,6 +99,16 @@ func (c *Client) ListSites(ctx context.Context) (*Sites, error) {
 	return &result, nil
 }
 
+// CreateSiteByName creates a new site by ID.
+func (c *Client) CreateSiteByName(ctx context.Context, name string, request *Site) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateSiteByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveSiteIDByName looks up a Site by name via GetSiteByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveSiteIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetSiteByName(ctx, name)

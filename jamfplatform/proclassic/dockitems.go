@@ -99,6 +99,16 @@ func (c *Client) ListDockItems(ctx context.Context) (*DockItems, error) {
 	return &result, nil
 }
 
+// CreateDockItemByName creates a new dock item by ID.
+func (c *Client) CreateDockItemByName(ctx context.Context, name string, request *DockItem) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateDockItemByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveDockItemIDByName looks up a DockItem by name via GetDockItemByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveDockItemIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetDockItemByName(ctx, name)

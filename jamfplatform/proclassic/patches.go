@@ -74,3 +74,29 @@ func (c *Client) ListPatches(ctx context.Context) (*PatchManagementSoftwareTitle
 	}
 	return &result, nil
 }
+
+// GetPatchByName finds the first patch with the name provided (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations/{id}".).
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) GetPatchByName(ctx context.Context, name string) (*SoftwareTitle, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result SoftwareTitle
+	endpoint := fmt.Sprintf("%s/patches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// GetPatchComputersByIDVersion display computers on a specific version (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations/{id}/definitions".).
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) GetPatchComputersByIDVersion(ctx context.Context, id string, version string) (*Computers, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Computers
+	endpoint := fmt.Sprintf("%s/patches/id/%s/version/%s", prefix, url.PathEscape(id), url.PathEscape(version))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchComputersByIDVersion(%s): %w", id, err)
+	}
+	return &result, nil
+}

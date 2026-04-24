@@ -99,6 +99,16 @@ func (c *Client) ListBuildings(ctx context.Context) (*Buildings, error) {
 	return &result, nil
 }
 
+// CreateBuildingByName creates a new building.
+func (c *Client) CreateBuildingByName(ctx context.Context, name string, request *Building) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateBuildingByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveBuildingIDByName looks up a Building by name via GetBuildingByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveBuildingIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetBuildingByName(ctx, name)

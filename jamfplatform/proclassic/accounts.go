@@ -172,6 +172,26 @@ func (c *Client) ListAccounts(ctx context.Context) (*Accounts, error) {
 	return &result, nil
 }
 
+// CreateAccountGroupByName creates a new group by ID.
+func (c *Client) CreateAccountGroupByName(ctx context.Context, name string, request *Group) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/accounts/groupname/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateAccountGroupByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// CreateAccountByUsername creates a new account by ID.
+func (c *Client) CreateAccountByUsername(ctx context.Context, name string, request *Account) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/accounts/username/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateAccountByUsername(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveAccountGroupIDByName looks up a AccountGroup by name via GetAccountGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveAccountGroupIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetAccountGroupByName(ctx, name)

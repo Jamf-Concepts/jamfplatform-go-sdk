@@ -179,6 +179,21 @@ func TestListClasses_NotFound(t *testing.T) {
 	}
 }
 
+func TestCreateClassByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/classes/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateClassByName(context.Background(), "test-id", &ClassPost{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolveClassIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/classes/name/test-id", func(w http.ResponseWriter, r *http.Request) {

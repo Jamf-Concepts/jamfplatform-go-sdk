@@ -99,6 +99,16 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 	return nil
 }
 
+// CreateAdvancedMobileDeviceSearchByName creates a new advanced mobile device search.
+func (c *Client) CreateAdvancedMobileDeviceSearchByName(ctx context.Context, name string, request *AdvancedMobileDeviceSearch) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateAdvancedMobileDeviceSearchByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveAdvancedMobileDeviceSearchIDByName looks up a AdvancedMobileDeviceSearch by name via GetAdvancedMobileDeviceSearchByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveAdvancedMobileDeviceSearchIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetAdvancedMobileDeviceSearchByName(ctx, name)

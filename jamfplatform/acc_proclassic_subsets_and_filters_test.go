@@ -599,3 +599,453 @@ func TestAcceptance_Classic_MobileDeviceEnrollmentProfileByIDSubset(t *testing.T
 	}
 	t.Logf("Mobile device enrollment profile %s (General subset) retrieved", id)
 }
+
+// --- computer match --------------------------------------------------
+
+func TestAcceptance_Classic_MatchComputers(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	// "*" matches all computers.
+	got, err := proclassic.New(c).MatchComputers(ctx, "*")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("MatchComputers(*): %v", err)
+	}
+	_ = got
+	t.Log("MatchComputers(*) succeeded")
+}
+
+func TestAcceptance_Classic_MatchComputersByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	got, err := proclassic.New(c).MatchComputersByName(ctx, "*")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("MatchComputersByName(*): %v", err)
+	}
+	_ = got
+	t.Log("MatchComputersByName(*) succeeded")
+}
+
+// --- computer by-ID subset -------------------------------------------
+
+func TestAcceptance_Classic_ComputerByIDSubset(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	computers, err := p.ListComputers(ctx)
+	skipIfNoFixture(t, "computers", err)
+	if len(computers.Computers) == 0 {
+		t.Skip("no computers on tenant")
+	}
+	id := strconv.Itoa(*computers.Computers[0].ID)
+
+	got, err := p.GetComputerByIDSubset(ctx, id, "General")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerByIDSubset(%s, General): %v", id, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Computer %s (General subset) retrieved", id)
+}
+
+// --- computer by MAC address -----------------------------------------
+
+func TestAcceptance_Classic_ComputerByMacAddress(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	computers, err := p.ListComputers(ctx)
+	skipIfNoFixture(t, "computers", err)
+	if len(computers.Computers) == 0 {
+		t.Skip("no computers on tenant")
+	}
+	// MAC is in the General sub-object; do a by-ID GET to fetch it.
+	id := strconv.Itoa(*computers.Computers[0].ID)
+	full, err := p.GetComputerByID(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerByID(%s): %v", id, err)
+	}
+	if full.General == nil || full.General.MacAddress == nil || *full.General.MacAddress == "" {
+		t.Skip("first computer has no MAC address")
+	}
+	mac := *full.General.MacAddress
+
+	got, err := p.GetComputerByMacAddress(ctx, mac)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerByMacAddress(%s): %v", mac, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Computer with MAC %s retrieved", mac)
+}
+
+// --- computer by UDID ------------------------------------------------
+
+func TestAcceptance_Classic_ComputerByUDID(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	computers, err := p.ListComputers(ctx)
+	skipIfNoFixture(t, "computers", err)
+	if len(computers.Computers) == 0 {
+		t.Skip("no computers on tenant")
+	}
+	id := strconv.Itoa(*computers.Computers[0].ID)
+	full, err := p.GetComputerByID(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerByID(%s): %v", id, err)
+	}
+	if full.General == nil || full.General.UDID == nil || *full.General.UDID == "" {
+		t.Skip("first computer has no UDID")
+	}
+	udid := *full.General.UDID
+
+	got, err := p.GetComputerByUDID(ctx, udid)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerByUDID(%s): %v", udid, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Computer with UDID %s retrieved", udid)
+}
+
+// --- computer commands by command / status ---------------------------
+
+func TestAcceptance_Classic_ComputerCommandsByCommand(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	// BlankPush is the most common MDM command. Server returns empty
+	// body (200) when no commands of this type exist — transport empty-
+	// body guard means we get a zero-value ComputerCommand back.
+	got, err := proclassic.New(c).GetComputerCommandsByCommand(ctx, "BlankPush")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			t.Logf("GetComputerCommandsByCommand(BlankPush): API error %d — accepted", apiErr.StatusCode)
+			return
+		}
+		t.Fatalf("GetComputerCommandsByCommand(BlankPush): %v", err)
+	}
+	_ = got
+	t.Log("GetComputerCommandsByCommand(BlankPush) succeeded")
+}
+
+func TestAcceptance_Classic_ComputerCommandsByStatus(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	got, err := proclassic.New(c).GetComputerCommandsByStatus(ctx, "Pending")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			t.Logf("GetComputerCommandsByStatus(Pending): API error %d — accepted", apiErr.StatusCode)
+			return
+		}
+		t.Fatalf("GetComputerCommandsByStatus(Pending): %v", err)
+	}
+	_ = got
+	t.Log("GetComputerCommandsByStatus(Pending) succeeded")
+}
+
+// --- mobile device by MAC / UDID -------------------------------------
+
+func TestAcceptance_Classic_MobileDeviceByMacAddress(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	list, err := p.ListMobileDevices(ctx)
+	skipIfNoFixture(t, "mobile-devices", err)
+	if len(list.MobileDevices) == 0 {
+		t.Skip("no mobile devices on tenant")
+	}
+	id := strconv.Itoa(*list.MobileDevices[0].ID)
+	full, err := p.GetMobileDeviceByID(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceByID(%s): %v", id, err)
+	}
+	if full.General == nil || full.General.WifiMacAddress == nil || *full.General.WifiMacAddress == "" {
+		t.Skip("first mobile device has no WiFi MAC address")
+	}
+	mac := *full.General.WifiMacAddress
+
+	got, err := p.GetMobileDeviceByMacAddress(ctx, mac)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceByMacAddress(%s): %v", mac, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Mobile device with MAC %s retrieved", mac)
+}
+
+func TestAcceptance_Classic_MobileDeviceByUDID(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	list, err := p.ListMobileDevices(ctx)
+	skipIfNoFixture(t, "mobile-devices", err)
+	if len(list.MobileDevices) == 0 {
+		t.Skip("no mobile devices on tenant")
+	}
+	id := strconv.Itoa(*list.MobileDevices[0].ID)
+	full, err := p.GetMobileDeviceByID(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceByID(%s): %v", id, err)
+	}
+	if full.General == nil || full.General.UDID == nil || *full.General.UDID == "" {
+		t.Skip("first mobile device has no UDID")
+	}
+	udid := *full.General.UDID
+
+	got, err := p.GetMobileDeviceByUDID(ctx, udid)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceByUDID(%s): %v", udid, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Mobile device with UDID %s retrieved", udid)
+}
+
+// --- mobile device enrollment profile by invitation subset -----------
+
+func TestAcceptance_Classic_MobileDeviceEnrollmentProfileByInvitationSubset(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	list, err := p.ListMobileDeviceEnrollmentProfiles(ctx)
+	skipIfNoFixture(t, "mobile-device-enrollment-profiles", err)
+	if len(list.MobileDeviceEnrollmentProfiles) == 0 {
+		t.Skip("no mobile device enrollment profiles on tenant")
+	}
+	// Fetch the full profile to get its invitation token.
+	id := strconv.Itoa(*list.MobileDeviceEnrollmentProfiles[0].ID)
+	full, err := p.GetMobileDeviceEnrollmentProfileByID(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceEnrollmentProfileByID(%s): %v", id, err)
+	}
+	if full.General == nil || full.General.Invitation == nil {
+		t.Skip("enrollment profile has no invitation token")
+	}
+	invitation := full.General.Invitation.String()
+
+	got, err := p.GetMobileDeviceEnrollmentProfileByInvitationSubset(ctx, invitation, "General")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
+			t.Logf("GetMobileDeviceEnrollmentProfileByInvitationSubset: 404 — invitation not resolvable via this path")
+			return
+		}
+		t.Fatalf("GetMobileDeviceEnrollmentProfileByInvitationSubset(%s, General): %v", invitation, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Mobile device enrollment profile by invitation %s (General subset) retrieved", invitation)
+}
+
+// --- mobile device provisioning profile by ID subset -----------------
+
+func TestAcceptance_Classic_MobileDeviceProvisioningProfileByIDSubset(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	list, err := p.ListMobileDeviceProvisioningProfiles(ctx)
+	skipIfNoFixture(t, "mobile-device-provisioning-profiles", err)
+	if len(list.MobileDeviceProvisioningProfiles) == 0 {
+		t.Skip("no mobile device provisioning profiles on tenant")
+	}
+	id := strconv.Itoa(*list.MobileDeviceProvisioningProfiles[0].ID)
+
+	got, err := p.GetMobileDeviceProvisioningProfileByIDSubset(ctx, id, "General")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceProvisioningProfileByIDSubset(%s, General): %v", id, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Mobile device provisioning profile %s (General subset) retrieved", id)
+}
+
+// --- patch by name ---------------------------------------------------
+
+func TestAcceptance_Classic_PatchByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	titles, err := p.ListPatches(ctx)
+	skipIfNoFixture(t, "patches", err)
+	if len(titles.PatchManagementSoftwareTitles) == 0 {
+		t.Skip("no patch software titles on tenant")
+	}
+	item := titles.PatchManagementSoftwareTitles[0]
+	if item.Name == nil || *item.Name == "" {
+		t.Skip("first patch title has no name")
+	}
+	name := *item.Name
+
+	got, err := p.GetPatchByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
+			t.Logf("GetPatchByName(%s): 404 — patch not resolvable by name on this tenant", name)
+			return
+		}
+		t.Fatalf("GetPatchByName(%s): %v", name, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Patch %q retrieved by name", name)
+}
+
+// --- patch computers by ID+version -----------------------------------
+
+func TestAcceptance_Classic_PatchComputersByIDVersion(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	titles, err := p.ListPatchSoftwareTitles(ctx)
+	skipIfNoFixture(t, "patch-software-titles", err)
+	if len(titles.PatchSoftwareTitles) == 0 {
+		t.Skip("no patch software titles on tenant")
+	}
+	item := titles.PatchSoftwareTitles[0]
+	if item.ID == nil {
+		t.Skip("first patch software title has no ID")
+	}
+	id := strconv.Itoa(*item.ID)
+
+	// "latest" is not a real version; server may 404 — that's fine here.
+	got, err := p.GetPatchComputersByIDVersion(ctx, id, "latest")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			t.Logf("GetPatchComputersByIDVersion(%s, latest): API error %d — accepted", id, apiErr.StatusCode)
+			return
+		}
+		t.Fatalf("GetPatchComputersByIDVersion(%s, latest): %v", id, err)
+	}
+	_ = got
+	t.Logf("GetPatchComputersByIDVersion(%s, latest) succeeded", id)
+}
+
+// --- patch report by title ID + version ------------------------------
+
+func TestAcceptance_Classic_PatchReportByTitleIDVersion(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	titles, err := p.ListPatchSoftwareTitles(ctx)
+	skipIfNoFixture(t, "patch-software-titles", err)
+	if len(titles.PatchSoftwareTitles) == 0 {
+		t.Skip("no patch software titles on tenant")
+	}
+	item := titles.PatchSoftwareTitles[0]
+	if item.ID == nil {
+		t.Skip("first patch software title has no ID")
+	}
+	id := strconv.Itoa(*item.ID)
+
+	got, err := p.GetPatchReportByTitleIDVersion(ctx, id, "latest")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			t.Logf("GetPatchReportByTitleIDVersion(%s, latest): API error %d — accepted", id, apiErr.StatusCode)
+			return
+		}
+		t.Fatalf("GetPatchReportByTitleIDVersion(%s, latest): %v", id, err)
+	}
+	_ = got
+	t.Logf("GetPatchReportByTitleIDVersion(%s, latest) succeeded", id)
+}
+
+// --- saved search by ID / name ---------------------------------------
+
+func TestAcceptance_Classic_SavedSearchByID(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	list, err := p.ListSavedSearches(ctx)
+	skipIfNoFixture(t, "saved-searches", err)
+	if len(list.SavedSearches) == 0 {
+		t.Skip("no saved searches on tenant")
+	}
+	item := list.SavedSearches[0]
+	if item.ID == nil {
+		t.Skip("first saved search has no ID")
+	}
+	id := strconv.Itoa(*item.ID)
+
+	got, err := p.GetSavedSearchByID(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetSavedSearchByID(%s): %v", id, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("SavedSearch id=%s retrieved", id)
+}
+
+func TestAcceptance_Classic_SavedSearchByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	list, err := p.ListSavedSearches(ctx)
+	skipIfNoFixture(t, "saved-searches", err)
+	if len(list.SavedSearches) == 0 {
+		t.Skip("no saved searches on tenant")
+	}
+	item := list.SavedSearches[0]
+	if item.Name == nil || *item.Name == "" {
+		t.Skip("first saved search has no name")
+	}
+	name := *item.Name
+
+	got, err := p.GetSavedSearchByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetSavedSearchByName(%s): %v", name, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("SavedSearch %q retrieved by name", name)
+}

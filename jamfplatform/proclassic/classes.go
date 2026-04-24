@@ -99,6 +99,16 @@ func (c *Client) ListClasses(ctx context.Context) (*Classes, error) {
 	return &result, nil
 }
 
+// CreateClassByName creates a new class by ID.
+func (c *Client) CreateClassByName(ctx context.Context, name string, request *ClassPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateClassByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveClassIDByName looks up a Class by name via GetClassByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveClassIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetClassByName(ctx, name)

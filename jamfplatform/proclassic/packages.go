@@ -99,6 +99,16 @@ func (c *Client) UpdateClassicPackageByName(ctx context.Context, name string, re
 	return nil
 }
 
+// CreateClassicPackageByName creates a new package by ID.
+func (c *Client) CreateClassicPackageByName(ctx context.Context, name string, request *Package) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateClassicPackageByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveClassicPackageIDByName looks up a ClassicPackage by name via GetClassicPackageByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveClassicPackageIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetClassicPackageByName(ctx, name)

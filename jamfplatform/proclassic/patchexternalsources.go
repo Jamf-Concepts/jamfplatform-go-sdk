@@ -100,6 +100,16 @@ func (c *Client) UpdatePatchExternalSourceByName(ctx context.Context, name strin
 	return nil
 }
 
+// DeletePatchExternalSourceByName deletes a patch external source by ID.
+func (c *Client) DeletePatchExternalSourceByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeletePatchExternalSourceByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolvePatchExternalSourceIDByName looks up a PatchExternalSource by name via GetPatchExternalSourceByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolvePatchExternalSourceIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetPatchExternalSourceByName(ctx, name)

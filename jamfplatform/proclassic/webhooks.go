@@ -99,6 +99,16 @@ func (c *Client) ListWebhooks(ctx context.Context) (*Webhooks, error) {
 	return &result, nil
 }
 
+// CreateWebhookByName creates a new webhook by ID.
+func (c *Client) CreateWebhookByName(ctx context.Context, name string, request *Webhook) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateWebhookByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveWebhookIDByName looks up a Webhook by name via GetWebhookByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveWebhookIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetWebhookByName(ctx, name)

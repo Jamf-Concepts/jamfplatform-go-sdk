@@ -166,3 +166,21 @@ func TestCreateMobileDeviceInvitationByInvitation(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 }
+
+func TestUpdateMobileDeviceInvitationByInvitation(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceinvitations/invitation/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		writeXML(t, w, http.StatusCreated, "<mobile_device_invitation></mobile_device_invitation>")
+	})
+
+	result, err := c.UpdateMobileDeviceInvitationByInvitation(context.Background(), "test-id", &MobileDeviceInvitationPost{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}

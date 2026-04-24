@@ -179,6 +179,21 @@ func TestListDepartments_NotFound(t *testing.T) {
 	}
 }
 
+func TestCreateDepartmentByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/departments/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateDepartmentByName(context.Background(), "test-id", &Department{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolveDepartmentIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/departments/name/test-id", func(w http.ResponseWriter, r *http.Request) {

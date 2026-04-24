@@ -99,6 +99,16 @@ func (c *Client) ListDiskEncryptionConfigurations(ctx context.Context) (*DiskEnc
 	return &result, nil
 }
 
+// CreateDiskEncryptionConfigurationByName creates a new disk encryption configuration by ID.
+func (c *Client) CreateDiskEncryptionConfigurationByName(ctx context.Context, name string, request *DiskEncryptionConfiguration) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateDiskEncryptionConfigurationByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveDiskEncryptionConfigurationIDByName looks up a DiskEncryptionConfiguration by name via GetDiskEncryptionConfigurationByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveDiskEncryptionConfigurationIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetDiskEncryptionConfigurationByName(ctx, name)

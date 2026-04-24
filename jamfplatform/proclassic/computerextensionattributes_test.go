@@ -179,6 +179,21 @@ func TestListComputerExtensionAttributes_NotFound(t *testing.T) {
 	}
 }
 
+func TestCreateComputerExtensionAttributeByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computerextensionattributes/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateComputerExtensionAttributeByName(context.Background(), "test-id", &ComputerExtensionAttribute{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolveComputerExtensionAttributeIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/computerextensionattributes/name/test-id", func(w http.ResponseWriter, r *http.Request) {

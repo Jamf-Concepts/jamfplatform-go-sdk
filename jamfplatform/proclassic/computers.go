@@ -131,3 +131,181 @@ func (c *Client) ListComputers(ctx context.Context) (*Computers, error) {
 	}
 	return &result, nil
 }
+
+// GetComputerByIDSubset finds a subset of information for a computer.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) GetComputerByIDSubset(ctx context.Context, id string, subset string) (*Computer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Computer
+	endpoint := fmt.Sprintf("%s/computers/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetComputerByMacAddress finds computers by MAC address.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) GetComputerByMacAddress(ctx context.Context, macaddress string) (*Computer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Computer
+	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerByMacAddress(%s): %w", macaddress, err)
+	}
+	return &result, nil
+}
+
+// GetComputerByUDID finds computers by UDID.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) GetComputerByUDID(ctx context.Context, udid string) (*Computer, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Computer
+	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerByUDID(%s): %w", udid, err)
+	}
+	return &result, nil
+}
+
+// GetComputersBasic finds basic information for all computers.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) GetComputersBasic(ctx context.Context) (*ComputersBasic, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputersBasic
+	endpoint := prefix + "/computers/subset/basic"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputersBasic: %w", err)
+	}
+	return &result, nil
+}
+
+// MatchComputers searches for computers that match the provided parameter.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) MatchComputers(ctx context.Context, match string) (*Computers, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Computers
+	endpoint := fmt.Sprintf("%s/computers/match/%s", prefix, url.PathEscape(match))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("MatchComputers(%s): %w", match, err)
+	}
+	return &result, nil
+}
+
+// MatchComputersByName searches for computers that match the provided name parameter.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) MatchComputersByName(ctx context.Context, matchName string) (*Computers, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result Computers
+	endpoint := fmt.Sprintf("%s/computers/match/name/%s", prefix, url.PathEscape(matchName))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("MatchComputersByName(%s): %w", matchName, err)
+	}
+	return &result, nil
+}
+
+// CreateComputerByName creates a computer.
+func (c *Client) CreateComputerByName(ctx context.Context, name string, request *ComputerPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateComputerByName(%s): %w", name, err)
+	}
+	return nil
+}
+
+// CreateComputerBySerialNumber creates a computer.
+func (c *Client) CreateComputerBySerialNumber(ctx context.Context, serialNumber string, request *ComputerPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/serialnumber/%s", prefix, url.PathEscape(serialNumber))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateComputerBySerialNumber(%s): %w", serialNumber, err)
+	}
+	return nil
+}
+
+// CreateComputerByMacAddress creates a computer.
+func (c *Client) CreateComputerByMacAddress(ctx context.Context, macaddress string, request *ComputerPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateComputerByMacAddress(%s): %w", macaddress, err)
+	}
+	return nil
+}
+
+// CreateComputerByUDID creates a computer.
+func (c *Client) CreateComputerByUDID(ctx context.Context, udid string, request *ComputerPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateComputerByUDID(%s): %w", udid, err)
+	}
+	return nil
+}
+
+// UpdateComputerBySerialNumber updates an existing computer by serial number.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) UpdateComputerBySerialNumber(ctx context.Context, serialNumber string, request *ComputerPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/serialnumber/%s", prefix, url.PathEscape(serialNumber))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateComputerBySerialNumber(%s): %w", serialNumber, err)
+	}
+	return nil
+}
+
+// UpdateComputerByMacAddress updates an existing computer by MAC address.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) UpdateComputerByMacAddress(ctx context.Context, macaddress string, request *ComputerPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateComputerByMacAddress(%s): %w", macaddress, err)
+	}
+	return nil
+}
+
+// UpdateComputerByUDID updates an existing computer by UDID.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) UpdateComputerByUDID(ctx context.Context, udid string, request *ComputerPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateComputerByUDID(%s): %w", udid, err)
+	}
+	return nil
+}
+
+// DeleteComputerByMacAddress deletes a computer by MAC address.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) DeleteComputerByMacAddress(ctx context.Context, macaddress string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteComputerByMacAddress(%s): %w", macaddress, err)
+	}
+	return nil
+}
+
+// DeleteComputerByUDID deletes a computer by UDID.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) DeleteComputerByUDID(ctx context.Context, udid string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteComputerByUDID(%s): %w", udid, err)
+	}
+	return nil
+}

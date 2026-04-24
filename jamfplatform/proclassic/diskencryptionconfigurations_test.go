@@ -179,6 +179,21 @@ func TestListDiskEncryptionConfigurations_NotFound(t *testing.T) {
 	}
 }
 
+func TestCreateDiskEncryptionConfigurationByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/diskencryptionconfigurations/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateDiskEncryptionConfigurationByName(context.Background(), "test-id", &DiskEncryptionConfiguration{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolveDiskEncryptionConfigurationIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/diskencryptionconfigurations/name/test-id", func(w http.ResponseWriter, r *http.Request) {

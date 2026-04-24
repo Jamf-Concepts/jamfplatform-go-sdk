@@ -99,6 +99,16 @@ func (c *Client) ListDistributionPoints(ctx context.Context) (*DistributionPoint
 	return &result, nil
 }
 
+// CreateDistributionPointByName creates a new distribution point by ID.
+func (c *Client) CreateDistributionPointByName(ctx context.Context, name string, request *DistributionPointPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateDistributionPointByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveDistributionPointIDByName looks up a DistributionPoint by name via GetDistributionPointByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveDistributionPointIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetDistributionPointByName(ctx, name)

@@ -155,6 +155,17 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByUUID(ctx context.Context
 	return &result, nil
 }
 
+// GetMobileDeviceProvisioningProfileByIDSubset finds a mobile device provisioning profiles by id.
+func (c *Client) GetMobileDeviceProvisioningProfileByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceProvisioningProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceProvisioningProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceProvisioningProfileByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // ResolveMobileDeviceProvisioningProfileIDByName looks up a MobileDeviceProvisioningProfile by name via GetMobileDeviceProvisioningProfileByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveMobileDeviceProvisioningProfileIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetMobileDeviceProvisioningProfileByName(ctx, name)

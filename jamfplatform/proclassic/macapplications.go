@@ -121,6 +121,16 @@ func (c *Client) GetMacApplicationByNameSubset(ctx context.Context, name string,
 	return &result, nil
 }
 
+// CreateMacApplicationByName creates a new mac application by ID.
+func (c *Client) CreateMacApplicationByName(ctx context.Context, name string, request *MacApplication) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMacApplicationByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveMacApplicationIDByName looks up a MacApplication by name via GetMacApplicationByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveMacApplicationIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetMacApplicationByName(ctx, name)

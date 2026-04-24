@@ -43,3 +43,13 @@ func (c *Client) ListInfrastructureManagers(ctx context.Context) (*Infrastructur
 	}
 	return &result, nil
 }
+
+// DeleteInfrastructureManagerByID updates an existing infrastructure manager by ID.
+func (c *Client) DeleteInfrastructureManagerByID(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/infrastructuremanager/id/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("DeleteInfrastructureManagerByID(%s): %w", id, err)
+	}
+	return nil
+}

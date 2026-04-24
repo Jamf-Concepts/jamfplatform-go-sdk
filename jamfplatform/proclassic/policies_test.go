@@ -269,33 +269,18 @@ func TestGetPolicyByIDSubset_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetPolicyByNameSubset(t *testing.T) {
+func TestCreatePolicyByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
+	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeXML(t, w, http.StatusOK, "<policy></policy>")
+		w.WriteHeader(http.StatusCreated)
 	})
 
-	result, err := c.GetPolicyByNameSubset(context.Background(), "test-id", "test-id")
+	err := c.CreatePolicyByName(context.Background(), "test-id", &PolicyPost{})
 	if err != nil {
 		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetPolicyByNameSubset_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.GetPolicyByNameSubset(context.Background(), "test-id", "test-id")
-	if err == nil {
-		t.Fatal("expected error")
 	}
 }
 

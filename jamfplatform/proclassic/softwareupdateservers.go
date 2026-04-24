@@ -99,6 +99,16 @@ func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdate
 	return &result, nil
 }
 
+// CreateSoftwareUpdateServerByName creates a new software update server by ID.
+func (c *Client) CreateSoftwareUpdateServerByName(ctx context.Context, name string, request *SoftwareUpdateServer) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateSoftwareUpdateServerByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveSoftwareUpdateServerIDByName looks up a SoftwareUpdateServer by name via GetSoftwareUpdateServerByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveSoftwareUpdateServerIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetSoftwareUpdateServerByName(ctx, name)

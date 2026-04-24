@@ -99,6 +99,16 @@ func (c *Client) ListPrinters(ctx context.Context) (*Printers, error) {
 	return &result, nil
 }
 
+// CreatePrinterByName creates a new printer by ID.
+func (c *Client) CreatePrinterByName(ctx context.Context, name string, request *Printer) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreatePrinterByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolvePrinterIDByName looks up a Printer by name via GetPrinterByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolvePrinterIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetPrinterByName(ctx, name)

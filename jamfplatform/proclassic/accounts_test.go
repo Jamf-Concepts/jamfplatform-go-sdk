@@ -317,6 +317,36 @@ func TestListAccounts_NotFound(t *testing.T) {
 	}
 }
 
+func TestCreateAccountGroupByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/accounts/groupname/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateAccountGroupByName(context.Background(), "test-id", &Group{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateAccountByUsername(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/accounts/username/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateAccountByUsername(context.Background(), "test-id", &Account{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolveAccountGroupIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/accounts/groupname/test-id", func(w http.ResponseWriter, r *http.Request) {

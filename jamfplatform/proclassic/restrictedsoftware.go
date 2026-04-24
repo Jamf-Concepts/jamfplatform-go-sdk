@@ -99,6 +99,16 @@ func (c *Client) ListRestrictedSoftware(ctx context.Context) (*RestrictedSoftwar
 	return &result, nil
 }
 
+// CreateRestrictedSoftwareByName creates a new restricted software by ID.
+func (c *Client) CreateRestrictedSoftwareByName(ctx context.Context, name string, request *RestrictedSoftware) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateRestrictedSoftwareByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveRestrictedSoftwareIDByName looks up a RestrictedSoftware by name via GetRestrictedSoftwareByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveRestrictedSoftwareIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetRestrictedSoftwareByName(ctx, name)

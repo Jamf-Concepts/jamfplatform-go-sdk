@@ -152,6 +152,37 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByNameSubset(ctx context.Contex
 	return &result, nil
 }
 
+// GetMobileDeviceEnrollmentProfileByInvitationSubset finds a subset of data for an enrollment profile.
+func (c *Client) GetMobileDeviceEnrollmentProfileByInvitationSubset(ctx context.Context, invitation string, subset string) (*MobileDeviceEnrollmentProfile, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceEnrollmentProfile
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s/subset/%s", prefix, url.PathEscape(invitation), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetMobileDeviceEnrollmentProfileByInvitationSubset(%s): %w", invitation, err)
+	}
+	return &result, nil
+}
+
+// CreateMobileDeviceEnrollmentProfileByInvitation creates a new mobile device enrollment profile by ID.
+func (c *Client) CreateMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string, request *MobileDeviceEnrollmentProfilePost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceEnrollmentProfileByInvitation(%s): %w", invitation, err)
+	}
+	return nil
+}
+
+// CreateMobileDeviceEnrollmentProfileByName creates a new mobile device enrollment profile by ID.
+func (c *Client) CreateMobileDeviceEnrollmentProfileByName(ctx context.Context, name string, request *MobileDeviceEnrollmentProfilePost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceEnrollmentProfileByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveMobileDeviceEnrollmentProfileIDByName looks up a MobileDeviceEnrollmentProfile by name via GetMobileDeviceEnrollmentProfileByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveMobileDeviceEnrollmentProfileIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetMobileDeviceEnrollmentProfileByName(ctx, name)

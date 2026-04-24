@@ -99,26 +99,6 @@ func (c *Client) GetUserByEmail(ctx context.Context, email string) (*User, error
 	return &result, nil
 }
 
-// UpdateUserByEmail updates an existing user by email address.
-func (c *Client) UpdateUserByEmail(ctx context.Context, email string, request *UserPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	endpoint := fmt.Sprintf("%s/users/email/%s", prefix, url.PathEscape(email))
-	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
-		return fmt.Errorf("UpdateUserByEmail(%s): %w", email, err)
-	}
-	return nil
-}
-
-// DeleteUserByEmail deletes a user by email address.
-func (c *Client) DeleteUserByEmail(ctx context.Context, email string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	endpoint := fmt.Sprintf("%s/users/email/%s", prefix, url.PathEscape(email))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
-		return fmt.Errorf("DeleteUserByEmail(%s): %w", email, err)
-	}
-	return nil
-}
-
 // ListUsers finds all users.
 func (c *Client) ListUsers(ctx context.Context) (*Users, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
@@ -128,6 +108,16 @@ func (c *Client) ListUsers(ctx context.Context) (*Users, error) {
 		return nil, fmt.Errorf("ListUsers: %w", err)
 	}
 	return &result, nil
+}
+
+// CreateUserByName creates a new user by ID.
+func (c *Client) CreateUserByName(ctx context.Context, name string, request *UserPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateUserByName(%s): %w", name, err)
+	}
+	return nil
 }
 
 // ResolveUserIDByName looks up a User by name via GetUserByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.

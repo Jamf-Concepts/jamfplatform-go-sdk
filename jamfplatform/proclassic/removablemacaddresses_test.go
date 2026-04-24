@@ -179,6 +179,21 @@ func TestListRemovableMacAddresses_NotFound(t *testing.T) {
 	}
 }
 
+func TestCreateRemovableMacAddressByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/removablemacaddresses/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateRemovableMacAddressByName(context.Background(), "test-id", &RemovableMacAddress{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolveRemovableMacAddressIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/removablemacaddresses/name/test-id", func(w http.ResponseWriter, r *http.Request) {
