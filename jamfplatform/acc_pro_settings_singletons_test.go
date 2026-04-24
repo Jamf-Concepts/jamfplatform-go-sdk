@@ -130,20 +130,6 @@ func TestAcceptance_Pro_Settings_JamfProServerURLV1Read(t *testing.T) {
 	}
 	t.Logf("Jamf Pro server URL: %s", url.URL)
 
-	// History endpoints on jamf-pro-server-url require elevated
-	// permissions the default OAuth client doesn't have. Tolerate 403.
-	if _, err := p.CreateJamfProServerURLHistoryNoteV1(ctx, &pro.ObjectHistoryNote{
-		Note: "sdk-acc test jamf-pro-server-url history entry",
-	}); err != nil {
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.StatusCode == 403 {
-			t.Logf("CreateJamfProServerURLHistoryNoteV1 denied: 403 — elevated permission required")
-			return
-		}
-		skipOnServerError(t, err)
-		t.Fatalf("CreateJamfProServerURLHistoryNoteV1: %v", err)
-	}
-
 	hist, err := p.ListJamfProServerURLHistoryV1(ctx, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)

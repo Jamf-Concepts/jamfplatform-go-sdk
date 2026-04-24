@@ -64,3 +64,14 @@ func (c *Client) DispatchOidcLoginV2(ctx context.Context, request *OidcLoginDisp
 	}
 	return &result, nil
 }
+
+// DispatchOidcV1 provide the url to redirect for OIDC login.
+func (c *Client) DispatchOidcV1(ctx context.Context, request *OidcLoginDispatchRequest) (*OidcLoginDispatchResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result OidcLoginDispatchResponse
+	endpoint := prefix + "/oidc/dispatch"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("DispatchOidcV1: %w", err)
+	}
+	return &result, nil
+}

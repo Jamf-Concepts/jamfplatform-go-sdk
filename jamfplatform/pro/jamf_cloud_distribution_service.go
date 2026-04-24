@@ -13,8 +13,6 @@ import (
 )
 
 // ListJCDSFilesV1 retrieve a list of files and file metadata from the Jamf Cloud Distribution Service.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 func (c *Client) ListJCDSFilesV1(ctx context.Context) ([]FileData, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []FileData
@@ -26,8 +24,6 @@ func (c *Client) ListJCDSFilesV1(ctx context.Context) ([]FileData, error) {
 }
 
 // InitiateJCDSUploadV1 initiate an upload to the Jamf Cloud Distribution Service.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 func (c *Client) InitiateJCDSUploadV1(ctx context.Context) (*Credentials, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Credentials
@@ -39,8 +35,6 @@ func (c *Client) InitiateJCDSUploadV1(ctx context.Context) (*Credentials, error)
 }
 
 // GetJCDSFileDownloadURLV1 retrieve a download URL for a specific file from the Jamf Cloud Distribution Service.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 func (c *Client) GetJCDSFileDownloadURLV1(ctx context.Context, fileName string) (*DownloadURL, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DownloadURL
@@ -52,8 +46,6 @@ func (c *Client) GetJCDSFileDownloadURLV1(ctx context.Context, fileName string) 
 }
 
 // DeleteJCDSFileV1 delete a file from the Jamf Cloud Distribution Service.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 func (c *Client) DeleteJCDSFileV1(ctx context.Context, fileName string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/jcds/files/%s", prefix, url.PathEscape(fileName))
@@ -64,8 +56,6 @@ func (c *Client) DeleteJCDSFileV1(ctx context.Context, fileName string) error {
 }
 
 // RefreshJCDSInventoryV1 refreshes the inventory and status of uploads in Jamf Pro. This will update the status of uploads in the Jamf Pro database and allow the uploads to be deployed.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 func (c *Client) RefreshJCDSInventoryV1(ctx context.Context, fileName string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/jcds/refresh-inventory"
@@ -83,8 +73,6 @@ func (c *Client) RefreshJCDSInventoryV1(ctx context.Context, fileName string) er
 }
 
 // RenewJCDSCredentialsV1 renew credentials for an upload to the Jamf Cloud Distribution Service.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 func (c *Client) RenewJCDSCredentialsV1(ctx context.Context) (*Credentials, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Credentials

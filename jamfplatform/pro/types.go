@@ -43,15 +43,6 @@ type AccountDrivenUserEnrollmentSessionTokenSettings struct {
 	ExpirationIntervalSeconds *int  `json:"expirationIntervalSeconds,omitempty"`
 }
 
-// AccountGroup represents a account group.
-type AccountGroup struct {
-	AccessLevel   string   `json:"accessLevel"`
-	MemberUserIds []int    `json:"memberUserIds"`
-	PrivilegeSet  string   `json:"privilegeSet"`
-	Privileges    []string `json:"privileges"`
-	SiteID        int      `json:"siteId"`
-}
-
 // AccountPreferences represents a account preferences.
 type AccountPreferences struct {
 	DateFormat             string `json:"dateFormat"`
@@ -66,15 +57,6 @@ type AccountPreferencesSearchType = string
 
 // AccountPreferencesUserInterfaceDisplayTheme represents a account preferences user interface display theme value.
 type AccountPreferencesUserInterfaceDisplayTheme = string
-
-// AccountPreferencesV1 represents a account preferences v1.
-type AccountPreferencesV1 struct {
-	DateFormat           string `json:"dateFormat"`
-	DisableRelativeDates bool   `json:"disableRelativeDates"`
-	Language             string `json:"language"`
-	Region               string `json:"region"`
-	Timezone             string `json:"timezone"`
-}
 
 // AccountPreferencesV6 represents a account preferences v6.
 type AccountPreferencesV6 struct {
@@ -414,32 +396,6 @@ type Attributes struct {
 	Removable             *bool     `json:"removable,omitempty"`
 	TapToPayScreenLock    *bool     `json:"tapToPayScreenLock,omitempty"`
 	VpnUUID               *string   `json:"vpnUuid,omitempty"`
-}
-
-// AuthAccountV1 represents a auth account v1.
-type AuthAccountV1 struct {
-	AccessLevel      string                `json:"accessLevel"`
-	CurrentSiteID    string                `json:"currentSiteId"`
-	Email            string                `json:"email"`
-	GroupIds         []string              `json:"groupIds"`
-	ID               string                `json:"id"`
-	MultiSiteAdmin   bool                  `json:"multiSiteAdmin"`
-	Preferences      *AccountPreferencesV1 `json:"preferences,omitempty"`
-	PrivilegeSet     string                `json:"privilegeSet"`
-	PrivilegesBySite map[string][]string   `json:"privilegesBySite"`
-	RealName         string                `json:"realName"`
-	Username         string                `json:"username"`
-}
-
-// AuthenticationType represents a authentication type value.
-type AuthenticationType = string
-
-// AuthorizationV1 represents a authorization v1.
-type AuthorizationV1 struct {
-	Account            *AuthAccountV1      `json:"account,omitempty"`
-	AccountGroups      []AccountGroup      `json:"accountGroups"`
-	AuthenticationType *AuthenticationType `json:"authenticationType,omitempty"`
-	Sites              []V1SiteBase        `json:"sites"`
 }
 
 // AvailableOsUpdates represents a available os updates.
@@ -875,10 +831,7 @@ type CloudLdapServerUpdate struct {
 // CloudResponse represents a cloud response.
 type CloudResponse struct {
 	CloudInstance                  bool `json:"cloudInstance"`
-	FedRampInstance                bool `json:"fedRampInstance"`
-	FipsEnabled                    bool `json:"fipsEnabled"`
 	GovCloudInstance               bool `json:"govCloudInstance"`
-	HighComplianceInstance         bool `json:"highComplianceInstance"`
 	ManagedServiceProviderInstance bool `json:"managedServiceProviderInstance"`
 	RampInstance                   bool `json:"rampInstance"`
 }
@@ -1186,7 +1139,7 @@ type ComputerGeneral struct {
 	Platform                                 string                       `json:"platform"`
 	RemoteManagement                         *ComputerRemoteManagement    `json:"remoteManagement,omitempty"`
 	ReportDate                               *time.Time                   `json:"reportDate,omitempty"`
-	Site                                     *V1SiteBase                  `json:"site,omitempty"`
+	Site                                     *V1Site                      `json:"site,omitempty"`
 	Supervised                               bool                         `json:"supervised"`
 	UserApprovedMDM                          bool                         `json:"userApprovedMdm"`
 }
@@ -1600,7 +1553,6 @@ type ComputerPrestageSearchResultsV3 struct {
 // ComputerPrestageV3 represents a computer prestage v3.
 type ComputerPrestageV3 struct {
 	AnchorCertificates                 *[]string                       `json:"anchorCertificates,omitempty"`
-	AuthURL                            *string                         `json:"authUrl,omitempty"`
 	AuthenticationPrompt               string                          `json:"authenticationPrompt"`
 	AutoAdvanceSetup                   bool                            `json:"autoAdvanceSetup"`
 	CustomPackageDistributionPointID   string                          `json:"customPackageDistributionPointId"`
@@ -1619,15 +1571,12 @@ type ComputerPrestageV3 struct {
 	Language                           *string                         `json:"language,omitempty"`
 	LocationInformation                LocationInformationV2           `json:"locationInformation"`
 	Mandatory                          bool                            `json:"mandatory"`
-	ManifestURL                        *string                         `json:"manifestUrl,omitempty"`
 	MDMRemovable                       bool                            `json:"mdmRemovable"`
 	MinimumOsSpecificVersion           *string                         `json:"minimumOsSpecificVersion,omitempty"`
 	PlatformSsoAppBundleID             *string                         `json:"platformSsoAppBundleId,omitempty"`
 	PrestageInstalledProfileIds        []string                        `json:"prestageInstalledProfileIds"`
 	PrestageMinimumOsTargetVersionType *string                         `json:"prestageMinimumOsTargetVersionType,omitempty"`
 	PreventActivationLock              bool                            `json:"preventActivationLock"`
-	ProfileURL                         *string                         `json:"profileUrl,omitempty"`
-	PssoConfigProfileID                *string                         `json:"pssoConfigProfileId,omitempty"`
 	PssoEnabled                        *bool                           `json:"pssoEnabled,omitempty"`
 	PurchasingInformation              PrestagePurchasingInformationV2 `json:"purchasingInformation"`
 	RecoveryLockPasswordType           *string                         `json:"recoveryLockPasswordType,omitempty"`
@@ -1816,37 +1765,6 @@ type ConfigurationSearchResults struct {
 	TotalCount int                      `json:"totalCount"`
 }
 
-// ConnectionConfigurationCandidateRequest Request that creates configuration and initialize connection between Jamf Pro and Team Viewer.
-type ConnectionConfigurationCandidateRequest struct {
-	DisplayName    string `json:"displayName"`
-	Enabled        bool   `json:"enabled"`
-	ScriptToken    string `json:"scriptToken"`
-	SessionTimeout int    `json:"sessionTimeout"`
-	SiteID         string `json:"siteId"`
-}
-
-// ConnectionConfigurationResponse Response that contains information about connection configuration for Team Viewer.
-type ConnectionConfigurationResponse struct {
-	DisplayName    string `json:"displayName"`
-	Enabled        bool   `json:"enabled"`
-	ID             string `json:"id"`
-	SessionTimeout *int   `json:"sessionTimeout,omitempty"`
-	SiteID         string `json:"siteId"`
-}
-
-// ConnectionConfigurationStatusResponse Response that contains connection configuration status for Team Viewer.
-type ConnectionConfigurationStatusResponse struct {
-	ConnectionVerificationResult string `json:"connectionVerificationResult"`
-}
-
-// ConnectionConfigurationUpdateRequest Request that updates configuration connection between Jamf Pro and Team Viewer.
-type ConnectionConfigurationUpdateRequest struct {
-	DisplayName    *string `json:"displayName,omitempty"`
-	Enabled        *bool   `json:"enabled,omitempty"`
-	SessionTimeout *int    `json:"sessionTimeout,omitempty"`
-	Token          *string `json:"token,omitempty"`
-}
-
 // Country represents a country.
 type Country struct {
 	Code string `json:"code"`
@@ -1963,13 +1881,6 @@ type DayOfWeek = string
 type DeclarativeManagementCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
 	Data        *string        `json:"data,omitempty"`
-}
-
-// DefaultApplications represents a default applications.
-type DefaultApplications struct {
-	Calling    *string `json:"calling,omitempty"`
-	Messaging  *string `json:"messaging,omitempty"`
-	WebBrowser *string `json:"webBrowser,omitempty"`
 }
 
 // DeleteUserCommand represents a delete user command.
@@ -2745,7 +2656,6 @@ type FileTransferItem struct {
 type GetComputerPrestageV3 struct {
 	AccountSettings                    *AccountSettingsResponse         `json:"accountSettings,omitempty"`
 	AnchorCertificates                 []string                         `json:"anchorCertificates"`
-	AuthURL                            *string                          `json:"authUrl,omitempty"`
 	AuthenticationPrompt               string                           `json:"authenticationPrompt"`
 	AutoAdvanceSetup                   bool                             `json:"autoAdvanceSetup"`
 	CustomPackageDistributionPointID   string                           `json:"customPackageDistributionPointId"`
@@ -2765,16 +2675,13 @@ type GetComputerPrestageV3 struct {
 	Language                           string                           `json:"language"`
 	LocationInformation                *LocationInformationV2           `json:"locationInformation,omitempty"`
 	Mandatory                          bool                             `json:"mandatory"`
-	ManifestURL                        *string                          `json:"manifestUrl,omitempty"`
 	MDMRemovable                       bool                             `json:"mdmRemovable"`
 	MinimumOsSpecificVersion           string                           `json:"minimumOsSpecificVersion"`
 	PlatformSsoAppBundleID             string                           `json:"platformSsoAppBundleId"`
 	PrestageInstalledProfileIds        []string                         `json:"prestageInstalledProfileIds"`
 	PrestageMinimumOsTargetVersionType string                           `json:"prestageMinimumOsTargetVersionType"`
 	PreventActivationLock              bool                             `json:"preventActivationLock"`
-	ProfileURL                         *string                          `json:"profileUrl,omitempty"`
 	ProfileUUID                        string                           `json:"profileUuid"`
-	PssoConfigProfileID                *string                          `json:"pssoConfigProfileId,omitempty"`
 	PssoEnabled                        bool                             `json:"pssoEnabled"`
 	PurchasingInformation              *PrestagePurchasingInformationV2 `json:"purchasingInformation,omitempty"`
 	RecoveryLockPasswordType           string                           `json:"recoveryLockPasswordType"`
@@ -2847,7 +2754,6 @@ type GetMobileDevicePrestageV3 struct {
 	Department                             string                           `json:"department"`
 	DeviceEnrollmentProgramInstanceID      string                           `json:"deviceEnrollmentProgramInstanceId"`
 	DisplayName                            string                           `json:"displayName"`
-	DoNotUseProfileFromBackup              bool                             `json:"doNotUseProfileFromBackup"`
 	EnableDeviceBasedActivationLock        bool                             `json:"enableDeviceBasedActivationLock"`
 	EnforceTemporarySessionTimeout         bool                             `json:"enforceTemporarySessionTimeout"`
 	EnforceUserSessionTimeout              bool                             `json:"enforceUserSessionTimeout"`
@@ -3076,20 +2982,24 @@ type ImpactAlertNotificationSettingsV1 struct {
 	ScopeableObjectsConfirmationCodeEnabled  bool `json:"scopeableObjectsConfirmationCodeEnabled"`
 }
 
+// InitializeV1 Initial Jamf Pro setup data.
+type InitializeV1 struct {
+	ActivationCode  string  `json:"activationCode"`
+	Email           *string `json:"email,omitempty"`
+	EulaAccepted    bool    `json:"eulaAccepted"`
+	InstitutionName string  `json:"institutionName"`
+	JssURL          string  `json:"jssUrl"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Password string `json:"password"`
+	Username string `json:"username"`
+}
+
 // InstallPackage Either devices or groupId must be provided.
 type InstallPackage struct {
 	Devices          *[]int          `json:"devices,omitempty"`
 	GroupID          *string         `json:"groupId,omitempty"`
 	InstallAsManaged *bool           `json:"installAsManaged,omitempty"`
 	Manifest         PackageManifest `json:"manifest"`
-}
-
-// InstalledApplicationListCommand represents a installed application list command.
-type InstalledApplicationListCommand struct {
-	CommandType     MDMCommandType `json:"commandType"`
-	Identifiers     *[]string      `json:"identifiers,omitempty"`
-	Items           *[]string      `json:"items,omitempty"`
-	ManagedAppsOnly *bool          `json:"managedAppsOnly,omitempty"`
 }
 
 // InternalRecipient represents a internal recipient.
@@ -3362,9 +3272,7 @@ type JamfProtectPlan struct {
 	Name             string `json:"name"`
 	ProfileID        int    `json:"profileId"`
 	ProfileName      string `json:"profileName"`
-	ProfileVersion   int    `json:"profileVersion"`
 	ScopeDescription string `json:"scopeDescription"`
-	SiteID           string `json:"siteId"`
 	UUID             string `json:"uuid"`
 }
 
@@ -3372,121 +3280,6 @@ type JamfProtectPlan struct {
 type LanguageCode struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
-}
-
-// LapsAccountManagementHistory represents a laps account management history.
-type LapsAccountManagementHistory struct {
-	EventTime  *time.Time `json:"eventTime,omitempty"`
-	EventType  string     `json:"eventType"`
-	UserSource string     `json:"userSource"`
-	Username   string     `json:"username"`
-	ViewedBy   *string    `json:"viewedBy,omitempty"`
-}
-
-// LapsAccountManagementHistoryResponse represents a laps account management history response.
-type LapsAccountManagementHistoryResponse struct {
-	Results    []LapsAccountManagementHistory `json:"results"`
-	TotalCount int                            `json:"totalCount"`
-}
-
-// LapsAuditV2 represents a laps audit v2.
-type LapsAuditV2 struct {
-	DateSeen *time.Time `json:"dateSeen,omitempty"`
-	ViewedBy *string    `json:"viewedBy,omitempty"`
-}
-
-// LapsHistory represents a laps history.
-type LapsHistory struct {
-	CreatedDate    *time.Time `json:"createdDate,omitempty"`
-	DateLastSeen   *time.Time `json:"dateLastSeen,omitempty"`
-	ExpirationTime *time.Time `json:"expirationTime,omitempty"`
-	RotationStatus string     `json:"rotationStatus"`
-}
-
-// LapsHistoryResponse represents a laps history response.
-type LapsHistoryResponse struct {
-	Results    []LapsHistory `json:"results"`
-	TotalCount int           `json:"totalCount"`
-}
-
-// LapsPasswordAndAuditsV2 represents a laps password and audits v2.
-type LapsPasswordAndAuditsV2 struct {
-	Audits         []LapsAuditV2 `json:"audits"`
-	DateLastSeen   *time.Time    `json:"dateLastSeen,omitempty"`
-	ExpirationTime *time.Time    `json:"expirationTime,omitempty"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Password string `json:"password"`
-}
-
-// LapsPasswordAuditsResultsV2 represents a laps password audits results v2.
-type LapsPasswordAuditsResultsV2 struct {
-	Results    []LapsPasswordAndAuditsV2 `json:"results"`
-	TotalCount int                       `json:"totalCount"`
-}
-
-// LapsPasswordResponseV2 represents a laps password response v2.
-type LapsPasswordResponseV2 struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Password string `json:"password"`
-}
-
-// LapsPendingRotation represents a laps pending rotation.
-type LapsPendingRotation struct {
-	CreatedDate *time.Time  `json:"createdDate,omitempty"`
-	LapsUser    *LapsUserV2 `json:"lapsUser,omitempty"`
-}
-
-// LapsPendingRotationResponse represents a laps pending rotation response.
-type LapsPendingRotationResponse struct {
-	Results    []LapsPendingRotation `json:"results"`
-	TotalCount int                   `json:"totalCount"`
-}
-
-// LapsSettingsRequestV2 represents a laps settings request v2.
-type LapsSettingsRequestV2 struct {
-	AutoDeployEnabled        bool `json:"autoDeployEnabled"`
-	AutoRotateEnabled        bool `json:"autoRotateEnabled"`
-	AutoRotateExpirationTime int  `json:"autoRotateExpirationTime"`
-	PasswordRotationTime     int  `json:"passwordRotationTime"`
-}
-
-// LapsSettingsResponseV2 represents a laps settings response v2.
-type LapsSettingsResponseV2 struct {
-	AutoDeployEnabled        bool `json:"autoDeployEnabled"`
-	AutoRotateEnabled        bool `json:"autoRotateEnabled"`
-	AutoRotateExpirationTime int  `json:"autoRotateExpirationTime"`
-	PasswordRotationTime     int  `json:"passwordRotationTime"`
-}
-
-// LapsUserPasswordRequestV2 represents a laps user password request v2.
-type LapsUserPasswordRequestV2 struct {
-	LapsUserPasswordList *[]LapsUserPasswordV2 `json:"lapsUserPasswordList,omitempty"`
-}
-
-// LapsUserPasswordResponseV2 represents a laps user password response v2.
-type LapsUserPasswordResponseV2 struct {
-	LapsUserPasswordList []LapsUserPasswordV2 `json:"lapsUserPasswordList"`
-}
-
-// LapsUserPasswordV2 represents a laps user password v2.
-type LapsUserPasswordV2 struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Password *string `json:"password,omitempty"`
-	Username *string `json:"username,omitempty"`
-}
-
-// LapsUserResultsV2 represents a laps user results v2.
-type LapsUserResultsV2 struct {
-	Results    []LapsUserV2 `json:"results"`
-	TotalCount int          `json:"totalCount"`
-}
-
-// LapsUserV2 represents a laps user v2.
-type LapsUserV2 struct {
-	ClientManagementID string `json:"clientManagementId"`
-	Guid               string `json:"guid"`
-	UserSource         string `json:"userSource"`
-	Username           string `json:"username"`
 }
 
 // LdapConfigurationRequest A Cloud Identity Provider LDAP configuration for requests.
@@ -3618,8 +3411,6 @@ type LoginContent struct {
 	ActionText              string `json:"actionText"`
 	DisclaimerHeading       string `json:"disclaimerHeading"`
 	DisclaimerMainText      string `json:"disclaimerMainText"`
-	FedRampInstance         bool   `json:"fedRampInstance"`
-	HighComplianceInstance  bool   `json:"highComplianceInstance"`
 	IncludeCustomDisclaimer bool   `json:"includeCustomDisclaimer"`
 	RampInstance            bool   `json:"rampInstance"`
 }
@@ -3771,14 +3562,11 @@ type MDMClientType = string
 
 // MDMCommand represents a m d m command.
 type MDMCommand struct {
-	Client        *MDMCommandClient `json:"client,omitempty"`
-	CommandError  *MDMCommandError  `json:"commandError,omitempty"`
-	CommandState  *MDMCommandState  `json:"commandState,omitempty"`
-	CommandType   *MDMCommandType   `json:"commandType,omitempty"`
-	DateCompleted *time.Time        `json:"dateCompleted,omitempty"`
-	DateSent      *time.Time        `json:"dateSent,omitempty"`
-	ProfileID     int               `json:"profileId"`
-	UUID          string            `json:"uuid"`
+	Client       *MDMCommandClient `json:"client,omitempty"`
+	CommandState *MDMCommandState  `json:"commandState,omitempty"`
+	CommandType  *MDMCommandType   `json:"commandType,omitempty"`
+	DateSent     *time.Time        `json:"dateSent,omitempty"`
+	UUID         string            `json:"uuid"`
 }
 
 // MDMCommandBase represents a m d m command base.
@@ -3795,14 +3583,6 @@ type MDMCommandClient struct {
 // MDMCommandClientRequest represents a m d m command client request.
 type MDMCommandClientRequest struct {
 	ManagementID *string `json:"managementId,omitempty"`
-}
-
-// MDMCommandError represents a m d m command error.
-type MDMCommandError struct {
-	ErrorCode                 int    `json:"errorCode"`
-	ErrorDomain               string `json:"errorDomain"`
-	ErrorEnglishDescription   string `json:"errorEnglishDescription"`
-	ErrorLocalizedDescription string `json:"errorLocalizedDescription"`
 }
 
 // MDMCommandRequest represents a m d m command request.
@@ -3954,7 +3734,7 @@ type MobileDeviceDetailsGetV2 struct {
 	OsSupplementalBuildVersion         string                       `json:"osSupplementalBuildVersion"`
 	OsVersion                          string                       `json:"osVersion"`
 	SerialNumber                       string                       `json:"serialNumber"`
-	Site                               *V1SiteBase                  `json:"site,omitempty"`
+	Site                               *V1Site                      `json:"site,omitempty"`
 	SoftwareUpdateDeviceID             string                       `json:"softwareUpdateDeviceId"`
 	TimeZone                           string                       `json:"timeZone"`
 	Tvos                               *TvOsDetails                 `json:"tvos,omitempty"`
@@ -3990,7 +3770,7 @@ type MobileDeviceDetailsV2 struct {
 	OsSupplementalBuildVersion         string                 `json:"osSupplementalBuildVersion"`
 	OsVersion                          string                 `json:"osVersion"`
 	SerialNumber                       string                 `json:"serialNumber"`
-	Site                               *V1SiteBase            `json:"site,omitempty"`
+	Site                               *V1Site                `json:"site,omitempty"`
 	SoftwareUpdateDeviceID             string                 `json:"softwareUpdateDeviceId"`
 	TimeZone                           string                 `json:"timeZone"`
 	Tvos                               *TvOsDetails           `json:"tvos,omitempty"`
@@ -4281,7 +4061,6 @@ type MobileDevicePrestageV3 struct {
 	Department                             string                          `json:"department"`
 	DeviceEnrollmentProgramInstanceID      string                          `json:"deviceEnrollmentProgramInstanceId"`
 	DisplayName                            string                          `json:"displayName"`
-	DoNotUseProfileFromBackup              *bool                           `json:"doNotUseProfileFromBackup,omitempty"`
 	EnableDeviceBasedActivationLock        bool                            `json:"enableDeviceBasedActivationLock"`
 	EnforceTemporarySessionTimeout         *bool                           `json:"enforceTemporarySessionTimeout,omitempty"`
 	EnforceUserSessionTimeout              *bool                           `json:"enforceUserSessionTimeout,omitempty"`
@@ -4637,12 +4416,6 @@ type OAuthClientCredentials struct {
 	ClientSecret string `json:"clientSecret"`
 }
 
-// OauthTokens represents a oauth tokens.
-type OauthTokens struct {
-	AccessToken string `json:"accessToken"`
-	IDToken     string `json:"idToken"`
-}
-
 // ObjectHistory represents a object history.
 type ObjectHistory struct {
 	Date     string  `json:"date"`
@@ -4691,6 +4464,11 @@ type OidcJwksResponseKeysItem struct {
 type OidcLoginDispatchRequest struct {
 	EmailAddress string `json:"emailAddress"`
 	OriginalURL  string `json:"originalUrl"`
+}
+
+// OidcLoginDispatchResponse represents a oidc login dispatch response.
+type OidcLoginDispatchResponse struct {
+	RedirectURL string `json:"redirectUrl"`
 }
 
 // OidcLoginDispatchResponseV2 represents a oidc login dispatch response v2.
@@ -4785,7 +4563,6 @@ type Package struct {
 	SelfHealingAction    *string `json:"selfHealingAction,omitempty"`
 	SerialNumber         *string `json:"serialNumber,omitempty"`
 	Sha256               *string `json:"sha256,omitempty"`
-	Sha3512              *string `json:"sha3512,omitempty"`
 	Size                 *string `json:"size,omitempty"`
 	SuppressEula         bool    `json:"suppressEula"`
 	SuppressFromDock     bool    `json:"suppressFromDock"`
@@ -5132,6 +4909,16 @@ type PlanStatus struct {
 	State        string    `json:"state"`
 }
 
+// PlatformInitializeV1 Platform Initial Jamf Pro setup data.
+type PlatformInitializeV1 struct {
+	ActivationCode  string `json:"activationCode"`
+	Email           string `json:"email"`
+	EulaAccepted    bool   `json:"eulaAccepted"`
+	InstitutionName string `json:"institutionName"`
+	JssURL          string `json:"jssUrl"`
+	Username        string `json:"username"`
+}
+
 // PlayLostModeSoundCommand represents a play lost mode sound command.
 type PlayLostModeSoundCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
@@ -5147,7 +4934,6 @@ type PolicyPropertiesV1 struct {
 type PostComputerPrestageV3 struct {
 	AccountSettings                    *AccountSettingsRequest         `json:"accountSettings,omitempty"`
 	AnchorCertificates                 *[]string                       `json:"anchorCertificates,omitempty"`
-	AuthURL                            *string                         `json:"authUrl,omitempty"`
 	AuthenticationPrompt               string                          `json:"authenticationPrompt"`
 	AutoAdvanceSetup                   bool                            `json:"autoAdvanceSetup"`
 	CustomPackageDistributionPointID   string                          `json:"customPackageDistributionPointId"`
@@ -5166,15 +4952,12 @@ type PostComputerPrestageV3 struct {
 	Language                           *string                         `json:"language,omitempty"`
 	LocationInformation                LocationInformationV2           `json:"locationInformation"`
 	Mandatory                          bool                            `json:"mandatory"`
-	ManifestURL                        *string                         `json:"manifestUrl,omitempty"`
 	MDMRemovable                       bool                            `json:"mdmRemovable"`
 	MinimumOsSpecificVersion           *string                         `json:"minimumOsSpecificVersion,omitempty"`
 	PlatformSsoAppBundleID             *string                         `json:"platformSsoAppBundleId,omitempty"`
 	PrestageInstalledProfileIds        []string                        `json:"prestageInstalledProfileIds"`
 	PrestageMinimumOsTargetVersionType *string                         `json:"prestageMinimumOsTargetVersionType,omitempty"`
 	PreventActivationLock              bool                            `json:"preventActivationLock"`
-	ProfileURL                         *string                         `json:"profileUrl,omitempty"`
-	PssoConfigProfileID                *string                         `json:"pssoConfigProfileId,omitempty"`
 	PssoEnabled                        *bool                           `json:"pssoEnabled,omitempty"`
 	PurchasingInformation              PrestagePurchasingInformationV2 `json:"purchasingInformation"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
@@ -5281,12 +5064,6 @@ type ProcessTextsSearchResults struct {
 	TotalCount int                           `json:"totalCount"`
 }
 
-// ProfileListCommand represents a profile list command.
-type ProfileListCommand struct {
-	CommandType MDMCommandType `json:"commandType"`
-	ManagedOnly *bool          `json:"managedOnly,omitempty"`
-}
-
 // ProtectRegistrationRequest Create an API Client in the Jamf Protect web console to obtain these values.
 type ProtectRegistrationRequest struct {
 	ClientID string `json:"clientId"`
@@ -5297,26 +5074,19 @@ type ProtectRegistrationRequest struct {
 
 // ProtectSettingsResponse represents a protect settings response.
 type ProtectSettingsResponse struct {
-	ApiClientID      string `json:"apiClientId"`
-	ApiClientName    string `json:"apiClientName"`
-	AutoInstall      bool   `json:"autoInstall"`
-	ID               string `json:"id"`
-	LastSyncTime     string `json:"lastSyncTime"`
-	PlatformPlanSync bool   `json:"platformPlanSync"`
-	ProtectURL       string `json:"protectUrl"`
-	RegistrationID   string `json:"registrationId"`
-	SyncStatus       string `json:"syncStatus"`
+	ApiClientID    string `json:"apiClientId"`
+	ApiClientName  string `json:"apiClientName"`
+	AutoInstall    bool   `json:"autoInstall"`
+	ID             string `json:"id"`
+	LastSyncTime   string `json:"lastSyncTime"`
+	ProtectURL     string `json:"protectUrl"`
+	RegistrationID string `json:"registrationId"`
+	SyncStatus     string `json:"syncStatus"`
 }
 
 // ProtectUpdatableSettingsRequest represents a protect updatable settings request.
 type ProtectUpdatableSettingsRequest struct {
 	AutoInstall *bool `json:"autoInstall,omitempty"`
-}
-
-// ProvisioningProfileListCommand represents a provisioning profile list command.
-type ProvisioningProfileListCommand struct {
-	CommandType MDMCommandType `json:"commandType"`
-	ManagedOnly *bool          `json:"managedOnly,omitempty"`
 }
 
 // PurchasingV2 represents a purchasing v2.
@@ -5339,7 +5109,6 @@ type PurchasingV2 struct {
 type PutComputerPrestageV3 struct {
 	AccountSettings                    *AccountSettingsRequest         `json:"accountSettings,omitempty"`
 	AnchorCertificates                 *[]string                       `json:"anchorCertificates,omitempty"`
-	AuthURL                            *string                         `json:"authUrl,omitempty"`
 	AuthenticationPrompt               string                          `json:"authenticationPrompt"`
 	AutoAdvanceSetup                   bool                            `json:"autoAdvanceSetup"`
 	CustomPackageDistributionPointID   string                          `json:"customPackageDistributionPointId"`
@@ -5358,15 +5127,12 @@ type PutComputerPrestageV3 struct {
 	Language                           *string                         `json:"language,omitempty"`
 	LocationInformation                LocationInformationV2           `json:"locationInformation"`
 	Mandatory                          bool                            `json:"mandatory"`
-	ManifestURL                        *string                         `json:"manifestUrl,omitempty"`
 	MDMRemovable                       bool                            `json:"mdmRemovable"`
 	MinimumOsSpecificVersion           *string                         `json:"minimumOsSpecificVersion,omitempty"`
 	PlatformSsoAppBundleID             *string                         `json:"platformSsoAppBundleId,omitempty"`
 	PrestageInstalledProfileIds        []string                        `json:"prestageInstalledProfileIds"`
 	PrestageMinimumOsTargetVersionType *string                         `json:"prestageMinimumOsTargetVersionType,omitempty"`
 	PreventActivationLock              bool                            `json:"preventActivationLock"`
-	ProfileURL                         *string                         `json:"profileUrl,omitempty"`
-	PssoConfigProfileID                *string                         `json:"pssoConfigProfileId,omitempty"`
 	PssoEnabled                        *bool                           `json:"pssoEnabled,omitempty"`
 	PurchasingInformation              PrestagePurchasingInformationV2 `json:"purchasingInformation"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
@@ -5392,7 +5158,6 @@ type PutMobileDevicePrestageV3 struct {
 	Department                             string                          `json:"department"`
 	DeviceEnrollmentProgramInstanceID      string                          `json:"deviceEnrollmentProgramInstanceId"`
 	DisplayName                            string                          `json:"displayName"`
-	DoNotUseProfileFromBackup              *bool                           `json:"doNotUseProfileFromBackup,omitempty"`
 	EnableDeviceBasedActivationLock        bool                            `json:"enableDeviceBasedActivationLock"`
 	EnforceTemporarySessionTimeout         *bool                           `json:"enforceTemporarySessionTimeout,omitempty"`
 	EnforceUserSessionTimeout              *bool                           `json:"enforceUserSessionTimeout,omitempty"`
@@ -5458,20 +5223,6 @@ type Reenrollment struct {
 type RefreshCellularPlansCommand struct {
 	CommandType   MDMCommandType `json:"commandType"`
 	EsimServerURL string         `json:"esimServerUrl"`
-}
-
-// RemoteAdministrationResponse A Remote administration response.
-type RemoteAdministrationResponse struct {
-	DisplayName string `json:"displayName"`
-	ID          string `json:"id"`
-	SiteID      string `json:"siteId"`
-	Type        string `json:"type"`
-}
-
-// RemoteAdministrationSearchResults A list with Remote administration configurations.
-type RemoteAdministrationSearchResults struct {
-	Results    []RemoteAdministrationResponse `json:"results"`
-	TotalCount int                            `json:"totalCount"`
 }
 
 // RemoveComputerMDMProfileResponse represents a remove computer m d m profile response.
@@ -5681,35 +5432,6 @@ type Session struct {
 	CurrentSiteID *int `json:"currentSiteId,omitempty"`
 }
 
-// SessionCandidateRequest Request to crate new remote session. Ultimately this allows connection between an admin and an end-user.
-type SessionCandidateRequest struct {
-	Description string `json:"description"`
-	DeviceID    string `json:"deviceId"`
-	DeviceType  string `json:"deviceType"`
-}
-
-// SessionDetails Session details.
-type SessionDetails struct {
-	Code          string     `json:"code"`
-	CreatedAt     *time.Time `json:"createdAt,omitempty"`
-	CreatorID     string     `json:"creatorId"`
-	CreatorName   string     `json:"creatorName"`
-	Description   string     `json:"description"`
-	DeviceID      string     `json:"deviceId"`
-	DeviceName    string     `json:"deviceName"`
-	DeviceType    string     `json:"deviceType"`
-	EndUserLink   string     `json:"endUserLink"`
-	ID            string     `json:"id"`
-	State         string     `json:"state"`
-	SupporterLink string     `json:"supporterLink"`
-}
-
-// SessionDetailsSearchResults Sessions search result.
-type SessionDetailsSearchResults struct {
-	Results    []SessionDetails `json:"results"`
-	TotalCount int              `json:"totalCount"`
-}
-
 // SessionHistoryItem represents a session history item.
 type SessionHistoryItem struct {
 	Comment                 string     `json:"comment"`
@@ -5748,12 +5470,6 @@ type SessionHistorySearchResults struct {
 	TotalCount int                  `json:"totalCount"`
 }
 
-// SessionStatus Session status.
-type SessionStatus struct {
-	Online       bool   `json:"online"`
-	SessionState string `json:"sessionState"`
-}
-
 // SetAutoAdminPasswordCommand represents a set auto admin password command.
 type SetAutoAdminPasswordCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
@@ -5771,24 +5487,22 @@ type SetRecoveryLockCommand struct {
 
 // SettingsCommand represents a settings command.
 type SettingsCommand struct {
-	ActivationLockAllowedWhileSupervised *bool                        `json:"activationLockAllowedWhileSupervised,omitempty"`
-	AppAnalytics                         *AppAnalyticsSetting         `json:"appAnalytics,omitempty"`
-	ApplicationAttributes                *ApplicationAttributes       `json:"applicationAttributes,omitempty"`
-	ApplicationConfiguration             *ApplicationConfiguration    `json:"applicationConfiguration,omitempty"`
-	Bluetooth                            *bool                        `json:"bluetooth,omitempty"`
-	BootstrapTokenAllowed                *bool                        `json:"bootstrapTokenAllowed,omitempty"`
-	CommandType                          MDMCommandType               `json:"commandType"`
-	DataRoaming                          *DataRoamingSetting          `json:"dataRoaming,omitempty"`
-	DefaultApplications                  *DefaultApplications         `json:"defaultApplications,omitempty"`
-	DeviceName                           *string                      `json:"deviceName,omitempty"`
-	DiagnosticSubmission                 *DiagnosticSubmissionSetting `json:"diagnosticSubmission,omitempty"`
-	MaximumResidentUsers                 *int                         `json:"maximumResidentUsers,omitempty"`
-	PasscodeLockGracePeriod              *int                         `json:"passcodeLockGracePeriod,omitempty"`
-	PersonalHotspot                      *PersonalHotspotSetting      `json:"personalHotspot,omitempty"`
-	SharedDeviceConfiguration            *SharedDeviceConfiguration   `json:"sharedDeviceConfiguration,omitempty"`
-	SoftwareUpdateSettings               *SoftwareUpdateSettings      `json:"softwareUpdateSettings,omitempty"`
-	TimeZone                             *string                      `json:"timeZone,omitempty"`
-	VoiceRoaming                         *VoiceRoamingSetting         `json:"voiceRoaming,omitempty"`
+	AppAnalytics              *AppAnalyticsSetting         `json:"appAnalytics,omitempty"`
+	ApplicationAttributes     *ApplicationAttributes       `json:"applicationAttributes,omitempty"`
+	ApplicationConfiguration  *ApplicationConfiguration    `json:"applicationConfiguration,omitempty"`
+	Bluetooth                 *bool                        `json:"bluetooth,omitempty"`
+	BootstrapTokenAllowed     *bool                        `json:"bootstrapTokenAllowed,omitempty"`
+	CommandType               MDMCommandType               `json:"commandType"`
+	DataRoaming               *DataRoamingSetting          `json:"dataRoaming,omitempty"`
+	DeviceName                *string                      `json:"deviceName,omitempty"`
+	DiagnosticSubmission      *DiagnosticSubmissionSetting `json:"diagnosticSubmission,omitempty"`
+	MaximumResidentUsers      *int                         `json:"maximumResidentUsers,omitempty"`
+	PasscodeLockGracePeriod   *int                         `json:"passcodeLockGracePeriod,omitempty"`
+	PersonalHotspot           *PersonalHotspotSetting      `json:"personalHotspot,omitempty"`
+	SharedDeviceConfiguration *SharedDeviceConfiguration   `json:"sharedDeviceConfiguration,omitempty"`
+	SoftwareUpdateSettings    *SoftwareUpdateSettings      `json:"softwareUpdateSettings,omitempty"`
+	TimeZone                  *string                      `json:"timeZone,omitempty"`
+	VoiceRoaming              *VoiceRoamingSetting         `json:"voiceRoaming,omitempty"`
 }
 
 // SharedDeviceComplianceFeatureToggle represents a shared device compliance feature toggle.
@@ -6301,7 +6015,6 @@ type User struct {
 type UserAccount struct {
 	AccessLevel               *string `json:"accessLevel,omitempty"`
 	AccountStatus             *string `json:"accountStatus,omitempty"`
-	AccountType               *string `json:"accountType,omitempty"`
 	ChangePasswordOnNextLogin *bool   `json:"changePasswordOnNextLogin,omitempty"`
 	DistinguishedName         *string `json:"distinguishedName,omitempty"`
 	Email                     *string `json:"email,omitempty"`
@@ -6399,13 +6112,6 @@ type UserTestSearchResponse struct {
 
 // V1Site represents a v1 site.
 type V1Site struct {
-	DivisionID *string `json:"divisionId,omitempty"`
-	ID         string  `json:"id"`
-	Name       string  `json:"name"`
-}
-
-// V1SiteBase represents a v1 site base.
-type V1SiteBase struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }

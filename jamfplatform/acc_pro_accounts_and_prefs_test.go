@@ -48,7 +48,6 @@ func TestAcceptance_Pro_AccountsV1(t *testing.T) {
 	// "Custom" / "Standard" will 400.
 	accessLevel := "FullAccess"
 	privilegeLevel := "ADMINISTRATOR"
-	accountType := "DEFAULT"
 	accountStatus := "Enabled"
 	phone := "000-000-0000"
 	distinguishedName := ""
@@ -68,7 +67,6 @@ func TestAcceptance_Pro_AccountsV1(t *testing.T) {
 		AccessLevel:               &accessLevel,
 		PrivilegeLevel:            &privilegeLevel,
 		AccountStatus:             &accountStatus,
-		AccountType:               &accountType,
 		ChangePasswordOnNextLogin: &changePassword,
 	})
 	if err != nil {

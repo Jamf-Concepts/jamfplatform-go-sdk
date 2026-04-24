@@ -145,3 +145,21 @@ func TestDispatchOidcLoginV2(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 }
+
+func TestDispatchOidcV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/oidc/dispatch", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.DispatchOidcV1(context.Background(), &OidcLoginDispatchRequest{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
