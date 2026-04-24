@@ -57,7 +57,7 @@ var funcMap = template.FuncMap{
 		} else {
 			base = fmt.Sprintf("/api/%s/%s/tenant/t-test", m.Namespace, m.Version)
 		}
-		path := pathParamRe.ReplaceAllString(stripVersionPrefix(m.SpecPath), "test-id")
+		path := pathParamRe.ReplaceAllString(m.ResourcePath, "test-id")
 		return base + path
 	},
 	"testCallArgs": func(m GoMethod) string {

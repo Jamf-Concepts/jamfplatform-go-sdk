@@ -657,7 +657,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 		HTTPMethod:      httpMethod,
 		Namespace:       spec.Namespace,
 		Version:         version,
-		ResourcePath:    stripVersionPrefix(specPath),
+		ResourcePath:    stripTenantPathSegment(stripVersionPrefix(specPath)),
 		QueryParams:     opDef.parseParams(),
 		ContentType:     opDef.ContentType,
 		PaginationStyle: opDef.Pagination,
@@ -690,7 +690,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 		m.Comment += "\n//\n// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release."
 	}
 
-	m.PathParams = extractPathParams(specPath, opDef.PathNames)
+	m.PathParams = extractPathParams(m.ResourcePath, opDef.PathNames)
 	m.ExpectedStatus, m.ResponseType = detectResponse(op)
 	// When detectResponse populates ResponseType from the spec, capture
 	// the matching schema's XML wire name so test stubs emit bodies the
@@ -832,6 +832,7 @@ func categorize(m GoMethod) string {
 // (enrollment-customization panels).
 var pathParamRe = regexp.MustCompile(`\{([\w-]+)\}`)
 var versionPrefixRe = regexp.MustCompile(`^/v\d+`)
+var tenantPathSegmentRe = regexp.MustCompile(`^/tenant/\{[^}]+\}`)
 
 func extractPathParams(path string, overrides map[string]string) []GoPathParam {
 	matches := pathParamRe.FindAllStringSubmatch(path, -1)
@@ -851,6 +852,14 @@ func extractPathParams(path string, overrides map[string]string) []GoPathParam {
 
 func stripVersionPrefix(path string) string {
 	return versionPrefixRe.ReplaceAllString(path, "")
+}
+
+// stripTenantPathSegment removes a leading /tenant/{param} segment left after
+// stripVersionPrefix when specs embed the tenant placeholder in the path
+// (e.g. /v1/tenant/{tenantId}/blueprints → /blueprints). The tenantId is
+// already injected by TenantPrefix, so it must not appear in ResourcePath.
+func stripTenantPathSegment(path string) string {
+	return tenantPathSegmentRe.ReplaceAllString(path, "")
 }
 
 // extractVersion returns "v1" from "/v1/devices" or "v2" from "/v2/benchmarks".

@@ -1,6 +1,117 @@
 {
   "components": {
+    "parameters": {
+      "tenantId": {
+        "description": "The tenant UUID identifier",
+        "in": "path",
+        "name": "tenantId",
+        "required": true,
+        "schema": {
+          "example": "e77c1408-10c8-4007-b177-abc9157fbcaa",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "type": "string"
+        }
+      }
+    },
     "schemas": {
+      "AcceptCookies": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "The policy Safari uses for managing cookies",
+            "enum": [
+              "Never",
+              "CurrentWebsite",
+              "VisitedWebsites",
+              "Always"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AllowDisablingFraudWarning": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "If false, the system forces fraud warnings on in Safari",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "AllowHistoryClearing": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "If false, the system disables clearing history in Safari",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "AllowJavaScript": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "If false, the system disables JavaScript in Safari",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "AllowPopups": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "If false, the system disables popups in Safari",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "AllowPrivateBrowsing": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "If false, the system disables private browsing in Safari",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "AllowSummary": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "If false, the system disables summarization of content in Safari",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "ApiError": {
         "properties": {
           "errors": {
@@ -23,6 +134,142 @@
         "required": [
           "errors",
           "traceId"
+        ],
+        "type": "object"
+      },
+      "AudioAccessorySettingsComponent": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/AudioAccessorySettingsConfiguration"
+          },
+          "identifier": {
+            "enum": [
+              "com.jamf.ddm.audio-accessory-settings"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "AudioAccessorySettingsConfiguration": {
+        "description": "Audio accessory settings configuration.\n\nConfigures audio accessory temporary pairing behavior.\n",
+        "properties": {
+          "TemporaryPairing": {
+            "$ref": "#/components/schemas/TemporaryPairing"
+          }
+        },
+        "type": "object"
+      },
+      "AutomaticAction": {
+        "properties": {
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "enum": [
+              "Allowed",
+              "AlwaysOn",
+              "AlwaysOff"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "Value"
+        ],
+        "type": "object"
+      },
+      "AutomaticActions": {
+        "properties": {
+          "Download": {
+            "$ref": "#/components/schemas/AutomaticAction"
+          },
+          "InstallOSUpdates": {
+            "$ref": "#/components/schemas/AutomaticAction"
+          },
+          "InstallSecurityUpdate": {
+            "$ref": "#/components/schemas/AutomaticAction"
+          }
+        },
+        "type": "object"
+      },
+      "BasicMode": {
+        "properties": {
+          "AddSquareRoot": {
+            "description": "Add the square root button to the basic calculator by replacing the +/- button.",
+            "type": "boolean"
+          },
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "AddSquareRoot"
+        ],
+        "type": "object"
+      },
+      "Beta": {
+        "properties": {
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "$ref": "#/components/schemas/BetaSettings"
+          }
+        },
+        "type": "object"
+      },
+      "BetaProgram": {
+        "properties": {
+          "Description": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "Token": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "BetaSettings": {
+        "properties": {
+          "OfferPrograms": {
+            "items": {
+              "$ref": "#/components/schemas/BetaProgram"
+            },
+            "maxItems": 100,
+            "type": "array"
+          },
+          "ProgramEnrollment": {
+            "enum": [
+              "Allowed",
+              "AlwaysOn",
+              "AlwaysOff"
+            ],
+            "type": "string"
+          },
+          "RequireProgram": {
+            "$ref": "#/components/schemas/BetaProgram"
+          }
+        },
+        "required": [
+          "ProgramEnrollment"
         ],
         "type": "object"
       },
@@ -214,21 +461,140 @@
         ],
         "type": "object"
       },
-      "Component": {
-        "description": "Array of components included in the step",
+      "BookmarkGroup": {
         "properties": {
-          "configuration": {
-            "$ref": "#/components/schemas/JsonNode"
+          "Bookmarks": {
+            "description": "A list of bookmarks",
+            "items": {
+              "$ref": "#/components/schemas/BookmarkItem"
+            },
+            "type": "array"
           },
-          "identifier": {
-            "description": "Blueprint component identifier",
-            "example": "com.jamf.ddm.sw-updates",
+          "GroupIdentifier": {
+            "description": "A string that specifies the unique identifier for this group of managed bookmarks",
+            "minLength": 1,
+            "type": "string"
+          },
+          "Title": {
+            "description": "The name of the bookmarks folder",
+            "minLength": 1,
             "type": "string"
           }
         },
         "required": [
-          "configuration",
-          "identifier"
+          "Bookmarks",
+          "GroupIdentifier",
+          "Title"
+        ],
+        "type": "object"
+      },
+      "BookmarkItem": {
+        "discriminator": {
+          "mapping": {
+            "BOOKMARK": "#/components/schemas/UrlBookmarkItem",
+            "FOLDER": "#/components/schemas/FolderBookmarkItem"
+          },
+          "propertyName": "Type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/FolderBookmarkItem"
+          },
+          {
+            "$ref": "#/components/schemas/UrlBookmarkItem"
+          }
+        ]
+      },
+      "Calculator": {
+        "properties": {
+          "BasicMode": {
+            "$ref": "#/components/schemas/BasicMode"
+          },
+          "InputModes": {
+            "$ref": "#/components/schemas/InputModes"
+          },
+          "MathNotesMode": {
+            "$ref": "#/components/schemas/MathNotesMode"
+          },
+          "ProgrammerMode": {
+            "$ref": "#/components/schemas/ProgrammerMode"
+          },
+          "ScientificMode": {
+            "$ref": "#/components/schemas/ScientificMode"
+          }
+        },
+        "type": "object"
+      },
+      "ChangeAtNextAuth": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Change at next auth",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "Component": {
+        "description": "A blueprint component",
+        "discriminator": {
+          "mapping": {
+            "com.jamf.ddm-configuration-profile": "#/components/schemas/ConfigurationProfile",
+            "com.jamf.ddm.audio-accessory-settings": "#/components/schemas/AudioAccessorySettingsComponent",
+            "com.jamf.ddm.disk-management": "#/components/schemas/DiskManagementComponent",
+            "com.jamf.ddm.math-settings": "#/components/schemas/MathSettingsComponent",
+            "com.jamf.ddm.passcode-settings": "#/components/schemas/PasscodeSettingsComponent",
+            "com.jamf.ddm.safari-bookmarks": "#/components/schemas/SafariBookmarksComponent",
+            "com.jamf.ddm.safari-extensions": "#/components/schemas/SafariExtensionsComponent",
+            "com.jamf.ddm.safari-settings": "#/components/schemas/SafariSettingsComponent",
+            "com.jamf.ddm.software-update-settings": "#/components/schemas/SoftwareUpdateSettingsComponent",
+            "com.jamf.ddm.sw-updates": "#/components/schemas/SwUpdateComponent"
+          },
+          "propertyName": "identifier"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ConfigurationProfile"
+          },
+          {
+            "$ref": "#/components/schemas/AudioAccessorySettingsComponent"
+          },
+          {
+            "$ref": "#/components/schemas/DiskManagementComponent"
+          },
+          {
+            "$ref": "#/components/schemas/MathSettingsComponent"
+          },
+          {
+            "$ref": "#/components/schemas/PasscodeSettingsComponent"
+          },
+          {
+            "$ref": "#/components/schemas/SafariBookmarksComponent"
+          },
+          {
+            "$ref": "#/components/schemas/SafariExtensionsComponent"
+          },
+          {
+            "$ref": "#/components/schemas/SafariSettingsComponent"
+          },
+          {
+            "$ref": "#/components/schemas/SoftwareUpdateSettingsComponent"
+          },
+          {
+            "$ref": "#/components/schemas/SwUpdateComponent"
+          }
+        ],
+        "properties": {
+          "identifier": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
         ],
         "type": "object"
       },
@@ -259,6 +625,64 @@
           "identifier",
           "meta",
           "name"
+        ],
+        "type": "object"
+      },
+      "ConfigurationProfile": {
+        "description": "Component for sending any Apple MDM configuration profile payload as a blueprint component.",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/ConfigurationProfileConfiguration"
+          },
+          "identifier": {
+            "description": "## Using Apple MDM profile payloads as blueprint components\n\nThe API accepts **any** Apple MDM configuration profile payload as a\nblueprint component — not only the ones explicitly listed in this\nspecification. Use the `com.jamf.ddm-configuration-profile` identifier with the\npattern described here to send one or more Apple payloads.\n\nApple publishes all payload definitions at\n[apple/device-management/mdm/profiles](https://github.com/apple/device-management/tree/release/mdm/profiles).\n\n### Step 1 — Choose the Apple payload(s)\n\nFind the payload YAML in the Apple repository. The `payloadtype` field\n(e.g. `com.apple.domains`, `com.apple.wifi.managed`,\n`com.apple.applicationaccess`) identifies each payload.\n\n\u003e **Unsupported payload types:** Blueprints with\n\u003e `com.apple.font` or `com.apple.webClip.managed` payloads\n\u003e cannot be created.\n\n### Step 2 — Build the `configuration` object\n\nThe `configuration` has two mandatory fields:\n\n| Field | Type | Description |\n|---|---|---|\n| `payloadDisplayName` | string | A human-readable name shown on the device (e.g. `\"Managed Domains\"`) |\n| `payloadContent` | array | An array of payload objects — each one represents a single Apple payload |\n\nEach entry in `payloadContent` **must** contain:\n\n| Field | Type | Description |\n|---|---|---|\n| `payloadType` | string | The Apple payload type identifier (e.g. `com.apple.domains`) |\n\nIn addition to `payloadType`, include the payload-specific keys from the\n`payloadkeys` section of the Apple payload YAML.\n\n### Apple type → JSON type mapping\n\n| Apple type | JSON value type | Example |\n|---|---|---|\n| `\u003cstring\u003e` | string | `\"example.com\"` |\n| `\u003cinteger\u003e` | number | `42` |\n| `\u003creal\u003e` | number | `3.14` |\n| `\u003cboolean\u003e` | boolean | `true` |\n| `\u003cdata\u003e` | string (Base64-encoded) | `\"SGVsbG8=\"` |\n| `\u003cdate\u003e` | string (ISO 8601) | `\"2026-01-15T00:00:00Z\"` |\n| `\u003carray\u003e` | array | `[\"a\", \"b\"]` |\n| `\u003cdictionary\u003e` | object | `{ \"key\": \"value\" }` |\n\nOnly include the keys you want to configure. Keys marked\n`presence: optional` in the Apple YAML can be omitted; keys marked\n`presence: required` must be present.\n\n### Reference\n\n- Apple payload definitions: https://github.com/apple/device-management/tree/release/mdm/profiles\n- Apple Configuration Profile reference: https://developer.apple.com/documentation/devicemanagement/profile-specific-payload-keys\n",
+            "enum": [
+              "com.jamf.ddm-configuration-profile"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "ConfigurationProfileConfiguration": {
+        "description": "Configuration wrapper for one or more Apple MDM profile payloads.\n\n### Example — `com.apple.domains`\n\nUsing the payload defined in\n[com.apple.domains.yaml](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.domains.yaml),\nits `payloadkeys` are `EmailDomains`, `WebDomains`,\n`SafariPasswordAutoFillDomains`, `CrossSiteTrackingPreventionRelaxedDomains`,\nand `CrossSiteTrackingPreventionRelaxedApps` — all optional arrays of strings.\n\n```json\n{\n  \"payloadDisplayName\": \"Managed Domains\",\n  \"payloadContent\": [\n    {\n      \"payloadType\": \"com.apple.domains\",\n      \"EmailDomains\": [\"example.com\", \"private.example.com\"],\n      \"WebDomains\": [\"*.example.com\"],\n      \"SafariPasswordAutoFillDomains\": [\"login.example.com\"]\n    }\n  ]\n}\n```\n\n### Example — `com.apple.wifi.managed`\n\nThe same pattern works for any payload. For\n[com.apple.wifi.managed](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.wifi.managed.yaml),\nlook up its `payloadkeys` and send:\n\n```json\n{\n  \"payloadDisplayName\": \"Corporate Wi-Fi\",\n  \"payloadContent\": [\n    {\n      \"payloadType\": \"com.apple.wifi.managed\",\n      \"SSID_STR\": \"Corporate-WiFi\",\n      \"EncryptionType\": \"WPA2\",\n      \"AutoJoin\": true,\n      \"IsHotspot\": false\n    }\n  ]\n}\n```\n\n### Combining multiple Apple payloads in one component\n\nA single `com.jamf.ddm-configuration-profile` component can contain multiple\nApple payloads in the `payloadContent` array:\n\n```json\n{\n  \"payloadDisplayName\": \"Network \u0026 Domains\",\n  \"payloadContent\": [\n    {\n      \"payloadType\": \"com.apple.domains\",\n      \"WebDomains\": [\"*.corp.example.com\"],\n      \"EmailDomains\": [\"corp.example.com\"]\n    },\n    {\n      \"payloadType\": \"com.apple.wifi.managed\",\n      \"SSID_STR\": \"CorpNet\",\n      \"EncryptionType\": \"WPA3\"\n    }\n  ]\n}\n```\n\nYou can also place multiple `com.jamf.ddm-configuration-profile` components in the\nsame blueprint step alongside other component types.\n",
+        "properties": {
+          "payloadContent": {
+            "description": "An array of Apple payload objects. Each entry represents a single\nApple MDM payload and **must** include a `payloadType` field set to\nthe Apple payload type identifier (e.g. `com.apple.domains`,\n`com.apple.wifi.managed`, `com.apple.applicationaccess`).\n\nIn addition to `payloadType`, include any payload-specific keys from\nthe `payloadkeys` section of the corresponding Apple payload YAML\ndefinition. Any additional properties beyond `payloadType` are\naccepted to accommodate any Apple payload schema.\n",
+            "items": {
+              "$ref": "#/components/schemas/ConfigurationProfileContentItem"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "payloadDisplayName": {
+            "description": "A human-readable name for this configuration profile, displayed on the device.",
+            "example": "Managed Domains",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payloadDisplayName",
+          "payloadContent"
+        ],
+        "type": "object"
+      },
+      "ConfigurationProfileContentItem": {
+        "additionalProperties": true,
+        "description": "A single Apple MDM payload entry. Must contain `payloadType` to\nidentify the Apple payload, plus any payload-specific keys.\n",
+        "properties": {
+          "payloadType": {
+            "description": "The Apple payload type identifier (e.g. `com.apple.domains`,\n`com.apple.wifi.managed`, `com.apple.applicationaccess`).\n",
+            "example": "com.apple.domains",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payloadType"
         ],
         "type": "object"
       },
@@ -317,7 +741,7 @@
         "type": "object"
       },
       "CreateScope": {
-        "description": "Scope Scoping Engine",
+        "description": "Scope of the blueprint",
         "properties": {
           "deviceGroups": {
             "description": "Device groups",
@@ -337,6 +761,48 @@
         "required": [
           "deviceGroups"
         ],
+        "type": "object"
+      },
+      "CustomRegex": {
+        "properties": {
+          "Description": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Map of OS language ID to a localized description. Use the special `default` key for languages that the dictionary doesn't contain.",
+            "example": {
+              "en-US": "Must be 16 digits long."
+            },
+            "type": "object"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Regex": {
+            "description": "Regular expression",
+            "example": "[0-9]{16}",
+            "maxLength": 2048,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Deferrals": {
+        "properties": {
+          "CombinedPeriodInDays": {
+            "$ref": "#/components/schemas/OptionalPeriodInDays"
+          },
+          "MajorPeriodInDays": {
+            "$ref": "#/components/schemas/OptionalPeriodInDays"
+          },
+          "MinorPeriodInDays": {
+            "$ref": "#/components/schemas/OptionalPeriodInDays"
+          },
+          "SystemPeriodInDays": {
+            "$ref": "#/components/schemas/OptionalPeriodInDays"
+          }
+        },
         "type": "object"
       },
       "Deployment": {
@@ -389,6 +855,60 @@
         ],
         "type": "object"
       },
+      "DetailsUrl": {
+        "description": "Optional URL with details about the enforced update",
+        "properties": {
+          "Included": {
+            "default": false,
+            "description": "Controls whether this setting should be used",
+            "type": "boolean"
+          },
+          "Value": {
+            "description": "URL of a web page with the details about the enforced update",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DiskManagementComponent": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/DiskManagementSettingsConfiguration"
+          },
+          "identifier": {
+            "enum": [
+              "com.jamf.ddm.disk-management"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "DiskManagementSettingsConfiguration": {
+        "description": "Disk management settings configuration.\n\nConfigures restrictions for external and network storage access.\n",
+        "properties": {
+          "Restrictions": {
+            "$ref": "#/components/schemas/Restrictions"
+          },
+          "version": {
+            "description": "Configuration version",
+            "enum": [
+              2
+            ],
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "type": "object"
+      },
       "Error": {
         "properties": {
           "code": {
@@ -420,8 +940,236 @@
         ],
         "type": "object"
       },
-      "JsonNode": {
-        "description": "Configuration of the component. Exact schema is dependent on component type.",
+      "FailedAttemptsResetInMinutes": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Failed attempts reset in minutes",
+            "example": 5,
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "FolderBookmarkItem": {
+        "properties": {
+          "Folder": {
+            "description": "An array of bookmarks for each bookmark in the folder",
+            "items": {
+              "$ref": "#/components/schemas/UrlBookmarkItem"
+            },
+            "type": "array"
+          },
+          "Title": {
+            "description": "The title of the folder shown in Safari",
+            "minLength": 1,
+            "type": "string"
+          },
+          "Type": {
+            "enum": [
+              "FOLDER"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "Title",
+          "Type"
+        ],
+        "type": "object"
+      },
+      "InputModes": {
+        "properties": {
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "RPN": {
+            "description": "Configures whether RPN input is enabled.",
+            "type": "boolean"
+          },
+          "UnitConversion": {
+            "description": "Configures whether unit conversions are enabled.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "RPN",
+          "UnitConversion"
+        ],
+        "type": "object"
+      },
+      "ManagedExtension": {
+        "properties": {
+          "AllowedDomains": {
+            "description": "Allowed domains",
+            "items": {
+              "$ref": "#/components/schemas/ManagedExtensionDomain"
+            },
+            "type": "array"
+          },
+          "DeniedDomains": {
+            "description": "Denied domains",
+            "items": {
+              "$ref": "#/components/schemas/ManagedExtensionDomain"
+            },
+            "type": "array"
+          },
+          "PrivateBrowsing": {
+            "description": "Private Browsing state",
+            "enum": [
+              "Allowed",
+              "AlwaysOn",
+              "AlwaysOff"
+            ],
+            "type": "string"
+          },
+          "State": {
+            "description": "Extension state",
+            "enum": [
+              "Allowed",
+              "AlwaysOn",
+              "AlwaysOff"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ManagedExtensionDomain": {
+        "properties": {
+          "Domain": {
+            "description": "Domain",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "Domain"
+        ],
+        "type": "object"
+      },
+      "MathNotesMode": {
+        "properties": {
+          "Enabled": {
+            "description": "Controls whether the mode is enabled.",
+            "type": "boolean"
+          },
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Enabled"
+        ],
+        "type": "object"
+      },
+      "MathSettingsComponent": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/MathSettingsConfiguration"
+          },
+          "identifier": {
+            "enum": [
+              "com.jamf.ddm.math-settings"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "MathSettingsConfiguration": {
+        "description": "Math settings configuration.\n\nConfigures Calculator app modes and system-wide math behavior including keyboard suggestions and Math Notes.\n",
+        "properties": {
+          "Calculator": {
+            "$ref": "#/components/schemas/Calculator"
+          },
+          "SystemBehavior": {
+            "$ref": "#/components/schemas/SystemBehavior"
+          }
+        },
+        "type": "object"
+      },
+      "MaximumFailedAttempts": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "default": 11,
+            "description": "Maximum failed attempts",
+            "example": 10,
+            "format": "int32",
+            "maximum": 11,
+            "minimum": 2,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "MaximumGracePeriodInMinutes": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Maximum grace period in minutes",
+            "example": 2,
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "MaximumInactivityInMinutes": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Maximum inactivity in minutes",
+            "example": 10,
+            "format": "int32",
+            "maximum": 15,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "MaximumPasscodeAgeInDays": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Maximum passcode age in days",
+            "example": 14,
+            "format": "int32",
+            "maximum": 730,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
         "type": "object"
       },
       "Meta": {
@@ -468,6 +1216,106 @@
         ],
         "type": "object"
       },
+      "MinimumComplexCharacters": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "default": 0,
+            "description": "Minimum complex characters",
+            "example": 1,
+            "format": "int32",
+            "maximum": 4,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "MinimumLength": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "default": 0,
+            "description": "Minimum length",
+            "example": 8,
+            "format": "int32",
+            "maximum": 16,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "NewTabStartPage": {
+        "properties": {
+          "ExtensionIdentifier": {
+            "description": "The composed identifier of the extension that provides the start page",
+            "example": "com.example.extension (ABC1234567)",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9\\-]*(?:\\.[a-zA-Z0-9\\-]+)+ \\([A-Z0-9]{10}\\)$",
+            "type": "string"
+          },
+          "HomepageURL": {
+            "description": "The URL of the homepage which needs to start with https:// or http://",
+            "example": "https://example.com",
+            "pattern": "^https?://.*$",
+            "type": "string"
+          },
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "PageType": {
+            "description": "Sets the start page type in Safari",
+            "enum": [
+              "Start",
+              "Home",
+              "Extension"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OptionalPeriodInDays": {
+        "properties": {
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "format": "int32",
+            "maximum": 90,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "OptionallyEnabled": {
+        "properties": {
+          "Enabled": {
+            "type": "boolean"
+          },
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Enabled"
+        ],
+        "type": "object"
+      },
       "PagedResponseBlueprintOverview": {
         "properties": {
           "results": {
@@ -510,6 +1358,402 @@
         ],
         "type": "object"
       },
+      "PasscodeReuseLimit": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Passcode reuse limit",
+            "example": 10,
+            "format": "int32",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PasscodeSettingsComponent": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/PasscodeSettingsConfiguration"
+          },
+          "identifier": {
+            "enum": [
+              "com.jamf.ddm.passcode-settings"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "PasscodeSettingsConfiguration": {
+        "description": "Passcode settings configuration.\n\nConfigures device passcode requirements including complexity, length, and expiration.\n",
+        "properties": {
+          "ChangeAtNextAuth": {
+            "$ref": "#/components/schemas/ChangeAtNextAuth"
+          },
+          "CustomRegex": {
+            "$ref": "#/components/schemas/CustomRegex"
+          },
+          "FailedAttemptsResetInMinutes": {
+            "$ref": "#/components/schemas/FailedAttemptsResetInMinutes"
+          },
+          "MaximumFailedAttempts": {
+            "$ref": "#/components/schemas/MaximumFailedAttempts"
+          },
+          "MaximumGracePeriodInMinutes": {
+            "$ref": "#/components/schemas/MaximumGracePeriodInMinutes"
+          },
+          "MaximumInactivityInMinutes": {
+            "$ref": "#/components/schemas/MaximumInactivityInMinutes"
+          },
+          "MaximumPasscodeAgeInDays": {
+            "$ref": "#/components/schemas/MaximumPasscodeAgeInDays"
+          },
+          "MinimumComplexCharacters": {
+            "$ref": "#/components/schemas/MinimumComplexCharacters"
+          },
+          "MinimumLength": {
+            "$ref": "#/components/schemas/MinimumLength"
+          },
+          "PasscodeReuseLimit": {
+            "$ref": "#/components/schemas/PasscodeReuseLimit"
+          },
+          "RequireAlphanumericPasscode": {
+            "$ref": "#/components/schemas/RequireAlphanumericPasscode"
+          },
+          "RequireComplexPasscode": {
+            "$ref": "#/components/schemas/RequireComplexPasscode"
+          },
+          "RequirePasscode": {
+            "$ref": "#/components/schemas/RequirePasscode"
+          },
+          "version": {
+            "description": "Configuration version",
+            "enum": [
+              2
+            ],
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "type": "object"
+      },
+      "ProgrammerMode": {
+        "properties": {
+          "Enabled": {
+            "description": "Controls whether the mode is enabled.",
+            "type": "boolean"
+          },
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Enabled"
+        ],
+        "type": "object"
+      },
+      "RapidSecurityResponse": {
+        "properties": {
+          "Enable": {
+            "$ref": "#/components/schemas/OptionallyEnabled"
+          },
+          "EnableRollback": {
+            "$ref": "#/components/schemas/OptionallyEnabled"
+          }
+        },
+        "type": "object"
+      },
+      "RecommendedCadence": {
+        "properties": {
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "enum": [
+              "All",
+              "Oldest",
+              "Newest"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "Value"
+        ],
+        "type": "object"
+      },
+      "RequireAlphanumericPasscode": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Require alphanumeric passcode",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "RequireComplexPasscode": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Require complex passcode",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "RequirePasscode": {
+        "properties": {
+          "Included": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Require passcode",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "Restrictions": {
+        "description": "Storage restrictions configuration",
+        "properties": {
+          "ExternalStorage": {
+            "$ref": "#/components/schemas/StorageMode"
+          },
+          "NetworkStorage": {
+            "$ref": "#/components/schemas/StorageMode"
+          }
+        },
+        "type": "object"
+      },
+      "SafariBookmarksComponent": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SafariBookmarksConfiguration"
+          },
+          "identifier": {
+            "enum": [
+              "com.jamf.ddm.safari-bookmarks"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "SafariBookmarksConfiguration": {
+        "description": "Safari bookmarks configuration.\n\nDefines managed bookmark groups and folders that appear in Safari across managed devices.\n",
+        "properties": {
+          "ManagedBookmarks": {
+            "description": "A dictionary that specifies a set of managed bookmarks",
+            "items": {
+              "$ref": "#/components/schemas/BookmarkGroup"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "ManagedBookmarks"
+        ],
+        "type": "object"
+      },
+      "SafariExtensionsComponent": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SafariExtensionsConfiguration"
+          },
+          "identifier": {
+            "enum": [
+              "com.jamf.ddm.safari-extensions"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "SafariExtensionsConfiguration": {
+        "description": "Safari extensions configuration.\n\nManages Safari browser extensions including allowed/denied domains and private browsing settings.\n",
+        "properties": {
+          "ManagedExtensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ManagedExtension"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "ManagedExtensions"
+        ],
+        "type": "object"
+      },
+      "SafariSettingsComponent": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SafariSettingsConfiguration"
+          },
+          "identifier": {
+            "enum": [
+              "com.jamf.ddm.safari-settings"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "SafariSettingsConfiguration": {
+        "description": "Safari settings configuration.\n\nConfigures Safari browser behavior including cookies, JavaScript, popups, private browsing, and start page settings.\n",
+        "properties": {
+          "AcceptCookies": {
+            "$ref": "#/components/schemas/AcceptCookies"
+          },
+          "AllowDisablingFraudWarning": {
+            "$ref": "#/components/schemas/AllowDisablingFraudWarning"
+          },
+          "AllowHistoryClearing": {
+            "$ref": "#/components/schemas/AllowHistoryClearing"
+          },
+          "AllowJavaScript": {
+            "$ref": "#/components/schemas/AllowJavaScript"
+          },
+          "AllowPopups": {
+            "$ref": "#/components/schemas/AllowPopups"
+          },
+          "AllowPrivateBrowsing": {
+            "$ref": "#/components/schemas/AllowPrivateBrowsing"
+          },
+          "AllowSummary": {
+            "$ref": "#/components/schemas/AllowSummary"
+          },
+          "NewTabStartPage": {
+            "$ref": "#/components/schemas/NewTabStartPage"
+          }
+        },
+        "type": "object"
+      },
+      "ScientificMode": {
+        "properties": {
+          "Enabled": {
+            "description": "Controls whether the mode is enabled.",
+            "type": "boolean"
+          },
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "Enabled"
+        ],
+        "type": "object"
+      },
+      "SoftwareUpdateSettingsComponent": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SoftwareUpdateSettingsConfiguration"
+          },
+          "identifier": {
+            "enum": [
+              "com.jamf.ddm.software-update-settings"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "SoftwareUpdateSettingsConfiguration": {
+        "description": "Software update settings configuration.\n\nConfigures OS update behavior including notifications, automatic actions, deferrals, and rapid security responses.\n",
+        "properties": {
+          "AllowStandardUserOSUpdates": {
+            "$ref": "#/components/schemas/OptionallyEnabled"
+          },
+          "AutomaticActions": {
+            "$ref": "#/components/schemas/AutomaticActions"
+          },
+          "Beta": {
+            "$ref": "#/components/schemas/Beta"
+          },
+          "Deferrals": {
+            "$ref": "#/components/schemas/Deferrals"
+          },
+          "Notifications": {
+            "$ref": "#/components/schemas/OptionallyEnabled"
+          },
+          "RapidSecurityResponse": {
+            "$ref": "#/components/schemas/RapidSecurityResponse"
+          },
+          "RecommendedCadence": {
+            "$ref": "#/components/schemas/RecommendedCadence"
+          }
+        },
+        "type": "object"
+      },
+      "StorageMode": {
+        "description": "Storage access mode configuration",
+        "properties": {
+          "Included": {
+            "default": true,
+            "description": "Controls whether this setting should be used",
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "Value": {
+            "description": "Controls whether the mode is enabled.",
+            "enum": [
+              "Allowed",
+              "Disallowed",
+              "ReadOnly"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "Value"
+        ],
+        "type": "object"
+      },
       "SupportedOs": {
         "description": "Supported version of OS families",
         "example": {
@@ -533,6 +1777,247 @@
         },
         "required": [
           "version"
+        ],
+        "type": "object"
+      },
+      "SwUpdateAutomaticConfiguration": {
+        "description": "Automatic software update enforcement configuration.\n\nAutomatically enforces updates based on strategy (LATEST or SEMANTIC).\n",
+        "discriminator": {
+          "mapping": {
+            "LATEST": "#/components/schemas/SwUpdateLatestConfiguration",
+            "SEMANTIC": "#/components/schemas/SwUpdateSemanticConfiguration"
+          },
+          "propertyName": "strategy"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SwUpdateLatestConfiguration"
+          },
+          {
+            "$ref": "#/components/schemas/SwUpdateSemanticConfiguration"
+          }
+        ],
+        "properties": {
+          "strategy": {
+            "description": "Strategy for enforcing automatic OS updates",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SwUpdateComponent": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/SwUpdateConfiguration"
+          },
+          "identifier": {
+            "enum": [
+              "com.jamf.ddm.sw-updates"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "SwUpdateConfiguration": {
+        "description": "Software update enforcement configuration.\n\nConfigures OS update enforcement using either manual (specific version by date) or automatic strategies.\n",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SwUpdateManualConfiguration"
+          },
+          {
+            "$ref": "#/components/schemas/SwUpdateAutomaticConfiguration"
+          }
+        ],
+        "properties": {
+          "enforcementType": {
+            "description": "Type of software update enforcement strategy",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SwUpdateLatestConfiguration": {
+        "description": "Automatic software update with LATEST strategy.\nEnforces the newest available OS version a specified number of days after release.\n",
+        "properties": {
+          "deploymentTime": {
+            "description": "The device local time (HH:MM) when the update should be installed",
+            "example": "16:00",
+            "type": "string"
+          },
+          "detailsURL": {
+            "$ref": "#/components/schemas/DetailsUrl"
+          },
+          "enforceAfterDays": {
+            "description": "The number of days after the OS update release",
+            "example": 14,
+            "format": "int32",
+            "maximum": 30,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "enforcementType": {
+            "enum": [
+              "AUTOMATIC"
+            ],
+            "type": "string"
+          },
+          "strategy": {
+            "enum": [
+              "LATEST"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "enforcementType",
+          "strategy",
+          "enforceAfterDays",
+          "deploymentTime"
+        ],
+        "type": "object"
+      },
+      "SwUpdateManualConfiguration": {
+        "description": "Manual software update enforcement configuration.\n\nEnforces a specific OS version by a specific date/time.\n",
+        "properties": {
+          "detailsURL": {
+            "$ref": "#/components/schemas/DetailsUrl"
+          },
+          "enforcementType": {
+            "enum": [
+              "MANUAL"
+            ],
+            "type": "string"
+          },
+          "targetLocalDateTime": {
+            "description": "Local time of the device until which update must be performed",
+            "example": "2025-07-10T10:45:06.809",
+            "format": "date-time",
+            "type": "string"
+          },
+          "targetOSVersion": {
+            "description": "Target OS version in semantic versioning format",
+            "example": "15.0.1",
+            "pattern": "^[1-9]\\d?(?:\\.(?:\\d|[1-9]\\d)){1,2}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enforcementType",
+          "targetOSVersion",
+          "targetLocalDateTime"
+        ],
+        "type": "object"
+      },
+      "SwUpdateSemanticConfiguration": {
+        "description": "Automatic software update with SEMANTIC strategy.\nApplies semantic versioning rules to determine update enforcement timing.\n",
+        "properties": {
+          "detailsURL": {
+            "$ref": "#/components/schemas/DetailsUrl"
+          },
+          "enforcementType": {
+            "enum": [
+              "AUTOMATIC"
+            ],
+            "type": "string"
+          },
+          "rules": {
+            "$ref": "#/components/schemas/UpdateRules"
+          },
+          "strategy": {
+            "enum": [
+              "SEMANTIC"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "enforcementType",
+          "strategy",
+          "rules"
+        ],
+        "type": "object"
+      },
+      "SystemBehavior": {
+        "properties": {
+          "Included": {
+            "default": true,
+            "description": "Controls whether this control should be used.",
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "KeyboardSuggestions": {
+            "description": "Controls whether keyboard suggestions include math solutions.",
+            "type": "boolean"
+          },
+          "MathNotes": {
+            "description": "Controls whether Math Notes is allowed in other apps such as Notes.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "KeyboardSuggestions",
+          "MathNotes"
+        ],
+        "type": "object"
+      },
+      "TemporaryPairing": {
+        "description": "Temporary pairing configuration",
+        "properties": {
+          "Configuration": {
+            "$ref": "#/components/schemas/TemporaryPairingConfig"
+          },
+          "Disabled": {
+            "default": false,
+            "description": "If true, temporary pairing of audio accessories is disabled",
+            "type": "boolean"
+          },
+          "Included": {
+            "default": true,
+            "description": "Controls whether this setting should be used",
+            "type": "boolean",
+            "writeOnly": true
+          }
+        },
+        "type": "object"
+      },
+      "TemporaryPairingConfig": {
+        "description": "Temporary pairing configuration details",
+        "properties": {
+          "UnpairingTime": {
+            "$ref": "#/components/schemas/UnpairingTime"
+          }
+        },
+        "required": [
+          "UnpairingTime"
+        ],
+        "type": "object"
+      },
+      "UnpairingTime": {
+        "description": "Automatic unpairing time configuration",
+        "properties": {
+          "Hour": {
+            "description": "Local time hour (24-hour clock) for automatic unpairing. Required when Policy is \"Hour\".",
+            "format": "int32",
+            "maximum": 23,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "Policy": {
+            "description": "A string that specifies the device's unpairing policy.",
+            "enum": [
+              "None",
+              "Hour"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "Policy"
         ],
         "type": "object"
       },
@@ -564,26 +2049,98 @@
           }
         },
         "type": "object"
+      },
+      "UpdateRule": {
+        "description": "Configuration for a specific update type",
+        "properties": {
+          "deploymentTime": {
+            "description": "The device local time (HH:MM) when the update should be installed",
+            "example": "16:00",
+            "type": "string"
+          },
+          "enforceAfterDays": {
+            "description": "The number of days after the OS update release",
+            "example": 14,
+            "format": "int32",
+            "maximum": 30,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "enforceAfterDays",
+          "deploymentTime"
+        ],
+        "type": "object"
+      },
+      "UpdateRules": {
+        "description": "Rules for semantic update strategy",
+        "properties": {
+          "minor": {
+            "$ref": "#/components/schemas/UpdateRule"
+          }
+        },
+        "required": [
+          "minor"
+        ],
+        "type": "object"
+      },
+      "UrlBookmarkItem": {
+        "properties": {
+          "Title": {
+            "description": "The title of the bookmark shown in Safari",
+            "minLength": 1,
+            "type": "string"
+          },
+          "Type": {
+            "enum": [
+              "BOOKMARK"
+            ],
+            "type": "string"
+          },
+          "URL": {
+            "description": "The URL for the bookmark item",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "Type",
+          "Title",
+          "URL"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {
-      "M2M": {
-        "scheme": "Bearer",
+      "bearerAuth": {
+        "bearerFormat": "JWT",
+        "description": "JWT Bearer token authentication. Obtain a token from the Jamf API Gateway.",
+        "scheme": "bearer",
         "type": "http"
       }
     }
   },
   "info": {
-    "title": "OpenAPI definition",
+    "contact": {
+      "name": "Jamf Developer",
+      "url": "https://developer.jamf.com"
+    },
+    "description": "Blueprints simplify the creation of complex workflows by leveraging declarative device management to ensure devices meet a particular management state. You can use blueprints to scope management settings to devices using customizable components that include payloads and their configurable settings, all in one location.",
+    "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
+    "title": "Blueprints API",
     "version": "v0"
   },
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "paths": {
-    "/v1/blueprint-components": {
+    "/v1/tenant/{tenantId}/blueprint-components": {
       "get": {
-        "description": "Get list of available blueprint components",
+        "description": "Get list of available blueprint components\n\n**Required Permissions:** `read:pro:blueprints`, `read:school:blueprints`",
         "operationId": "listComponents",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "Zero-based page index (0..N)",
             "in": "query",
@@ -619,23 +2176,30 @@
             "description": "OK"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "List available blueprint components",
         "tags": [
           "blueprints"
         ],
         "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:blueprints",
           "read:pro:blueprints",
           "read:school:blueprints"
         ]
       }
     },
-    "/v1/blueprint-components/{identifier}": {
+    "/v1/tenant/{tenantId}/blueprint-components/{identifier}": {
       "get": {
-        "description": "Get component by identifier",
+        "description": "Get component by identifier\n\n**Required Permissions:** `read:pro:blueprints`, `read:school:blueprints`",
         "operationId": "getComponent",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "Identifier of the component",
             "in": "path",
@@ -668,23 +2232,30 @@
             "description": "Blueprint component was not found"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Get component",
         "tags": [
           "blueprints"
         ],
         "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:blueprints",
           "read:pro:blueprints",
           "read:school:blueprints"
         ]
       }
     },
-    "/v1/blueprints": {
+    "/v1/tenant/{tenantId}/blueprints": {
       "get": {
-        "description": "Get list of blueprints",
+        "description": "Get list of blueprints\n\n**Required Permissions:** `read:pro:blueprints`, `read:school:blueprints`",
         "operationId": "listBlueprints",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "Zero-based page index (0..N)",
             "in": "query",
@@ -739,20 +2310,29 @@
             "description": "OK"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "List blueprints",
         "tags": [
           "blueprints"
         ],
         "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:blueprints",
           "read:pro:blueprints",
           "read:school:blueprints"
         ]
       },
       "post": {
-        "description": "Create a new blueprint",
+        "description": "Create a new blueprint\n\n**Required Permissions:** `create:pro:blueprints`, `create:school:blueprints`",
         "operationId": "createBlueprint",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -795,23 +2375,30 @@
             "description": "Blueprint is invalid"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Create a new blueprint",
         "tags": [
           "blueprints"
         ],
         "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:blueprints",
           "create:pro:blueprints",
           "create:school:blueprints"
         ]
       }
     },
-    "/v1/blueprints/{blueprintId}": {
+    "/v1/tenant/{tenantId}/blueprints/{blueprintId}": {
       "delete": {
-        "description": "Delete a blueprint",
+        "description": "Delete a blueprint\n\n**Required Permissions:** `delete:pro:blueprints`, `delete:school:blueprints`",
         "operationId": "deleteBlueprint",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "Blueprint ID",
             "in": "path",
@@ -838,21 +2425,28 @@
             "description": "Blueprint wasn't found"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Delete a blueprint",
         "tags": [
           "blueprints"
         ],
         "x-authentication-required": true,
         "x-required-privileges": [
-          "delete:env:blueprints",
           "delete:pro:blueprints",
           "delete:school:blueprints"
         ]
       },
       "get": {
-        "description": "Get a blueprint",
+        "description": "Get a blueprint\n\n**Required Permissions:** `read:pro:blueprints`, `read:school:blueprints`",
         "operationId": "getBlueprint",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "Blueprint ID",
             "in": "path",
@@ -886,21 +2480,28 @@
             "description": "Blueprint doesn't exist"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Get a blueprint",
         "tags": [
           "blueprints"
         ],
         "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:blueprints",
           "read:pro:blueprints",
           "read:school:blueprints"
         ]
       },
       "patch": {
-        "description": "Updates a blueprint configuration.",
+        "description": "Updates a blueprint configuration.\n\n**Required Permissions:** `update:pro:blueprints`, `update:school:blueprints`",
         "operationId": "patchBlueprint",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "Blueprint ID",
             "in": "path",
@@ -947,23 +2548,30 @@
             "description": "Blueprint wasn't found"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Updates a blueprint configuration",
         "tags": [
           "blueprints"
         ],
         "x-authentication-required": true,
         "x-required-privileges": [
-          "update:env:blueprints",
           "update:pro:blueprints",
           "update:school:blueprints"
         ]
       }
     },
-    "/v1/blueprints/{blueprintId}/deploy": {
+    "/v1/tenant/{tenantId}/blueprints/{blueprintId}/deploy": {
       "post": {
-        "description": "Deploy blueprint",
+        "description": "Deploy blueprint\n\n**Required Permissions:** `deploy:pro:blueprints`, `deploy:school:blueprints`",
         "operationId": "deployBlueprint",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "Blueprint ID",
             "in": "path",
@@ -1000,6 +2608,11 @@
             "description": "Blueprint is not valid for deployment"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Deploy blueprint",
         "tags": [
           "blueprints"
@@ -1007,17 +2620,19 @@
         "x-action": true,
         "x-authentication-required": true,
         "x-required-privileges": [
-          "deploy:env:blueprints",
           "deploy:pro:blueprints",
           "deploy:school:blueprints"
         ]
       }
     },
-    "/v1/blueprints/{blueprintId}/report": {
+    "/v1/tenant/{tenantId}/blueprints/{blueprintId}/report": {
       "get": {
-        "description": "Retrieve deployment status report for a specified blueprint.",
+        "description": "Retrieve deployment status report for a specified blueprint.\n\n**Required Permissions:** `read:pro:blueprints`, `read:school:blueprints`",
         "operationId": "getBlueprintStatus",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "Blueprint ID",
             "in": "path",
@@ -1051,23 +2666,30 @@
             "description": "Blueprint status report doesn't exist"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Get blueprint status report",
         "tags": [
           "blueprints"
         ],
         "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:blueprints",
           "read:pro:blueprints",
           "read:school:blueprints"
         ]
       }
     },
-    "/v1/blueprints/{blueprintId}/undeploy": {
+    "/v1/tenant/{tenantId}/blueprints/{blueprintId}/undeploy": {
       "post": {
-        "description": "Undeploy blueprint",
+        "description": "Undeploy blueprint\n\n**Required Permissions:** `deploy:pro:blueprints`, `deploy:school:blueprints`",
         "operationId": "undeployBlueprint",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "description": "Blueprint ID",
             "in": "path",
@@ -1094,6 +2716,11 @@
             "description": "Blueprint doesn't exist"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Undeploy blueprint",
         "tags": [
           "blueprints"
@@ -1101,7 +2728,6 @@
         "x-action": true,
         "x-authentication-required": true,
         "x-required-privileges": [
-          "deploy:env:blueprints",
           "deploy:pro:blueprints",
           "deploy:school:blueprints"
         ]
@@ -1110,13 +2736,24 @@
   },
   "security": [
     {
-      "M2M": []
+      "bearerAuth": []
     }
   ],
   "servers": [
     {
-      "description": "Generated server url",
-      "url": "http://localhost:8080"
+      "description": "Jamf Beta API Gateway - prod",
+      "url": "https://{region}.apigw.jamf.com/api/blueprints",
+      "variables": {
+        "region": {
+          "default": "us",
+          "description": "Geographic deployment region",
+          "enum": [
+            "us",
+            "eu",
+            "apac"
+          ]
+        }
+      }
     }
   ],
   "tags": [

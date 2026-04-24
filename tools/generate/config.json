@@ -72,14 +72,14 @@
       ]
     },
     {
-      "file": "testing/blueprints.json",
+      "file": "testing/blueprints-api.json",
       "namespace": "blueprints",
       "package": "blueprints",
       "splitByTag": true,
       "specFile": "blueprints_api.json",
       "operations": [
         {
-          "op": "GET /v1/blueprints",
+          "op": "GET /v1/tenant/{tenantId}/blueprints",
           "name": "ListBlueprints",
           "pagination": "sizeCheck",
           "params": [
@@ -96,35 +96,35 @@
           }
         },
         {
-          "op": "POST /v1/blueprints",
+          "op": "POST /v1/tenant/{tenantId}/blueprints",
           "name": "CreateBlueprint"
         },
         {
-          "op": "GET /v1/blueprints/{blueprintId}",
+          "op": "GET /v1/tenant/{tenantId}/blueprints/{blueprintId}",
           "name": "GetBlueprint"
         },
         {
-          "op": "PATCH /v1/blueprints/{blueprintId}",
+          "op": "PATCH /v1/tenant/{tenantId}/blueprints/{blueprintId}",
           "name": "UpdateBlueprint"
         },
         {
-          "op": "DELETE /v1/blueprints/{blueprintId}",
+          "op": "DELETE /v1/tenant/{tenantId}/blueprints/{blueprintId}",
           "name": "DeleteBlueprint"
         },
         {
-          "op": "POST /v1/blueprints/{blueprintId}/deploy",
+          "op": "POST /v1/tenant/{tenantId}/blueprints/{blueprintId}/deploy",
           "name": "DeployBlueprint"
         },
         {
-          "op": "POST /v1/blueprints/{blueprintId}/undeploy",
+          "op": "POST /v1/tenant/{tenantId}/blueprints/{blueprintId}/undeploy",
           "name": "UndeployBlueprint"
         },
         {
-          "op": "GET /v1/blueprints/{blueprintId}/report",
+          "op": "GET /v1/tenant/{tenantId}/blueprints/{blueprintId}/report",
           "name": "GetBlueprintReport"
         },
         {
-          "op": "GET /v1/blueprint-components",
+          "op": "GET /v1/tenant/{tenantId}/blueprint-components",
           "name": "ListBlueprintComponents",
           "pagination": "sizeCheck",
           "resolver": {
@@ -136,10 +136,15 @@
           }
         },
         {
-          "op": "GET /v1/blueprint-components/{identifier}",
+          "op": "GET /v1/tenant/{tenantId}/blueprint-components/{identifier}",
           "name": "GetBlueprintComponent"
         }
-      ]
+      ],
+      "schemaAdditions": {"Component": {"configuration": "object"}},
+      "fieldTypeOverrides": {
+        "component.configuration": "json.RawMessage",
+        "configuration_profile_configuration.payloadContent": "[]json.RawMessage"
+      }
     },
     {
       "file": "testing/devicegroups.yaml",
@@ -8805,22 +8810,6 @@
           "expectedStatus": 204
         }
       ]
-    },
-    {
-      "file": "testing/blueprint-component-sw-update-service.json",
-      "namespace": "bpcomponents",
-      "package": "bpcomponents/swupdate",
-      "typesOnly": true,
-      "splitByTag": true,
-      "specFile": "blueprint_component_sw_update_service.json"
-    },
-    {
-      "file": "testing/blueprint-component-declarations-service.json",
-      "namespace": "bpcomponents",
-      "package": "bpcomponents/declarations",
-      "typesOnly": true,
-      "splitByTag": true,
-      "specFile": "blueprint_component_declarations_service.json"
     }
   ]
 }

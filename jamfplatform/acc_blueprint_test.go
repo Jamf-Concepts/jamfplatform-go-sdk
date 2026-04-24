@@ -13,8 +13,6 @@ import (
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/blueprints"
-	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/bpcomponents/declarations"
-	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/bpcomponents/swupdate"
 )
 
 func createTestBlueprint(t *testing.T, c *jamfplatform.Client, name string, groupID string, steps []blueprints.BlueprintStep) *blueprints.BlueprintDetail {
@@ -140,45 +138,6 @@ func TestAcceptance_Blueprint_EmptyBlueprint(t *testing.T) {
 	t.Logf("Created empty blueprint ID: %s", bp.ID)
 }
 
-func TestAcceptance_Blueprint_PasscodePolicy(t *testing.T) {
-	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
-
-	boolTrue := true
-	minLen := 8
-	maxFailed := 5
-	reuseLimit := 1
-
-	steps := makeStep("com.jamf.ddm.passcode-settings", declarations.PasscodeSettingsConfigurationV2{
-		RequirePasscode: &declarations.RequirePasscode{
-			Included: &boolTrue,
-			Value:    &boolTrue,
-		},
-		MinimumLength: &declarations.MinimumLength{
-			Included: &boolTrue,
-			Value:    &minLen,
-		},
-		MaximumFailedAttempts: &declarations.MaximumFailedAttempts{
-			Included: &boolTrue,
-			Value:    &maxFailed,
-		},
-		PasscodeReuseLimit: &declarations.PasscodeReuseLimit{
-			Included: &boolTrue,
-			Value:    &reuseLimit,
-		},
-		Version: 2,
-	})
-	bp := createTestBlueprint(t, c, "sdk-acc-passcode-"+runSuffix(), groupID, steps)
-
-	if len(bp.Steps) == 0 || len(bp.Steps[0].Components) == 0 {
-		t.Fatal("expected at least one step with one component")
-	}
-	if bp.Steps[0].Components[0].Identifier != "com.jamf.ddm.passcode-settings" {
-		t.Errorf("unexpected identifier: %q", bp.Steps[0].Components[0].Identifier)
-	}
-	t.Logf("Created passcode blueprint ID: %s", bp.ID)
-}
-
 func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
 	c := accClient(t)
@@ -191,20 +150,20 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 	maxFailed := 3
 	reuseLimit := 1
 
-	steps := makeStep("com.jamf.ddm.passcode-settings", declarations.PasscodeSettingsConfigurationV2{
-		RequirePasscode: &declarations.RequirePasscode{
+	steps := makeStep("com.jamf.ddm.passcode-settings", blueprints.PasscodeSettingsConfiguration{
+		RequirePasscode: &blueprints.RequirePasscode{
 			Included: &boolTrue,
 			Value:    &boolTrue,
 		},
-		MinimumLength: &declarations.MinimumLength{
+		MinimumLength: &blueprints.MinimumLength{
 			Included: &boolTrue,
 			Value:    &minLen,
 		},
-		MaximumFailedAttempts: &declarations.MaximumFailedAttempts{
+		MaximumFailedAttempts: &blueprints.MaximumFailedAttempts{
 			Included: &boolTrue,
 			Value:    &maxFailed,
 		},
-		PasscodeReuseLimit: &declarations.PasscodeReuseLimit{
+		PasscodeReuseLimit: &blueprints.PasscodeReuseLimit{
 			Included: &boolTrue,
 			Value:    &reuseLimit,
 		},
@@ -251,20 +210,20 @@ func TestAcceptance_Blueprint_PartialUpdatePreservesSteps(t *testing.T) {
 	maxFailed := 3
 	reuseLimit := 1
 
-	steps := makeStep("com.jamf.ddm.passcode-settings", declarations.PasscodeSettingsConfigurationV2{
-		RequirePasscode: &declarations.RequirePasscode{
+	steps := makeStep("com.jamf.ddm.passcode-settings", blueprints.PasscodeSettingsConfiguration{
+		RequirePasscode: &blueprints.RequirePasscode{
 			Included: &boolTrue,
 			Value:    &boolTrue,
 		},
-		MinimumLength: &declarations.MinimumLength{
+		MinimumLength: &blueprints.MinimumLength{
 			Included: &boolTrue,
 			Value:    &minLen,
 		},
-		MaximumFailedAttempts: &declarations.MaximumFailedAttempts{
+		MaximumFailedAttempts: &blueprints.MaximumFailedAttempts{
 			Included: &boolTrue,
 			Value:    &maxFailed,
 		},
-		PasscodeReuseLimit: &declarations.PasscodeReuseLimit{
+		PasscodeReuseLimit: &blueprints.PasscodeReuseLimit{
 			Included: &boolTrue,
 			Value:    &reuseLimit,
 		},
@@ -312,20 +271,20 @@ func TestAcceptance_Blueprint_Report(t *testing.T) {
 	maxFailed := 3
 	reuseLimit := 1
 
-	steps := makeStep("com.jamf.ddm.passcode-settings", declarations.PasscodeSettingsConfigurationV2{
-		RequirePasscode: &declarations.RequirePasscode{
+	steps := makeStep("com.jamf.ddm.passcode-settings", blueprints.PasscodeSettingsConfiguration{
+		RequirePasscode: &blueprints.RequirePasscode{
 			Included: &boolTrue,
 			Value:    &boolTrue,
 		},
-		MinimumLength: &declarations.MinimumLength{
+		MinimumLength: &blueprints.MinimumLength{
 			Included: &boolTrue,
 			Value:    &minLen,
 		},
-		MaximumFailedAttempts: &declarations.MaximumFailedAttempts{
+		MaximumFailedAttempts: &blueprints.MaximumFailedAttempts{
 			Included: &boolTrue,
 			Value:    &maxFailed,
 		},
-		PasscodeReuseLimit: &declarations.PasscodeReuseLimit{
+		PasscodeReuseLimit: &blueprints.PasscodeReuseLimit{
 			Included: &boolTrue,
 			Value:    &reuseLimit,
 		},
@@ -362,10 +321,9 @@ func TestAcceptance_Blueprint_Report(t *testing.T) {
 }
 
 // TestAcceptance_Blueprint_TypedComponents creates a blueprint for each
-// component type using the generated typed configuration structs from the
-// bpcomponents packages. This proves that typed configs marshal correctly
-// and are accepted by the Jamf API. Components not available on the tenant
-// are skipped automatically.
+// component type using the generated typed configuration structs. This proves
+// that typed configs marshal correctly and are accepted by the Jamf API.
+// Components not available on the tenant are skipped automatically.
 func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
 	c := accClient(t)
@@ -392,7 +350,7 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 	maxAge := 90
 	acceptCookies := "Always"
 	unpairingHour := 17
-	extStorage := "ReadOnly"
+	extStorage := "Disallowed"
 	deferral2 := 2
 	deferral3 := 3
 	deferral4 := 4
@@ -406,36 +364,36 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 		{
 			name:       "PasscodeSettings",
 			identifier: "com.jamf.ddm.passcode-settings",
-			config: declarations.PasscodeSettingsConfigurationV2{
-				RequirePasscode: &declarations.RequirePasscode{
+			config: blueprints.PasscodeSettingsConfiguration{
+				RequirePasscode: &blueprints.RequirePasscode{
 					Included: &boolTrue,
 					Value:    &boolTrue,
 				},
-				MinimumLength: &declarations.MinimumLength{
+				MinimumLength: &blueprints.MinimumLength{
 					Included: &boolTrue,
 					Value:    &minLen,
 				},
-				MaximumFailedAttempts: &declarations.MaximumFailedAttempts{
+				MaximumFailedAttempts: &blueprints.MaximumFailedAttempts{
 					Included: &boolTrue,
 					Value:    &maxFailed,
 				},
-				PasscodeReuseLimit: &declarations.PasscodeReuseLimit{
+				PasscodeReuseLimit: &blueprints.PasscodeReuseLimit{
 					Included: &boolTrue,
 					Value:    &reuseLimit,
 				},
-				MaximumInactivityInMinutes: &declarations.MaximumInactivityInMinutes{
+				MaximumInactivityInMinutes: &blueprints.MaximumInactivityInMinutes{
 					Included: &boolTrue,
 					Value:    &maxInactivity,
 				},
-				MaximumGracePeriodInMinutes: &declarations.MaximumGracePeriodInMinutes{
+				MaximumGracePeriodInMinutes: &blueprints.MaximumGracePeriodInMinutes{
 					Included: &boolTrue,
 					Value:    &maxGrace,
 				},
-				MaximumPasscodeAgeInDays: &declarations.MaximumPasscodeAgeInDays{
+				MaximumPasscodeAgeInDays: &blueprints.MaximumPasscodeAgeInDays{
 					Included: &boolTrue,
 					Value:    &maxAge,
 				},
-				RequireAlphanumericPasscode: &declarations.RequireAlphanumericPasscode{
+				RequireAlphanumericPasscode: &blueprints.RequireAlphanumericPasscode{
 					Included: &boolTrue,
 					Value:    &boolFalse,
 				},
@@ -445,49 +403,49 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 		{
 			name:       "SoftwareUpdateSettings",
 			identifier: "com.jamf.ddm.software-update-settings",
-			config: declarations.SoftwareUpdateSettingsConfiguration{
-				AllowStandardUserOSUpdates: &declarations.OptionallyEnabled{
+			config: blueprints.SoftwareUpdateSettingsConfiguration{
+				AllowStandardUserOSUpdates: &blueprints.OptionallyEnabled{
 					Included: &boolTrue,
 					Enabled:  true,
 				},
-				AutomaticActions: &declarations.AutomaticActions{
-					Download: &declarations.AutomaticAction{
+				AutomaticActions: &blueprints.AutomaticActions{
+					Download: &blueprints.AutomaticAction{
 						Included: &boolTrue,
 						Value:    "AlwaysOn",
 					},
-					InstallOSUpdates: &declarations.AutomaticAction{
+					InstallOSUpdates: &blueprints.AutomaticAction{
 						Included: &boolTrue,
 						Value:    "AlwaysOn",
 					},
-					InstallSecurityUpdate: &declarations.AutomaticAction{
+					InstallSecurityUpdate: &blueprints.AutomaticAction{
 						Included: &boolTrue,
 						Value:    "AlwaysOn",
 					},
 				},
-				Beta: &declarations.Beta{
+				Beta: &blueprints.Beta{
 					Included: &boolTrue,
-					Value: &declarations.BetaSettings{
+					Value: &blueprints.BetaSettings{
 						ProgramEnrollment: "Allowed",
-						OfferPrograms: &[]declarations.BetaProgram{
-							{Token: "test", Description: "test"},
+						OfferPrograms: &[]blueprints.BetaProgram{
+							{Token: strPtr("test"), Description: strPtr("test")},
 						},
 					},
 				},
-				Deferrals: &declarations.Deferrals{
-					CombinedPeriodInDays: &declarations.OptionalPeriodInDays{Included: &boolTrue, Value: &deferral2},
-					MajorPeriodInDays:    &declarations.OptionalPeriodInDays{Included: &boolTrue, Value: &deferral3},
-					MinorPeriodInDays:    &declarations.OptionalPeriodInDays{Included: &boolTrue, Value: &deferral4},
-					SystemPeriodInDays:   &declarations.OptionalPeriodInDays{Included: &boolTrue, Value: &deferral5},
+				Deferrals: &blueprints.Deferrals{
+					CombinedPeriodInDays: &blueprints.OptionalPeriodInDays{Included: &boolTrue, Value: &deferral2},
+					MajorPeriodInDays:    &blueprints.OptionalPeriodInDays{Included: &boolTrue, Value: &deferral3},
+					MinorPeriodInDays:    &blueprints.OptionalPeriodInDays{Included: &boolTrue, Value: &deferral4},
+					SystemPeriodInDays:   &blueprints.OptionalPeriodInDays{Included: &boolTrue, Value: &deferral5},
 				},
-				Notifications: &declarations.OptionallyEnabled{
+				Notifications: &blueprints.OptionallyEnabled{
 					Included: &boolTrue,
 					Enabled:  false,
 				},
-				RapidSecurityResponse: &declarations.RapidSecurityResponse{
-					Enable:         &declarations.OptionallyEnabled{Included: &boolTrue, Enabled: true},
-					EnableRollback: &declarations.OptionallyEnabled{Included: &boolTrue, Enabled: false},
+				RapidSecurityResponse: &blueprints.RapidSecurityResponse{
+					Enable:         &blueprints.OptionallyEnabled{Included: &boolTrue, Enabled: true},
+					EnableRollback: &blueprints.OptionallyEnabled{Included: &boolTrue, Enabled: false},
 				},
-				RecommendedCadence: &declarations.RecommendedCadence{
+				RecommendedCadence: &blueprints.RecommendedCadence{
 					Included: &boolTrue,
 					Value:    "Newest",
 				},
@@ -496,20 +454,20 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 		{
 			name:       "SafariSettings",
 			identifier: "com.jamf.ddm.safari-settings",
-			config: declarations.SafariSettingsConfiguration{
-				AllowPopups: &declarations.AllowPopups{
+			config: blueprints.SafariSettingsConfiguration{
+				AllowPopups: &blueprints.AllowPopups{
 					Included: &boolTrue,
 					Value:    &boolFalse,
 				},
-				AllowJavaScript: &declarations.AllowJavaScript{
+				AllowJavaScript: &blueprints.AllowJavaScript{
 					Included: &boolTrue,
 					Value:    &boolTrue,
 				},
-				AllowPrivateBrowsing: &declarations.AllowPrivateBrowsing{
+				AllowPrivateBrowsing: &blueprints.AllowPrivateBrowsing{
 					Included: &boolTrue,
 					Value:    &boolTrue,
 				},
-				AcceptCookies: &declarations.AcceptCookies{
+				AcceptCookies: &blueprints.AcceptCookies{
 					Included: &boolTrue,
 					Value:    &acceptCookies,
 				},
@@ -518,8 +476,8 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 		{
 			name:       "SafariExtensions",
 			identifier: "com.jamf.ddm.safari-extensions",
-			config: declarations.SafariExtensionsConfiguration{
-				ManagedExtensions: map[string]declarations.ManagedExtension{
+			config: blueprints.SafariExtensionsConfiguration{
+				ManagedExtensions: map[string]blueprints.ManagedExtension{
 					"com.example.test-extension": {State: &extState},
 				},
 			},
@@ -527,12 +485,14 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 		{
 			name:       "SafariBookmarks",
 			identifier: "com.jamf.ddm.safari-bookmarks",
-			config: declarations.SafariBookmarksConfiguration{
-				ManagedBookmarks: []declarations.BookmarkGroup{
+			config: blueprints.SafariBookmarksConfiguration{
+				ManagedBookmarks: []blueprints.BookmarkGroup{
 					{
 						Title:           "SDK Test Bookmarks",
 						GroupIdentifier: "sdk-acc-test-group",
-						Bookmarks:       []any{map[string]any{"Type": "BOOKMARK", "Title": "Jamf", "URL": "https://www.jamf.com"}},
+						Bookmarks: []blueprints.BookmarkItem{
+							{Type: "BOOKMARK", BOOKMARK: &blueprints.URLBookmarkItem{Type: "BOOKMARK", Title: "Jamf", URL: "https://www.jamf.com"}},
+						},
 					},
 				},
 			},
@@ -540,22 +500,27 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 		{
 			name:       "DiskManagement",
 			identifier: "com.jamf.ddm.disk-management",
-			config: declarations.DiskManagementSettingsConfigurationV1{
-				Restrictions: &declarations.RestrictionsV1{
-					ExternalStorage: &extStorage,
+			config: blueprints.DiskManagementSettingsConfiguration{
+				Restrictions: &blueprints.Restrictions{
+					ExternalStorage: &blueprints.StorageMode{
+						Included: &boolTrue,
+						Value:    extStorage},
+					NetworkStorage: &blueprints.StorageMode{
+						Included: &boolTrue,
+						Value:    extStorage},
 				},
-				Version: ptr(1),
+				Version: 2,
 			},
 		},
 		{
 			name:       "AudioAccessorySettings",
 			identifier: "com.jamf.ddm.audio-accessory-settings",
-			config: declarations.AudioAccessorySettingsConfiguration{
-				TemporaryPairing: &declarations.TemporaryPairing{
+			config: blueprints.AudioAccessorySettingsConfiguration{
+				TemporaryPairing: &blueprints.TemporaryPairing{
 					Included: &boolTrue,
 					Disabled: &boolFalse,
-					Configuration: &declarations.Configuration{
-						UnpairingTime: declarations.UnpairingTime{
+					Configuration: &blueprints.TemporaryPairingConfig{
+						UnpairingTime: blueprints.UnpairingTime{
 							Policy: "Hour",
 							Hour:   &unpairingHour,
 						},
@@ -566,19 +531,19 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 		{
 			name:       "MathSettings",
 			identifier: "com.jamf.ddm.math-settings",
-			config: declarations.MathSettingsConfiguration{
-				Calculator: &declarations.Calculator{
-					BasicMode: &declarations.BasicMode{
+			config: blueprints.MathSettingsConfiguration{
+				Calculator: &blueprints.Calculator{
+					BasicMode: &blueprints.BasicMode{
 						Included:      &boolTrue,
 						AddSquareRoot: true,
 					},
-					InputModes: &declarations.InputModes{
+					InputModes: &blueprints.InputModes{
 						Included:       &boolTrue,
 						RPN:            false,
 						UnitConversion: true,
 					},
 				},
-				SystemBehavior: &declarations.SystemBehavior{
+				SystemBehavior: &blueprints.SystemBehavior{
 					Included:            &boolTrue,
 					KeyboardSuggestions: true,
 					MathNotes:           true,
@@ -586,62 +551,33 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 			},
 		},
 		{
-			name:       "FreeForm",
-			identifier: "com.jamf.ddm.free-form",
-			config: declarations.FreeFormConfiguration{
-				Declarations: []declarations.Declaration{
-					{Kind: "CONFIGURATION", Type: "com.apple.configuration.passcode.settings", Payload: json.RawMessage(`{}`)},
-				},
-			},
-		},
-		{
-			name:       "ServicesBackgroundTasks",
-			identifier: "com.jamf.ddm.service-background-tasks",
-			config: declarations.ServicesBackgroundTasksConfiguration{
-				BackgroundTasks: []declarations.ServiceBackgroundTasksConfiguration{
-					{
-						TaskType:        "daemon",
-						TaskDescription: strPtr("SDK acceptance test task"),
-						LaunchdConfigurations: &[]declarations.LaunchdItem{
-							{
-								Context: "daemon",
-								FileAssetReference: declarations.DataAssetReference{
-									Reference: declarations.AssetDataReference{DataURL: "https://example.com/test.plist"},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:       "ServicesConfigurationFiles",
-			identifier: "com.jamf.ddm.service-configuration-files",
-			config: declarations.ServicesConfigurationFilesConfiguration{
-				ServiceConfigFiles: []declarations.ServiceConfigurationFilesConfiguration{
-					{
-						ServiceType: "APACHE",
-						DataAssetReference: declarations.DataAssetReference{
-							Reference: declarations.AssetDataReference{DataURL: "https://example.com/test.conf"},
-						},
-					},
+			name:       "ConfigurationProfile",
+			identifier: "com.jamf.ddm-configuration-profile",
+			config: blueprints.ConfigurationProfileConfiguration{
+				PayloadDisplayName: "SDK Test Profile",
+				PayloadContent: []json.RawMessage{
+					json.RawMessage(`{"payloadType":"com.apple.applicationaccess","payloadIdentifier":"9b924c9d-2f91-45e9-8c02-44bc11c61ce6","safariAllowJavaScript":false}`),
+					json.RawMessage(`{"payloadType":"com.apple.preference.security","payloadIdentifier":"637b91c1-4e11-41b1-ba76-9a909485d919","dontAllowFireWallUI":true,"dontAllowPasswordResetUI":true}`),
 				},
 			},
 		},
 		{
 			name:       "SwUpdate",
 			identifier: "com.jamf.ddm.sw-updates",
-			config: swupdate.SwUpdateAutomaticConfiguration{
-				Strategy:        strPtr("SEMANTIC"),
-				EnforcementType: "AUTOMATIC",
-				DetailsURL: &swupdate.DetailsURL{
-					Included: &boolFalse,
-					Value:    strPtr(""),
-				},
-				Rules: &swupdate.UpdateRules{
-					Minor: swupdate.UpdateRule{
-						DeploymentTime:   "13:10",
-						EnforceAfterDays: 0,
+			config: blueprints.SwUpdateAutomaticConfiguration{
+				Strategy: "SEMANTIC",
+				SEMANTIC: &blueprints.SwUpdateSemanticConfiguration{
+					EnforcementType: "AUTOMATIC",
+					Strategy:        "SEMANTIC",
+					Rules: blueprints.UpdateRules{
+						Minor: blueprints.UpdateRule{
+							DeploymentTime:   "13:10",
+							EnforceAfterDays: 0,
+						},
+					},
+					DetailsURL: &blueprints.DetailsURL{
+						Included: &boolFalse,
+						Value:    strPtr(""),
 					},
 				},
 			},
