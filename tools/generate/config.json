@@ -140,7 +140,11 @@
           "name": "GetBlueprintComponent"
         }
       ],
-      "schemaAdditions": {"Component": {"configuration": "object"}},
+      "schemaAdditions": {
+        "Component": {
+          "configuration": "object"
+        }
+      },
       "fieldTypeOverrides": {
         "component.configuration": "json.RawMessage",
         "configuration_profile_configuration.payloadContent": "[]json.RawMessage"
@@ -256,16 +260,15 @@
       ]
     },
     {
-      "file": "testing/benchmarks.json",
+      "file": "testing/jamf-compliance-benchmark-engine-api.json",
       "namespace": "compliance-benchmarks",
       "package": "compliancebenchmarks",
       "splitByTag": true,
       "specFile": "compliance_benchmark_engine.json",
       "operations": [
         {
-          "op": "GET /v2/benchmarks",
+          "op": "GET /v1/tenant/{tenantId}/benchmarks",
           "name": "ListBenchmarks",
-          "version": "v1",
           "resolver": {
             "resourceType": "Benchmark",
             "nameField": "title",
@@ -276,21 +279,20 @@
           }
         },
         {
-          "op": "POST /v2/benchmarks",
+          "op": "POST /v1/tenant/{tenantId}/benchmarks",
           "name": "CreateBenchmark",
-          "version": "v1"
+          "expectedStatus": 202
         },
         {
-          "op": "GET /v2/benchmarks/{id}",
-          "name": "GetBenchmark",
-          "version": "v1"
+          "op": "GET /v1/tenant/{tenantId}/benchmarks/{id}",
+          "name": "GetBenchmark"
         },
         {
-          "op": "DELETE /v1/benchmarks/{benchmarkId}",
+          "op": "DELETE /v1/tenant/{tenantId}/benchmarks/{id}",
           "name": "DeleteBenchmark"
         },
         {
-          "op": "GET /v1/baselines",
+          "op": "GET /v1/tenant/{tenantId}/baselines",
           "name": "ListBaselines",
           "resolver": {
             "resourceType": "Baseline",
@@ -302,7 +304,7 @@
           }
         },
         {
-          "op": "GET /v1/rules",
+          "op": "GET /v1/tenant/{tenantId}/rules",
           "name": "GetBaselineRules",
           "params": [
             "baselineId:string:baselineID"

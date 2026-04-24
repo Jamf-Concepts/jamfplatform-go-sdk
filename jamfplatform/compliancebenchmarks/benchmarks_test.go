@@ -97,6 +97,21 @@ func TestGetBenchmark_NotFound(t *testing.T) {
 	}
 }
 
+func TestDeleteBenchmark(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/benchmarks/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteBenchmark(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolveBenchmarkIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/benchmarks", func(w http.ResponseWriter, r *http.Request) {

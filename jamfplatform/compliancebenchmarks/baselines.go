@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-// ListBaselines returns list of the mSCP baselines.
+// ListBaselines return list of the mSCP baselines.
 func (c *Client) ListBaselines(ctx context.Context) (*BaselinesResponse, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BaselinesResponse

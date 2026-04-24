@@ -1,5 +1,31 @@
 {
   "components": {
+    "parameters": {
+      "tenantId": {
+        "description": "The tenant UUID identifier",
+        "in": "path",
+        "name": "tenantId",
+        "required": true,
+        "schema": {
+          "example": "e77c1408-10c8-4007-b177-abc9157fbcaa",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        },
+        "description": "Bad request due to invalid parameters"
+      }
+    },
     "schemas": {
       "BaselineInfo": {
         "properties": {
@@ -497,18 +523,37 @@
         },
         "type": "object"
       }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "bearerFormat": "JWT",
+        "description": "JWT Bearer token authentication. Obtain a token from the Jamf API Gateway.",
+        "scheme": "bearer",
+        "type": "http"
+      }
     }
   },
   "info": {
-    "title": "compliance-benchmark-engine",
+    "contact": {
+      "name": "Jamf Developer",
+      "url": "https://developer.jamf.com"
+    },
+    "description": "Jamf Compliance Benchmarks API allows you to manage, enforce, and validate compliance on Apple devices",
+    "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
+    "title": "Jamf Compliance Benchmarks API - Beta",
     "version": "latest"
   },
   "openapi": "3.1.0",
   "paths": {
-    "/v1/baselines": {
+    "/v1/tenant/{tenantId}/baselines": {
       "get": {
-        "description": "Returns list of the mSCP baselines allowed for the Compliance benchmarks",
-        "operationId": "getBaselines_1",
+        "description": "Return list of the mSCP baselines allowed for the Compliance benchmarks\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
+        "operationId": "getBaselines",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -527,98 +572,30 @@
             "description": "Insufficient permissions"
           }
         },
-        "summary": "Returns list of the mSCP baselines",
-        "tags": [
-          "baseline-controller"
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "summary": "Return list of the mSCP baselines",
+        "tags": [
+          "baselines"
+        ],
+        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:compliance-benchmarks",
           "read:pro:compliance-benchmarks"
         ]
       }
     },
-    "/v1/benchmarks/{benchmarkId}": {
-      "delete": {
-        "description": "Removes benchmark with given benchmark and removes associated draft (if any) and artifacts from the MDM",
-        "operationId": "deleteBenchmark",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "benchmarkId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful operation result"
-          },
-          "400": {
-            "description": "Invalid benchmark request or missing benchmark ID"
-          },
-          "401": {
-            "description": "Unauthorized request"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          }
-        },
-        "summary": "Removes benchmark with given benchmark ID",
-        "tags": [
-          "benchmark-controller"
-        ],
-        "x-required-privileges": [
-          "delete:env:compliance-benchmarks",
-          "delete:pro:compliance-benchmarks"
-        ]
-      }
-    },
-    "/v1/rules": {
+    "/v1/tenant/{tenantId}/benchmarks": {
       "get": {
-        "description": "Returns list of the rules for given mSCP baseline together with sources that provide them",
-        "operationId": "getRules",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "baselineId",
-            "required": true,
-            "schema": {
-              "minLength": 1,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SourcedRules"
-                }
-              }
-            },
-            "description": "Successful operation result"
-          },
-          "400": {
-            "description": "Missing or empty baseline ID"
-          }
-        },
-        "summary": "Get list of rules for given baseline",
-        "tags": [
-          "rule-controller"
-        ],
-        "x-required-privileges": [
-          "read:env:compliance-benchmarks",
-          "read:pro:compliance-benchmarks"
-        ]
-      }
-    },
-    "/v2/benchmarks": {
-      "get": {
-        "description": "Returns list of tenant benchmarks (if any)",
+        "description": "Return list of tenant benchmarks (if any)\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
         "operationId": "getTenantBenchmarks",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -637,18 +614,28 @@
             "description": "Insufficient permissions"
           }
         },
-        "summary": "Returns list of tenant benchmarks",
-        "tags": [
-          "benchmark-controller-v-2"
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "summary": "Return list of tenant benchmarks",
+        "tags": [
+          "benchmarks"
+        ],
+        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:compliance-benchmarks",
           "read:pro:compliance-benchmarks"
         ]
       },
       "post": {
-        "description": "Creates a new benchmark from provided benchmark request and deploys associated artifacts to the MDM",
+        "description": "Create a new benchmark from provided benchmark request and deploy associated artifacts to the MDM\n\n**Required Permissions:** `create:pro:compliance-benchmarks`",
         "operationId": "postBenchmark",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -683,21 +670,73 @@
             "description": "Benchmark with the same title exists already or database write conflict occurred"
           }
         },
-        "summary": "Creates a new benchmark from provided benchmark request",
-        "tags": [
-          "benchmark-controller-v-2"
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "summary": "Create a new benchmark from provided benchmark request",
+        "tags": [
+          "benchmarks"
+        ],
+        "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:compliance-benchmarks",
           "create:pro:compliance-benchmarks"
         ]
       }
     },
-    "/v2/benchmarks/{id}": {
+    "/v1/tenant/{tenantId}/benchmarks/{id}": {
+      "delete": {
+        "description": "Remove benchmark with given benchmark ID and remove associated draft (if any) and artifacts from the MDM\n\n**Required Permissions:** `delete:pro:compliance-benchmarks`",
+        "operationId": "deleteBenchmark",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation result"
+          },
+          "400": {
+            "description": "Invalid benchmark request or missing benchmark ID"
+          },
+          "401": {
+            "description": "Unauthorized request"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove benchmark with given benchmark ID",
+        "tags": [
+          "benchmarks"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "delete:pro:compliance-benchmarks"
+        ]
+      },
       "get": {
-        "description": "Returns benchmark for given benchmark ID (if exists)",
+        "description": "Return benchmark for given benchmark ID (if exists)\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
         "operationId": "getBenchmark",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "in": "path",
             "name": "id",
@@ -731,15 +770,90 @@
             "description": "Benchmark not found"
           }
         },
-        "summary": "Returns benchmark for given benchmark ID",
-        "tags": [
-          "benchmark-controller-v-2"
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "summary": "Return benchmark for given benchmark ID",
+        "tags": [
+          "benchmarks"
+        ],
+        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:compliance-benchmarks",
+          "read:pro:compliance-benchmarks"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/rules": {
+      "get": {
+        "description": "Return list of the rules for given mSCP baseline together with sources that provide them\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
+        "operationId": "getRules",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "in": "query",
+            "name": "baselineId",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourcedRules"
+                }
+              }
+            },
+            "description": "Successful operation result"
+          },
+          "400": {
+            "description": "Missing or empty baseline ID"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get list of rules for given baseline",
+        "tags": [
+          "rules"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
           "read:pro:compliance-benchmarks"
         ]
       }
     }
-  }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "description": "Jamf Beta API Gateway - prod",
+      "url": "https://{region}.apigw.jamf.com/api/compliance-benchmarks",
+      "variables": {
+        "region": {
+          "default": "us",
+          "description": "Geographic deployment region",
+          "enum": [
+            "us",
+            "eu",
+            "apac"
+          ]
+        }
+      }
+    }
+  ]
 }
