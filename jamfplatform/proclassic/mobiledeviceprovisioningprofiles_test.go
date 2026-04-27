@@ -284,6 +284,36 @@ func TestUpdateMobileDeviceProvisioningProfileByUUID(t *testing.T) {
 	}
 }
 
+func TestGetMobileDeviceProvisioningProfileByIDSubset(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<mobile_device_provisioning_profile></mobile_device_provisioning_profile>")
+	})
+
+	result, err := c.GetMobileDeviceProvisioningProfileByIDSubset(context.Background(), "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetMobileDeviceProvisioningProfileByIDSubset_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetMobileDeviceProvisioningProfileByIDSubset(context.Background(), "test-id", "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestResolveMobileDeviceProvisioningProfileIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledeviceprovisioningprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {

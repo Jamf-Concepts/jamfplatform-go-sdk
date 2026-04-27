@@ -99,6 +99,16 @@ func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensio
 	return &result, nil
 }
 
+// CreateUserExtensionAttributeByName creates a new user extension attribute by ID.
+func (c *Client) CreateUserExtensionAttributeByName(ctx context.Context, name string, request *UserExtensionAttribute) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/userextensionattributes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateUserExtensionAttributeByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveUserExtensionAttributeIDByName looks up a UserExtensionAttribute by name via GetUserExtensionAttributeByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveUserExtensionAttributeIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetUserExtensionAttributeByName(ctx, name)

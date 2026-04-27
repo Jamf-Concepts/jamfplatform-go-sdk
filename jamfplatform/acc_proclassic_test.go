@@ -474,11 +474,31 @@ func TestAcceptance_Classic_ComputerGroupCRUD(t *testing.T) {
 	}
 	id := *created.ID
 	cleanupDelete(t, "DeleteComputerGroupByID", func() error { return pc.DeleteComputerGroupByID(ctx, intToStr(id)) })
+	t.Logf("Created computer group id=%d name=%q", id, name)
+
+	got, err := pc.GetComputerGroupByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerGroupByID(%d): %v", id, err)
+	}
+	if got.Name == nil || *got.Name != name {
+		t.Errorf("GetComputerGroupByID Name = %v, want %q", got.Name, name)
+	}
+
+	newName := name + "-updated"
+	if err := pc.UpdateComputerGroupByID(ctx, intToStr(id), &proclassic.ComputerGroupPost{
+		Name:    classicStrPtr(newName),
+		IsSmart: &isSmart,
+	}); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateComputerGroupByID(%d): %v", id, err)
+	}
 
 	if err := pc.DeleteComputerGroupByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("delete: %v", err)
+		t.Fatalf("DeleteComputerGroupByID(%d): %v", id, err)
 	}
+
 	_, err = pc.GetComputerGroupByID(ctx, intToStr(id))
 	var apiErr *jamfplatform.APIResponseError
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
@@ -1822,6 +1842,18 @@ func TestAcceptance_Classic_GetGSXConnection(t *testing.T) {
 	}
 	if g == nil {
 		t.Fatal("nil GSXConnection")
+	}
+}
+
+func TestAcceptance_Classic_GetJSSUser(t *testing.T) {
+	c := accClient(t)
+	u, err := proclassic.New(c).GetJSSUser(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetJSSUser: %v", err)
+	}
+	if u == nil {
+		t.Fatal("nil JssUser")
 	}
 }
 

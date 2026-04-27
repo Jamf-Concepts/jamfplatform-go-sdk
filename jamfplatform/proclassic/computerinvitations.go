@@ -86,3 +86,35 @@ func (c *Client) CreateComputerInvitationByInvitation(ctx context.Context, invit
 	}
 	return &result, nil
 }
+
+// GetComputerInvitationByName finds computer invitations by invitation.
+func (c *Client) GetComputerInvitationByName(ctx context.Context, name string) (*ComputerInvitation, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerInvitation
+	endpoint := fmt.Sprintf("%s/computerinvitations/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerInvitationByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// CreateComputerInvitationByName creates a new computer invitation by invitation.
+func (c *Client) CreateComputerInvitationByName(ctx context.Context, name string, request *ComputerInvitation) (*ComputerInvitation, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerInvitation
+	endpoint := fmt.Sprintf("%s/computerinvitations/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateComputerInvitationByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// DeleteComputerInvitationByName deletes a computer invitation by invitation.
+func (c *Client) DeleteComputerInvitationByName(ctx context.Context, name string) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computerinvitations/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeleteComputerInvitationByName(%s): %w", name, err)
+	}
+	return nil
+}

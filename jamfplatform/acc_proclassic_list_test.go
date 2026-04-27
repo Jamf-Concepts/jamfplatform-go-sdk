@@ -753,3 +753,27 @@ func TestAcceptance_Classic_ListWebhooks(t *testing.T) {
 		t.Fatalf("ListWebhooks: %v", err)
 	}
 }
+
+func TestAcceptance_Classic_ListSavedSearches(t *testing.T) {
+	c := accClient(t)
+	if _, err := proclassic.New(c).ListSavedSearches(context.Background()); err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("ListSavedSearches forbidden on this tenant/credentials: %v", err)
+		}
+		t.Fatalf("ListSavedSearches: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_GetComputersBasic(t *testing.T) {
+	c := accClient(t)
+	if _, err := proclassic.New(c).GetComputersBasic(context.Background()); err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("GetComputersBasic forbidden on this tenant/credentials: %v", err)
+		}
+		t.Fatalf("GetComputersBasic: %v", err)
+	}
+}

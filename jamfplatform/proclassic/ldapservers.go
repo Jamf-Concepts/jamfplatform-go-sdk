@@ -132,37 +132,14 @@ func (c *Client) GetLDAPServerByIDUser(ctx context.Context, id string, user stri
 	return &result, nil
 }
 
-// GetLDAPServerByNameGroup display information for matching groups for an LDAP server.
-func (c *Client) GetLDAPServerByNameGroup(ctx context.Context, name string, group string) (*LdapServer, error) {
+// CreateLDAPServerByName creates a new LDAP server by ID.
+func (c *Client) CreateLDAPServerByName(ctx context.Context, name string, request *LdapServerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result LdapServer
-	endpoint := fmt.Sprintf("%s/ldapservers/name/%s/group/%s", prefix, url.PathEscape(name), url.PathEscape(group))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetLDAPServerByNameGroup(%s): %w", name, err)
+	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateLDAPServerByName(%s): %w", name, err)
 	}
-	return &result, nil
-}
-
-// GetLDAPServerByNameGroupUser display information about user membership in a group for an LDAP server.
-func (c *Client) GetLDAPServerByNameGroupUser(ctx context.Context, name string, group string, user string) (*LdapServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result LdapServer
-	endpoint := fmt.Sprintf("%s/ldapservers/name/%s/group/%s/user/%s", prefix, url.PathEscape(name), url.PathEscape(group), url.PathEscape(user))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetLDAPServerByNameGroupUser(%s): %w", name, err)
-	}
-	return &result, nil
-}
-
-// GetLDAPServerByNameUser display information for matching users for an LDAP server.
-func (c *Client) GetLDAPServerByNameUser(ctx context.Context, name string, user string) (*LdapServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result LdapServer
-	endpoint := fmt.Sprintf("%s/ldapservers/name/%s/user/%s", prefix, url.PathEscape(name), url.PathEscape(user))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetLDAPServerByNameUser(%s): %w", name, err)
-	}
-	return &result, nil
+	return nil
 }
 
 // ResolveLDAPServerIDByName looks up a LDAPServer by name via GetLDAPServerByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.

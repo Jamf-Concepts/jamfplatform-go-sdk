@@ -91,14 +91,14 @@ func (c *Client) ResolveAccountV1IDByName(ctx context.Context, name string) (str
 }
 
 // ResolveAccountV1ByName looks up a AccountV1 by its username field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveAccountV1ByName(ctx context.Context, name string) (*Account, error) {
+func (c *Client) ResolveAccountV1ByName(ctx context.Context, name string) (*UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/accounts"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveAccountV1ByName(%s): %w", name, err)
 	}
-	var out Account
+	var out UserAccount
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveAccountV1ByName(%s): decoding matched element: %w", name, err)
 	}

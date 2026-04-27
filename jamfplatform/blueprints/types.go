@@ -10,11 +10,112 @@ import (
 	"time"
 )
 
+// AcceptCookies represents a accept cookies.
+type AcceptCookies struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool   `json:"Included,omitempty"`
+	Value    *string `json:"Value,omitempty"`
+}
+
+// AllowDisablingFraudWarning represents a allow disabling fraud warning.
+type AllowDisablingFraudWarning struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
+// AllowHistoryClearing represents a allow history clearing.
+type AllowHistoryClearing struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
+// AllowJavaScript represents a allow java script.
+type AllowJavaScript struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
+// AllowPopups represents a allow popups.
+type AllowPopups struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
+// AllowPrivateBrowsing represents a allow private browsing.
+type AllowPrivateBrowsing struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
+// AllowSummary represents a allow summary.
+type AllowSummary struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
 // ApiError represents a api error.
 type ApiError struct {
 	Errors     *Error `json:"errors,omitempty"`
 	HttpStatus int    `json:"httpStatus"`
 	TraceID    string `json:"traceId"`
+}
+
+// AudioAccessorySettingsComponent represents a audio accessory settings component.
+type AudioAccessorySettingsComponent struct {
+	Configuration AudioAccessorySettingsConfiguration `json:"configuration"`
+	Identifier    string                              `json:"identifier"`
+}
+
+// AudioAccessorySettingsConfiguration Audio accessory settings configuration. Configures audio accessory temporary pairing behavior.
+type AudioAccessorySettingsConfiguration struct {
+	TemporaryPairing *TemporaryPairing `json:"TemporaryPairing,omitempty"`
+}
+
+// AutomaticAction represents a automatic action.
+type AutomaticAction struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool  `json:"Included,omitempty"`
+	Value    string `json:"Value"`
+}
+
+// AutomaticActions represents a automatic actions.
+type AutomaticActions struct {
+	Download              *AutomaticAction `json:"Download,omitempty"`
+	InstallOSUpdates      *AutomaticAction `json:"InstallOSUpdates,omitempty"`
+	InstallSecurityUpdate *AutomaticAction `json:"InstallSecurityUpdate,omitempty"`
+}
+
+// BasicMode represents a basic mode.
+type BasicMode struct {
+	AddSquareRoot bool `json:"AddSquareRoot"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+}
+
+// Beta represents a beta.
+type Beta struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool         `json:"Included,omitempty"`
+	Value    *BetaSettings `json:"Value,omitempty"`
+}
+
+// BetaProgram represents a beta program.
+type BetaProgram struct {
+	Description *string `json:"Description,omitempty"`
+	Token       *string `json:"Token,omitempty"`
+}
+
+// BetaSettings represents a beta settings.
+type BetaSettings struct {
+	OfferPrograms     *[]BetaProgram `json:"OfferPrograms,omitempty"`
+	ProgramEnrollment string         `json:"ProgramEnrollment"`
+	RequireProgram    *BetaProgram   `json:"RequireProgram,omitempty"`
 }
 
 // BlueprintDetail represents a blueprint detail.
@@ -58,10 +159,74 @@ type BlueprintStep struct {
 	Name                *string     `json:"name,omitempty"`
 }
 
-// Component Array of components included in the step.
+// BookmarkGroup represents a bookmark group.
+type BookmarkGroup struct {
+	Bookmarks       []BookmarkItem `json:"Bookmarks"`
+	GroupIdentifier string         `json:"GroupIdentifier"`
+	Title           string         `json:"Title"`
+}
+
+// BookmarkItem is a polymorphic response keyed by Type. Exactly one variant pointer is populated after unmarshaling.
+type BookmarkItem struct {
+	Type     string              `json:"Type"`
+	BOOKMARK *URLBookmarkItem    `json:"-"`
+	FOLDER   *FolderBookmarkItem `json:"-"`
+}
+
+// UnmarshalJSON dispatches the payload to the variant matching the
+// Type discriminator. Unknown values leave the variant
+// pointers nil but preserve the discriminator string.
+func (m *BookmarkItem) UnmarshalJSON(data []byte) error {
+	var d struct {
+		Type string `json:"Type"`
+	}
+	if err := json.Unmarshal(data, &d); err != nil {
+		return err
+	}
+	m.Type = d.Type
+	switch d.Type {
+	case "BOOKMARK":
+		m.BOOKMARK = new(URLBookmarkItem)
+		return json.Unmarshal(data, m.BOOKMARK)
+	case "FOLDER":
+		m.FOLDER = new(FolderBookmarkItem)
+		return json.Unmarshal(data, m.FOLDER)
+	}
+	return nil
+}
+
+// MarshalJSON emits the active variant's JSON. If the matching variant
+// pointer is nil, emits a minimal object carrying only the discriminator.
+func (m BookmarkItem) MarshalJSON() ([]byte, error) {
+	switch m.Type {
+	case "BOOKMARK":
+		return json.Marshal(m.BOOKMARK)
+	case "FOLDER":
+		return json.Marshal(m.FOLDER)
+	}
+	return json.Marshal(map[string]string{"Type": m.Type})
+}
+
+// Calculator represents a calculator.
+type Calculator struct {
+	BasicMode      *BasicMode      `json:"BasicMode,omitempty"`
+	InputModes     *InputModes     `json:"InputModes,omitempty"`
+	MathNotesMode  *MathNotesMode  `json:"MathNotesMode,omitempty"`
+	ProgrammerMode *ProgrammerMode `json:"ProgrammerMode,omitempty"`
+	ScientificMode *ScientificMode `json:"ScientificMode,omitempty"`
+}
+
+// ChangeAtNextAuth represents a change at next auth.
+type ChangeAtNextAuth struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
+// Component A blueprint component.
 type Component struct {
-	Configuration JsonNode `json:"configuration"`
-	Identifier    string   `json:"identifier"`
+	Configuration json.RawMessage `json:"configuration"`
+	Identifier    string          `json:"identifier"`
 }
 
 // ComponentDescription Array of result items.
@@ -70,6 +235,23 @@ type ComponentDescription struct {
 	Identifier  string  `json:"identifier"`
 	Meta        *Meta   `json:"meta,omitempty"`
 	Name        string  `json:"name"`
+}
+
+// ConfigurationProfile Component for sending any Apple MDM configuration profile payload as a blueprint component.
+type ConfigurationProfile struct {
+	Configuration ConfigurationProfileConfiguration `json:"configuration"`
+	Identifier    string                            `json:"identifier"`
+}
+
+// ConfigurationProfileConfiguration Configuration wrapper for one or more Apple MDM profile payloads. ### Example — `com.apple.domains` Using the payload defined in [com.apple.domains.yaml](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.domains.yaml), its `payloadkeys` are `EmailDomains`, `WebDomains`, `SafariPasswordAutoFillDomains`, `CrossSiteTrackingPreventionRelaxedDomains`, and `CrossSiteTrackingPreventionRelaxedApps` — all optional arrays of strings. ```json { "payloadDisplayName": "Managed Domains", "payloadContent": [ { "payloadType": "com.apple.domains", "EmailDomains": ["example.com", "private.example.com"], "WebDomains": ["*.example.com"], "SafariPasswordAutoFillDomains": ["login.example.com"] } ] } ``` ### Example — `com.apple.wifi.managed` The same pattern works for any payload. For [com.apple.wifi.managed](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.wifi.managed.yaml), look up its `payloadkeys` and send: ```json { "payloadDisplayName": "Corporate Wi-Fi", "payloadContent": [ { "payloadType": "com.apple.wifi.managed", "SSID_STR": "Corporate-WiFi", "EncryptionType": "WPA2", "AutoJoin": true, "IsHotspot": false } ] } ``` ### Combining multiple Apple payloads in one component A single `com.jamf.ddm-configuration-profile` component can contain multiple Apple payloads in the `payloadContent` array: ```json { "payloadDisplayName": "Network & Domains", "payloadContent": [ { "payloadType": "com.apple.domains", "WebDomains": ["*.corp.example.com"], "EmailDomains": ["corp.example.com"] }, { "payloadType": "com.apple.wifi.managed", "SSID_STR": "CorpNet", "EncryptionType": "WPA3" } ] } ``` You can also place multiple `com.jamf.ddm-configuration-profile` components in the same blueprint step alongside other component types.
+type ConfigurationProfileConfiguration struct {
+	PayloadContent     []json.RawMessage `json:"payloadContent"`
+	PayloadDisplayName string            `json:"payloadDisplayName"`
+}
+
+// ConfigurationProfileContentItem A single Apple MDM payload entry. Must contain `payloadType` to identify the Apple payload, plus any payload-specific keys.
+type ConfigurationProfileContentItem struct {
+	PayloadType string `json:"payloadType"`
 }
 
 // CreateBlueprintRequest represents a create blueprint request.
@@ -86,9 +268,25 @@ type CreateResponse struct {
 	ID   string `json:"id"`
 }
 
-// CreateScope Scope Scoping Engine.
+// CreateScope Scope of the blueprint.
 type CreateScope struct {
 	DeviceGroups []string `json:"deviceGroups"`
+}
+
+// CustomRegex represents a custom regex.
+type CustomRegex struct {
+	Description *map[string]string `json:"Description,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool   `json:"Included,omitempty"`
+	Regex    *string `json:"Regex,omitempty"`
+}
+
+// Deferrals represents a deferrals.
+type Deferrals struct {
+	CombinedPeriodInDays *OptionalPeriodInDays `json:"CombinedPeriodInDays,omitempty"`
+	MajorPeriodInDays    *OptionalPeriodInDays `json:"MajorPeriodInDays,omitempty"`
+	MinorPeriodInDays    *OptionalPeriodInDays `json:"MinorPeriodInDays,omitempty"`
+	SystemPeriodInDays   *OptionalPeriodInDays `json:"SystemPeriodInDays,omitempty"`
 }
 
 // Deployment Information about last deployment job.
@@ -103,6 +301,24 @@ type DeploymentState struct {
 	State          string      `json:"state"`
 }
 
+// DetailsURL Optional URL with details about the enforced update.
+type DetailsURL struct {
+	Included *bool   `json:"Included,omitempty"`
+	Value    *string `json:"Value,omitempty"`
+}
+
+// DiskManagementComponent represents a disk management component.
+type DiskManagementComponent struct {
+	Configuration DiskManagementSettingsConfiguration `json:"configuration"`
+	Identifier    string                              `json:"identifier"`
+}
+
+// DiskManagementSettingsConfiguration Disk management settings configuration. Configures restrictions for external and network storage access.
+type DiskManagementSettingsConfiguration struct {
+	Restrictions *Restrictions `json:"Restrictions,omitempty"`
+	Version      int           `json:"version"`
+}
+
 // Error represents a error.
 type Error struct {
 	Code        string  `json:"code"`
@@ -111,12 +327,128 @@ type Error struct {
 	ID          *string `json:"id,omitempty"`
 }
 
-// JsonNode configuration of the component. Exact schema is dependent on component type.
-type JsonNode = json.RawMessage
+// FailedAttemptsResetInMinutes represents a failed attempts reset in minutes.
+type FailedAttemptsResetInMinutes struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *int  `json:"Value,omitempty"`
+}
+
+// FolderBookmarkItem represents a folder bookmark item.
+type FolderBookmarkItem struct {
+	Folder *[]URLBookmarkItem `json:"Folder,omitempty"`
+	Title  string             `json:"Title"`
+	Type   string             `json:"Type"`
+}
+
+// InputModes represents a input modes.
+type InputModes struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included       *bool `json:"Included,omitempty"`
+	RPN            bool  `json:"RPN"`
+	UnitConversion bool  `json:"UnitConversion"`
+}
+
+// ManagedExtension represents a managed extension.
+type ManagedExtension struct {
+	AllowedDomains  *[]ManagedExtensionDomain `json:"AllowedDomains,omitempty"`
+	DeniedDomains   *[]ManagedExtensionDomain `json:"DeniedDomains,omitempty"`
+	PrivateBrowsing *string                   `json:"PrivateBrowsing,omitempty"`
+	State           *string                   `json:"State,omitempty"`
+}
+
+// ManagedExtensionDomain represents a managed extension domain.
+type ManagedExtensionDomain struct {
+	Domain string `json:"Domain"`
+}
+
+// MathNotesMode represents a math notes mode.
+type MathNotesMode struct {
+	Enabled bool `json:"Enabled"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+}
+
+// MathSettingsComponent represents a math settings component.
+type MathSettingsComponent struct {
+	Configuration MathSettingsConfiguration `json:"configuration"`
+	Identifier    string                    `json:"identifier"`
+}
+
+// MathSettingsConfiguration Math settings configuration. Configures Calculator app modes and system-wide math behavior including keyboard suggestions and Math Notes.
+type MathSettingsConfiguration struct {
+	Calculator     *Calculator     `json:"Calculator,omitempty"`
+	SystemBehavior *SystemBehavior `json:"SystemBehavior,omitempty"`
+}
+
+// MaximumFailedAttempts represents a maximum failed attempts.
+type MaximumFailedAttempts struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *int  `json:"Value,omitempty"`
+}
+
+// MaximumGracePeriodInMinutes represents a maximum grace period in minutes.
+type MaximumGracePeriodInMinutes struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *int  `json:"Value,omitempty"`
+}
+
+// MaximumInactivityInMinutes represents a maximum inactivity in minutes.
+type MaximumInactivityInMinutes struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *int  `json:"Value,omitempty"`
+}
+
+// MaximumPasscodeAgeInDays represents a maximum passcode age in days.
+type MaximumPasscodeAgeInDays struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *int  `json:"Value,omitempty"`
+}
 
 // Meta Meta object containing additional information about component.
 type Meta struct {
 	SupportedOs map[string][]SupportedOs `json:"supportedOs"`
+}
+
+// MinimumComplexCharacters represents a minimum complex characters.
+type MinimumComplexCharacters struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *int  `json:"Value,omitempty"`
+}
+
+// MinimumLength represents a minimum length.
+type MinimumLength struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *int  `json:"Value,omitempty"`
+}
+
+// NewTabStartPage represents a new tab start page.
+type NewTabStartPage struct {
+	ExtensionIdentifier *string `json:"ExtensionIdentifier,omitempty"`
+	HomepageURL         *string `json:"HomepageURL,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool   `json:"Included,omitempty"`
+	PageType *string `json:"PageType,omitempty"`
+}
+
+// OptionalPeriodInDays represents a optional period in days.
+type OptionalPeriodInDays struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *int  `json:"Value,omitempty"`
+}
+
+// OptionallyEnabled represents a optionally enabled.
+type OptionallyEnabled struct {
+	Enabled bool `json:"Enabled"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
 }
 
 // PagedResponseBlueprintOverview represents a paged response blueprint overview.
@@ -131,9 +463,262 @@ type PagedResponseComponentDescription struct {
 	TotalCount int64                  `json:"totalCount"`
 }
 
+// PasscodeReuseLimit represents a passcode reuse limit.
+type PasscodeReuseLimit struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *int  `json:"Value,omitempty"`
+}
+
+// PasscodeSettingsComponent represents a passcode settings component.
+type PasscodeSettingsComponent struct {
+	Configuration PasscodeSettingsConfiguration `json:"configuration"`
+	Identifier    string                        `json:"identifier"`
+}
+
+// PasscodeSettingsConfiguration Passcode settings configuration. Configures device passcode requirements including complexity, length, and expiration.
+type PasscodeSettingsConfiguration struct {
+	ChangeAtNextAuth             *ChangeAtNextAuth             `json:"ChangeAtNextAuth,omitempty"`
+	CustomRegex                  *CustomRegex                  `json:"CustomRegex,omitempty"`
+	FailedAttemptsResetInMinutes *FailedAttemptsResetInMinutes `json:"FailedAttemptsResetInMinutes,omitempty"`
+	MaximumFailedAttempts        *MaximumFailedAttempts        `json:"MaximumFailedAttempts,omitempty"`
+	MaximumGracePeriodInMinutes  *MaximumGracePeriodInMinutes  `json:"MaximumGracePeriodInMinutes,omitempty"`
+	MaximumInactivityInMinutes   *MaximumInactivityInMinutes   `json:"MaximumInactivityInMinutes,omitempty"`
+	MaximumPasscodeAgeInDays     *MaximumPasscodeAgeInDays     `json:"MaximumPasscodeAgeInDays,omitempty"`
+	MinimumComplexCharacters     *MinimumComplexCharacters     `json:"MinimumComplexCharacters,omitempty"`
+	MinimumLength                *MinimumLength                `json:"MinimumLength,omitempty"`
+	PasscodeReuseLimit           *PasscodeReuseLimit           `json:"PasscodeReuseLimit,omitempty"`
+	RequireAlphanumericPasscode  *RequireAlphanumericPasscode  `json:"RequireAlphanumericPasscode,omitempty"`
+	RequireComplexPasscode       *RequireComplexPasscode       `json:"RequireComplexPasscode,omitempty"`
+	RequirePasscode              *RequirePasscode              `json:"RequirePasscode,omitempty"`
+	Version                      int                           `json:"version"`
+}
+
+// ProgrammerMode represents a programmer mode.
+type ProgrammerMode struct {
+	Enabled bool `json:"Enabled"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+}
+
+// RapidSecurityResponse represents a rapid security response.
+type RapidSecurityResponse struct {
+	Enable         *OptionallyEnabled `json:"Enable,omitempty"`
+	EnableRollback *OptionallyEnabled `json:"EnableRollback,omitempty"`
+}
+
+// RecommendedCadence represents a recommended cadence.
+type RecommendedCadence struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool  `json:"Included,omitempty"`
+	Value    string `json:"Value"`
+}
+
+// RequireAlphanumericPasscode represents a require alphanumeric passcode.
+type RequireAlphanumericPasscode struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
+// RequireComplexPasscode represents a require complex passcode.
+type RequireComplexPasscode struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
+// RequirePasscode represents a require passcode.
+type RequirePasscode struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	Value    *bool `json:"Value,omitempty"`
+}
+
+// Restrictions Storage restrictions configuration.
+type Restrictions struct {
+	ExternalStorage *StorageMode `json:"ExternalStorage,omitempty"`
+	NetworkStorage  *StorageMode `json:"NetworkStorage,omitempty"`
+}
+
+// SafariBookmarksComponent represents a safari bookmarks component.
+type SafariBookmarksComponent struct {
+	Configuration SafariBookmarksConfiguration `json:"configuration"`
+	Identifier    string                       `json:"identifier"`
+}
+
+// SafariBookmarksConfiguration Safari bookmarks configuration. Defines managed bookmark groups and folders that appear in Safari across managed devices.
+type SafariBookmarksConfiguration struct {
+	ManagedBookmarks []BookmarkGroup `json:"ManagedBookmarks"`
+}
+
+// SafariExtensionsComponent represents a safari extensions component.
+type SafariExtensionsComponent struct {
+	Configuration SafariExtensionsConfiguration `json:"configuration"`
+	Identifier    string                        `json:"identifier"`
+}
+
+// SafariExtensionsConfiguration Safari extensions configuration. Manages Safari browser extensions including allowed/denied domains and private browsing settings.
+type SafariExtensionsConfiguration struct {
+	ManagedExtensions map[string]ManagedExtension `json:"ManagedExtensions"`
+}
+
+// SafariSettingsComponent represents a safari settings component.
+type SafariSettingsComponent struct {
+	Configuration SafariSettingsConfiguration `json:"configuration"`
+	Identifier    string                      `json:"identifier"`
+}
+
+// SafariSettingsConfiguration Safari settings configuration. Configures Safari browser behavior including cookies, JavaScript, popups, private browsing, and start page settings.
+type SafariSettingsConfiguration struct {
+	AcceptCookies              *AcceptCookies              `json:"AcceptCookies,omitempty"`
+	AllowDisablingFraudWarning *AllowDisablingFraudWarning `json:"AllowDisablingFraudWarning,omitempty"`
+	AllowHistoryClearing       *AllowHistoryClearing       `json:"AllowHistoryClearing,omitempty"`
+	AllowJavaScript            *AllowJavaScript            `json:"AllowJavaScript,omitempty"`
+	AllowPopups                *AllowPopups                `json:"AllowPopups,omitempty"`
+	AllowPrivateBrowsing       *AllowPrivateBrowsing       `json:"AllowPrivateBrowsing,omitempty"`
+	AllowSummary               *AllowSummary               `json:"AllowSummary,omitempty"`
+	NewTabStartPage            *NewTabStartPage            `json:"NewTabStartPage,omitempty"`
+}
+
+// ScientificMode represents a scientific mode.
+type ScientificMode struct {
+	Enabled bool `json:"Enabled"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+}
+
+// SoftwareUpdateSettingsComponent represents a software update settings component.
+type SoftwareUpdateSettingsComponent struct {
+	Configuration SoftwareUpdateSettingsConfiguration `json:"configuration"`
+	Identifier    string                              `json:"identifier"`
+}
+
+// SoftwareUpdateSettingsConfiguration Software update settings configuration. Configures OS update behavior including notifications, automatic actions, deferrals, and rapid security responses.
+type SoftwareUpdateSettingsConfiguration struct {
+	AllowStandardUserOSUpdates *OptionallyEnabled     `json:"AllowStandardUserOSUpdates,omitempty"`
+	AutomaticActions           *AutomaticActions      `json:"AutomaticActions,omitempty"`
+	Beta                       *Beta                  `json:"Beta,omitempty"`
+	Deferrals                  *Deferrals             `json:"Deferrals,omitempty"`
+	Notifications              *OptionallyEnabled     `json:"Notifications,omitempty"`
+	RapidSecurityResponse      *RapidSecurityResponse `json:"RapidSecurityResponse,omitempty"`
+	RecommendedCadence         *RecommendedCadence    `json:"RecommendedCadence,omitempty"`
+}
+
+// StorageMode Storage access mode configuration.
+type StorageMode struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool  `json:"Included,omitempty"`
+	Value    string `json:"Value"`
+}
+
 // SupportedOs Supported version of OS families.
 type SupportedOs struct {
 	Version string `json:"version"`
+}
+
+// SwUpdateAutomaticConfiguration Automatic software update enforcement configuration. Automatically enforces updates based on strategy (LATEST or SEMANTIC).
+type SwUpdateAutomaticConfiguration struct {
+	Strategy string                         `json:"strategy"`
+	LATEST   *SwUpdateLatestConfiguration   `json:"-"`
+	SEMANTIC *SwUpdateSemanticConfiguration `json:"-"`
+}
+
+// UnmarshalJSON dispatches the payload to the variant matching the
+// strategy discriminator. Unknown values leave the variant
+// pointers nil but preserve the discriminator string.
+func (m *SwUpdateAutomaticConfiguration) UnmarshalJSON(data []byte) error {
+	var d struct {
+		Strategy string `json:"strategy"`
+	}
+	if err := json.Unmarshal(data, &d); err != nil {
+		return err
+	}
+	m.Strategy = d.Strategy
+	switch d.Strategy {
+	case "LATEST":
+		m.LATEST = new(SwUpdateLatestConfiguration)
+		return json.Unmarshal(data, m.LATEST)
+	case "SEMANTIC":
+		m.SEMANTIC = new(SwUpdateSemanticConfiguration)
+		return json.Unmarshal(data, m.SEMANTIC)
+	}
+	return nil
+}
+
+// MarshalJSON emits the active variant's JSON. If the matching variant
+// pointer is nil, emits a minimal object carrying only the discriminator.
+func (m SwUpdateAutomaticConfiguration) MarshalJSON() ([]byte, error) {
+	switch m.Strategy {
+	case "LATEST":
+		return json.Marshal(m.LATEST)
+	case "SEMANTIC":
+		return json.Marshal(m.SEMANTIC)
+	}
+	return json.Marshal(map[string]string{"strategy": m.Strategy})
+}
+
+// SwUpdateComponent represents a sw update component.
+type SwUpdateComponent struct {
+	Configuration SwUpdateConfiguration `json:"configuration"`
+	Identifier    string                `json:"identifier"`
+}
+
+// SwUpdateConfiguration Software update enforcement configuration. Configures OS update enforcement using either manual (specific version by date) or automatic strategies.
+type SwUpdateConfiguration struct {
+	EnforcementType *string `json:"enforcementType,omitempty"`
+}
+
+// SwUpdateLatestConfiguration Automatic software update with LATEST strategy. Enforces the newest available OS version a specified number of days after release.
+type SwUpdateLatestConfiguration struct {
+	DeploymentTime   string      `json:"deploymentTime"`
+	DetailsURL       *DetailsURL `json:"detailsURL,omitempty"`
+	EnforceAfterDays int         `json:"enforceAfterDays"`
+	EnforcementType  string      `json:"enforcementType"`
+	Strategy         string      `json:"strategy"`
+}
+
+// SwUpdateManualConfiguration Manual software update enforcement configuration. Enforces a specific OS version by a specific date/time.
+type SwUpdateManualConfiguration struct {
+	DetailsURL          *DetailsURL `json:"detailsURL,omitempty"`
+	EnforcementType     string      `json:"enforcementType"`
+	TargetLocalDateTime time.Time   `json:"targetLocalDateTime"`
+	TargetOSVersion     string      `json:"targetOSVersion"`
+}
+
+// SwUpdateSemanticConfiguration Automatic software update with SEMANTIC strategy. Applies semantic versioning rules to determine update enforcement timing.
+type SwUpdateSemanticConfiguration struct {
+	DetailsURL      *DetailsURL `json:"detailsURL,omitempty"`
+	EnforcementType string      `json:"enforcementType"`
+	Rules           UpdateRules `json:"rules"`
+	Strategy        string      `json:"strategy"`
+}
+
+// SystemBehavior represents a system behavior.
+type SystemBehavior struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included            *bool `json:"Included,omitempty"`
+	KeyboardSuggestions bool  `json:"KeyboardSuggestions"`
+	MathNotes           bool  `json:"MathNotes"`
+}
+
+// TemporaryPairing Temporary pairing configuration.
+type TemporaryPairing struct {
+	Configuration *TemporaryPairingConfig `json:"Configuration,omitempty"`
+	Disabled      *bool                   `json:"Disabled,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+}
+
+// TemporaryPairingConfig Temporary pairing configuration details.
+type TemporaryPairingConfig struct {
+	UnpairingTime UnpairingTime `json:"UnpairingTime"`
+}
+
+// UnpairingTime Automatic unpairing time configuration.
+type UnpairingTime struct {
+	Hour   *int   `json:"Hour,omitempty"`
+	Policy string `json:"Policy"`
 }
 
 // UpdateBlueprintRequest represents a update blueprint request.
@@ -142,4 +727,22 @@ type UpdateBlueprintRequest struct {
 	Name        *string          `json:"name,omitempty"`
 	Scope       *BlueprintScope  `json:"scope,omitempty"`
 	Steps       *[]BlueprintStep `json:"steps,omitempty"`
+}
+
+// UpdateRule Configuration for a specific update type.
+type UpdateRule struct {
+	DeploymentTime   string `json:"deploymentTime"`
+	EnforceAfterDays int    `json:"enforceAfterDays"`
+}
+
+// UpdateRules Rules for semantic update strategy.
+type UpdateRules struct {
+	Minor UpdateRule `json:"minor"`
+}
+
+// URLBookmarkItem represents a u r l bookmark item.
+type URLBookmarkItem struct {
+	Title string `json:"Title"`
+	Type  string `json:"Type"`
+	URL   string `json:"URL"`
 }

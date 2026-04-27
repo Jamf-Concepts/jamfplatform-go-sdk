@@ -179,6 +179,21 @@ func TestListDockItems_NotFound(t *testing.T) {
 	}
 }
 
+func TestCreateDockItemByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/dockitems/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateDockItemByName(context.Background(), "test-id", &DockItem{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolveDockItemIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/dockitems/name/test-id", func(w http.ResponseWriter, r *http.Request) {

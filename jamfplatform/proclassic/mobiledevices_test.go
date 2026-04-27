@@ -389,36 +389,6 @@ func TestGetMobileDeviceByIDSubset_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetMobileDeviceByMacAddressSubset(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/macaddress/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeXML(t, w, http.StatusOK, "<mobile_device></mobile_device>")
-	})
-
-	result, err := c.GetMobileDeviceByMacAddressSubset(context.Background(), "test-id", "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetMobileDeviceByMacAddressSubset_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/macaddress/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.GetMobileDeviceByMacAddressSubset(context.Background(), "test-id", "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestGetMobileDeviceByMatch(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/match/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -449,92 +419,62 @@ func TestGetMobileDeviceByMatch_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetMobileDeviceByNameSubset(t *testing.T) {
+func TestCreateMobileDeviceByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/name/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeXML(t, w, http.StatusOK, "<mobile_device></mobile_device>")
+		w.WriteHeader(http.StatusCreated)
 	})
 
-	result, err := c.GetMobileDeviceByNameSubset(context.Background(), "test-id", "test-id")
+	err := c.CreateMobileDeviceByName(context.Background(), "test-id", &MobileDevicePost{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
 }
 
-func TestGetMobileDeviceByNameSubset_NotFound(t *testing.T) {
+func TestCreateMobileDeviceBySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/name/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.GetMobileDeviceByNameSubset(context.Background(), "test-id", "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
-func TestGetMobileDeviceBySerialNumberSubset(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/serialnumber/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/serialnumber/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeXML(t, w, http.StatusOK, "<mobile_device></mobile_device>")
+		w.WriteHeader(http.StatusCreated)
 	})
 
-	result, err := c.GetMobileDeviceBySerialNumberSubset(context.Background(), "test-id", "test-id")
+	err := c.CreateMobileDeviceBySerialNumber(context.Background(), "test-id", &MobileDevicePost{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
 }
 
-func TestGetMobileDeviceBySerialNumberSubset_NotFound(t *testing.T) {
+func TestCreateMobileDeviceByMacAddress(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/serialnumber/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.GetMobileDeviceBySerialNumberSubset(context.Background(), "test-id", "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
-func TestGetMobileDeviceByUDIDSubset(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/udid/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/macaddress/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeXML(t, w, http.StatusOK, "<mobile_device></mobile_device>")
+		w.WriteHeader(http.StatusCreated)
 	})
 
-	result, err := c.GetMobileDeviceByUDIDSubset(context.Background(), "test-id", "test-id")
+	err := c.CreateMobileDeviceByMacAddress(context.Background(), "test-id", &MobileDevicePost{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
 }
 
-func TestGetMobileDeviceByUDIDSubset_NotFound(t *testing.T) {
+func TestCreateMobileDeviceByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/udid/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	mux.HandleFunc("/api/proclassic/tenant/t-test/mobiledevices/udid/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
 	})
 
-	_, err := c.GetMobileDeviceByUDIDSubset(context.Background(), "test-id", "test-id")
-	if err == nil {
-		t.Fatal("expected error")
+	err := c.CreateMobileDeviceByUDID(context.Background(), "test-id", &MobileDevicePost{})
+	if err != nil {
+		t.Fatal(err)
 	}
 }

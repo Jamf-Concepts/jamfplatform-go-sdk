@@ -121,6 +121,16 @@ func (c *Client) GetOsxConfigurationProfileByNameSubset(ctx context.Context, nam
 	return &result, nil
 }
 
+// CreateOSXConfigurationProfileByName creates a new OS X configuration profile by ID.
+func (c *Client) CreateOSXConfigurationProfileByName(ctx context.Context, name string, request *OsXConfigurationProfile) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateOSXConfigurationProfileByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveOSXConfigurationProfileIDByName looks up a OSXConfigurationProfile by name via GetOSXConfigurationProfileByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveOSXConfigurationProfileIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetOSXConfigurationProfileByName(ctx, name)

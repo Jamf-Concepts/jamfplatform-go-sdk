@@ -465,8 +465,15 @@ func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, cla
 		if bp, ok := result.(*[]byte); ok {
 			*bp = append((*bp)[:0], body...)
 		} else if classic {
-			if err := xml.Unmarshal(body, result); err != nil {
-				return fmt.Errorf("failed to decode XML response: %w", err)
+			// Classic endpoints sometimes return 200/201 with an empty body
+			// or an XML prolog-only body (e.g. computercommands/command/{cmd}
+			// when no results exist). xml.Unmarshal returns io.EOF when it
+			// finds no root element; treat that as a successful zero-value
+			// decode, identical to a fully empty body.
+			if len(bytes.TrimSpace(body)) > 0 {
+				if err := xml.Unmarshal(body, result); err != nil && err != io.EOF {
+					return fmt.Errorf("failed to decode XML response: %w", err)
+				}
 			}
 		} else if err := json.Unmarshal(body, result); err != nil {
 			return fmt.Errorf("failed to decode response: %w", err)

@@ -1239,18 +1239,6 @@ func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByMacAddressD
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByMacAddressDateRangeSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerHardwareSoftwareReportByMacAddressDateRangeSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerHardwareSoftwareReportByMacAddressDateRangeSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByNameDateRange(t *testing.T) {
 	c := accClient(t)
@@ -1265,18 +1253,6 @@ func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByNameDateRan
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByNameDateRangeSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerHardwareSoftwareReportByNameDateRangeSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerHardwareSoftwareReportByNameDateRangeSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportBySerialNumberDateRange(t *testing.T) {
 	c := accClient(t)
@@ -1291,18 +1267,6 @@ func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportBySerialNumbe
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportBySerialNumberDateRangeSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerHardwareSoftwareReportBySerialNumberDateRangeSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerHardwareSoftwareReportBySerialNumberDateRangeSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByUDIDDateRange(t *testing.T) {
 	c := accClient(t)
@@ -1317,18 +1281,6 @@ func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByUDIDDateRan
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByUDIDDateRangeSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerHardwareSoftwareReportByUDIDDateRangeSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerHardwareSoftwareReportByUDIDDateRangeSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetComputerHistoryByIDSubset(t *testing.T) {
 	c := accClient(t)
@@ -1343,57 +1295,9 @@ func TestAcceptance_Classic_Probe_GetComputerHistoryByIDSubset(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetComputerHistoryByMacAddressSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerHistoryByMacAddressSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerHistoryByMacAddressSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerHistoryByNameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerHistoryByNameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerHistoryByNameSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerHistoryBySerialNumberSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerHistoryBySerialNumberSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerHistoryBySerialNumberSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerHistoryByUDIDSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerHistoryByUDIDSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerHistoryByUDIDSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetComputerInvitationByInvitation(t *testing.T) {
 	c := accClient(t)
@@ -1460,213 +1364,21 @@ func TestAcceptance_Classic_Probe_GetComputerManagementByIDUsernameSubset(t *tes
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByMacAddressPatchFilter(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByMacAddressPatchFilter(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByMacAddressPatchFilter transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByMacAddressSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByMacAddressSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByMacAddressSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByMacAddressUsername(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByMacAddressUsername(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByMacAddressUsername transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByMacAddressUsernameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByMacAddressUsernameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByMacAddressUsernameSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByNamePatchFilter(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByNamePatchFilter(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByNamePatchFilter transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByNameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByNameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByNameSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByNameUsername(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByNameUsername(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByNameUsername transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByNameUsernameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByNameUsernameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByNameUsernameSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementBySerialNumberPatchFilter(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementBySerialNumberPatchFilter(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementBySerialNumberPatchFilter transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementBySerialNumberSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementBySerialNumberSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementBySerialNumberSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementBySerialNumberUsername(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementBySerialNumberUsername(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementBySerialNumberUsername transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementBySerialNumberUsernameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementBySerialNumberUsernameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementBySerialNumberUsernameSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByUDIDPatchFilter(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByUDIDPatchFilter(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByUDIDPatchFilter transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByUDIDSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByUDIDSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByUDIDSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByUDIDUsername(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByUDIDUsername(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByUDIDUsername transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetComputerManagementByUDIDUsernameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetComputerManagementByUDIDUsernameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetComputerManagementByUDIDUsernameSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetEbookByIDSubset(t *testing.T) {
 	c := accClient(t)
@@ -1681,18 +1393,6 @@ func TestAcceptance_Classic_Probe_GetEbookByIDSubset(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetEbookByNameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetEbookByNameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetEbookByNameSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetLDAPServerByIDGroup(t *testing.T) {
 	c := accClient(t)
@@ -1733,44 +1433,8 @@ func TestAcceptance_Classic_Probe_GetLDAPServerByIDUser(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetLDAPServerByNameGroup(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetLDAPServerByNameGroup(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetLDAPServerByNameGroup transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetLDAPServerByNameGroupUser(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetLDAPServerByNameGroupUser(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetLDAPServerByNameGroupUser transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetLDAPServerByNameUser(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetLDAPServerByNameUser(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetLDAPServerByNameUser transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetMacApplicationByIDSubset(t *testing.T) {
 	c := accClient(t)
@@ -1915,57 +1579,9 @@ func TestAcceptance_Classic_Probe_GetMobileDeviceHistoryByIDSubset(t *testing.T)
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetMobileDeviceHistoryByMacAddressSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetMobileDeviceHistoryByMacAddressSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetMobileDeviceHistoryByMacAddressSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetMobileDeviceHistoryByNameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetMobileDeviceHistoryByNameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetMobileDeviceHistoryByNameSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetMobileDeviceHistoryBySerialNumberSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetMobileDeviceHistoryBySerialNumberSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetMobileDeviceHistoryBySerialNumberSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetMobileDeviceHistoryByUDIDSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetMobileDeviceHistoryByUDIDSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetMobileDeviceHistoryByUDIDSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetMobileDeviceInvitationByInvitation(t *testing.T) {
 	c := accClient(t)
@@ -1993,18 +1609,6 @@ func TestAcceptance_Classic_Probe_GetMobileDeviceByIDSubset(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetMobileDeviceByMacAddressSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetMobileDeviceByMacAddressSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetMobileDeviceByMacAddressSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetMobileDeviceByMatch(t *testing.T) {
 	c := accClient(t)
@@ -2019,44 +1623,8 @@ func TestAcceptance_Classic_Probe_GetMobileDeviceByMatch(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetMobileDeviceByNameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetMobileDeviceByNameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetMobileDeviceByNameSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetMobileDeviceBySerialNumberSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetMobileDeviceBySerialNumberSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetMobileDeviceBySerialNumberSubset transport error: %v", err)
-	}
-}
 
-func TestAcceptance_Classic_Probe_GetMobileDeviceByUDIDSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetMobileDeviceByUDIDSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetMobileDeviceByUDIDSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetOsxConfigurationProfileByIDSubset(t *testing.T) {
 	c := accClient(t)
@@ -2149,18 +1717,6 @@ func TestAcceptance_Classic_Probe_GetPolicyByIDSubset(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_Probe_GetPolicyByNameSubset(t *testing.T) {
-	c := accClient(t)
-	_, err := proclassic.New(c).GetPolicyByNameSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("GetPolicyByNameSubset transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_Probe_GetVPPInvitationByIDSubset(t *testing.T) {
 	c := accClient(t)
@@ -2172,5 +1728,239 @@ func TestAcceptance_Classic_Probe_GetVPPInvitationByIDSubset(t *testing.T) {
 			return
 		}
 		t.Fatalf("GetVPPInvitationByIDSubset transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetComputersBasic(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetComputersBasic(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetComputersBasic transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetJSSUser(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetJSSUser(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetJSSUser transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_ListSavedSearches(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).ListSavedSearches(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("ListSavedSearches transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetComputerByMacAddress(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetComputerByMacAddress(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetComputerByMacAddress transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetComputerByUDID(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetComputerByUDID(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetComputerByUDID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetComputerCommandsByCommand(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetComputerCommandsByCommand(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetComputerCommandsByCommand transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetComputerCommandsByStatus(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetComputerCommandsByStatus(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetComputerCommandsByStatus transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetComputerInvitationByName(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetComputerInvitationByName(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetComputerInvitationByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetPatchByName(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetPatchByName(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetPatchByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetSavedSearchByID(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetSavedSearchByID(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetSavedSearchByID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetSavedSearchByName(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetSavedSearchByName(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetSavedSearchByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_MatchComputers(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).MatchComputers(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("MatchComputers transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_MatchComputersByName(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).MatchComputersByName(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("MatchComputersByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetComputerByIDSubset(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetComputerByIDSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetComputerByIDSubset transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetMobileDeviceEnrollmentProfileByInvitationSubset(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetMobileDeviceEnrollmentProfileByInvitationSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetMobileDeviceEnrollmentProfileByInvitationSubset transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetMobileDeviceProvisioningProfileByIDSubset(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetMobileDeviceProvisioningProfileByIDSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetMobileDeviceProvisioningProfileByIDSubset transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetPatchComputersByIDVersion(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetPatchComputersByIDVersion(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetPatchComputersByIDVersion transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_GetPatchReportByTitleIDVersion(t *testing.T) {
+	c := accClient(t)
+	_, err := proclassic.New(c).GetPatchReportByTitleIDVersion(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("GetPatchReportByTitleIDVersion transport error: %v", err)
 	}
 }

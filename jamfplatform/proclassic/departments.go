@@ -99,6 +99,16 @@ func (c *Client) ListDepartments(ctx context.Context) (*Departments, error) {
 	return &result, nil
 }
 
+// CreateDepartmentByName creates a new department by ID.
+func (c *Client) CreateDepartmentByName(ctx context.Context, name string, request *Department) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateDepartmentByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveDepartmentIDByName looks up a Department by name via GetDepartmentByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveDepartmentIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetDepartmentByName(ctx, name)

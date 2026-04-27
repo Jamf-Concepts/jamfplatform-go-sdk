@@ -200,17 +200,6 @@ func (c *Client) GetMobileDeviceByIDSubset(ctx context.Context, id string, subse
 	return &result, nil
 }
 
-// GetMobileDeviceByMacAddressSubset finds a subset of data for mobile devices by Mac address.
-func (c *Client) GetMobileDeviceByMacAddressSubset(ctx context.Context, macaddress string, subset string) (*MobileDevice, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result MobileDevice
-	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s/subset/%s", prefix, url.PathEscape(macaddress), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetMobileDeviceByMacAddressSubset(%s): %w", macaddress, err)
-	}
-	return &result, nil
-}
-
 // GetMobileDeviceByMatch searches for mobile devices that match the provided parameter.
 func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
@@ -222,35 +211,42 @@ func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*Mob
 	return &result, nil
 }
 
-// GetMobileDeviceByNameSubset finds a subset of data for mobile devices by name.
-func (c *Client) GetMobileDeviceByNameSubset(ctx context.Context, name string, subset string) (*MobileDevice, error) {
+// CreateMobileDeviceByName creates a new mobile device by ID.
+func (c *Client) CreateMobileDeviceByName(ctx context.Context, name string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result MobileDevice
-	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetMobileDeviceByNameSubset(%s): %w", name, err)
+	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceByName(%s): %w", name, err)
 	}
-	return &result, nil
+	return nil
 }
 
-// GetMobileDeviceBySerialNumberSubset finds a subset of data for mobile devices by serial number.
-func (c *Client) GetMobileDeviceBySerialNumberSubset(ctx context.Context, serialnumber string, subset string) (*MobileDevice, error) {
+// CreateMobileDeviceBySerialNumber creates a new mobile device by ID.
+func (c *Client) CreateMobileDeviceBySerialNumber(ctx context.Context, serialNumber string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result MobileDevice
-	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s/subset/%s", prefix, url.PathEscape(serialnumber), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetMobileDeviceBySerialNumberSubset(%s): %w", serialnumber, err)
+	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s", prefix, url.PathEscape(serialNumber))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceBySerialNumber(%s): %w", serialNumber, err)
 	}
-	return &result, nil
+	return nil
 }
 
-// GetMobileDeviceByUDIDSubset finds a subset of data for mobile devices by UDID.
-func (c *Client) GetMobileDeviceByUDIDSubset(ctx context.Context, udid string, subset string) (*MobileDevice, error) {
+// CreateMobileDeviceByMacAddress creates a new mobile device by ID.
+func (c *Client) CreateMobileDeviceByMacAddress(ctx context.Context, macaddress string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result MobileDevice
-	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s/subset/%s", prefix, url.PathEscape(udid), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetMobileDeviceByUDIDSubset(%s): %w", udid, err)
+	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s", prefix, url.PathEscape(macaddress))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceByMacAddress(%s): %w", macaddress, err)
 	}
-	return &result, nil
+	return nil
+}
+
+// CreateMobileDeviceByUDID creates a new mobile device by ID.
+func (c *Client) CreateMobileDeviceByUDID(ctx context.Context, udid string, request *MobileDevicePost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s", prefix, url.PathEscape(udid))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceByUDID(%s): %w", udid, err)
+	}
+	return nil
 }

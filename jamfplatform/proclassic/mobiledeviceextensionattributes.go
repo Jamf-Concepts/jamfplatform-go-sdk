@@ -99,6 +99,16 @@ func (c *Client) ListMobileDeviceExtensionAttributes(ctx context.Context) (*Mobi
 	return &result, nil
 }
 
+// CreateMobileDeviceExtensionAttributeByName creates a new mobile device extension attribute by ID.
+func (c *Client) CreateMobileDeviceExtensionAttributeByName(ctx context.Context, name string, request *MobileDeviceExtensionAttribute) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceExtensionAttributeByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveMobileDeviceExtensionAttributeIDByName looks up a MobileDeviceExtensionAttribute by name via GetMobileDeviceExtensionAttributeByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveMobileDeviceExtensionAttributeIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetMobileDeviceExtensionAttributeByName(ctx, name)

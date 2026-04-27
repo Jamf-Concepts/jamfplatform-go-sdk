@@ -24,3 +24,16 @@ func (c *Client) GetPatchReportByPatchSoftwareTitleID(ctx context.Context, id st
 	}
 	return &result, nil
 }
+
+// GetPatchReportByTitleIDVersion display computers for a specific version of a patch report. (Deprecated) Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations/{id}/patch-report".
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+func (c *Client) GetPatchReportByTitleIDVersion(ctx context.Context, id string, version string) (*PatchReport, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result PatchReport
+	endpoint := fmt.Sprintf("%s/patchreports/patchsoftwaretitleid/%s/version/%s", prefix, url.PathEscape(id), url.PathEscape(version))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchReportByTitleIDVersion(%s): %w", id, err)
+	}
+	return &result, nil
+}

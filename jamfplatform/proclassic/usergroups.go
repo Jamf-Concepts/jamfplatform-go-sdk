@@ -99,6 +99,16 @@ func (c *Client) ListUserGroups(ctx context.Context) (*UserGroups, error) {
 	return &result, nil
 }
 
+// CreateUserGroupByName creates user groups by ID.
+func (c *Client) CreateUserGroupByName(ctx context.Context, name string, request *UserGroup) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateUserGroupByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveUserGroupIDByName looks up a UserGroup by name via GetUserGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveUserGroupIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetUserGroupByName(ctx, name)

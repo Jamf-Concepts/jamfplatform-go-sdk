@@ -179,36 +179,6 @@ func TestGetUserByEmail_NotFound(t *testing.T) {
 	}
 }
 
-func TestUpdateUserByEmail(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/users/email/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPut {
-			t.Errorf("method = %s, want PUT", r.Method)
-		}
-		w.WriteHeader(http.StatusCreated)
-	})
-
-	err := c.UpdateUserByEmail(context.Background(), "test-id", &UserPost{})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestDeleteUserByEmail(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/users/email/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
-			t.Errorf("method = %s, want DELETE", r.Method)
-		}
-		w.WriteHeader(http.StatusOK)
-	})
-
-	err := c.DeleteUserByEmail(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestListUsers(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/users", func(w http.ResponseWriter, r *http.Request) {
@@ -236,6 +206,21 @@ func TestListUsers_NotFound(t *testing.T) {
 	_, err := c.ListUsers(context.Background())
 	if err == nil {
 		t.Fatal("expected error")
+	}
+}
+
+func TestCreateUserByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/users/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateUserByName(context.Background(), "test-id", &UserPost{})
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

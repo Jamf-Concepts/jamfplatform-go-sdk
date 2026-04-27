@@ -99,6 +99,16 @@ func (c *Client) ListLicensedSoftware(ctx context.Context) (*LicensedSoftwareAll
 	return &result, nil
 }
 
+// CreateLicensedSoftwareByName creates new licensed software by ID.
+func (c *Client) CreateLicensedSoftwareByName(ctx context.Context, name string, request *LicensedSoftware) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateLicensedSoftwareByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveLicensedSoftwareIDByName looks up a LicensedSoftware by name via GetLicensedSoftwareByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveLicensedSoftwareIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetLicensedSoftwareByName(ctx, name)

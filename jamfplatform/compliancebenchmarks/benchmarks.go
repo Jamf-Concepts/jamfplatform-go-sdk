@@ -13,7 +13,7 @@ import (
 	"net/url"
 )
 
-// ListBenchmarks returns list of tenant benchmarks.
+// ListBenchmarks return list of tenant benchmarks.
 func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarksResponseV2
@@ -24,7 +24,7 @@ func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, err
 	return &result, nil
 }
 
-// CreateBenchmark creates a new benchmark from provided benchmark request.
+// CreateBenchmark create a new benchmark from provided benchmark request.
 func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV2) (*BenchmarkResponseV2, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
@@ -35,7 +35,7 @@ func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV
 	return &result, nil
 }
 
-// GetBenchmark returns benchmark for given benchmark ID.
+// GetBenchmark return benchmark for given benchmark ID.
 func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkResponseV2, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
@@ -44,6 +44,16 @@ func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkRespons
 		return nil, fmt.Errorf("GetBenchmark(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// DeleteBenchmark remove benchmark with given benchmark ID.
+func (c *Client) DeleteBenchmark(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	endpoint := fmt.Sprintf("%s/benchmarks/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteBenchmark(%s): %w", id, err)
+	}
+	return nil
 }
 
 // ResolveBenchmarkIDByName looks up a Benchmark by its title field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.

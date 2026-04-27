@@ -67,14 +67,3 @@ func (c *Client) ListJamfProServerURLHistoryV1(ctx context.Context, sort []strin
 		return result.Results, hasNext, nil
 	})
 }
-
-// CreateJamfProServerURLHistoryNoteV1 add Jamf Pro Server URL settings history notes.
-func (c *Client) CreateJamfProServerURLHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	var result ObjectHistory
-	endpoint := prefix + "/jamf-pro-server-url/history"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateJamfProServerURLHistoryNoteV1: %w", err)
-	}
-	return &result, nil
-}

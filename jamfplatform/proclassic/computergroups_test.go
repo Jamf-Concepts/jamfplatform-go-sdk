@@ -179,6 +179,21 @@ func TestListComputerGroups_NotFound(t *testing.T) {
 	}
 }
 
+func TestCreateComputerGroupByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.CreateComputerGroupByName(context.Background(), "test-id", &ComputerGroupPost{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolveComputerGroupIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {

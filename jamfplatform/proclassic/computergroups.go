@@ -99,6 +99,16 @@ func (c *Client) ListComputerGroups(ctx context.Context) (*ComputerGroups, error
 	return &result, nil
 }
 
+// CreateComputerGroupByName creates a new computer group by ID.
+func (c *Client) CreateComputerGroupByName(ctx context.Context, name string, request *ComputerGroupPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateComputerGroupByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveComputerGroupIDByName looks up a ComputerGroup by name via GetComputerGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveComputerGroupIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetComputerGroupByName(ctx, name)

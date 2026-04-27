@@ -99,6 +99,16 @@ func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
 	return &result, nil
 }
 
+// CreateIBeaconByName creates a new iBeacon region by ID.
+func (c *Client) CreateIBeaconByName(ctx context.Context, name string, request *Ibeacon) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateIBeaconByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveIBeaconIDByName looks up a IBeacon by name via GetIBeaconByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveIBeaconIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetIBeaconByName(ctx, name)

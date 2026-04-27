@@ -99,6 +99,16 @@ func (c *Client) ListComputerExtensionAttributes(ctx context.Context) (*Computer
 	return &result, nil
 }
 
+// CreateComputerExtensionAttributeByName creates a new computer extension attribute by ID.
+func (c *Client) CreateComputerExtensionAttributeByName(ctx context.Context, name string, request *ComputerExtensionAttribute) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateComputerExtensionAttributeByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveComputerExtensionAttributeIDByName looks up a ComputerExtensionAttribute by name via GetComputerExtensionAttributeByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveComputerExtensionAttributeIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetComputerExtensionAttributeByName(ctx, name)

@@ -11,6 +11,50 @@ import (
 	"testing"
 )
 
+func TestListBenchmarkRulesStats(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/benchmarks/test-id/rules", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{}},
+			"totalCount": 1,
+			"hasNext":    false,
+		})
+	})
+
+	results, err := c.ListBenchmarkRulesStats(context.Background(), "test-id", "", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
+func TestListBenchmarkRuleDevices(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/benchmarks/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{}},
+			"totalCount": 1,
+			"hasNext":    false,
+		})
+	})
+
+	results, err := c.ListBenchmarkRuleDevices(context.Background(), "test-id", "", "", "", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
 func TestGetBenchmarkCompliancePercentage(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/benchmarks/test-id/compliance-percentage", func(w http.ResponseWriter, r *http.Request) {

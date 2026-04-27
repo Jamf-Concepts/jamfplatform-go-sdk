@@ -43,14 +43,3 @@ func (c *Client) SyncDdmV1(ctx context.Context, clientManagementID string) error
 	}
 	return nil
 }
-
-// GetDssDeclarationV1 retrieve an existing declaration.
-func (c *Client) GetDssDeclarationV1(ctx context.Context, declarationID string) (*DssDeclarations, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	var result DssDeclarations
-	endpoint := fmt.Sprintf("%s/dss-declarations/%s", prefix, url.PathEscape(declarationID))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetDssDeclarationV1(%s): %w", declarationID, err)
-	}
-	return &result, nil
-}

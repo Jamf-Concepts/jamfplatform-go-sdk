@@ -99,6 +99,16 @@ func (c *Client) ListNetworkSegments(ctx context.Context) (*NetworkSegments, err
 	return &result, nil
 }
 
+// CreateNetworkSegmentByName creates a new network segment by ID.
+func (c *Client) CreateNetworkSegmentByName(ctx context.Context, name string, request *NetworkSegmentPost) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/networksegments/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateNetworkSegmentByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveNetworkSegmentIDByName looks up a NetworkSegment by name via GetNetworkSegmentByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveNetworkSegmentIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetNetworkSegmentByName(ctx, name)

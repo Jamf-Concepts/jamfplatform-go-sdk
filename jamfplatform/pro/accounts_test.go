@@ -108,7 +108,7 @@ func TestResolveAccountV1IDByName(t *testing.T) {
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results": []map[string]any{
-				{"id": 42, "username": "target"},
+				{"id": "resolved-id", "username": "target"},
 			},
 			"totalCount": 1,
 		})
@@ -118,8 +118,8 @@ func TestResolveAccountV1IDByName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if id != "42" {
-		t.Errorf("id = %q, want 42", id)
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
 	}
 }
 
@@ -131,7 +131,7 @@ func TestResolveAccountV1ByName(t *testing.T) {
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results": []map[string]any{
-				{"id": 42, "username": "target"},
+				{"id": "resolved-id", "username": "target"},
 			},
 			"totalCount": 1,
 		})

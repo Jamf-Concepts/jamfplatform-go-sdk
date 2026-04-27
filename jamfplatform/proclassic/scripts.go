@@ -99,6 +99,16 @@ func (c *Client) ListScripts(ctx context.Context) (*Scripts, error) {
 	return &result, nil
 }
 
+// CreateScriptByName creates a new script by ID.
+func (c *Client) CreateScriptByName(ctx context.Context, name string, request *Script) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/scripts/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateScriptByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveScriptIDByName looks up a Script by name via GetScriptByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveScriptIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetScriptByName(ctx, name)

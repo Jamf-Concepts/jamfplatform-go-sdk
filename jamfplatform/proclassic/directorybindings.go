@@ -99,6 +99,16 @@ func (c *Client) ListDirectoryBindings(ctx context.Context) (*DirectoryBindings,
 	return &result, nil
 }
 
+// CreateDirectoryBindingByName creates a new directory binding by ID.
+func (c *Client) CreateDirectoryBindingByName(ctx context.Context, name string, request *DirectoryBinding) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateDirectoryBindingByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveDirectoryBindingIDByName looks up a DirectoryBinding by name via GetDirectoryBindingByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveDirectoryBindingIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetDirectoryBindingByName(ctx, name)

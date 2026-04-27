@@ -1029,17 +1029,6 @@ func TestAcceptance_Classic_ProbeUpdate_UpdateSoftwareUpdateServerByName(t *test
 	}
 }
 
-func TestAcceptance_Classic_ProbeUpdate_UpdateUserByEmail(t *testing.T) {
-	c := accClient(t)
-	if err := proclassic.New(c).UpdateUserByEmail(context.Background(), "sdk-probe-update-nonexistent", &proclassic.UserPost{}); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return
-		}
-		t.Fatalf("UpdateUserByEmail transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_ProbeUpdate_UpdateUserByID(t *testing.T) {
 	c := accClient(t)
@@ -1313,5 +1302,83 @@ func TestAcceptance_Classic_Probe_UpdatePatchExternalSourceByName(t *testing.T) 
 			return
 		}
 		t.Fatalf("UpdatePatchExternalSourceByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateComputerByMacAddress(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateComputerByMacAddress(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.ComputerPost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateComputerByMacAddress transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateComputerBySerialNumber(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateComputerBySerialNumber(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.ComputerPost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateComputerBySerialNumber transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateComputerByUDID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateComputerByUDID(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.ComputerPost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateComputerByUDID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateMobileDeviceByID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateMobileDeviceByID(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.MobileDevicePost{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateMobileDeviceByID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateScriptByID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateScriptByID(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.Script{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateScriptByID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_UpdateBuildingByID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).UpdateBuildingByID(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.Building{})
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("UpdateBuildingByID transport error: %v", err)
 	}
 }

@@ -620,17 +620,6 @@ func TestAcceptance_Classic_ProbeDelete_DeleteSoftwareUpdateServerByName(t *test
 	}
 }
 
-func TestAcceptance_Classic_ProbeDelete_DeleteUserByEmail(t *testing.T) {
-	c := accClient(t)
-	if err := proclassic.New(c).DeleteUserByEmail(context.Background(), "sdk-probe-delete-nonexistent"); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
-			return // endpoint responded; plumbing verified
-		}
-		t.Fatalf("DeleteUserByEmail transport error: %v", err)
-	}
-}
 
 func TestAcceptance_Classic_ProbeDelete_DeleteUserByName(t *testing.T) {
 	c := accClient(t)
@@ -856,5 +845,70 @@ func TestAcceptance_Classic_Probe_DeleteClassicPackageByName(t *testing.T) {
 			return
 		}
 		t.Fatalf("DeleteClassicPackageByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteComputerByMacAddress(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteComputerByMacAddress(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteComputerByMacAddress transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteComputerByUDID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteComputerByUDID(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteComputerByUDID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteComputerInvitationByName(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteComputerInvitationByName(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteComputerInvitationByName transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeleteInfrastructureManagerByID(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeleteInfrastructureManagerByID(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeleteInfrastructureManagerByID transport error: %v", err)
+	}
+}
+
+func TestAcceptance_Classic_Probe_DeletePatchExternalSourceByName(t *testing.T) {
+	c := accClient(t)
+	err := proclassic.New(c).DeletePatchExternalSourceByName(context.Background(), "sdk-probe-nonexistent-xyz")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			return
+		}
+		t.Fatalf("DeletePatchExternalSourceByName transport error: %v", err)
 	}
 }

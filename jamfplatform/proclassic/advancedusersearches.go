@@ -99,6 +99,16 @@ func (c *Client) UpdateAdvancedUserSearchByName(ctx context.Context, name string
 	return nil
 }
 
+// CreateAdvancedUserSearchByName creates a new advanced user search by ID.
+func (c *Client) CreateAdvancedUserSearchByName(ctx context.Context, name string, request *AdvancedUserSearch) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/advancedusersearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateAdvancedUserSearchByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveAdvancedUserSearchIDByName looks up a AdvancedUserSearch by name via GetAdvancedUserSearchByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveAdvancedUserSearchIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetAdvancedUserSearchByName(ctx, name)

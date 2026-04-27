@@ -1,6 +1,78 @@
 {
   "components": {
+    "parameters": {
+      "tenantId": {
+        "description": "The tenant UUID identifier",
+        "in": "path",
+        "name": "tenantId",
+        "required": true,
+        "schema": {
+          "example": "e77c1408-10c8-4007-b177-abc9157fbcaa",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        },
+        "description": "Bad request due to invalid parameters"
+      }
+    },
     "schemas": {
+      "ApiError": {
+        "properties": {
+          "errors": {
+            "items": {
+              "properties": {
+                "code": {
+                  "description": "Error-specific code for troubleshooting",
+                  "example": "INVALID_FIELD",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "A detailed error message",
+                  "example": "Invalid value for field name",
+                  "type": "string"
+                },
+                "field": {
+                  "description": "The field that caused the error",
+                  "example": "name",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "httpStatus": {
+            "description": "HTTP status of the response",
+            "example": 400,
+            "maximum": 599,
+            "minimum": 100,
+            "type": "integer"
+          },
+          "traceId": {
+            "description": "Unique identifier for the request, useful for tracing and debugging",
+            "example": "7AF8CEAB-F7EE-45C3-B573-38A4F93C6E7E",
+            "type": "string"
+          }
+        },
+        "required": [
+          "httpStatus",
+          "errors",
+          "traceId"
+        ],
+        "type": "object"
+      },
       "BaselineInfo": {
         "properties": {
           "baselineId": {
@@ -168,6 +240,45 @@
         ],
         "type": "object"
       },
+      "BenchmarkRuleDevicesResponse": {
+        "description": "Representation of devices for a benchmark rule. Used for drill-down view controller",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/DeviceRuleResult"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "readOnly": true,
+        "type": "object"
+      },
+      "BenchmarkRulesStatsResponse": {
+        "description": "Representation of rules results for whole benchmark. Used for top-level view controller",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/RuleResult"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "BenchmarkV2": {
         "properties": {
           "description": {
@@ -220,6 +331,46 @@
         },
         "required": [
           "benchmarks"
+        ],
+        "type": "object"
+      },
+      "CompliancePercentage": {
+        "properties": {
+          "compliancePercentage": {
+            "example": 82.7,
+            "format": "float",
+            "maximum": 100,
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "compliancePercentage"
+        ],
+        "type": "object"
+      },
+      "DeviceRuleResult": {
+        "properties": {
+          "deviceId": {
+            "description": "Device Platform ID",
+            "example": "641dcad2-695f-456b-83e7-ec58f2e14ec6",
+            "minLength": 1,
+            "type": "string"
+          },
+          "deviceName": {
+            "example": "John's MacBook Pro",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "$ref": "#/components/schemas/RuleResultState"
+          }
+        },
+        "required": [
+          "deviceId",
+          "state"
         ],
         "type": "object"
       },
@@ -421,6 +572,73 @@
         ],
         "type": "object"
       },
+      "RuleResult": {
+        "properties": {
+          "discussion": {
+            "example": "The information system _IS_ configured to allow administrators to modify security settings and system attributes.",
+            "type": "string"
+          },
+          "failed": {
+            "example": 40,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "numberOfDevices": {
+            "example": 200,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "passPercentage": {
+            "example": 75,
+            "format": "float",
+            "minimum": 0,
+            "type": "number"
+          },
+          "passed": {
+            "example": 150,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "ruleId": {
+            "example": "supplemental_password_policy",
+            "minLength": 1,
+            "type": "string"
+          },
+          "ruleNumber": {
+            "description": "Rule number in the benchmark, if applicable. E.g. CIS numbers like '2.5.1.1'.",
+            "example": "2.5.1.1",
+            "type": "string"
+          },
+          "ruleTitle": {
+            "example": "Password Policy Supplemental",
+            "minLength": 1,
+            "type": "string"
+          },
+          "unknown": {
+            "example": 10,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ruleId",
+          "ruleTitle",
+          "passed",
+          "failed",
+          "unknown",
+          "passPercentage",
+          "numberOfDevices"
+        ],
+        "type": "object"
+      },
+      "RuleResultState": {
+        "enum": [
+          "PASSED",
+          "FAILED",
+          "UNKNOWN"
+        ],
+        "type": "string"
+      },
       "Source": {
         "properties": {
           "branch": {
@@ -497,18 +715,37 @@
         },
         "type": "object"
       }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "bearerFormat": "JWT",
+        "description": "JWT Bearer token authentication. Obtain a token from the Jamf API Gateway.",
+        "scheme": "bearer",
+        "type": "http"
+      }
     }
   },
   "info": {
-    "title": "compliance-benchmark-engine",
+    "contact": {
+      "name": "Jamf Developer",
+      "url": "https://developer.jamf.com"
+    },
+    "description": "Jamf Compliance Benchmarks API allows you to manage, enforce, and validate compliance on Apple devices",
+    "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
+    "title": "Jamf Compliance Benchmarks API - Beta",
     "version": "latest"
   },
   "openapi": "3.1.0",
   "paths": {
-    "/v1/baselines": {
+    "/v1/tenant/{tenantId}/baselines": {
       "get": {
-        "description": "Returns list of the mSCP baselines allowed for the Compliance benchmarks",
-        "operationId": "getBaselines_1",
+        "description": "Return list of the mSCP baselines allowed for the Compliance benchmarks\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
+        "operationId": "getBaselines",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -527,98 +764,30 @@
             "description": "Insufficient permissions"
           }
         },
-        "summary": "Returns list of the mSCP baselines",
-        "tags": [
-          "baseline-controller"
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "summary": "Return list of the mSCP baselines",
+        "tags": [
+          "baselines"
+        ],
+        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:compliance-benchmarks",
           "read:pro:compliance-benchmarks"
         ]
       }
     },
-    "/v1/benchmarks/{benchmarkId}": {
-      "delete": {
-        "description": "Removes benchmark with given benchmark and removes associated draft (if any) and artifacts from the MDM",
-        "operationId": "deleteBenchmark",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "benchmarkId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful operation result"
-          },
-          "400": {
-            "description": "Invalid benchmark request or missing benchmark ID"
-          },
-          "401": {
-            "description": "Unauthorized request"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          }
-        },
-        "summary": "Removes benchmark with given benchmark ID",
-        "tags": [
-          "benchmark-controller"
-        ],
-        "x-required-privileges": [
-          "delete:env:compliance-benchmarks",
-          "delete:pro:compliance-benchmarks"
-        ]
-      }
-    },
-    "/v1/rules": {
+    "/v1/tenant/{tenantId}/benchmarks": {
       "get": {
-        "description": "Returns list of the rules for given mSCP baseline together with sources that provide them",
-        "operationId": "getRules",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "baselineId",
-            "required": true,
-            "schema": {
-              "minLength": 1,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SourcedRules"
-                }
-              }
-            },
-            "description": "Successful operation result"
-          },
-          "400": {
-            "description": "Missing or empty baseline ID"
-          }
-        },
-        "summary": "Get list of rules for given baseline",
-        "tags": [
-          "rule-controller"
-        ],
-        "x-required-privileges": [
-          "read:env:compliance-benchmarks",
-          "read:pro:compliance-benchmarks"
-        ]
-      }
-    },
-    "/v2/benchmarks": {
-      "get": {
-        "description": "Returns list of tenant benchmarks (if any)",
+        "description": "Return list of tenant benchmarks (if any)\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
         "operationId": "getTenantBenchmarks",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -637,18 +806,28 @@
             "description": "Insufficient permissions"
           }
         },
-        "summary": "Returns list of tenant benchmarks",
-        "tags": [
-          "benchmark-controller-v-2"
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "summary": "Return list of tenant benchmarks",
+        "tags": [
+          "benchmarks"
+        ],
+        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:compliance-benchmarks",
           "read:pro:compliance-benchmarks"
         ]
       },
       "post": {
-        "description": "Creates a new benchmark from provided benchmark request and deploys associated artifacts to the MDM",
+        "description": "Create a new benchmark from provided benchmark request and deploy associated artifacts to the MDM\n\n**Required Permissions:** `create:pro:compliance-benchmarks`",
         "operationId": "postBenchmark",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -683,21 +862,73 @@
             "description": "Benchmark with the same title exists already or database write conflict occurred"
           }
         },
-        "summary": "Creates a new benchmark from provided benchmark request",
-        "tags": [
-          "benchmark-controller-v-2"
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "summary": "Create a new benchmark from provided benchmark request",
+        "tags": [
+          "benchmarks"
+        ],
+        "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:compliance-benchmarks",
           "create:pro:compliance-benchmarks"
         ]
       }
     },
-    "/v2/benchmarks/{id}": {
+    "/v1/tenant/{tenantId}/benchmarks/{id}": {
+      "delete": {
+        "description": "Remove benchmark with given benchmark ID and remove associated draft (if any) and artifacts from the MDM\n\n**Required Permissions:** `delete:pro:compliance-benchmarks`",
+        "operationId": "deleteBenchmark",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation result"
+          },
+          "400": {
+            "description": "Invalid benchmark request or missing benchmark ID"
+          },
+          "401": {
+            "description": "Unauthorized request"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove benchmark with given benchmark ID",
+        "tags": [
+          "benchmarks"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "delete:pro:compliance-benchmarks"
+        ]
+      },
       "get": {
-        "description": "Returns benchmark for given benchmark ID (if exists)",
+        "description": "Return benchmark for given benchmark ID (if exists)\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
         "operationId": "getBenchmark",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
           {
             "in": "path",
             "name": "id",
@@ -731,15 +962,326 @@
             "description": "Benchmark not found"
           }
         },
-        "summary": "Returns benchmark for given benchmark ID",
-        "tags": [
-          "benchmark-controller-v-2"
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "summary": "Return benchmark for given benchmark ID",
+        "tags": [
+          "benchmarks"
+        ],
+        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:compliance-benchmarks",
+          "read:pro:compliance-benchmarks"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/benchmarks/{id}/compliance-percentage": {
+      "get": {
+        "description": "Calculate and return the overall compliance percentage for a specific benchmark report as sum of device compliance scores divided by number of devices\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
+        "operationId": "v1GetBenchmarkCompliancePercentage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Tenant's benchmark ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompliancePercentage"
+                }
+              }
+            },
+            "description": "Successful response with compliance percentage"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "description": "Benchmark has no applicable rules for reporting calculations"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get compliance percentage for a benchmark report",
+        "tags": [
+          "benchmark-reports"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:compliance-benchmarks"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/benchmarks/{id}/devices": {
+      "get": {
+        "description": "Provide devices filtered report for a specific benchmark rule\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
+        "operationId": "v1GetDevicesForBenchmarkRule",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Tenant's benchmark ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rule-id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Search devices with matching device name or device ID",
+            "in": "query",
+            "name": "device-search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rule-result",
+            "schema": {
+              "$ref": "#/components/schemas/RuleResultState"
+            }
+          },
+          {
+            "description": "Page number (0-based index, default is 0)",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of results per page (default is 100)",
+            "in": "query",
+            "name": "page-size",
+            "schema": {
+              "default": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Sort order of result (e.g., 'deviceName:asc', 'ruleResult:desc'). Supports chained sorting like 'deviceName,ruleResult:desc'. Ascending order is default and in such a case doesn't require to be specified.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "ruleResult:desc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BenchmarkRuleDevicesResponse"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get devices for a benchmark report rule",
+        "tags": [
+          "benchmark-reports"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:compliance-benchmarks"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/benchmarks/{id}/rules": {
+      "get": {
+        "description": "Provide benchmark rules stats for a specific benchmark\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
+        "operationId": "v1GetBenchmarkRulesStats",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Tenant's benchmark ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "string to search in rule title and rule id",
+            "in": "query",
+            "name": "rule-search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Page number (0-based index, default is 0)",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of results per page (default is 500)",
+            "in": "query",
+            "name": "page-size",
+            "schema": {
+              "default": 500,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Sort order of result (e.g., 'ruleTitle:asc', 'passed:desc', 'failed:desc', 'unknown:desc'). Supports chained sorting like 'ruleId,passed:desc'. Ascending order is default and in such a case doesn't require to be specified, such as 'ruleNumber,ruleTitle'.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "ruleNumber,ruleTitle",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BenchmarkRulesStatsResponse"
+                }
+              }
+            },
+            "description": "Successful response with benchmark rules list"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get benchmark rules for a tenant",
+        "tags": [
+          "benchmark-reports"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:compliance-benchmarks"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/rules": {
+      "get": {
+        "description": "Return list of the rules for given mSCP baseline together with sources that provide them\n\n**Required Permissions:** `read:pro:compliance-benchmarks`",
+        "operationId": "getRules",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "in": "query",
+            "name": "baselineId",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourcedRules"
+                }
+              }
+            },
+            "description": "Successful operation result"
+          },
+          "400": {
+            "description": "Missing or empty baseline ID"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get list of rules for given baseline",
+        "tags": [
+          "rules"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
           "read:pro:compliance-benchmarks"
         ]
       }
     }
-  }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "description": "Jamf Beta API Gateway - prod",
+      "url": "https://{region}.apigw.jamf.com/api/compliance-benchmarks",
+      "variables": {
+        "region": {
+          "default": "us",
+          "description": "Geographic deployment region",
+          "enum": [
+            "us",
+            "eu",
+            "apac"
+          ]
+        }
+      }
+    }
+  ]
 }

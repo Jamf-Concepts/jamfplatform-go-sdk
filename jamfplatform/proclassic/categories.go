@@ -99,6 +99,16 @@ func (c *Client) ListCategories(ctx context.Context) (*Categories, error) {
 	return &result, nil
 }
 
+// CreateCategoryByName creates a new category by ID.
+func (c *Client) CreateCategoryByName(ctx context.Context, name string, request *Category) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/categories/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateCategoryByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveCategoryIDByName looks up a Category by name via GetCategoryByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveCategoryIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetCategoryByName(ctx, name)

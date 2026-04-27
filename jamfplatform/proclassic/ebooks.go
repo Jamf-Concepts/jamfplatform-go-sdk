@@ -110,15 +110,14 @@ func (c *Client) GetEbookByIDSubset(ctx context.Context, id string, subset strin
 	return &result, nil
 }
 
-// GetEbookByNameSubset finds a subset of data for ebooks by name.
-func (c *Client) GetEbookByNameSubset(ctx context.Context, name string, subset string) (*Ebook, error) {
+// CreateEbookByName creates a new ebook by ID.
+func (c *Client) CreateEbookByName(ctx context.Context, name string, request *EbookPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result Ebook
-	endpoint := fmt.Sprintf("%s/ebooks/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetEbookByNameSubset(%s): %w", name, err)
+	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateEbookByName(%s): %w", name, err)
 	}
-	return &result, nil
+	return nil
 }
 
 // ResolveEbookIDByName looks up a Ebook by name via GetEbookByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.

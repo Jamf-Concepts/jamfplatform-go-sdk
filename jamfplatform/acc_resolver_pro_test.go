@@ -1327,7 +1327,6 @@ func TestAcceptance_ResolveAccountV1_Lifecycle(t *testing.T) {
 	acctEmail := name + "@example.invalid"
 	siteID := -1
 	acctStatus := "Enabled"
-	acctType := "DEFAULT"
 	falseVal := false
 	ldapServerID := -1
 	distinguishedName := ""
@@ -1346,7 +1345,6 @@ func TestAcceptance_ResolveAccountV1_Lifecycle(t *testing.T) {
 			LdapServerID:              &ldapServerID,
 			DistinguishedName:         &distinguishedName,
 			AccountStatus:             &acctStatus,
-			AccountType:               &acctType,
 			ChangePasswordOnNextLogin: &falseVal,
 		}
 	}
@@ -2627,64 +2625,6 @@ func TestAcceptance_ResolveMobileDeviceDetailV2IDByUDID_Existing(t *testing.T) {
 		t.Errorf("resolved id = %q, want %q", gotID, mobileDeviceID)
 	}
 	t.Logf("resolved UDID %q → %s ✓", udid, gotID)
-}
-
-// ─── RemoteAdminConfiguration (TeamViewer) ──────────────────────────────────
-// No create/delete endpoint. Read-only probe.
-
-func TestAcceptance_ResolveRemoteAdminConfigurationPreview_NotFound(t *testing.T) {
-	c := pro.New(accClient(t))
-	_, err := c.ResolveRemoteAdminConfigurationPreviewIDByName(context.Background(), "sdk-does-not-exist-teamviewer-"+runSuffix())
-	requireNotFoundErr(t, "ResolveRemoteAdminConfigurationPreviewIDByName", err)
-	t.Log("not-found surfaced 404 ✓")
-}
-
-func TestAcceptance_ResolveRemoteAdminConfigurationPreview_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	configs, err := c.ListRemoteAdminConfigurations(ctx)
-	if err != nil {
-		t.Fatalf("ListRemoteAdminConfigurations: %v", err)
-	}
-	if len(configs) == 0 {
-		t.Skip("no remote admin configurations — skipping")
-	}
-	first := configs[0]
-	gotID, err := c.ResolveRemoteAdminConfigurationPreviewIDByName(ctx, first.DisplayName)
-	if err != nil {
-		t.Fatalf("resolve: %v", err)
-	}
-	if gotID != first.ID {
-		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
-	}
-	t.Logf("resolved %q → %s ✓", first.DisplayName, gotID)
-}
-
-func TestAcceptance_ResolveRemoteAdminConfigurationPreview_Typed(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	configs, err := c.ListRemoteAdminConfigurations(ctx)
-	if err != nil {
-		t.Fatalf("ListRemoteAdminConfigurations: %v", err)
-	}
-	if len(configs) == 0 {
-		t.Skip("no remote admin configurations — skipping")
-	}
-	first := configs[0]
-	got, err := c.ResolveRemoteAdminConfigurationPreviewByName(ctx, first.DisplayName)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil {
-		t.Fatal("resolve returned nil")
-	}
-	if got.ID != first.ID {
-		t.Errorf("typed ID = %q, want %q", got.ID, first.ID)
-	}
-	if got.DisplayName != first.DisplayName {
-		t.Errorf("typed DisplayName = %q, want %q", got.DisplayName, first.DisplayName)
-	}
-	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
 }
 
 // ─── JamfConnectConfigProfile (read-only) ───────────────────────────────────

@@ -25,26 +25,6 @@ import (
 // fixture env var. api-integrations + api-roles are self-contained
 // and run full CRUD.
 
-// --- api-authentication ------------------------------------------------
-
-// GetAuthorizationV1 is the user-authorization-session probe. OAuth
-// client-credential callers don't have a user identity and get 403
-// BAD_PERMISSIONS — documented server behaviour, not an SDK fault.
-func TestAcceptance_Pro_Security_GetAuthorizationV1(t *testing.T) {
-	c := accClient(t)
-
-	auth, err := pro.New(c).GetAuthorizationV1(context.Background())
-	if err != nil {
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.StatusCode == 403 {
-			t.Skip("GetAuthorizationV1: 403 — endpoint requires a user-scoped token, not an OAuth client credential")
-		}
-		skipOnServerError(t, err)
-		t.Fatalf("GetAuthorizationV1: %v", err)
-	}
-	t.Logf("Authorization account: %+v", auth)
-}
-
 // --- api-integrations --------------------------------------------------
 
 func TestAcceptance_Pro_Security_ApiIntegrationCRUDV1(t *testing.T) {
@@ -663,23 +643,6 @@ func TestAcceptance_Pro_Security_GenerateSsoFailoverV1(t *testing.T) {
 		t.Error("GenerateSsoFailoverV1 returned empty FailoverURL")
 	}
 	t.Logf("SSO failover URL rotated (URL not logged)")
-}
-
-// --- sso-oauth-session-tokens -----------------------------------------
-
-func TestAcceptance_Pro_Security_ListOauthSessionTokensV1(t *testing.T) {
-	c := accClient(t)
-
-	tokens, err := pro.New(c).ListSsoOauthSessionTokensV1(context.Background())
-	if err != nil {
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.StatusCode == 403 {
-			t.Skipf("ListSsoOauthSessionTokensV1: 403 — OAuth client lacks privilege for this endpoint (needs a user-scoped token)")
-		}
-		skipOnServerError(t, err)
-		t.Fatalf("ListSsoOauthSessionTokensV1: %v", err)
-	}
-	t.Logf("OAuth2 session tokens: %+v", tokens)
 }
 
 // min is a tiny helper used in PEM slicing above.

@@ -132,15 +132,14 @@ func (c *Client) GetPolicyByIDSubset(ctx context.Context, id string, subset stri
 	return &result, nil
 }
 
-// GetPolicyByNameSubset finds a subset of data for policies by name.
-func (c *Client) GetPolicyByNameSubset(ctx context.Context, name string, subset string) (*Policy, error) {
+// CreatePolicyByName creates a new policy by ID.
+func (c *Client) CreatePolicyByName(ctx context.Context, name string, request *PolicyPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result Policy
-	endpoint := fmt.Sprintf("%s/policies/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetPolicyByNameSubset(%s): %w", name, err)
+	endpoint := fmt.Sprintf("%s/policies/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreatePolicyByName(%s): %w", name, err)
 	}
-	return &result, nil
+	return nil
 }
 
 // ResolvePolicyIDByName looks up a Policy by name via GetPolicyByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.

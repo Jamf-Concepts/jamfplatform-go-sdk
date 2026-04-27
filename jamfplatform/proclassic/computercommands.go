@@ -67,13 +67,24 @@ func (c *Client) CreateComputerCommandByCommand(ctx context.Context, command str
 	return &result, nil
 }
 
-// CreateComputerCommandByCommandActionID creates a new computer command with a command specific action. Commands supported: ScheduleOSUpdate (deprecated on 2022-10-17).
-func (c *Client) CreateComputerCommandByCommandActionID(ctx context.Context, command string, action string, id string, request *ComputerCommandPost) (*ComputerCommand, error) {
+// GetComputerCommandsByCommand finds all computer commands by name.
+func (c *Client) GetComputerCommandsByCommand(ctx context.Context, command string) (*ComputerCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerCommand
-	endpoint := fmt.Sprintf("%s/computercommands/command/%s/action/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(action), url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateComputerCommandByCommandActionID(%s): %w", command, err)
+	endpoint := fmt.Sprintf("%s/computercommands/command/%s", prefix, url.PathEscape(command))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerCommandsByCommand(%s): %w", command, err)
+	}
+	return &result, nil
+}
+
+// GetComputerCommandsByStatus finds a computer command by UUID.
+func (c *Client) GetComputerCommandsByStatus(ctx context.Context, uuid string) (*ComputerCommand, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result ComputerCommand
+	endpoint := fmt.Sprintf("%s/computercommands/status/%s", prefix, url.PathEscape(uuid))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerCommandsByStatus(%s): %w", uuid, err)
 	}
 	return &result, nil
 }

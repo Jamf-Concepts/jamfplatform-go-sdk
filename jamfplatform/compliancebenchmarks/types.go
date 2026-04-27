@@ -7,6 +7,20 @@ package compliancebenchmarks
 
 import "time"
 
+// ApiError represents a api error.
+type ApiError struct {
+	Errors     []ApiErrorErrorsItem `json:"errors"`
+	HttpStatus int                  `json:"httpStatus"`
+	TraceID    string               `json:"traceId"`
+}
+
+// ApiErrorErrorsItem represents a api error errors item.
+type ApiErrorErrorsItem struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Field       string `json:"field"`
+}
+
 // BaselineInfo represents a baseline info.
 type BaselineInfo struct {
 	BaselineID  string `json:"baselineId"`
@@ -49,6 +63,18 @@ type BenchmarkResponseV2 struct {
 	UpdateAvailable    bool       `json:"updateAvailable"`
 }
 
+// BenchmarkRuleDevicesResponse Representation of devices for a benchmark rule. Used for drill-down view controller.
+type BenchmarkRuleDevicesResponse struct {
+	Results    []DeviceRuleResult `json:"results"`
+	TotalCount int                `json:"totalCount"`
+}
+
+// BenchmarkRulesStatsResponse Representation of rules results for whole benchmark. Used for top-level view controller.
+type BenchmarkRulesStatsResponse struct {
+	Results    []RuleResult `json:"results"`
+	TotalCount int          `json:"totalCount"`
+}
+
 // BenchmarkV2 represents a benchmark v2.
 type BenchmarkV2 struct {
 	Description     string    `json:"description"`
@@ -63,6 +89,18 @@ type BenchmarkV2 struct {
 // BenchmarksResponseV2 represents a benchmarks response v2.
 type BenchmarksResponseV2 struct {
 	Benchmarks []BenchmarkV2 `json:"benchmarks"`
+}
+
+// CompliancePercentage represents a compliance percentage.
+type CompliancePercentage struct {
+	CompliancePercentage float32 `json:"compliancePercentage"`
+}
+
+// DeviceRuleResult represents a device rule result.
+type DeviceRuleResult struct {
+	DeviceID   string          `json:"deviceId"`
+	DeviceName any             `json:"deviceName"`
+	State      RuleResultState `json:"state"`
 }
 
 // ODVRecommendation represents a o d v recommendation.
@@ -129,6 +167,22 @@ type RuleRequest struct {
 	ODV     *ODVRequest `json:"odv,omitempty"`
 }
 
+// RuleResult represents a rule result.
+type RuleResult struct {
+	Discussion      string  `json:"discussion"`
+	Failed          int     `json:"failed"`
+	NumberOfDevices int     `json:"numberOfDevices"`
+	PassPercentage  float32 `json:"passPercentage"`
+	Passed          int     `json:"passed"`
+	RuleID          string  `json:"ruleId"`
+	RuleNumber      string  `json:"ruleNumber"`
+	RuleTitle       string  `json:"ruleTitle"`
+	Unknown         int     `json:"unknown"`
+}
+
+// RuleResultState represents a rule result state value.
+type RuleResultState = string
+
 // Source represents a source.
 type Source struct {
 	Branch   string `json:"branch"`
@@ -153,57 +207,3 @@ type ValidationConstraints struct {
 	Min        int      `json:"min"`
 	Regex      string   `json:"regex"`
 }
-
-// ApiError represents a api error.
-type ApiError struct {
-	Errors     []ApiErrorErrorsItem `json:"errors"`
-	HttpStatus int                  `json:"httpStatus"`
-	TraceID    string               `json:"traceId"`
-}
-
-// ApiErrorErrorsItem represents a api error errors item.
-type ApiErrorErrorsItem struct {
-	Code        string `json:"code"`
-	Description string `json:"description"`
-	Field       string `json:"field"`
-}
-
-// BenchmarkRuleDevicesResponse Representation of devices for a benchmark rule. Used for drill-down view controller.
-type BenchmarkRuleDevicesResponse struct {
-	Results    []DeviceRuleResult `json:"results"`
-	TotalCount int                `json:"totalCount"`
-}
-
-// BenchmarkRulesStatsResponse Representation of rules results for whole benchmark. Used for top-level view controller.
-type BenchmarkRulesStatsResponse struct {
-	Results    []RuleResult `json:"results"`
-	TotalCount int          `json:"totalCount"`
-}
-
-// CompliancePercentage represents a compliance percentage.
-type CompliancePercentage struct {
-	CompliancePercentage float32 `json:"compliancePercentage"`
-}
-
-// DeviceRuleResult represents a device rule result.
-type DeviceRuleResult struct {
-	DeviceID   string          `json:"deviceId"`
-	DeviceName *string         `json:"deviceName,omitempty"`
-	State      RuleResultState `json:"state"`
-}
-
-// RuleResult represents a rule result.
-type RuleResult struct {
-	Discussion      string  `json:"discussion"`
-	Failed          int     `json:"failed"`
-	NumberOfDevices int     `json:"numberOfDevices"`
-	PassPercentage  float32 `json:"passPercentage"`
-	Passed          int     `json:"passed"`
-	RuleID          string  `json:"ruleId"`
-	RuleNumber      string  `json:"ruleNumber"`
-	RuleTitle       string  `json:"ruleTitle"`
-	Unknown         int     `json:"unknown"`
-}
-
-// RuleResultState represents a rule result state value.
-type RuleResultState = string

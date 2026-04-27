@@ -99,6 +99,16 @@ func (c *Client) UpdateAdvancedComputerSearchByName(ctx context.Context, name st
 	return nil
 }
 
+// CreateAdvancedComputerSearchByName creates a new advanced computer search.
+func (c *Client) CreateAdvancedComputerSearchByName(ctx context.Context, name string, request *AdvancedComputerSearch) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateAdvancedComputerSearchByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveAdvancedComputerSearchIDByName looks up a AdvancedComputerSearch by name via GetAdvancedComputerSearchByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveAdvancedComputerSearchIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetAdvancedComputerSearchByName(ctx, name)

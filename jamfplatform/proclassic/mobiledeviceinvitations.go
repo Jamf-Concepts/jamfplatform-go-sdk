@@ -86,3 +86,14 @@ func (c *Client) CreateMobileDeviceInvitationByInvitation(ctx context.Context, i
 	}
 	return &result, nil
 }
+
+// UpdateMobileDeviceInvitationByInvitation creates a new mobile device invitation by id.
+func (c *Client) UpdateMobileDeviceInvitationByInvitation(ctx context.Context, invitation string, request *MobileDeviceInvitationPost) (*MobileDeviceInvitation, error) {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	var result MobileDeviceInvitation
+	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/invitation/%s", prefix, url.PathEscape(invitation))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("UpdateMobileDeviceInvitationByInvitation(%s): %w", invitation, err)
+	}
+	return &result, nil
+}

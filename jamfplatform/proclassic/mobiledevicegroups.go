@@ -99,6 +99,16 @@ func (c *Client) ListMobileDeviceGroups(ctx context.Context) (*MobileDeviceGroup
 	return &result, nil
 }
 
+// CreateMobileDeviceGroupByName creates a new mobile device group by ID.
+func (c *Client) CreateMobileDeviceGroupByName(ctx context.Context, name string, request *MobileDeviceGroup) error {
+	prefix := c.transport.TenantPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("CreateMobileDeviceGroupByName(%s): %w", name, err)
+	}
+	return nil
+}
+
 // ResolveMobileDeviceGroupIDByName looks up a MobileDeviceGroup by name via GetMobileDeviceGroupByName and returns its ID as a string. Returns an error when the underlying call returns a nil ID.
 func (c *Client) ResolveMobileDeviceGroupIDByName(ctx context.Context, name string) (string, error) {
 	r, err := c.GetMobileDeviceGroupByName(ctx, name)

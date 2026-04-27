@@ -45,6 +45,12 @@ func applySchemaAdditions(doc *openapi3.T, additions map[string]map[string]strin
 				propSchema.Format = "password"
 				propSchema.WriteOnly = true
 			}
+			// "object" with no properties → freeform JSON (decoded as json.RawMessage).
+			// The schema has type:object and no further constraints so the generator's
+			// freeform-object detector fires and emits the field as json.RawMessage.
+			if baseType == "object" {
+				propSchema.AdditionalProperties = openapi3.AdditionalProperties{}
+			}
 			schema.Properties[propName] = &openapi3.SchemaRef{Value: propSchema}
 		}
 	}
@@ -439,6 +445,12 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 			continue
 		}
 		if schema.Type == nil {
+			// oneOf + discriminator with no explicit type field (some specs
+			// omit "type: object" on union roots, e.g. BookmarkItem).
+			if schema.Discriminator != nil && len(schema.OneOf) > 0 && !hasContentAddressedDiscriminator(schema) {
+				types = append(types, schemaToDiscriminatorType(name, schema))
+				continue
+			}
 			// Swagger 2.0 often omits type: object on definitions that are
 			// clearly objects (Classic spec does this). If there are
 			// properties, treat it as an object anyway.
@@ -514,7 +526,11 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 		}
 
 		// oneOf + discriminator → union type with per-variant pointer fields.
-		if schema.Discriminator != nil && len(schema.OneOf) > 0 {
+		// Skip when the discriminator mapping keys are content-addressing
+		// identifiers (contain dots, e.g. "com.jamf.ddm.*"). Those are value
+		// discriminants for routing/documentation, not Go-safe type tags. The
+		// schema falls through to normal struct generation instead.
+		if schema.Discriminator != nil && len(schema.OneOf) > 0 && !hasContentAddressedDiscriminator(schema) {
 			types = append(types, schemaToDiscriminatorType(name, schema))
 			continue
 		}
@@ -714,6 +730,23 @@ func stripConflictingXMLNames(types []GoType) {
 	}
 }
 
+// hasContentAddressedDiscriminator reports whether any discriminator mapping
+// key contains a dot. Dot-containing keys are reverse-DNS content addresses
+// (e.g. "com.jamf.ddm.passcode-settings"), not simple type discriminators.
+// Schemas with such keys should not be emitted as Go union structs because
+// the keys cannot become valid Go identifiers via exportedGoName.
+func hasContentAddressedDiscriminator(schema *openapi3.Schema) bool {
+	if schema.Discriminator == nil {
+		return false
+	}
+	for k := range schema.Discriminator.Mapping {
+		if strings.Contains(k, ".") {
+			return true
+		}
+	}
+	return false
+}
+
 // schemaToDiscriminatorType builds a GoType for a oneOf+discriminator schema.
 // Variants come from the discriminator Mapping if present, else from the
 // OneOf refs directly. The on-the-wire discriminator value lives in the
@@ -746,7 +779,7 @@ func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
 	for _, mapKey := range sortedMapKeys(schema.Discriminator.Mapping) {
 		ref := schema.Discriminator.Mapping[mapKey]
 		parts := strings.Split(ref.Ref, "/")
-		addVariant(mapKey, parts[len(parts)-1])
+		addVariant(mapKey, exportedGoName(parts[len(parts)-1]))
 	}
 	if len(gt.Discriminator.Variants) == 0 {
 		for _, one := range schema.OneOf {
@@ -755,7 +788,7 @@ func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
 			}
 			parts := strings.Split(one.Ref, "/")
 			tn := parts[len(parts)-1]
-			addVariant(tn, tn)
+			addVariant(tn, exportedGoName(tn))
 		}
 	}
 	return gt

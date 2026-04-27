@@ -45,17 +45,6 @@ func (c *Client) GetComputerHardwareSoftwareReportByMacAddressDateRange(ctx cont
 	return &result, nil
 }
 
-// GetComputerHardwareSoftwareReportByMacAddressDateRangeSubset finds a subset of hardware/software reports by computer MAC address.
-func (c *Client) GetComputerHardwareSoftwareReportByMacAddressDateRangeSubset(ctx context.Context, macaddress string, start_date string, end_date string, subset string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result ComputerHardwareSoftwareReports
-	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/macaddress/%s/%s_%s/subset/%s", prefix, url.PathEscape(macaddress), url.PathEscape(start_date), url.PathEscape(end_date), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerHardwareSoftwareReportByMacAddressDateRangeSubset(%s): %w", macaddress, err)
-	}
-	return &result, nil
-}
-
 // GetComputerHardwareSoftwareReportByNameDateRange finds hardware/software reports by computer name.
 func (c *Client) GetComputerHardwareSoftwareReportByNameDateRange(ctx context.Context, name string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
@@ -63,17 +52,6 @@ func (c *Client) GetComputerHardwareSoftwareReportByNameDateRange(ctx context.Co
 	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/name/%s/%s_%s", prefix, url.PathEscape(name), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetComputerHardwareSoftwareReportByNameDateRange(%s): %w", name, err)
-	}
-	return &result, nil
-}
-
-// GetComputerHardwareSoftwareReportByNameDateRangeSubset finds a subset of hardware/software reports by computer name.
-func (c *Client) GetComputerHardwareSoftwareReportByNameDateRangeSubset(ctx context.Context, name string, start_date string, end_date string, subset string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result ComputerHardwareSoftwareReports
-	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/name/%s/%s_%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(start_date), url.PathEscape(end_date), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerHardwareSoftwareReportByNameDateRangeSubset(%s): %w", name, err)
 	}
 	return &result, nil
 }
@@ -89,17 +67,6 @@ func (c *Client) GetComputerHardwareSoftwareReportBySerialNumberDateRange(ctx co
 	return &result, nil
 }
 
-// GetComputerHardwareSoftwareReportBySerialNumberDateRangeSubset finds a subset of hardware/software reports by computer serial number.
-func (c *Client) GetComputerHardwareSoftwareReportBySerialNumberDateRangeSubset(ctx context.Context, serialnumber string, start_date string, end_date string, subset string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result ComputerHardwareSoftwareReports
-	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/serialnumber/%s/%s_%s/subset/%s", prefix, url.PathEscape(serialnumber), url.PathEscape(start_date), url.PathEscape(end_date), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerHardwareSoftwareReportBySerialNumberDateRangeSubset(%s): %w", serialnumber, err)
-	}
-	return &result, nil
-}
-
 // GetComputerHardwareSoftwareReportByUDIDDateRange finds hardware/software reports by computer UDID.
 func (c *Client) GetComputerHardwareSoftwareReportByUDIDDateRange(ctx context.Context, udid string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
@@ -107,17 +74,6 @@ func (c *Client) GetComputerHardwareSoftwareReportByUDIDDateRange(ctx context.Co
 	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/udid/%s/%s_%s", prefix, url.PathEscape(udid), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetComputerHardwareSoftwareReportByUDIDDateRange(%s): %w", udid, err)
-	}
-	return &result, nil
-}
-
-// GetComputerHardwareSoftwareReportByUDIDDateRangeSubset finds a subset of hardware/software reports by computer UDID.
-func (c *Client) GetComputerHardwareSoftwareReportByUDIDDateRangeSubset(ctx context.Context, udid string, start_date string, end_date string, subset string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
-	var result ComputerHardwareSoftwareReports
-	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/udid/%s/%s_%s/subset/%s", prefix, url.PathEscape(udid), url.PathEscape(start_date), url.PathEscape(end_date), url.PathEscape(subset))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerHardwareSoftwareReportByUDIDDateRangeSubset(%s): %w", udid, err)
 	}
 	return &result, nil
 }

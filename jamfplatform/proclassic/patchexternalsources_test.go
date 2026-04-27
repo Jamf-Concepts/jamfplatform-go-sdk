@@ -182,6 +182,21 @@ func TestUpdatePatchExternalSourceByName(t *testing.T) {
 	}
 }
 
+func TestDeletePatchExternalSourceByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/proclassic/tenant/t-test/patchexternalsources/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	err := c.DeletePatchExternalSourceByName(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolvePatchExternalSourceIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/proclassic/tenant/t-test/patchexternalsources/name/test-id", func(w http.ResponseWriter, r *http.Request) {
