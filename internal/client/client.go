@@ -252,10 +252,15 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 	if resp.StatusCode == http.StatusTooManyRequests {
 		delay := parseRetryAfter(resp.Header.Get("Retry-After"), time.Now())
 		if delay > 0 && delay <= 60*time.Second {
-			_ = resp.Body.Close()
+			// Capture the 429 error before discarding the body so we can
+			// surface it if the context is cancelled during the wait.
+			lastErr := c.handleResponse(ctx, resp, classic, expectedStatus, result)
 			select {
 			case <-time.After(delay):
 			case <-ctx.Done():
+				if lastErr != nil {
+					return lastErr
+				}
 				return ctx.Err()
 			}
 			resp, classic, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
@@ -275,11 +280,16 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 		backoff := 2 * time.Second
 		for resp.StatusCode != expectedStatus && is4xxRetryable(resp.StatusCode) {
 			status := resp.StatusCode
-			_ = resp.Body.Close()
+			// Capture the error from this response before discarding the body
+			// so we can surface it if the context is cancelled during backoff.
+			lastErr := c.handleResponse(ctx, resp, classic, expectedStatus, result)
 			log.Printf("jamfplatform: retrying %s %s after %s (status %d — eventual consistency)", method, path, backoff, status)
 			select {
 			case <-time.After(backoff):
 			case <-ctx.Done():
+				if lastErr != nil {
+					return lastErr
+				}
 				return ctx.Err()
 			}
 			resp, classic, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
