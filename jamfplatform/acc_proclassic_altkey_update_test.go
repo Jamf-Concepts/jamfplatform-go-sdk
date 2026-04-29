@@ -1029,7 +1029,6 @@ func TestAcceptance_Classic_ProbeUpdate_UpdateSoftwareUpdateServerByName(t *test
 	}
 }
 
-
 func TestAcceptance_Classic_ProbeUpdate_UpdateUserByID(t *testing.T) {
 	c := accClient(t)
 	if err := proclassic.New(c).UpdateUserByID(context.Background(), "999999999", &proclassic.UserPost{}); err != nil {

@@ -1830,4 +1830,3 @@ func TestAcceptance_ApplyStaticMobileDeviceGroupV1(t *testing.T) {
 	}
 	t.Logf("membership after apply update: %v", memberIDs)
 }
-

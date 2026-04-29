@@ -1239,7 +1239,6 @@ func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByMacAddressD
 	}
 }
 
-
 func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByNameDateRange(t *testing.T) {
 	c := accClient(t)
 	_, err := proclassic.New(c).GetComputerHardwareSoftwareReportByNameDateRange(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
@@ -1252,7 +1251,6 @@ func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByNameDateRan
 		t.Fatalf("GetComputerHardwareSoftwareReportByNameDateRange transport error: %v", err)
 	}
 }
-
 
 func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportBySerialNumberDateRange(t *testing.T) {
 	c := accClient(t)
@@ -1267,7 +1265,6 @@ func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportBySerialNumbe
 	}
 }
 
-
 func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByUDIDDateRange(t *testing.T) {
 	c := accClient(t)
 	_, err := proclassic.New(c).GetComputerHardwareSoftwareReportByUDIDDateRange(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
@@ -1281,7 +1278,6 @@ func TestAcceptance_Classic_Probe_GetComputerHardwareSoftwareReportByUDIDDateRan
 	}
 }
 
-
 func TestAcceptance_Classic_Probe_GetComputerHistoryByIDSubset(t *testing.T) {
 	c := accClient(t)
 	_, err := proclassic.New(c).GetComputerHistoryByIDSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
@@ -1294,10 +1290,6 @@ func TestAcceptance_Classic_Probe_GetComputerHistoryByIDSubset(t *testing.T) {
 		t.Fatalf("GetComputerHistoryByIDSubset transport error: %v", err)
 	}
 }
-
-
-
-
 
 func TestAcceptance_Classic_Probe_GetComputerInvitationByInvitation(t *testing.T) {
 	c := accClient(t)
@@ -1364,22 +1356,6 @@ func TestAcceptance_Classic_Probe_GetComputerManagementByIDUsernameSubset(t *tes
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 func TestAcceptance_Classic_Probe_GetEbookByIDSubset(t *testing.T) {
 	c := accClient(t)
 	_, err := proclassic.New(c).GetEbookByIDSubset(context.Background(), "sdk-probe-nonexistent-xyz", "sdk-probe-nonexistent-xyz")
@@ -1392,7 +1368,6 @@ func TestAcceptance_Classic_Probe_GetEbookByIDSubset(t *testing.T) {
 		t.Fatalf("GetEbookByIDSubset transport error: %v", err)
 	}
 }
-
 
 func TestAcceptance_Classic_Probe_GetLDAPServerByIDGroup(t *testing.T) {
 	c := accClient(t)
@@ -1432,9 +1407,6 @@ func TestAcceptance_Classic_Probe_GetLDAPServerByIDUser(t *testing.T) {
 		t.Fatalf("GetLDAPServerByIDUser transport error: %v", err)
 	}
 }
-
-
-
 
 func TestAcceptance_Classic_Probe_GetMacApplicationByIDSubset(t *testing.T) {
 	c := accClient(t)
@@ -1579,10 +1551,6 @@ func TestAcceptance_Classic_Probe_GetMobileDeviceHistoryByIDSubset(t *testing.T)
 	}
 }
 
-
-
-
-
 func TestAcceptance_Classic_Probe_GetMobileDeviceInvitationByInvitation(t *testing.T) {
 	c := accClient(t)
 	_, err := proclassic.New(c).GetMobileDeviceInvitationByInvitation(context.Background(), "sdk-probe-nonexistent-xyz")
@@ -1609,7 +1577,6 @@ func TestAcceptance_Classic_Probe_GetMobileDeviceByIDSubset(t *testing.T) {
 	}
 }
 
-
 func TestAcceptance_Classic_Probe_GetMobileDeviceByMatch(t *testing.T) {
 	c := accClient(t)
 	_, err := proclassic.New(c).GetMobileDeviceByMatch(context.Background(), "sdk-probe-nonexistent-xyz")
@@ -1622,9 +1589,6 @@ func TestAcceptance_Classic_Probe_GetMobileDeviceByMatch(t *testing.T) {
 		t.Fatalf("GetMobileDeviceByMatch transport error: %v", err)
 	}
 }
-
-
-
 
 func TestAcceptance_Classic_Probe_GetOsxConfigurationProfileByIDSubset(t *testing.T) {
 	c := accClient(t)
@@ -1716,7 +1680,6 @@ func TestAcceptance_Classic_Probe_GetPolicyByIDSubset(t *testing.T) {
 		t.Fatalf("GetPolicyByIDSubset transport error: %v", err)
 	}
 }
-
 
 func TestAcceptance_Classic_Probe_GetVPPInvitationByIDSubset(t *testing.T) {
 	c := accClient(t)
