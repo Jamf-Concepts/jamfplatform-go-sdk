@@ -349,7 +349,6 @@ func TestAcceptance_Classic_Probe_CreateComputerCommandByCommand(t *testing.T) {
 	}
 }
 
-
 func TestAcceptance_Classic_Probe_CreateComputerInvitationByInvitation(t *testing.T) {
 	c := accClient(t)
 	_, err := proclassic.New(c).CreateComputerInvitationByInvitation(context.Background(), "sdk-probe-nonexistent-xyz", &proclassic.ComputerInvitation{})
@@ -375,8 +374,6 @@ func TestAcceptance_Classic_Probe_UploadFileByResourceIDTypeID(t *testing.T) {
 		t.Fatalf("UploadFileByResourceIDTypeID transport error: %v", err)
 	}
 }
-
-
 
 func TestAcceptance_Classic_Probe_CreateMobileDeviceCommandByCommandID(t *testing.T) {
 	c := accClient(t)

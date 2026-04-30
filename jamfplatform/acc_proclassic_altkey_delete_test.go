@@ -620,7 +620,6 @@ func TestAcceptance_Classic_ProbeDelete_DeleteSoftwareUpdateServerByName(t *test
 	}
 }
 
-
 func TestAcceptance_Classic_ProbeDelete_DeleteUserByName(t *testing.T) {
 	c := accClient(t)
 	if err := proclassic.New(c).DeleteUserByName(context.Background(), "sdk-probe-delete-nonexistent"); err != nil {

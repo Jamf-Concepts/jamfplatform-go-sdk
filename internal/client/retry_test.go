@@ -154,8 +154,15 @@ func TestRetryOn4xx_ContextCancelled(t *testing.T) {
 	defer cancel()
 
 	err := c.Do(ctx, http.MethodDelete, "/api/eventual", nil, nil)
-	if !errors.Is(err, context.DeadlineExceeded) {
-		t.Fatalf("expected DeadlineExceeded, got: %v", err)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("expected APIResponseError, got: %v", err)
+	}
+	if apiErr.StatusCode != http.StatusBadRequest {
+		t.Errorf("expected status 400, got %d", apiErr.StatusCode)
 	}
 }
 
