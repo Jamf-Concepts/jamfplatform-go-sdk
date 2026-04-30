@@ -2,7 +2,7 @@ module github.com/Jamf-Concepts/jamfplatform-go-sdk/tools
 
 go 1.26.2
 
-require github.com/hashicorp/copywrite v0.25.2
+require github.com/hashicorp/copywrite v0.25.3
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7 // indirect
@@ -13,6 +13,7 @@ require (
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/google/go-github/v45 v45.2.0 // indirect
 	github.com/google/go-github/v84 v84.0.0 // indirect
@@ -24,6 +25,7 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/knadh/koanf v1.5.0 // indirect
+	github.com/knadh/koanf/v2 v2.3.4 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.21 // indirect
 	github.com/mattn/go-runewidth v0.0.23 // indirect
