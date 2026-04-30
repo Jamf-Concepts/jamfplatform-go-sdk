@@ -3,7 +3,7 @@ module github.com/Jamf-Concepts/jamfplatform-go-sdk/tools/generate
 go 1.26.2
 
 require (
-	github.com/getkin/kin-openapi v0.135.0
+	github.com/getkin/kin-openapi v0.137.0
 	golang.org/x/tools v0.44.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -17,7 +17,9 @@ require (
 	github.com/oasdiff/yaml v0.0.9 // indirect
 	github.com/oasdiff/yaml3 v0.0.12 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
+	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
 	github.com/woodsbury/decimal128 v1.4.0 // indirect
 	golang.org/x/mod v0.35.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 )
