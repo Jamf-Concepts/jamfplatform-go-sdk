@@ -12,6 +12,19 @@ import (
 	"net/url"
 )
 
+// GetComputerInventoryCollectionSettingsV1 returns computer inventory settings.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+func (c *Client) GetComputerInventoryCollectionSettingsV1(ctx context.Context) (*ComputerInventoryCollectionSettings, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result ComputerInventoryCollectionSettings
+	endpoint := prefix + "/computer-inventory-collection-settings"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerInventoryCollectionSettingsV1: %w", err)
+	}
+	return &result, nil
+}
+
 // GetComputerInventoryCollectionSettingsV2 returns computer inventory settings.
 func (c *Client) GetComputerInventoryCollectionSettingsV2(ctx context.Context) (*ComputerInventoryCollectionSettingsV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
@@ -19,6 +32,19 @@ func (c *Client) GetComputerInventoryCollectionSettingsV2(ctx context.Context) (
 	endpoint := prefix + "/computer-inventory-collection-settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetComputerInventoryCollectionSettingsV2: %w", err)
+	}
+	return &result, nil
+}
+
+// UpdateComputerInventoryCollectionSettingsV1 update computer inventory settings.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+func (c *Client) UpdateComputerInventoryCollectionSettingsV1(ctx context.Context, request *ComputerInventoryCollectionSettings) (*ComputerInventoryCollectionSettings, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result ComputerInventoryCollectionSettings
+	endpoint := prefix + "/computer-inventory-collection-settings"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateComputerInventoryCollectionSettingsV1: %w", err)
 	}
 	return &result, nil
 }
@@ -33,6 +59,19 @@ func (c *Client) UpdateComputerInventoryCollectionSettingsV2(ctx context.Context
 	return nil
 }
 
+// CreateComputerInventoryCollectionCustomPathV1 create Computer Inventory Collection Settings Custom Path.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+func (c *Client) CreateComputerInventoryCollectionCustomPathV1(ctx context.Context, request *CreatePath) (*HrefResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result HrefResponse
+	endpoint := prefix + "/computer-inventory-collection-settings/custom-path"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateComputerInventoryCollectionCustomPathV1: %w", err)
+	}
+	return &result, nil
+}
+
 // CreateComputerInventoryCollectionCustomPathV2 create Computer Inventory Collection Settings Custom Path.
 func (c *Client) CreateComputerInventoryCollectionCustomPathV2(ctx context.Context, request *CreatePathV2) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
@@ -42,6 +81,18 @@ func (c *Client) CreateComputerInventoryCollectionCustomPathV2(ctx context.Conte
 		return nil, fmt.Errorf("CreateComputerInventoryCollectionCustomPathV2: %w", err)
 	}
 	return &result, nil
+}
+
+// DeleteComputerInventoryCollectionCustomPathV1 delete Custom Path from Computer Inventory Collection Settings.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+func (c *Client) DeleteComputerInventoryCollectionCustomPathV1(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	endpoint := fmt.Sprintf("%s/computer-inventory-collection-settings/custom-path/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteComputerInventoryCollectionCustomPathV1(%s): %w", id, err)
+	}
+	return nil
 }
 
 // DeleteComputerInventoryCollectionCustomPathV2 delete Custom Path from Computer Inventory Collection Settings.

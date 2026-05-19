@@ -274,6 +274,140 @@
         "example": "MATCH_SYSTEM",
         "type": "string"
       },
+      "AccountPreferencesV5": {
+        "properties": {
+          "computerApplicationSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerApplicationUsageSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerFontSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerLocalUserAccountSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerPackageReceiptSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerPeripheralSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerPluginSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerPrinterSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerServiceSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "computerSoftwareUpdateSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "configProfilesSortingMethod": {
+            "example": "ALPHABETICALLY",
+            "type": "string"
+          },
+          "dateFormat": {
+            "example": "MM/dd/yyyy",
+            "type": "string"
+          },
+          "disablePageLeaveCheck": {
+            "example": true,
+            "type": "boolean"
+          },
+          "disableRelativeDates": {
+            "example": false,
+            "type": "boolean"
+          },
+          "disableShortcutsTooltips": {
+            "example": true,
+            "type": "boolean"
+          },
+          "disableTablePagination": {
+            "example": true,
+            "type": "boolean"
+          },
+          "language": {
+            "default": "en",
+            "description": "Language codes supported by Jamf Pro",
+            "enum": [
+              "en",
+              "de",
+              "fr",
+              "es",
+              "ja",
+              "zh-hant"
+            ],
+            "type": "string"
+          },
+          "mobileDeviceAppSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "mobileDeviceSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "resultsPerPage": {
+            "default": 100,
+            "example": 50,
+            "type": "integer"
+          },
+          "timezone": {
+            "example": "America/Chicago",
+            "type": "string"
+          },
+          "userAllContentSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "userEbookSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "userInterfaceDisplayTheme": {
+            "$ref": "#/components/schemas/AccountPreferencesUserInterfaceDisplayTheme"
+          },
+          "userMacAppStoreAppSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "userMobileDeviceAppSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          },
+          "userSearchMethod": {
+            "$ref": "#/components/schemas/AccountPreferencesSearchType"
+          }
+        },
+        "required": [
+          "computerApplicationSearchMethod",
+          "computerApplicationUsageSearchMethod",
+          "computerLocalUserAccountSearchMethod",
+          "computerPackageReceiptSearchMethod",
+          "computerPrinterSearchMethod",
+          "computerSearchMethod",
+          "computerServiceSearchMethod",
+          "configProfilesSortingMethod",
+          "dateFormat",
+          "disablePageLeaveCheck",
+          "disableRelativeDates",
+          "disableShortcutsTooltips",
+          "disableTablePagination",
+          "language",
+          "mobileDeviceAppSearchMethod",
+          "mobileDeviceSearchMethod",
+          "resultsPerPage",
+          "timezone",
+          "userAllContentSearchMethod",
+          "userEbookSearchMethod",
+          "userInterfaceDisplayTheme",
+          "userMacAppStoreAppSearchMethod",
+          "userMobileDeviceAppSearchMethod",
+          "userSearchMethod"
+        ],
+        "type": "object"
+      },
       "AccountPreferencesV6": {
         "properties": {
           "computerApplicationSearchMethod": {
@@ -3137,6 +3271,44 @@
         },
         "type": "object"
       },
+      "ComputerApplication": {
+        "properties": {
+          "bundleId": {
+            "example": "1",
+            "type": "string"
+          },
+          "externalVersionId": {
+            "description": "The app's external version ID. It can be used in the iTunes Search API to decide if the app needs to be updated",
+            "example": "1",
+            "type": "string"
+          },
+          "macAppStore": {
+            "example": true,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Microsoft Word",
+            "type": "string"
+          },
+          "path": {
+            "example": "/usr/local/app",
+            "type": "string"
+          },
+          "sizeMegabytes": {
+            "example": 25,
+            "type": "integer"
+          },
+          "updateAvailable": {
+            "example": false,
+            "type": "boolean"
+          },
+          "version": {
+            "example": "1.0.0",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ComputerApplicationCreate": {
         "properties": {
           "name": {
@@ -4222,6 +4394,43 @@
           }
         ]
       },
+      "ComputerFont": {
+        "properties": {
+          "name": {
+            "example": "font name",
+            "type": "string"
+          },
+          "path": {
+            "example": "/Applications/",
+            "type": "string"
+          },
+          "version": {
+            "example": "1.02",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerFontCreate": {
+        "properties": {
+          "name": {
+            "example": "font name",
+            "nullable": true,
+            "type": "string"
+          },
+          "path": {
+            "example": "/Applications/",
+            "nullable": true,
+            "type": "string"
+          },
+          "version": {
+            "example": "1.02",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ComputerGeneral": {
         "properties": {
           "assetTag": {
@@ -4857,6 +5066,225 @@
         },
         "type": "object"
       },
+      "ComputerInventory": {
+        "properties": {
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerApplication"
+            },
+            "type": "array"
+          },
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerAttachment"
+            },
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerCertificate"
+            },
+            "type": "array"
+          },
+          "configurationProfiles": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerConfigurationProfile"
+            },
+            "type": "array"
+          },
+          "contentCaching": {
+            "$ref": "#/components/schemas/ComputerContentCaching"
+          },
+          "diskEncryption": {
+            "$ref": "#/components/schemas/ComputerDiskEncryption"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "fonts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerFont"
+            },
+            "type": "array"
+          },
+          "general": {
+            "$ref": "#/components/schemas/ComputerGeneral"
+          },
+          "groupMemberships": {
+            "items": {
+              "$ref": "#/components/schemas/GroupMembership"
+            },
+            "type": "array"
+          },
+          "hardware": {
+            "$ref": "#/components/schemas/ComputerHardware"
+          },
+          "ibeacons": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerIbeacon"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "licensedSoftware": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLicensedSoftware"
+            },
+            "type": "array"
+          },
+          "localUserAccounts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLocalUserAccount"
+            },
+            "type": "array"
+          },
+          "operatingSystem": {
+            "$ref": "#/components/schemas/ComputerOperatingSystem"
+          },
+          "packageReceipts": {
+            "$ref": "#/components/schemas/ComputerPackageReceipts"
+          },
+          "plugins": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPlugin"
+            },
+            "type": "array"
+          },
+          "printers": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPrinter"
+            },
+            "type": "array"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/ComputerPurchase"
+          },
+          "security": {
+            "$ref": "#/components/schemas/ComputerSecurity"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerService"
+            },
+            "type": "array"
+          },
+          "softwareUpdates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerSoftwareUpdate"
+            },
+            "type": "array"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/ComputerStorage"
+          },
+          "udid": {
+            "example": "123",
+            "type": "string"
+          },
+          "userAndLocation": {
+            "$ref": "#/components/schemas/ComputerUserAndLocation"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryCollectionPreferences": {
+        "properties": {
+          "allowChangingUserAndLocation": {
+            "default": true,
+            "example": true,
+            "type": "boolean"
+          },
+          "calculateSizes": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "collectSyncedMobileDeviceInfo": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "collectUnmanagedCertificates": {
+            "default": true,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeAccounts": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeFonts": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeHiddenAccounts": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includePackages": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includePlugins": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includePrinters": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeServices": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeSoftwareId": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "includeSoftwareUpdates": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "monitorApplicationUsage": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "monitorBeacons": {
+            "default": false,
+            "example": true,
+            "type": "boolean"
+          },
+          "updateLdapInfoOnComputerInventorySubmissions": {
+            "default": false,
+            "example": false,
+            "type": "boolean"
+          },
+          "useUnixUserPaths": {
+            "default": true,
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "ComputerInventoryCollectionPreferencesV2": {
         "properties": {
           "allowChangingUserAndLocation": {
@@ -4937,6 +5365,32 @@
         },
         "type": "object"
       },
+      "ComputerInventoryCollectionSettings": {
+        "properties": {
+          "applicationPaths": {
+            "items": {
+              "$ref": "#/components/schemas/AppPath"
+            },
+            "type": "array"
+          },
+          "computerInventoryCollectionPreferences": {
+            "$ref": "#/components/schemas/ComputerInventoryCollectionPreferences"
+          },
+          "fontPaths": {
+            "items": {
+              "$ref": "#/components/schemas/FontPath"
+            },
+            "type": "array"
+          },
+          "pluginPaths": {
+            "items": {
+              "$ref": "#/components/schemas/PluginPath"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ComputerInventoryCollectionSettingsV2": {
         "properties": {
           "applicationPaths": {
@@ -4947,6 +5401,103 @@
           },
           "computerInventoryCollectionPreferences": {
             "$ref": "#/components/schemas/ComputerInventoryCollectionPreferencesV2"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryCreateRequest": {
+        "properties": {
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerApplicationCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerCertificateCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "configurationProfiles": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerConfigurationProfileCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "fonts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerFontCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "general": {
+            "$ref": "#/components/schemas/ComputerGeneralCreate"
+          },
+          "hardware": {
+            "$ref": "#/components/schemas/ComputerHardwareCreate"
+          },
+          "localUserAccounts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLocalUserAccountCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "operatingSystem": {
+            "$ref": "#/components/schemas/ComputerOperatingSystemCreate"
+          },
+          "packageReceipts": {
+            "$ref": "#/components/schemas/ComputerPackageReceiptsCreate"
+          },
+          "plugins": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPluginCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "printers": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPrinterCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/ComputerPurchaseCreate"
+          },
+          "security": {
+            "$ref": "#/components/schemas/ComputerSecurityCreate"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerServiceCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "softwareUpdates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerSoftwareUpdateCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/ComputerStorageCreate"
+          },
+          "udid": {
+            "example": "45436edf-864e-4364-982a-330b01d39e65",
+            "nullable": true,
+            "type": "string"
+          },
+          "userAndLocation": {
+            "$ref": "#/components/schemas/ComputerUserAndLocationCreate"
           }
         },
         "type": "object"
@@ -5112,6 +5663,38 @@
         },
         "type": "object"
       },
+      "ComputerInventorySearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerInventory"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventorySearchResultsV2": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerInventoryV2"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "ComputerInventorySearchResultsV3": {
         "properties": {
           "results": {
@@ -5150,6 +5733,123 @@
           },
           "udid": {
             "example": "45436edf-864e-4364-982a-330b01d39e65",
+            "type": "string"
+          },
+          "userAndLocation": {
+            "$ref": "#/components/schemas/ComputerUserAndLocation"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryV2": {
+        "properties": {
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerApplication"
+            },
+            "type": "array"
+          },
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerAttachment"
+            },
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerCertificate"
+            },
+            "type": "array"
+          },
+          "configurationProfiles": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerConfigurationProfile"
+            },
+            "type": "array"
+          },
+          "contentCaching": {
+            "$ref": "#/components/schemas/ComputerContentCaching"
+          },
+          "diskEncryption": {
+            "$ref": "#/components/schemas/ComputerDiskEncryption"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "general": {
+            "$ref": "#/components/schemas/ComputerGeneral"
+          },
+          "groupMemberships": {
+            "items": {
+              "$ref": "#/components/schemas/GroupMembership"
+            },
+            "type": "array"
+          },
+          "hardware": {
+            "$ref": "#/components/schemas/ComputerHardware"
+          },
+          "ibeacons": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerIbeacon"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "licensedSoftware": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLicensedSoftware"
+            },
+            "type": "array"
+          },
+          "localUserAccounts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLocalUserAccount"
+            },
+            "type": "array"
+          },
+          "operatingSystem": {
+            "$ref": "#/components/schemas/ComputerOperatingSystem"
+          },
+          "packageReceipts": {
+            "$ref": "#/components/schemas/ComputerPackageReceipts"
+          },
+          "printers": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPrinter"
+            },
+            "type": "array"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/ComputerPurchase"
+          },
+          "security": {
+            "$ref": "#/components/schemas/ComputerSecurity"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerService"
+            },
+            "type": "array"
+          },
+          "softwareUpdates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerSoftwareUpdate"
+            },
+            "type": "array"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/ComputerStorage"
+          },
+          "udid": {
+            "example": "123",
             "type": "string"
           },
           "userAndLocation": {
@@ -5908,6 +6608,43 @@
         "example": "ENCRYPTING",
         "type": "string"
       },
+      "ComputerPlugin": {
+        "properties": {
+          "name": {
+            "example": "plugin name",
+            "type": "string"
+          },
+          "path": {
+            "example": "/Applications/",
+            "type": "string"
+          },
+          "version": {
+            "example": "1.02",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerPluginCreate": {
+        "properties": {
+          "name": {
+            "example": "plugin name",
+            "nullable": true,
+            "type": "string"
+          },
+          "path": {
+            "example": "/Applications/",
+            "nullable": true,
+            "type": "string"
+          },
+          "version": {
+            "example": "1.02",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ComputerPrestageSearchResultsV3": {
         "properties": {
           "results": {
@@ -6204,6 +6941,64 @@
           }
         },
         "type": "object"
+      },
+      "ComputerSection": {
+        "enum": [
+          "GENERAL",
+          "DISK_ENCRYPTION",
+          "PURCHASING",
+          "APPLICATIONS",
+          "STORAGE",
+          "USER_AND_LOCATION",
+          "CONFIGURATION_PROFILES",
+          "PRINTERS",
+          "SERVICES",
+          "HARDWARE",
+          "LOCAL_USER_ACCOUNTS",
+          "CERTIFICATES",
+          "ATTACHMENTS",
+          "PLUGINS",
+          "PACKAGE_RECEIPTS",
+          "FONTS",
+          "SECURITY",
+          "OPERATING_SYSTEM",
+          "LICENSED_SOFTWARE",
+          "IBEACONS",
+          "SOFTWARE_UPDATES",
+          "EXTENSION_ATTRIBUTES",
+          "CONTENT_CACHING",
+          "GROUP_MEMBERSHIPS"
+        ],
+        "example": "general",
+        "type": "string"
+      },
+      "ComputerSectionV2": {
+        "enum": [
+          "GENERAL",
+          "DISK_ENCRYPTION",
+          "PURCHASING",
+          "APPLICATIONS",
+          "STORAGE",
+          "USER_AND_LOCATION",
+          "CONFIGURATION_PROFILES",
+          "PRINTERS",
+          "SERVICES",
+          "HARDWARE",
+          "LOCAL_USER_ACCOUNTS",
+          "CERTIFICATES",
+          "ATTACHMENTS",
+          "PACKAGE_RECEIPTS",
+          "SECURITY",
+          "OPERATING_SYSTEM",
+          "LICENSED_SOFTWARE",
+          "IBEACONS",
+          "SOFTWARE_UPDATES",
+          "EXTENSION_ATTRIBUTES",
+          "CONTENT_CACHING",
+          "GROUP_MEMBERSHIPS"
+        ],
+        "example": "general",
+        "type": "string"
       },
       "ComputerSectionV3": {
         "enum": [
@@ -6690,6 +7485,28 @@
             "type": "array"
           }
         },
+        "type": "object"
+      },
+      "CreatePath": {
+        "properties": {
+          "path": {
+            "example": "/Example/Path/",
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "APP",
+              "FONT",
+              "PLUGIN"
+            ],
+            "example": "APP",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "scope"
+        ],
         "type": "object"
       },
       "CreatePathV2": {
@@ -9786,6 +10603,19 @@
         ],
         "type": "object"
       },
+      "FileAttachmentV2": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "receipt.pdf",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "FileAttachmentV3": {
         "properties": {
           "id": {
@@ -9855,6 +10685,24 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "FontPath": {
+        "properties": {
+          "id": {
+            "description": "A \"-1\" id indicates a built-in path that cannot be deleted or modified.",
+            "example": "2",
+            "type": "string"
+          },
+          "path": {
+            "example": "/Example/Path/To/Font/",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path"
+        ],
         "type": "object"
       },
       "GetComputerPrestageV3": {
@@ -9965,6 +10813,34 @@
               "type": {
                 "example": "text",
                 "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GetMobileDevicePrestageV2": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDevicePrestageV2"
+          },
+          {
+            "properties": {
+              "id": {
+                "example": "1",
+                "type": "string"
+              },
+              "profileUuid": {
+                "example": "29d-a8d8f-b8sdjndf-dsa9",
+                "type": "string"
+              },
+              "siteId": {
+                "example": "5",
+                "type": "string"
+              },
+              "versionLock": {
+                "example": 0,
+                "type": "integer"
               }
             },
             "type": "object"
@@ -14149,6 +15025,23 @@
         },
         "type": "object"
       },
+      "MobileDevicePrestageNameV2": {
+        "properties": {
+          "deviceName": {
+            "example": "iPad",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "used": {
+            "example": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "MobileDevicePrestageNameV3": {
         "properties": {
           "deviceName": {
@@ -14162,6 +15055,41 @@
           "used": {
             "example": false,
             "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "MobileDevicePrestageNamesV2": {
+        "properties": {
+          "assignNamesUsing": {
+            "example": "List of Names",
+            "type": "string"
+          },
+          "deviceNamePrefix": {
+            "example": "prefix",
+            "type": "string"
+          },
+          "deviceNameSuffix": {
+            "example": "suffix",
+            "type": "string"
+          },
+          "deviceNamingConfigured": {
+            "example": true,
+            "type": "boolean"
+          },
+          "manageNames": {
+            "example": true,
+            "type": "boolean"
+          },
+          "prestageDeviceNames": {
+            "items": {
+              "$ref": "#/components/schemas/MobileDevicePrestageNameV2"
+            },
+            "type": "array"
+          },
+          "singleDeviceName": {
+            "example": "name",
+            "type": "string"
           }
         },
         "type": "object"
@@ -14201,6 +15129,22 @@
         },
         "type": "object"
       },
+      "MobileDevicePrestageSearchResultsV2": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/GetMobileDevicePrestageV2"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "MobileDevicePrestageSearchResultsV3": {
         "properties": {
           "results": {
@@ -14216,6 +15160,126 @@
           }
         },
         "type": "object"
+      },
+      "MobileDevicePrestageV2": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeviceEnrollmentPrestageV2"
+          },
+          {
+            "properties": {
+              "allowPairing": {
+                "example": true,
+                "type": "boolean"
+              },
+              "configureDeviceBeforeSetupAssistant": {
+                "example": true,
+                "type": "boolean"
+              },
+              "enforceTemporarySessionTimeout": {
+                "example": false,
+                "type": "boolean"
+              },
+              "enforceUserSessionTimeout": {
+                "example": false,
+                "type": "boolean"
+              },
+              "maximumSharedAccounts": {
+                "example": 10,
+                "type": "integer"
+              },
+              "minimumOsSpecificVersionIos": {
+                "example": "17.1",
+                "type": "string"
+              },
+              "minimumOsSpecificVersionIpad": {
+                "example": "17.1",
+                "type": "string"
+              },
+              "multiUser": {
+                "example": true,
+                "type": "boolean"
+              },
+              "names": {
+                "$ref": "#/components/schemas/MobileDevicePrestageNamesV2"
+              },
+              "prestageMinimumOsTargetVersionTypeIos": {
+                "enum": [
+                  "NO_ENFORCEMENT",
+                  "MINIMUM_OS_LATEST_VERSION",
+                  "MINIMUM_OS_LATEST_MAJOR_VERSION",
+                  "MINIMUM_OS_LATEST_MINOR_VERSION",
+                  "MINIMUM_OS_SPECIFIC_VERSION"
+                ],
+                "example": "MINIMUM_OS_LATEST_VERSION",
+                "type": "string"
+              },
+              "prestageMinimumOsTargetVersionTypeIpad": {
+                "enum": [
+                  "NO_ENFORCEMENT",
+                  "MINIMUM_OS_LATEST_VERSION",
+                  "MINIMUM_OS_LATEST_MAJOR_VERSION",
+                  "MINIMUM_OS_LATEST_MINOR_VERSION",
+                  "MINIMUM_OS_SPECIFIC_VERSION"
+                ],
+                "example": "MINIMUM_OS_LATEST_VERSION",
+                "type": "string"
+              },
+              "rtsConfigProfileId": {
+                "example": "1",
+                "type": "string"
+              },
+              "rtsEnabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "sendTimezone": {
+                "example": true,
+                "type": "boolean"
+              },
+              "storageQuotaSizeMegabytes": {
+                "example": 4096,
+                "type": "integer"
+              },
+              "supervised": {
+                "example": true,
+                "type": "boolean"
+              },
+              "temporarySessionOnly": {
+                "example": false,
+                "type": "boolean"
+              },
+              "temporarySessionTimeout": {
+                "example": 30,
+                "type": "integer"
+              },
+              "timezone": {
+                "example": "America/Chicago",
+                "type": "string"
+              },
+              "useStorageQuotaSize": {
+                "example": true,
+                "type": "boolean"
+              },
+              "userSessionTimeout": {
+                "example": 30,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "allowPairing",
+              "configureDeviceBeforeSetupAssistant",
+              "maximumSharedAccounts",
+              "multiUser",
+              "sendTimezone",
+              "storageQuotaSizeMegabytes",
+              "supervised",
+              "timezone",
+              "useStorageQuotaSize"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "MobileDevicePrestageV3": {
         "allOf": [
@@ -16874,6 +17938,24 @@
           }
         ]
       },
+      "PluginPath": {
+        "properties": {
+          "id": {
+            "description": "A \"-1\" id indicates a built-in path that cannot be deleted or modified.",
+            "example": "3",
+            "type": "string"
+          },
+          "path": {
+            "example": "/Example/Path/To/Plugin/",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path"
+        ],
+        "type": "object"
+      },
       "PolicyPropertiesV1": {
         "properties": {
           "allowNetworkStateChangeTriggers": {
@@ -16933,6 +18015,23 @@
           },
           "name": {
             "example": "Name",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PrestageFileAttachmentV2": {
+        "properties": {
+          "fileType": {
+            "example": "pdf",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "receipt.pdf",
             "type": "string"
           }
         },
@@ -17374,6 +18473,22 @@
               "versionLock": {
                 "example": 0,
                 "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "PutMobileDevicePrestageV2": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MobileDevicePrestageV2"
+          },
+          {
+            "properties": {
+              "versionLock": {
+                "example": 0,
                 "type": "integer"
               }
             },
@@ -27979,6 +29094,198 @@
         ]
       }
     },
+    "/v1/tenant/{tenantId}/computer-inventory-collection-settings": {
+      "get": {
+        "deprecated": true,
+        "description": "Returns computer inventory settings\n\n**Required Permissions:** `read:pro:computer-inventory-collection-settings`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryCollectionSettings"
+                }
+              }
+            },
+            "description": "Successful response returns the computer inventory settings"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Returns computer inventory settings",
+        "tags": [
+          "computer-inventory-collection-settings"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:computer-inventory-collection-settings"
+        ]
+      },
+      "patch": {
+        "deprecated": true,
+        "description": "Update computer inventory settings\n\n**Required Permissions:** `update:pro:computer-inventory-collection-settings`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryCollectionSettings"
+              }
+            }
+          },
+          "description": "Computer inventory settings to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryCollectionSettings"
+                }
+              }
+            },
+            "description": "Computer inventory settings updated"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Update computer inventory settings",
+        "tags": [
+          "computer-inventory-collection-settings"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "update:pro:computer-inventory-collection-settings"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computer-inventory-collection-settings/custom-path": {
+      "post": {
+        "deprecated": true,
+        "description": "Creates a custom search path to use when collecting applications, fonts, and plug-ins.\n\n**Required Permissions:** `create:pro:custom-paths`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePath"
+              }
+            }
+          },
+          "description": "Computer inventory settings to update",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Custom path created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid data response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Create Computer Inventory Collection Settings Custom Path",
+        "tags": [
+          "computer-inventory-collection-settings"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "create:pro:custom-paths"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computer-inventory-collection-settings/custom-path/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "Delete Custom Path from Computer Inventory Collection Settings\n\n**Required Permissions:** `delete:pro:custom-paths`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "id of Custom Path",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Custom path deleted"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid data response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Delete Custom Path from Computer Inventory Collection Settings",
+        "tags": [
+          "computer-inventory-collection-settings"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "delete:pro:custom-paths"
+        ]
+      }
+    },
     "/v1/tenant/{tenantId}/computer-inventory/{id}/erase": {
       "post": {
         "description": "Erase a computer\n\n**Required Permissions:** `execute:pro:computer-commands`",
@@ -28109,6 +29416,816 @@
         "x-authentication-required": true,
         "x-required-privileges": [
           "execute:pro:computer-commands"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computers-inventory": {
+      "get": {
+        "deprecated": true,
+        "description": "Return paginated Computer Inventory records\n\n**Required Permissions:** `read:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "section of computer details, if not specified, General section data is returned. Multiple section parameters are supported, e.g. section=GENERAL\u0026section=HARDWARE",
+            "explode": true,
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "default": [
+                "GENERAL"
+              ],
+              "example": [
+                "GENERAL"
+              ],
+              "items": {
+                "$ref": "#/components/schemas/ComputerSection"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `general.name:asc`. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`,\n`general.mdmCertificateExpiration`, `general.platform`, `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,\n`general.mdmCertificateExpiration`, `general.platform`, `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`\n`hardware.make`, `hardware.model`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,\n`userAndLocation.realname`,\n`purchasing.lifeExpectancy`, `purchasing.warrantyDate`\n\nExample: `sort=udid:desc,general.name:asc`.\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "general.name:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter computer inventory collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`, `general.barcode2`,\n`general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`, `general.itunesStoreAccountActive`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`, `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`, `general.managementId`, `general.remoteManagement.managed`,\n`general.mdmCapable.capable`, `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`, `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`, \n`general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`, \n`general.mdmCapable.capable`, `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`, `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`, `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,\n`hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`, `hardware.modelIdentifier`, `hardware.serialNumber`,\n`hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`, `operatingSystem.fileVault2Status`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,\n`security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`, `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,\n`userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`, `userAndLocation.username`, `diskEncryption.fileVault2Enabled`,\n`purchasing.appleCareId`, `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`, `purchasing.warrantyDate`,\n\nThis param can be combined with paging and sorting.\nExample: `filter=general.name==\"Orchard\"`\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventorySearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return paginated Computer Inventory records",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:computers"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "Creates Computer Inventory record\n\n**Required Permissions:** `create:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successful response - Computer Inventory record created"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Create Computer Inventory record",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "create:pro:computers"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computers-inventory-detail/{id}": {
+      "get": {
+        "deprecated": true,
+        "description": "Return all sections of a computer\n\n**Required Permissions:** `read:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventory"
+                }
+              }
+            },
+            "description": "Details of computer were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return all sections of a computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:computers"
+        ]
+      },
+      "patch": {
+        "deprecated": true,
+        "description": "Update specific fields on a computer, then return the updated computer object.\n\n**Required Permissions:** `update:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventory"
+                }
+              }
+            },
+            "description": "Details of computer were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Update specific fields on a computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "update:pro:computers"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computers-inventory/filevault": {
+      "get": {
+        "deprecated": true,
+        "description": "Return paginated FileVault information for all computers\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryFileVaultSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return paginated FileVault information for all computers",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:disk-encryption-recovery-key"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computers-inventory/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "Remove specified Computer record\n\n**Required Permissions:** `delete:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Computer record successfully removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object id does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Remove specified Computer record",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "delete:pro:computers"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "Return General section of a Computer\n\n**Required Permissions:** `read:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "section of computer details, if not specified, General section data is returned. Multiple section parameters are supported, e.g. section=general\u0026section=hardware",
+            "explode": true,
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "default": [
+                "GENERAL"
+              ],
+              "example": [
+                "GENERAL"
+              ],
+              "items": {
+                "$ref": "#/components/schemas/ComputerSection"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventory"
+                }
+              }
+            },
+            "description": "Details of computer were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return General section of a Computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:computers"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computers-inventory/{id}/attachments": {
+      "post": {
+        "deprecated": true,
+        "description": "Upload attachment and assign to computer\n\n**Required Permissions:** `update:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successfully uploaded attachment"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Upload attachment and assign to computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "update:pro:computers"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}": {
+      "delete": {
+        "deprecated": true,
+        "description": "Remove attachment\n\n**Required Permissions:** `update:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "instance id of attachment object",
+            "explode": false,
+            "in": "path",
+            "name": "attachmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Attachment successfully removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object or attachment does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Remove attachment",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "update:pro:computers"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "Download attachment file\n\n**Required Permissions:** `read:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "instance id of attachment object",
+            "explode": false,
+            "in": "path",
+            "name": "attachmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "description": "Downloaded binary file, Content-Type will be dynamic, based on a file extension",
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Attachment successfully downloaded"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object or attachment does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Download attachment file",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:computers"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computers-inventory/{id}/filevault": {
+      "get": {
+        "deprecated": true,
+        "description": "Return FileVault information for a specific computer\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryFileVault"
+                }
+              }
+            },
+            "description": "FileVault information for computer was found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "FileVault information for specified computer does not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return FileVault information for a specific computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:disk-encryption-recovery-key"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin": {
+      "get": {
+        "deprecated": true,
+        "description": "Return a computer's Device Lock PIN\n\n**Required Permissions:** `read:pro:computer-device-lock-pin`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryDeviceLockPinResponse"
+                }
+              }
+            },
+            "description": "Device Lock PIN"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return a computer's Device Lock PIN",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:computer-device-lock-pin"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password": {
+      "get": {
+        "deprecated": true,
+        "description": "Return a Computers Recovery Lock Password\n\n**Required Permissions:** `read:pro:recovery-lock`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryRecoveryLockPasswordResponse"
+                }
+              }
+            },
+            "description": "Recovery Lock Password"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return a Computers Recovery Lock Password",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:recovery-lock"
         ]
       }
     },
@@ -33415,6 +35532,159 @@
         "x-authentication-required": true
       }
     },
+    "/v1/tenant/{tenantId}/inventory-preload/csv-template": {
+      "get": {
+        "deprecated": true,
+        "description": "Retrieves the Inventory Preload CSV template.\n\n**Required Permissions:** `read:pro:inventory-preload-records`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Retrieve the Inventory Preload CSV template\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2020-04-21",
+        "x-required-privileges": [
+          "read:pro:inventory-preload-records"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/inventory-preload/history": {
+      "get": {
+        "deprecated": true,
+        "description": "Gets Inventory Preload history entries.\n\n**Required Permissions:** `read:pro:inventory-preload-records`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/pagesize"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "date:desc",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get Inventory Preload history entries\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2020-04-24",
+        "x-required-privileges": [
+          "read:pro:inventory-preload-records"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "Adds Inventory Preload history object notes.\n\n**Required Permissions:** `update:pro:inventory-preload-records`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes of Inventory Preload history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload history can not be saved"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Add Inventory Preload history object notes\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2020-04-24",
+        "x-required-privileges": [
+          "update:pro:inventory-preload-records"
+        ]
+      }
+    },
     "/v1/tenant/{tenantId}/jamf-connect": {
       "get": {
         "description": "Get the Jamf Connect settings that you have access to see.\n\n**Required Permissions:** `read:pro:jamf-connect-deployments`, `read:pro:jamf-connect-settings`",
@@ -36821,6 +39091,91 @@
           "mdm-renewal"
         ],
         "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:computer-commands",
+          "read:pro:mobile-device-commands"
+        ]
+      }
+    },
+    "/v1/tenant/{tenantId}/mdm/commands": {
+      "get": {
+        "deprecated": true,
+        "description": "Get information about mdm commands made by Jamf Pro.\n\n**Required Permissions:** `read:pro:computer-commands`, `read:pro:mobile-device-commands`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "A list of the UUIDs of the commands being searched for.  Limited to 40 UUIDs in length. Choose one of two parameters, but not both.",
+            "explode": true,
+            "in": "query",
+            "name": "uuids",
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "The client management id used to search for a list of commands. Choose one of two parameters, but not both.",
+            "explode": true,
+            "in": "query",
+            "name": "client-management-id",
+            "schema": {
+              "example": "fd68c371-5921-436e-b16b-8a3c1bf90ee5",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MdmCommand"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "414": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Too many UUIDs were provided in the path. The limit is set at a strict 40 UUIDs."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get information about mdm commands made by Jamf Pro.",
+        "tags": [
+          "mdm"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2023-10-16",
         "x-required-privileges": [
           "read:pro:computer-commands",
           "read:pro:mobile-device-commands"
@@ -47777,6 +50132,122 @@
         ]
       }
     },
+    "/v2/tenant/{tenantId}/account-preferences": {
+      "get": {
+        "deprecated": true,
+        "description": "Get Jamf Pro account preferences\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Locale to be used.",
+            "explode": false,
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountPreferencesV5"
+                }
+              }
+            },
+            "description": "Successful response - Jamf Pro Account Preferences retrieved"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get Jamf Pro account preferences\n",
+        "tags": [
+          "jamf-pro-account-preferences"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30"
+      },
+      "patch": {
+        "deprecated": true,
+        "description": "Update Jamf Pro account preferences\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Locale to be used, when user has not defined preferred language.",
+            "explode": false,
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Session cookie, that's used to determine user session where account preferences should be refreshed",
+            "explode": true,
+            "in": "cookie",
+            "name": "JSESSIONID",
+            "schema": {
+              "default": "null",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPreferencesV5"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountPreferencesV5"
+                }
+              }
+            },
+            "description": "Successful response - Jamf Pro Account Preferences updated"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Pro account preferences not valid"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Update Jamf Pro account preferences\n",
+        "tags": [
+          "jamf-pro-account-preferences"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30"
+      }
+    },
     "/v2/tenant/{tenantId}/cloud-ldaps": {
       "post": {
         "description": "Create new Cloud Identity Provider configuration with unique display name. If mappings not provided, then defaults will be generated instead.\n\n**Required Permissions:** `create:pro:ldap-servers`",
@@ -49713,6 +52184,783 @@
         "x-authentication-required": true,
         "x-required-privileges": [
           "update:pro:computer-prestage-enrollments"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/computers-inventory": {
+      "get": {
+        "description": "Return paginated Computer Inventory records\n\n**Required Permissions:** `read:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "section of computer details, if not specified, General section data is returned. Multiple section parameters are supported, e.g. section=GENERAL\u0026section=HARDWARE",
+            "explode": true,
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "default": [
+                "GENERAL"
+              ],
+              "example": [
+                "GENERAL"
+              ],
+              "items": {
+                "$ref": "#/components/schemas/ComputerSectionV2"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `general.name:asc`. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`,\n`general.mdmCertificateExpiration`, `general.platform`, `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,\n`general.mdmCertificateExpiration`, `general.platform`, `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`\n`hardware.make`, `hardware.model`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,\n`userAndLocation.realname`,\n`purchasing.lifeExpectancy`, `purchasing.warrantyDate`\n\nExample: `sort=udid:desc,general.name:asc`.\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "general.name:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter computer inventory collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`, `general.barcode2`,\n`general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`, `general.itunesStoreAccountActive`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`, `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`, `general.managementId`, `general.remoteManagement.managed`,\n`general.mdmCapable.capable`, `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`, `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`, \n`general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`, \n`general.mdmCapable.capable`, `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`, `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`, `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,\n`hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`, `hardware.modelIdentifier`, `hardware.serialNumber`,\n`hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`, `operatingSystem.fileVault2Status`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,\n`security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`, `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,\n`userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`, `userAndLocation.username`, `diskEncryption.fileVault2Enabled`,\n`purchasing.appleCareId`, `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`, `purchasing.warrantyDate`,\n\nThis param can be combined with paging and sorting.\nExample: `filter=general.name==\"Orchard\"`\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventorySearchResultsV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return paginated Computer Inventory records",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:computers"
+        ]
+      },
+      "post": {
+        "description": "Creates Computer Inventory record\n\n**Required Permissions:** `create:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryCreateRequestV2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successful response - Computer Inventory record created"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Create Computer Inventory record",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "create:pro:computers"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/computers-inventory-detail/{id}": {
+      "get": {
+        "description": "Return all sections of a computer\n\n**Required Permissions:** `read:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryV2"
+                }
+              }
+            },
+            "description": "Details of computer were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return all sections of a computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:computers"
+        ]
+      },
+      "patch": {
+        "description": "Update specific fields on a computer, then return the updated computer object.\n\n**Required Permissions:** `update:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Details of computer were updated"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Update specific fields on a computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "update:pro:computers"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/computers-inventory/filevault": {
+      "get": {
+        "description": "Return paginated FileVault information for all computers\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryFileVaultSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return paginated FileVault information for all computers",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:disk-encryption-recovery-key"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/computers-inventory/{id}": {
+      "delete": {
+        "description": "Remove specified Computer record\n\n**Required Permissions:** `delete:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Computer record successfully removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object id does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Remove specified Computer record",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "delete:pro:computers"
+        ]
+      },
+      "get": {
+        "description": "Return General section of a Computer\n\n**Required Permissions:** `read:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "section of computer details, if not specified, General section data is returned. Multiple section parameters are supported, e.g. section=general\u0026section=hardware",
+            "explode": true,
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "default": [
+                "GENERAL"
+              ],
+              "example": [
+                "GENERAL"
+              ],
+              "items": {
+                "$ref": "#/components/schemas/ComputerSectionV2"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryV2"
+                }
+              }
+            },
+            "description": "Details of computer were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return General section of a Computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:computers"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/computers-inventory/{id}/attachments": {
+      "post": {
+        "description": "Upload attachment and assign to computer\n\n**Required Permissions:** `update:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successfully uploaded attachment"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Upload attachment and assign to computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "update:pro:computers"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}": {
+      "delete": {
+        "description": "Remove attachment\n\n**Required Permissions:** `update:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "instance id of attachment object",
+            "explode": false,
+            "in": "path",
+            "name": "attachmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Attachment successfully removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object or attachment does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Remove attachment",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "update:pro:computers"
+        ]
+      },
+      "get": {
+        "description": "Download attachment file\n\n**Required Permissions:** `read:pro:computers`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "instance id of attachment object",
+            "explode": false,
+            "in": "path",
+            "name": "attachmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "description": "Downloaded binary file, Content-Type will be dynamic, based on a file extension",
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Attachment successfully downloaded"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object or attachment does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Download attachment file",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:computers"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/computers-inventory/{id}/filevault": {
+      "get": {
+        "description": "Return FileVault information for a specific computer\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryFileVault"
+                }
+              }
+            },
+            "description": "FileVault information for computer was found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "FileVault information for specified computer does not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return FileVault information for a specific computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:disk-encryption-recovery-key"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin": {
+      "get": {
+        "description": "Return a computer's Device Lock PIN\n\n**Required Permissions:** `read:pro:computer-device-lock-pin`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryDeviceLockPinResponse"
+                }
+              }
+            },
+            "description": "Device Lock PIN"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return a computer's Device Lock PIN",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:computer-device-lock-pin"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password": {
+      "get": {
+        "description": "Return a Computers Recovery Lock Password\n\n**Required Permissions:** `read:pro:recovery-lock`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryRecoveryLockPasswordResponse"
+                }
+              }
+            },
+            "description": "Recovery Lock Password"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return a Computers Recovery Lock Password",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:recovery-lock"
         ]
       }
     },
@@ -51764,6 +55012,111 @@
         ]
       }
     },
+    "/v2/tenant/{tenantId}/mobile-device-prestages": {
+      "get": {
+        "deprecated": true,
+        "description": "Gets sorted and paged mobile device prestages\n\n**Required Permissions:** `read:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "id:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileDevicePrestageSearchResultsV2"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get sorted and paged Mobile Device Prestages\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:mobile-device-prestage-enrollments"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "Create a mobile device prestage\n\n**Required Permissions:** `create:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MobileDevicePrestageV2"
+              }
+            }
+          },
+          "description": "Mobile Device Prestage to create. ids defined in this body will be ignored",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage was created"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Create a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "create:pro:mobile-device-prestage-enrollments"
+        ]
+      }
+    },
     "/v2/tenant/{tenantId}/mobile-device-prestages/scope": {
       "get": {
         "description": "Get all device scope for all mobile device prestages\n\n**Required Permissions:** `read:pro:mobile-device-prestage-enrollments`",
@@ -51834,6 +55187,515 @@
         "x-authentication-required": true,
         "x-required-privileges": [
           "read:pro:mobile-device-prestage-enrollments"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/mobile-device-prestages/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "Deletes a Mobile Device Prestage with the supplied id\n\n**Required Permissions:** `delete:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Delete a Mobile Device Prestage with the supplied id\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "delete:pro:mobile-device-prestage-enrollments"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "Retrieves a Mobile Device Prestage with the supplied id\n\n**Required Permissions:** `read:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMobileDevicePrestageV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Retrieve a Mobile Device Prestage with the supplied id\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:mobile-device-prestage-enrollments"
+        ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Updates a Mobile Device Prestage\n\n**Required Permissions:** `update:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutMobileDevicePrestageV2"
+              }
+            }
+          },
+          "description": "Mobile Device Prestage to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMobileDevicePrestageV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "The Mobile Device Prestage was modified by another process. Read the Mobile Device Prestage again for updated changes."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Update a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "update:pro:mobile-device-prestage-enrollments"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/mobile-device-prestages/{id}/attachments": {
+      "get": {
+        "deprecated": true,
+        "description": "Get attachments for a Mobile Device Prestage\n\n**Required Permissions:** `read:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FileAttachmentV2"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get attachments for a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:mobile-device-prestage-enrollments"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "Add an attachment to a Mobile Device prestage\n\n**Required Permissions:** `create:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Identifier of the Mobile Device Prestage the attachment should be assigned to",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrestageFileAttachmentV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile Device Prestage with that id does not exist"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Add an attachment to a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "create:pro:mobile-device-prestage-enrollments"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/mobile-device-prestages/{id}/attachments/delete-multiple": {
+      "post": {
+        "deprecated": true,
+        "description": "Remove an attachment for a Mobile Device Prestage\n\n**Required Permissions:** `delete:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ids"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Remove an attachment for a Mobile Device Prestage\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-action": true,
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "delete:pro:mobile-device-prestage-enrollments"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/mobile-device-prestages/{id}/history": {
+      "get": {
+        "deprecated": true,
+        "description": "Gets sorted and paged mobile device prestage history objects\n\n**Required Permissions:** `read:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property,asc/desc. Default sort order is descending. Multiple sort criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort' query param is duplicated for each sort criterion, e.g., ...\u0026sort=name%2Casc\u0026sort=date%2Cdesc",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of mobile device prestage history were found"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get sorted and paged Mobile Device Prestage history objects\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "read:pro:mobile-device-prestage-enrollments"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "Adds mobile device prestage history object notes\n\n**Required Permissions:** `update:pro:mobile-device-prestage-enrollments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Mobile Device Prestage identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of mobile deivce prestage history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Mobile device prestage history can not be saved"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Add Mobile Device Prestage history object notes\n",
+        "tags": [
+          "mobile-device-prestages"
+        ],
+        "x-authentication-required": true,
+        "x-deprecation-date": "2025-06-30",
+        "x-required-privileges": [
+          "update:pro:mobile-device-prestage-enrollments"
         ]
       }
     },

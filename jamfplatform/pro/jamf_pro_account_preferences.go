@@ -11,6 +11,19 @@ import (
 	"net/http"
 )
 
+// GetAccountPreferencesV2 get Jamf Pro account preferences.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+func (c *Client) GetAccountPreferencesV2(ctx context.Context) (*AccountPreferencesV5, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result AccountPreferencesV5
+	endpoint := prefix + "/account-preferences"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetAccountPreferencesV2: %w", err)
+	}
+	return &result, nil
+}
+
 // GetAccountPreferencesV3 get Jamf Pro account preferences.
 func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferencesV6, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
@@ -18,6 +31,19 @@ func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferenc
 	endpoint := prefix + "/account-preferences"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetAccountPreferencesV3: %w", err)
+	}
+	return &result, nil
+}
+
+// UpdateAccountPreferencesV2 update Jamf Pro account preferences.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+func (c *Client) UpdateAccountPreferencesV2(ctx context.Context, request *AccountPreferencesV5) (*AccountPreferencesV5, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result AccountPreferencesV5
+	endpoint := prefix + "/account-preferences"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateAccountPreferencesV2: %w", err)
 	}
 	return &result, nil
 }

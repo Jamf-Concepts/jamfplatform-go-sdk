@@ -11,6 +11,40 @@ import (
 	"testing"
 )
 
+func TestGetComputerInventoryCollectionSettingsV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetComputerInventoryCollectionSettingsV1(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerInventoryCollectionSettingsV1_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/computer-inventory-collection-settings", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetComputerInventoryCollectionSettingsV1(context.Background())
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestGetComputerInventoryCollectionSettingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +79,24 @@ func TestGetComputerInventoryCollectionSettingsV2_NotFound(t *testing.T) {
 	}
 }
 
+func TestUpdateComputerInventoryCollectionSettingsV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPatch {
+			t.Errorf("method = %s, want PATCH", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.UpdateComputerInventoryCollectionSettingsV1(context.Background(), &ComputerInventoryCollectionSettings{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestUpdateComputerInventoryCollectionSettingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
@@ -57,6 +109,24 @@ func TestUpdateComputerInventoryCollectionSettingsV2(t *testing.T) {
 	err := c.UpdateComputerInventoryCollectionSettingsV2(context.Background(), &ComputerInventoryCollectionSettingsV2{})
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestCreateComputerInventoryCollectionCustomPathV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/computer-inventory-collection-settings/custom-path", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
+	})
+
+	result, err := c.CreateComputerInventoryCollectionCustomPathV1(context.Background(), &CreatePath{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
 	}
 }
 
@@ -75,6 +145,21 @@ func TestCreateComputerInventoryCollectionCustomPathV2(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestDeleteComputerInventoryCollectionCustomPathV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/computer-inventory-collection-settings/custom-path/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteComputerInventoryCollectionCustomPathV1(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

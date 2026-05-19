@@ -49,6 +49,19 @@ func (c *Client) UploadInventoryPreloadCsvV2(ctx context.Context, fileFilename s
 	return &result, nil
 }
 
+// DownloadInventoryPreloadCsvTemplateV1 retrieve the Inventory Preload CSV template.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2020-04-21) and may be removed in a future release.
+func (c *Client) DownloadInventoryPreloadCsvTemplateV1(ctx context.Context) ([]byte, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result []byte
+	endpoint := prefix + "/inventory-preload/csv-template"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("DownloadInventoryPreloadCsvTemplateV1: %w", err)
+	}
+	return result, nil
+}
+
 // DownloadInventoryPreloadCsvTemplateV2 download the Inventory Preload CSV template.
 func (c *Client) DownloadInventoryPreloadCsvTemplateV2(ctx context.Context) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
@@ -118,6 +131,35 @@ func (c *Client) ExportInventoryPreloadV2(ctx context.Context, request *ExportPa
 	return result, nil
 }
 
+// ListInventoryPreloadHistoryV1 get Inventory Preload history entries.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2020-04-24) and may be removed in a future release.
+func (c *Client) ListInventoryPreloadHistoryV1(ctx context.Context, sort []string) ([]ObjectHistory, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+
+		endpoint := prefix + "/inventory-preload/history"
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int             `json:"totalCount"`
+			Results    []ObjectHistory `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
 // ListInventoryPreloadHistoryV2 get Inventory Preload history entries.
 func (c *Client) ListInventoryPreloadHistoryV2(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
@@ -146,6 +188,19 @@ func (c *Client) ListInventoryPreloadHistoryV2(ctx context.Context, sort []strin
 		hasNext := (page+1)*pageSize < result.TotalCount
 		return result.Results, hasNext, nil
 	})
+}
+
+// CreateInventoryPreloadHistoryNoteV1 add Inventory Preload history object notes.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2020-04-24) and may be removed in a future release.
+func (c *Client) CreateInventoryPreloadHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result ObjectHistory
+	endpoint := prefix + "/inventory-preload/history"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateInventoryPreloadHistoryNoteV1: %w", err)
+	}
+	return &result, nil
 }
 
 // CreateInventoryPreloadHistoryNoteV2 add Inventory Preload history object notes.

@@ -202,10 +202,6 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 	applySchemaAdditions(doc, spec.SchemaAdditions)
 	hoistInlineObjects(doc)
 
-	if spec.SkipDeprecated {
-		spec.Operations = dropDeprecatedOps(doc, spec)
-	}
-
 	methods, err := extractMethods(doc, spec)
 	if err != nil {
 		return err
@@ -335,9 +331,6 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
 		}
 		spec := ls.spec
-		if spec.SkipDeprecated {
-			spec.Operations = dropDeprecatedOps(doc, spec)
-		}
 		methods, err := extractMethods(doc, spec)
 		if err != nil {
 			return fmt.Errorf("spec %s: %w", spec.File, err)

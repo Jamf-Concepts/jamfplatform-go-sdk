@@ -4,10 +4,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 
@@ -126,13 +127,14 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 				}
 				parts := strings.Split(path, ".")
 				checks := []string{"r == nil"}
-				expr := "r"
+				var expr strings.Builder
+				expr.WriteString("r")
 				for _, p := range parts {
-					expr += "." + p
-					checks = append(checks, expr+" == nil")
+					expr.WriteString("." + p)
+					checks = append(checks, expr.String()+" == nil")
 				}
 				gr.IDNilCheck = strings.Join(checks, " || ")
-				gr.IDDeref = "*" + expr
+				gr.IDDeref = "*" + expr.String()
 				xmlBody := "42"
 				for i := len(parts) - 1; i >= 0; i-- {
 					tag := strings.ToLower(parts[i])
@@ -323,13 +325,7 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 						}
 					}
 					if nameJSONField != "" {
-						isRequired := false
-						for _, req := range schemaRef.Value.Required {
-							if req == nameJSONField {
-								isRequired = true
-								break
-							}
-						}
+						isRequired := slices.Contains(schemaRef.Value.Required, nameJSONField)
 						if !isRequired {
 							nameIsPointer = true
 						}
@@ -583,6 +579,37 @@ func sortedContentEntries(content map[string]*openapi3.MediaType) func(yield fun
 	}
 }
 
+// deprecationDate returns the value of the x-deprecation-date vendor
+// extension on op normalised to YYYY-MM-DD, or "" when absent. Specs in
+// this repo use either bare dates (pro: "2025-06-30") or ISO datetimes
+// (classic: "2025-02-11T00:00:00.000Z"); both render as YYYY-MM-DD in
+// the godoc. kin-openapi stores vendor extensions as raw JSON bytes
+// keyed by the extension name.
+func deprecationDate(op *openapi3.Operation) string {
+	if op == nil {
+		return ""
+	}
+	raw, ok := op.Extensions["x-deprecation-date"]
+	if !ok {
+		return ""
+	}
+	var s string
+	switch v := raw.(type) {
+	case string:
+		s = v
+	case []byte:
+		s = strings.Trim(string(v), `"`)
+	case json.RawMessage:
+		s = strings.Trim(string(v), `"`)
+	default:
+		s = strings.Trim(fmt.Sprintf("%s", v), `"`)
+	}
+	if idx := strings.IndexAny(s, "T "); idx >= 0 {
+		s = s[:idx]
+	}
+	return s
+}
+
 // isRateLimited reports whether the operation carries x-rate-limit: true.
 // kin-openapi stores vendor extensions as raw JSON bytes keyed by the
 // extension name.
@@ -606,34 +633,6 @@ func isRateLimited(op *openapi3.Operation) bool {
 		s := fmt.Sprintf("%s", v)
 		return s == "true"
 	}
-}
-
-// dropDeprecatedOps returns spec.Operations with any operations whose spec
-// marks them deprecated removed. Logs each drop so the curator can see why
-// the generated surface shrank. Operations with Deprecated=true in config
-// are kept regardless — this allows explicitly including deprecated endpoints
-// that the SDK still needs to expose.
-func dropDeprecatedOps(doc *openapi3.T, spec SpecDef) []OperationDef {
-	kept := make([]OperationDef, 0, len(spec.Operations))
-	for _, opDef := range spec.Operations {
-		if opDef.Deprecated {
-			kept = append(kept, opDef)
-			continue
-		}
-		httpMethod, specPath := opDef.parseOp()
-		pathItem := doc.Paths.Find(specPath)
-		if pathItem == nil {
-			kept = append(kept, opDef)
-			continue
-		}
-		op := pathItem.GetOperation(httpMethod)
-		if op != nil && op.Deprecated {
-			log.Printf("skipping deprecated operation %s (%s)", opDef.Name, opDef.Op)
-			continue
-		}
-		kept = append(kept, opDef)
-	}
-	return kept
 }
 
 func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, error) {
@@ -687,7 +686,12 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 		if m.Comment == "" {
 			m.Comment = opDef.Name + " is deprecated."
 		}
-		m.Comment += "\n//\n// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release."
+		depMsg := "\n//\n// Deprecated: this endpoint is marked deprecated in the Jamf API spec"
+		if d := deprecationDate(op); d != "" {
+			depMsg += " (deprecation-date: " + d + ")"
+		}
+		depMsg += " and may be removed in a future release."
+		m.Comment += depMsg
 	}
 
 	m.PathParams = extractPathParams(m.ResourcePath, opDef.PathNames)
