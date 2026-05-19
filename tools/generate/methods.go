@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 
@@ -126,13 +127,14 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 				}
 				parts := strings.Split(path, ".")
 				checks := []string{"r == nil"}
-				expr := "r"
+				var expr strings.Builder
+				expr.WriteString("r")
 				for _, p := range parts {
-					expr += "." + p
-					checks = append(checks, expr+" == nil")
+					expr.WriteString("." + p)
+					checks = append(checks, expr.String()+" == nil")
 				}
 				gr.IDNilCheck = strings.Join(checks, " || ")
-				gr.IDDeref = "*" + expr
+				gr.IDDeref = "*" + expr.String()
 				xmlBody := "42"
 				for i := len(parts) - 1; i >= 0; i-- {
 					tag := strings.ToLower(parts[i])
@@ -323,13 +325,7 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 						}
 					}
 					if nameJSONField != "" {
-						isRequired := false
-						for _, req := range schemaRef.Value.Required {
-							if req == nameJSONField {
-								isRequired = true
-								break
-							}
-						}
+						isRequired := slices.Contains(schemaRef.Value.Required, nameJSONField)
 						if !isRequired {
 							nameIsPointer = true
 						}

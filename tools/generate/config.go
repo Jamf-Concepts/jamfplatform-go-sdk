@@ -28,7 +28,7 @@ type SpecDef struct {
 	SplitByTag         bool                         `json:"splitByTag,omitempty"` // emit one methods file per OpenAPI tag instead of one per spec
 	Format             string                       `json:"format,omitempty"`     // "json" (default) or "xml" — drives struct tag style and transport codec
 	RawBody            bool                         `json:"rawBody,omitempty"`    // generate methods that take/return []byte instead of typed structs; consumer owns marshaling (used for Classic where spec has no useful types)
-	TypesOnly          bool                         `json:"typesOnly,omitempty"` // generate only Go types from all schemas — no client methods, no method tests, no client.go; used for specs that define types consumed in other API payloads (e.g. blueprint component configurations)
+	TypesOnly          bool                         `json:"typesOnly,omitempty"`  // generate only Go types from all schemas — no client methods, no method tests, no client.go; used for specs that define types consumed in other API payloads (e.g. blueprint component configurations)
 	Operations         []OperationDef               `json:"operations"`
 	ExcludePaths       []string                     `json:"excludePaths,omitempty"`       // "METHOD /path" entries the generator must refuse to include
 	FieldTypeOverrides map[string]string            `json:"fieldTypeOverrides,omitempty"` // "schema_name.property_name" -> Go type, used to correct spec bugs (e.g. `integer` fields where the server actually returns a non-int64 string). Applied per-spec so upstream spec updates don't get silently overwritten.
@@ -69,19 +69,19 @@ type OperationDef struct {
 // Resolve<ResourceType>IDByName (returns string ID) and
 // Resolve<ResourceType>ByName (returns the typed resource).
 type ResolverConfig struct {
-	ResourceType string `json:"resourceType"`            // Go type name used in emitted method names (e.g. "Blueprint")
-	NameField    string `json:"nameField"`               // dot-notation JSON path for the name field on each list element (e.g. "name", "general.name", "title")
-	MatchField   string `json:"matchField,omitempty"`    // optional: dot-notation JSON path for client-side match verification when it differs from nameField (e.g. RSQL uses "displayName" but response nests it at "general.displayName"). Empty defaults to nameField.
-	IDField      string `json:"idField"`                 // dot-notation JSON path for the ID field (e.g. "id")
-	IDNumeric    bool   `json:"idNumeric,omitempty"`     // when true, the ID field is a number in JSON (int in Go); test stubs emit numeric IDs
-	IDPointer    bool   `json:"idPointer,omitempty"`     // when true, the ID field is a pointer (*int) in Go; overrides IDNumeric's strconv.Itoa to use fmt.Sprintf with dereference
-	Mode         string `json:"mode"`                    // "filtered" (server-side RSQL) or "clientFilter" (walk list in memory). "direct" reserved for proclassic by-name endpoints and handled in a later phase.
-	SearchParam  string `json:"searchParam,omitempty"`   // clientFilter mode only: server-side search query key to narrow results (e.g. "search"). Empty → fetch full list.
-	ResultsField string `json:"resultsField,omitempty"`  // envelope key containing the array of list elements. Empty defaults to "results"; set to e.g. "benchmarks" for non-standard wrappers.
-	TypedReturn  string `json:"typedReturn,omitempty"`   // Go type returned by the typed wrapper (e.g. "BlueprintOverview"). Defaults to ResourceType when empty.
-	ExtraParams  string `json:"extraParams,omitempty"`   // filtered mode only: additional query params appended to the list path before the filter (e.g. "section=GENERAL" for endpoints that require a section param to populate filterable fields).
-	ByField      string `json:"byField,omitempty"`       // override the "ByName" suffix in method names (e.g. "BySerialNumber" emits ResolveDeviceIDBySerialNumber). Empty defaults to "ByName".
-	Apply        *ApplyConfig `json:"apply,omitempty"`   // when set, generates an Apply<ResourceType> upsert method that resolves by name, then creates or updates
+	ResourceType string       `json:"resourceType"`           // Go type name used in emitted method names (e.g. "Blueprint")
+	NameField    string       `json:"nameField"`              // dot-notation JSON path for the name field on each list element (e.g. "name", "general.name", "title")
+	MatchField   string       `json:"matchField,omitempty"`   // optional: dot-notation JSON path for client-side match verification when it differs from nameField (e.g. RSQL uses "displayName" but response nests it at "general.displayName"). Empty defaults to nameField.
+	IDField      string       `json:"idField"`                // dot-notation JSON path for the ID field (e.g. "id")
+	IDNumeric    bool         `json:"idNumeric,omitempty"`    // when true, the ID field is a number in JSON (int in Go); test stubs emit numeric IDs
+	IDPointer    bool         `json:"idPointer,omitempty"`    // when true, the ID field is a pointer (*int) in Go; overrides IDNumeric's strconv.Itoa to use fmt.Sprintf with dereference
+	Mode         string       `json:"mode"`                   // "filtered" (server-side RSQL) or "clientFilter" (walk list in memory). "direct" reserved for proclassic by-name endpoints and handled in a later phase.
+	SearchParam  string       `json:"searchParam,omitempty"`  // clientFilter mode only: server-side search query key to narrow results (e.g. "search"). Empty → fetch full list.
+	ResultsField string       `json:"resultsField,omitempty"` // envelope key containing the array of list elements. Empty defaults to "results"; set to e.g. "benchmarks" for non-standard wrappers.
+	TypedReturn  string       `json:"typedReturn,omitempty"`  // Go type returned by the typed wrapper (e.g. "BlueprintOverview"). Defaults to ResourceType when empty.
+	ExtraParams  string       `json:"extraParams,omitempty"`  // filtered mode only: additional query params appended to the list path before the filter (e.g. "section=GENERAL" for endpoints that require a section param to populate filterable fields).
+	ByField      string       `json:"byField,omitempty"`      // override the "ByName" suffix in method names (e.g. "BySerialNumber" emits ResolveDeviceIDBySerialNumber). Empty defaults to "ByName".
+	Apply        *ApplyConfig `json:"apply,omitempty"`        // when set, generates an Apply<ResourceType> upsert method that resolves by name, then creates or updates
 }
 
 // ApplyConfig declares an upsert method the generator should emit alongside
@@ -113,11 +113,11 @@ type ApplyConfig struct {
 
 // MembershipPreFetchConfig controls the membership pre-fetch step in Apply.
 type MembershipPreFetchConfig struct {
-	FetchOp              string `json:"fetchOp"`                        // list op to call for current membership (e.g. "ListStaticMobileDeviceGroupMembershipV1")
-	SourceIDField        string `json:"sourceIdField"`                  // field on each result item (e.g. "MobileDeviceID")
-	AssignmentType       string `json:"assignmentType"`                 // Go type for assignments (e.g. "Assignment")
-	AssignmentIDField    string `json:"assignmentIdField"`              // ID field on assignment type (e.g. "MobileDeviceID")
-	RequestField         string `json:"requestField"`                   // field on request to inject into (e.g. "Assignments")
+	FetchOp              string `json:"fetchOp"`                             // list op to call for current membership (e.g. "ListStaticMobileDeviceGroupMembershipV1")
+	SourceIDField        string `json:"sourceIdField"`                       // field on each result item (e.g. "MobileDeviceID")
+	AssignmentType       string `json:"assignmentType"`                      // Go type for assignments (e.g. "Assignment")
+	AssignmentIDField    string `json:"assignmentIdField"`                   // ID field on assignment type (e.g. "MobileDeviceID")
+	RequestField         string `json:"requestField"`                        // field on request to inject into (e.g. "Assignments")
 	AssignmentFieldIsPtr bool   `json:"assignmentFieldIsSlicePtr,omitempty"` // true when request field is *[]T rather than []T
 }
 
