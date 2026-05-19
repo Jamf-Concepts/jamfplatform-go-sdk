@@ -31,7 +31,6 @@ type SpecDef struct {
 	TypesOnly          bool                         `json:"typesOnly,omitempty"` // generate only Go types from all schemas — no client methods, no method tests, no client.go; used for specs that define types consumed in other API payloads (e.g. blueprint component configurations)
 	Operations         []OperationDef               `json:"operations"`
 	ExcludePaths       []string                     `json:"excludePaths,omitempty"`       // "METHOD /path" entries the generator must refuse to include
-	SkipDeprecated     bool                         `json:"skipDeprecated,omitempty"`     // omit operations marked deprecated in the spec
 	FieldTypeOverrides map[string]string            `json:"fieldTypeOverrides,omitempty"` // "schema_name.property_name" -> Go type, used to correct spec bugs (e.g. `integer` fields where the server actually returns a non-int64 string). Applied per-spec so upstream spec updates don't get silently overwritten.
 	SchemaAdditions    map[string]map[string]string `json:"schemaAdditions,omitempty"`    // "schema_name" -> { "property_name": "openapi_type" }, inject missing properties into a spec schema. Used when the spec omits a field the server accepts but we need to send (e.g. Classic's account schema has no `password` property). openapi_type is one of "string", "integer", "boolean", "string:password" (writeOnly string).
 }
@@ -61,7 +60,6 @@ type OperationDef struct {
 	RequestType    string            `json:"requestType,omitempty"`    // explicit request schema name (used when spec body is untyped, e.g. Classic)
 	ResponseType   string            `json:"responseType,omitempty"`   // explicit response schema name (same)
 	ExpectedStatus int               `json:"expectedStatus,omitempty"` // explicit success status code (default 200)
-	Deprecated     bool              `json:"deprecated,omitempty"`     // when true, keeps the operation even when SkipDeprecated is set at spec level — used for endpoints that are deprecated but still needed in the SDK surface
 	Resolver       *ResolverConfig   `json:"resolver,omitempty"`       // attach name->ID resolver emission to this operation (typically a List op)
 	Resolvers      []ResolverConfig  `json:"resolvers,omitempty"`      // attach multiple resolvers to one operation (e.g. resolve device by name AND by serialNumber)
 }

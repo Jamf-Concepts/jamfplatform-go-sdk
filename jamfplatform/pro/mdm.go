@@ -56,6 +56,29 @@ func (c *Client) SendMdmBlankPushV2(ctx context.Context, request *BlankPushReque
 	return &result, nil
 }
 
+// ListMdmCommandsV1 get information about mdm commands made by Jamf Pro.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2023-10-16) and may be removed in a future release.
+func (c *Client) ListMdmCommandsV1(ctx context.Context, uuids []string, clientManagementID string) ([]MDMCommand, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result []MDMCommand
+	endpoint := prefix + "/mdm/commands"
+	params := url.Values{}
+	if len(uuids) > 0 {
+		params.Set("uuids", strings.Join(uuids, ","))
+	}
+	if clientManagementID != "" {
+		params.Set("client-management-id", clientManagementID)
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMdmCommandsV1: %w", err)
+	}
+	return result, nil
+}
+
 // ListMdmCommandsV2 get information about mdm commands made by Jamf Pro.
 func (c *Client) ListMdmCommandsV2(ctx context.Context, sort []string, filter string) ([]MDMCommand, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")

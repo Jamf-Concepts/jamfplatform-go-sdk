@@ -11,6 +11,40 @@ import (
 	"testing"
 )
 
+func TestGetAccountPreferencesV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/account-preferences", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetAccountPreferencesV2(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetAccountPreferencesV2_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/account-preferences", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetAccountPreferencesV2(context.Background())
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestGetAccountPreferencesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v3/tenant/t-test/account-preferences", func(w http.ResponseWriter, r *http.Request) {
@@ -42,6 +76,24 @@ func TestGetAccountPreferencesV3_NotFound(t *testing.T) {
 	_, err := c.GetAccountPreferencesV3(context.Background())
 	if err == nil {
 		t.Fatal("expected error")
+	}
+}
+
+func TestUpdateAccountPreferencesV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/account-preferences", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPatch {
+			t.Errorf("method = %s, want PATCH", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.UpdateAccountPreferencesV2(context.Background(), &AccountPreferencesV5{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
 	}
 }
 

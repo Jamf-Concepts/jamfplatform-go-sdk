@@ -237,6 +237,28 @@ func TestGetLatestMobileDevicePrestageSyncV2_NotFound(t *testing.T) {
 	}
 }
 
+func TestListMobileDevicePrestagesV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{}},
+			"totalCount": 1,
+			"hasNext":    false,
+		})
+	})
+
+	results, err := c.ListMobileDevicePrestagesV2(context.Background(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
 func TestListMobileDevicePrestagesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v3/tenant/t-test/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
@@ -259,6 +281,24 @@ func TestListMobileDevicePrestagesV3(t *testing.T) {
 	}
 }
 
+func TestCreateMobileDevicePrestageV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
+	})
+
+	result, err := c.CreateMobileDevicePrestageV2(context.Background(), &MobileDevicePrestageV2{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestCreateMobileDevicePrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v3/tenant/t-test/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
@@ -274,6 +314,40 @@ func TestCreateMobileDevicePrestageV3(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetMobileDevicePrestageV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetMobileDevicePrestageV2(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetMobileDevicePrestageV2_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetMobileDevicePrestageV2(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }
 
@@ -311,6 +385,24 @@ func TestGetMobileDevicePrestageV3_NotFound(t *testing.T) {
 	}
 }
 
+func TestUpdateMobileDevicePrestageV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.UpdateMobileDevicePrestageV2(context.Background(), "test-id", &PutMobileDevicePrestageV2{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestUpdateMobileDevicePrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v3/tenant/t-test/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -329,6 +421,21 @@ func TestUpdateMobileDevicePrestageV3(t *testing.T) {
 	}
 }
 
+func TestDeleteMobileDevicePrestageV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteMobileDevicePrestageV2(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestDeleteMobileDevicePrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v3/tenant/t-test/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -341,6 +448,40 @@ func TestDeleteMobileDevicePrestageV3(t *testing.T) {
 	err := c.DeleteMobileDevicePrestageV3(context.Background(), "test-id")
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestListMobileDevicePrestageAttachmentsV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
+	})
+
+	result, err := c.ListMobileDevicePrestageAttachmentsV2(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestListMobileDevicePrestageAttachmentsV2_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.ListMobileDevicePrestageAttachmentsV2(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }
 
@@ -378,6 +519,26 @@ func TestListMobileDevicePrestageAttachmentsV3_NotFound(t *testing.T) {
 	}
 }
 
+func TestUploadMobileDevicePrestageAttachmentV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
+			t.Errorf("Content-Type = %q, want multipart/form-data", ct)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
+	})
+	result, err := c.UploadMobileDevicePrestageAttachmentV2(context.Background(), "test-id", "test.bin", bytes.NewBufferString("stub"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestUploadMobileDevicePrestageAttachmentV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v3/tenant/t-test/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
@@ -398,6 +559,21 @@ func TestUploadMobileDevicePrestageAttachmentV3(t *testing.T) {
 	}
 }
 
+func TestDeleteMultipleMobileDevicePrestageAttachmentsV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id/attachments/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteMultipleMobileDevicePrestageAttachmentsV2(context.Background(), "test-id", &Ids{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestDeleteMultipleMobileDevicePrestageAttachmentsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v3/tenant/t-test/mobile-device-prestages/test-id/attachments/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
@@ -410,6 +586,28 @@ func TestDeleteMultipleMobileDevicePrestageAttachmentsV3(t *testing.T) {
 	err := c.DeleteMultipleMobileDevicePrestageAttachmentsV3(context.Background(), "test-id", &Ids{})
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestListMobileDevicePrestageHistoryV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{}},
+			"totalCount": 1,
+			"hasNext":    false,
+		})
+	})
+
+	results, err := c.ListMobileDevicePrestageHistoryV2(context.Background(), "test-id", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
 	}
 }
 
@@ -435,6 +633,24 @@ func TestListMobileDevicePrestageHistoryV3(t *testing.T) {
 	}
 }
 
+func TestCreateMobileDevicePrestageHistoryNoteV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
+	})
+
+	result, err := c.CreateMobileDevicePrestageHistoryNoteV2(context.Background(), "test-id", &ObjectHistoryNote{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestCreateMobileDevicePrestageHistoryNoteV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v3/tenant/t-test/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
@@ -445,6 +661,52 @@ func TestCreateMobileDevicePrestageHistoryNoteV3(t *testing.T) {
 	})
 
 	result, err := c.CreateMobileDevicePrestageHistoryNoteV3(context.Background(), "test-id", &ObjectHistoryNote{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestResolveMobileDevicePrestageV2IDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "displayName": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveMobileDevicePrestageV2IDByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveMobileDevicePrestageV2ByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "displayName": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveMobileDevicePrestageV2ByName(context.Background(), "target")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -496,6 +758,76 @@ func TestResolveMobileDevicePrestageV3ByName(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestApplyMobileDevicePrestageV2_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List and create share the same path — single handler dispatches on method.
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"results":    []any{},
+				"totalCount": 0,
+			})
+		case http.MethodPost:
+			writeJSON(t, w, 201, map[string]any{
+				"id":   "new-id",
+				"href": "/new-id",
+			})
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+
+	id, created, err := c.ApplyMobileDevicePrestageV2(context.Background(), &MobileDevicePrestageV2{DisplayName: "target"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "new-id" {
+		t.Errorf("id = %q, want new-id", id)
+	}
+}
+
+func TestApplyMobileDevicePrestageV2_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns a match → resolver succeeds → apply updates.
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "existing-id", "displayName": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	// GET (versionLock fetch) and Update share the same path — dispatch on method.
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-prestages/existing-id", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "versionLock": 5})
+		case http.MethodPut, http.MethodPatch:
+			writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
+		default:
+			t.Errorf("unexpected method %s", r.Method)
+		}
+	})
+
+	id, created, err := c.ApplyMobileDevicePrestageV2(context.Background(), &MobileDevicePrestageV2{DisplayName: "target"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
 	}
 }
 

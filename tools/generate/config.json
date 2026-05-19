@@ -341,7 +341,6 @@
       "namespace": "pro",
       "package": "pro",
       "splitByTag": true,
-      "skipDeprecated": true,
       "specFile": "pro_api.json",
       "fieldTypeOverrides": {
         "managed_software_update_plan_toggle_status.elapsedTime": "*float64",
@@ -1436,6 +1435,80 @@
           "name": "RemoveMdmProfileFromComputerV1"
         },
         {
+          "op": "GET /v1/tenant/{tenantId}/computers-inventory",
+          "name": "ListComputersInventoryV1",
+          "pagination": "totalCount",
+          "params": [
+            "section:[]string",
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "ComputerInventoryV1",
+            "nameField": "general.name",
+            "idField": "id",
+            "mode": "filtered",
+            "extraParams": "section=GENERAL",
+            "typedReturn": "ComputerInventory"
+          },
+          "resolvers": [
+            {
+              "resourceType": "ComputerInventoryV1",
+              "nameField": "hardware.serialNumber",
+              "idField": "id",
+              "mode": "filtered",
+              "extraParams": "section=HARDWARE",
+              "typedReturn": "ComputerInventory",
+              "byField": "BySerialNumber"
+            },
+            {
+              "resourceType": "ComputerInventoryV1",
+              "nameField": "udid",
+              "idField": "id",
+              "mode": "filtered",
+              "typedReturn": "ComputerInventory",
+              "byField": "ByUDID"
+            }
+          ]
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/computers-inventory",
+          "name": "ListComputersInventoryV2",
+          "pagination": "totalCount",
+          "params": [
+            "section:[]string",
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "ComputerInventoryV2",
+            "nameField": "general.name",
+            "idField": "id",
+            "mode": "filtered",
+            "extraParams": "section=GENERAL",
+            "typedReturn": "ComputerInventoryV2"
+          },
+          "resolvers": [
+            {
+              "resourceType": "ComputerInventoryV2",
+              "nameField": "hardware.serialNumber",
+              "idField": "id",
+              "mode": "filtered",
+              "extraParams": "section=HARDWARE",
+              "typedReturn": "ComputerInventoryV2",
+              "byField": "BySerialNumber"
+            },
+            {
+              "resourceType": "ComputerInventoryV2",
+              "nameField": "udid",
+              "idField": "id",
+              "mode": "filtered",
+              "typedReturn": "ComputerInventoryV2",
+              "byField": "ByUDID"
+            }
+          ]
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory",
           "name": "ListComputersInventoryV3",
           "pagination": "totalCount",
@@ -1473,13 +1546,45 @@
           ]
         },
         {
+          "op": "POST /v1/tenant/{tenantId}/computers-inventory",
+          "name": "CreateComputerInventoryV1"
+        },
+        {
+          "op": "POST /v2/tenant/{tenantId}/computers-inventory",
+          "name": "CreateComputerInventoryV2"
+        },
+        {
           "op": "POST /v3/tenant/{tenantId}/computers-inventory",
           "name": "CreateComputerInventoryV3"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/computers-inventory/filevault",
+          "name": "ListComputerInventoryFileVaultsV1",
+          "pagination": "totalCount"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/computers-inventory/filevault",
+          "name": "ListComputerInventoryFileVaultsV2",
+          "pagination": "totalCount"
         },
         {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/filevault",
           "name": "ListComputerInventoryFileVaultsV3",
           "pagination": "totalCount"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}",
+          "name": "GetComputerInventoryV1",
+          "params": [
+            "section:[]string"
+          ]
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}",
+          "name": "GetComputerInventoryV2",
+          "params": [
+            "section:[]string"
+          ]
         },
         {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}",
@@ -1489,13 +1594,37 @@
           ]
         },
         {
+          "op": "DELETE /v1/tenant/{tenantId}/computers-inventory/{id}",
+          "name": "DeleteComputerInventoryV1"
+        },
+        {
+          "op": "DELETE /v2/tenant/{tenantId}/computers-inventory/{id}",
+          "name": "DeleteComputerInventoryV2"
+        },
+        {
           "op": "DELETE /v3/tenant/{tenantId}/computers-inventory/{id}",
           "name": "DeleteComputerInventoryV3",
           "expectedStatus": 204
         },
         {
+          "op": "GET /v1/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "name": "GetComputerInventoryDetailV1"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "name": "GetComputerInventoryDetailV2"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory-detail/{id}",
           "name": "GetComputerInventoryDetailV3"
+        },
+        {
+          "op": "PATCH /v1/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "name": "UpdateComputerInventoryDetailV1"
+        },
+        {
+          "op": "PATCH /v2/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "name": "UpdateComputerInventoryDetailV2"
         },
         {
           "op": "PATCH /v3/tenant/{tenantId}/computers-inventory-detail/{id}",
@@ -1503,12 +1632,36 @@
           "expectedStatus": 204
         },
         {
+          "op": "POST /v1/tenant/{tenantId}/computers-inventory/{id}/attachments",
+          "name": "UploadComputerInventoryAttachmentV1"
+        },
+        {
+          "op": "POST /v2/tenant/{tenantId}/computers-inventory/{id}/attachments",
+          "name": "UploadComputerInventoryAttachmentV2"
+        },
+        {
           "op": "POST /v3/tenant/{tenantId}/computers-inventory/{id}/attachments",
           "name": "UploadComputerInventoryAttachmentV3"
         },
         {
+          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "name": "DownloadComputerInventoryAttachmentV1"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "name": "DownloadComputerInventoryAttachmentV2"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DownloadComputerInventoryAttachmentV3"
+        },
+        {
+          "op": "DELETE /v1/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "name": "DeleteComputerInventoryAttachmentV1"
+        },
+        {
+          "op": "DELETE /v2/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "name": "DeleteComputerInventoryAttachmentV2"
         },
         {
           "op": "DELETE /v3/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
@@ -1516,28 +1669,68 @@
           "expectedStatus": 204
         },
         {
+          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}/filevault",
+          "name": "GetComputerInventoryFileVaultV1"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}/filevault",
+          "name": "GetComputerInventoryFileVaultV2"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/filevault",
           "name": "GetComputerInventoryFileVaultV3"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin",
+          "name": "GetComputerDeviceLockPinV1"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin",
+          "name": "GetComputerDeviceLockPinV2"
         },
         {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin",
           "name": "GetComputerDeviceLockPinV3"
         },
         {
+          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",
+          "name": "GetComputerRecoveryLockPasswordV1"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",
+          "name": "GetComputerRecoveryLockPasswordV2"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",
           "name": "GetComputerRecoveryLockPasswordV3"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/computer-inventory-collection-settings",
+          "name": "GetComputerInventoryCollectionSettingsV1"
         },
         {
           "op": "GET /v2/tenant/{tenantId}/computer-inventory-collection-settings",
           "name": "GetComputerInventoryCollectionSettingsV2"
         },
         {
+          "op": "PATCH /v1/tenant/{tenantId}/computer-inventory-collection-settings",
+          "name": "UpdateComputerInventoryCollectionSettingsV1"
+        },
+        {
           "op": "PATCH /v2/tenant/{tenantId}/computer-inventory-collection-settings",
           "name": "UpdateComputerInventoryCollectionSettingsV2"
         },
         {
+          "op": "POST /v1/tenant/{tenantId}/computer-inventory-collection-settings/custom-path",
+          "name": "CreateComputerInventoryCollectionCustomPathV1"
+        },
+        {
           "op": "POST /v2/tenant/{tenantId}/computer-inventory-collection-settings/custom-path",
           "name": "CreateComputerInventoryCollectionCustomPathV2"
+        },
+        {
+          "op": "DELETE /v1/tenant/{tenantId}/computer-inventory-collection-settings/custom-path/{id}",
+          "name": "DeleteComputerInventoryCollectionCustomPathV1"
         },
         {
           "op": "DELETE /v2/tenant/{tenantId}/computer-inventory-collection-settings/custom-path/{id}",
@@ -1551,6 +1744,10 @@
         {
           "op": "POST /v2/tenant/{tenantId}/inventory-preload/csv",
           "name": "UploadInventoryPreloadCsvV2"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/inventory-preload/csv-template",
+          "name": "DownloadInventoryPreloadCsvTemplateV1"
         },
         {
           "op": "GET /v2/tenant/{tenantId}/inventory-preload/csv-template",
@@ -1575,6 +1772,14 @@
           ]
         },
         {
+          "op": "GET /v1/tenant/{tenantId}/inventory-preload/history",
+          "name": "ListInventoryPreloadHistoryV1",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string"
+          ]
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/inventory-preload/history",
           "name": "ListInventoryPreloadHistoryV2",
           "pagination": "totalCount",
@@ -1582,6 +1787,10 @@
             "sort:[]string",
             "filter"
           ]
+        },
+        {
+          "op": "POST /v1/tenant/{tenantId}/inventory-preload/history",
+          "name": "CreateInventoryPreloadHistoryNoteV1"
         },
         {
           "op": "POST /v2/tenant/{tenantId}/inventory-preload/history",
@@ -1810,6 +2019,29 @@
           "name": "GetLatestMobileDevicePrestageSyncV2"
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages",
+          "name": "ListMobileDevicePrestagesV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string"
+          ],
+          "resolver": {
+            "resourceType": "MobileDevicePrestageV2",
+            "nameField": "displayName",
+            "idField": "id",
+            "mode": "clientFilter",
+            "apply": {
+              "createOp": "CreateMobileDevicePrestageV2",
+              "updateOp": "UpdateMobileDevicePrestageV2",
+              "deleteOp": "DeleteMobileDevicePrestageV2",
+              "nameGoField": "DisplayName",
+              "updateType": "PutMobileDevicePrestageV2",
+              "getOp": "GetMobileDevicePrestageV2",
+              "versionLock": true
+            }
+          }
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/mobile-device-prestages",
           "name": "ListMobileDevicePrestagesV3",
           "pagination": "totalCount",
@@ -1833,16 +2065,32 @@
           }
         },
         {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages",
+          "name": "CreateMobileDevicePrestageV2"
+        },
+        {
           "op": "POST /v3/tenant/{tenantId}/mobile-device-prestages",
           "name": "CreateMobileDevicePrestageV3"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/{id}",
+          "name": "GetMobileDevicePrestageV2"
         },
         {
           "op": "GET /v3/tenant/{tenantId}/mobile-device-prestages/{id}",
           "name": "GetMobileDevicePrestageV3"
         },
         {
+          "op": "PUT /v2/tenant/{tenantId}/mobile-device-prestages/{id}",
+          "name": "UpdateMobileDevicePrestageV2"
+        },
+        {
           "op": "PUT /v3/tenant/{tenantId}/mobile-device-prestages/{id}",
           "name": "UpdateMobileDevicePrestageV3"
+        },
+        {
+          "op": "DELETE /v2/tenant/{tenantId}/mobile-device-prestages/{id}",
+          "name": "DeleteMobileDevicePrestageV2"
         },
         {
           "op": "DELETE /v3/tenant/{tenantId}/mobile-device-prestages/{id}",
@@ -1850,16 +2098,36 @@
           "expectedStatus": 204
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/{id}/attachments",
+          "name": "ListMobileDevicePrestageAttachmentsV2"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/mobile-device-prestages/{id}/attachments",
           "name": "ListMobileDevicePrestageAttachmentsV3"
+        },
+        {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages/{id}/attachments",
+          "name": "UploadMobileDevicePrestageAttachmentV2"
         },
         {
           "op": "POST /v3/tenant/{tenantId}/mobile-device-prestages/{id}/attachments",
           "name": "UploadMobileDevicePrestageAttachmentV3"
         },
         {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages/{id}/attachments/delete-multiple",
+          "name": "DeleteMultipleMobileDevicePrestageAttachmentsV2"
+        },
+        {
           "op": "POST /v3/tenant/{tenantId}/mobile-device-prestages/{id}/attachments/delete-multiple",
           "name": "DeleteMultipleMobileDevicePrestageAttachmentsV3"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/{id}/history",
+          "name": "ListMobileDevicePrestageHistoryV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string"
+          ]
         },
         {
           "op": "GET /v3/tenant/{tenantId}/mobile-device-prestages/{id}/history",
@@ -1868,6 +2136,10 @@
           "params": [
             "sort:[]string"
           ]
+        },
+        {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages/{id}/history",
+          "name": "CreateMobileDevicePrestageHistoryNoteV2"
         },
         {
           "op": "POST /v3/tenant/{tenantId}/mobile-device-prestages/{id}/history",
@@ -2316,6 +2588,14 @@
         {
           "op": "POST /v2/tenant/{tenantId}/mdm/blank-push",
           "name": "SendMdmBlankPushV2"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/mdm/commands",
+          "name": "ListMdmCommandsV1",
+          "params": [
+            "uuids:[]string",
+            "client-management-id:string:clientManagementID"
+          ]
         },
         {
           "op": "GET /v2/tenant/{tenantId}/mdm/commands",
@@ -2891,24 +3171,20 @@
         },
         {
           "op": "GET /v1/tenant/{tenantId}/jcds/files",
-          "name": "ListJCDSFilesV1",
-          "deprecated": true
+          "name": "ListJCDSFilesV1"
         },
         {
           "op": "POST /v1/tenant/{tenantId}/jcds/files",
-          "name": "InitiateJCDSUploadV1",
-          "deprecated": true
+          "name": "InitiateJCDSUploadV1"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/jcds/files/{fileName}",
-          "name": "GetJCDSFileDownloadURLV1",
-          "deprecated": true
+          "name": "GetJCDSFileDownloadURLV1"
         },
         {
           "op": "DELETE /v1/tenant/{tenantId}/jcds/files/{fileName}",
           "name": "DeleteJCDSFileV1",
-          "expectedStatus": 204,
-          "deprecated": true
+          "expectedStatus": 204
         },
         {
           "op": "POST /v1/tenant/{tenantId}/jcds/refresh-inventory",
@@ -2916,13 +3192,11 @@
           "expectedStatus": 204,
           "params": [
             "file-name:string:fileName"
-          ],
-          "deprecated": true
+          ]
         },
         {
           "op": "POST /v1/tenant/{tenantId}/jcds/renew-credentials",
-          "name": "RenewJCDSCredentialsV1",
-          "deprecated": true
+          "name": "RenewJCDSCredentialsV1"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/distribution-points",
@@ -4083,8 +4357,16 @@
           "expectedStatus": 202
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/account-preferences",
+          "name": "GetAccountPreferencesV2"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/account-preferences",
           "name": "GetAccountPreferencesV3"
+        },
+        {
+          "op": "PATCH /v2/tenant/{tenantId}/account-preferences",
+          "name": "UpdateAccountPreferencesV2"
         },
         {
           "op": "PATCH /v3/tenant/{tenantId}/account-preferences",

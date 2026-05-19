@@ -40,6 +40,16 @@ Operations are whitelist-based — only endpoints listed in config are generated
 
 CI enforces generated output is current on every PR (`git diff --exit-code`).
 
+### Endpoint versions
+
+Jamf publishes new versions of Pro endpoints (V1 → V2 → V3 …) and keeps prior versions in the spec until they are physically removed. SDK policy is to retain every spec version side-by-side as a typed function — `ListComputersInventoryV1`, `V2`, `V3` all coexist — so downstream consumers (notably `terraform-provider-jamfplatform`) have a real migration window when Jamf marks a version deprecated. A version is removed from the SDK only when Jamf removes it from the spec.
+
+Each version has its own resolver / apply sugar: `ResolveComputerInventoryV1ByName`, `ResolveComputerInventoryV2ByName`, etc. The `resourceType` in the resolver config carries the V<N> suffix to keep method names disambiguated. `typedReturn` falls back to the unsuffixed Go type when the spec hasn't suffixed the V1 schema (e.g. V1 returns `*ComputerInventory`, V2 returns `*ComputerInventoryV2`).
+
+When Jamf publishes a new endpoint version, run `python3 tools/scripts/backfill_versions.py` from the repo root — it synthesizes missing version entries by cloning the closest sibling in config and version-suffixing the names. Re-run `make generate` afterwards. The script is idempotent.
+
+Endpoints marked `deprecated: true` in the spec are always emitted; the generator adds a `// Deprecated:` godoc line that includes the `x-deprecation-date` value (normalised to `YYYY-MM-DD`) so consumers see the removal window. There is no `skipDeprecated` knob — deprecation is opt-out by retaining the entry in config, opt-in (i.e. removed) by deleting it once Jamf drops the path.
+
 ### Two-layer design
 
 - **`jamfplatform/`** — Exported package. Generated types, methods, and the handwritten `Client` with `tenantPrefix` helper. Methods call `c.transport.Do`/`DoExpect`/`DoWithContentType`.

@@ -52,19 +52,10 @@ func publishSpecs(root string, cfg Config) error {
 			specFile = spec.SpecFile
 		}
 
-		// Apply the same skipDeprecated filter the code generator uses so
-		// the published spec describes only the SDK's real surface — a
-		// spec op removed from generated Go for being deprecated must not
-		// linger in api/*.json.
-		publishOps := spec.Operations
-		if spec.SkipDeprecated {
-			publishOps = dropDeprecatedOps(doc, spec)
-		}
-
 		// Build whitelist of path+method pairs from config.
 		type pathMethod struct{ path, method string }
 		allowed := make(map[pathMethod]bool)
-		for _, op := range publishOps {
+		for _, op := range spec.Operations {
 			method, path := op.parseOp()
 			allowed[pathMethod{path, method}] = true
 		}
@@ -118,7 +109,7 @@ func publishSpecs(root string, cfg Config) error {
 				usedSchemas[name] = true
 				return true
 			})
-			for _, op := range publishOps {
+			for _, op := range spec.Operations {
 				for _, typeName := range []string{op.RequestType, op.ResponseType} {
 					if typeName == "" {
 						continue
