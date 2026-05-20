@@ -2817,3 +2817,297 @@ func TestAcceptance_ResolveAppRequestFormInputFieldV1_Lifecycle(t *testing.T) {
 	}
 	t.Logf("step 4: resolve typed %q ✓", title)
 }
+
+// ─── Smart Computer Groups (V3) ────────────────────────────────────────────
+// New in Jamf Pro 11.28.0 — same lifecycle as V2, exercising the v3 endpoint
+// family that the backfill cloned from the V2 sibling.
+
+func TestAcceptance_ResolveSmartComputerGroupV3_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-scg-v3-" + runSuffix()
+
+	_, err := c.ResolveSmartComputerGroupV3IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+
+	resp, err := c.CreateSmartComputerGroupV3(ctx, &pro.SmartComputerGroupV3{Name: name}, false)
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteSmartComputerGroupV3(ctx, id1) })
+
+	gotID, err := c.ResolveSmartComputerGroupV3IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("resolve ID: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+
+	got, err := c.ResolveSmartComputerGroupV3ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil || got.Name != name {
+		t.Errorf("typed Name = %v, want %q", got, name)
+	}
+
+	id2, dupCreated := tryCreateDuplicate(t, "smart computer group v3", func() (string, error) {
+		r, e := c.CreateSmartComputerGroupV3(ctx, &pro.SmartComputerGroupV3{Name: name}, false)
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteSmartComputerGroupV3(ctx, id) })
+
+	if dupCreated {
+		_, err = c.ResolveSmartComputerGroupV3IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
+		_ = c.DeleteSmartComputerGroupV3(ctx, id2)
+	}
+
+	if err := c.DeleteSmartComputerGroupV3(ctx, id1); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = c.ResolveSmartComputerGroupV3IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("lifecycle complete ✓")
+}
+
+// ─── Static Computer Groups (V3) ───────────────────────────────────────────
+
+func TestAcceptance_ResolveStaticComputerGroupV3_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-stcg-v3-" + runSuffix()
+
+	_, err := c.ResolveStaticComputerGroupV3IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+
+	emptyAssignments := []string{}
+	resp, err := c.CreateStaticComputerGroupV3(ctx, &pro.StaticComputerGroupAssignment{Name: name, Assignments: &emptyAssignments}, false)
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteStaticComputerGroupV3(ctx, id1) })
+
+	gotID, err := c.ResolveStaticComputerGroupV3IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("resolve ID: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+
+	got, err := c.ResolveStaticComputerGroupV3ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil || got.Name != name {
+		t.Errorf("typed Name = %v, want %q", got, name)
+	}
+
+	id2, dupCreated := tryCreateDuplicate(t, "static computer group v3", func() (string, error) {
+		r, e := c.CreateStaticComputerGroupV3(ctx, &pro.StaticComputerGroupAssignment{Name: name, Assignments: &emptyAssignments}, false)
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteStaticComputerGroupV3(ctx, id) })
+
+	if dupCreated {
+		_, err = c.ResolveStaticComputerGroupV3IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
+		_ = c.DeleteStaticComputerGroupV3(ctx, id2)
+	}
+
+	if err := c.DeleteStaticComputerGroupV3(ctx, id1); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = c.ResolveStaticComputerGroupV3IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("lifecycle complete ✓")
+}
+
+// ─── Smart Mobile Device Groups (V2) ───────────────────────────────────────
+
+func TestAcceptance_ResolveSmartMobileDeviceGroupV2_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-smdg-v2-" + runSuffix()
+
+	_, err := c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+
+	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteSmartMobileDeviceGroupV2(ctx, id1) })
+
+	gotID, err := c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("resolve ID: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+
+	got, err := c.ResolveSmartMobileDeviceGroupV2ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatalf("resolve typed: nil result")
+	}
+	t.Logf("resolve typed: groupName field on V2 schema = %+v", got)
+
+	id2, dupCreated := tryCreateDuplicate(t, "smart mobile device group v2", func() (string, error) {
+		r, e := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteSmartMobileDeviceGroupV2(ctx, id) })
+
+	if dupCreated {
+		_, err = c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
+		_ = c.DeleteSmartMobileDeviceGroupV2(ctx, id2)
+	}
+
+	if err := c.DeleteSmartMobileDeviceGroupV2(ctx, id1); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("lifecycle complete ✓")
+}
+
+// ─── Static Mobile Device Groups (V2) ──────────────────────────────────────
+
+func TestAcceptance_ResolveStaticMobileDeviceGroupV2_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-stmdg-v2-" + runSuffix()
+
+	_, err := c.ResolveStaticMobileDeviceGroupV2IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+
+	emptyAssignments := []pro.Assignment{}
+	resp, err := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1"), Assignments: &emptyAssignments}, false)
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteStaticMobileDeviceGroupV2(ctx, id1) })
+
+	gotID, err := c.ResolveStaticMobileDeviceGroupV2IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("resolve ID: %v", err)
+	}
+	if gotID != id1 {
+		t.Errorf("resolve ID = %q, want %q", gotID, id1)
+	}
+
+	got, err := c.ResolveStaticMobileDeviceGroupV2ByName(ctx, name)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatalf("resolve typed: nil result")
+	}
+
+	if err := c.DeleteStaticMobileDeviceGroupV2(ctx, id1); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = c.ResolveStaticMobileDeviceGroupV2IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("lifecycle complete ✓")
+}
+
+// ─── Mobile Device Groups (combined V2) ────────────────────────────────────
+// Combined smart+static list. Create via SmartMobileDeviceGroupV2 to test.
+
+func TestAcceptance_ResolveMobileDeviceGroupV2_Lifecycle(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	name := "sdk-acc-res-mdg-v2-" + runSuffix()
+
+	_, err := c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
+	requireNotFoundErr(t, "pre-create", err)
+
+	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	if err != nil {
+		t.Fatalf("CreateSmartMobileDeviceGroupV2: %v", err)
+	}
+	id1 := resp.ID
+	t.Cleanup(func() { _ = c.DeleteSmartMobileDeviceGroupV2(ctx, id1) })
+
+	gotID, err := c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
+	if err != nil {
+		t.Fatalf("resolve ID: %v", err)
+	}
+	// MobileDeviceGroup.ID is int, resolver returns string
+	t.Logf("resolved %q → %s ✓", name, gotID)
+
+	emptyAssignmentsMDG := []pro.Assignment{}
+	id2, dupCreated := tryCreateDuplicate(t, "mobile device group v2 (static)", func() (string, error) {
+		r, e := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1"), Assignments: &emptyAssignmentsMDG}, false)
+		if e != nil {
+			return "", e
+		}
+		return r.ID, nil
+	}, func(id string) error { return c.DeleteStaticMobileDeviceGroupV2(ctx, id) })
+
+	if dupCreated {
+		_, err = c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
+		requireAmbiguousErr(t, "ambiguous", err)
+		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
+		_ = c.DeleteStaticMobileDeviceGroupV2(ctx, id2)
+	}
+
+	if err := c.DeleteSmartMobileDeviceGroupV2(ctx, id1); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
+	requireNotFoundErr(t, "post-delete", err)
+	t.Log("lifecycle complete ✓")
+}
+
+// ─── Platform Groups (V2) ──────────────────────────────────────────────────
+// Synced from identity providers — no create endpoint. Read-only probe.
+
+func TestAcceptance_ResolveGroupV2_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveGroupV2IDByName(context.Background(), "sdk-does-not-exist-grp-v2-"+runSuffix())
+	requireNotFoundErr(t, "ResolveGroupV2IDByName", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveGroupV2IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	groups, err := c.ListGroupsV2(ctx, nil, "")
+	if err != nil {
+		t.Fatalf("ListGroupsV2: %v", err)
+	}
+	if len(groups) == 0 {
+		t.Skip("no platform groups — skipping")
+	}
+	first := groups[0]
+	gotID, err := c.ResolveGroupV2IDByName(ctx, first.GroupName)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.GroupPlatformID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.GroupPlatformID)
+	}
+	t.Logf("resolved %q → %s ✓", first.GroupName, gotID)
+}

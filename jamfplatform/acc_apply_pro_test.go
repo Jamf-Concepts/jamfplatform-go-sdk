@@ -1830,3 +1830,241 @@ func TestAcceptance_ApplyStaticMobileDeviceGroupV1(t *testing.T) {
 	}
 	t.Logf("membership after apply update: %v", memberIDs)
 }
+
+// ---------- SmartComputerGroupV3 ----------
+// New in Jamf Pro 11.28.0. Mirrors the V2 lifecycle.
+
+func TestAcceptance_ApplySmartComputerGroupV3(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	name := "sdk-acc-apply-scg-v3-" + runSuffix()
+
+	id, created, err := p.ApplySmartComputerGroupV3(ctx, &pro.SmartComputerGroupV3{Name: name}, false)
+	if err != nil {
+		t.Fatalf("apply create: %v", err)
+	}
+	cleanupDelete(t, "SmartComputerGroupV3 "+id, func() error { return p.DeleteSmartComputerGroupV3(ctx, id) })
+	if !created {
+		t.Error("expected created = true")
+	}
+
+	id2, created2, err := p.ApplySmartComputerGroupV3(ctx, &pro.SmartComputerGroupV3{Name: name}, false)
+	if err != nil {
+		t.Fatalf("apply update: %v", err)
+	}
+	if created2 {
+		t.Error("expected created = false")
+	}
+	if id2 != id {
+		t.Errorf("id changed: %s → %s", id, id2)
+	}
+
+	if err := p.DeleteSmartComputerGroupV3(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = p.ResolveSmartComputerGroupV3IDByName(ctx, name)
+	if err == nil {
+		t.Fatal("expected 404 after delete")
+	}
+}
+
+// ---------- StaticComputerGroupV3 ----------
+
+func TestAcceptance_ApplyStaticComputerGroupV3(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	name := "sdk-acc-apply-stcg-v3-" + runSuffix()
+	assignments := []string{}
+
+	id, created, err := p.ApplyStaticComputerGroupV3(ctx, &pro.StaticComputerGroupAssignment{
+		Name:        name,
+		Assignments: &assignments,
+	}, false)
+	if err != nil {
+		t.Fatalf("apply create: %v", err)
+	}
+	cleanupDelete(t, "StaticComputerGroupV3 "+id, func() error { return p.DeleteStaticComputerGroupV3(ctx, id) })
+	if !created {
+		t.Error("expected created = true")
+	}
+
+	id2, created2, err := p.ApplyStaticComputerGroupV3(ctx, &pro.StaticComputerGroupAssignment{
+		Name:        name,
+		Assignments: &assignments,
+	}, false)
+	if err != nil {
+		t.Fatalf("apply update: %v", err)
+	}
+	if created2 {
+		t.Error("expected created = false")
+	}
+	if id2 != id {
+		t.Errorf("id changed: %s → %s", id, id2)
+	}
+
+	if err := p.DeleteStaticComputerGroupV3(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = p.ResolveStaticComputerGroupV3IDByName(ctx, name)
+	if err == nil {
+		t.Fatal("expected 404 after delete")
+	}
+}
+
+// ---------- SmartMobileDeviceGroupV2 ----------
+
+func TestAcceptance_ApplySmartMobileDeviceGroupV2(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	name := "sdk-acc-apply-smdg-v2-" + runSuffix()
+
+	id, created, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	if err != nil {
+		t.Fatalf("apply create: %v", err)
+	}
+	cleanupDelete(t, "SmartMobileDeviceGroupV2 "+id, func() error { return p.DeleteSmartMobileDeviceGroupV2(ctx, id) })
+	if !created {
+		t.Error("expected created = true")
+	}
+
+	id2, created2, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	if err != nil {
+		t.Fatalf("apply update: %v", err)
+	}
+	if created2 {
+		t.Error("expected created = false")
+	}
+	if id2 != id {
+		t.Errorf("id changed: %s → %s", id, id2)
+	}
+
+	if err := p.DeleteSmartMobileDeviceGroupV2(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	_, err = p.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
+	if err == nil {
+		t.Fatal("expected 404 after delete")
+	}
+}
+
+// TestAcceptance_ApplyStaticMobileDeviceGroupV2 verifies V2's Apply method
+// honours the membershipPreFetch contract: on update, the method fetches
+// current membership and re-sends all members as selected=true so the PATCH
+// doesn't wipe devices added outside the Apply call. Mirrors the V1 test.
+func TestAcceptance_ApplyStaticMobileDeviceGroupV2(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+	pc := proclassic.New(c)
+
+	suffix := runSuffix()
+	groupName := "sdk-acc-apply-static-mdg-v2-" + suffix
+
+	createDevice := func(n int) string {
+		sn := fmt.Sprintf("SDKACV%s%d", strings.ToUpper(suffix), n)
+		name := fmt.Sprintf("sdk-acc-device-v2-%s-%d", suffix, n)
+		managed := true
+		dev, err := pc.CreateMobileDeviceByID(ctx, "0", &proclassic.MobileDevicePost{
+			General: &proclassic.MobileDevicePostGeneral{
+				Name:         &name,
+				SerialNumber: &sn,
+				UDID:         &sn,
+				Managed:      &managed,
+			},
+		})
+		if err != nil {
+			t.Fatalf("create device %d: %v", n, err)
+		}
+		if dev.ID == nil {
+			t.Fatalf("create device %d: missing ID in response", n)
+		}
+		return strconv.Itoa(*dev.ID)
+	}
+
+	dev1ID := createDevice(1)
+	dev2ID := createDevice(2)
+	dev3ID := createDevice(3)
+	t.Logf("dummy devices: %s, %s, %s", dev1ID, dev2ID, dev3ID)
+
+	t.Cleanup(func() {
+		for _, id := range []string{dev1ID, dev2ID, dev3ID} {
+			if err := pc.DeleteMobileDeviceByID(ctx, id); err != nil {
+				t.Logf("cleanup device %s: %v", id, err)
+			}
+		}
+	})
+
+	trueVal := true
+	siteID := "-1"
+
+	// 1. Apply creates group with device 1.
+	groupID, created, err := p.ApplyStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{
+		GroupName: groupName,
+		SiteID:    &siteID,
+		Assignments: &[]pro.Assignment{
+			{MobileDeviceID: &dev1ID, Selected: &trueVal},
+		},
+	}, false)
+	if err != nil {
+		t.Fatalf("apply create: %v", err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	t.Logf("created group id=%s", groupID)
+
+	t.Cleanup(func() {
+		if err := p.DeleteStaticMobileDeviceGroupV2(ctx, groupID); err != nil {
+			t.Logf("cleanup group %s: %v", groupID, err)
+		}
+	})
+
+	// 2. Add devices 2 and 3 via direct PATCH (outside of Apply).
+	if _, err := p.PatchStaticMobileDeviceGroupV2(ctx, groupID, &pro.StaticGroupAssignment{
+		GroupName: groupName,
+		SiteID:    &siteID,
+		Assignments: &[]pro.Assignment{
+			{MobileDeviceID: &dev2ID, Selected: &trueVal},
+			{MobileDeviceID: &dev3ID, Selected: &trueVal},
+		},
+	}); err != nil {
+		t.Fatalf("patch to add devices 2+3: %v", err)
+	}
+
+	// 3. Apply update must fetch current membership and re-send all 3.
+	groupID2, created2, err := p.ApplyStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{
+		GroupName: groupName,
+		SiteID:    &siteID,
+	}, false)
+	if err != nil {
+		t.Fatalf("apply update: %v", err)
+	}
+	if created2 {
+		t.Error("expected created = false on update")
+	}
+	if groupID2 != groupID {
+		t.Errorf("apply update: id=%s, want %s", groupID2, groupID)
+	}
+
+	// 4. Verify all 3 devices still members after Apply update.
+	members, err := p.ListStaticMobileDeviceGroupMembershipV2(ctx, groupID, nil, "")
+	if err != nil {
+		t.Fatalf("list membership: %v", err)
+	}
+	memberIDs := make(map[string]bool, len(members))
+	for _, m := range members {
+		memberIDs[m.MobileDeviceID] = true
+	}
+	for _, wantID := range []string{dev1ID, dev2ID, dev3ID} {
+		if !memberIDs[wantID] {
+			t.Errorf("device %s missing from membership after apply update", wantID)
+		}
+	}
+	t.Logf("membership after apply update: %v", memberIDs)
+}
