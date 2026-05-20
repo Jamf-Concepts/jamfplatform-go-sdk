@@ -10,15 +10,62 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+	"strings"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetDeviceDeclarationReport get device report declarations.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-17) and may be removed in a future release.
 func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string) (*DeviceReportDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	var result DeviceReportDto
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(deviceID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetDeviceDeclarationReport(%s): %w", deviceID, err)
+	}
+	return &result, nil
+}
+
+// GetDeviceDeclarationReportFiltered get filtered device report declarations.
+func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceID string, filter string, sort []string) ([]FilteredResultDto, error) {
+	prefix := c.transport.TenantPrefix("ddm/report", "v1")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("size", strconv.Itoa(pageSize))
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+
+		endpoint := fmt.Sprintf("%s/devices/%s/declarations", prefix, url.PathEscape(deviceID))
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int                 `json:"totalCount"`
+			Results    []FilteredResultDto `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
+// GetDeviceChannels get device channels.
+func (c *Client) GetDeviceChannels(ctx context.Context, deviceID string) (*DeviceChannelsDto, error) {
+	prefix := c.transport.TenantPrefix("ddm/report", "v1")
+	var result DeviceChannelsDto
+	endpoint := fmt.Sprintf("%s/devices/%s/channels", prefix, url.PathEscape(deviceID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetDeviceChannels(%s): %w", deviceID, err)
 	}
 	return &result, nil
 }

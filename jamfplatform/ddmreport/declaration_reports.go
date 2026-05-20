@@ -17,6 +17,8 @@ import (
 )
 
 // ListDeclarationReportClients get declaration report devices.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-17) and may be removed in a future release.
 func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationIdentifier string, sort []string) ([]DeclarationReportClientDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeclarationReportClientDto, bool, error) {
@@ -34,6 +36,36 @@ func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationId
 		var result struct {
 			TotalCount int                          `json:"totalCount"`
 			Results    []DeclarationReportClientDto `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
+// ListDeclarationReportClientsFiltered get filtered declaration report devices.
+func (c *Client) ListDeclarationReportClientsFiltered(ctx context.Context, declarationIdentifier string, filter string, sort []string) ([]FilteredResultDto, error) {
+	prefix := c.transport.TenantPrefix("ddm/report", "v1")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("size", strconv.Itoa(pageSize))
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+
+		endpoint := fmt.Sprintf("%s/declarations/%s/devices", prefix, url.PathEscape(declarationIdentifier))
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int                 `json:"totalCount"`
+			Results    []FilteredResultDto `json:"results"`
 		}
 		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 			return nil, false, err

@@ -243,10 +243,30 @@
       "package": "ddmreport",
       "splitByTag": true,
       "specFile": "declaration_reporting_service.json",
+      "fieldTypeOverrides": {
+        "error_dto.id": "*string",
+        "status_report_declaration_dto.dateUpdated": "*time.Time",
+        "filtered_result_dto.dateUpdated": "*time.Time",
+        "filtered_result_dto.lastReportTime": "*time.Time"
+      },
       "operations": [
         {
           "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}",
           "name": "GetDeviceDeclarationReport"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}/declarations",
+          "name": "GetDeviceDeclarationReportFiltered",
+          "pagination": "totalCount",
+          "pageSizeParam": "size",
+          "params": [
+            "filter:string",
+            "sort:[]string"
+          ]
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}/channels",
+          "name": "GetDeviceChannels"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/declarations/{declarationIdentifier}",
@@ -254,6 +274,16 @@
           "pagination": "totalCount",
           "pageSizeParam": "size",
           "params": [
+            "sort:[]string"
+          ]
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/declarations/{declarationIdentifier}/devices",
+          "name": "ListDeclarationReportClientsFiltered",
+          "pagination": "totalCount",
+          "pageSizeParam": "size",
+          "params": [
+            "filter:string",
             "sort:[]string"
           ]
         }
