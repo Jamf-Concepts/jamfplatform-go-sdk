@@ -149,9 +149,11 @@ func TestAcceptance_Pro_MdmUpdates_SyncDdmV1(t *testing.T) {
 }
 
 func TestAcceptance_Pro_MdmUpdates_GetDssDeclarationV1(t *testing.T) {
-	// New in 11.28.0. Plumbing-only probe with a syntactic UUID —
-	// without a known declaration id we accept any 4xx as proof the
-	// request shape and routing are correct.
+	// New in 11.28.0. Plumbing-only probe with a syntactic zero UUID —
+	// the only acceptable rejection is 404 (no such declaration). 400
+	// would indicate a request-shape regression, 401/403 an auth
+	// regression, 422 a schema-validation tightening — none of which
+	// this test should silently swallow.
 	c := accClient(t)
 	ctx := context.Background()
 	p := pro.New(c)
@@ -163,12 +165,12 @@ func TestAcceptance_Pro_MdmUpdates_GetDssDeclarationV1(t *testing.T) {
 		return
 	}
 	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-		t.Logf("GetDssDeclarationV1(%s): %d — no such declaration, plumbing OK", probeID, apiErr.StatusCode)
+	if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
+		t.Logf("GetDssDeclarationV1(%s): 404 — no such declaration, plumbing OK", probeID)
 		return
 	}
 	skipOnServerError(t, err)
-	t.Fatalf("GetDssDeclarationV1(%s): %v", probeID, err)
+	t.Fatalf("GetDssDeclarationV1(%s): want 404, got %v", probeID, err)
 }
 
 // --- managed-software-updates ------------------------------------------

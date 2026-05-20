@@ -33,7 +33,10 @@ func TestAcceptance_Pro_LastLoginV1(t *testing.T) {
 		t.Fatalf("GetLastLoginV1: %v", err)
 	}
 	if resp == nil {
-		t.Log("GetLastLoginV1: 204 no-content — no recorded last login for this principal")
+		t.Fatal("GetLastLoginV1: nil response (transport returns a pointer to a zero-value struct on 2xx)")
+	}
+	if resp.LastLogin.IsZero() {
+		t.Log("GetLastLoginV1: zero lastLogin — no recorded last login for this principal")
 		return
 	}
 	t.Logf("LastLoginV1: lastLogin=%s", resp.LastLogin.Format(time.RFC3339))
