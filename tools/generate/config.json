@@ -696,6 +696,28 @@
           }
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/smart-groups",
+          "name": "ListSmartComputerGroupsV3",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "SmartComputerGroupV3",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "filtered",
+            "typedReturn": "SmartComputerGroupSearch",
+            "apply": {
+              "createOp": "CreateSmartComputerGroupV3",
+              "updateOp": "UpdateSmartComputerGroupV3",
+              "deleteOp": "DeleteSmartComputerGroupV3",
+              "nameGoField": "Name"
+            }
+          }
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/smart-groups",
           "name": "ListSmartComputerGroupsV2",
           "pagination": "totalCount",
@@ -718,6 +740,13 @@
           }
         },
         {
+          "op": "POST /v3/tenant/{tenantId}/computer-groups/smart-groups",
+          "name": "CreateSmartComputerGroupV3",
+          "params": [
+            "platform:bool"
+          ]
+        },
+        {
           "op": "POST /v2/tenant/{tenantId}/computer-groups/smart-groups",
           "name": "CreateSmartComputerGroupV2",
           "params": [
@@ -725,8 +754,16 @@
           ]
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "name": "GetSmartComputerGroupV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/smart-groups/{id}",
           "name": "GetSmartComputerGroupV2"
+        },
+        {
+          "op": "PUT /v3/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "name": "UpdateSmartComputerGroupV3"
         },
         {
           "op": "PUT /v2/tenant/{tenantId}/computer-groups/smart-groups/{id}",
@@ -734,13 +771,43 @@
           "expectedStatus": 202
         },
         {
+          "op": "DELETE /v3/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "name": "DeleteSmartComputerGroupV3"
+        },
+        {
           "op": "DELETE /v2/tenant/{tenantId}/computer-groups/smart-groups/{id}",
           "name": "DeleteSmartComputerGroupV2",
           "expectedStatus": 204
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/smart-group-membership/{id}",
+          "name": "GetSmartComputerGroupMembershipV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/smart-group-membership/{id}",
           "name": "GetSmartComputerGroupMembershipV2"
+        },
+        {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/static-groups",
+          "name": "ListStaticComputerGroupsV3",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "StaticComputerGroupV3",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "filtered",
+            "typedReturn": "StaticComputerGroupSummary",
+            "apply": {
+              "createOp": "CreateStaticComputerGroupV3",
+              "updateOp": "UpdateStaticComputerGroupV3",
+              "deleteOp": "DeleteStaticComputerGroupV3",
+              "nameGoField": "Name"
+            }
+          }
         },
         {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/static-groups",
@@ -765,6 +832,13 @@
           }
         },
         {
+          "op": "POST /v3/tenant/{tenantId}/computer-groups/static-groups",
+          "name": "CreateStaticComputerGroupV3",
+          "params": [
+            "platform:bool"
+          ]
+        },
+        {
           "op": "POST /v2/tenant/{tenantId}/computer-groups/static-groups",
           "name": "CreateStaticComputerGroupV2",
           "params": [
@@ -772,13 +846,25 @@
           ]
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "name": "GetStaticComputerGroupV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/static-groups/{id}",
           "name": "GetStaticComputerGroupV2"
+        },
+        {
+          "op": "PUT /v3/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "name": "UpdateStaticComputerGroupV3"
         },
         {
           "op": "PUT /v2/tenant/{tenantId}/computer-groups/static-groups/{id}",
           "name": "UpdateStaticComputerGroupV2",
           "expectedStatus": 202
+        },
+        {
+          "op": "DELETE /v3/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "name": "DeleteStaticComputerGroupV3"
         },
         {
           "op": "DELETE /v2/tenant/{tenantId}/computer-groups/static-groups/{id}",
@@ -970,6 +1056,18 @@
           "name": "CreateMobileDeviceExtensionAttributeHistoryNoteV1"
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups",
+          "name": "ListMobileDeviceGroupsV2",
+          "resolver": {
+            "resourceType": "MobileDeviceGroupV2",
+            "nameField": "name",
+            "idField": "id",
+            "idNumeric": true,
+            "mode": "clientFilter",
+            "typedReturn": "MobileDeviceGroup"
+          }
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups",
           "name": "ListMobileDeviceGroupsV1",
           "resolver": {
@@ -979,6 +1077,28 @@
             "idNumeric": true,
             "mode": "clientFilter",
             "typedReturn": "MobileDeviceGroup"
+          }
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/smart-groups",
+          "name": "ListSmartMobileDeviceGroupsV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "SmartMobileDeviceGroupV2",
+            "nameField": "groupName",
+            "idField": "groupId",
+            "mode": "filtered",
+            "typedReturn": "SmartGroup",
+            "apply": {
+              "createOp": "CreateSmartMobileDeviceGroupV2",
+              "updateOp": "UpdateSmartMobileDeviceGroupV2",
+              "deleteOp": "DeleteSmartMobileDeviceGroupV2",
+              "nameGoField": "GroupName"
+            }
           }
         },
         {
@@ -1004,6 +1124,13 @@
           }
         },
         {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-groups/smart-groups",
+          "name": "CreateSmartMobileDeviceGroupV2",
+          "params": [
+            "platform:bool"
+          ]
+        },
+        {
           "op": "POST /v1/tenant/{tenantId}/mobile-device-groups/smart-groups",
           "name": "CreateSmartMobileDeviceGroupV1",
           "params": [
@@ -1011,8 +1138,16 @@
           ]
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "name": "GetSmartMobileDeviceGroupV2"
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
           "name": "GetSmartMobileDeviceGroupV1"
+        },
+        {
+          "op": "PUT /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "name": "UpdateSmartMobileDeviceGroupV2"
         },
         {
           "op": "PUT /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
@@ -1020,9 +1155,22 @@
           "expectedStatus": 200
         },
         {
+          "op": "DELETE /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "name": "DeleteSmartMobileDeviceGroupV2"
+        },
+        {
           "op": "DELETE /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
           "name": "DeleteSmartMobileDeviceGroupV1",
           "expectedStatus": 204
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/smart-group-membership/{id}",
+          "name": "ListSmartMobileDeviceGroupMembershipV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ]
         },
         {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/smart-group-membership/{id}",
@@ -1032,6 +1180,36 @@
             "sort:[]string",
             "filter"
           ]
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/static-groups",
+          "name": "ListStaticMobileDeviceGroupsV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "StaticMobileDeviceGroupV2",
+            "nameField": "groupName",
+            "idField": "groupId",
+            "mode": "filtered",
+            "typedReturn": "StaticGroup",
+            "apply": {
+              "createOp": "CreateStaticMobileDeviceGroupV2",
+              "updateOp": "PatchStaticMobileDeviceGroupV2",
+              "deleteOp": "DeleteStaticMobileDeviceGroupV2",
+              "nameGoField": "GroupName",
+              "membershipPreFetch": {
+                "fetchOp": "ListStaticMobileDeviceGroupMembershipV2",
+                "sourceIdField": "MobileDeviceID",
+                "assignmentType": "Assignment",
+                "assignmentIdField": "MobileDeviceID",
+                "requestField": "Assignments",
+                "assignmentFieldIsSlicePtr": true
+              }
+            }
+          }
         },
         {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/static-groups",
@@ -1064,6 +1242,13 @@
           }
         },
         {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-groups/static-groups",
+          "name": "CreateStaticMobileDeviceGroupV2",
+          "params": [
+            "platform:bool"
+          ]
+        },
+        {
           "op": "POST /v1/tenant/{tenantId}/mobile-device-groups/static-groups",
           "name": "CreateStaticMobileDeviceGroupV1",
           "params": [
@@ -1071,8 +1256,16 @@
           ]
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "name": "GetStaticMobileDeviceGroupV2"
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
           "name": "GetStaticMobileDeviceGroupV1"
+        },
+        {
+          "op": "DELETE /v2/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "name": "DeleteStaticMobileDeviceGroupV2"
         },
         {
           "op": "DELETE /v1/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
@@ -1080,8 +1273,21 @@
           "expectedStatus": 204
         },
         {
+          "op": "PATCH /v2/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "name": "PatchStaticMobileDeviceGroupV2"
+        },
+        {
           "op": "PATCH /v1/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
           "name": "PatchStaticMobileDeviceGroupV1"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/static-group-membership/{id}",
+          "name": "ListStaticMobileDeviceGroupMembershipV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ]
         },
         {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/static-group-membership/{id}",
@@ -1091,6 +1297,10 @@
             "sort:[]string",
             "filter"
           ]
+        },
+        {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-groups/{id}/erase",
+          "name": "EraseMobileDeviceGroupV2"
         },
         {
           "op": "POST /v1/tenant/{tenantId}/mobile-device-groups/{id}/erase",
@@ -1169,6 +1379,22 @@
           "expectedStatus": 204
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/groups",
+          "name": "ListGroupsV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "GroupV2",
+            "nameField": "groupName",
+            "idField": "groupPlatformId",
+            "mode": "filtered",
+            "typedReturn": "GroupDtoV1"
+          }
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/groups",
           "name": "ListGroupsV1",
           "pagination": "totalCount",
@@ -1185,13 +1411,25 @@
           }
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/groups/{id}",
+          "name": "GetGroupV2"
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/groups/{id}",
           "name": "GetGroupV1"
+        },
+        {
+          "op": "DELETE /v2/tenant/{tenantId}/groups/{id}",
+          "name": "DeleteGroupV2"
         },
         {
           "op": "DELETE /v1/tenant/{tenantId}/groups/{id}",
           "name": "DeleteGroupV1",
           "expectedStatus": 204
+        },
+        {
+          "op": "PATCH /v2/tenant/{tenantId}/groups/{id}",
+          "name": "PatchGroupV2"
         },
         {
           "op": "PATCH /v1/tenant/{tenantId}/groups/{id}",
@@ -4508,6 +4746,63 @@
         {
           "op": "POST /v1/tenant/{tenantId}/system/platform-initialize",
           "name": "PlatformInitializeSystemV1"
+        },
+        {
+          "op": "POST /v1/tenant/{tenantId}/system/initialize-database-connection",
+          "name": "InitializeDatabaseConnectionV1",
+          "expectedStatus": 202
+        },
+        {
+          "op": "PUT /v1/tenant/{tenantId}/accounts/{id}",
+          "name": "UpdateAccountV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/account-groups",
+          "name": "ListAccountGroupsV1",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "AccountGroupV1",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "filtered",
+            "typedReturn": "AccountGroupV1"
+          }
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/account-groups/{id}",
+          "name": "GetAccountGroupV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/dss-declarations/{declarationId}",
+          "name": "GetDssDeclarationV1",
+          "pathNames": {
+            "declarationId": "declarationID"
+          }
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/last-login",
+          "name": "GetLastLoginV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/m2m/tenant-id",
+          "name": "GetM2MTenantIDV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/user-sessions/active",
+          "name": "ListActiveUserSessionsV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/user-sessions/count",
+          "name": "GetActiveUsersCountV1"
+        },
+        {
+          "op": "POST /v1/tenant/{tenantId}/jamf-pro-server-url/history",
+          "name": "CreateJamfProServerURLHistoryV1",
+          "expectedStatus": 201
         }
       ]
     },

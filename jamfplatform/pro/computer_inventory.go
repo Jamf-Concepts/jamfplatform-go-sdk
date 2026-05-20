@@ -76,6 +76,8 @@ func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string,
 }
 
 // ListComputersInventoryV2 return paginated Computer Inventory records.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV2, bool, error) {
@@ -155,6 +157,8 @@ func (c *Client) CreateComputerInventoryV1(ctx context.Context, request *Compute
 }
 
 // CreateComputerInventoryV2 create Computer Inventory record.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) CreateComputerInventoryV2(ctx context.Context, request *ComputerInventoryCreateRequestV2) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -203,6 +207,8 @@ func (c *Client) ListComputerInventoryFileVaultsV1(ctx context.Context) ([]Compu
 }
 
 // ListComputerInventoryFileVaultsV2 return paginated FileVault information for all computers.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) ListComputerInventoryFileVaultsV2(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
@@ -271,6 +277,8 @@ func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section 
 }
 
 // GetComputerInventoryV2 return General section of a Computer.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section []string) (*ComputerInventoryV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryV2
@@ -319,6 +327,8 @@ func (c *Client) DeleteComputerInventoryV1(ctx context.Context, id string) error
 }
 
 // DeleteComputerInventoryV2 remove specified Computer record.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) DeleteComputerInventoryV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
@@ -352,6 +362,8 @@ func (c *Client) GetComputerInventoryDetailV1(ctx context.Context, id string) (*
 }
 
 // GetComputerInventoryDetailV2 return all sections of a computer.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) GetComputerInventoryDetailV2(ctx context.Context, id string) (*ComputerInventoryV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryV2
@@ -387,6 +399,8 @@ func (c *Client) UpdateComputerInventoryDetailV1(ctx context.Context, id string,
 }
 
 // UpdateComputerInventoryDetailV2 update specific fields on a computer.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) UpdateComputerInventoryDetailV2(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
@@ -429,6 +443,8 @@ func (c *Client) UploadComputerInventoryAttachmentV1(ctx context.Context, id str
 }
 
 // UploadComputerInventoryAttachmentV2 upload attachment and assign to computer.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -482,6 +498,8 @@ func (c *Client) DownloadComputerInventoryAttachmentV1(ctx context.Context, id s
 }
 
 // DownloadComputerInventoryAttachmentV2 download attachment file.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) DownloadComputerInventoryAttachmentV2(ctx context.Context, id string, attachmentID string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []byte
@@ -516,6 +534,8 @@ func (c *Client) DeleteComputerInventoryAttachmentV1(ctx context.Context, id str
 }
 
 // DeleteComputerInventoryAttachmentV2 remove attachment.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) DeleteComputerInventoryAttachmentV2(ctx context.Context, id string, attachmentID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
@@ -549,6 +569,8 @@ func (c *Client) GetComputerInventoryFileVaultV1(ctx context.Context, id string)
 }
 
 // GetComputerInventoryFileVaultV2 return FileVault information for a specific computer.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) GetComputerInventoryFileVaultV2(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryFileVault
@@ -584,6 +606,8 @@ func (c *Client) GetComputerDeviceLockPinV1(ctx context.Context, id string) (*Co
 }
 
 // GetComputerDeviceLockPinV2 return a computer's Device Lock PIN.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) GetComputerDeviceLockPinV2(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryDeviceLockPinResponse
@@ -619,6 +643,8 @@ func (c *Client) GetComputerRecoveryLockPasswordV1(ctx context.Context, id strin
 }
 
 // GetComputerRecoveryLockPasswordV2 return a Computers Recovery Lock Password.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 func (c *Client) GetComputerRecoveryLockPasswordV2(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryRecoveryLockPasswordResponse

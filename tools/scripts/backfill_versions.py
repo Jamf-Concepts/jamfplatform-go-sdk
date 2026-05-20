@@ -72,16 +72,20 @@ def adjust_type_name(name: str, target_v: int) -> str:
     if not name:
         return name
     m = re.search(r'V(\d+)$', name)
-    if m:
-        base = name[:-len(m.group(0))]
-        if target_v == 1:
-            if base in schemas:
-                return base
-            return f'{base}V{target_v}'
-        return f'{base}V{target_v}'
-    if target_v == 1:
-        return name
-    return f'{name}V{target_v}'
+    base = name[:-len(m.group(0))] if m else name
+    suffixed = f'{base}V{target_v}'
+    # Prefer the version-suffixed schema when it exists in the spec.
+    if suffixed in schemas:
+        return suffixed
+    # Fall back to the unsuffixed schema when present — Jamf often reuses a
+    # single schema (e.g. `SmartGroup`, `MobileDeviceGroup`) across multiple
+    # endpoint versions even though method names carry V<N>.
+    if base in schemas:
+        return base
+    # Last resort: keep the original sibling name when neither variant exists
+    # as a schema. Surfaces as a build error so the operator can fix manually
+    # rather than silently emitting a wrong type.
+    return name
 
 
 def adjust_op_name(name: str, target_v: int) -> str:

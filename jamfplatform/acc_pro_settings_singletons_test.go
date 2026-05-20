@@ -136,6 +136,18 @@ func TestAcceptance_Pro_Settings_JamfProServerURLV1Read(t *testing.T) {
 		t.Fatalf("ListJamfProServerURLHistoryV1: %v", err)
 	}
 	t.Logf("Jamf Pro server URL history: %d entries", len(hist))
+
+	// New in 11.28.0. POST appends a history note — durable, but
+	// confined to the audit log so safe to exercise once per run with
+	// a clearly-tagged note. No DELETE counterpart exists, so we
+	// don't loop and we don't run this on every nested test.
+	note := "sdk-acc-history-note-" + runSuffix()
+	created, err := p.CreateJamfProServerURLHistoryV1(ctx, &pro.ObjectHistoryNote{Note: note})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateJamfProServerURLHistoryV1: %v", err)
+	}
+	t.Logf("CreateJamfProServerURLHistoryV1: appended note id=%d", created.ID)
 }
 
 // --- device-communication settings ------------------------------------

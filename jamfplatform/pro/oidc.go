@@ -66,6 +66,8 @@ func (c *Client) DispatchOidcLoginV2(ctx context.Context, request *OidcLoginDisp
 }
 
 // DispatchOidcV1 provide the url to redirect for OIDC login.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-02-17) and may be removed in a future release.
 func (c *Client) DispatchOidcV1(ctx context.Context, request *OidcLoginDispatchRequest) (*OidcLoginDispatchResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result OidcLoginDispatchResponse

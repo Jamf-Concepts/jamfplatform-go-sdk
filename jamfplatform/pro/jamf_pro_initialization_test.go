@@ -40,3 +40,18 @@ func TestPlatformInitializeSystemV1(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestInitializeDatabaseConnectionV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/system/initialize-database-connection", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	err := c.InitializeDatabaseConnectionV1(context.Background(), &DatabasePassword{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}

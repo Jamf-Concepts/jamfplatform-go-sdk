@@ -149,7 +149,26 @@ func TestAcceptance_Pro_MdmUpdates_SyncDdmV1(t *testing.T) {
 }
 
 func TestAcceptance_Pro_MdmUpdates_GetDssDeclarationV1(t *testing.T) {
-	t.Skip("requires a known declaration id — use the declarations returned by ManagedSoftwareUpdatePlan events if available")
+	// New in 11.28.0. Plumbing-only probe with a syntactic UUID —
+	// without a known declaration id we accept any 4xx as proof the
+	// request shape and routing are correct.
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	probeID := "00000000-0000-0000-0000-000000000000"
+	_, err := p.GetDssDeclarationV1(ctx, probeID)
+	if err == nil {
+		t.Logf("GetDssDeclarationV1(%s): unexpectedly succeeded", probeID)
+		return
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+		t.Logf("GetDssDeclarationV1(%s): %d — no such declaration, plumbing OK", probeID, apiErr.StatusCode)
+		return
+	}
+	skipOnServerError(t, err)
+	t.Fatalf("GetDssDeclarationV1(%s): %v", probeID, err)
 }
 
 // --- managed-software-updates ------------------------------------------

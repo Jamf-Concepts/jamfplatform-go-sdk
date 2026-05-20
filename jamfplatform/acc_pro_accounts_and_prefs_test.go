@@ -88,6 +88,69 @@ func TestAcceptance_Pro_AccountsV1(t *testing.T) {
 	if got.Username == nil || *got.Username != uname {
 		t.Errorf("username round-trip mismatch: got %v, want %q", got.Username, uname)
 	}
+
+	// Update the realname and round-trip. The PUT body mirrors the
+	// create body — server rejects partial PUTs that omit the LDAP
+	// sentinels even though the schema marks them optional.
+	updatedRealname := realname + " (updated)"
+	got.Realname = &updatedRealname
+	updated, err := p.UpdateAccountV1(ctx, id, got)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateAccountV1: %v", err)
+	}
+	if updated.Realname == nil || *updated.Realname != updatedRealname {
+		t.Errorf("realname update mismatch: got %v, want %q", updated.Realname, updatedRealname)
+	}
+}
+
+// --- account-groups --------------------------------------------------
+
+// New in 11.28.0. Read-only — list, then GET first by id if any exist.
+// Exercises the filtered resolver when a name is available.
+func TestAcceptance_Pro_AccountGroupsV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	groups, err := p.ListAccountGroupsV1(ctx, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListAccountGroupsV1: %v", err)
+	}
+	t.Logf("AccountGroupsV1: %d existing", len(groups))
+
+	if len(groups) == 0 {
+		t.Skip("no account groups present — skip detail + resolver checks")
+	}
+
+	first := groups[0]
+	if first.ID == "" {
+		t.Fatalf("ListAccountGroupsV1: first group has empty ID")
+	}
+	id := first.ID
+	got, err := p.GetAccountGroupV1(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetAccountGroupV1(%s): %v", id, err)
+	}
+	if got.ID != id {
+		t.Errorf("GetAccountGroupV1: ID mismatch got=%s want=%s", got.ID, id)
+	}
+
+	if first.Name == "" {
+		return
+	}
+	name := first.Name
+	resolvedID, err := p.ResolveAccountGroupV1IDByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Logf("ResolveAccountGroupV1IDByName(%q) failed — likely the list endpoint doesn't support RSQL on name; switch resolver to clientFilter if reproducible: %v", name, err)
+		return
+	}
+	if resolvedID != id {
+		t.Errorf("ResolveAccountGroupV1IDByName(%q): resolved %s, want %s", name, resolvedID, id)
+	}
 }
 
 // --- user session ----------------------------------------------------

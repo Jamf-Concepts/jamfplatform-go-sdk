@@ -17,7 +17,39 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
+// ListGroupsV2 returns group information for all Mobile Device and Computer groups.
+func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := prefix + "/groups"
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int          `json:"totalCount"`
+			Results    []GroupDtoV1 `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
 // ListGroupsV1 returns group information for all Mobile Device and Computer groups.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
@@ -47,7 +79,20 @@ func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string)
 	})
 }
 
+// GetGroupV2 returns group information for the given platform UUID.
+func (c *Client) GetGroupV2(ctx context.Context, id string) (*GroupWithCriteriaDtoV1, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result GroupWithCriteriaDtoV1
+	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetGroupV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetGroupV1 returns group information for the given platform UUID.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GroupWithCriteriaDtoV1
@@ -58,7 +103,19 @@ func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaD
 	return &result, nil
 }
 
+// DeleteGroupV2 delete a group by platform UUID.
+func (c *Client) DeleteGroupV2(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteGroupV2(%s): %w", id, err)
+	}
+	return nil
+}
+
 // DeleteGroupV1 delete a group by platform UUID.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
@@ -68,7 +125,19 @@ func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
 	return nil
 }
 
+// PatchGroupV2 update a group by platform UUID.
+func (c *Client) PatchGroupV2(ctx context.Context, id string, request *GroupUpdateDtoV2) error {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("PatchGroupV2(%s): %w", id, err)
+	}
+	return nil
+}
+
 // PatchGroupV1 update a group by platform UUID.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) PatchGroupV1(ctx context.Context, id string, request *GroupUpdateDtoV1) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
@@ -76,6 +145,32 @@ func (c *Client) PatchGroupV1(ctx context.Context, id string, request *GroupUpda
 		return fmt.Errorf("PatchGroupV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveGroupV2IDByName looks up a GroupV2 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveGroupV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveGroupV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveGroupV2ByName looks up a GroupV2 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveGroupV2ByName(ctx context.Context, name string) (*GroupDtoV1, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveGroupV2ByName(%s): %w", name, err)
+	}
+	var out GroupDtoV1
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveGroupV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }
 
 // ResolveGroupV1IDByName looks up a GroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
