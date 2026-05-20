@@ -1097,18 +1097,27 @@ func formatGo(filename string, src []byte) ([]byte, error) {
 // spec (the entry with package "pro"). Generation MUST fail loud rather
 // than bake a placeholder constant: the whole point of JamfProAPIVersion
 // is build-time provenance, and "unknown" defeats that.
+//
+// Loads via resolveSpecPath so CI — which doesn't have access to the
+// private testing/ source specs — transparently falls back to the
+// already-published api/ spec, which carries the same info.version.
 func readJamfProAPIVersion(root string, cfg Config) (string, error) {
-	var specFile string
+	var proSpec SpecDef
+	found := false
 	for _, s := range cfg.Specs {
 		if s.Package == "pro" {
-			specFile = s.File
+			proSpec = s
+			found = true
 			break
 		}
 	}
-	if specFile == "" {
+	if !found {
 		return "", fmt.Errorf("readJamfProAPIVersion: no spec entry with package %q in config", "pro")
 	}
-	specPath := filepath.Join(root, specFile)
+	specPath, _, err := resolveSpecPath(root, cfg, proSpec)
+	if err != nil {
+		return "", fmt.Errorf("readJamfProAPIVersion: %w", err)
+	}
 	data, err := os.ReadFile(specPath)
 	if err != nil {
 		return "", fmt.Errorf("readJamfProAPIVersion: reading %s: %w", specPath, err)
