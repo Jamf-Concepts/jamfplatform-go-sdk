@@ -1177,7 +1177,8 @@
         },
         {
           "op": "PUT /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
-          "name": "UpdateSmartMobileDeviceGroupV2"
+          "name": "UpdateSmartMobileDeviceGroupV2",
+          "expectedStatus": 200
         },
         {
           "op": "PUT /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",

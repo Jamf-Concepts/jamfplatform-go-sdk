@@ -233,7 +233,7 @@ func TestUpdateSmartMobileDeviceGroupV2(t *testing.T) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
-		writeJSON(t, w, http.StatusAccepted, map[string]any{})
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
 	result, err := c.UpdateSmartMobileDeviceGroupV2(context.Background(), "test-id", &SmartGroupAssignmentV2{})
@@ -948,7 +948,7 @@ func TestApplySmartMobileDeviceGroupV2_Update(t *testing.T) {
 		})
 	})
 	mux.HandleFunc("/api/pro/v2/tenant/t-test/mobile-device-groups/smart-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(t, w, 202, map[string]any{"id": "existing-id"})
+		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 
 	id, created, err := c.ApplySmartMobileDeviceGroupV2(context.Background(), &SmartGroupAssignmentV2{GroupName: "target"}, false)

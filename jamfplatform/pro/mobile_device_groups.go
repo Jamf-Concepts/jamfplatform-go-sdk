@@ -170,7 +170,7 @@ func (c *Client) UpdateSmartMobileDeviceGroupV2(ctx context.Context, id string, 
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmartGroupAssignmentV2
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("UpdateSmartMobileDeviceGroupV2(%s): %w", id, err)
 	}
 	return &result, nil
