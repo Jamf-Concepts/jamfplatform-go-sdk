@@ -8178,12 +8178,18 @@ func (t NetworkSegment) MarshalXML(e *xml.Encoder, start xml.StartElement) error
 // NetworkSegmentPost represents a network segment post.
 type NetworkSegmentPost struct {
 	XMLName             xml.Name
+	Building            *string `xml:"building,omitempty"`
+	Department          *string `xml:"department,omitempty"`
+	DistributionPoint   *string `xml:"distribution_point,omitempty"`
+	DistributionServer  *string `xml:"distribution_server,omitempty"`
 	EndingAddress       *string `xml:"ending_address,omitempty"`
 	ID                  *int    `xml:"id,omitempty"`
 	Name                *string `xml:"name,omitempty"`
 	OverrideBuildings   *bool   `xml:"override_buildings,omitempty"`
 	OverrideDepartments *bool   `xml:"override_departments,omitempty"`
 	StartingAddress     *string `xml:"starting_address,omitempty"`
+	SwuServer           *string `xml:"swu_server,omitempty"`
+	URL                 *string `xml:"url,omitempty"`
 }
 
 // MarshalXML forces the NetworkSegmentPost root element name to the wire value

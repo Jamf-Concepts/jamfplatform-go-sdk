@@ -4856,6 +4856,14 @@
         },
         "json_web_token_configuration": {
           "encryption_key": "string:password"
+        },
+        "network_segment_post": {
+          "distribution_server": "string",
+          "distribution_point": "string",
+          "url": "string",
+          "swu_server": "string",
+          "building": "string",
+          "department": "string"
         }
       },
       "excludePaths": [
