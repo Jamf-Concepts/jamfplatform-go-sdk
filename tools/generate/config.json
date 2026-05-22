@@ -4832,6 +4832,105 @@
           "department": "string"
         }
       },
+      "propertyRenames": {
+        "policy": {
+          "self_service.re-install_button_text": "reinstall_button_text",
+          "user_interaction.allow_user_to_defer": "allow_users_to_defer"
+        }
+      },
+      "schemaPatches": {
+        "policy": {
+          "general.date_time_limitations.no_execute_on.day": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] }
+          },
+          "general.network_limitations.network_segments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "network_segment": { "$ref": "#/components/schemas/id_name" }
+              }
+            }
+          },
+          "scope.jss_users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user": { "$ref": "#/components/schemas/id_name" }
+              }
+            }
+          },
+          "scope.jss_user_groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_group": { "$ref": "#/components/schemas/id_name" }
+              }
+            }
+          },
+          "scope.exclusions.jss_users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user": { "$ref": "#/components/schemas/id_name" }
+              }
+            }
+          },
+          "scope.exclusions.jss_user_groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_group": { "$ref": "#/components/schemas/id_name" }
+              }
+            }
+          },
+          "self_service.notification": { "type": "boolean" },
+          "self_service.notification_type": { "type": "string" },
+          "self_service.notification_subject": { "type": "string" },
+          "self_service.notification_message": { "type": "string" },
+          "account_maintenance.accounts.account.hint": { "type": "string" },
+          "account_maintenance.accounts.account.secure_token_allowed": { "type": "boolean" },
+          "account_maintenance.accounts.account.password_sha256": { "type": "string" },
+          "account_maintenance.open_firmware_efi_password.of_password_sha256": { "type": "string" },
+          "printers": {
+            "type": "object",
+            "properties": {
+              "size": { "type": "integer" },
+              "leave_existing_default": { "type": "boolean" },
+              "printer": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "name": { "type": "string" },
+                    "action": { "type": "string", "enum": ["install", "uninstall"] },
+                    "make_default": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          },
+          "reboot": {
+            "type": "object",
+            "properties": {
+              "message": { "type": "string" },
+              "startup_disk": { "type": "string" },
+              "specify_startup": { "type": "string" },
+              "no_user_logged_in": { "type": "string" },
+              "user_logged_in": { "type": "string" },
+              "minutes_until_reboot": { "type": "integer" },
+              "start_reboot_timer_immediately": { "type": "boolean" },
+              "file_vault_2_reboot": { "type": "boolean" }
+            }
+          }
+        }
+      },
       "excludePaths": [
         "GET /tenant/{tenantId}/byoprofiles",
         "GET /tenant/{tenantId}/byoprofiles/id/{id}",

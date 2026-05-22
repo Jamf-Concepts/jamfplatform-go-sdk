@@ -322,7 +322,7 @@ func TestAcceptance_Classic_Probe_IssueMobileDeviceCommand(t *testing.T) {
 	_, err = pc.IssueMobileDeviceCommand(ctx, &proclassic.MobileDeviceCommandPost{
 		General: &proclassic.MobileDeviceCommandPostGeneral{Command: &cmd},
 		MobileDevices: &proclassic.MobileDeviceCommandPostMobileDevices{
-			MobileDevice: &proclassic.MobileDeviceCommandPostMobileDevicesMobileDevice{ID: targetID},
+			MobileDevice: &proclassic.MobileDeviceCommandMobileDevicesMobileDevice{ID: targetID},
 		},
 	})
 	if err != nil {

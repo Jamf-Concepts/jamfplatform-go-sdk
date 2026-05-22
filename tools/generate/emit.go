@@ -200,6 +200,9 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 	}
 
 	applySchemaAdditions(doc, spec.SchemaAdditions)
+	applySchemaPatches(doc, spec.SchemaPatches)
+	applyPropertyRenames(doc, spec.PropertyRenames)
+	applyPostSymmetry(doc, spec.PostSymmetryExcludes)
 	if spec.Format == "xml" {
 		flattenClassicSizeWrappers(doc)
 	}
@@ -328,6 +331,9 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		doc, err := loadSpec(ls.specPath, allowedOpsSet(ls.spec))
 		if err == nil {
 			applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+			applySchemaPatches(doc, ls.spec.SchemaPatches)
+			applyPropertyRenames(doc, ls.spec.PropertyRenames)
+			applyPostSymmetry(doc, ls.spec.PostSymmetryExcludes)
 			if ls.spec.Format == "xml" {
 				flattenClassicSizeWrappers(doc)
 			}
@@ -441,6 +447,9 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
 		}
 		applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+		applySchemaPatches(doc, ls.spec.SchemaPatches)
+		applyPropertyRenames(doc, ls.spec.PropertyRenames)
+		applyPostSymmetry(doc, ls.spec.PostSymmetryExcludes)
 		if ls.spec.Format == "xml" {
 			flattenClassicSizeWrappers(doc)
 		}

@@ -4,6 +4,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"maps"
 	"sort"
@@ -54,6 +55,207 @@ func applySchemaAdditions(doc *openapi3.T, additions map[string]map[string]strin
 			schema.Properties[propName] = &openapi3.SchemaRef{Value: propSchema}
 		}
 	}
+}
+
+// applySchemaPatches inserts or replaces sub-schemas at dotted property paths
+// under named component schemas. Used when a spec omits a structured field the
+// server actually returns or accepts (e.g. policy missing top-level `reboot`,
+// `scope.jss_users`, or self-service notification scalars). Each patch value
+// is a raw OpenAPI 3 Schema JSON fragment; intermediate path segments must
+// resolve to object-with-properties so the walker can descend. Replaces an
+// existing property when the path already terminates somewhere; otherwise
+// adds it. Runs after applySchemaAdditions and before applyPostSymmetry so
+// that *_post schemas inherit the patched read shape.
+func applySchemaPatches(doc *openapi3.T, patches map[string]map[string]json.RawMessage) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(patches) == 0 {
+		return
+	}
+	for schemaName, paths := range patches {
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			continue
+		}
+		for path := range paths {
+			raw := paths[path]
+			if len(raw) == 0 {
+				continue
+			}
+			sub, err := parsePatchSchema(raw)
+			if err != nil {
+				panic(fmt.Sprintf("schemaPatches[%q][%q]: %v", schemaName, path, err))
+			}
+			resolvePatchRefs(sub, doc)
+			parent, leaf, ok := walkPropertyPath(ref.Value, path)
+			if !ok {
+				panic(fmt.Sprintf("schemaPatches[%q]: cannot reach path %q in schema", schemaName, path))
+			}
+			if parent.Properties == nil {
+				parent.Properties = openapi3.Schemas{}
+			}
+			parent.Properties[leaf] = sub
+		}
+	}
+}
+
+// applyPropertyRenames renames property keys at dotted paths inside named
+// component schemas. Used to repair spec keys that don't match the wire so
+// decode actually succeeds (`re-install_button_text` → `reinstall_button_text`,
+// `allow_user_to_defer` → `allow_users_to_defer`). Path's last segment is the
+// current key on the parent; value is the new key. Runs before applyPostSymmetry
+// so the post sibling sees the corrected key.
+func applyPropertyRenames(doc *openapi3.T, renames map[string]map[string]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(renames) == 0 {
+		return
+	}
+	for schemaName, paths := range renames {
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			continue
+		}
+		for path, newKey := range paths {
+			parent, leaf, ok := walkPropertyPath(ref.Value, path)
+			if !ok {
+				panic(fmt.Sprintf("propertyRenames[%q]: cannot reach path %q", schemaName, path))
+			}
+			cur, exists := parent.Properties[leaf]
+			if !exists {
+				panic(fmt.Sprintf("propertyRenames[%q]: property %q missing at path %q", schemaName, leaf, path))
+			}
+			delete(parent.Properties, leaf)
+			parent.Properties[newKey] = cur
+		}
+	}
+}
+
+// applyPostSymmetry copies properties from each read schema X into its *_post
+// sibling X_post so write types accept the full field set the server actually
+// honours. Default behaviour for every spec — Jamf's classic specs routinely
+// declare X_post as a minimal "general only" object even when the server
+// accepts (and persists) every other top-level block. Specs that genuinely
+// have write-only fields list them under PostSymmetryExcludes.
+//
+// Copy semantics: when the read schema declares a property the post sibling
+// doesn't, the property's *openapi3.SchemaRef is shared between read and post
+// (cheap; hoistInlineObjects mutates per-schema property map entries, not the
+// underlying inline objects). When the post sibling already declares the same
+// property, the read shape REPLACES it — the brief is explicit that the post
+// must mirror the read, not preserve a slimmer alternative shape (e.g. the
+// existing EbookPostScope all_* booleans only). The post schema's own xml
+// metadata (typically `xml.name = <read-name>`) is preserved.
+func applyPostSymmetry(doc *openapi3.T, excludes map[string][]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
+		return
+	}
+	for postName, ref := range doc.Components.Schemas {
+		if !strings.HasSuffix(postName, "_post") || ref == nil || ref.Value == nil {
+			continue
+		}
+		readName := strings.TrimSuffix(postName, "_post")
+		readRef, ok := doc.Components.Schemas[readName]
+		if !ok || readRef == nil || readRef.Value == nil {
+			continue
+		}
+		post := ref.Value
+		read := readRef.Value
+		if len(read.Properties) == 0 {
+			continue
+		}
+		skip := make(map[string]bool, len(excludes[postName]))
+		for _, p := range excludes[postName] {
+			skip[p] = true
+		}
+		if post.Properties == nil {
+			post.Properties = openapi3.Schemas{}
+		}
+		for propName, propRef := range read.Properties {
+			if skip[propName] {
+				continue
+			}
+			post.Properties[propName] = propRef
+		}
+	}
+}
+
+// parsePatchSchema parses a raw JSON OpenAPI Schema fragment into a SchemaRef.
+// Uses SchemaRef's own UnmarshalJSON so nested `$ref` strings populate the
+// Ref field on the right SchemaRef levels (a direct json.Unmarshal into
+// openapi3.Schema would skip that path for property values and items).
+// Refs in the fragment are left unresolved on purpose — the parent document
+// already carries the target schemas (e.g. id_name), and `openapi3.SchemaRef`
+// callers downstream key off `.Ref` strings rather than `.Value` pointers.
+func parsePatchSchema(raw json.RawMessage) (*openapi3.SchemaRef, error) {
+	var ref openapi3.SchemaRef
+	if err := ref.UnmarshalJSON(raw); err != nil {
+		return nil, err
+	}
+	return &ref, nil
+}
+
+// resolvePatchRefs walks a freshly-parsed patch SchemaRef tree and points
+// each unresolved `$ref` at the matching component schema in the parent
+// doc. Manual unmarshal of a SchemaRef populates `Ref` but leaves `Value`
+// nil; downstream passes (flattenClassicSizeWrappers, hoistInlineObjects)
+// short-circuit on `Value == nil`, treating refs as unknown shape. Loader
+// machinery would normally resolve these but bypassing the loader was
+// chosen to avoid forcing each patch fragment into a standalone document
+// with every transitive $ref target restated.
+func resolvePatchRefs(ref *openapi3.SchemaRef, doc *openapi3.T) {
+	if ref == nil {
+		return
+	}
+	if ref.Ref != "" && ref.Value == nil {
+		if name, ok := strings.CutPrefix(ref.Ref, "#/components/schemas/"); ok {
+			if target, exists := doc.Components.Schemas[name]; exists && target != nil {
+				ref.Value = target.Value
+			}
+		}
+	}
+	if ref.Value == nil {
+		return
+	}
+	for _, p := range ref.Value.Properties {
+		resolvePatchRefs(p, doc)
+	}
+	if ref.Value.Items != nil {
+		resolvePatchRefs(ref.Value.Items, doc)
+	}
+	for _, s := range ref.Value.AllOf {
+		resolvePatchRefs(s, doc)
+	}
+}
+
+// walkPropertyPath traverses dotted `a.b.c` into nested object schemas. Returns
+// the deepest reachable parent schema and the final leaf segment. Auto-descends
+// through array schemas via `.items.value` (Classic spec routinely models
+// repeating XML children as `prop: { type: array, items: { type: object,
+// properties: { child: { … } } } }`; expressing the descent explicitly in the
+// path would force every caller to thread `items.` through every array hop).
+// Non-leaf segments must resolve to an object-with-properties (after array
+// auto-descent); the leaf segment may or may not exist on the returned parent.
+func walkPropertyPath(root *openapi3.Schema, path string) (*openapi3.Schema, string, bool) {
+	if root == nil || path == "" {
+		return nil, "", false
+	}
+	parts := strings.Split(path, ".")
+	cur := root
+	for i := 0; i < len(parts)-1; i++ {
+		seg := parts[i]
+		if cur.Type != nil && cur.Type.Is("array") && cur.Items != nil && cur.Items.Value != nil {
+			cur = cur.Items.Value
+		}
+		if cur.Properties == nil {
+			return nil, "", false
+		}
+		next, ok := cur.Properties[seg]
+		if !ok || next == nil || next.Value == nil {
+			return nil, "", false
+		}
+		cur = next.Value
+	}
+	if cur.Type != nil && cur.Type.Is("array") && cur.Items != nil && cur.Items.Value != nil {
+		cur = cur.Items.Value
+	}
+	return cur, parts[len(parts)-1], true
 }
 
 // flattenClassicSizeWrappers rewrites Jamf Classic's `<wrapper><size>N</size><item>...</item>...</wrapper>`

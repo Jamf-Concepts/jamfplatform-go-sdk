@@ -4,6 +4,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -33,6 +34,40 @@ type SpecDef struct {
 	ExcludePaths       []string                     `json:"excludePaths,omitempty"`       // "METHOD /path" entries the generator must refuse to include
 	FieldTypeOverrides map[string]string            `json:"fieldTypeOverrides,omitempty"` // "schema_name.property_name" -> Go type, used to correct spec bugs (e.g. `integer` fields where the server actually returns a non-int64 string). Applied per-spec so upstream spec updates don't get silently overwritten.
 	SchemaAdditions    map[string]map[string]string `json:"schemaAdditions,omitempty"`    // "schema_name" -> { "property_name": "openapi_type" }, inject missing properties into a spec schema. Used when the spec omits a field the server accepts but we need to send (e.g. Classic's account schema has no `password` property). openapi_type is one of "string", "integer", "boolean", "string:password" (writeOnly string).
+
+	// SchemaPatches injects (or replaces) arbitrary OpenAPI schema fragments at
+	// dotted property paths under a named component schema. Used when a spec
+	// omits a richer sub-structure the server actually returns (e.g. policy
+	// missing top-level `reboot`, or scope missing `jss_users`/`jss_user_groups`).
+	// Outer key: schema name (e.g. "policy"). Inner key: dotted path of
+	// properties to walk into, with the last segment being the property whose
+	// schema we set (e.g. "self_service.notification" or
+	// "general.date_time_limitations.no_execute_on.day"). Inner value: raw
+	// JSON for an OpenAPI 3 Schema object. If every walked intermediate
+	// segment is an `object` with `properties`, the patch slots in cleanly.
+	// Existing properties at the final segment are replaced; missing ones are
+	// added. Applied after SchemaAdditions and before PostSymmetry, so a patch
+	// to the read schema also flows into the *_post sibling.
+	SchemaPatches map[string]map[string]json.RawMessage `json:"schemaPatches,omitempty"`
+
+	// PropertyRenames renames property keys at dotted paths under a named
+	// component schema. Outer key: schema name. Inner key: dotted path to the
+	// property to rename (e.g. "self_service.re-install_button_text"). Inner
+	// value: new key name (e.g. "reinstall_button_text"). Used to repair spec
+	// keys that don't match the actual wire (silent decode failures otherwise).
+	// Renames the property *key* in the schema map; downstream Go field naming
+	// follows from the corrected key. Applied before PostSymmetry so the
+	// post sibling sees the corrected name.
+	PropertyRenames map[string]map[string]string `json:"propertyRenames,omitempty"`
+
+	// PostSymmetryExcludes lists, per *_post schema, property names whose
+	// presence in the read sibling should NOT be copied across when the
+	// generator's Post-symmetry pass mirrors read fields onto a post type.
+	// Default is full symmetry — only add an entry here when the server
+	// genuinely cannot accept a field on write (e.g. server-assigned audit
+	// timestamps). Outer key: post schema name (e.g. "policy_post"). Value:
+	// list of property names (top-level on the schema) to skip.
+	PostSymmetryExcludes map[string][]string `json:"postSymmetryExcludes,omitempty"`
 }
 
 // baseName derives a Go file base name from the spec file path.
