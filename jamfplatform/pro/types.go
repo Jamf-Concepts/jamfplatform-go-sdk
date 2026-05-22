@@ -592,20 +592,6 @@ type BuildingSearchResults struct {
 	TotalCount int        `json:"totalCount"`
 }
 
-// CacheSettings represents a cache settings.
-type CacheSettings struct {
-	CacheType                  string               `json:"cacheType"`
-	CacheUniqueID              string               `json:"cacheUniqueId"`
-	DirectoryTimeToLiveSeconds *int                 `json:"directoryTimeToLiveSeconds,omitempty"`
-	EhcacheMaxBytesLocalHeap   *string              `json:"ehcacheMaxBytesLocalHeap,omitempty"`
-	Elasticache                *bool                `json:"elasticache,omitempty"`
-	ID                         *string              `json:"id,omitempty"`
-	MemcachedEndpoints         []MemcachedEndpoints `json:"memcachedEndpoints"`
-	Name                       *string              `json:"name,omitempty"`
-	TimeToIdleSeconds          *int                 `json:"timeToIdleSeconds,omitempty"`
-	TimeToLiveSeconds          int                  `json:"timeToLiveSeconds"`
-}
-
 // CategoriesSearchResults represents a categories search results.
 type CategoriesSearchResults struct {
 	Results    []Category `json:"results"`
@@ -2118,12 +2104,6 @@ type DashboardSetupTask struct {
 
 // DataRoamingSetting represents a data roaming setting value.
 type DataRoamingSetting = string
-
-// DatabasePassword represents a database password.
-type DatabasePassword struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Password string `json:"password"`
-}
 
 // DayOfWeek represents a day of week value.
 type DayOfWeek = string
@@ -4018,16 +3998,6 @@ type MembershipTestSearchResponse struct {
 	IsMember       bool   `json:"isMember"`
 	IsMemberByUUID bool   `json:"isMemberByUuid"`
 	Username       string `json:"username"`
-}
-
-// MemcachedEndpoints represents a memcached endpoints.
-type MemcachedEndpoints struct {
-	Enabled                 *bool   `json:"enabled,omitempty"`
-	HostName                *string `json:"hostName,omitempty"`
-	ID                      *string `json:"id,omitempty"`
-	JssCacheConfigurationID *int    `json:"jssCacheConfigurationId,omitempty"`
-	Name                    *string `json:"name,omitempty"`
-	Port                    *int    `json:"port,omitempty"`
 }
 
 // MobileDeviceApplication represents a mobile device application.

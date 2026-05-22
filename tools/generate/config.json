@@ -3832,15 +3832,6 @@
           "name": "UpdateJamfProServerURLV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-pro-server-url/history",
-          "name": "ListJamfProServerURLHistoryV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ]
-        },
-        {
           "op": "GET /v1/tenant/{tenantId}/device-communication-settings",
           "name": "GetDeviceCommunicationSettingsV1"
         },
@@ -3883,14 +3874,6 @@
           "op": "POST /v3/tenant/{tenantId}/check-in/history",
           "name": "CreateCheckInHistoryNoteV3",
           "expectedStatus": 201
-        },
-        {
-          "op": "GET /v1/tenant/{tenantId}/cache-settings",
-          "name": "GetCacheSettingsV1"
-        },
-        {
-          "op": "PUT /v1/tenant/{tenantId}/cache-settings",
-          "name": "UpdateCacheSettingsV1"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/login-customization",
@@ -4779,11 +4762,6 @@
           "name": "PlatformInitializeSystemV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/system/initialize-database-connection",
-          "name": "InitializeDatabaseConnectionV1",
-          "expectedStatus": 202
-        },
-        {
           "op": "PUT /v1/tenant/{tenantId}/accounts/{id}",
           "name": "UpdateAccountV1"
         },
@@ -4808,13 +4786,6 @@
           "name": "GetAccountGroupV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/dss-declarations/{declarationId}",
-          "name": "GetDssDeclarationV1",
-          "pathNames": {
-            "declarationId": "declarationID"
-          }
-        },
-        {
           "op": "GET /v1/tenant/{tenantId}/last-login",
           "name": "GetLastLoginV1"
         },
@@ -4829,11 +4800,6 @@
         {
           "op": "GET /v1/tenant/{tenantId}/user-sessions/count",
           "name": "GetActiveUsersCountV1"
-        },
-        {
-          "op": "POST /v1/tenant/{tenantId}/jamf-pro-server-url/history",
-          "name": "CreateJamfProServerURLHistoryV1",
-          "expectedStatus": 201
         }
       ]
     },

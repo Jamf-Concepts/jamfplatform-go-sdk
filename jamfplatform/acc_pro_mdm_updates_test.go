@@ -148,31 +148,6 @@ func TestAcceptance_Pro_MdmUpdates_SyncDdmV1(t *testing.T) {
 	t.Skip("destructive (re-sync MDM state for a real device) — manual curl only")
 }
 
-func TestAcceptance_Pro_MdmUpdates_GetDssDeclarationV1(t *testing.T) {
-	// New in 11.28.0. Plumbing-only probe with a syntactic zero UUID —
-	// the only acceptable rejection is 404 (no such declaration). 400
-	// would indicate a request-shape regression, 401/403 an auth
-	// regression, 422 a schema-validation tightening — none of which
-	// this test should silently swallow.
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	probeID := "00000000-0000-0000-0000-000000000000"
-	_, err := p.GetDssDeclarationV1(ctx, probeID)
-	if err == nil {
-		t.Logf("GetDssDeclarationV1(%s): unexpectedly succeeded", probeID)
-		return
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
-		t.Logf("GetDssDeclarationV1(%s): 404 — no such declaration, plumbing OK", probeID)
-		return
-	}
-	skipOnServerError(t, err)
-	t.Fatalf("GetDssDeclarationV1(%s): want 404, got %v", probeID, err)
-}
-
 // --- managed-software-updates ------------------------------------------
 
 func TestAcceptance_Pro_MdmUpdates_ListAvailableOsUpdatesV1(t *testing.T) {

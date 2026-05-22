@@ -99,17 +99,6 @@ func TestAcceptance_Pro_SchedulerV1(t *testing.T) {
 	}
 }
 
-// --- jamf-pro-initialization ----------------------------------------
-
-// New in 11.28.0. POST /v1/system/initialize-database-connection
-// supplies a DB password during first-time Jamf Pro startup. On a
-// tenant that's already running it either no-ops or wedges startup,
-// so we don't exercise it. Documented here as a deliberate skip per
-// the SDK's destructive-endpoint policy.
-func TestAcceptance_Pro_InitializeDatabaseConnectionV1(t *testing.T) {
-	t.Skip("destructive: bootstrap-only DB initialization, unsafe to run against a live tenant")
-}
-
 // --- slasa -----------------------------------------------------------
 
 // POST /v1/slasa accepts the Software License + Service Agreement for

@@ -30,13 +30,3 @@ func (c *Client) PlatformInitializeSystemV1(ctx context.Context, request *Platfo
 	}
 	return nil
 }
-
-// InitializeDatabaseConnectionV1 provide Database Password during startup.
-func (c *Client) InitializeDatabaseConnectionV1(ctx context.Context, request *DatabasePassword) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	endpoint := prefix + "/system/initialize-database-connection"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
-		return fmt.Errorf("InitializeDatabaseConnectionV1: %w", err)
-	}
-	return nil
-}

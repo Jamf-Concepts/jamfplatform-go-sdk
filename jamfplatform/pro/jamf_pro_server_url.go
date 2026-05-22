@@ -9,11 +9,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/url"
-	"strconv"
-	"strings"
-
-	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetJamfProServerURLV1 get Jamf Pro Server URL settings.
@@ -34,47 +29,6 @@ func (c *Client) UpdateJamfProServerURLV1(ctx context.Context, request *JamfProS
 	endpoint := prefix + "/jamf-pro-server-url"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("UpdateJamfProServerURLV1: %w", err)
-	}
-	return &result, nil
-}
-
-// ListJamfProServerURLHistoryV1 get Jamf Pro Server URL settings history.
-func (c *Client) ListJamfProServerURLHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := prefix + "/jamf-pro-server-url/history"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int             `json:"totalCount"`
-			Results    []ObjectHistory `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
-// CreateJamfProServerURLHistoryV1 add Jamf Pro Server URL settings history notes.
-func (c *Client) CreateJamfProServerURLHistoryV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
-	var result ObjectHistory
-	endpoint := prefix + "/jamf-pro-server-url/history"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateJamfProServerURLHistoryV1: %w", err)
 	}
 	return &result, nil
 }
