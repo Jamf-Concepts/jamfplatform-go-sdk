@@ -200,6 +200,9 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 	}
 
 	applySchemaAdditions(doc, spec.SchemaAdditions)
+	if spec.Format == "xml" {
+		flattenClassicSizeWrappers(doc)
+	}
 	hoistInlineObjects(doc)
 
 	methods, err := extractMethods(doc, spec)
@@ -325,6 +328,9 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		doc, err := loadSpec(ls.specPath, allowedOpsSet(ls.spec))
 		if err == nil {
 			applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+			if ls.spec.Format == "xml" {
+				flattenClassicSizeWrappers(doc)
+			}
 			hoistInlineObjects(doc)
 		}
 		if err != nil {
@@ -435,6 +441,9 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
 		}
 		applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+		if ls.spec.Format == "xml" {
+			flattenClassicSizeWrappers(doc)
+		}
 		hoistInlineObjects(doc)
 
 		refs := collectAllSchemas(doc)

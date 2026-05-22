@@ -56,6 +56,123 @@ func applySchemaAdditions(doc *openapi3.T, additions map[string]map[string]strin
 	}
 }
 
+// flattenClassicSizeWrappers rewrites Jamf Classic's `<wrapper><size>N</size><item>...</item>...</wrapper>`
+// XML containers so they round-trip through encoding/xml without data loss.
+//
+// The Classic spec models these as `wrapper: type:array, items: {size, X}` —
+// implying N wrapper elements, each carrying a size sentinel and a single item.
+// The actual wire emits ONE `<wrapper>` element with a single `<size>` sibling
+// and N repeated `<X>` children. Mapping the spec literally produces
+// `Wrapper *[]Item` in Go; encoding/xml then sees one `<wrapper>` element,
+// allocates one slot, and the N `<X>` children collide into the slot's
+// non-slice X field — only the last survives. Smart groups silently lose every
+// criterion except the final one (confirmed across UserGroup, MobileDeviceGroup,
+// ComputerGroup on real tenant XML).
+//
+// Transform: `wrapper: array of {size, X}` → `wrapper: object {size, X: array of <X-shape>}`.
+// hoistInlineObjects then lifts the new wrapper into its own named schema, and
+// the inner X array hoists / dedups against existing named schemas (criterion,
+// computer, mobile_device, etc.) as usual. Output: callers get
+// `*UserGroupCriteria { Size *int, Criterion []Criterion }` and the full slice
+// survives a decode.
+//
+// Pattern guard — applied only when ALL of the following hold so we don't
+// rewrite legitimate JSON-style arrays-of-{size,item} (none exist in Classic
+// today, but the heuristic should be tight regardless):
+//   - property is `type: array` with inline items (no $ref)
+//   - items.properties has 1 or 2 keys
+//   - one is "size" (optional); exactly one other key, naming a singular wire child
+//   - the other key references or inlines an object schema
+//
+// Runs before hoistInlineObjects so hoisting sees the transformed shape.
+// XML-format specs only — JSON specs may legitimately use the lossy shape.
+func flattenClassicSizeWrappers(doc *openapi3.T) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
+		return
+	}
+	visited := map[*openapi3.Schema]bool{}
+	for _, ref := range doc.Components.Schemas {
+		if ref != nil && ref.Value != nil {
+			flattenClassicSizeWrappersInSchema(ref.Value, visited)
+		}
+	}
+}
+
+func flattenClassicSizeWrappersInSchema(schema *openapi3.Schema, visited map[*openapi3.Schema]bool) {
+	if schema == nil || visited[schema] {
+		return
+	}
+	visited[schema] = true
+	for propName, propRef := range schema.Properties {
+		if propRef == nil || propRef.Value == nil || propRef.Ref != "" {
+			continue
+		}
+		if rewritten := flattenIfClassicWrapper(propRef.Value); rewritten != nil {
+			schema.Properties[propName] = &openapi3.SchemaRef{Value: rewritten}
+		}
+	}
+	for _, propRef := range schema.Properties {
+		if propRef != nil && propRef.Value != nil {
+			flattenClassicSizeWrappersInSchema(propRef.Value, visited)
+		}
+	}
+	if schema.Items != nil && schema.Items.Value != nil {
+		flattenClassicSizeWrappersInSchema(schema.Items.Value, visited)
+	}
+	for _, s := range schema.AllOf {
+		if s != nil && s.Value != nil {
+			flattenClassicSizeWrappersInSchema(s.Value, visited)
+		}
+	}
+}
+
+func flattenIfClassicWrapper(s *openapi3.Schema) *openapi3.Schema {
+	if s == nil || !s.Type.Is("array") || s.Items == nil || s.Items.Ref != "" || s.Items.Value == nil {
+		return nil
+	}
+	items := s.Items.Value
+	if len(items.Properties) == 0 || len(items.Properties) > 2 {
+		return nil
+	}
+	var sizeRef, itemRef *openapi3.SchemaRef
+	var itemKey string
+	for k, v := range items.Properties {
+		switch k {
+		case "size":
+			sizeRef = v
+		default:
+			if itemRef != nil {
+				// More than one non-size key — not a wrapper shape.
+				return nil
+			}
+			itemRef = v
+			itemKey = k
+		}
+	}
+	if itemRef == nil || itemRef.Value == nil {
+		return nil
+	}
+	// The non-size key must reference (or inline) an object schema.
+	if itemRef.Ref == "" && len(itemRef.Value.Properties) == 0 {
+		return nil
+	}
+	newProps := openapi3.Schemas{}
+	if sizeRef != nil {
+		newProps["size"] = sizeRef
+	}
+	newProps[itemKey] = &openapi3.SchemaRef{
+		Value: &openapi3.Schema{
+			Type:  &openapi3.Types{"array"},
+			Items: itemRef,
+		},
+	}
+	return &openapi3.Schema{
+		Type:       &openapi3.Types{"object"},
+		Properties: newProps,
+		XML:        s.XML,
+	}
+}
+
 // hoistInlineObjects promotes every inline object-with-properties found in
 // component schemas to its own named top-level schema and replaces the
 // property with a $ref. Specs that model deeply-nested XML resources
@@ -114,13 +231,28 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 			return ref
 		}
 		v := ref.Value
-		inlineObject := v.Type.Is("object") && len(v.Properties) > 0
+		// Treat (Type==nil && Properties>0) as object-shape. Classic's
+		// spec frequently omits `type: object` on inline subschemas that
+		// are clearly objects (e.g. user_group.criteria.items, user_group.users.items).
+		// Mirrors the extractTypes nil-type tolerance at the top of this file.
+		hasObjShape := func(s *openapi3.Schema) bool {
+			return s != nil && len(s.Properties) > 0 && (s.Type.Is("object") || s.Type == nil)
+		}
+		inlineObject := hasObjShape(v)
 		inlineArrayOfObject := v.Type.Is("array") && v.Items != nil && v.Items.Ref == "" &&
-			v.Items.Value != nil && v.Items.Value.Type.Is("object") && len(v.Items.Value.Properties) > 0
+			hasObjShape(v.Items.Value)
 		if !inlineObject && !inlineArrayOfObject {
 			return ref
 		}
 		if inlineObject {
+			// Reuse a top-level schema with matching name + property keyset
+			// instead of emitting a near-duplicate hoisted type. Classic's
+			// spec sometimes inlines the same shape that's also defined as
+			// a named component (e.g. user_group.criteria.items.criterion
+			// matches the top-level `criterion` schema verbatim).
+			if existing, ok := doc.Components.Schemas[propName]; ok && sameInlineShapeAsNamed(v, existing) {
+				return &openapi3.SchemaRef{Ref: "#/components/schemas/" + propName, Value: existing.Value}
+			}
 			nested := parentName + exportedGoName(propName)
 			nested = uniqueSchemaName(doc, nested)
 			// Preserve the original property name as the hoisted schema's
@@ -136,7 +268,20 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 			hoisted = true
 			return &openapi3.SchemaRef{Ref: "#/components/schemas/" + nested, Value: v}
 		}
-		// inline array of object — hoist the element schema.
+		// inline array of object — hoist the element schema. First try to
+		// dedup against an existing top-level schema whose name matches the
+		// array's element wire shape (typically the singular of the property
+		// name, e.g. property `criterion` is already singular, property
+		// `users` maps to schema `user`). Mirrors the inline-object dedup
+		// above so wrapper-flattened criteria/users/computers/mobile_devices
+		// arrays point at the shared component schema instead of emitting a
+		// fresh per-parent Item type.
+		for _, candidate := range []string{propName, singularize(propName)} {
+			if existing, ok := doc.Components.Schemas[candidate]; ok && sameInlineShapeAsNamed(v.Items.Value, existing) {
+				v.Items = &openapi3.SchemaRef{Ref: "#/components/schemas/" + candidate, Value: existing.Value}
+				return ref
+			}
+		}
 		nested := parentName + exportedGoName(propName) + "Item"
 		nested = uniqueSchemaName(doc, nested)
 		if v.Items.Value.XML == nil {
@@ -159,6 +304,28 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 	return hoisted
 }
 
+// sameInlineShapeAsNamed reports whether `inline` and `named` (a top-level
+// schema ref) share the same property keyset. Used by hoistInlineObjectsInSchema
+// to deduplicate inline objects against a name-matched top-level schema
+// instead of emitting a near-duplicate hoisted type. Conservative — only
+// matches when key counts AND keys agree exactly; nested property types
+// are not compared, since OpenAPI key collisions across unrelated shapes
+// are rare in Jamf's specs (and tests will catch any divergence).
+func sameInlineShapeAsNamed(inline *openapi3.Schema, named *openapi3.SchemaRef) bool {
+	if inline == nil || named == nil || named.Value == nil {
+		return false
+	}
+	if len(inline.Properties) != len(named.Value.Properties) {
+		return false
+	}
+	for k := range inline.Properties {
+		if _, ok := named.Value.Properties[k]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
 // singularize returns a best-effort singular form of a plural noun — used
 // as the default XML element name for array items when the spec doesn't
 // provide one. Handles the common English plural suffixes Jamf uses
@@ -176,14 +343,32 @@ func singularize(plural string) string {
 }
 
 // uniqueSchemaName disambiguates a proposed schema name if the name is
-// already taken by an unrelated schema.
+// already taken by an unrelated schema. Checks both the spec namespace
+// (exact key collisions) AND the Go-identifier namespace produced by
+// goTypeName (e.g. "computer_extension_attributesItem" and
+// "computerExtensionAttributesItem" are distinct spec keys but map to
+// the same exported Go type "ComputerExtensionAttributesItem"). Without
+// the Go-name check the generator silently emits duplicate Go type
+// declarations and the package fails to compile.
 func uniqueSchemaName(doc *openapi3.T, base string) string {
-	if _, exists := doc.Components.Schemas[base]; !exists {
+	taken := func(s string) bool {
+		if _, exists := doc.Components.Schemas[s]; exists {
+			return true
+		}
+		want := goTypeName(s)
+		for k := range doc.Components.Schemas {
+			if goTypeName(k) == want {
+				return true
+			}
+		}
+		return false
+	}
+	if !taken(base) {
 		return base
 	}
 	for i := 2; ; i++ {
 		candidate := fmt.Sprintf("%s%d", base, i)
-		if _, exists := doc.Components.Schemas[candidate]; !exists {
+		if !taken(candidate) {
 			return candidate
 		}
 	}
@@ -603,6 +788,18 @@ func classicListWrapper(goName, specName string, schema *openapi3.Schema, doc *o
 	if resourceName == "" || resourceProp == nil {
 		return GoType{}, false
 	}
+	// Classic spec quirk: some list specs nest the resource property as
+	// `type: array` inside the items wrapper (computer_groups does this —
+	// `computer_groups.items.computer_group: type: array, items: {...}`)
+	// while the wire is still `<computer_groups><size/><computer_group>...
+	// </computer_group>*</computer_groups>`. Without descending, the
+	// wrapper emits `[][]ComputerGroupsItemComputerGroupItem` — a
+	// double-slice Go can't decode against the flat repeated-child wire.
+	// Drop the inner array; use its element type as the slice element.
+	if resourceProp.Ref == "" && resourceProp.Value != nil &&
+		resourceProp.Value.Type.Is("array") && resourceProp.Value.Items != nil {
+		resourceProp = resourceProp.Value.Items
+	}
 	resourceGo := refName(resourceProp)
 	fields := []GoField{}
 	if sizeProp != nil {
@@ -648,6 +845,17 @@ func plural(singular string) string {
 // no-op on reads (server never populates it there) and populates cleanly
 // on writes.
 func addTopLevelIDsForClassic(types []GoType) {
+	// Named aliases to scalar types (e.g. `type Size = int`) are written
+	// as `*Size` in fields but are not real sub-objects; without this
+	// registry the loop misclassifies any type with a `*Size` field as
+	// "has a sub-object" and injects a bogus top-level ID into hoisted
+	// wrapper types like UserGroupCriteria / ComputerGroupComputers.
+	scalarAliases := map[string]bool{}
+	for _, t := range types {
+		if t.AliasTarget != "" && isScalar(t.AliasTarget) {
+			scalarAliases[t.Name] = true
+		}
+	}
 	for i := range types {
 		t := &types[i]
 		if len(t.Fields) == 0 || t.AliasTarget != "" || t.IsRawJSON || t.IsListWrapper {
@@ -662,9 +870,11 @@ func addTopLevelIDsForClassic(types []GoType) {
 			// General, Connection, Scope — is a signal the server probably
 			// returns id at the top level on create while the spec nests it
 			// inside one of these children. Scalar ptr fields (*string, *int,
-			// *bool) and slice/map types don't count.
+			// *bool), scalar-aliased ptr fields (*Size), and slice/map types
+			// don't count.
 			if strings.HasPrefix(f.Type, "*") && !strings.HasPrefix(f.Type, "*[]") &&
 				!isScalar(strings.TrimPrefix(f.Type, "*")) &&
+				!scalarAliases[strings.TrimPrefix(f.Type, "*")] &&
 				!strings.HasPrefix(f.Type, "*map[") {
 				hasSubObject = true
 			}
