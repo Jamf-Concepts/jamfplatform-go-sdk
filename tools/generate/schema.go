@@ -383,7 +383,7 @@ func flattenIfClassicWrapper(s *openapi3.Schema) *openapi3.Schema {
 // to map[string]any, which encoding/xml can't populate from structured
 // XML content. Runs in-place on the doc; safe for specs that already use
 // named schemas (no inline objects found → no-op).
-func hoistInlineObjects(doc *openapi3.T) {
+func hoistInlineObjects(doc *openapi3.T, format string) {
 	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
 		return
 	}
@@ -395,7 +395,7 @@ func hoistInlineObjects(doc *openapi3.T) {
 			if schema == nil {
 				continue
 			}
-			if hoistInlineObjectsInSchema(name, schema, doc) {
+			if hoistInlineObjectsInSchema(name, schema, doc, format) {
 				changed = true
 			}
 		}
@@ -404,8 +404,12 @@ func hoistInlineObjects(doc *openapi3.T) {
 
 // hoistInlineObjectsInSchema walks one schema's properties and items, lifting
 // inline typed objects into named top-level schemas. Returns true when any
-// lift happened so the outer loop can revisit schemas added mid-walk.
-func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc *openapi3.T) bool {
+// lift happened so the outer loop can revisit schemas added mid-walk. The
+// format hint enables XML-specific behaviour: empty `type: object` properties
+// are hoisted into named structs (so they round-trip as <element/> rather
+// than freeform map[string]any) — JSON specs continue treating those as
+// freeform per the OpenAPI convention.
+func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc *openapi3.T, format string) bool {
 	if schema == nil {
 		return false
 	}
@@ -437,8 +441,25 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 		// spec frequently omits `type: object` on inline subschemas that
 		// are clearly objects (e.g. user_group.criteria.items, user_group.users.items).
 		// Mirrors the extractTypes nil-type tolerance at the top of this file.
+		//
+		// XML specs also hoist explicit empty `type: object` properties:
+		// Classic emits per-type binding blocks like <powerbroker_identity_services/>
+		// that need to round-trip as an empty struct, not the map[string]any
+		// fallback an unhoisted empty object would produce. JSON specs
+		// continue treating empty `type: object` as freeform per OpenAPI's
+		// convention (the freeform branch in extractTypes turns those into
+		// json.RawMessage).
 		hasObjShape := func(s *openapi3.Schema) bool {
-			return s != nil && len(s.Properties) > 0 && (s.Type.Is("object") || s.Type == nil)
+			if s == nil {
+				return false
+			}
+			if len(s.Properties) > 0 && (s.Type.Is("object") || s.Type == nil) {
+				return true
+			}
+			if format == "xml" && s.Type.Is("object") && s.AdditionalProperties.Schema == nil {
+				return true
+			}
+			return false
 		}
 		inlineObject := hasObjShape(v)
 		inlineArrayOfObject := v.Type.Is("array") && v.Items != nil && v.Items.Ref == "" &&
@@ -922,8 +943,19 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 			continue
 		}
 
-		// Freeform object (no properties) → json.RawMessage
+		// Freeform object (no properties): JSON specs treat as
+		// json.RawMessage (the OpenAPI convention for unconstrained shape).
+		// XML specs need an empty struct instead — Classic emits per-type
+		// blocks like <powerbroker_identity_services/> whose presence is
+		// itself semantic and must round-trip as an empty element, not a
+		// freeform body.
 		if len(schema.Properties) == 0 && schema.AdditionalProperties.Schema == nil {
+			if format == "xml" {
+				t := schemaToGoType(name, schema, usage.isRequest, format)
+				t.XMLName = xmlName
+				types = append(types, t)
+				continue
+			}
 			comment := name + " represents a freeform JSON object."
 			if schema.Description != "" {
 				comment = name + " " + lowerFirst(cleanComment(schema.Description))

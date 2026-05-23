@@ -339,7 +339,7 @@ func (m {{ .Name }}) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(map[string]string{"{{ .Discriminator.PropertyName }}": m.{{ .Discriminator.GoFieldName }}})
 }
-{{- else if .Fields }}
+{{- else if or .Fields (and (eq $.Format "xml") .XMLName) }}
 // {{ .Comment }}
 type {{ .Name }} struct {
 {{- if and (eq $.Format "xml") .XMLName }}

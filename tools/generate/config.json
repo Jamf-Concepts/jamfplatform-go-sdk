@@ -4843,6 +4843,70 @@
         }
       },
       "schemaPatches": {
+        "directory_binding": {
+          "password_sha256": { "type": "string" },
+          "active_directory": {
+            "type": "object",
+            "properties": {
+              "forest": { "type": "string" },
+              "cache_last_user": { "type": "boolean" },
+              "require_confirmation": { "type": "boolean" },
+              "local_home": { "type": "boolean" },
+              "use_unc_path": { "type": "boolean" },
+              "mount_style": { "type": "string" },
+              "default_shell": { "type": "string" },
+              "uid": { "type": "string" },
+              "user_gid": { "type": "string" },
+              "gid": { "type": "string" },
+              "multiple_domains": { "type": "boolean" },
+              "preferred_domain": { "type": "string" },
+              "admin_groups": { "type": "string" }
+            }
+          },
+          "open_directory": {
+            "type": "object",
+            "properties": {
+              "encrypt_using_ssl": { "type": "boolean" },
+              "perform_secure_bind": { "type": "boolean" },
+              "use_for_authentication": { "type": "boolean" },
+              "use_for_contacts": { "type": "boolean" }
+            }
+          },
+          "powerbroker_identity_services": {
+            "type": "object"
+          },
+          "admitmac": {
+            "type": "object",
+            "properties": {
+              "require_confirmation": { "type": "boolean" },
+              "local_home": { "type": "string" },
+              "mount_style": { "type": "string" },
+              "default_shell": { "type": "string" },
+              "mount_network_home": { "type": "boolean" },
+              "place_home_folders": { "type": "string" },
+              "uid": { "type": "string" },
+              "user_gid": { "type": "string" },
+              "gid": { "type": "string" },
+              "admin_group": { "type": "string" },
+              "cached_credentials": { "type": "integer" },
+              "add_user_to_local": { "type": "boolean" },
+              "users_ou": { "type": "string" },
+              "groups_ou": { "type": "string" },
+              "printers_ou": { "type": "string" },
+              "shared_folders_ou": { "type": "string" }
+            }
+          },
+          "centrify": {
+            "type": "object",
+            "properties": {
+              "workstation_mode": { "type": "boolean" },
+              "overwrite_existing": { "type": "boolean" },
+              "update_PAM": { "type": "boolean" },
+              "zone": { "type": "string" },
+              "preferred_domain_server": { "type": "string" }
+            }
+          }
+        },
         "policy": {
           "general.date_time_limitations.no_execute_on.day": {
             "type": "array",

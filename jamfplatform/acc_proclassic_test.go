@@ -939,6 +939,105 @@ func TestAcceptance_Classic_DirectoryBindingCRUD(t *testing.T) {
 	}
 }
 
+// TestAcceptance_Classic_DirectoryBindingNestedAD exercises the per-type
+// nested configuration blocks on DirectoryBinding (here: ActiveDirectory).
+// The flat-8 struct historically dropped active_directory/open_directory/
+// powerbroker_identity_services/admitmac/centrify children on round-trip;
+// this test creates a binding with a populated nested block, re-fetches it,
+// and asserts every field survived. The other four nested types follow
+// the same wire pattern, so coverage on AD is representative.
+func TestAcceptance_Classic_DirectoryBindingNestedAD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	bp := func(b bool) *bool { return &b }
+	name := "sdk-acc-dirbind-ad-" + runSuffix()
+	want := &proclassic.DirectoryBinding{
+		Name:       classicStrPtr(name),
+		Priority:   func(i int) *int { return &i }(9),
+		Domain:     classicStrPtr("acc.test"),
+		Username:   classicStrPtr("accuser"),
+		Password:   classicStrPtr("placeholder-pw"),
+		ComputerOu: classicStrPtr("OU=acc"),
+		Type:       classicStrPtr("Active Directory"),
+		ActiveDirectory: &proclassic.DirectoryBindingActiveDirectory{
+			CacheLastUser:       bp(true),
+			RequireConfirmation: bp(false),
+			LocalHome:           bp(true),
+			UseUncPath:          bp(false),
+			MountStyle:          classicStrPtr("smb"),
+			DefaultShell:        classicStrPtr("/bin/bash"),
+			Uid:                 classicStrPtr("accuid"),
+			UserGid:             classicStrPtr("accugid"),
+			Gid:                 classicStrPtr("accgid"),
+			MultipleDomains:     bp(false),
+			PreferredDomain:     classicStrPtr("accpref"),
+			AdminGroups:         classicStrPtr("accgrp"),
+		},
+	}
+
+	created, err := pc.CreateDirectoryBindingByID(ctx, "0", want)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("Create: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteDirectoryBindingByID", func() error { return pc.DeleteDirectoryBindingByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetDirectoryBindingByID(ctx, intToStr(id))
+	if err != nil {
+		t.Fatalf("Get: %v", err)
+	}
+	if got.ActiveDirectory == nil {
+		t.Fatalf("ActiveDirectory block dropped on read; want populated")
+	}
+	gotAD := got.ActiveDirectory
+	checks := []struct {
+		field string
+		want  any
+		got   any
+	}{
+		{"CacheLastUser", true, derefBool(gotAD.CacheLastUser)},
+		{"RequireConfirmation", false, derefBool(gotAD.RequireConfirmation)},
+		{"LocalHome", true, derefBool(gotAD.LocalHome)},
+		{"UseUncPath", false, derefBool(gotAD.UseUncPath)},
+		{"MountStyle", "smb", derefStr(gotAD.MountStyle)},
+		{"DefaultShell", "/bin/bash", derefStr(gotAD.DefaultShell)},
+		{"Uid", "accuid", derefStr(gotAD.Uid)},
+		{"UserGid", "accugid", derefStr(gotAD.UserGid)},
+		{"Gid", "accgid", derefStr(gotAD.Gid)},
+		{"MultipleDomains", false, derefBool(gotAD.MultipleDomains)},
+		{"PreferredDomain", "accpref", derefStr(gotAD.PreferredDomain)},
+		{"AdminGroups", "accgrp", derefStr(gotAD.AdminGroups)},
+	}
+	for _, ck := range checks {
+		if ck.want != ck.got {
+			t.Errorf("ActiveDirectory.%s: want %v, got %v", ck.field, ck.want, ck.got)
+		}
+	}
+	if got.PasswordSha256 == nil || *got.PasswordSha256 == "" {
+		t.Errorf("PasswordSha256: want server-emitted hash field, got nil/empty")
+	}
+}
+
+func derefBool(p *bool) bool {
+	if p == nil {
+		return false
+	}
+	return *p
+}
+
+func derefStr(p *string) string {
+	if p == nil {
+		return ""
+	}
+	return *p
+}
+
 func TestAcceptance_Classic_ClassicPackageCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()

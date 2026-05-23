@@ -5226,15 +5226,21 @@ func (t DepartmentsItem) MarshalXML(e *xml.Encoder, start xml.StartElement) erro
 
 // DirectoryBinding represents a directory binding.
 type DirectoryBinding struct {
-	XMLName    xml.Name
-	ComputerOu *string `xml:"computer_ou,omitempty"`
-	Domain     *string `xml:"domain,omitempty"`
-	ID         *int    `xml:"id,omitempty"`
-	Name       *string `xml:"name,omitempty"`
-	Password   *string `xml:"password,omitempty"`
-	Priority   *int    `xml:"priority,omitempty"`
-	Type       *string `xml:"type,omitempty"`
-	Username   *string `xml:"username,omitempty"`
+	XMLName                     xml.Name
+	ActiveDirectory             *DirectoryBindingActiveDirectory             `xml:"active_directory,omitempty"`
+	Admitmac                    *DirectoryBindingAdmitmac                    `xml:"admitmac,omitempty"`
+	Centrify                    *DirectoryBindingCentrify                    `xml:"centrify,omitempty"`
+	ComputerOu                  *string                                      `xml:"computer_ou,omitempty"`
+	Domain                      *string                                      `xml:"domain,omitempty"`
+	ID                          *int                                         `xml:"id,omitempty"`
+	Name                        *string                                      `xml:"name,omitempty"`
+	OpenDirectory               *DirectoryBindingOpenDirectory               `xml:"open_directory,omitempty"`
+	Password                    *string                                      `xml:"password,omitempty"`
+	PasswordSha256              *string                                      `xml:"password_sha256,omitempty"`
+	PowerbrokerIdentityServices *DirectoryBindingPowerbrokerIdentityServices `xml:"powerbroker_identity_services,omitempty"`
+	Priority                    *int                                         `xml:"priority,omitempty"`
+	Type                        *string                                      `xml:"type,omitempty"`
+	Username                    *string                                      `xml:"username,omitempty"`
 }
 
 // MarshalXML forces the DirectoryBinding root element name to the wire value
@@ -5247,6 +5253,134 @@ type DirectoryBinding struct {
 func (t DirectoryBinding) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "directory_binding"}
 	type shadow DirectoryBinding
+	return e.EncodeElement(shadow(t), start)
+}
+
+// DirectoryBindingActiveDirectory represents a directory binding active directory.
+type DirectoryBindingActiveDirectory struct {
+	XMLName             xml.Name
+	AdminGroups         *string `xml:"admin_groups,omitempty"`
+	CacheLastUser       *bool   `xml:"cache_last_user,omitempty"`
+	DefaultShell        *string `xml:"default_shell,omitempty"`
+	Forest              *string `xml:"forest,omitempty"`
+	Gid                 *string `xml:"gid,omitempty"`
+	LocalHome           *bool   `xml:"local_home,omitempty"`
+	MountStyle          *string `xml:"mount_style,omitempty"`
+	MultipleDomains     *bool   `xml:"multiple_domains,omitempty"`
+	PreferredDomain     *string `xml:"preferred_domain,omitempty"`
+	RequireConfirmation *bool   `xml:"require_confirmation,omitempty"`
+	Uid                 *string `xml:"uid,omitempty"`
+	UseUncPath          *bool   `xml:"use_unc_path,omitempty"`
+	UserGid             *string `xml:"user_gid,omitempty"`
+}
+
+// MarshalXML forces the DirectoryBindingActiveDirectory root element name to the wire value
+// declared by the spec (<active_directory>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t DirectoryBindingActiveDirectory) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "active_directory"}
+	type shadow DirectoryBindingActiveDirectory
+	return e.EncodeElement(shadow(t), start)
+}
+
+// DirectoryBindingAdmitmac represents a directory binding admitmac.
+type DirectoryBindingAdmitmac struct {
+	XMLName             xml.Name
+	AddUserToLocal      *bool   `xml:"add_user_to_local,omitempty"`
+	AdminGroup          *string `xml:"admin_group,omitempty"`
+	CachedCredentials   *int    `xml:"cached_credentials,omitempty"`
+	DefaultShell        *string `xml:"default_shell,omitempty"`
+	Gid                 *string `xml:"gid,omitempty"`
+	GroupsOu            *string `xml:"groups_ou,omitempty"`
+	LocalHome           *string `xml:"local_home,omitempty"`
+	MountNetworkHome    *bool   `xml:"mount_network_home,omitempty"`
+	MountStyle          *string `xml:"mount_style,omitempty"`
+	PlaceHomeFolders    *string `xml:"place_home_folders,omitempty"`
+	PrintersOu          *string `xml:"printers_ou,omitempty"`
+	RequireConfirmation *bool   `xml:"require_confirmation,omitempty"`
+	SharedFoldersOu     *string `xml:"shared_folders_ou,omitempty"`
+	Uid                 *string `xml:"uid,omitempty"`
+	UserGid             *string `xml:"user_gid,omitempty"`
+	UsersOu             *string `xml:"users_ou,omitempty"`
+}
+
+// MarshalXML forces the DirectoryBindingAdmitmac root element name to the wire value
+// declared by the spec (<admitmac>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t DirectoryBindingAdmitmac) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "admitmac"}
+	type shadow DirectoryBindingAdmitmac
+	return e.EncodeElement(shadow(t), start)
+}
+
+// DirectoryBindingCentrify represents a directory binding centrify.
+type DirectoryBindingCentrify struct {
+	XMLName               xml.Name
+	OverwriteExisting     *bool   `xml:"overwrite_existing,omitempty"`
+	PreferredDomainServer *string `xml:"preferred_domain_server,omitempty"`
+	UpdatePAM             *bool   `xml:"update_PAM,omitempty"`
+	WorkstationMode       *bool   `xml:"workstation_mode,omitempty"`
+	Zone                  *string `xml:"zone,omitempty"`
+}
+
+// MarshalXML forces the DirectoryBindingCentrify root element name to the wire value
+// declared by the spec (<centrify>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t DirectoryBindingCentrify) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "centrify"}
+	type shadow DirectoryBindingCentrify
+	return e.EncodeElement(shadow(t), start)
+}
+
+// DirectoryBindingOpenDirectory represents a directory binding open directory.
+type DirectoryBindingOpenDirectory struct {
+	XMLName              xml.Name
+	EncryptUsingSsl      *bool `xml:"encrypt_using_ssl,omitempty"`
+	PerformSecureBind    *bool `xml:"perform_secure_bind,omitempty"`
+	UseForAuthentication *bool `xml:"use_for_authentication,omitempty"`
+	UseForContacts       *bool `xml:"use_for_contacts,omitempty"`
+}
+
+// MarshalXML forces the DirectoryBindingOpenDirectory root element name to the wire value
+// declared by the spec (<open_directory>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t DirectoryBindingOpenDirectory) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "open_directory"}
+	type shadow DirectoryBindingOpenDirectory
+	return e.EncodeElement(shadow(t), start)
+}
+
+// DirectoryBindingPowerbrokerIdentityServices represents a directory binding powerbroker identity services.
+type DirectoryBindingPowerbrokerIdentityServices struct {
+	XMLName xml.Name
+}
+
+// MarshalXML forces the DirectoryBindingPowerbrokerIdentityServices root element name to the wire value
+// declared by the spec (<powerbroker_identity_services>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t DirectoryBindingPowerbrokerIdentityServices) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "powerbroker_identity_services"}
+	type shadow DirectoryBindingPowerbrokerIdentityServices
 	return e.EncodeElement(shadow(t), start)
 }
 
