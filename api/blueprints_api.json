@@ -596,6 +596,9 @@
           }
         ],
         "properties": {
+          "configuration": {
+            "type": "object"
+          },
           "identifier": {
             "type": "string"
           }

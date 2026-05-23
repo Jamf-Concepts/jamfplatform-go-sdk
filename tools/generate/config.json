@@ -4830,6 +4830,10 @@
           "swu_server": "string",
           "building": "string",
           "department": "string"
+        },
+        "printer": {
+          "shared": "string",
+          "os_requirements": "string"
         }
       },
       "propertyRenames": {

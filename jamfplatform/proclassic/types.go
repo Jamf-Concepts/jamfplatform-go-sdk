@@ -16548,21 +16548,23 @@ func (t PolicyPostUserInteraction) MarshalXML(e *xml.Encoder, start xml.StartEle
 
 // Printer represents a printer.
 type Printer struct {
-	XMLName     xml.Name
-	CUPSName    *string `xml:"CUPS_name,omitempty"`
-	Category    *string `xml:"category,omitempty"`
-	ID          *int    `xml:"id,omitempty"`
-	Info        *string `xml:"info,omitempty"`
-	Location    *string `xml:"location,omitempty"`
-	MakeDefault *bool   `xml:"make_default,omitempty"`
-	Model       *string `xml:"model,omitempty"`
-	Name        *string `xml:"name,omitempty"`
-	Notes       *string `xml:"notes,omitempty"`
-	Ppd         *string `xml:"ppd,omitempty"`
-	PpdContents *string `xml:"ppd_contents,omitempty"`
-	PpdPath     *string `xml:"ppd_path,omitempty"`
-	URI         *string `xml:"uri,omitempty"`
-	UseGeneric  *bool   `xml:"use_generic,omitempty"`
+	XMLName        xml.Name
+	CUPSName       *string `xml:"CUPS_name,omitempty"`
+	Category       *string `xml:"category,omitempty"`
+	ID             *int    `xml:"id,omitempty"`
+	Info           *string `xml:"info,omitempty"`
+	Location       *string `xml:"location,omitempty"`
+	MakeDefault    *bool   `xml:"make_default,omitempty"`
+	Model          *string `xml:"model,omitempty"`
+	Name           *string `xml:"name,omitempty"`
+	Notes          *string `xml:"notes,omitempty"`
+	OsRequirements *string `xml:"os_requirements,omitempty"`
+	Ppd            *string `xml:"ppd,omitempty"`
+	PpdContents    *string `xml:"ppd_contents,omitempty"`
+	PpdPath        *string `xml:"ppd_path,omitempty"`
+	Shared         *string `xml:"shared,omitempty"`
+	URI            *string `xml:"uri,omitempty"`
+	UseGeneric     *bool   `xml:"use_generic,omitempty"`
 }
 
 // MarshalXML forces the Printer root element name to the wire value

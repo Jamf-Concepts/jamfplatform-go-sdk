@@ -72,6 +72,11 @@
             "example": "John Smith",
             "type": "string"
           },
+          "password": {
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
           "privilege_set": {
             "enum": [
               "Administrator",
@@ -5391,6 +5396,11 @@
             "default": false,
             "type": "boolean"
           },
+          "encryption_key": {
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
           "id": {
             "example": 1,
             "type": "integer"
@@ -9783,6 +9793,18 @@
       },
       "network_segment_post": {
         "properties": {
+          "building": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          },
+          "distribution_point": {
+            "type": "string"
+          },
+          "distribution_server": {
+            "type": "string"
+          },
           "ending_address": {
             "example": "10.10.1.1",
             "type": "string"
@@ -9805,6 +9827,12 @@
           },
           "starting_address": {
             "example": "10.1.1.1",
+            "type": "string"
+          },
+          "swu_server": {
+            "type": "string"
+          },
+          "url": {
             "type": "string"
           }
         },
@@ -12342,6 +12370,9 @@
           "notes": {
             "type": "string"
           },
+          "os_requirements": {
+            "type": "string"
+          },
           "ppd": {
             "example": "9th_Floor_HP.ppd",
             "type": "string"
@@ -12351,6 +12382,9 @@
           },
           "ppd_path": {
             "example": "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Resources/Generic.ppd",
+            "type": "string"
+          },
+          "shared": {
             "type": "string"
           },
           "uri": {
