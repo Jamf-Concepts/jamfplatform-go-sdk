@@ -4843,6 +4843,18 @@
         }
       },
       "schemaPatches": {
+        "disk_encryption_configuration": {
+          "institutional_recovery_key": {
+            "type": "object",
+            "properties": {
+              "certificate_type": { "type": "string" },
+              "data": { "type": "string" },
+              "key": { "type": "string" },
+              "password": { "type": "string" },
+              "password_sha256": { "type": "string" }
+            }
+          }
+        },
         "directory_binding": {
           "password_sha256": { "type": "string" },
           "active_directory": {
