@@ -4969,6 +4969,15 @@
               }
             }
           },
+          "scope.limit_to_users.user_groups": {
+            "type": "object",
+            "properties": {
+              "user_group": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
           "scope.all_jss_users": { "type": "boolean" },
           "self_service.notification": { "type": "boolean" },
           "self_service.notification_type": { "type": "string" },

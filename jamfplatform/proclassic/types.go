@@ -16033,7 +16033,8 @@ func (t PolicyScopeJssUsers) MarshalXML(e *xml.Encoder, start xml.StartElement) 
 // PolicyScopeLimitToUsers represents a policy scope limit to users.
 type PolicyScopeLimitToUsers struct {
 	XMLName    xml.Name
-	UserGroups *[]PolicyScopeLimitToUsersUserGroupsItem `xml:"user_groups,omitempty"`
+	ID         *int                               `xml:"id,omitempty"`
+	UserGroups *PolicyScopeLimitToUsersUserGroups `xml:"user_groups,omitempty"`
 }
 
 // MarshalXML forces the PolicyScopeLimitToUsers root element name to the wire value
@@ -16049,9 +16050,23 @@ func (t PolicyScopeLimitToUsers) MarshalXML(e *xml.Encoder, start xml.StartEleme
 	return e.EncodeElement(shadow(t), start)
 }
 
-// PolicyScopeLimitToUsersUserGroupsItem represents a policy scope limit to users user groups item.
-type PolicyScopeLimitToUsersUserGroupsItem struct {
-	UserGroup *string `xml:"user_group,omitempty"`
+// PolicyScopeLimitToUsersUserGroups represents a policy scope limit to users user groups.
+type PolicyScopeLimitToUsersUserGroups struct {
+	XMLName   xml.Name
+	UserGroup *[]string `xml:"user_group,omitempty"`
+}
+
+// MarshalXML forces the PolicyScopeLimitToUsersUserGroups root element name to the wire value
+// declared by the spec (<user_groups>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t PolicyScopeLimitToUsersUserGroups) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "user_groups"}
+	type shadow PolicyScopeLimitToUsersUserGroups
+	return e.EncodeElement(shadow(t), start)
 }
 
 // PolicyScopeLimitations represents a policy scope limitations.

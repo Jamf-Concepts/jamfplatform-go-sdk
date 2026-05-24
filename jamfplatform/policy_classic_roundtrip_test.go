@@ -174,6 +174,40 @@ func TestPolicyPost_OmissionSemantics(t *testing.T) {
 	}
 }
 
+// TestPolicyScopeLimitToUsers_MultipleGroups locks in the wire shape for
+// `<limit_to_users><user_groups>` with N>1 user groups. The earlier spec
+// shape modelled `user_groups` as `array<{user_group}>` which encoding/xml
+// emits as one `<user_groups>` wrapper per slice element (malformed for
+// N>=2; the server discards all but the last on decode). Server-correct
+// shape is a single `<user_groups>` wrapper with repeated `<user_group>`
+// children — mirroring sibling `<limitations><user_groups>`.
+func TestPolicyScopeLimitToUsers_MultipleGroups(t *testing.T) {
+	limit := &proclassic.PolicyScopeLimitToUsers{
+		UserGroups: &proclassic.PolicyScopeLimitToUsersUserGroups{
+			UserGroup: &[]string{"GroupA", "GroupB"},
+		},
+	}
+	buf, err := xml.Marshal(limit)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	want := "<limit_to_users><user_groups><user_group>GroupA</user_group><user_group>GroupB</user_group></user_groups></limit_to_users>"
+	if string(buf) != want {
+		t.Errorf("marshal mismatch.\n  want: %s\n  got:  %s", want, buf)
+	}
+
+	var got proclassic.PolicyScopeLimitToUsers
+	if err := xml.Unmarshal([]byte(want), &got); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if got.UserGroups == nil || got.UserGroups.UserGroup == nil {
+		t.Fatalf("UserGroups.UserGroup nil after decode: %+v", got)
+	}
+	if g := *got.UserGroups.UserGroup; len(g) != 2 || g[0] != "GroupA" || g[1] != "GroupB" {
+		t.Errorf("decode lost children: %v", g)
+	}
+}
+
 // TestPolicyTagMismatchFixes_Decode catches the silent-decode failures the
 // brief flagged: previous spec tags `re-install_button_text` and
 // `allow_user_to_defer` never decoded because the wire elements are
