@@ -4969,10 +4969,23 @@
               }
             }
           },
+          "scope.all_jss_users": { "type": "boolean" },
           "self_service.notification": { "type": "boolean" },
           "self_service.notification_type": { "type": "string" },
           "self_service.notification_subject": { "type": "string" },
           "self_service.notification_message": { "type": "string" },
+          "self_service.self_service_categories.category": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "name": { "type": "string" },
+                "display_in": { "type": "boolean" },
+                "feature_in": { "type": "boolean" }
+              }
+            }
+          },
           "account_maintenance.accounts.account.hint": { "type": "string" },
           "account_maintenance.accounts.account.secure_token_allowed": { "type": "boolean" },
           "account_maintenance.accounts.account.password_sha256": { "type": "string" },
