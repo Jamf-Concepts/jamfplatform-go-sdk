@@ -707,17 +707,25 @@ func (n *NotificationValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 	return nil
 }
 
-// MarshalXML emits up to two <notification> elements: the bool form if
-// Enabled is set, then the method form if Method is set. Omits both
-// when neither is set.
+// MarshalXML emits up to two <notification> elements: the method form
+// first if Method is set, then the bool form if Enabled is set. Omits
+// both when neither is set.
+//
+// Order matters. The Classic server's self_service parser takes the
+// second <notification> as the "primary" value; sending bool first then
+// method silently drops the bool (server returns false on the next GET
+// regardless of what was sent). Wire-probed on a live tenant and
+// confirmed against the order the Jamf Pro admin UI itself writes —
+// method first, bool second — which is the only order that round-trips
+// cleanly for every resource carrying a Notification field.
 func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if n.Enabled != nil {
-		if err := e.EncodeElement(strconv.FormatBool(*n.Enabled), start); err != nil {
+	if n.Method != nil {
+		if err := e.EncodeElement(*n.Method, start); err != nil {
 			return err
 		}
 	}
-	if n.Method != nil {
-		if err := e.EncodeElement(*n.Method, start); err != nil {
+	if n.Enabled != nil {
+		if err := e.EncodeElement(strconv.FormatBool(*n.Enabled), start); err != nil {
 			return err
 		}
 	}
