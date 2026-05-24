@@ -4840,6 +4840,11 @@
         "policy": {
           "self_service.re-install_button_text": "reinstall_button_text",
           "user_interaction.allow_user_to_defer": "allow_users_to_defer"
+        },
+        "os_x_configuration_profile": {
+          "scope.jss_users.users": "user",
+          "scope.exclusions.jss_users.jss_user": "user",
+          "scope.exclusions.jss_user_groups.jss_user_group": "user_group"
         }
       },
       "schemaPatches": {
@@ -5030,6 +5035,36 @@
               "minutes_until_reboot": { "type": "integer" },
               "start_reboot_timer_immediately": { "type": "boolean" },
               "file_vault_2_reboot": { "type": "boolean" }
+            }
+          }
+        },
+        "os_x_configuration_profile": {
+          "self_service.self_service_display_name": { "type": "string" },
+          "self_service.security": {
+            "type": "object",
+            "properties": {
+              "removal_disallowed": { "type": "string" },
+              "password": { "type": "string" }
+            }
+          },
+          "self_service.self_service_categories.category": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "name": { "type": "string" },
+                "display_in": { "type": "boolean" },
+                "feature_in": { "type": "boolean" }
+              }
+            }
+          },
+          "scope.limitations.network_segments.network_segment": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "uid": { "type": "string" },
+              "name": { "type": "string" }
             }
           }
         }
