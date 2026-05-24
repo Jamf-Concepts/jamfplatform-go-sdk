@@ -15453,9 +15453,10 @@ func (t PolicyMaintenance) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 
 // PolicyPackageConfiguration represents a policy package configuration.
 type PolicyPackageConfiguration struct {
-	XMLName  xml.Name
-	ID       *int                                `xml:"id,omitempty"`
-	Packages *PolicyPackageConfigurationPackages `xml:"packages,omitempty"`
+	XMLName           xml.Name
+	ID                *int                                `xml:"id,omitempty"`
+	DistributionPoint *string                             `xml:"distribution_point,omitempty"`
+	Packages          *PolicyPackageConfigurationPackages `xml:"packages,omitempty"`
 }
 
 // MarshalXML forces the PolicyPackageConfiguration root element name to the wire value
@@ -16535,9 +16536,10 @@ func (t PolicyPostMaintenance) MarshalXML(e *xml.Encoder, start xml.StartElement
 
 // PolicyPostPackageConfiguration represents a policy post package configuration.
 type PolicyPostPackageConfiguration struct {
-	XMLName  xml.Name
-	ID       *int                                `xml:"id,omitempty"`
-	Packages *PolicyPackageConfigurationPackages `xml:"packages,omitempty"`
+	XMLName           xml.Name
+	ID                *int                                `xml:"id,omitempty"`
+	DistributionPoint *string                             `xml:"distribution_point,omitempty"`
+	Packages          *PolicyPackageConfigurationPackages `xml:"packages,omitempty"`
 }
 
 // MarshalXML forces the PolicyPostPackageConfiguration root element name to the wire value

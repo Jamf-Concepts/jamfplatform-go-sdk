@@ -4990,6 +4990,7 @@
           "account_maintenance.accounts.account.secure_token_allowed": { "type": "boolean" },
           "account_maintenance.accounts.account.password_sha256": { "type": "string" },
           "account_maintenance.open_firmware_efi_password.of_password_sha256": { "type": "string" },
+          "package_configuration.distribution_point": { "type": "string" },
           "printers": {
             "type": "object",
             "properties": {
