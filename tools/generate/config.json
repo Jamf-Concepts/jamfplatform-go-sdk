@@ -4852,6 +4852,9 @@
         }
       },
       "schemaPatches": {
+        "mobile_device_configuration_profile": {
+          "self_service.security_name.password": { "type": "string" }
+        },
         "disk_encryption_configuration": {
           "institutional_recovery_key": {
             "type": "object",

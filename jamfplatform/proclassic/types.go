@@ -10771,6 +10771,7 @@ func (t MobileDeviceConfigurationProfileSelfService) MarshalXML(e *xml.Encoder, 
 // MobileDeviceConfigurationProfileSelfServiceSecurity represents a mobile device configuration profile self service security.
 type MobileDeviceConfigurationProfileSelfServiceSecurity struct {
 	XMLName           xml.Name
+	Password          *string `xml:"password,omitempty"`
 	RemovalDisallowed *string `xml:"removal_disallowed,omitempty"`
 }
 
