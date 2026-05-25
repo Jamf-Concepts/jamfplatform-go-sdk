@@ -10172,18 +10172,18 @@ func (t MobileDeviceConfigurationProfile) MarshalXML(e *xml.Encoder, start xml.S
 
 // MobileDeviceConfigurationProfileGeneral represents a mobile device configuration profile general.
 type MobileDeviceConfigurationProfileGeneral struct {
-	XMLName                               xml.Name
-	Category                              *CategoryObject `xml:"category,omitempty"`
-	DeploymentMethod                      *string         `xml:"deployment_method,omitempty"`
-	Description                           *string         `xml:"description,omitempty"`
-	ID                                    *int            `xml:"id,omitempty"`
-	Level                                 *string         `xml:"level,omitempty"`
-	Name                                  *string         `xml:"name,omitempty"`
-	Payloads                              *string         `xml:"payloads,omitempty"`
-	RedeployDayssBeforeCertificateExpires *int            `xml:"redeploy_Dayss_before_certificate_expires,omitempty"`
-	RedeployOnUpdate                      *string         `xml:"redeploy_on_update,omitempty"`
-	Site                                  *SiteObject     `xml:"site,omitempty"`
-	UUID                                  *string         `xml:"uuid,omitempty"`
+	XMLName                              xml.Name
+	Category                             *CategoryObject `xml:"category,omitempty"`
+	DeploymentMethod                     *string         `xml:"deployment_method,omitempty"`
+	Description                          *string         `xml:"description,omitempty"`
+	ID                                   *int            `xml:"id,omitempty"`
+	Level                                *string         `xml:"level,omitempty"`
+	Name                                 *string         `xml:"name,omitempty"`
+	Payloads                             *string         `xml:"payloads,omitempty"`
+	RedeployDaysBeforeCertificateExpires *int            `xml:"redeploy_days_before_certificate_expires,omitempty"`
+	RedeployOnUpdate                     *string         `xml:"redeploy_on_update,omitempty"`
+	Site                                 *SiteObject     `xml:"site,omitempty"`
+	UUID                                 *string         `xml:"uuid,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceConfigurationProfileGeneral root element name to the wire value
@@ -10749,7 +10749,7 @@ type MobileDeviceConfigurationProfileSelfService struct {
 	XMLName                xml.Name
 	ID                     *int                                                              `xml:"id,omitempty"`
 	FeatureOnMainPage      *bool                                                             `xml:"feature_on_main_page,omitempty"`
-	SecurityName           *MobileDeviceConfigurationProfileSelfServiceSecurityName          `xml:"security_name,omitempty"`
+	Security               *MobileDeviceConfigurationProfileSelfServiceSecurity              `xml:"security,omitempty"`
 	SelfServiceCategories  *MobileDeviceConfigurationProfileSelfServiceSelfServiceCategories `xml:"self_service_categories,omitempty"`
 	SelfServiceDescription *string                                                           `xml:"self_service_description,omitempty"`
 	SelfServiceIcon        *MobileDeviceConfigurationProfileSelfServiceSelfServiceIcon       `xml:"self_service_icon,omitempty"`
@@ -10768,9 +10768,23 @@ func (t MobileDeviceConfigurationProfileSelfService) MarshalXML(e *xml.Encoder, 
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDeviceConfigurationProfileSelfServiceSecurityName represents a mobile device configuration profile self service security name.
-type MobileDeviceConfigurationProfileSelfServiceSecurityName struct {
+// MobileDeviceConfigurationProfileSelfServiceSecurity represents a mobile device configuration profile self service security.
+type MobileDeviceConfigurationProfileSelfServiceSecurity struct {
+	XMLName           xml.Name
 	RemovalDisallowed *string `xml:"removal_disallowed,omitempty"`
+}
+
+// MarshalXML forces the MobileDeviceConfigurationProfileSelfServiceSecurity root element name to the wire value
+// declared by the spec (<security>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MobileDeviceConfigurationProfileSelfServiceSecurity) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "security"}
+	type shadow MobileDeviceConfigurationProfileSelfServiceSecurity
+	return e.EncodeElement(shadow(t), start)
 }
 
 // MobileDeviceConfigurationProfileSelfServiceSelfServiceCategories represents a mobile device configuration profile self service self service categories.

@@ -4845,6 +4845,10 @@
           "scope.jss_users.users": "user",
           "scope.exclusions.jss_users.jss_user": "user",
           "scope.exclusions.jss_user_groups.jss_user_group": "user_group"
+        },
+        "mobile_device_configuration_profile": {
+          "general.redeploy_Dayss_before_certificate_expires": "redeploy_days_before_certificate_expires",
+          "self_service.security_name": "security"
         }
       },
       "schemaPatches": {
