@@ -2785,8 +2785,8 @@ type EnrollmentSettingsV4 struct {
 
 // EnrollmentSsoConfig represents a enrollment sso config.
 type EnrollmentSsoConfig struct {
-	Hosts          *[]string `json:"hosts,omitempty"`
-	ManagementHint *string   `json:"managementHint,omitempty"`
+	Hosts          *[]string `json:"hosts"`
+	ManagementHint *string   `json:"managementHint"`
 }
 
 // EraseDeviceCommand represents a erase device command.
@@ -4913,9 +4913,9 @@ type OidcPublicFeaturesResponse struct {
 
 // OidcSettings represents a oidc settings.
 type OidcSettings struct {
-	JamfIDAuthenticationEnabled   *bool   `json:"jamfIdAuthenticationEnabled,omitempty"`
+	JamfIDAuthenticationEnabled   *bool   `json:"jamfIdAuthenticationEnabled"`
 	UserMapping                   string  `json:"userMapping"`
-	UsernameAttributeClaimMapping *string `json:"usernameAttributeClaimMapping,omitempty"`
+	UsernameAttributeClaimMapping *string `json:"usernameAttributeClaimMapping"`
 }
 
 // OnboardingConfiguration represents a onboarding configuration.
@@ -5805,20 +5805,20 @@ type SafelistedApp struct {
 
 // SamlSettings represents a saml settings.
 type SamlSettings struct {
-	EntityID                *string `json:"entityId,omitempty"`
-	FederationMetadataFile  *[]byte `json:"federationMetadataFile,omitempty"`
-	GroupAttributeName      *string `json:"groupAttributeName,omitempty"`
-	GroupRdnKey             *string `json:"groupRdnKey,omitempty"`
-	IdpProviderType         *string `json:"idpProviderType,omitempty"`
-	IdpURL                  *string `json:"idpUrl,omitempty"`
-	MetadataFileName        *string `json:"metadataFileName,omitempty"`
-	MetadataSource          *string `json:"metadataSource,omitempty"`
-	OtherProviderTypeName   *string `json:"otherProviderTypeName,omitempty"`
-	SessionTimeout          *int    `json:"sessionTimeout,omitempty"`
-	TokenExpirationDisabled *bool   `json:"tokenExpirationDisabled,omitempty"`
-	UserAttributeEnabled    *bool   `json:"userAttributeEnabled,omitempty"`
-	UserAttributeName       *string `json:"userAttributeName,omitempty"`
-	UserMapping             *string `json:"userMapping,omitempty"`
+	EntityID                *string `json:"entityId"`
+	FederationMetadataFile  *[]byte `json:"federationMetadataFile"`
+	GroupAttributeName      *string `json:"groupAttributeName"`
+	GroupRdnKey             *string `json:"groupRdnKey"`
+	IdpProviderType         *string `json:"idpProviderType"`
+	IdpURL                  *string `json:"idpUrl"`
+	MetadataFileName        *string `json:"metadataFileName"`
+	MetadataSource          *string `json:"metadataSource"`
+	OtherProviderTypeName   *string `json:"otherProviderTypeName"`
+	SessionTimeout          *int    `json:"sessionTimeout"`
+	TokenExpirationDisabled *bool   `json:"tokenExpirationDisabled"`
+	UserAttributeEnabled    *bool   `json:"userAttributeEnabled"`
+	UserAttributeName       *string `json:"userAttributeName"`
+	UserMapping             *string `json:"userMapping"`
 }
 
 // SchedulerJob represents a scheduler job.

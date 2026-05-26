@@ -68,6 +68,27 @@ type SpecDef struct {
 	// timestamps). Outer key: post schema name (e.g. "policy_post"). Value:
 	// list of property names (top-level on the schema) to skip.
 	PostSymmetryExcludes map[string][]string `json:"postSymmetryExcludes,omitempty"`
+
+	// EmitNullForOptional lists schema names whose optional pointer fields
+	// must marshal as explicit JSON null when nil, rather than being omitted.
+	// Required for endpoints whose server distinguishes "field omitted" (keep
+	// existing tenant value) from "field present with null" (clear / reset).
+	//
+	// Example: Pro v3 PUT /sso. A SAML metadata_source transition from "URL"
+	// to "FILE" succeeds only when the request body sends "idpUrl": null and
+	// "metadataFileName": null alongside the new "metadataSource": "FILE". If
+	// those keys are omitted (the default behaviour produced by ",omitempty"
+	// on a nil *string), the server merges cached URL-mode values against the
+	// new FILE-mode request and rejects with 400 "SAML settings validation
+	// failed". Listing SamlSettings / OidcSettings / EnrollmentSsoConfig here
+	// drops ",omitempty" from their pointer field JSON tags so consumers can
+	// emit explicit nulls.
+	//
+	// Schema names may be supplied in either spec form (snake_case) or Go
+	// form (PascalCase); the generator normalises via toSnakeCase before
+	// matching. Affects JSON marshalling only — has no impact on unmarshal
+	// behaviour or XML tags.
+	EmitNullForOptional []string `json:"emitNullForOptional,omitempty"`
 }
 
 // baseName derives a Go file base name from the spec file path.

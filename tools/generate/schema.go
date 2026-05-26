@@ -829,6 +829,27 @@ var currentFieldOverrides map[string]string
 // Set to true for typesOnly specs where the writeOnly annotation is misleading.
 var suppressWriteOnly bool
 
+// currentEmitNullForOptional is the per-spec set of schemas whose optional
+// pointer fields must marshal as JSON null (no ",omitempty"). Threaded the
+// same way as currentFieldOverrides — set/cleared around extractTypes calls
+// in emit.go. Keys are snake_case (the form schemaToGoType derives via
+// goNameToSpecName), populated by buildEmitNullForOptionalSet.
+var currentEmitNullForOptional map[string]bool
+
+// buildEmitNullForOptionalSet normalises a SpecDef.EmitNullForOptional list
+// into the snake_case lookup set the schema walker expects. Returns nil for
+// an empty input so callers can keep the "set then nil-out" pattern.
+func buildEmitNullForOptionalSet(names []string) map[string]bool {
+	if len(names) == 0 {
+		return nil
+	}
+	out := make(map[string]bool, len(names))
+	for _, n := range names {
+		out[toSnakeCase(n)] = true
+	}
+	return out
+}
+
 func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string) []GoType {
 	names := sortedKeys(doc.Components.Schemas)
 	var types []GoType
@@ -1372,6 +1393,17 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 		var fieldComment string
 		if !suppressWriteOnly && prop != nil && (prop.WriteOnly || prop.Format == "password") {
 			fieldComment = "Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update."
+		}
+
+		// Strip ",omitempty" when the enclosing schema is listed in the
+		// per-spec EmitNullForOptional set. Lets callers emit explicit JSON
+		// null for unpopulated optional pointer fields — required by Pro v3
+		// PUT /sso, whose validator rejects when expected fields are absent
+		// from the request body. Pointer wrapping is unchanged; only the
+		// marshal behaviour shifts from "omit when nil" to "emit null when
+		// nil". See SpecDef.EmitNullForOptional for full rationale.
+		if currentEmitNullForOptional[specName] {
+			jsonTag = strings.TrimSuffix(jsonTag, ",omitempty")
 		}
 
 		gt.Fields = append(gt.Fields, GoField{

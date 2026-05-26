@@ -379,6 +379,11 @@
         "notification_v1.params": "map[string]any",
         "sso_keystore_details.serialNumber": "json.Number"
       },
+      "emitNullForOptional": [
+        "SamlSettings",
+        "OidcSettings",
+        "EnrollmentSsoConfig"
+      ],
       "excludePaths": [
         "POST /v1/tenant/{tenantId}/auth/token",
         "POST /v1/tenant/{tenantId}/auth/keep-alive",
