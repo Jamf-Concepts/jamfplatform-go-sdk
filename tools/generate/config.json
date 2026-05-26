@@ -376,7 +376,8 @@
         "managed_software_update_plan_toggle_status.elapsedTime": "*float64",
         "linked_connect_profile.profileId": "*int",
         "user_account.lastPasswordChange": "*string",
-        "notification_v1.params": "map[string]any"
+        "notification_v1.params": "map[string]any",
+        "sso_keystore_details.serialNumber": "json.Number"
       },
       "excludePaths": [
         "POST /v1/tenant/{tenantId}/auth/token",

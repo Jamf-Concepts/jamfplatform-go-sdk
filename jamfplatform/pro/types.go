@@ -6262,11 +6262,11 @@ type SsoKeystoreCertParseResponse struct {
 
 // SsoKeystoreDetails represents a sso keystore details.
 type SsoKeystoreDetails struct {
-	Expiration   string   `json:"expiration"`
-	Issuer       string   `json:"issuer"`
-	Keys         []string `json:"keys"`
-	SerialNumber int      `json:"serialNumber"`
-	Subject      string   `json:"subject"`
+	Expiration   string       `json:"expiration"`
+	Issuer       string       `json:"issuer"`
+	Keys         []string     `json:"keys"`
+	SerialNumber *json.Number `json:"serialNumber,omitempty"`
+	Subject      string       `json:"subject"`
 }
 
 // SsoKeystoreParse represents a sso keystore parse.
