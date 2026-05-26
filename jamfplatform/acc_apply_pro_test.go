@@ -1103,7 +1103,7 @@ func TestAcceptance_ApplyReturnToServiceConfigurationV1(t *testing.T) {
 
 	// RTS wifiProfileId requires a mobile device configuration profile (not macOS).
 	profileName := "sdk-acc-mobile-wifi-" + suffix
-	payloads := wifiMobileProfilePayload(suffix)
+	payloads := proclassic.PayloadsXMLText(wifiMobileProfilePayload(suffix))
 	level := "Device Level"
 	profile, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{

@@ -14,6 +14,15 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
 )
 
+// ptrProclassicPayloads wraps a raw .mobileconfig plist string in the
+// proclassic.PayloadsXMLText alias used by *ConfigurationProfileGeneral
+// since the Classic JSSResource double-decode workaround landed. Tests
+// continue to construct payloads as plain Go strings.
+func ptrProclassicPayloads(s string) *proclassic.PayloadsXMLText {
+	v := proclassic.PayloadsXMLText(s)
+	return &v
+}
+
 // ---------------------------------------------------------------------------
 // Apply acceptance tests — Classic (proclassic) resources + InventoryPreload
 //
@@ -1032,7 +1041,7 @@ func TestAcceptance_ApplyMobileDeviceConfigurationProfile(t *testing.T) {
 	id, created, err := pc.ApplyMobileDeviceConfigurationProfile(ctx, &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
 			Name:     ptrStr(name),
-			Payloads: ptrStr(minimalProfilePayload),
+			Payloads: ptrProclassicPayloads(minimalProfilePayload),
 		},
 	})
 	if err != nil {
@@ -1049,7 +1058,7 @@ func TestAcceptance_ApplyMobileDeviceConfigurationProfile(t *testing.T) {
 	id2, created2, err := pc.ApplyMobileDeviceConfigurationProfile(ctx, &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
 			Name:        ptrStr(name),
-			Payloads:    ptrStr(minimalProfilePayload),
+			Payloads:    ptrProclassicPayloads(minimalProfilePayload),
 			Description: ptrStr("updated"),
 		},
 	})
@@ -1306,7 +1315,7 @@ func TestAcceptance_ApplyOSXConfigurationProfile(t *testing.T) {
 	id, created, err := pc.ApplyOSXConfigurationProfile(ctx, &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
 			Name:     ptrStr(name),
-			Payloads: ptrStr(minimalProfilePayload),
+			Payloads: ptrProclassicPayloads(minimalProfilePayload),
 		},
 	})
 	if err != nil {
@@ -1323,7 +1332,7 @@ func TestAcceptance_ApplyOSXConfigurationProfile(t *testing.T) {
 	id2, created2, err := pc.ApplyOSXConfigurationProfile(ctx, &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
 			Name:        ptrStr(name),
-			Payloads:    ptrStr(minimalProfilePayload),
+			Payloads:    ptrProclassicPayloads(minimalProfilePayload),
 			Description: ptrStr("updated"),
 		},
 	})

@@ -102,7 +102,7 @@ func TestAcceptance_Pro_JamfConnect_LifecycleV1(t *testing.T) {
 	desc := "sdk-acc test Jamf Connect fixture — safe to delete"
 	level := "System"
 	distribution := "Install Automatically"
-	payload := fmt.Sprintf(jamfConnectPayloadXML, suffix, suffix)
+	payload := proclassic.PayloadsXMLText(fmt.Sprintf(jamfConnectPayloadXML, suffix, suffix))
 
 	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{

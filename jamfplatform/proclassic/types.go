@@ -10173,17 +10173,17 @@ func (t MobileDeviceConfigurationProfile) MarshalXML(e *xml.Encoder, start xml.S
 // MobileDeviceConfigurationProfileGeneral represents a mobile device configuration profile general.
 type MobileDeviceConfigurationProfileGeneral struct {
 	XMLName                              xml.Name
-	Category                             *CategoryObject `xml:"category,omitempty"`
-	DeploymentMethod                     *string         `xml:"deployment_method,omitempty"`
-	Description                          *string         `xml:"description,omitempty"`
-	ID                                   *int            `xml:"id,omitempty"`
-	Level                                *string         `xml:"level,omitempty"`
-	Name                                 *string         `xml:"name,omitempty"`
-	Payloads                             *string         `xml:"payloads,omitempty"`
-	RedeployDaysBeforeCertificateExpires *int            `xml:"redeploy_days_before_certificate_expires,omitempty"`
-	RedeployOnUpdate                     *string         `xml:"redeploy_on_update,omitempty"`
-	Site                                 *SiteObject     `xml:"site,omitempty"`
-	UUID                                 *string         `xml:"uuid,omitempty"`
+	Category                             *CategoryObject  `xml:"category,omitempty"`
+	DeploymentMethod                     *string          `xml:"deployment_method,omitempty"`
+	Description                          *string          `xml:"description,omitempty"`
+	ID                                   *int             `xml:"id,omitempty"`
+	Level                                *string          `xml:"level,omitempty"`
+	Name                                 *string          `xml:"name,omitempty"`
+	Payloads                             *PayloadsXMLText `xml:"payloads,omitempty"`
+	RedeployDaysBeforeCertificateExpires *int             `xml:"redeploy_days_before_certificate_expires,omitempty"`
+	RedeployOnUpdate                     *string          `xml:"redeploy_on_update,omitempty"`
+	Site                                 *SiteObject      `xml:"site,omitempty"`
+	UUID                                 *string          `xml:"uuid,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceConfigurationProfileGeneral root element name to the wire value
@@ -12735,17 +12735,17 @@ func (t OsXConfigurationProfile) MarshalXML(e *xml.Encoder, start xml.StartEleme
 // OsXConfigurationProfileGeneral represents a os x configuration profile general.
 type OsXConfigurationProfileGeneral struct {
 	XMLName            xml.Name
-	Category           *CategoryObject `xml:"category,omitempty"`
-	Description        *string         `xml:"description,omitempty"`
-	DistributionMethod *string         `xml:"distribution_method,omitempty"`
-	ID                 *int            `xml:"id,omitempty"`
-	Level              *string         `xml:"level,omitempty"`
-	Name               *string         `xml:"name,omitempty"`
-	Payloads           *string         `xml:"payloads,omitempty"`
-	RedeployOnUpdate   *string         `xml:"redeploy_on_update,omitempty"`
-	Site               *SiteObject     `xml:"site,omitempty"`
-	UserRemovable      *bool           `xml:"user_removable,omitempty"`
-	UUID               *string         `xml:"uuid,omitempty"`
+	Category           *CategoryObject  `xml:"category,omitempty"`
+	Description        *string          `xml:"description,omitempty"`
+	DistributionMethod *string          `xml:"distribution_method,omitempty"`
+	ID                 *int             `xml:"id,omitempty"`
+	Level              *string          `xml:"level,omitempty"`
+	Name               *string          `xml:"name,omitempty"`
+	Payloads           *PayloadsXMLText `xml:"payloads,omitempty"`
+	RedeployOnUpdate   *string          `xml:"redeploy_on_update,omitempty"`
+	Site               *SiteObject      `xml:"site,omitempty"`
+	UserRemovable      *bool            `xml:"user_removable,omitempty"`
+	UUID               *string          `xml:"uuid,omitempty"`
 }
 
 // MarshalXML forces the OsXConfigurationProfileGeneral root element name to the wire value

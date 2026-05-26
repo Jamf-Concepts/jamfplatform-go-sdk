@@ -4814,7 +4814,9 @@
         "*.invitation": "*BigInt",
         "*.expiration_date_epoch": "*BigInt",
         "*.date_sent_epoch": "*BigInt",
-        "*.notification": "*NotificationValue"
+        "*.notification": "*NotificationValue",
+        "os_x_configuration_profile_general.payloads": "PayloadsXMLText",
+        "mobile_device_configuration_profile_general.payloads": "PayloadsXMLText"
       },
       "schemaAdditions": {
         "account": {

@@ -33,7 +33,7 @@ func createWifiProfileFixture(t *testing.T) string {
 	suffix := runSuffix()
 	name := "sdk-acc-wifi-" + suffix
 	desc := "sdk-acc test — safe to delete"
-	payload := fmt.Sprintf(wifiProfilePayloadXML, suffix, suffix)
+	payload := proclassic.PayloadsXMLText(fmt.Sprintf(wifiProfilePayloadXML, suffix, suffix))
 
 	req := &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{

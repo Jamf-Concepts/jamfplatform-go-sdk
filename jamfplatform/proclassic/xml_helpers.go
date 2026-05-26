@@ -14,6 +14,7 @@
 package proclassic
 
 import (
+	"bytes"
 	"encoding/xml"
 	"math/big"
 	"strconv"
@@ -146,5 +147,54 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 			return err
 		}
 	}
+	return nil
+}
+
+// PayloadsXMLText is a wrapper for configuration-profile <payloads> bodies
+// (raw .mobileconfig plist XML embedded as element text) that works
+// around a Jamf Pro Classic JSSResource ingress bug: the server runs an
+// extra XML-entity-decode pass on the <payloads> text before handing it
+// to its plist parser. A correctly-encoded `&amp;` therefore reaches
+// the plist parser as a bare `&`, which is invalid XML inside the plist,
+// and the request 409s with "Unable to update the database".
+//
+// Compensation: MarshalXML pre-escapes the input once before letting
+// encoding/xml's normal text-escape run, so the wire form carries one
+// extra level of entity encoding. The server's spurious decode then
+// leaves the plist parser with exactly one level of entity encoding —
+// the same shape the Jamf Pro admin UI produces and stores.
+// UnmarshalXML is symmetric: the server returns single-encoded text,
+// encoding/xml's default decode unescapes once, and the caller sees the
+// plist source verbatim.
+//
+// Round-trip semantics preserved: callers pass a Go string (the raw
+// .mobileconfig contents); the SDK handles the extra escape level on
+// the wire. TODO: remove this wrapper when the Jamf Pro Classic API fix
+// for the double-decode lands (tracking JSS-XXXXX).
+type PayloadsXMLText string
+
+// MarshalXML pre-escapes the payload text once via xml.EscapeText. The
+// outer encoding/xml pass then escapes a second time on the wire,
+// producing the double-encoded form the buggy JSSResource ingress
+// requires to round-trip the caller's literal payload bytes through to
+// the stored profile.
+func (p PayloadsXMLText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	var buf bytes.Buffer
+	if err := xml.EscapeText(&buf, []byte(p)); err != nil {
+		return err
+	}
+	return e.EncodeElement(buf.String(), start)
+}
+
+// UnmarshalXML decodes the element's text using encoding/xml's default
+// pass (one level of entity unescape) and stores the result verbatim.
+// Symmetric to MarshalXML: server returns single-encoded text, decoder
+// unescapes once, caller sees the original plist source.
+func (p *PayloadsXMLText) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+	*p = PayloadsXMLText(s)
 	return nil
 }
