@@ -20,31 +20,49 @@ type payloadsTestParent struct {
 	Payloads *PayloadsXMLText `xml:"payloads,omitempty"`
 }
 
-func TestPayloadsXMLText_MarshalDoubleEncodesEntities(t *testing.T) {
-	// Caller submits a string containing pre-encoded XML entities
-	// (representative of a .mobileconfig plist body). The wrapper must
-	// emit one extra level of encoding on the wire so the Classic
-	// JSSResource double-decode lands at one level when the plist
-	// parser sees it.
-	v := PayloadsXMLText("ab&amp;cd")
+func TestPayloadsXMLText_MarshalSingleEncodesEntities(t *testing.T) {
+	// Caller submits raw plist XML containing chardata-special characters
+	// (`<`, `>`, `&`). The wrapper must emit those at a single XML entity
+	// layer — encoding/xml's default chardata escape — matching what
+	// jamf-upload writes (production-tested across the AutoPkg community)
+	// and what the Jamf Pro admin UI itself writes.
+	v := PayloadsXMLText(`<string>a & b</string>`)
 	parent := payloadsTestParent{Payloads: &v}
 	out, err := xml.Marshal(parent)
 	if err != nil {
 		t.Fatalf("marshal: %v", err)
 	}
 	got := string(out)
-	if !strings.Contains(got, "&amp;amp;") {
-		t.Fatalf("expected double-encoded entity %q in wire output, got: %s", "&amp;amp;", got)
+	if strings.Contains(got, "&amp;amp;") {
+		t.Fatalf("wire form is double-escaped (corrupts content): %s", got)
+	}
+	if !strings.Contains(got, "&amp;") || !strings.Contains(got, "&lt;string&gt;") {
+		t.Fatalf("wire form not single-escaped as expected: %s", got)
+	}
+}
+
+func TestPayloadsXMLText_MarshalSingleEscapesQuotes(t *testing.T) {
+	// Go's encoding/xml conservatively escapes `"` in chardata to `&#34;`
+	// (legal but not strictly required per XML spec). The chosen form
+	// must be a single entity layer — never `&amp;#34;` (double-escape, the
+	// regression form that breaks device-side parsing of CodeRequirement
+	// / TCC / PPPC string content).
+	v := PayloadsXMLText(`identifier "com.foo" and anchor apple generic`)
+	parent := payloadsTestParent{Payloads: &v}
+	out, err := xml.Marshal(parent)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	got := string(out)
+	if strings.Contains(got, "&amp;#34;") || strings.Contains(got, "&amp;quot;") {
+		t.Fatalf("wire form double-escapes literal quote: %s", got)
 	}
 }
 
 func TestPayloadsXMLText_UnmarshalSingleDecodes(t *testing.T) {
-	// Mirrors the server's GET response shape. The Classic server stores
-	// payloads at a single level of entity encoding and emits them on the
-	// wire with the default XML encode pass, so a stored `&amp;` arrives
-	// as `&amp;amp;`. Default decode unescapes once to `&amp;` and the
-	// wrapper stores it verbatim — caller sees the original plist source.
-	wire := []byte("<parent><payloads>ab&amp;amp;cd&amp;lt;br/&amp;gt;ef</payloads></parent>")
+	// Server returns chardata at one level of XML entity encoding. The
+	// decoder unescapes once; the wrapper stores the result verbatim.
+	wire := []byte("<parent><payloads>ab&amp;cd&lt;br/&gt;ef</payloads></parent>")
 	var got payloadsTestParent
 	if err := xml.Unmarshal(wire, &got); err != nil {
 		t.Fatalf("unmarshal: %v", err)
@@ -52,7 +70,7 @@ func TestPayloadsXMLText_UnmarshalSingleDecodes(t *testing.T) {
 	if got.Payloads == nil {
 		t.Fatalf("decoded payloads is nil")
 	}
-	want := "ab&amp;cd&lt;br/&gt;ef"
+	want := "ab&cd<br/>ef"
 	if string(*got.Payloads) != want {
 		t.Fatalf("decode mismatch:\n  want: %s\n  got:  %s", want, string(*got.Payloads))
 	}
@@ -60,69 +78,6 @@ func TestPayloadsXMLText_UnmarshalSingleDecodes(t *testing.T) {
 
 func TestPayloadsXMLText_NilOmitsField(t *testing.T) {
 	parent := payloadsTestParent{}
-	out, err := xml.Marshal(parent)
-	if err != nil {
-		t.Fatalf("marshal: %v", err)
-	}
-	if strings.Contains(string(out), "<payloads") {
-		t.Fatalf("expected <payloads> omitted when field is nil, got: %s", out)
-	}
-}
-
-// payloadsSingleEscapeTestParent mirrors payloadsTestParent for the PUT-side
-// wrapper. Exercises PayloadsXMLTextSingleEscape inside a struct field so the
-// test covers both the wrapper's MarshalXML/UnmarshalXML and the surrounding
-// encoding/xml machinery.
-type payloadsSingleEscapeTestParent struct {
-	XMLName  xml.Name                     `xml:"parent"`
-	Payloads *PayloadsXMLTextSingleEscape `xml:"payloads,omitempty"`
-}
-
-func TestPayloadsXMLTextSingleEscape_MarshalSingleEncodesEntities(t *testing.T) {
-	// The PUT-side wrapper must emit chardata at a single XML entity layer.
-	// Caller writes a literal "; wire form must contain `&#34;`, never `&amp;#34;`
-	// (double-escape, the broken PUT shape that persists 8 bytes on disk
-	// and breaks device-side parsing) and never a raw `&` (malformed
-	// chardata).
-	v := PayloadsXMLTextSingleEscape(`<string>identifier "com.foo"</string>`)
-	parent := payloadsSingleEscapeTestParent{Payloads: &v}
-	out, err := xml.Marshal(parent)
-	if err != nil {
-		t.Fatalf("marshal: %v", err)
-	}
-	got := string(out)
-	if strings.Contains(got, "&amp;#34;") {
-		t.Fatalf("wire form is double-escaped (broken PUT shape): %s", got)
-	}
-	if !strings.Contains(got, "&#34;") {
-		t.Fatalf("wire form missing single-escape &#34;: %s", got)
-	}
-	if !strings.Contains(got, "&lt;string&gt;") {
-		t.Fatalf("wire form missing single-escape &lt;string&gt;: %s", got)
-	}
-}
-
-func TestPayloadsXMLTextSingleEscape_UnmarshalSingleDecodes(t *testing.T) {
-	// Symmetric to PayloadsXMLText.UnmarshalXML — both wrappers see the
-	// same server GET response shape; only Marshal differs. The server
-	// returns single-encoded text; encoding/xml's default decode unescapes
-	// once; the wrapper stores the result verbatim.
-	wire := []byte("<parent><payloads>ab&amp;amp;cd&amp;lt;br/&amp;gt;ef</payloads></parent>")
-	var got payloadsSingleEscapeTestParent
-	if err := xml.Unmarshal(wire, &got); err != nil {
-		t.Fatalf("unmarshal: %v", err)
-	}
-	if got.Payloads == nil {
-		t.Fatalf("decoded payloads is nil")
-	}
-	want := "ab&amp;cd&lt;br/&gt;ef"
-	if string(*got.Payloads) != want {
-		t.Fatalf("decode mismatch:\n  want: %s\n  got:  %s", want, string(*got.Payloads))
-	}
-}
-
-func TestPayloadsXMLTextSingleEscape_NilOmitsField(t *testing.T) {
-	parent := payloadsSingleEscapeTestParent{}
 	out, err := xml.Marshal(parent)
 	if err != nil {
 		t.Fatalf("marshal: %v", err)

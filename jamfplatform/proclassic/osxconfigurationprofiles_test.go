@@ -68,7 +68,7 @@ func TestUpdateOSXConfigurationProfileByID(t *testing.T) {
 		w.WriteHeader(http.StatusCreated)
 	})
 
-	err := c.UpdateOSXConfigurationProfileByID(context.Background(), "test-id", &OsXConfigurationProfileUpdate{})
+	err := c.UpdateOSXConfigurationProfileByID(context.Background(), "test-id", &OsXConfigurationProfile{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +128,7 @@ func TestUpdateOSXConfigurationProfileByName(t *testing.T) {
 		w.WriteHeader(http.StatusCreated)
 	})
 
-	err := c.UpdateOSXConfigurationProfileByName(context.Background(), "test-id", &OsXConfigurationProfileUpdate{})
+	err := c.UpdateOSXConfigurationProfileByName(context.Background(), "test-id", &OsXConfigurationProfile{})
 	if err != nil {
 		t.Fatal(err)
 	}

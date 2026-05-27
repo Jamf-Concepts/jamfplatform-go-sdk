@@ -5871,7 +5871,6 @@
           "op": "PUT /tenant/{tenantId}/osxconfigurationprofiles/id/{id}",
           "name": "UpdateOSXConfigurationProfileByID",
           "requestType": "os_x_configuration_profile",
-          "requestTypeGo": "OsXConfigurationProfileUpdate",
           "pathNames": {
             "id": "id"
           },
@@ -5906,7 +5905,6 @@
           "op": "PUT /tenant/{tenantId}/mobiledeviceconfigurationprofiles/id/{id}",
           "name": "UpdateMobileDeviceConfigurationProfileByID",
           "requestType": "mobile_device_configuration_profile",
-          "requestTypeGo": "MobileDeviceConfigurationProfileUpdate",
           "pathNames": {
             "id": "id"
           },
@@ -8031,9 +8029,7 @@
               "createOp": "CreateOSXConfigurationProfileByID",
               "updateOp": "UpdateOSXConfigurationProfileByID",
               "deleteOp": "DeleteOSXConfigurationProfileByID",
-              "nameGoField": "General.Name",
-              "updateType": "OsXConfigurationProfileUpdate",
-              "updateViaToUpdate": true
+              "nameGoField": "General.Name"
             }
           }
         },
@@ -8041,7 +8037,6 @@
           "op": "PUT /tenant/{tenantId}/osxconfigurationprofiles/name/{name}",
           "name": "UpdateOSXConfigurationProfileByName",
           "requestType": "os_x_configuration_profile",
-          "requestTypeGo": "OsXConfigurationProfileUpdate",
           "expectedStatus": 201
         },
         {
@@ -8060,9 +8055,7 @@
               "createOp": "CreateMobileDeviceConfigurationProfileByID",
               "updateOp": "UpdateMobileDeviceConfigurationProfileByID",
               "deleteOp": "DeleteMobileDeviceConfigurationProfileByID",
-              "nameGoField": "General.Name",
-              "updateType": "MobileDeviceConfigurationProfileUpdate",
-              "updateViaToUpdate": true
+              "nameGoField": "General.Name"
             }
           }
         },
@@ -8070,7 +8063,6 @@
           "op": "PUT /tenant/{tenantId}/mobiledeviceconfigurationprofiles/name/{name}",
           "name": "UpdateMobileDeviceConfigurationProfileByName",
           "requestType": "mobile_device_configuration_profile",
-          "requestTypeGo": "MobileDeviceConfigurationProfileUpdate",
           "expectedStatus": 201
         },
         {

@@ -889,18 +889,7 @@ func (c *Client) {{ .Name }}(ctx context.Context, request *{{ .Apply.RequestType
 		}
 		return "", false, fmt.Errorf("{{ .Name }}: resolve: %w", err)
 	}
-{{- if .Apply.UpdateViaToUpdate }}
-	// Convert create request to update type via the type's hand-emitted
-	// ToUpdate helper. Used when create and update need distinct Go types
-	// for MarshalXML reasons (proclassic configuration profiles swap the
-	// <payloads> field-type override between POST and PUT).
-	updateReq := request.ToUpdate()
-{{- if .Apply.UpdateReturnsVal }}
-	_, err = c.{{ .Apply.UpdateMethod }}(ctx, id, updateReq)
-{{- else }}
-	err = c.{{ .Apply.UpdateMethod }}(ctx, id, updateReq)
-{{- end }}
-{{- else if .Apply.HasUpdateType }}
+{{- if .Apply.HasUpdateType }}
 {{- if .Apply.VersionLock }}
 	// Fetch current resource to extract versionLock values for optimistic locking.
 	current, getErr := c.{{ .Apply.GetMethod }}(ctx, id)

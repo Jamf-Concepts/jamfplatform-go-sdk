@@ -400,20 +400,6 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				ga.HasUpdateType = true
 			}
 
-			// UpdateViaToUpdate: typed conversion via request.ToUpdate()
-			// instead of HasUpdateType's JSON round-trip. Required for
-			// proclassic configuration profiles (POST→PUT type swap is a
-			// MarshalXML behaviour change the JSON path can't preserve).
-			if ac.UpdateViaToUpdate {
-				if ac.UpdateType == "" {
-					return nil, fmt.Errorf("apply on %s: updateViaToUpdate requires updateType (target Go type for ToUpdate result)", r.ResourceType)
-				}
-				if ga.HasUpdateType {
-					ga.HasUpdateType = false
-				}
-				ga.UpdateViaToUpdate = true
-			}
-
 			// VersionLock: optimistic locking for prestages. On create,
 			// zero all VersionLock fields recursively. On update, GET the
 			// current resource to extract VersionLock values, then inject
@@ -758,15 +744,6 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 	// (may be snake_case); the generator normalises to Go PascalCase.
 	if opDef.RequestType != "" {
 		m.RequestType = goTypeName(opDef.RequestType)
-	}
-	// requestTypeGo: hard override of the Go identifier independent of the
-	// wire schema name. Used when create/update share a wire schema but the
-	// SDK exposes parallel Go structs to swap field-type overrides per HTTP
-	// method (e.g. proclassic configuration profile PUTs route through
-	// *OsXConfigurationProfileUpdate to swap PayloadsXMLText for the
-	// single-escape variant).
-	if opDef.RequestTypeGo != "" {
-		m.RequestType = opDef.RequestTypeGo
 	}
 	if opDef.ResponseType != "" {
 		m.ResponseType = goTypeName(opDef.ResponseType)

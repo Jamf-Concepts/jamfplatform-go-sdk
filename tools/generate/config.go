@@ -114,7 +114,6 @@ type OperationDef struct {
 	Params         []string          `json:"params,omitempty"`    // "name", "name:type", "spec:type:goName"
 	UnwrapResults  string            `json:"unwrapResults,omitempty"`
 	RequestType    string            `json:"requestType,omitempty"`    // explicit request schema name (used when spec body is untyped, e.g. Classic)
-	RequestTypeGo  string            `json:"requestTypeGo,omitempty"`  // explicit Go identifier for the request type, overrides the one derived from RequestType / spec body. Used when the wire type and the Go type intentionally diverge — e.g. proclassic configuration profile PUT endpoints take *OsXConfigurationProfileUpdate (single-escape payloads) while POST takes *OsXConfigurationProfile (double-escape payloads). The wire root element name comes from the type's MarshalXML method, so both types must force the same <root>.
 	ResponseType   string            `json:"responseType,omitempty"`   // explicit response schema name (same)
 	ExpectedStatus int               `json:"expectedStatus,omitempty"` // explicit success status code (default 200)
 	Resolver       *ResolverConfig   `json:"resolver,omitempty"`       // attach name->ID resolver emission to this operation (typically a List op)
@@ -152,16 +151,6 @@ type ApplyConfig struct {
 	UpdateType  string `json:"updateType,omitempty"`  // Go type for the update request when it differs from create (triggers JSON round-trip conversion)
 	GetOp       string `json:"getOp,omitempty"`       // GET operation name for fetching current resource (required when versionLock is true)
 	VersionLock bool   `json:"versionLock,omitempty"` // when true, zeros VersionLock on create and fetches+injects current VersionLock on update
-
-	// UpdateViaToUpdate triggers a typed conversion via request.ToUpdate()
-	// instead of HasUpdateType's JSON round-trip. The ToUpdate method must
-	// exist on the create-side request type (the generator's
-	// emitPkgConfigProfileUpdateVariants emits the hand-written conversion
-	// for proclassic configuration profiles). Required when create and
-	// update need distinct Go types because of MarshalXML behaviour the
-	// JSON round-trip can't preserve. Mutually exclusive with the
-	// JSON-based UpdateType path.
-	UpdateViaToUpdate bool `json:"updateViaToUpdate,omitempty"`
 
 	// Token-upload mode: for resources created via token upload (e.g. DEP).
 	// The Apply method takes (ctx, request, token) where token is optional on update.

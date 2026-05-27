@@ -49,13 +49,16 @@ import (
 //   - includeAmpersand=false → only the prompt's PPPC `"` marker is
 //     embedded. Isolates the original PUT-double-escape-on-quote bug
 //     from the orthogonal `&`-content corruption.
-//   - includeAmpersand=true  → adds `&amp;` inside the Identifier /
-//     CodeRequirement strings. Exposes the broader entity-doubling
-//     issue affecting POST today.
+//   - includeAmpersand=true  → adds `&amp;` inside the inner-payload
+//     PayloadDescription string. PayloadDescription is a free-text
+//     description field the server preserves verbatim; using it for the
+//     `&` marker isolates the entity round-trip from server-side
+//     bundle-ID / CodeRequirement syntax validation, which rejects `&`
+//     even when the wire form is well-formed.
 func osxProfilePlist(displayName, marker string, includeAmpersand bool) string {
-	identifier := "com.example.sdk"
+	description := "Test description"
 	if includeAmpersand {
-		identifier = "com.example&amp;sdk"
+		description = "Foo &amp; Bar &lt;br/&gt; baz"
 	}
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -72,6 +75,8 @@ func osxProfilePlist(displayName, marker string, includeAmpersand bool) string {
 			<string>11111111-2222-3333-4444-555555555555</string>
 			<key>PayloadDisplayName</key>
 			<string>` + marker + `</string>
+			<key>PayloadDescription</key>
+			<string>` + description + `</string>
 			<key>PayloadVersion</key>
 			<integer>1</integer>
 			<key>Services</key>
@@ -80,11 +85,11 @@ func osxProfilePlist(displayName, marker string, includeAmpersand bool) string {
 				<array>
 					<dict>
 						<key>Identifier</key>
-						<string>` + identifier + `</string>
+						<string>com.example.sdk</string>
 						<key>IdentifierType</key>
 						<string>bundleID</string>
 						<key>CodeRequirement</key>
-						<string>identifier "` + identifier + `" and anchor apple generic</string>
+						<string>identifier "com.example.sdk" and anchor apple generic</string>
 						<key>Authorization</key>
 						<string>Allow</string>
 					</dict>
@@ -245,12 +250,12 @@ func TestAcceptance_Classic_OSXProfile_QuoteRoundtrip(t *testing.T) {
 	t.Logf("after Create: payload chardata:\n%s", got)
 
 	updatePayload := osxProfilePlist(name, "update-marker-quote-\"-only", false)
-	updateReq := (&proclassic.OsXConfigurationProfile{
+	updateReq := &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
 			Name:     classicStrPtr(name),
 			Payloads: payloadsXMLPtr(updatePayload),
 		},
-	}).ToUpdate()
+	}
 	if err := pc.UpdateOSXConfigurationProfileByID(ctx, intToStr(id), updateReq); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateOSXConfigurationProfileByID: %v", err)
@@ -273,15 +278,27 @@ func TestAcceptance_Classic_OSXProfile_QuoteRoundtrip(t *testing.T) {
 	}
 }
 
-// TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip is the broader
-// scenario: plist contains both `"` and `&amp;` markers. Currently
-// expected to fail on POST because the existing PayloadsXMLText
-// double-escape corrupts `&`-content. Documents the open `&`-content
-// bug — orthogonal to the PUT-on-`"` fix this commit lands. Skipped
-// from CI gating until the `&`-content bug is independently fixed; use
-// `go test -run AmpersandRoundtrip` locally to track the issue.
+// TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip exercises plist
+// content with both `"` and `&amp;` markers in `<string>` values. It is
+// currently expected to fail with HTTP 409 "Unable to update the
+// database" on POST — wire-confirmed 2026-05-27, EU tenant.
+//
+// Root cause is NOT the SDK escape strategy. Single-escape on the wire
+// (matching jamf-upload's production-tested approach) decodes to
+// well-formed plist XML server-side; the plist parser then decodes
+// `&amp;` to a literal `&` string value; the server's DB-write layer
+// rejects literal `&` in stored plist `<string>` values regardless of
+// how the wire was framed. Double-escaping the wire only side-steps
+// this by storing the entity ref `&amp;` as the value (8 bytes of
+// `&amp;amp;` chardata in the saved mobileconfig) — that's silent
+// content corruption, not a fix. The SDK chooses single-escape (Option
+// B) to surface the limitation as a clean 409 instead of hiding it.
+//
+// Skipped under default acc-test runs because the failure is
+// server-side. Unskip locally to track if Jamf fixes the underlying API
+// behaviour.
 func TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip(t *testing.T) {
-	t.Skip("open `&`-content corruption affects POST too; tracked separately from the PUT-quote fix landing now")
+	t.Skip("server-side limitation: Classic API rejects literal `&` in plist <string> values regardless of wire escape level. SDK fix not possible; see test docstring.")
 	c := accClient(t)
 	ctx := context.Background()
 	pc := proclassic.New(c)
@@ -299,14 +316,55 @@ func TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateOSXConfigurationProfileByID: %v", err)
 	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateOSXConfigurationProfileByID: no ID returned: %+v", created)
+	}
 	id := *created.ID
 	cleanupDelete(t, "DeleteOSXConfigurationProfileByID", func() error {
 		return pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id))
 	})
 
-	afterCreate, _ := pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	afterCreate, err := pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetOSXConfigurationProfileByID after create: %v", err)
+	}
+	if afterCreate == nil || afterCreate.General == nil || afterCreate.General.Payloads == nil {
+		t.Fatalf("GET after create: profile or payloads missing: %+v", afterCreate)
+	}
 	got := string(*afterCreate.General.Payloads)
+	assertQuoteRoundtrip(t, "after Create (POST)", got)
 	assertAmpersandRoundtrip(t, "after Create (POST)", got)
+	t.Logf("after Create: payload chardata:\n%s", got)
+
+	updatePayload := osxProfilePlist(name, "update-marker-amp-\"-and-&amp;", true)
+	updateReq := &proclassic.OsXConfigurationProfile{
+		General: &proclassic.OsXConfigurationProfileGeneral{
+			Name:     classicStrPtr(name),
+			Payloads: payloadsXMLPtr(updatePayload),
+		},
+	}
+	if err := pc.UpdateOSXConfigurationProfileByID(ctx, intToStr(id), updateReq); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateOSXConfigurationProfileByID: %v", err)
+	}
+
+	afterUpdate, err := pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetOSXConfigurationProfileByID after update: %v", err)
+	}
+	if afterUpdate == nil || afterUpdate.General == nil || afterUpdate.General.Payloads == nil {
+		t.Fatalf("GET after update: profile or payloads missing: %+v", afterUpdate)
+	}
+	got = string(*afterUpdate.General.Payloads)
+	assertQuoteRoundtrip(t, "after Update (PUT)", got)
+	assertAmpersandRoundtrip(t, "after Update (PUT)", got)
+	t.Logf("after Update: payload chardata:\n%s", got)
+
+	if !strings.Contains(got, "update-marker") {
+		t.Fatalf("after Update: payload still contains create-marker, server did not apply the update. Got:\n%s", got)
+	}
 }
 
 // TestAcceptance_Classic_MobileDeviceProfile_QuoteRoundtrip mirrors the
@@ -350,12 +408,12 @@ func TestAcceptance_Classic_MobileDeviceProfile_QuoteRoundtrip(t *testing.T) {
 	t.Logf("after Create: payload chardata:\n%s", got)
 
 	updatePayload := mobileProfilePlist(name, "update-marker-quote-\"-only", false)
-	updateReq := (&proclassic.MobileDeviceConfigurationProfile{
+	updateReq := &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
 			Name:     classicStrPtr(name),
 			Payloads: payloadsXMLPtr(updatePayload),
 		},
-	}).ToUpdate()
+	}
 	if err := pc.UpdateMobileDeviceConfigurationProfileByID(ctx, intToStr(id), updateReq); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateMobileDeviceConfigurationProfileByID: %v", err)
@@ -371,6 +429,135 @@ func TestAcceptance_Classic_MobileDeviceProfile_QuoteRoundtrip(t *testing.T) {
 	}
 	got = string(*afterUpdate.General.Payloads)
 	assertQuoteRoundtrip(t, "after Update (PUT)", got)
+	t.Logf("after Update: payload chardata:\n%s", got)
+
+	if !strings.Contains(got, "update-marker") {
+		t.Fatalf("after Update: payload still contains create-marker, server did not apply the update. Got:\n%s", got)
+	}
+}
+
+// minimalNotificationsPlist mirrors the shape of
+// terraform-provider-jamfplatform/local-testing/pro/support_files/
+// minimal_notifications.mobileconfig — a fixture caught by the original
+// `&amp;`-content regression. Embeds a URL with `&amp;` and a display
+// string with `&lt;br/&gt;`. Round-trip success means both POST and PUT
+// preserve the entity encoding caller-side.
+func minimalNotificationsPlist(displayName, marker string) string {
+	return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadType</key>
+			<string>com.apple.notificationsettings</string>
+			<key>PayloadIdentifier</key>
+			<string>com.example.notifications.sdk-acc</string>
+			<key>PayloadUUID</key>
+			<string>12121212-3434-5656-7878-909090909090</string>
+			<key>PayloadDisplayName</key>
+			<string>Notifications Payload</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>SyncURL</key>
+			<string>https://sync-server-hostname/blockables/%file_sha%&amp;test=` + marker + `</string>
+			<key>StatusMessage</key>
+			<string>Entering Monitor mode&lt;br/&gt;Please be careful! (` + marker + `)</string>
+		</dict>
+	</array>
+	<key>PayloadDisplayName</key>
+	<string>` + displayName + `</string>
+	<key>PayloadIdentifier</key>
+	<string>com.example.notifications-profile.sdk-acc</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>56565656-7878-9090-1212-343434343434</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>
+`
+}
+
+// TestAcceptance_Classic_OSXProfile_NotificationsFixtureRoundtrip uses
+// a fixture mirroring terraform-provider-jamfplatform's
+// minimal_notifications.mobileconfig: a URL with `&amp;` and a string
+// containing `&lt;br/&gt;`. Same 409 server-side limitation as
+// AmpersandRoundtrip — Classic API rejects literal `&` / `<` / `>` in
+// plist `<string>` values regardless of SDK escape level. Skipped for
+// the same reason.
+func TestAcceptance_Classic_OSXProfile_NotificationsFixtureRoundtrip(t *testing.T) {
+	t.Skip("server-side limitation: Classic API rejects literal `&`/`<`/`>` in plist <string> values regardless of wire escape level. SDK fix not possible; see test docstring.")
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-osxcp-notifs-" + runSuffix()
+	createPayload := minimalNotificationsPlist(name, "create-marker")
+
+	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
+		General: &proclassic.OsXConfigurationProfileGeneral{
+			Name:     classicStrPtr(name),
+			Payloads: payloadsXMLPtr(createPayload),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateOSXConfigurationProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateOSXConfigurationProfileByID: no ID returned: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteOSXConfigurationProfileByID", func() error {
+		return pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id))
+	})
+
+	afterCreate, err := pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetOSXConfigurationProfileByID after create: %v", err)
+	}
+	if afterCreate == nil || afterCreate.General == nil || afterCreate.General.Payloads == nil {
+		t.Fatalf("GET after create: profile or payloads missing: %+v", afterCreate)
+	}
+	got := string(*afterCreate.General.Payloads)
+	assertAmpersandRoundtrip(t, "after Create (POST)", got)
+	if !strings.Contains(got, "&lt;br/&gt;") && !strings.Contains(got, "<br/>") {
+		t.Fatalf("after Create: payload missing the <br/> fragment (literal or &lt;-encoded). Got:\n%s", got)
+	}
+	if strings.Contains(got, "&amp;lt;") || strings.Contains(got, "&amp;gt;") {
+		t.Fatalf("after Create: payload double-encodes &lt;/&gt; → &amp;lt;/&amp;gt;. Got:\n%s", got)
+	}
+	t.Logf("after Create: payload chardata:\n%s", got)
+
+	updatePayload := minimalNotificationsPlist(name, "update-marker")
+	updateReq := &proclassic.OsXConfigurationProfile{
+		General: &proclassic.OsXConfigurationProfileGeneral{
+			Name:     classicStrPtr(name),
+			Payloads: payloadsXMLPtr(updatePayload),
+		},
+	}
+	if err := pc.UpdateOSXConfigurationProfileByID(ctx, intToStr(id), updateReq); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateOSXConfigurationProfileByID: %v", err)
+	}
+
+	afterUpdate, err := pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetOSXConfigurationProfileByID after update: %v", err)
+	}
+	if afterUpdate == nil || afterUpdate.General == nil || afterUpdate.General.Payloads == nil {
+		t.Fatalf("GET after update: profile or payloads missing: %+v", afterUpdate)
+	}
+	got = string(*afterUpdate.General.Payloads)
+	assertAmpersandRoundtrip(t, "after Update (PUT)", got)
+	if strings.Contains(got, "&amp;lt;") || strings.Contains(got, "&amp;gt;") {
+		t.Fatalf("after Update: payload double-encodes &lt;/&gt; → &amp;lt;/&amp;gt;. Got:\n%s", got)
+	}
 	t.Logf("after Update: payload chardata:\n%s", got)
 
 	if !strings.Contains(got, "update-marker") {

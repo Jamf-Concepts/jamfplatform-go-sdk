@@ -68,7 +68,7 @@ func TestUpdateMobileDeviceConfigurationProfileByID(t *testing.T) {
 		w.WriteHeader(http.StatusCreated)
 	})
 
-	err := c.UpdateMobileDeviceConfigurationProfileByID(context.Background(), "test-id", &MobileDeviceConfigurationProfileUpdate{})
+	err := c.UpdateMobileDeviceConfigurationProfileByID(context.Background(), "test-id", &MobileDeviceConfigurationProfile{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +128,7 @@ func TestUpdateMobileDeviceConfigurationProfileByName(t *testing.T) {
 		w.WriteHeader(http.StatusCreated)
 	})
 
-	err := c.UpdateMobileDeviceConfigurationProfileByName(context.Background(), "test-id", &MobileDeviceConfigurationProfileUpdate{})
+	err := c.UpdateMobileDeviceConfigurationProfileByName(context.Background(), "test-id", &MobileDeviceConfigurationProfile{})
 	if err != nil {
 		t.Fatal(err)
 	}
