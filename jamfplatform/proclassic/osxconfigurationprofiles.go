@@ -38,7 +38,7 @@ func (c *Client) CreateOSXConfigurationProfileByID(ctx context.Context, id strin
 }
 
 // UpdateOSXConfigurationProfileByID updates an existing OS X configuration profile by ID.
-func (c *Client) UpdateOSXConfigurationProfileByID(ctx context.Context, id string, request *OsXConfigurationProfile) error {
+func (c *Client) UpdateOSXConfigurationProfileByID(ctx context.Context, id string, request *OsXConfigurationProfileUpdate) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
@@ -69,7 +69,7 @@ func (c *Client) GetOSXConfigurationProfileByName(ctx context.Context, name stri
 }
 
 // UpdateOSXConfigurationProfileByName updates an existing OS X configuration profile by name.
-func (c *Client) UpdateOSXConfigurationProfileByName(ctx context.Context, name string, request *OsXConfigurationProfile) error {
+func (c *Client) UpdateOSXConfigurationProfileByName(ctx context.Context, name string, request *OsXConfigurationProfileUpdate) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
@@ -168,7 +168,12 @@ func (c *Client) ApplyOSXConfigurationProfile(ctx context.Context, request *OsXC
 		}
 		return "", false, fmt.Errorf("ApplyOSXConfigurationProfile: resolve: %w", err)
 	}
-	err = c.UpdateOSXConfigurationProfileByID(ctx, id, request)
+	// Convert create request to update type via the type's hand-emitted
+	// ToUpdate helper. Used when create and update need distinct Go types
+	// for MarshalXML reasons (proclassic configuration profiles swap the
+	// <payloads> field-type override between POST and PUT).
+	updateReq := request.ToUpdate()
+	err = c.UpdateOSXConfigurationProfileByID(ctx, id, updateReq)
 	if err != nil {
 		return "", false, fmt.Errorf("ApplyOSXConfigurationProfile: update(%s): %w", id, err)
 	}

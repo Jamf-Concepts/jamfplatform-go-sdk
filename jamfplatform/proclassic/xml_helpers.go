@@ -151,12 +151,13 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 }
 
 // PayloadsXMLText is a wrapper for configuration-profile <payloads> bodies
-// (raw .mobileconfig plist XML embedded as element text) that works
-// around a Jamf Pro Classic JSSResource ingress bug: the server runs an
-// extra XML-entity-decode pass on the <payloads> text before handing it
-// to its plist parser. A correctly-encoded `&amp;` therefore reaches
-// the plist parser as a bare `&`, which is invalid XML inside the plist,
-// and the request 409s with "Unable to update the database".
+// (raw .mobileconfig plist XML embedded as element text) used on the
+// **Create (POST)** path only. It works around a Jamf Pro Classic
+// JSSResource POST-ingress bug: the server runs an extra
+// XML-entity-decode pass on the <payloads> text before handing it to
+// its plist parser. A correctly-encoded `&amp;` therefore reaches
+// the plist parser as a bare `&`, which is invalid XML inside the
+// plist, and the request 409s with "Unable to update the database".
 //
 // Compensation: MarshalXML pre-escapes the input once before letting
 // encoding/xml's normal text-escape run, so the wire form carries one
@@ -167,6 +168,14 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 // encoding/xml's default decode unescapes once, and the caller sees the
 // plist source verbatim.
 //
+// The **Update (PUT)** path uses PayloadsXMLTextSingleEscape instead —
+// the PUT handler stores wire bytes verbatim without the canonicalisation
+// pass that POST applies, so the double-escape used here would persist
+// literal `&amp;#34;` (8 bytes) in storage for every `"` the caller wrote
+// and break device-side parsing of CodeRequirement / TCC / PPPC payloads.
+// See `OsXConfigurationProfileUpdate` / `MobileDeviceConfigurationProfileUpdate`
+// and `PayloadsXMLTextSingleEscape` for the PUT-side wrapper.
+//
 // Round-trip semantics preserved: callers pass a Go string (the raw
 // .mobileconfig contents); the SDK handles the extra escape level on
 // the wire. TODO: remove this wrapper when the Jamf Pro Classic API fix
@@ -175,7 +184,7 @@ type PayloadsXMLText string
 
 // MarshalXML pre-escapes the payload text once via xml.EscapeText. The
 // outer encoding/xml pass then escapes a second time on the wire,
-// producing the double-encoded form the buggy JSSResource ingress
+// producing the double-encoded form the buggy JSSResource POST ingress
 // requires to round-trip the caller's literal payload bytes through to
 // the stored profile.
 func (p PayloadsXMLText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -196,5 +205,48 @@ func (p *PayloadsXMLText) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 		return err
 	}
 	*p = PayloadsXMLText(s)
+	return nil
+}
+
+// PayloadsXMLTextSingleEscape is the **Update (PUT)** counterpart to
+// PayloadsXMLText. MarshalXML emits the chardata at a single level of
+// XML entity encoding — encoding/xml's default behaviour — without the
+// pre-escape pass PayloadsXMLText performs.
+//
+// Why a separate wrapper. The Jamf Pro Classic API stores the wire
+// <payloads> chardata bytes **verbatim** on PUT, without the
+// canonicalisation re-emit step that POST applies. Double-escaping a
+// caller's literal `"` therefore persists `&amp;#34;` (8 bytes) on disk;
+// devices receiving that mobileconfig then see `&#34;` (after Apple's
+// one-decode pass) where the user wrote `"` and fail to evaluate
+// payload semantics that depend on string content — TCC / PPPC
+// CodeRequirement, configuration profiles that embed quoted strings, etc.
+//
+// Single-escape is the spec-correct XML chardata encoding. POST cannot
+// use it because the POST handler does an extra entity-decode pass
+// before its plist parser sees the bytes; PUT can because it skips that
+// pass entirely.
+//
+// UnmarshalXML is identical to PayloadsXMLText: the server's GET
+// response shape is the same for both POST and PUT, only the storage
+// path differs.
+type PayloadsXMLTextSingleEscape string
+
+// MarshalXML emits the chardata at a single XML entity layer (the
+// default encoding/xml behaviour). Used on the Update (PUT) path so the
+// server's verbatim-storage behaviour persists the caller's literal
+// payload bytes.
+func (p PayloadsXMLTextSingleEscape) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return e.EncodeElement(string(p), start)
+}
+
+// UnmarshalXML mirrors PayloadsXMLText.UnmarshalXML — both wrappers see
+// the same server GET response shape; only Marshal differs.
+func (p *PayloadsXMLTextSingleEscape) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+	*p = PayloadsXMLTextSingleEscape(s)
 	return nil
 }

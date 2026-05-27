@@ -43,15 +43,28 @@ var builtinTypeRefs = map[string]bool{
 	"time.Time":       true,
 	"json.RawMessage": true,
 	"xml.Name":        true,
-	// BigInt, NotificationValue, and PayloadsXMLText are supplemental types
-	// the generator emits into XML packages (see xml_helpers.go) as
-	// FieldTypeOverride targets for spec/wire bugs (int overflow, repeated
-	// duplicate elements, Classic JSSResource double-decode on <payloads>).
-	// Treat them as builtins for validation — the validator can't see
-	// supplemental files and would false-positive.
+	// BigInt, NotificationValue, PayloadsXMLText and PayloadsXMLTextSingleEscape
+	// are supplemental types the generator emits into XML packages (see
+	// xml_helpers.go) as FieldTypeOverride targets for spec/wire bugs (int
+	// overflow, repeated duplicate elements, Classic JSSResource double-decode
+	// on <payloads> create, single-decode on <payloads> update). Treat them
+	// as builtins for validation — the validator can't see supplemental files
+	// and would false-positive.
+	//
+	// OsXConfigurationProfileUpdate, OsXConfigurationProfileGeneralUpdate,
+	// MobileDeviceConfigurationProfileUpdate, MobileDeviceConfigurationProfileGeneralUpdate
+	// are static update-variant structs emitted alongside the *Create types so
+	// PUT operations can route through a Payloads wrapper that single-escapes
+	// (see emitPkgConfigProfileUpdateVariants). Same false-positive caveat as
+	// above.
 	"BigInt":            true,
 	"NotificationValue": true,
 	"PayloadsXMLText":   true,
+	"PayloadsXMLTextSingleEscape":                   true,
+	"OsXConfigurationProfileUpdate":                 true,
+	"OsXConfigurationProfileGeneralUpdate":          true,
+	"MobileDeviceConfigurationProfileUpdate":        true,
+	"MobileDeviceConfigurationProfileGeneralUpdate": true,
 }
 
 // validateTypeReferences reports missing Go types referenced by methods.

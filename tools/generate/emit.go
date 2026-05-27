@@ -418,6 +418,9 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	if err := emitPkgXMLSupplementsTest(pkgDir, goPkgName, pkgFormat); err != nil {
 		return err
 	}
+	if err := emitPkgConfigProfileUpdateVariants(pkgDir, goPkgName, pkgFormat); err != nil {
+		return err
+	}
 
 	// Emit versionLock helpers if any Apply method uses optimistic locking.
 	hasVersionLock := false
@@ -743,12 +746,13 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 }
 
 // PayloadsXMLText is a wrapper for configuration-profile <payloads> bodies
-// (raw .mobileconfig plist XML embedded as element text) that works
-// around a Jamf Pro Classic JSSResource ingress bug: the server runs an
-// extra XML-entity-decode pass on the <payloads> text before handing it
-// to its plist parser. A correctly-encoded ` + "`&amp;`" + ` therefore reaches
-// the plist parser as a bare ` + "`&`" + `, which is invalid XML inside the plist,
-// and the request 409s with "Unable to update the database".
+// (raw .mobileconfig plist XML embedded as element text) used on the
+// **Create (POST)** path only. It works around a Jamf Pro Classic
+// JSSResource POST-ingress bug: the server runs an extra
+// XML-entity-decode pass on the <payloads> text before handing it to
+// its plist parser. A correctly-encoded ` + "`&amp;`" + ` therefore reaches
+// the plist parser as a bare ` + "`&`" + `, which is invalid XML inside the
+// plist, and the request 409s with "Unable to update the database".
 //
 // Compensation: MarshalXML pre-escapes the input once before letting
 // encoding/xml's normal text-escape run, so the wire form carries one
@@ -759,6 +763,14 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 // encoding/xml's default decode unescapes once, and the caller sees the
 // plist source verbatim.
 //
+// The **Update (PUT)** path uses PayloadsXMLTextSingleEscape instead —
+// the PUT handler stores wire bytes verbatim without the canonicalisation
+// pass that POST applies, so the double-escape used here would persist
+// literal ` + "`&amp;#34;`" + ` (8 bytes) in storage for every ` + "`\"`" + ` the caller wrote
+// and break device-side parsing of CodeRequirement / TCC / PPPC payloads.
+// See ` + "`OsXConfigurationProfileUpdate`" + ` / ` + "`MobileDeviceConfigurationProfileUpdate`" + `
+// and ` + "`PayloadsXMLTextSingleEscape`" + ` for the PUT-side wrapper.
+//
 // Round-trip semantics preserved: callers pass a Go string (the raw
 // .mobileconfig contents); the SDK handles the extra escape level on
 // the wire. TODO: remove this wrapper when the Jamf Pro Classic API fix
@@ -767,7 +779,7 @@ type PayloadsXMLText string
 
 // MarshalXML pre-escapes the payload text once via xml.EscapeText. The
 // outer encoding/xml pass then escapes a second time on the wire,
-// producing the double-encoded form the buggy JSSResource ingress
+// producing the double-encoded form the buggy JSSResource POST ingress
 // requires to round-trip the caller's literal payload bytes through to
 // the stored profile.
 func (p PayloadsXMLText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -788,6 +800,49 @@ func (p *PayloadsXMLText) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 		return err
 	}
 	*p = PayloadsXMLText(s)
+	return nil
+}
+
+// PayloadsXMLTextSingleEscape is the **Update (PUT)** counterpart to
+// PayloadsXMLText. MarshalXML emits the chardata at a single level of
+// XML entity encoding — encoding/xml's default behaviour — without the
+// pre-escape pass PayloadsXMLText performs.
+//
+// Why a separate wrapper. The Jamf Pro Classic API stores the wire
+// <payloads> chardata bytes **verbatim** on PUT, without the
+// canonicalisation re-emit step that POST applies. Double-escaping a
+// caller's literal ` + "`\"`" + ` therefore persists ` + "`&amp;#34;`" + ` (8 bytes) on disk;
+// devices receiving that mobileconfig then see ` + "`&#34;`" + ` (after Apple's
+// one-decode pass) where the user wrote ` + "`\"`" + ` and fail to evaluate
+// payload semantics that depend on string content — TCC / PPPC
+// CodeRequirement, configuration profiles that embed quoted strings, etc.
+//
+// Single-escape is the spec-correct XML chardata encoding. POST cannot
+// use it because the POST handler does an extra entity-decode pass
+// before its plist parser sees the bytes; PUT can because it skips that
+// pass entirely.
+//
+// UnmarshalXML is identical to PayloadsXMLText: the server's GET
+// response shape is the same for both POST and PUT, only the storage
+// path differs.
+type PayloadsXMLTextSingleEscape string
+
+// MarshalXML emits the chardata at a single XML entity layer (the
+// default encoding/xml behaviour). Used on the Update (PUT) path so the
+// server's verbatim-storage behaviour persists the caller's literal
+// payload bytes.
+func (p PayloadsXMLTextSingleEscape) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return e.EncodeElement(string(p), start)
+}
+
+// UnmarshalXML mirrors PayloadsXMLText.UnmarshalXML — both wrappers see
+// the same server GET response shape; only Marshal differs.
+func (p *PayloadsXMLTextSingleEscape) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+	*p = PayloadsXMLTextSingleEscape(s)
 	return nil
 }
 `, pkgName)
@@ -882,11 +937,305 @@ func TestPayloadsXMLText_NilOmitsField(t *testing.T) {
 		t.Fatalf("expected <payloads> omitted when field is nil, got: %%s", out)
 	}
 }
-`, pkgName, "`", "`", "`", "`")
+
+// payloadsSingleEscapeTestParent mirrors payloadsTestParent for the PUT-side
+// wrapper. Exercises PayloadsXMLTextSingleEscape inside a struct field so the
+// test covers both the wrapper's MarshalXML/UnmarshalXML and the surrounding
+// encoding/xml machinery.
+type payloadsSingleEscapeTestParent struct {
+	XMLName  xml.Name                     %sxml:"parent"%s
+	Payloads *PayloadsXMLTextSingleEscape %sxml:"payloads,omitempty"%s
+}
+
+func TestPayloadsXMLTextSingleEscape_MarshalSingleEncodesEntities(t *testing.T) {
+	// The PUT-side wrapper must emit chardata at a single XML entity layer.
+	// Caller writes a literal %s; wire form must contain %s, never %s
+	// (double-escape, the broken PUT shape that persists 8 bytes on disk
+	// and breaks device-side parsing) and never a raw %s (malformed
+	// chardata).
+	v := PayloadsXMLTextSingleEscape(%s<string>identifier "com.foo"</string>%s)
+	parent := payloadsSingleEscapeTestParent{Payloads: &v}
+	out, err := xml.Marshal(parent)
+	if err != nil {
+		t.Fatalf("marshal: %%v", err)
+	}
+	got := string(out)
+	if strings.Contains(got, "&amp;#34;") {
+		t.Fatalf("wire form is double-escaped (broken PUT shape): %%s", got)
+	}
+	if !strings.Contains(got, "&#34;") {
+		t.Fatalf("wire form missing single-escape &#34;: %%s", got)
+	}
+	if !strings.Contains(got, "&lt;string&gt;") {
+		t.Fatalf("wire form missing single-escape &lt;string&gt;: %%s", got)
+	}
+}
+
+func TestPayloadsXMLTextSingleEscape_UnmarshalSingleDecodes(t *testing.T) {
+	// Symmetric to PayloadsXMLText.UnmarshalXML — both wrappers see the
+	// same server GET response shape; only Marshal differs. The server
+	// returns single-encoded text; encoding/xml's default decode unescapes
+	// once; the wrapper stores the result verbatim.
+	wire := []byte("<parent><payloads>ab&amp;amp;cd&amp;lt;br/&amp;gt;ef</payloads></parent>")
+	var got payloadsSingleEscapeTestParent
+	if err := xml.Unmarshal(wire, &got); err != nil {
+		t.Fatalf("unmarshal: %%v", err)
+	}
+	if got.Payloads == nil {
+		t.Fatalf("decoded payloads is nil")
+	}
+	want := "ab&amp;cd&lt;br/&gt;ef"
+	if string(*got.Payloads) != want {
+		t.Fatalf("decode mismatch:\n  want: %%s\n  got:  %%s", want, string(*got.Payloads))
+	}
+}
+
+func TestPayloadsXMLTextSingleEscape_NilOmitsField(t *testing.T) {
+	parent := payloadsSingleEscapeTestParent{}
+	out, err := xml.Marshal(parent)
+	if err != nil {
+		t.Fatalf("marshal: %%v", err)
+	}
+	if strings.Contains(string(out), "<payloads") {
+		t.Fatalf("expected <payloads> omitted when field is nil, got: %%s", out)
+	}
+}
+`, pkgName, "`", "`", "`", "`", "`", "`", "`", "`",
+		`"`, "`&#34;`", "`&amp;#34;`", "`&`", "`", "`")
 	outPath := filepath.Join(pkgDir, "xml_helpers_test.go")
 	formatted, err := formatGo("xml_helpers_test.go", []byte(src))
 	if err != nil {
 		return fmt.Errorf("formatting xml_helpers_test.go: %w\n---raw---\n%s", err, src)
+	}
+	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+		return fmt.Errorf("writing %s: %w", outPath, err)
+	}
+	log.Printf("wrote %s", outPath)
+	return nil
+}
+
+// emitPkgConfigProfileUpdateVariants writes configurationprofile_update.go
+// into the proclassic package. The file declares parallel "Update" struct
+// types for OS X / Mobile Device configuration profile resources whose
+// <payloads> field is wired to PayloadsXMLTextSingleEscape rather than
+// PayloadsXMLText.
+//
+// Why parallel types: the Jamf Pro Classic JSSResource POST handler runs
+// an extra entity-decode pass on the inbound <payloads> chardata then
+// canonicalises the parsed plist on the way to storage, so the SDK has
+// to double-escape on Create or POST 409s with "Unable to update the
+// database". The PUT handler does neither: it stores the post-XML-decode
+// chardata bytes verbatim, so double-escaping on Update persists literal
+// `&amp;#34;` (8 bytes) where the caller wrote `"` (1 byte) and breaks
+// downstream device-side parsing of CodeRequirement / TCC / PPPC payload
+// strings.
+//
+// MarshalXML behaviour cannot be context-switched (the encoder doesn't
+// know which HTTP method the body is destined for), so we use the type
+// system: Create endpoints take *OsXConfigurationProfile (POST-side
+// PayloadsXMLText), Update endpoints take *OsXConfigurationProfileUpdate
+// (PUT-side PayloadsXMLTextSingleEscape). Same for mobile.
+//
+// ToUpdate() converts the POST-side request type into the PUT-side
+// variant for callers (notably ApplyOSXConfigurationProfile /
+// ApplyMobileDeviceConfigurationProfile) that share a single user-facing
+// request struct across create/update.
+//
+// File contents are hardcoded: the Classic spec is frozen and the two
+// affected schemas are stable. If new resources hit the same asymmetry,
+// extend this emitter rather than reinventing schema-cloning machinery.
+func emitPkgConfigProfileUpdateVariants(pkgDir, pkgName, pkgFormat string) error {
+	if pkgFormat != "xml" || pkgName != "proclassic" {
+		return nil
+	}
+	src := `// Code generated by tools/generate; DO NOT EDIT.
+
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+// Configuration-profile Update-variant request types. Mirror the
+// equivalent Create-side structs from types.go field-for-field, except
+// the embedded <general> sub-struct's Payloads field is wired to
+// PayloadsXMLTextSingleEscape so PUT requests do not carry the POST-side
+// double-escape compensation. See xml_helpers.go and
+// emitPkgConfigProfileUpdateVariants for the full rationale.
+
+package proclassic
+
+import "encoding/xml"
+
+// OsXConfigurationProfileUpdate is the PUT-side request type for the
+// osxconfigurationprofiles resource. Mirrors OsXConfigurationProfile
+// but routes <general>.<payloads> through PayloadsXMLTextSingleEscape.
+type OsXConfigurationProfileUpdate struct {
+	XMLName     xml.Name
+	ID          *int                                  ` + "`xml:\"id,omitempty\"`" + `
+	General     *OsXConfigurationProfileGeneralUpdate ` + "`xml:\"general,omitempty\"`" + `
+	Scope       *OsXConfigurationProfileScope         ` + "`xml:\"scope,omitempty\"`" + `
+	SelfService *OsXConfigurationProfileSelfService   ` + "`xml:\"self_service,omitempty\"`" + `
+}
+
+// MarshalXML forces the root element to <os_x_configuration_profile>,
+// matching OsXConfigurationProfile.MarshalXML. Shadow type suppresses
+// re-entry during encoding.
+func (t OsXConfigurationProfileUpdate) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "os_x_configuration_profile"}
+	type shadow OsXConfigurationProfileUpdate
+	return e.EncodeElement(shadow(t), start)
+}
+
+// OsXConfigurationProfileGeneralUpdate is the PUT-side <general> block
+// for the osxconfigurationprofiles resource. Mirrors
+// OsXConfigurationProfileGeneral; the only schema difference is
+// Payloads, which uses the single-escape wrapper for verbatim PUT
+// storage.
+type OsXConfigurationProfileGeneralUpdate struct {
+	XMLName            xml.Name
+	Category           *CategoryObject              ` + "`xml:\"category,omitempty\"`" + `
+	Description        *string                      ` + "`xml:\"description,omitempty\"`" + `
+	DistributionMethod *string                      ` + "`xml:\"distribution_method,omitempty\"`" + `
+	ID                 *int                         ` + "`xml:\"id,omitempty\"`" + `
+	Level              *string                      ` + "`xml:\"level,omitempty\"`" + `
+	Name               *string                      ` + "`xml:\"name,omitempty\"`" + `
+	Payloads           *PayloadsXMLTextSingleEscape ` + "`xml:\"payloads,omitempty\"`" + `
+	RedeployOnUpdate   *string                      ` + "`xml:\"redeploy_on_update,omitempty\"`" + `
+	Site               *SiteObject                  ` + "`xml:\"site,omitempty\"`" + `
+	UserRemovable      *bool                        ` + "`xml:\"user_removable,omitempty\"`" + `
+	UUID               *string                      ` + "`xml:\"uuid,omitempty\"`" + `
+}
+
+// MarshalXML forces the root element to <general>, matching
+// OsXConfigurationProfileGeneral.MarshalXML.
+func (t OsXConfigurationProfileGeneralUpdate) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "general"}
+	type shadow OsXConfigurationProfileGeneralUpdate
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ToUpdate converts an OsXConfigurationProfile (POST-side request) into
+// the PUT-side equivalent. All scalar/sub-struct pointers are shared
+// directly with the source; the Payloads field is rewrapped from
+// *PayloadsXMLText into *PayloadsXMLTextSingleEscape so the wire form
+// emits at a single XML entity layer. Returns nil when p is nil.
+func (p *OsXConfigurationProfile) ToUpdate() *OsXConfigurationProfileUpdate {
+	if p == nil {
+		return nil
+	}
+	var general *OsXConfigurationProfileGeneralUpdate
+	if p.General != nil {
+		general = &OsXConfigurationProfileGeneralUpdate{
+			Category:           p.General.Category,
+			Description:        p.General.Description,
+			DistributionMethod: p.General.DistributionMethod,
+			ID:                 p.General.ID,
+			Level:              p.General.Level,
+			Name:               p.General.Name,
+			RedeployOnUpdate:   p.General.RedeployOnUpdate,
+			Site:               p.General.Site,
+			UserRemovable:      p.General.UserRemovable,
+			UUID:               p.General.UUID,
+		}
+		if p.General.Payloads != nil {
+			v := PayloadsXMLTextSingleEscape(*p.General.Payloads)
+			general.Payloads = &v
+		}
+	}
+	return &OsXConfigurationProfileUpdate{
+		ID:          p.ID,
+		General:     general,
+		Scope:       p.Scope,
+		SelfService: p.SelfService,
+	}
+}
+
+// MobileDeviceConfigurationProfileUpdate is the PUT-side request type
+// for the mobiledeviceconfigurationprofiles resource. Mirrors
+// MobileDeviceConfigurationProfile but routes <general>.<payloads>
+// through PayloadsXMLTextSingleEscape.
+type MobileDeviceConfigurationProfileUpdate struct {
+	XMLName     xml.Name
+	ID          *int                                           ` + "`xml:\"id,omitempty\"`" + `
+	General     *MobileDeviceConfigurationProfileGeneralUpdate ` + "`xml:\"general,omitempty\"`" + `
+	Scope       *MobileDeviceConfigurationProfileScope         ` + "`xml:\"scope,omitempty\"`" + `
+	SelfService *MobileDeviceConfigurationProfileSelfService   ` + "`xml:\"self_service,omitempty\"`" + `
+}
+
+// MarshalXML forces the root element to <configuration_profile>,
+// matching MobileDeviceConfigurationProfile.MarshalXML.
+func (t MobileDeviceConfigurationProfileUpdate) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "configuration_profile"}
+	type shadow MobileDeviceConfigurationProfileUpdate
+	return e.EncodeElement(shadow(t), start)
+}
+
+// MobileDeviceConfigurationProfileGeneralUpdate is the PUT-side
+// <general> block for the mobiledeviceconfigurationprofiles resource.
+// Mirrors MobileDeviceConfigurationProfileGeneral; the only schema
+// difference is Payloads, which uses the single-escape wrapper for
+// verbatim PUT storage.
+type MobileDeviceConfigurationProfileGeneralUpdate struct {
+	XMLName                              xml.Name
+	Category                             *CategoryObject              ` + "`xml:\"category,omitempty\"`" + `
+	DeploymentMethod                     *string                      ` + "`xml:\"deployment_method,omitempty\"`" + `
+	Description                          *string                      ` + "`xml:\"description,omitempty\"`" + `
+	ID                                   *int                         ` + "`xml:\"id,omitempty\"`" + `
+	Level                                *string                      ` + "`xml:\"level,omitempty\"`" + `
+	Name                                 *string                      ` + "`xml:\"name,omitempty\"`" + `
+	Payloads                             *PayloadsXMLTextSingleEscape ` + "`xml:\"payloads,omitempty\"`" + `
+	RedeployDaysBeforeCertificateExpires *int                         ` + "`xml:\"redeploy_days_before_certificate_expires,omitempty\"`" + `
+	RedeployOnUpdate                     *string                      ` + "`xml:\"redeploy_on_update,omitempty\"`" + `
+	Site                                 *SiteObject                  ` + "`xml:\"site,omitempty\"`" + `
+	UUID                                 *string                      ` + "`xml:\"uuid,omitempty\"`" + `
+}
+
+// MarshalXML forces the root element to <general>, matching
+// MobileDeviceConfigurationProfileGeneral.MarshalXML.
+func (t MobileDeviceConfigurationProfileGeneralUpdate) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "general"}
+	type shadow MobileDeviceConfigurationProfileGeneralUpdate
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ToUpdate converts a MobileDeviceConfigurationProfile (POST-side
+// request) into the PUT-side equivalent. All scalar/sub-struct pointers
+// are shared directly with the source; the Payloads field is rewrapped
+// from *PayloadsXMLText into *PayloadsXMLTextSingleEscape so the wire
+// form emits at a single XML entity layer. Returns nil when p is nil.
+func (p *MobileDeviceConfigurationProfile) ToUpdate() *MobileDeviceConfigurationProfileUpdate {
+	if p == nil {
+		return nil
+	}
+	var general *MobileDeviceConfigurationProfileGeneralUpdate
+	if p.General != nil {
+		general = &MobileDeviceConfigurationProfileGeneralUpdate{
+			Category:                             p.General.Category,
+			DeploymentMethod:                     p.General.DeploymentMethod,
+			Description:                          p.General.Description,
+			ID:                                   p.General.ID,
+			Level:                                p.General.Level,
+			Name:                                 p.General.Name,
+			RedeployDaysBeforeCertificateExpires: p.General.RedeployDaysBeforeCertificateExpires,
+			RedeployOnUpdate:                     p.General.RedeployOnUpdate,
+			Site:                                 p.General.Site,
+			UUID:                                 p.General.UUID,
+		}
+		if p.General.Payloads != nil {
+			v := PayloadsXMLTextSingleEscape(*p.General.Payloads)
+			general.Payloads = &v
+		}
+	}
+	return &MobileDeviceConfigurationProfileUpdate{
+		ID:          p.ID,
+		General:     general,
+		Scope:       p.Scope,
+		SelfService: p.SelfService,
+	}
+}
+`
+	outPath := filepath.Join(pkgDir, "configurationprofile_update.go")
+	formatted, err := formatGo("configurationprofile_update.go", []byte(src))
+	if err != nil {
+		return fmt.Errorf("formatting configurationprofile_update.go: %w", err)
 	}
 	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)

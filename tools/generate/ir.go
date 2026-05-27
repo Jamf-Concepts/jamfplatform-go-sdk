@@ -135,6 +135,16 @@ type GoApply struct {
 	UpdateType    string // Go type for the update request (empty = same as RequestType)
 	HasUpdateType bool   // true when UpdateType is set (different create/update types)
 
+	// UpdateViaToUpdate — when the Apply method must convert the create-side
+	// request to the update-side type by calling request.ToUpdate() instead
+	// of the default JSON round-trip used by HasUpdateType. Used for the
+	// proclassic configuration profile resources where the create/update
+	// types are intentionally distinct Go structs (POST-side double-escape
+	// vs PUT-side single-escape on the <payloads> field) and a typed
+	// conversion helper is hand-emitted in configurationprofile_update.go.
+	// Mutually exclusive with HasUpdateType's JSON path.
+	UpdateViaToUpdate bool
+
 	// Optimistic locking (versionLock) — for prestages.
 	VersionLock       bool   // true when create must zero VersionLock fields and update must GET→inject them
 	GetMethod         string // GET operation name (e.g. "GetComputerPrestageV3") — required when VersionLock is true

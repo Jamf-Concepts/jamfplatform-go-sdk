@@ -38,7 +38,7 @@ func (c *Client) CreateMobileDeviceConfigurationProfileByID(ctx context.Context,
 }
 
 // UpdateMobileDeviceConfigurationProfileByID updates an existing mobile device configuration profile by ID.
-func (c *Client) UpdateMobileDeviceConfigurationProfileByID(ctx context.Context, id string, request *MobileDeviceConfigurationProfile) error {
+func (c *Client) UpdateMobileDeviceConfigurationProfileByID(ctx context.Context, id string, request *MobileDeviceConfigurationProfileUpdate) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
@@ -69,7 +69,7 @@ func (c *Client) GetMobileDeviceConfigurationProfileByName(ctx context.Context, 
 }
 
 // UpdateMobileDeviceConfigurationProfileByName updates an existing mobile device configuration profile by name.
-func (c *Client) UpdateMobileDeviceConfigurationProfileByName(ctx context.Context, name string, request *MobileDeviceConfigurationProfile) error {
+func (c *Client) UpdateMobileDeviceConfigurationProfileByName(ctx context.Context, name string, request *MobileDeviceConfigurationProfileUpdate) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
@@ -168,7 +168,12 @@ func (c *Client) ApplyMobileDeviceConfigurationProfile(ctx context.Context, requ
 		}
 		return "", false, fmt.Errorf("ApplyMobileDeviceConfigurationProfile: resolve: %w", err)
 	}
-	err = c.UpdateMobileDeviceConfigurationProfileByID(ctx, id, request)
+	// Convert create request to update type via the type's hand-emitted
+	// ToUpdate helper. Used when create and update need distinct Go types
+	// for MarshalXML reasons (proclassic configuration profiles swap the
+	// <payloads> field-type override between POST and PUT).
+	updateReq := request.ToUpdate()
+	err = c.UpdateMobileDeviceConfigurationProfileByID(ctx, id, updateReq)
 	if err != nil {
 		return "", false, fmt.Errorf("ApplyMobileDeviceConfigurationProfile: update(%s): %w", id, err)
 	}

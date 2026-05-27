@@ -647,7 +647,7 @@ func TestAcceptance_Classic_ProbeUpdate_UpdateMobileDeviceByUDID(t *testing.T) {
 
 func TestAcceptance_Classic_ProbeUpdate_UpdateMobileDeviceConfigurationProfileByID(t *testing.T) {
 	c := accClient(t)
-	if err := proclassic.New(c).UpdateMobileDeviceConfigurationProfileByID(context.Background(), "999999999", &proclassic.MobileDeviceConfigurationProfile{}); err != nil {
+	if err := proclassic.New(c).UpdateMobileDeviceConfigurationProfileByID(context.Background(), "999999999", &proclassic.MobileDeviceConfigurationProfileUpdate{}); err != nil {
 		skipOnServerError(t, err)
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) {
@@ -659,7 +659,7 @@ func TestAcceptance_Classic_ProbeUpdate_UpdateMobileDeviceConfigurationProfileBy
 
 func TestAcceptance_Classic_ProbeUpdate_UpdateMobileDeviceConfigurationProfileByName(t *testing.T) {
 	c := accClient(t)
-	if err := proclassic.New(c).UpdateMobileDeviceConfigurationProfileByName(context.Background(), "sdk-probe-update-nonexistent", &proclassic.MobileDeviceConfigurationProfile{}); err != nil {
+	if err := proclassic.New(c).UpdateMobileDeviceConfigurationProfileByName(context.Background(), "sdk-probe-update-nonexistent", &proclassic.MobileDeviceConfigurationProfileUpdate{}); err != nil {
 		skipOnServerError(t, err)
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) {
@@ -767,7 +767,7 @@ func TestAcceptance_Classic_ProbeUpdate_UpdateNetworkSegmentByName(t *testing.T)
 
 func TestAcceptance_Classic_ProbeUpdate_UpdateOSXConfigurationProfileByID(t *testing.T) {
 	c := accClient(t)
-	if err := proclassic.New(c).UpdateOSXConfigurationProfileByID(context.Background(), "999999999", &proclassic.OsXConfigurationProfile{}); err != nil {
+	if err := proclassic.New(c).UpdateOSXConfigurationProfileByID(context.Background(), "999999999", &proclassic.OsXConfigurationProfileUpdate{}); err != nil {
 		skipOnServerError(t, err)
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) {
@@ -779,7 +779,7 @@ func TestAcceptance_Classic_ProbeUpdate_UpdateOSXConfigurationProfileByID(t *tes
 
 func TestAcceptance_Classic_ProbeUpdate_UpdateOSXConfigurationProfileByName(t *testing.T) {
 	c := accClient(t)
-	if err := proclassic.New(c).UpdateOSXConfigurationProfileByName(context.Background(), "sdk-probe-update-nonexistent", &proclassic.OsXConfigurationProfile{}); err != nil {
+	if err := proclassic.New(c).UpdateOSXConfigurationProfileByName(context.Background(), "sdk-probe-update-nonexistent", &proclassic.OsXConfigurationProfileUpdate{}); err != nil {
 		skipOnServerError(t, err)
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) {
