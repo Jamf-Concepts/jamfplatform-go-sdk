@@ -5469,9 +5469,9 @@ type PrestagePurchasingInformationV3 struct {
 
 // PrestageScopeAssignmentV2 represents a prestage scope assignment v2.
 type PrestageScopeAssignmentV2 struct {
-	AssignmentDate *time.Time `json:"assignmentDate,omitempty"`
-	SerialNumber   string     `json:"serialNumber"`
-	UserAssigned   string     `json:"userAssigned"`
+	AssignmentDate *string `json:"assignmentDate"`
+	SerialNumber   string  `json:"serialNumber"`
+	UserAssigned   string  `json:"userAssigned"`
 }
 
 // PrestageScopeResponseV2 represents a prestage scope response v2.
