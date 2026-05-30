@@ -378,7 +378,8 @@
         "user_account.lastPasswordChange": "*string",
         "notification_v1.params": "map[string]any",
         "sso_keystore_details.serialNumber": "json.Number",
-        "prestage_scope_assignment_v2.assignmentDate": "*string"
+        "prestage_scope_assignment_v2.assignmentDate": "*string",
+        "cloud_ldap_keystore.expirationDate": "*string"
       },
       "emitNullForOptional": [
         "SamlSettings",

@@ -817,10 +817,10 @@ type CloudLdapConnectionStatus struct {
 
 // CloudLdapKeystore Response with keystore information.
 type CloudLdapKeystore struct {
-	ExpirationDate *time.Time `json:"expirationDate,omitempty"`
-	FileName       string     `json:"fileName"`
-	Subject        string     `json:"subject"`
-	Type           string     `json:"type"`
+	ExpirationDate *string `json:"expirationDate"`
+	FileName       string  `json:"fileName"`
+	Subject        string  `json:"subject"`
+	Type           string  `json:"type"`
 }
 
 // CloudLdapKeystoreFile Request with the Base64-encoded keystore file.
