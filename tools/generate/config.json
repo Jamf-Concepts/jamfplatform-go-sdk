@@ -4830,6 +4830,9 @@
         "account": {
           "password": "string:password"
         },
+        "category": {
+          "priority": "integer"
+        },
         "json_web_token_configuration": {
           "encryption_key": "string:password"
         },
