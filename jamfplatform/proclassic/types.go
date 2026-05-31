@@ -21,10 +21,11 @@ type Account struct {
 	LdapServer          *AccountLdapServer `xml:"ldap_server,omitempty"`
 	Name                *string            `xml:"name,omitempty"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Password     *string            `xml:"password,omitempty"`
-	PrivilegeSet *string            `xml:"privilege_set,omitempty"`
-	Privileges   *AccountPrivileges `xml:"privileges,omitempty"`
-	Site         *SiteObject        `xml:"site,omitempty"`
+	Password       *string            `xml:"password,omitempty"`
+	PasswordSha256 *string            `xml:"password_sha256,omitempty"`
+	PrivilegeSet   *string            `xml:"privilege_set,omitempty"`
+	Privileges     *AccountPrivileges `xml:"privileges,omitempty"`
+	Site           *SiteObject        `xml:"site,omitempty"`
 }
 
 // MarshalXML forces the Account root element name to the wire value
