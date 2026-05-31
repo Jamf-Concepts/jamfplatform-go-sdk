@@ -5098,6 +5098,9 @@
             }
           }
         },
+        "vpp_account": {
+          "location_name": { "type": "string" }
+        },
         "mac_application": {
           "general.deployment_type": { "type": "string" },
           "vpp": {

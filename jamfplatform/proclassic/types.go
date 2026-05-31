@@ -18386,6 +18386,7 @@ type VppAccount struct {
 	Country                       *string     `xml:"country,omitempty"`
 	ExpirationDate                *string     `xml:"expiration_date,omitempty"`
 	ID                            *int        `xml:"id,omitempty"`
+	LocationName                  *string     `xml:"location_name,omitempty"`
 	Name                          *string     `xml:"name,omitempty"`
 	NotifyDisassociation          *bool       `xml:"notify_disassociation,omitempty"`
 	PopulateCatalogFromVppContent *bool       `xml:"populate_catalog_from_vpp_content,omitempty"`
