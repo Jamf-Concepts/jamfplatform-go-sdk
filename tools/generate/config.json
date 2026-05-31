@@ -4847,6 +4847,12 @@
         "printer": {
           "shared": "boolean",
           "os_requirements": "string"
+        },
+        "distribution_point": {
+          "ssh_password_sha256":       "string",
+          "read_only_password_sha256": "string",
+          "read_write_password_sha256":"string",
+          "http_password_sha256":      "string"
         }
       },
       "propertyRenames": {

@@ -5522,6 +5522,7 @@ type DistributionPoint struct {
 	FailoverPointURL         *string `xml:"failover_point_url,omitempty"`
 	HttpDownloadsEnabled     *bool   `xml:"http_downloads_enabled,omitempty"`
 	HttpPassword             *string `xml:"http_password,omitempty"`
+	HttpPasswordSha256       *string `xml:"http_password_sha256,omitempty"`
 	HttpURL                  *string `xml:"http_url,omitempty"`
 	HttpUsername             *string `xml:"http_username,omitempty"`
 	ID                       *int    `xml:"id,omitempty"`
@@ -5534,11 +5535,14 @@ type DistributionPoint struct {
 	Port                     *int    `xml:"port,omitempty"`
 	Protocol                 *string `xml:"protocol,omitempty"`
 	ReadOnlyPassword         *string `xml:"read_only_password,omitempty"`
+	ReadOnlyPasswordSha256   *string `xml:"read_only_password_sha256,omitempty"`
 	ReadOnlyUsername         *string `xml:"read_only_username,omitempty"`
 	ReadWritePassword        *string `xml:"read_write_password,omitempty"`
+	ReadWritePasswordSha256  *string `xml:"read_write_password_sha256,omitempty"`
 	ReadWriteUsername        *string `xml:"read_write_username,omitempty"`
 	ShareName                *string `xml:"share_name,omitempty"`
 	SharePort                *int    `xml:"share_port,omitempty"`
+	SshPasswordSha256        *string `xml:"ssh_password_sha256,omitempty"`
 	SshUsername              *string `xml:"ssh_username,omitempty"`
 	UsernamePasswordRequired *bool   `xml:"username_password_required,omitempty"`
 	WorkgroupOrDomain        *string `xml:"workgroup_or_domain,omitempty"`
@@ -5567,6 +5571,7 @@ type DistributionPointPost struct {
 	FailoverPointURL         *string `xml:"failover_point_url,omitempty"`
 	HttpDownloadsEnabled     *bool   `xml:"http_downloads_enabled,omitempty"`
 	HttpPassword             *string `xml:"http_password,omitempty"`
+	HttpPasswordSha256       *string `xml:"http_password_sha256,omitempty"`
 	HttpURL                  *string `xml:"http_url,omitempty"`
 	HttpUsername             *string `xml:"http_username,omitempty"`
 	ID                       *int    `xml:"id,omitempty"`
@@ -5579,11 +5584,14 @@ type DistributionPointPost struct {
 	Port                     *int    `xml:"port,omitempty"`
 	Protocol                 *string `xml:"protocol,omitempty"`
 	ReadOnlyPassword         *string `xml:"read_only_password,omitempty"`
+	ReadOnlyPasswordSha256   *string `xml:"read_only_password_sha256,omitempty"`
 	ReadOnlyUsername         *string `xml:"read_only_username,omitempty"`
 	ReadWritePassword        *string `xml:"read_write_password,omitempty"`
+	ReadWritePasswordSha256  *string `xml:"read_write_password_sha256,omitempty"`
 	ReadWriteUsername        *string `xml:"read_write_username,omitempty"`
 	ShareName                *string `xml:"share_name,omitempty"`
 	SharePort                *int    `xml:"share_port,omitempty"`
+	SshPasswordSha256        *string `xml:"ssh_password_sha256,omitempty"`
 	SshUsername              *string `xml:"ssh_username,omitempty"`
 	UsernamePasswordRequired *bool   `xml:"username_password_required,omitempty"`
 	WorkgroupOrDomain        *string `xml:"workgroup_or_domain,omitempty"`
