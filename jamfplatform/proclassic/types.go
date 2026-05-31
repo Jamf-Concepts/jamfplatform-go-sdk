@@ -7667,6 +7667,7 @@ func (t LdapServersItem) MarshalXML(e *xml.Encoder, start xml.StartElement) erro
 type LicensedSoftware struct {
 	XMLName             xml.Name
 	ID                  *int                                 `xml:"id,omitempty"`
+	Computers           *LicensedSoftwareComputers           `xml:"computers,omitempty"`
 	FontDefinitions     *LicensedSoftwareFontDefinitions     `xml:"font_definitions,omitempty"`
 	General             *LicensedSoftwareGeneral             `xml:"general,omitempty"`
 	Licenses            *LicensedSoftwareLicenses            `xml:"licenses,omitempty"`
@@ -7684,6 +7685,46 @@ type LicensedSoftware struct {
 func (t LicensedSoftware) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "licensed_software"}
 	type shadow LicensedSoftware
+	return e.EncodeElement(shadow(t), start)
+}
+
+// LicensedSoftwareComputers represents a licensed software computers.
+type LicensedSoftwareComputers struct {
+	XMLName  xml.Name
+	Computer *[]LicensedSoftwareComputersComputerItem `xml:"computer,omitempty"`
+}
+
+// MarshalXML forces the LicensedSoftwareComputers root element name to the wire value
+// declared by the spec (<computers>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t LicensedSoftwareComputers) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "computers"}
+	type shadow LicensedSoftwareComputers
+	return e.EncodeElement(shadow(t), start)
+}
+
+// LicensedSoftwareComputersComputerItem represents a licensed software computers computer item.
+type LicensedSoftwareComputersComputerItem struct {
+	XMLName xml.Name
+	ID      *int    `xml:"id,omitempty"`
+	Name    *string `xml:"name,omitempty"`
+	UDID    *string `xml:"udid,omitempty"`
+}
+
+// MarshalXML forces the LicensedSoftwareComputersComputerItem root element name to the wire value
+// declared by the spec (<computer>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t LicensedSoftwareComputersComputerItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "computer"}
+	type shadow LicensedSoftwareComputersComputerItem
 	return e.EncodeElement(shadow(t), start)
 }
 

@@ -4943,6 +4943,24 @@
             }
           }
         },
+        "licensed_software": {
+          "computers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "computer": {
+                  "type": "object",
+                  "properties": {
+                    "id":   { "type": "integer" },
+                    "name": { "type": "string" },
+                    "udid": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
         "disk_encryption_configuration": {
           "institutional_recovery_key": {
             "type": "object",
