@@ -8022,6 +8022,7 @@ type MacApplication struct {
 	General     *MacApplicationGeneral     `xml:"general,omitempty"`
 	Scope       *MacApplicationScope       `xml:"scope,omitempty"`
 	SelfService *MacApplicationSelfService `xml:"self_service,omitempty"`
+	Vpp         *MacApplicationVpp         `xml:"vpp,omitempty"`
 }
 
 // MarshalXML forces the MacApplication root element name to the wire value
@@ -8039,15 +8040,16 @@ func (t MacApplication) MarshalXML(e *xml.Encoder, start xml.StartElement) error
 
 // MacApplicationGeneral represents a mac application general.
 type MacApplicationGeneral struct {
-	XMLName  xml.Name
-	BundleID *string         `xml:"bundle_id,omitempty"`
-	Category *CategoryObject `xml:"category,omitempty"`
-	ID       *int            `xml:"id,omitempty"`
-	IsFree   *bool           `xml:"is_free,omitempty"`
-	Name     *string         `xml:"name,omitempty"`
-	Site     *SiteObject     `xml:"site,omitempty"`
-	URL      *string         `xml:"url,omitempty"`
-	Version  *string         `xml:"version,omitempty"`
+	XMLName        xml.Name
+	BundleID       *string         `xml:"bundle_id,omitempty"`
+	Category       *CategoryObject `xml:"category,omitempty"`
+	DeploymentType *string         `xml:"deployment_type,omitempty"`
+	ID             *int            `xml:"id,omitempty"`
+	IsFree         *bool           `xml:"is_free,omitempty"`
+	Name           *string         `xml:"name,omitempty"`
+	Site           *SiteObject     `xml:"site,omitempty"`
+	URL            *string         `xml:"url,omitempty"`
+	Version        *string         `xml:"version,omitempty"`
 }
 
 // MarshalXML forces the MacApplicationGeneral root element name to the wire value
@@ -8674,6 +8676,29 @@ type MacApplicationSelfServiceVpp struct {
 func (t MacApplicationSelfServiceVpp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "vpp"}
 	type shadow MacApplicationSelfServiceVpp
+	return e.EncodeElement(shadow(t), start)
+}
+
+// MacApplicationVpp represents a mac application vpp.
+type MacApplicationVpp struct {
+	XMLName                      xml.Name
+	AssignVppDeviceBasedLicenses *bool `xml:"assign_vpp_device_based_licenses,omitempty"`
+	RemainingVppLicenses         *int  `xml:"remaining_vpp_licenses,omitempty"`
+	TotalVppLicenses             *int  `xml:"total_vpp_licenses,omitempty"`
+	UsedVppLicenses              *int  `xml:"used_vpp_licenses,omitempty"`
+	VppAdminAccountID            *int  `xml:"vpp_admin_account_id,omitempty"`
+}
+
+// MarshalXML forces the MacApplicationVpp root element name to the wire value
+// declared by the spec (<vpp>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MacApplicationVpp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "vpp"}
+	type shadow MacApplicationVpp
 	return e.EncodeElement(shadow(t), start)
 }
 
