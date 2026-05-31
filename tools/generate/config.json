@@ -4857,6 +4857,11 @@
         "patch_external_source": {
           "certificate_validation_enabled": "boolean",
           "enabled": "boolean"
+        },
+        "webhook": {
+          "header":        "string",
+          "hash_algorithm":"string",
+          "smart_group_id":"integer"
         }
       },
       "propertyRenames": {

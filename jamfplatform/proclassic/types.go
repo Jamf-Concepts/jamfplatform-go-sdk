@@ -19424,10 +19424,13 @@ type Webhook struct {
 	EnableDisplayFieldsForGroupObject *bool                 `xml:"enable_display_fields_for_group_object,omitempty"`
 	Enabled                           *bool                 `xml:"enabled,omitempty"`
 	Event                             *string               `xml:"event,omitempty"`
+	HashAlgorithm                     *string               `xml:"hash_algorithm,omitempty"`
+	Header                            *string               `xml:"header,omitempty"`
 	ID                                *int                  `xml:"id,omitempty"`
 	Name                              *string               `xml:"name,omitempty"`
 	Password                          *string               `xml:"password,omitempty"`
 	ReadTimeout                       *int                  `xml:"read_timeout,omitempty"`
+	SmartGroupID                      *int                  `xml:"smart_group_id,omitempty"`
 	URL                               *string               `xml:"url,omitempty"`
 	Username                          *string               `xml:"username,omitempty"`
 }
