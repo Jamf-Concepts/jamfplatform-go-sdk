@@ -4925,6 +4925,24 @@
             }
           }
         },
+        "computer_extension_attribute": {
+          "input_type.platform":      { "type": "string" },
+          "input_type.script":        { "type": "string" },
+          "input_type.popup_choices": {
+            "type": "object",
+            "properties": {
+              "choice": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "user_extension_attribute": {
+          "input_type.popup_choices": {
+            "type": "object",
+            "properties": {
+              "choice": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
         "disk_encryption_configuration": {
           "institutional_recovery_key": {
             "type": "object",

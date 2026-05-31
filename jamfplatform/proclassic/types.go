@@ -2919,8 +2919,12 @@ func (t ComputerExtensionAttribute) MarshalXML(e *xml.Encoder, start xml.StartEl
 
 // ComputerExtensionAttributeInputType represents a computer extension attribute input type.
 type ComputerExtensionAttributeInputType struct {
-	XMLName xml.Name
-	Type    *string `xml:"type,omitempty"`
+	XMLName      xml.Name
+	ID           *int                                             `xml:"id,omitempty"`
+	Platform     *string                                          `xml:"platform,omitempty"`
+	PopupChoices *ComputerExtensionAttributeInputTypePopupChoices `xml:"popup_choices,omitempty"`
+	Script       *string                                          `xml:"script,omitempty"`
+	Type         *string                                          `xml:"type,omitempty"`
 }
 
 // MarshalXML forces the ComputerExtensionAttributeInputType root element name to the wire value
@@ -2933,6 +2937,25 @@ type ComputerExtensionAttributeInputType struct {
 func (t ComputerExtensionAttributeInputType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "input_type"}
 	type shadow ComputerExtensionAttributeInputType
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ComputerExtensionAttributeInputTypePopupChoices represents a computer extension attribute input type popup choices.
+type ComputerExtensionAttributeInputTypePopupChoices struct {
+	XMLName xml.Name
+	Choice  *[]string `xml:"choice,omitempty"`
+}
+
+// MarshalXML forces the ComputerExtensionAttributeInputTypePopupChoices root element name to the wire value
+// declared by the spec (<popup_choices>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ComputerExtensionAttributeInputTypePopupChoices) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "popup_choices"}
+	type shadow ComputerExtensionAttributeInputTypePopupChoices
 	return e.EncodeElement(shadow(t), start)
 }
 
@@ -18017,8 +18040,10 @@ func (t UserExtensionAttribute) MarshalXML(e *xml.Encoder, start xml.StartElemen
 
 // UserExtensionAttributeInputType represents a user extension attribute input type.
 type UserExtensionAttributeInputType struct {
-	XMLName xml.Name
-	Type    *string `xml:"type,omitempty"`
+	XMLName      xml.Name
+	ID           *int                                         `xml:"id,omitempty"`
+	PopupChoices *UserExtensionAttributeInputTypePopupChoices `xml:"popup_choices,omitempty"`
+	Type         *string                                      `xml:"type,omitempty"`
 }
 
 // MarshalXML forces the UserExtensionAttributeInputType root element name to the wire value
@@ -18031,6 +18056,25 @@ type UserExtensionAttributeInputType struct {
 func (t UserExtensionAttributeInputType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "input_type"}
 	type shadow UserExtensionAttributeInputType
+	return e.EncodeElement(shadow(t), start)
+}
+
+// UserExtensionAttributeInputTypePopupChoices represents a user extension attribute input type popup choices.
+type UserExtensionAttributeInputTypePopupChoices struct {
+	XMLName xml.Name
+	Choice  *[]string `xml:"choice,omitempty"`
+}
+
+// MarshalXML forces the UserExtensionAttributeInputTypePopupChoices root element name to the wire value
+// declared by the spec (<popup_choices>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t UserExtensionAttributeInputTypePopupChoices) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "popup_choices"}
+	type shadow UserExtensionAttributeInputTypePopupChoices
 	return e.EncodeElement(shadow(t), start)
 }
 
