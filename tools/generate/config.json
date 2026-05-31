@@ -4860,6 +4860,9 @@
         }
       },
       "propertyRenames": {
+        "patch_software_title": {
+          "categories": "category"
+        },
         "policy": {
           "self_service.re-install_button_text": "reinstall_button_text",
           "user_interaction.allow_user_to_defer": "allow_users_to_defer"
@@ -4884,6 +4887,9 @@
           "general.require_network_tethered":       { "type": "boolean" },
           "self_service.self_service_install_button_text":       { "type": "string" },
           "self_service.self_service_after_install_button_text": { "type": "string" }
+        },
+        "patch_software_title": {
+          "site": { "$ref": "#/components/schemas/site_object" }
         },
         "mobile_device_configuration_profile": {
           "self_service.security_name.password": { "type": "string" }

@@ -14542,11 +14542,12 @@ func (t PatchReportVersionsVersionItemComputersComputerItem) MarshalXML(e *xml.E
 // PatchSoftwareTitle represents a patch software title.
 type PatchSoftwareTitle struct {
 	XMLName       xml.Name
-	Categories    *CategoryObject                  `xml:"categories,omitempty"`
+	Category      *CategoryObject                  `xml:"category,omitempty"`
 	ID            *int                             `xml:"id,omitempty"`
 	Name          *string                          `xml:"name,omitempty"`
 	NameID        *string                          `xml:"name_id,omitempty"`
 	Notifications *PatchSoftwareTitleNotifications `xml:"notifications,omitempty"`
+	Site          *SiteObject                      `xml:"site,omitempty"`
 	SourceID      *int                             `xml:"source_id,omitempty"`
 	Versions      *PatchSoftwareTitleVersions      `xml:"versions,omitempty"`
 }
