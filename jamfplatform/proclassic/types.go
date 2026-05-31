@@ -11093,7 +11093,7 @@ func (t MobileDeviceEnrollmentProfilesItemMobileDeviceEnrollmentProfile) Marshal
 // MobileDeviceExtensionAttribute represents a mobile device extension attribute.
 type MobileDeviceExtensionAttribute struct {
 	XMLName          xml.Name
-	DateType         *string                                  `xml:"date_type,omitempty"`
+	DataType         *string                                  `xml:"data_type,omitempty"`
 	Description      *string                                  `xml:"description,omitempty"`
 	ID               *int                                     `xml:"id,omitempty"`
 	InputType        *MobileDeviceExtensionAttributeInputType `xml:"input_type,omitempty"`
@@ -11116,8 +11116,10 @@ func (t MobileDeviceExtensionAttribute) MarshalXML(e *xml.Encoder, start xml.Sta
 
 // MobileDeviceExtensionAttributeInputType represents a mobile device extension attribute input type.
 type MobileDeviceExtensionAttributeInputType struct {
-	XMLName xml.Name
-	Type    *string `xml:"type,omitempty"`
+	XMLName      xml.Name
+	ID           *int                                                 `xml:"id,omitempty"`
+	PopupChoices *MobileDeviceExtensionAttributeInputTypePopupChoices `xml:"popup_choices,omitempty"`
+	Type         *string                                              `xml:"type,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceExtensionAttributeInputType root element name to the wire value
@@ -11130,6 +11132,25 @@ type MobileDeviceExtensionAttributeInputType struct {
 func (t MobileDeviceExtensionAttributeInputType) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "input_type"}
 	type shadow MobileDeviceExtensionAttributeInputType
+	return e.EncodeElement(shadow(t), start)
+}
+
+// MobileDeviceExtensionAttributeInputTypePopupChoices represents a mobile device extension attribute input type popup choices.
+type MobileDeviceExtensionAttributeInputTypePopupChoices struct {
+	XMLName xml.Name
+	Choice  *[]string `xml:"choice,omitempty"`
+}
+
+// MarshalXML forces the MobileDeviceExtensionAttributeInputTypePopupChoices root element name to the wire value
+// declared by the spec (<popup_choices>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MobileDeviceExtensionAttributeInputTypePopupChoices) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "popup_choices"}
+	type shadow MobileDeviceExtensionAttributeInputTypePopupChoices
 	return e.EncodeElement(shadow(t), start)
 }
 
