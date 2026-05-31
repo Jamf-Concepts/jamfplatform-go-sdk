@@ -4823,6 +4823,7 @@
         "*.expiration_date_epoch": "*BigInt",
         "*.date_sent_epoch": "*BigInt",
         "*.notification": "*NotificationValue",
+        "*.map_user_membership_to_group_field": "*string",
         "os_x_configuration_profile_general.payloads": "PayloadsXMLText",
         "mobile_device_configuration_profile_general.payloads": "PayloadsXMLText"
       },
@@ -4887,6 +4888,12 @@
         },
         "mobile_device_extension_attribute": {
           "date_type": "data_type"
+        },
+        "ldap_server": {
+          "mappings_for_users.user_mappings.map_telephone": "map_phone"
+        },
+        "ldap_server_post": {
+          "mappings_for_users.user_mappings.map_telephone": "map_phone"
         }
       },
       "propertyRemovals": {
@@ -5196,6 +5203,14 @@
               "used_vpp_licenses":               { "type": "integer" }
             }
           }
+        },
+        "ldap_server": {
+          "connection.is_enabled":                                                                                           { "type": "boolean" },
+          "connection.migrated_to_id":                                                                                       { "type": "integer" },
+          "connection.certificates_used":                                                                                    { "type": "string"  },
+          "connection.account.password_sha256":                                                                              { "type": "string"  },
+          "mappings_for_users.user_group_membership_mappings.group_membership_enabled_when_user_membership_selected":        { "type": "boolean" },
+          "mappings_for_users.user_group_membership_mappings.membership_scoping_optimization":                               { "type": "boolean" }
         }
       },
       "excludePaths": [

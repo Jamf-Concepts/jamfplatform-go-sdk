@@ -7392,8 +7392,11 @@ type LdapServerConnection struct {
 	XMLName            xml.Name
 	Account            *LdapServerConnectionAccount `xml:"account,omitempty"`
 	AuthenticationType *string                      `xml:"authentication_type,omitempty"`
+	CertificatesUsed   *string                      `xml:"certificates_used,omitempty"`
 	Hostname           *string                      `xml:"hostname,omitempty"`
 	ID                 *int                         `xml:"id,omitempty"`
+	IsEnabled          *bool                        `xml:"is_enabled,omitempty"`
+	MigratedToID       *int                         `xml:"migrated_to_id,omitempty"`
 	Name               *string                      `xml:"name,omitempty"`
 	OpenCloseTimeout   *int                         `xml:"open_close_timeout,omitempty"`
 	Port               *int                         `xml:"port,omitempty"`
@@ -7422,6 +7425,7 @@ type LdapServerConnectionAccount struct {
 	XMLName               xml.Name
 	DistinguishedUsername *string `xml:"distinguished_username,omitempty"`
 	Password              *string `xml:"password,omitempty"`
+	PasswordSha256        *string `xml:"password_sha256,omitempty"`
 }
 
 // MarshalXML forces the LdapServerConnectionAccount root element name to the wire value
@@ -7486,21 +7490,23 @@ func (t LdapServerMappingsForUsersUserGroupMappings) MarshalXML(e *xml.Encoder, 
 
 // LdapServerMappingsForUsersUserGroupMembershipMappings represents a ldap server mappings for users user group membership mappings.
 type LdapServerMappingsForUsersUserGroupMembershipMappings struct {
-	XMLName                           xml.Name
-	AppendToUsername                  *string `xml:"append_to_username,omitempty"`
-	GroupID                           *string `xml:"group_id,omitempty"`
-	MapGroupMembershipToUserField     *string `xml:"map_group_membership_to_user_field,omitempty"`
-	MapObjectClassToAnyOrAll          *string `xml:"map_object_class_to_any_or_all,omitempty"`
-	MapUserMembershipToGroupField     *bool   `xml:"map_user_membership_to_group_field,omitempty"`
-	MapUserMembershipUseDn            *bool   `xml:"map_user_membership_use_dn,omitempty"`
-	ObjectClasses                     *string `xml:"object_classes,omitempty"`
-	RecursiveLookups                  *bool   `xml:"recursive_lookups,omitempty"`
-	SearchBase                        *string `xml:"search_base,omitempty"`
-	SearchScope                       *string `xml:"search_scope,omitempty"`
-	UseDn                             *bool   `xml:"use_dn,omitempty"`
-	UserGroupMembershipStoredIn       *string `xml:"user_group_membership_stored_in,omitempty"`
-	UserGroupMembershipUseLdapCompare *bool   `xml:"user_group_membership_use_ldap_compare,omitempty"`
-	Username                          *string `xml:"username,omitempty"`
+	XMLName                                          xml.Name
+	AppendToUsername                                 *string `xml:"append_to_username,omitempty"`
+	GroupID                                          *string `xml:"group_id,omitempty"`
+	GroupMembershipEnabledWhenUserMembershipSelected *bool   `xml:"group_membership_enabled_when_user_membership_selected,omitempty"`
+	MapGroupMembershipToUserField                    *string `xml:"map_group_membership_to_user_field,omitempty"`
+	MapObjectClassToAnyOrAll                         *string `xml:"map_object_class_to_any_or_all,omitempty"`
+	MapUserMembershipToGroupField                    *string `xml:"map_user_membership_to_group_field"`
+	MapUserMembershipUseDn                           *bool   `xml:"map_user_membership_use_dn,omitempty"`
+	MembershipScopingOptimization                    *bool   `xml:"membership_scoping_optimization,omitempty"`
+	ObjectClasses                                    *string `xml:"object_classes,omitempty"`
+	RecursiveLookups                                 *bool   `xml:"recursive_lookups,omitempty"`
+	SearchBase                                       *string `xml:"search_base,omitempty"`
+	SearchScope                                      *string `xml:"search_scope,omitempty"`
+	UseDn                                            *bool   `xml:"use_dn,omitempty"`
+	UserGroupMembershipStoredIn                      *string `xml:"user_group_membership_stored_in,omitempty"`
+	UserGroupMembershipUseLdapCompare                *bool   `xml:"user_group_membership_use_ldap_compare,omitempty"`
+	Username                                         *string `xml:"username,omitempty"`
 }
 
 // MarshalXML forces the LdapServerMappingsForUsersUserGroupMembershipMappings root element name to the wire value
@@ -7524,10 +7530,10 @@ type LdapServerMappingsForUsersUserMappings struct {
 	MapDepartment            *string `xml:"map_department,omitempty"`
 	MapEmailAddress          *string `xml:"map_email_address,omitempty"`
 	MapObjectClassToAnyOrAll *string `xml:"map_object_class_to_any_or_all,omitempty"`
+	MapPhone                 *string `xml:"map_phone,omitempty"`
 	MapPosition              *string `xml:"map_position,omitempty"`
 	MapRealname              *string `xml:"map_realname,omitempty"`
 	MapRoom                  *string `xml:"map_room,omitempty"`
-	MapTelephone             *string `xml:"map_telephone,omitempty"`
 	MapUserID                *string `xml:"map_user_id,omitempty"`
 	MapUserUUID              *string `xml:"map_user_uuid,omitempty"`
 	MapUsername              *string `xml:"map_username,omitempty"`
@@ -7575,8 +7581,11 @@ type LdapServerPostConnection struct {
 	XMLName            xml.Name
 	Account            *LdapServerConnectionAccount `xml:"account,omitempty"`
 	AuthenticationType *string                      `xml:"authentication_type,omitempty"`
+	CertificatesUsed   *string                      `xml:"certificates_used,omitempty"`
 	Hostname           *string                      `xml:"hostname,omitempty"`
 	ID                 *int                         `xml:"id,omitempty"`
+	IsEnabled          *bool                        `xml:"is_enabled,omitempty"`
+	MigratedToID       *int                         `xml:"migrated_to_id,omitempty"`
 	Name               *string                      `xml:"name,omitempty"`
 	OpenCloseTimeout   *int                         `xml:"open_close_timeout,omitempty"`
 	Port               *int                         `xml:"port,omitempty"`
