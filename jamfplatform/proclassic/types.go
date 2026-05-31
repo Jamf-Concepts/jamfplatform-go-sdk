@@ -9138,6 +9138,7 @@ func (t MobileDeviceApplicationAppConfiguration) MarshalXML(e *xml.Encoder, star
 // MobileDeviceApplicationGeneral represents a mobile device application general.
 type MobileDeviceApplicationGeneral struct {
 	XMLName                          xml.Name
+	AllowUserToDelete                *bool                               `xml:"allow_user_to_delete,omitempty"`
 	BundleID                         *string                             `xml:"bundle_id,omitempty"`
 	Category                         *CategoryObject                     `xml:"category,omitempty"`
 	DeployAsManagedApp               *bool                               `xml:"deploy_as_managed_app,omitempty"`
@@ -9155,12 +9156,14 @@ type MobileDeviceApplicationGeneral struct {
 	ItunesCountryRegion              *string                             `xml:"itunes_country_region,omitempty"`
 	ItunesStoreURL                   *string                             `xml:"itunes_store_url,omitempty"`
 	ItunesSyncTime                   *int                                `xml:"itunes_sync_time,omitempty"`
+	KeepAppUpdatedOnDevices          *bool                               `xml:"keep_app_updated_on_devices,omitempty"`
 	KeepDescriptionAndIconUpToDate   *bool                               `xml:"keep_description_and_icon_up_to_date,omitempty"`
 	MakeAvailableAfterInstall        *bool                               `xml:"make_available_after_install,omitempty"`
 	MobileDeviceProvisioningProfile  *int                                `xml:"mobile_device_provisioning_profile,omitempty"`
 	Name                             *string                             `xml:"name,omitempty"`
 	PreventBackupOfAppData           *bool                               `xml:"prevent_backup_of_app_data,omitempty"`
 	RemoveAppWhenMDMProfileIsRemoved *bool                               `xml:"remove_app_when_mdm_profile_is_removed,omitempty"`
+	RequireNetworkTethered           *bool                               `xml:"require_network_tethered,omitempty"`
 	Site                             *SiteObject                         `xml:"site,omitempty"`
 	TakeOverManagement               *bool                               `xml:"take_over_management,omitempty"`
 	Version                          *string                             `xml:"version,omitempty"`
@@ -9729,15 +9732,17 @@ func (t MobileDeviceApplicationScopeMobileDevicesMobileDeviceItem) MarshalXML(e 
 
 // MobileDeviceApplicationSelfService represents a mobile device application self service.
 type MobileDeviceApplicationSelfService struct {
-	XMLName                xml.Name
-	ID                     *int                                                     `xml:"id,omitempty"`
-	FeatureOnMainPage      *bool                                                    `xml:"feature_on_main_page,omitempty"`
-	Notification           *NotificationValue                                       `xml:"notification"`
-	NotificationMessage    *string                                                  `xml:"notification_message,omitempty"`
-	NotificationSubject    *string                                                  `xml:"notification_subject,omitempty"`
-	SelfServiceCategories  *MobileDeviceApplicationSelfServiceSelfServiceCategories `xml:"self_service_categories,omitempty"`
-	SelfServiceDescription *string                                                  `xml:"self_service_description,omitempty"`
-	SelfServiceIcon        *MobileDeviceApplicationSelfServiceSelfServiceIcon       `xml:"self_service_icon,omitempty"`
+	XMLName                           xml.Name
+	ID                                *int                                                     `xml:"id,omitempty"`
+	FeatureOnMainPage                 *bool                                                    `xml:"feature_on_main_page,omitempty"`
+	Notification                      *NotificationValue                                       `xml:"notification"`
+	NotificationMessage               *string                                                  `xml:"notification_message,omitempty"`
+	NotificationSubject               *string                                                  `xml:"notification_subject,omitempty"`
+	SelfServiceAfterInstallButtonText *string                                                  `xml:"self_service_after_install_button_text,omitempty"`
+	SelfServiceCategories             *MobileDeviceApplicationSelfServiceSelfServiceCategories `xml:"self_service_categories,omitempty"`
+	SelfServiceDescription            *string                                                  `xml:"self_service_description,omitempty"`
+	SelfServiceIcon                   *MobileDeviceApplicationSelfServiceSelfServiceIcon       `xml:"self_service_icon,omitempty"`
+	SelfServiceInstallButtonText      *string                                                  `xml:"self_service_install_button_text,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceApplicationSelfService root element name to the wire value
