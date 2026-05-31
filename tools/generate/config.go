@@ -60,6 +60,17 @@ type SpecDef struct {
 	// post sibling sees the corrected name.
 	PropertyRenames map[string]map[string]string `json:"propertyRenames,omitempty"`
 
+	// PropertyRemovals deletes properties at dotted paths under named component
+	// schemas. Outer key: schema name. Value: list of dotted paths to delete
+	// (same path syntax as SchemaPatches / PropertyRenames). Applied after
+	// PropertyRenames and before PostSymmetry so the post sibling inherits the
+	// trimmed shape. Panics on missing paths — a declared removal that can't be
+	// walked is a config typo.
+	//
+	// Targets inline object schemas only. If a path resolves through a shared
+	// $ref component, the deletion affects every schema that references it.
+	PropertyRemovals map[string][]string `json:"propertyRemovals,omitempty"`
+
 	// PostSymmetryExcludes lists, per *_post schema, property names whose
 	// presence in the read sibling should NOT be copied across when the
 	// generator's Post-symmetry pass mirrors read fields onto a post type.

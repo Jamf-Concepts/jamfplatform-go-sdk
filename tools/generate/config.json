@@ -4861,6 +4861,9 @@
           "self_service.security_name": "security"
         }
       },
+      "propertyRemovals": {
+        "mac_application": ["self_service.vpp"]
+      },
       "schemaPatches": {
         "mobile_device_configuration_profile": {
           "self_service.security_name.password": { "type": "string" }

@@ -8581,7 +8581,6 @@ type MacApplicationSelfService struct {
 	SelfServiceCategories       *MacApplicationSelfServiceSelfServiceCategories `xml:"self_service_categories,omitempty"`
 	SelfServiceDescription      *string                                         `xml:"self_service_description,omitempty"`
 	SelfServiceIcon             *MacApplicationSelfServiceSelfServiceIcon       `xml:"self_service_icon,omitempty"`
-	Vpp                         *MacApplicationSelfServiceVpp                   `xml:"vpp,omitempty"`
 }
 
 // MarshalXML forces the MacApplicationSelfService root element name to the wire value
@@ -8656,26 +8655,6 @@ type MacApplicationSelfServiceSelfServiceIcon struct {
 func (t MacApplicationSelfServiceSelfServiceIcon) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "self_service_icon"}
 	type shadow MacApplicationSelfServiceSelfServiceIcon
-	return e.EncodeElement(shadow(t), start)
-}
-
-// MacApplicationSelfServiceVpp represents a mac application self service vpp.
-type MacApplicationSelfServiceVpp struct {
-	XMLName                      xml.Name
-	AssignVppDeviceBasedLicenses *bool `xml:"assign_vpp_device_based_licenses,omitempty"`
-	VppAdminAccountID            *int  `xml:"vpp_admin_account_id,omitempty"`
-}
-
-// MarshalXML forces the MacApplicationSelfServiceVpp root element name to the wire value
-// declared by the spec (<vpp>) regardless of what XMLName.Local
-// holds. Classic resources are frequently decoded from polymorphic wire
-// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
-// stashing the incoming root name in XMLName is useful context but must
-// not leak back into writes. The shadow type suppresses re-entry into
-// this method during encoding.
-func (t MacApplicationSelfServiceVpp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "vpp"}
-	type shadow MacApplicationSelfServiceVpp
 	return e.EncodeElement(shadow(t), start)
 }
 

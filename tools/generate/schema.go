@@ -127,6 +127,37 @@ func applyPropertyRenames(doc *openapi3.T, renames map[string]map[string]string)
 	}
 }
 
+// applyPropertyRemovals deletes properties at dotted paths inside named
+// component schemas. Used to drop spec properties that are misplaced (e.g.
+// mac_application.self_service.vpp is nested under self_service in the spec
+// but lives at the top level on the wire; the top-level shape is added via
+// schemaPatches, and this removes the phantom nested one so generated Go
+// types expose only the correct field). Runs after applyPropertyRenames and
+// before applyPostSymmetry so the post sibling inherits the trimmed shape.
+// Panics on missing paths — a declared removal whose path can't be resolved
+// is always a config bug.
+func applyPropertyRemovals(doc *openapi3.T, removals map[string][]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(removals) == 0 {
+		return
+	}
+	for schemaName, paths := range removals {
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			continue
+		}
+		for _, path := range paths {
+			parent, leaf, ok := walkPropertyPath(ref.Value, path)
+			if !ok {
+				panic(fmt.Sprintf("propertyRemovals[%q]: cannot reach path %q", schemaName, path))
+			}
+			if _, exists := parent.Properties[leaf]; !exists {
+				panic(fmt.Sprintf("propertyRemovals[%q]: property %q missing at path %q", schemaName, leaf, path))
+			}
+			delete(parent.Properties, leaf)
+		}
+	}
+}
+
 // applyPostSymmetry copies properties from each read schema X into its *_post
 // sibling X_post so write types accept the full field set the server actually
 // honours. Default behaviour for every spec — Jamf's classic specs routinely
