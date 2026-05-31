@@ -121,6 +121,74 @@ func TestRetryOn4xx_403NotRetried(t *testing.T) {
 	}
 }
 
+// TestRetryOn4xx_DeleteImmediate404IsSuccess covers the simplest idempotent
+// case: deleting an already-absent resource. A 404 on the first DELETE is the
+// delete's objective, so it returns nil without any retry.
+func TestRetryOn4xx_DeleteImmediate404IsSuccess(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	var calls atomic.Int32
+	mux.HandleFunc("/api/gone", func(w http.ResponseWriter, _ *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	err := c.DoExpect(context.Background(), http.MethodDelete, "/api/gone", nil, http.StatusNoContent, nil)
+	if err != nil {
+		t.Fatalf("expected nil (404-on-DELETE is success), got: %v", err)
+	}
+	if calls.Load() != 1 {
+		t.Errorf("expected exactly 1 call (no retry on idempotent-delete hit), got %d", calls.Load())
+	}
+}
+
+// TestRetryOn4xx_DeleteResolvesTo404IsSuccess reproduces the real-world bug: a
+// buggy API returns 400 on the first DELETE even though the resource is being
+// removed; the retry rides out the spurious 400 and lands on 404 once the
+// resource is gone. That terminal 404 is success, not the long-stall-then-error
+// the old blanket policy produced.
+func TestRetryOn4xx_DeleteResolvesTo404IsSuccess(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	var calls atomic.Int32
+	mux.HandleFunc("/api/eventual", func(w http.ResponseWriter, _ *http.Request) {
+		n := calls.Add(1)
+		if n == 1 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	err := c.DoExpect(context.Background(), http.MethodDelete, "/api/eventual", nil, http.StatusNoContent, nil)
+	if err != nil {
+		t.Fatalf("expected nil (400 then 404-on-DELETE is success), got: %v", err)
+	}
+	if calls.Load() != 2 {
+		t.Errorf("expected 2 calls (400, then 404 success), got %d", calls.Load())
+	}
+}
+
+// TestRetryOn4xx_Get404NotTreatedAsSuccess confirms the idempotent-delete
+// short-circuit is method-scoped: a 404 on a GET is a genuine not-found and
+// must still surface as an error (it is not a delete objective).
+func TestRetryOn4xx_Get404NotTreatedAsSuccess(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.retryOn4xx = true
+	mux.HandleFunc("/api/missing", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	// Bounded context so the (pre-existing) GET-404 retry can't hang the test.
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer cancel()
+
+	err := c.Do(ctx, http.MethodGet, "/api/missing", nil, nil)
+	if err == nil {
+		t.Fatal("expected error for GET 404, got nil")
+	}
+}
+
 func TestRetryOn4xx_5xxNotRetried(t *testing.T) {
 	c, _, mux := newTestClient(t)
 	c.retryOn4xx = true

@@ -130,6 +130,18 @@ func is4xxRetryable(status int) bool {
 		status != http.StatusForbidden
 }
 
+// isIdempotentDeleteHit reports whether a response represents an already-absent
+// resource on a DELETE. A 404 on DELETE means the resource is gone — which is
+// the delete's objective, so it is success, not an error. This breaks the
+// 4xx-retry loop and prevents a successful delete from surfacing as an error
+// (the failure mode where a buggy API returns a non-success code on the first
+// DELETE, then 404 on retry once the resource is actually gone). Only consulted
+// inside the retryOn4xx path; callers who didn't opt into resilient retry keep
+// the default behavior where a 404 surfaces as an *APIResponseError.
+func isIdempotentDeleteHit(method string, status int) bool {
+	return method == http.MethodDelete && status == http.StatusNotFound
+}
+
 // NewTransport creates a new Jamf Platform API transport.
 func NewTransport(baseURL, clientID, clientSecret string) *Transport {
 	return NewTransportWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")
@@ -278,7 +290,7 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 	if c.retryOn4xx {
 		const maxBackoff = 10 * time.Second
 		backoff := 2 * time.Second
-		for resp.StatusCode != expectedStatus && is4xxRetryable(resp.StatusCode) {
+		for resp.StatusCode != expectedStatus && is4xxRetryable(resp.StatusCode) && !isIdempotentDeleteHit(method, resp.StatusCode) {
 			status := resp.StatusCode
 			// Capture the error from this response before discarding the body
 			// so we can surface it if the context is cancelled during backoff.
@@ -300,6 +312,15 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 			if backoff > maxBackoff {
 				backoff = maxBackoff
 			}
+		}
+
+		// A DELETE that resolved to 404 means the resource is already absent —
+		// the delete's objective is met. handleResponse still runs to drain and
+		// close the body and log deprecation/response, but its 404
+		// APIResponseError is intentionally discarded in favor of success.
+		if isIdempotentDeleteHit(method, resp.StatusCode) {
+			_ = c.handleResponse(ctx, resp, classic, expectedStatus, result)
+			return nil
 		}
 	}
 
