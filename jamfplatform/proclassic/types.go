@@ -13639,12 +13639,14 @@ func (t PatchAvailableTitlesAvailableTitlesAvailableTitleItem) MarshalXML(e *xml
 
 // PatchExternalSource represents a patch external source.
 type PatchExternalSource struct {
-	XMLName    xml.Name
-	HostName   *string `xml:"host_name,omitempty"`
-	ID         *int    `xml:"id,omitempty"`
-	Name       *string `xml:"name,omitempty"`
-	Port       *int    `xml:"port,omitempty"`
-	SslEnabled *bool   `xml:"ssl_enabled,omitempty"`
+	XMLName                      xml.Name
+	CertificateValidationEnabled *bool   `xml:"certificate_validation_enabled,omitempty"`
+	Enabled                      *bool   `xml:"enabled,omitempty"`
+	HostName                     *string `xml:"host_name,omitempty"`
+	ID                           *int    `xml:"id,omitempty"`
+	Name                         *string `xml:"name,omitempty"`
+	Port                         *int    `xml:"port,omitempty"`
+	SslEnabled                   *bool   `xml:"ssl_enabled,omitempty"`
 }
 
 // MarshalXML forces the PatchExternalSource root element name to the wire value

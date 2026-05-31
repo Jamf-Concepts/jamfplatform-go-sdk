@@ -4853,6 +4853,10 @@
           "read_only_password_sha256": "string",
           "read_write_password_sha256":"string",
           "http_password_sha256":      "string"
+        },
+        "patch_external_source": {
+          "certificate_validation_enabled": "boolean",
+          "enabled": "boolean"
         }
       },
       "propertyRenames": {
