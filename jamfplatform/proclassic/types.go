@@ -1013,22 +1013,23 @@ type CategoryObject struct {
 
 // Class represents a class.
 type Class struct {
-	XMLName             xml.Name
-	AppleTvs            *ClassAppleTvs                  `xml:"apple_tvs,omitempty"`
-	Description         *string                         `xml:"description,omitempty"`
-	ID                  *int                            `xml:"id,omitempty"`
-	MeetingTimes        *ClassMeetingTimes              `xml:"meeting_times,omitempty"`
-	MobileDeviceGroup   *IDName                         `xml:"mobile_device_group,omitempty"`
-	MobileDeviceGroupID *[]ClassMobileDeviceGroupIDItem `xml:"mobile_device_group_id,omitempty"`
-	MobileDevices       *ClassMobileDevices             `xml:"mobile_devices,omitempty"`
-	Name                *string                         `xml:"name,omitempty"`
-	Site                *SiteObject                     `xml:"site,omitempty"`
-	Source              *string                         `xml:"source,omitempty"`
-	StudentGroupIds     *[]ClassStudentGroupIdsItem     `xml:"student_group_ids,omitempty"`
-	Students            *[]ClassStudentsItem            `xml:"students,omitempty"`
-	TeacherGroupIds     *[]ClassTeacherGroupIdsItem     `xml:"teacher_group_ids,omitempty"`
-	TeacherIds          *[]ClassTeacherIdsItem          `xml:"teacher_ids,omitempty"`
-	Teachers            *[]ClassTeachersItem            `xml:"teachers,omitempty"`
+	XMLName              xml.Name
+	AppleTvs             *ClassAppleTvs                   `xml:"apple_tvs,omitempty"`
+	Description          *string                          `xml:"description,omitempty"`
+	ID                   *int                             `xml:"id,omitempty"`
+	MeetingTimes         *ClassMeetingTimes               `xml:"meeting_times,omitempty"`
+	MobileDeviceGroup    *IDName                          `xml:"mobile_device_group,omitempty"`
+	MobileDeviceGroupIds *[]ClassMobileDeviceGroupIdsItem `xml:"mobile_device_group_ids,omitempty"`
+	MobileDevices        *ClassMobileDevices              `xml:"mobile_devices,omitempty"`
+	Name                 *string                          `xml:"name,omitempty"`
+	Site                 *SiteObject                      `xml:"site,omitempty"`
+	Source               *string                          `xml:"source,omitempty"`
+	StudentGroupIds      *[]ClassStudentGroupIdsItem      `xml:"student_group_ids,omitempty"`
+	StudentIds           *[]ClassStudentIdsItem           `xml:"student_ids,omitempty"`
+	Students             *[]ClassStudentsItem             `xml:"students,omitempty"`
+	TeacherGroupIds      *[]ClassTeacherGroupIdsItem      `xml:"teacher_group_ids,omitempty"`
+	TeacherIds           *[]ClassTeacherIdsItem           `xml:"teacher_ids,omitempty"`
+	Teachers             *[]ClassTeachersItem             `xml:"teachers,omitempty"`
 }
 
 // MarshalXML forces the Class root element name to the wire value
@@ -1127,23 +1128,9 @@ func (t ClassMeetingTimesMeetingTime) MarshalXML(e *xml.Encoder, start xml.Start
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ClassMobileDeviceGroupIDItem represents a class mobile device group i d item.
-type ClassMobileDeviceGroupIDItem struct {
-	XMLName xml.Name
-	ID      *int `xml:"id,omitempty"`
-}
-
-// MarshalXML forces the ClassMobileDeviceGroupIDItem root element name to the wire value
-// declared by the spec (<mobile_device_group_id>) regardless of what XMLName.Local
-// holds. Classic resources are frequently decoded from polymorphic wire
-// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
-// stashing the incoming root name in XMLName is useful context but must
-// not leak back into writes. The shadow type suppresses re-entry into
-// this method during encoding.
-func (t ClassMobileDeviceGroupIDItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "mobile_device_group_id"}
-	type shadow ClassMobileDeviceGroupIDItem
-	return e.EncodeElement(shadow(t), start)
+// ClassMobileDeviceGroupIdsItem represents a class mobile device group ids item.
+type ClassMobileDeviceGroupIdsItem struct {
+	ID *int `xml:"id,omitempty"`
 }
 
 // ClassMobileDevices represents a class mobile devices.
@@ -1191,6 +1178,11 @@ type ClassStudentGroupIdsItem struct {
 	ID *int `xml:"id,omitempty"`
 }
 
+// ClassStudentIdsItem represents a class student ids item.
+type ClassStudentIdsItem struct {
+	ID *int `xml:"id,omitempty"`
+}
+
 // ClassStudentsItem represents a class students item.
 type ClassStudentsItem struct {
 	Student *string `xml:"student,omitempty"`
@@ -1213,22 +1205,23 @@ type ClassTeachersItem struct {
 
 // ClassPost represents a class post.
 type ClassPost struct {
-	XMLName             xml.Name
-	AppleTvs            *ClassPostAppleTvs              `xml:"apple_tvs,omitempty"`
-	Description         *string                         `xml:"description,omitempty"`
-	ID                  *int                            `xml:"id,omitempty"`
-	MeetingTimes        *ClassPostMeetingTimes          `xml:"meeting_times,omitempty"`
-	MobileDeviceGroup   *IDName                         `xml:"mobile_device_group,omitempty"`
-	MobileDeviceGroupID *[]ClassMobileDeviceGroupIDItem `xml:"mobile_device_group_id,omitempty"`
-	MobileDevices       *ClassPostMobileDevices         `xml:"mobile_devices,omitempty"`
-	Name                *string                         `xml:"name,omitempty"`
-	Site                *SiteObject                     `xml:"site,omitempty"`
-	Source              *string                         `xml:"source,omitempty"`
-	StudentGroupIds     *[]ClassStudentGroupIdsItem     `xml:"student_group_ids,omitempty"`
-	Students            *[]ClassStudentsItem            `xml:"students,omitempty"`
-	TeacherGroupIds     *[]ClassTeacherGroupIdsItem     `xml:"teacher_group_ids,omitempty"`
-	TeacherIds          *[]ClassTeacherIdsItem          `xml:"teacher_ids,omitempty"`
-	Teachers            *[]ClassTeachersItem            `xml:"teachers,omitempty"`
+	XMLName              xml.Name
+	AppleTvs             *ClassPostAppleTvs               `xml:"apple_tvs,omitempty"`
+	Description          *string                          `xml:"description,omitempty"`
+	ID                   *int                             `xml:"id,omitempty"`
+	MeetingTimes         *ClassPostMeetingTimes           `xml:"meeting_times,omitempty"`
+	MobileDeviceGroup    *IDName                          `xml:"mobile_device_group,omitempty"`
+	MobileDeviceGroupIds *[]ClassMobileDeviceGroupIdsItem `xml:"mobile_device_group_ids,omitempty"`
+	MobileDevices        *ClassPostMobileDevices          `xml:"mobile_devices,omitempty"`
+	Name                 *string                          `xml:"name,omitempty"`
+	Site                 *SiteObject                      `xml:"site,omitempty"`
+	Source               *string                          `xml:"source,omitempty"`
+	StudentGroupIds      *[]ClassStudentGroupIdsItem      `xml:"student_group_ids,omitempty"`
+	StudentIds           *[]ClassStudentIdsItem           `xml:"student_ids,omitempty"`
+	Students             *[]ClassStudentsItem             `xml:"students,omitempty"`
+	TeacherGroupIds      *[]ClassTeacherGroupIdsItem      `xml:"teacher_group_ids,omitempty"`
+	TeacherIds           *[]ClassTeacherIdsItem           `xml:"teacher_ids,omitempty"`
+	Teachers             *[]ClassTeachersItem             `xml:"teachers,omitempty"`
 }
 
 // MarshalXML forces the ClassPost root element name to the wire value

@@ -4863,6 +4863,9 @@
         "patch_software_title": {
           "categories": "category"
         },
+        "class": {
+          "mobile_device_group_id": "mobile_device_group_ids"
+        },
         "policy": {
           "self_service.re-install_button_text": "reinstall_button_text",
           "user_interaction.allow_user_to_defer": "allow_users_to_defer"
@@ -4890,6 +4893,17 @@
         },
         "patch_software_title": {
           "site": { "$ref": "#/components/schemas/site_object" }
+        },
+        "class": {
+          "student_ids": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" }
+              }
+            }
+          }
         },
         "mobile_device_configuration_profile": {
           "self_service.security_name.password": { "type": "string" }
