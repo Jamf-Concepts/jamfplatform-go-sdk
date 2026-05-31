@@ -77,6 +77,9 @@
             "type": "string",
             "writeOnly": true
           },
+          "password_sha256": {
+            "type": "string"
+          },
           "privilege_set": {
             "enum": [
               "Administrator",
@@ -3998,6 +4001,9 @@
             "description": "Password for basic authentication",
             "type": "string"
           },
+          "http_password_sha256": {
+            "type": "string"
+          },
           "http_url": {
             "description": "URL to download packages from",
             "example": "http://ny.company.com/CasperShare",
@@ -4054,6 +4060,9 @@
             "example": "password",
             "type": "string"
           },
+          "read_only_password_sha256": {
+            "type": "string"
+          },
           "read_only_username": {
             "description": "Account with read only privileges to the share",
             "example": "casperinstall",
@@ -4062,6 +4071,9 @@
           "read_write_password": {
             "description": "Password for the read/write account",
             "example": "password",
+            "type": "string"
+          },
+          "read_write_password_sha256": {
             "type": "string"
           },
           "read_write_username": {
@@ -4077,6 +4089,9 @@
           "share_port": {
             "example": 139,
             "type": "integer"
+          },
+          "ssh_password_sha256": {
+            "type": "string"
           },
           "ssh_username": {
             "example": "username",
@@ -10454,6 +10469,12 @@
       },
       "patch_external_source": {
         "properties": {
+          "certificate_validation_enabled": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
           "host_name": {
             "example": "patch.url.com/v1",
             "type": "string"
@@ -12385,7 +12406,7 @@
             "type": "string"
           },
           "shared": {
-            "type": "string"
+            "type": "boolean"
           },
           "uri": {
             "example": "lpd://10.1.20.204/",
@@ -13986,6 +14007,12 @@
             ],
             "type": "string"
           },
+          "hash_algorithm": {
+            "type": "string"
+          },
+          "header": {
+            "type": "string"
+          },
           "id": {
             "example": 1,
             "type": "integer"
@@ -14000,6 +14027,9 @@
           "read_timeout": {
             "default": 2,
             "description": "Number of seconds to wait for a response from the webhooks host server after sending a request",
+            "type": "integer"
+          },
+          "smart_group_id": {
             "type": "integer"
           },
           "url": {
