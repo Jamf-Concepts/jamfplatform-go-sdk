@@ -16804,7 +16804,7 @@ type Printer struct {
 	Ppd            *string `xml:"ppd,omitempty"`
 	PpdContents    *string `xml:"ppd_contents,omitempty"`
 	PpdPath        *string `xml:"ppd_path,omitempty"`
-	Shared         *string `xml:"shared,omitempty"`
+	Shared         *bool   `xml:"shared,omitempty"`
 	URI            *string `xml:"uri,omitempty"`
 	UseGeneric     *bool   `xml:"use_generic,omitempty"`
 }

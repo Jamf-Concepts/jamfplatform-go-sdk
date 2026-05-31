@@ -4845,7 +4845,7 @@
           "department": "string"
         },
         "printer": {
-          "shared": "string",
+          "shared": "boolean",
           "os_requirements": "string"
         }
       },
