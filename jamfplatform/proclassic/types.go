@@ -9236,6 +9236,7 @@ type MobileDeviceApplicationGeneral struct {
 	MakeAvailableAfterInstall        *bool                               `xml:"make_available_after_install,omitempty"`
 	MobileDeviceProvisioningProfile  *int                                `xml:"mobile_device_provisioning_profile,omitempty"`
 	Name                             *string                             `xml:"name,omitempty"`
+	OsType                           *string                             `xml:"os_type,omitempty"`
 	PreventBackupOfAppData           *bool                               `xml:"prevent_backup_of_app_data,omitempty"`
 	RemoveAppWhenMDMProfileIsRemoved *bool                               `xml:"remove_app_when_mdm_profile_is_removed,omitempty"`
 	RequireNetworkTethered           *bool                               `xml:"require_network_tethered,omitempty"`
@@ -9875,11 +9876,12 @@ func (t MobileDeviceApplicationSelfServiceSelfServiceCategoriesCategoryItem) Mar
 
 // MobileDeviceApplicationSelfServiceSelfServiceIcon represents a mobile device application self service self service icon.
 type MobileDeviceApplicationSelfServiceSelfServiceIcon struct {
-	XMLName xml.Name
-	Data    *string `xml:"data,omitempty"`
-	ID      *int    `xml:"id,omitempty"`
-	Name    *string `xml:"name,omitempty"`
-	URI     *string `xml:"uri,omitempty"`
+	XMLName  xml.Name
+	Data     *string `xml:"data,omitempty"`
+	Filename *string `xml:"filename,omitempty"`
+	ID       *int    `xml:"id,omitempty"`
+	Name     *string `xml:"name,omitempty"`
+	URI      *string `xml:"uri,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceApplicationSelfServiceSelfServiceIcon root element name to the wire value
