@@ -1146,7 +1146,7 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttribute(t *testing.T) {
 
 	id, created, err := pc.ApplyMobileDeviceExtensionAttribute(ctx, &proclassic.MobileDeviceExtensionAttribute{
 		Name:             ptrStr(name),
-		DateType:         ptrStr("String"),
+		DataType:         ptrStr("String"),
 		InventoryDisplay: ptrStr("General"),
 		InputType: &proclassic.MobileDeviceExtensionAttributeInputType{
 			Type: ptrStr("Text Field"),
@@ -1165,7 +1165,7 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttribute(t *testing.T) {
 
 	id2, created2, err := pc.ApplyMobileDeviceExtensionAttribute(ctx, &proclassic.MobileDeviceExtensionAttribute{
 		Name:             ptrStr(name),
-		DateType:         ptrStr("String"),
+		DataType:         ptrStr("String"),
 		InventoryDisplay: ptrStr("General"),
 		Description:      ptrStr("updated"),
 		InputType: &proclassic.MobileDeviceExtensionAttributeInputType{

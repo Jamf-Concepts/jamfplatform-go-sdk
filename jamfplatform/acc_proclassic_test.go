@@ -400,7 +400,7 @@ func TestAcceptance_Classic_MobileDeviceEACRUD(t *testing.T) {
 	name := "sdk-acc-classic-mdea-" + runSuffix()
 	created, err := pc.CreateMobileDeviceExtensionAttributeByID(ctx, "0", &proclassic.MobileDeviceExtensionAttribute{
 		Name:     classicStrPtr(name),
-		DateType: classicStrPtr("String"), // spec typo: date_type; Jamf spec has this misspelling
+		DataType: classicStrPtr("String"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
