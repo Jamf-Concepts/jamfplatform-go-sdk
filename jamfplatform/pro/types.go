@@ -6984,6 +6984,7 @@ type AppInstallerDeploymentCreate struct {
 	SelfServiceSettings             *AppInstallerSelfServiceSettings  `json:"selfServiceSettings,omitempty"`
 	SiteID                          *string                           `json:"siteId,omitempty"`
 	SmartGroupID                    *string                           `json:"smartGroupId,omitempty"`
+	TriggerAdminNotifications       *bool                             `json:"triggerAdminNotifications,omitempty"`
 	UpdateBehavior                  *string                           `json:"updateBehavior,omitempty"`
 }
 

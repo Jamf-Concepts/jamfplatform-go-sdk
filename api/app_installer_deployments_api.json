@@ -150,6 +150,9 @@
           "smartGroupId": {
             "type": "string"
           },
+          "triggerAdminNotifications": {
+            "type": "boolean"
+          },
           "updateBehavior": {
             "enum": [
               "AUTOMATIC",
