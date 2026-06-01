@@ -1,6 +1,49 @@
 {
   "components": {
     "schemas": {
+      "AppInstallerApp": {
+        "description": "Resolved app-catalog reference as returned in the list response. All fields are read-only server-assigned values.",
+        "properties": {
+          "bundleId": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "deployedVersion": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "iconUrl": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "App Installer title ID",
+            "readOnly": true,
+            "type": "string"
+          },
+          "latestVersion": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "mediaSourceType": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "selectedVersion": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "titleAvailableInAis": {
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "versionRemoved": {
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "AppInstallerDeployment": {
         "properties": {
           "appTitleId": {
@@ -124,9 +167,8 @@
       },
       "AppInstallerDeploymentListItem": {
         "properties": {
-          "bundleId": {
-            "readOnly": true,
-            "type": "string"
+          "app": {
+            "$ref": "#/components/schemas/AppInstallerApp"
           },
           "category": {
             "$ref": "#/components/schemas/IdName"
@@ -148,14 +190,7 @@
             "readOnly": true,
             "type": "string"
           },
-          "latestVersion": {
-            "readOnly": true,
-            "type": "string"
-          },
           "name": {
-            "type": "string"
-          },
-          "selectedVersion": {
             "type": "string"
           },
           "site": {

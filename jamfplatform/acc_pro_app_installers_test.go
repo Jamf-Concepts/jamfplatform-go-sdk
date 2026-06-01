@@ -167,8 +167,20 @@ func TestAcceptance_Pro_AppInstallerDeploymentListShape(t *testing.T) {
 	}
 	t.Logf("App Installer deployments: %d", len(items))
 	first := items[0]
+	bundleID := ""
+	if first.App != nil {
+		bundleID = first.App.BundleID
+	}
 	t.Logf("first deployment: id=%s name=%q deploymentType=%s updateBehavior=%s bundleId=%q",
-		first.ID, first.Name, first.DeploymentType, first.UpdateBehavior, first.BundleID)
+		first.ID, first.Name, first.DeploymentType, first.UpdateBehavior, bundleID)
+	// Verify nested app object populated by wire
+	if first.App == nil {
+		t.Error("first list entry has nil App — nested app object missing from wire decode")
+	} else {
+		t.Logf("  app: titleId=%s bundleId=%q latestVersion=%q selectedVersion=%q deployedVersion=%q versionRemoved=%v titleAvailableInAis=%v mediaSourceType=%q",
+			first.App.ID, first.App.BundleID, first.App.LatestVersion, first.App.SelectedVersion,
+			first.App.DeployedVersion, first.App.VersionRemoved, first.App.TitleAvailableInAis, first.App.MediaSourceType)
+	}
 	if first.ID == "" {
 		t.Error("first list entry has empty ID")
 	}

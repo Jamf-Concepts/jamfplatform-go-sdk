@@ -6929,6 +6929,19 @@ type OriginalMediaSource struct {
 	URL      string `json:"url"`
 }
 
+// AppInstallerApp Resolved app-catalog reference as returned in the list response. All fields are read-only server-assigned values.
+type AppInstallerApp struct {
+	BundleID            string `json:"bundleId"`
+	DeployedVersion     string `json:"deployedVersion"`
+	IconURL             string `json:"iconUrl"`
+	ID                  string `json:"id"`
+	LatestVersion       string `json:"latestVersion"`
+	MediaSourceType     string `json:"mediaSourceType"`
+	SelectedVersion     string `json:"selectedVersion"`
+	TitleAvailableInAis bool   `json:"titleAvailableInAis"`
+	VersionRemoved      bool   `json:"versionRemoved"`
+}
+
 // AppInstallerComputerStatuses represents a app installer computer statuses.
 type AppInstallerComputerStatuses struct {
 	Available   int `json:"available"`
@@ -6982,15 +6995,13 @@ type AppInstallerDeploymentHrefResponse struct {
 
 // AppInstallerDeploymentListEntry represents a app installer deployment list entry.
 type AppInstallerDeploymentListEntry struct {
-	BundleID         string                        `json:"bundleId"`
+	App              *AppInstallerApp              `json:"app,omitempty"`
 	Category         *AppInstallerNamedRef         `json:"category,omitempty"`
 	ComputerStatuses *AppInstallerComputerStatuses `json:"computerStatuses,omitempty"`
 	DeploymentType   string                        `json:"deploymentType"`
 	Enabled          bool                          `json:"enabled"`
 	ID               string                        `json:"id"`
-	LatestVersion    string                        `json:"latestVersion"`
 	Name             string                        `json:"name"`
-	SelectedVersion  string                        `json:"selectedVersion"`
 	Site             *AppInstallerNamedRef         `json:"site,omitempty"`
 	SmartGroup       *AppInstallerNamedRef         `json:"smartGroup,omitempty"`
 	UpdateBehavior   string                        `json:"updateBehavior"`
