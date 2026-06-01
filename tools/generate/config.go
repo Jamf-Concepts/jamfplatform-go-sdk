@@ -35,6 +35,15 @@ type SpecDef struct {
 	FieldTypeOverrides map[string]string            `json:"fieldTypeOverrides,omitempty"` // "schema_name.property_name" -> Go type, used to correct spec bugs (e.g. `integer` fields where the server actually returns a non-int64 string). Applied per-spec so upstream spec updates don't get silently overwritten.
 	SchemaAdditions    map[string]map[string]string `json:"schemaAdditions,omitempty"`    // "schema_name" -> { "property_name": "openapi_type" }, inject missing properties into a spec schema. Used when the spec omits a field the server accepts but we need to send (e.g. Classic's account schema has no `password` property). openapi_type is one of "string", "integer", "boolean", "string:password" (writeOnly string).
 
+	// SchemaRenames renames schema keys in doc.Components.Schemas and updates
+	// all $ref strings that reference the old name. Applied before all other
+	// patches so downstream fixups see the corrected names. Use when a spec
+	// uses generic schema names that would collide with schemas emitted by
+	// other specs in the same Go package (e.g. "SelfServiceSettings" is a
+	// top-level Pro API type; an app-installer spec reusing that name would
+	// silently shadow it). Outer key: old schema name. Value: new schema name.
+	SchemaRenames map[string]string `json:"schemaRenames,omitempty"`
+
 	// SchemaPatches injects (or replaces) arbitrary OpenAPI schema fragments at
 	// dotted property paths under a named component schema. Used when a spec
 	// omits a richer sub-structure the server actually returns (e.g. policy

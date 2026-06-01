@@ -9805,10 +9805,10 @@
       ]
     },
     {
-      "file": "testing/app-installers.yaml",
+      "file": "testing/AppInstallerTitles.yaml",
       "namespace": "pro",
       "package": "pro",
-      "specFile": "app_installers_api.json",
+      "specFile": "app_installer_titles_api.json",
       "splitByTag": true,
       "operations": [
         {
@@ -9826,7 +9826,34 @@
         {
           "op": "GET /v1/app-installers/titles/{id}",
           "name": "GetAppInstallerTitleV1"
-        },
+        }
+      ]
+    },
+    {
+      "file": "testing/AppInstallerDeployments.yaml",
+      "namespace": "pro",
+      "package": "pro",
+      "specFile": "app_installer_deployments_api.json",
+      "splitByTag": true,
+      "schemaRenames": {
+        "SelfServiceSettings": "AppInstallerSelfServiceSettings",
+        "NotificationSettings": "AppInstallerNotificationSettings",
+        "IdName": "AppInstallerNamedRef",
+        "ComputerStatuses": "AppInstallerComputerStatuses",
+        "AppInstallerDeploymentListItem": "AppInstallerDeploymentListEntry",
+        "AppInstallerDeploymentRef": "AppInstallerDeploymentHrefResponse"
+      },
+      "schemaAdditions": {
+        "AppInstallerDeployment": {
+          "categoryId": "string"
+        }
+      },
+      "excludePaths": [
+        "GET /v1/app-installers/deployments/{id}/computers",
+        "GET /v1/app-installers/deployments/{id}/installation-summary",
+        "POST /v1/app-installers/deployments/{id}/computers/installation-retry"
+      ],
+      "operations": [
         {
           "op": "GET /v1/app-installers/deployments",
           "name": "ListAppInstallerDeploymentsV1",

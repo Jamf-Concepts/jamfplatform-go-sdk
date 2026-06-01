@@ -41,7 +41,7 @@ func (c *Client) ListAppInstallerDeploymentsV1(ctx context.Context) ([]AppInstal
 }
 
 // CreateAppInstallerDeploymentV1 create an App Installer deployment.
-func (c *Client) CreateAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeployment) (*AppInstallerDeploymentHrefResponse, error) {
+func (c *Client) CreateAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeploymentCreate) (*AppInstallerDeploymentHrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AppInstallerDeploymentHrefResponse
 	endpoint := prefix + "/app-installers/deployments"
@@ -63,7 +63,7 @@ func (c *Client) GetAppInstallerDeploymentV1(ctx context.Context, id string) (*A
 }
 
 // UpdateAppInstallerDeploymentV1 update an App Installer deployment.
-func (c *Client) UpdateAppInstallerDeploymentV1(ctx context.Context, id string, request *AppInstallerDeployment) (*AppInstallerDeployment, error) {
+func (c *Client) UpdateAppInstallerDeploymentV1(ctx context.Context, id string, request *AppInstallerDeploymentCreate) (*AppInstallerDeployment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AppInstallerDeployment
 	endpoint := fmt.Sprintf("%s/app-installers/deployments/%s", prefix, url.PathEscape(id))
@@ -110,11 +110,8 @@ func (c *Client) ResolveAppInstallerDeploymentV1ByName(ctx context.Context, name
 }
 
 // ApplyAppInstallerDeploymentV1 creates or updates a AppInstallerDeploymentV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
-func (c *Client) ApplyAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeployment) (string, bool, error) {
-	var name string
-	if request.Name != nil {
-		name = *request.Name
-	}
+func (c *Client) ApplyAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeploymentCreate) (string, bool, error) {
+	name := request.Name
 	if name == "" {
 		return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: Name must not be empty")
 	}

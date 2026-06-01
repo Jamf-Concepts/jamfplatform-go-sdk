@@ -13,6 +13,102 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
+// applySchemaRenames renames schema keys in doc.Components.Schemas and updates
+// all $ref strings that reference the old name throughout the document. Applied
+// before other patches so downstream fixups see corrected names. Only the Ref
+// string on each SchemaRef is updated; the walker stops at $ref boundaries and
+// does not recurse into the referenced schema's Value to avoid cycles.
+func applySchemaRenames(doc *openapi3.T, renames map[string]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(renames) == 0 {
+		return
+	}
+	refMap := make(map[string]string, len(renames))
+	for oldName, newName := range renames {
+		refMap["#/components/schemas/"+oldName] = "#/components/schemas/" + newName
+	}
+	for oldName, newName := range renames {
+		if ref, ok := doc.Components.Schemas[oldName]; ok {
+			doc.Components.Schemas[newName] = ref
+			delete(doc.Components.Schemas, oldName)
+		}
+	}
+
+	visited := make(map[*openapi3.SchemaRef]bool)
+	var walkSchema func(ref *openapi3.SchemaRef)
+	walkSchema = func(ref *openapi3.SchemaRef) {
+		if ref == nil || visited[ref] {
+			return
+		}
+		visited[ref] = true
+		if ref.Ref != "" {
+			if newRef, ok := refMap[ref.Ref]; ok {
+				ref.Ref = newRef
+			}
+			return // stop at ref boundaries; Value is the shared component, walked separately
+		}
+		if ref.Value == nil {
+			return
+		}
+		for _, prop := range ref.Value.Properties {
+			walkSchema(prop)
+		}
+		if ref.Value.Items != nil {
+			walkSchema(ref.Value.Items)
+		}
+		if ref.Value.AdditionalProperties.Schema != nil {
+			walkSchema(ref.Value.AdditionalProperties.Schema)
+		}
+		for _, s := range ref.Value.AllOf {
+			walkSchema(s)
+		}
+		for _, s := range ref.Value.AnyOf {
+			walkSchema(s)
+		}
+		for _, s := range ref.Value.OneOf {
+			walkSchema(s)
+		}
+	}
+
+	for _, ref := range doc.Components.Schemas {
+		walkSchema(ref)
+	}
+	if doc.Paths == nil {
+		return
+	}
+	for _, pathStr := range doc.Paths.InMatchingOrder() {
+		item := doc.Paths.Find(pathStr)
+		if item == nil {
+			continue
+		}
+		for _, op := range []*openapi3.Operation{
+			item.Get, item.Post, item.Put, item.Patch, item.Delete,
+		} {
+			if op == nil {
+				continue
+			}
+			if op.RequestBody != nil && op.RequestBody.Value != nil {
+				for _, content := range op.RequestBody.Value.Content {
+					if content != nil && content.Schema != nil {
+						walkSchema(content.Schema)
+					}
+				}
+			}
+			if op.Responses != nil {
+				for _, respRef := range op.Responses.Map() {
+					if respRef == nil || respRef.Value == nil {
+						continue
+					}
+					for _, content := range respRef.Value.Content {
+						if content != nil && content.Schema != nil {
+							walkSchema(content.Schema)
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 // applySchemaAdditions injects missing property declarations into named
 // component schemas. Used for specs that omit fields the server actually
 // accepts (e.g. Classic's `account` schema has no `password` property

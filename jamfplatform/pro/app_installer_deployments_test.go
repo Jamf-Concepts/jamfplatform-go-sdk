@@ -42,7 +42,7 @@ func TestCreateAppInstallerDeploymentV1(t *testing.T) {
 		writeJSON(t, w, http.StatusCreated, map[string]any{})
 	})
 
-	result, err := c.CreateAppInstallerDeploymentV1(context.Background(), &AppInstallerDeployment{})
+	result, err := c.CreateAppInstallerDeploymentV1(context.Background(), &AppInstallerDeploymentCreate{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +94,7 @@ func TestUpdateAppInstallerDeploymentV1(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
-	result, err := c.UpdateAppInstallerDeploymentV1(context.Background(), "test-id", &AppInstallerDeployment{})
+	result, err := c.UpdateAppInstallerDeploymentV1(context.Background(), "test-id", &AppInstallerDeploymentCreate{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -184,7 +184,7 @@ func TestApplyAppInstallerDeploymentV1_Create(t *testing.T) {
 		}
 	})
 
-	id, created, err := c.ApplyAppInstallerDeploymentV1(context.Background(), &AppInstallerDeployment{Name: ptrStr("target")})
+	id, created, err := c.ApplyAppInstallerDeploymentV1(context.Background(), &AppInstallerDeploymentCreate{Name: "target"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -214,7 +214,7 @@ func TestApplyAppInstallerDeploymentV1_Update(t *testing.T) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 
-	id, created, err := c.ApplyAppInstallerDeploymentV1(context.Background(), &AppInstallerDeployment{Name: ptrStr("target")})
+	id, created, err := c.ApplyAppInstallerDeploymentV1(context.Background(), &AppInstallerDeploymentCreate{Name: "target"})
 	if err != nil {
 		t.Fatal(err)
 	}

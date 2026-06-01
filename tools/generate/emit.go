@@ -95,7 +95,86 @@ func loadSpec(path string, allowed map[string]bool) (*openapi3.T, error) {
 		}
 		return v3, nil
 	}
+	// OpenAPI 3 YAML: convert to JSON in memory so we can strip external
+	// parameter $refs that kin-openapi can't resolve (no-op for specs without
+	// external refs). Load from the stripped JSON bytes rather than the file.
+	if strings.HasSuffix(strings.ToLower(path), ".yaml") || strings.HasSuffix(strings.ToLower(path), ".yml") {
+		var generic any
+		if err := yaml.Unmarshal(data, &generic); err != nil {
+			return nil, fmt.Errorf("parsing yaml: %w", err)
+		}
+		generic = yamlMapsToJSON(generic)
+		jsonData, err := json.Marshal(generic)
+		if err != nil {
+			return nil, fmt.Errorf("re-encoding yaml as json: %w", err)
+		}
+		jsonData = stripExternalParamRefs(jsonData)
+		return openapi3.NewLoader().LoadFromData(jsonData)
+	}
 	return openapi3.NewLoader().LoadFromFile(path)
+}
+
+// stripExternalParamRefs removes parameter entries from path items and
+// operation objects whose $ref points to an external file (value does not
+// start with "#"). The generator adds pagination params internally; spec-level
+// external param refs are pure documentation and cannot be resolved without
+// the referenced file.
+func stripExternalParamRefs(data []byte) []byte {
+	var top map[string]interface{}
+	if err := json.Unmarshal(data, &top); err != nil {
+		return data
+	}
+	paths, ok := top["paths"].(map[string]interface{})
+	if !ok {
+		return data
+	}
+	modified := false
+	httpMethods := []string{"get", "post", "put", "patch", "delete", "head", "options", "trace"}
+	filterParams := func(obj map[string]interface{}) {
+		params, ok := obj["parameters"].([]interface{})
+		if !ok {
+			return
+		}
+		filtered := make([]interface{}, 0, len(params))
+		for _, p := range params {
+			pm, ok := p.(map[string]interface{})
+			if !ok {
+				filtered = append(filtered, p)
+				continue
+			}
+			ref, _ := pm["$ref"].(string)
+			if ref == "" || strings.HasPrefix(ref, "#") {
+				filtered = append(filtered, p)
+			} else {
+				modified = true
+			}
+		}
+		if len(filtered) == 0 {
+			delete(obj, "parameters")
+		} else {
+			obj["parameters"] = filtered
+		}
+	}
+	for _, item := range paths {
+		pathItem, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		filterParams(pathItem)
+		for _, method := range httpMethods {
+			if op, ok := pathItem[method].(map[string]interface{}); ok {
+				filterParams(op)
+			}
+		}
+	}
+	if !modified {
+		return data
+	}
+	result, err := json.Marshal(top)
+	if err != nil {
+		return data
+	}
+	return result
 }
 
 // allowedOpsSet builds the "METHOD /path" allowlist for a spec from its
@@ -199,6 +278,7 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 		return fmt.Errorf("loading spec: %w", err)
 	}
 
+	applySchemaRenames(doc, spec.SchemaRenames)
 	applySchemaAdditions(doc, spec.SchemaAdditions)
 	applySchemaPatches(doc, spec.SchemaPatches)
 	applyPropertyRenames(doc, spec.PropertyRenames)
@@ -333,6 +413,7 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	for _, ls := range specs {
 		doc, err := loadSpec(ls.specPath, allowedOpsSet(ls.spec))
 		if err == nil {
+			applySchemaRenames(doc, ls.spec.SchemaRenames)
 			applySchemaAdditions(doc, ls.spec.SchemaAdditions)
 			applySchemaPatches(doc, ls.spec.SchemaPatches)
 			applyPropertyRenames(doc, ls.spec.PropertyRenames)
@@ -455,6 +536,7 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 		if err != nil {
 			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
 		}
+		applySchemaRenames(doc, ls.spec.SchemaRenames)
 		applySchemaAdditions(doc, ls.spec.SchemaAdditions)
 		applySchemaPatches(doc, ls.spec.SchemaPatches)
 		applyPropertyRenames(doc, ls.spec.PropertyRenames)
