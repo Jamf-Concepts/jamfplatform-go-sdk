@@ -2101,15 +2101,10 @@ func TestAcceptance_ResolveAppInstallerDeploymentV1ByName_Existing(t *testing.T)
 	if got == nil {
 		t.Fatal("resolve returned nil")
 	}
-	if got.Name == nil || *got.Name != first.Name {
-		t.Errorf("typed Name = %v, want %q", got.Name, first.Name)
+	if got.Name != first.Name {
+		t.Errorf("typed Name = %q, want %q", got.Name, first.Name)
 	}
-	t.Logf("resolved typed %q → %s ✓", first.Name, func() string {
-		if got.ID != nil {
-			return *got.ID
-		}
-		return "<nil>"
-	}())
+	t.Logf("resolved typed %q → %s ✓", first.Name, got.ID)
 }
 
 // ─── AppInstallerTitles (read-only) ─────────────────────────────────────────

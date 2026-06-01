@@ -1004,15 +1004,14 @@ func TestAcceptance_ApplyAppInstallerDeploymentV1(t *testing.T) {
 	titleID := titles[0].ID
 
 	name := "sdk-acc-apply-aid-" + runSuffix()
-	deployType := "INSTALL_AUTOMATICALLY"
-	updateBeh := "AUTOMATIC"
+	req := &pro.AppInstallerDeploymentCreate{
+		Name:           name,
+		AppTitleID:     titleID,
+		DeploymentType: "INSTALL_AUTOMATICALLY",
+		UpdateBehavior: ptrStr("AUTOMATIC"),
+	}
 
-	id, created, err := p.ApplyAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeployment{
-		Name:           &name,
-		AppTitleID:     &titleID,
-		DeploymentType: &deployType,
-		UpdateBehavior: &updateBeh,
-	})
+	id, created, err := p.ApplyAppInstallerDeploymentV1(ctx, req)
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -1021,12 +1020,7 @@ func TestAcceptance_ApplyAppInstallerDeploymentV1(t *testing.T) {
 		t.Error("expected created = true")
 	}
 
-	id2, created2, err := p.ApplyAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeployment{
-		Name:           &name,
-		AppTitleID:     &titleID,
-		DeploymentType: &deployType,
-		UpdateBehavior: &updateBeh,
-	})
+	id2, created2, err := p.ApplyAppInstallerDeploymentV1(ctx, req)
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
