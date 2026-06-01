@@ -4894,6 +4894,9 @@
         },
         "ldap_server_post": {
           "mappings_for_users.user_mappings.map_telephone": "map_phone"
+        },
+        "patch_policy": {
+          "general.incremental_updates": "incremental_update"
         }
       },
       "propertyRemovals": {

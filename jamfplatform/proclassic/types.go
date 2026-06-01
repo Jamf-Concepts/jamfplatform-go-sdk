@@ -13990,7 +13990,7 @@ type PatchPolicyGeneral struct {
 	DistributionMethod *string                     `xml:"distribution_method,omitempty"`
 	Enabled            *bool                       `xml:"enabled,omitempty"`
 	ID                 *int                        `xml:"id,omitempty"`
-	IncrementalUpdates *bool                       `xml:"incremental_updates,omitempty"`
+	IncrementalUpdate  *bool                       `xml:"incremental_update,omitempty"`
 	KillApps           *PatchPolicyGeneralKillApps `xml:"kill_apps,omitempty"`
 	MinimumOs          *string                     `xml:"minimum_os,omitempty"`
 	Name               *string                     `xml:"name,omitempty"`
