@@ -5193,6 +5193,20 @@
             }
           }
         },
+        "ebook": {
+          "self_service.self_service_categories.category": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "name": { "type": "string" },
+                "display_in": { "type": "boolean" },
+                "feature_in": { "type": "boolean" }
+              }
+            }
+          }
+        },
         "vpp_account": {
           "location_name": { "type": "string" }
         },

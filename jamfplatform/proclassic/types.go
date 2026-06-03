@@ -6485,8 +6485,7 @@ func (t EbookSelfService) MarshalXML(e *xml.Encoder, start xml.StartElement) err
 // EbookSelfServiceSelfServiceCategories represents a ebook self service self service categories.
 type EbookSelfServiceSelfServiceCategories struct {
 	XMLName  xml.Name
-	ID       *int                                           `xml:"id,omitempty"`
-	Category *EbookSelfServiceSelfServiceCategoriesCategory `xml:"category,omitempty"`
+	Category *[]EbookSelfServiceSelfServiceCategoriesCategoryItem `xml:"category,omitempty"`
 }
 
 // MarshalXML forces the EbookSelfServiceSelfServiceCategories root element name to the wire value
@@ -6502,25 +6501,25 @@ func (t EbookSelfServiceSelfServiceCategories) MarshalXML(e *xml.Encoder, start 
 	return e.EncodeElement(shadow(t), start)
 }
 
-// EbookSelfServiceSelfServiceCategoriesCategory represents a ebook self service self service categories category.
-type EbookSelfServiceSelfServiceCategoriesCategory struct {
+// EbookSelfServiceSelfServiceCategoriesCategoryItem represents a ebook self service self service categories category item.
+type EbookSelfServiceSelfServiceCategoriesCategoryItem struct {
 	XMLName   xml.Name
-	DisplayIn *string `xml:"display_in,omitempty"`
+	DisplayIn *bool   `xml:"display_in,omitempty"`
 	FeatureIn *bool   `xml:"feature_in,omitempty"`
 	ID        *int    `xml:"id,omitempty"`
 	Name      *string `xml:"name,omitempty"`
 }
 
-// MarshalXML forces the EbookSelfServiceSelfServiceCategoriesCategory root element name to the wire value
+// MarshalXML forces the EbookSelfServiceSelfServiceCategoriesCategoryItem root element name to the wire value
 // declared by the spec (<category>) regardless of what XMLName.Local
 // holds. Classic resources are frequently decoded from polymorphic wire
 // roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
 // stashing the incoming root name in XMLName is useful context but must
 // not leak back into writes. The shadow type suppresses re-entry into
 // this method during encoding.
-func (t EbookSelfServiceSelfServiceCategoriesCategory) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (t EbookSelfServiceSelfServiceCategoriesCategoryItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "category"}
-	type shadow EbookSelfServiceSelfServiceCategoriesCategory
+	type shadow EbookSelfServiceSelfServiceCategoriesCategoryItem
 	return e.EncodeElement(shadow(t), start)
 }
 
