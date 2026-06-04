@@ -12049,30 +12049,30 @@ func (t MobileDeviceInvitationEnrollIntoSite) MarshalXML(e *xml.Encoder, start x
 // MobileDeviceInvitationPost represents a mobile device invitation post.
 type MobileDeviceInvitationPost struct {
 	XMLName                    xml.Name
-	AllowMultipleUses          *bool                                       `xml:"allow_multiple_uses,omitempty"`
-	DateSent                   *string                                     `xml:"date_sent,omitempty"`
-	DateSentEpoch              *BigInt                                     `xml:"date_sent_epoch"`
-	DateSentUtc                *string                                     `xml:"date_sent_utc,omitempty"`
-	EnrolledIntoSite           *MobileDeviceInvitationPostEnrolledIntoSite `xml:"enrolled_into_site,omitempty"`
-	ExpirationDate             *string                                     `xml:"expiration_date,omitempty"`
-	ExpirationDateEpoch        *BigInt                                     `xml:"expiration_date_epoch"`
-	ExpirationDateUtc          *string                                     `xml:"expiration_date_utc,omitempty"`
-	ID                         *int                                        `xml:"id,omitempty"`
-	Invitation                 *BigInt                                     `xml:"invitation"`
-	InvitationType             *string                                     `xml:"invitation_type,omitempty"`
-	KeepExistingSiteMembership *bool                                       `xml:"keep_existing_site_membership,omitempty"`
-	LastAction                 *string                                     `xml:"last_action,omitempty"`
-	LoginRequired              *bool                                       `xml:"login_required,omitempty"`
-	Message                    *string                                     `xml:"message,omitempty"`
-	MultipleUsesAllowed        *bool                                       `xml:"multiple_uses_allowed,omitempty"`
-	ReplyTo                    *string                                     `xml:"reply_to,omitempty"`
-	RequireLogin               *bool                                       `xml:"require_login,omitempty"`
-	SentFrom                   *string                                     `xml:"sent_from,omitempty"`
-	SentTo                     *string                                     `xml:"sent_to,omitempty"`
-	Site                       *SiteObject                                 `xml:"site,omitempty"`
-	Subject                    *string                                     `xml:"subject,omitempty"`
-	TargetIos                  *string                                     `xml:"target_ios,omitempty"`
-	Username                   *string                                     `xml:"username,omitempty"`
+	AllowMultipleUses          *bool                                     `xml:"allow_multiple_uses,omitempty"`
+	DateSent                   *string                                   `xml:"date_sent,omitempty"`
+	DateSentEpoch              *BigInt                                   `xml:"date_sent_epoch"`
+	DateSentUtc                *string                                   `xml:"date_sent_utc,omitempty"`
+	EnrollIntoSite             *MobileDeviceInvitationPostEnrollIntoSite `xml:"enroll_into_site,omitempty"`
+	ExpirationDate             *string                                   `xml:"expiration_date,omitempty"`
+	ExpirationDateEpoch        *BigInt                                   `xml:"expiration_date_epoch"`
+	ExpirationDateUtc          *string                                   `xml:"expiration_date_utc,omitempty"`
+	ID                         *int                                      `xml:"id,omitempty"`
+	Invitation                 *BigInt                                   `xml:"invitation"`
+	InvitationType             *string                                   `xml:"invitation_type,omitempty"`
+	KeepExistingSiteMembership *bool                                     `xml:"keep_existing_site_membership,omitempty"`
+	LastAction                 *string                                   `xml:"last_action,omitempty"`
+	LoginRequired              *bool                                     `xml:"login_required,omitempty"`
+	Message                    *string                                   `xml:"message,omitempty"`
+	MultipleUsesAllowed        *bool                                     `xml:"multiple_uses_allowed,omitempty"`
+	ReplyTo                    *string                                   `xml:"reply_to,omitempty"`
+	RequireLogin               *bool                                     `xml:"require_login,omitempty"`
+	SentFrom                   *string                                   `xml:"sent_from,omitempty"`
+	SentTo                     *string                                   `xml:"sent_to,omitempty"`
+	Site                       *SiteObject                               `xml:"site,omitempty"`
+	Subject                    *string                                   `xml:"subject,omitempty"`
+	TargetIos                  *string                                   `xml:"target_ios,omitempty"`
+	Username                   *string                                   `xml:"username,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceInvitationPost root element name to the wire value
@@ -12088,23 +12088,23 @@ func (t MobileDeviceInvitationPost) MarshalXML(e *xml.Encoder, start xml.StartEl
 	return e.EncodeElement(shadow(t), start)
 }
 
-// MobileDeviceInvitationPostEnrolledIntoSite represents a mobile device invitation post enrolled into site.
-type MobileDeviceInvitationPostEnrolledIntoSite struct {
+// MobileDeviceInvitationPostEnrollIntoSite represents a mobile device invitation post enroll into site.
+type MobileDeviceInvitationPostEnrollIntoSite struct {
 	XMLName xml.Name
 	ID      *int    `xml:"id,omitempty"`
 	Name    *string `xml:"name,omitempty"`
 }
 
-// MarshalXML forces the MobileDeviceInvitationPostEnrolledIntoSite root element name to the wire value
-// declared by the spec (<enrolled_into_site>) regardless of what XMLName.Local
+// MarshalXML forces the MobileDeviceInvitationPostEnrollIntoSite root element name to the wire value
+// declared by the spec (<enroll_into_site>) regardless of what XMLName.Local
 // holds. Classic resources are frequently decoded from polymorphic wire
 // roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
 // stashing the incoming root name in XMLName is useful context but must
 // not leak back into writes. The shadow type suppresses re-entry into
 // this method during encoding.
-func (t MobileDeviceInvitationPostEnrolledIntoSite) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "enrolled_into_site"}
-	type shadow MobileDeviceInvitationPostEnrolledIntoSite
+func (t MobileDeviceInvitationPostEnrollIntoSite) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "enroll_into_site"}
+	type shadow MobileDeviceInvitationPostEnrollIntoSite
 	return e.EncodeElement(shadow(t), start)
 }
 

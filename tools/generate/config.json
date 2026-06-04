@@ -4903,13 +4903,13 @@
         },
         "mobile_device_invitation": {
           "enrolled_into_site": "enroll_into_site"
+        },
+        "mobile_device_invitation_post": {
+          "enrolled_into_site": "enroll_into_site"
         }
       },
       "propertyRemovals": {
         "mac_application": ["self_service.vpp"]
-      },
-      "postSymmetryExcludes": {
-        "mobile_device_invitation_post": ["enroll_into_site"]
       },
       "schemaPatches": {
         "mobile_device_application": {
