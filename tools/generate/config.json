@@ -4897,10 +4897,19 @@
         },
         "patch_policy": {
           "general.incremental_updates": "incremental_update"
+        },
+        "computer_invitation": {
+          "multiple_users_allowed": "multiple_uses_allowed"
+        },
+        "mobile_device_invitation": {
+          "enrolled_into_site": "enroll_into_site"
         }
       },
       "propertyRemovals": {
         "mac_application": ["self_service.vpp"]
+      },
+      "postSymmetryExcludes": {
+        "mobile_device_invitation_post": ["enroll_into_site"]
       },
       "schemaPatches": {
         "mobile_device_application": {
