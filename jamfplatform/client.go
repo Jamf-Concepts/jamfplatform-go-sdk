@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 	"golang.org/x/oauth2"
@@ -52,8 +53,8 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	if cfg.tenantID != "" {
 		transportOpts = append(transportOpts, client.WithTenantID(cfg.tenantID))
 	}
-	if cfg.retryOn4xx {
-		transportOpts = append(transportOpts, client.WithRetryOn4xx(true))
+	if cfg.minRequestIntervalSet {
+		transportOpts = append(transportOpts, client.WithMinRequestInterval(cfg.minRequestInterval))
 	}
 
 	transport := client.NewTransportWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
@@ -97,7 +98,9 @@ type clientConfig struct {
 	tokenCache   TokenCache
 	cacheDir     string
 	cookieJarDir string
-	retryOn4xx   bool
+
+	minRequestInterval    time.Duration
+	minRequestIntervalSet bool
 }
 
 // Option configures a Client.
@@ -159,14 +162,14 @@ func WithTenantID(id string) Option {
 	}
 }
 
-// WithRetryOn4xx opts the client into retrying unexpected 4xx responses
-// (400–499, excluding 401 and 403) with exponential backoff. Intended for
-// API families that exhibit eventual consistency — e.g. a device-group DELETE
-// returning 400 HAS_DEPENDENCIES immediately after the referencing blueprint
-// was deleted. Backoff starts at 2s, caps at 10s; context timeout is the only
-// bound. Default is off.
-func WithRetryOn4xx(enabled bool) Option {
+// WithMinRequestInterval sets the minimum wall-clock time between the start of
+// consecutive outbound HTTP requests, paced across the shared transport that
+// the SDK fans out over parallel goroutines. It gives the server breathing room
+// and reduces 429s. A value <= 0 disables the gate. When this option is not
+// supplied, the SDK applies a 100ms default.
+func WithMinRequestInterval(d time.Duration) Option {
 	return func(cfg *clientConfig) {
-		cfg.retryOn4xx = enabled
+		cfg.minRequestInterval = d
+		cfg.minRequestIntervalSet = true
 	}
 }

@@ -30,7 +30,11 @@ func testServerWithOpts(t *testing.T, opts ...Option) (*Client, *http.ServeMux) 
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
-	c := NewClient(srv.URL, "test-id", "test-secret", opts...)
+	// Disable inter-request pacing in unit tests so the per-method httptest
+	// suite isn't throttled to the default 100ms cadence. The gate's own
+	// behavior is covered in internal/client.
+	clientOpts := append([]Option{WithMinRequestInterval(0)}, opts...)
+	c := NewClient(srv.URL, "test-id", "test-secret", clientOpts...)
 	return c, mux
 }
 

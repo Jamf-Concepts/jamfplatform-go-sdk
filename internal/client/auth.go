@@ -98,11 +98,14 @@ func newCookieJar() *cookiejar.Jar {
 // token fetch (e.g. load-balancer session cookies) also apply to API calls.
 // No Client.Timeout is set — callers bound request lifetime via ctx; the
 // underlying Transport bounds each network phase individually.
-func newOAuth2Client(config *clientcredentials.Config, userAgent string) (oauthClient *http.Client, baseClient *http.Client) {
+func newOAuth2Client(config *clientcredentials.Config, userAgent string, throttle *requestThrottle) (oauthClient *http.Client, baseClient *http.Client) {
 	jar := newCookieJar()
 	base := &http.Client{Jar: jar}
 
 	var rt http.RoundTripper = newTunedTransport()
+	if throttle != nil {
+		rt = &throttleTransport{base: rt, throttle: throttle}
+	}
 	if userAgent != "" {
 		rt = &userAgentTransport{base: rt, userAgent: userAgent}
 	}
@@ -115,8 +118,17 @@ func newOAuth2Client(config *clientcredentials.Config, userAgent string) (oauthC
 }
 
 // wrapWithOAuth2 wraps a base HTTP client with OAuth2 token management,
-// preserving the base client's cookie jar on the outer client.
-func wrapWithOAuth2(config *clientcredentials.Config, base *http.Client) *http.Client {
+// preserving the base client's cookie jar on the outer client. When throttle
+// is non-nil, the base client's transport is wrapped so the request-spacing
+// gate covers both API calls and token fetches on a caller-supplied client.
+func wrapWithOAuth2(config *clientcredentials.Config, base *http.Client, throttle *requestThrottle) *http.Client {
+	if throttle != nil {
+		rt := base.Transport
+		if rt == nil {
+			rt = http.DefaultTransport
+		}
+		base.Transport = &throttleTransport{base: rt, throttle: throttle}
+	}
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
 	outer := config.Client(ctx)
 	outer.Jar = base.Jar
