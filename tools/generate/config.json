@@ -4944,6 +4944,21 @@
             }
           }
         },
+        "mobile_device_provisioning_profile": {
+          "general.creation_date_utc":     { "type": "string"  },
+          "general.creation_date_epoch":   { "type": "integer" },
+          "general.expiration_date_utc":   { "type": "string"  },
+          "general.expiration_date_epoch": { "type": "integer" },
+          "general.profile": {
+            "type": "object",
+            "properties": {
+              "id":   { "type": "integer" },
+              "name": { "type": "string"  },
+              "uri":  { "type": "string"  },
+              "data": { "type": "string"  }
+            }
+          }
+        },
         "computer_extension_attribute": {
           "input_type.platform":      { "type": "string" },
           "input_type.script":        { "type": "string" },

@@ -12771,11 +12771,16 @@ func (t MobileDeviceProvisioningProfile) MarshalXML(e *xml.Encoder, start xml.St
 
 // MobileDeviceProvisioningProfileGeneral represents a mobile device provisioning profile general.
 type MobileDeviceProvisioningProfileGeneral struct {
-	XMLName     xml.Name
-	DisplayName *string `xml:"display_name,omitempty"`
-	ID          *int    `xml:"id,omitempty"`
-	Name        *string `xml:"name,omitempty"`
-	UUID        *string `xml:"uuid,omitempty"`
+	XMLName             xml.Name
+	CreationDateEpoch   *int                                           `xml:"creation_date_epoch,omitempty"`
+	CreationDateUtc     *string                                        `xml:"creation_date_utc,omitempty"`
+	DisplayName         *string                                        `xml:"display_name,omitempty"`
+	ExpirationDateEpoch *BigInt                                        `xml:"expiration_date_epoch"`
+	ExpirationDateUtc   *string                                        `xml:"expiration_date_utc,omitempty"`
+	ID                  *int                                           `xml:"id,omitempty"`
+	Name                *string                                        `xml:"name,omitempty"`
+	Profile             *MobileDeviceProvisioningProfileGeneralProfile `xml:"profile,omitempty"`
+	UUID                *string                                        `xml:"uuid,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceProvisioningProfileGeneral root element name to the wire value
@@ -12788,6 +12793,28 @@ type MobileDeviceProvisioningProfileGeneral struct {
 func (t MobileDeviceProvisioningProfileGeneral) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "general"}
 	type shadow MobileDeviceProvisioningProfileGeneral
+	return e.EncodeElement(shadow(t), start)
+}
+
+// MobileDeviceProvisioningProfileGeneralProfile represents a mobile device provisioning profile general profile.
+type MobileDeviceProvisioningProfileGeneralProfile struct {
+	XMLName xml.Name
+	Data    *string `xml:"data,omitempty"`
+	ID      *int    `xml:"id,omitempty"`
+	Name    *string `xml:"name,omitempty"`
+	URI     *string `xml:"uri,omitempty"`
+}
+
+// MarshalXML forces the MobileDeviceProvisioningProfileGeneralProfile root element name to the wire value
+// declared by the spec (<profile>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MobileDeviceProvisioningProfileGeneralProfile) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "profile"}
+	type shadow MobileDeviceProvisioningProfileGeneralProfile
 	return e.EncodeElement(shadow(t), start)
 }
 
