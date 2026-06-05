@@ -4925,15 +4925,13 @@
           "site": { "$ref": "#/components/schemas/site_object" }
         },
         "class": {
-          "student_ids": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": { "type": "integer" }
-              }
-            }
-          }
+          "students":               { "type": "object", "properties": { "student": { "type": "array", "items": { "type": "string"  } } } },
+          "teachers":               { "type": "object", "properties": { "teacher": { "type": "array", "items": { "type": "string"  } } } },
+          "student_ids":            { "type": "object", "properties": { "id":      { "type": "array", "items": { "type": "integer" } } } },
+          "teacher_ids":            { "type": "object", "properties": { "id":      { "type": "array", "items": { "type": "integer" } } } },
+          "student_group_ids":      { "type": "object", "properties": { "id":      { "type": "array", "items": { "type": "integer" } } } },
+          "teacher_group_ids":      { "type": "object", "properties": { "id":      { "type": "array", "items": { "type": "integer" } } } },
+          "mobile_device_group_id": { "type": "object", "properties": { "id":      { "type": "array", "items": { "type": "integer" } } } }
         },
         "mobile_device_configuration_profile": {
           "self_service.security_name.password": { "type": "string" }

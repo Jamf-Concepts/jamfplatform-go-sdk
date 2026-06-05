@@ -1015,22 +1015,22 @@ type CategoryObject struct {
 // Class represents a class.
 type Class struct {
 	XMLName              xml.Name
-	AppleTvs             *ClassAppleTvs                   `xml:"apple_tvs,omitempty"`
-	Description          *string                          `xml:"description,omitempty"`
-	ID                   *int                             `xml:"id,omitempty"`
-	MeetingTimes         *ClassMeetingTimes               `xml:"meeting_times,omitempty"`
-	MobileDeviceGroup    *IDName                          `xml:"mobile_device_group,omitempty"`
-	MobileDeviceGroupIds *[]ClassMobileDeviceGroupIdsItem `xml:"mobile_device_group_ids,omitempty"`
-	MobileDevices        *ClassMobileDevices              `xml:"mobile_devices,omitempty"`
-	Name                 *string                          `xml:"name,omitempty"`
-	Site                 *SiteObject                      `xml:"site,omitempty"`
-	Source               *string                          `xml:"source,omitempty"`
-	StudentGroupIds      *[]ClassStudentGroupIdsItem      `xml:"student_group_ids,omitempty"`
-	StudentIds           *[]ClassStudentIdsItem           `xml:"student_ids,omitempty"`
-	Students             *[]ClassStudentsItem             `xml:"students,omitempty"`
-	TeacherGroupIds      *[]ClassTeacherGroupIdsItem      `xml:"teacher_group_ids,omitempty"`
-	TeacherIds           *[]ClassTeacherIdsItem           `xml:"teacher_ids,omitempty"`
-	Teachers             *[]ClassTeachersItem             `xml:"teachers,omitempty"`
+	AppleTvs             *ClassAppleTvs             `xml:"apple_tvs,omitempty"`
+	Description          *string                    `xml:"description,omitempty"`
+	ID                   *int                       `xml:"id,omitempty"`
+	MeetingTimes         *ClassMeetingTimes         `xml:"meeting_times,omitempty"`
+	MobileDeviceGroup    *IDName                    `xml:"mobile_device_group,omitempty"`
+	MobileDeviceGroupIds *ClassMobileDeviceGroupIds `xml:"mobile_device_group_ids,omitempty"`
+	MobileDevices        *ClassMobileDevices        `xml:"mobile_devices,omitempty"`
+	Name                 *string                    `xml:"name,omitempty"`
+	Site                 *SiteObject                `xml:"site,omitempty"`
+	Source               *string                    `xml:"source,omitempty"`
+	StudentGroupIds      *ClassStudentGroupIds      `xml:"student_group_ids,omitempty"`
+	StudentIds           *ClassStudentIds           `xml:"student_ids,omitempty"`
+	Students             *ClassStudents             `xml:"students,omitempty"`
+	TeacherGroupIds      *ClassTeacherGroupIds      `xml:"teacher_group_ids,omitempty"`
+	TeacherIds           *ClassTeacherIds           `xml:"teacher_ids,omitempty"`
+	Teachers             *ClassTeachers             `xml:"teachers,omitempty"`
 }
 
 // MarshalXML forces the Class root element name to the wire value
@@ -1129,9 +1129,23 @@ func (t ClassMeetingTimesMeetingTime) MarshalXML(e *xml.Encoder, start xml.Start
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ClassMobileDeviceGroupIdsItem represents a class mobile device group ids item.
-type ClassMobileDeviceGroupIdsItem struct {
-	ID *int `xml:"id,omitempty"`
+// ClassMobileDeviceGroupIds represents a class mobile device group ids.
+type ClassMobileDeviceGroupIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
+}
+
+// MarshalXML forces the ClassMobileDeviceGroupIds root element name to the wire value
+// declared by the spec (<mobile_device_group_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassMobileDeviceGroupIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "mobile_device_group_ids"}
+	type shadow ClassMobileDeviceGroupIds
+	return e.EncodeElement(shadow(t), start)
 }
 
 // ClassMobileDevices represents a class mobile devices.
@@ -1174,55 +1188,139 @@ func (t ClassMobileDevicesMobileDeviceItem) MarshalXML(e *xml.Encoder, start xml
 	return e.EncodeElement(shadow(t), start)
 }
 
-// ClassStudentGroupIdsItem represents a class student group ids item.
-type ClassStudentGroupIdsItem struct {
-	ID *int `xml:"id,omitempty"`
+// ClassStudentGroupIds represents a class student group ids.
+type ClassStudentGroupIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
 }
 
-// ClassStudentIdsItem represents a class student ids item.
-type ClassStudentIdsItem struct {
-	ID *int `xml:"id,omitempty"`
+// MarshalXML forces the ClassStudentGroupIds root element name to the wire value
+// declared by the spec (<student_group_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassStudentGroupIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "student_group_ids"}
+	type shadow ClassStudentGroupIds
+	return e.EncodeElement(shadow(t), start)
 }
 
-// ClassStudentsItem represents a class students item.
-type ClassStudentsItem struct {
-	Student *string `xml:"student,omitempty"`
+// ClassStudentIds represents a class student ids.
+type ClassStudentIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
 }
 
-// ClassTeacherGroupIdsItem represents a class teacher group ids item.
-type ClassTeacherGroupIdsItem struct {
-	ID *int `xml:"id,omitempty"`
+// MarshalXML forces the ClassStudentIds root element name to the wire value
+// declared by the spec (<student_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassStudentIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "student_ids"}
+	type shadow ClassStudentIds
+	return e.EncodeElement(shadow(t), start)
 }
 
-// ClassTeacherIdsItem represents a class teacher ids item.
-type ClassTeacherIdsItem struct {
-	ID *int `xml:"id,omitempty"`
+// ClassStudents represents a class students.
+type ClassStudents struct {
+	XMLName xml.Name
+	Student *[]string `xml:"student,omitempty"`
 }
 
-// ClassTeachersItem represents a class teachers item.
-type ClassTeachersItem struct {
-	Teacher *string `xml:"teacher,omitempty"`
+// MarshalXML forces the ClassStudents root element name to the wire value
+// declared by the spec (<students>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassStudents) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "students"}
+	type shadow ClassStudents
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ClassTeacherGroupIds represents a class teacher group ids.
+type ClassTeacherGroupIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
+}
+
+// MarshalXML forces the ClassTeacherGroupIds root element name to the wire value
+// declared by the spec (<teacher_group_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassTeacherGroupIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "teacher_group_ids"}
+	type shadow ClassTeacherGroupIds
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ClassTeacherIds represents a class teacher ids.
+type ClassTeacherIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
+}
+
+// MarshalXML forces the ClassTeacherIds root element name to the wire value
+// declared by the spec (<teacher_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassTeacherIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "teacher_ids"}
+	type shadow ClassTeacherIds
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ClassTeachers represents a class teachers.
+type ClassTeachers struct {
+	XMLName xml.Name
+	Teacher *[]string `xml:"teacher,omitempty"`
+}
+
+// MarshalXML forces the ClassTeachers root element name to the wire value
+// declared by the spec (<teachers>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassTeachers) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "teachers"}
+	type shadow ClassTeachers
+	return e.EncodeElement(shadow(t), start)
 }
 
 // ClassPost represents a class post.
 type ClassPost struct {
 	XMLName              xml.Name
-	AppleTvs             *ClassPostAppleTvs               `xml:"apple_tvs,omitempty"`
-	Description          *string                          `xml:"description,omitempty"`
-	ID                   *int                             `xml:"id,omitempty"`
-	MeetingTimes         *ClassPostMeetingTimes           `xml:"meeting_times,omitempty"`
-	MobileDeviceGroup    *IDName                          `xml:"mobile_device_group,omitempty"`
-	MobileDeviceGroupIds *[]ClassMobileDeviceGroupIdsItem `xml:"mobile_device_group_ids,omitempty"`
-	MobileDevices        *ClassPostMobileDevices          `xml:"mobile_devices,omitempty"`
-	Name                 *string                          `xml:"name,omitempty"`
-	Site                 *SiteObject                      `xml:"site,omitempty"`
-	Source               *string                          `xml:"source,omitempty"`
-	StudentGroupIds      *[]ClassStudentGroupIdsItem      `xml:"student_group_ids,omitempty"`
-	StudentIds           *[]ClassStudentIdsItem           `xml:"student_ids,omitempty"`
-	Students             *[]ClassStudentsItem             `xml:"students,omitempty"`
-	TeacherGroupIds      *[]ClassTeacherGroupIdsItem      `xml:"teacher_group_ids,omitempty"`
-	TeacherIds           *[]ClassTeacherIdsItem           `xml:"teacher_ids,omitempty"`
-	Teachers             *[]ClassTeachersItem             `xml:"teachers,omitempty"`
+	AppleTvs             *ClassPostAppleTvs             `xml:"apple_tvs,omitempty"`
+	Description          *string                        `xml:"description,omitempty"`
+	ID                   *int                           `xml:"id,omitempty"`
+	MeetingTimes         *ClassPostMeetingTimes         `xml:"meeting_times,omitempty"`
+	MobileDeviceGroup    *IDName                        `xml:"mobile_device_group,omitempty"`
+	MobileDeviceGroupIds *ClassPostMobileDeviceGroupIds `xml:"mobile_device_group_ids,omitempty"`
+	MobileDevices        *ClassPostMobileDevices        `xml:"mobile_devices,omitempty"`
+	Name                 *string                        `xml:"name,omitempty"`
+	Site                 *SiteObject                    `xml:"site,omitempty"`
+	Source               *string                        `xml:"source,omitempty"`
+	StudentGroupIds      *ClassPostStudentGroupIds      `xml:"student_group_ids,omitempty"`
+	StudentIds           *ClassPostStudentIds           `xml:"student_ids,omitempty"`
+	Students             *ClassPostStudents             `xml:"students,omitempty"`
+	TeacherGroupIds      *ClassPostTeacherGroupIds      `xml:"teacher_group_ids,omitempty"`
+	TeacherIds           *ClassPostTeacherIds           `xml:"teacher_ids,omitempty"`
+	Teachers             *ClassPostTeachers             `xml:"teachers,omitempty"`
 }
 
 // MarshalXML forces the ClassPost root element name to the wire value
@@ -1300,6 +1398,25 @@ func (t ClassPostMeetingTimes) MarshalXML(e *xml.Encoder, start xml.StartElement
 	return e.EncodeElement(shadow(t), start)
 }
 
+// ClassPostMobileDeviceGroupIds represents a class post mobile device group ids.
+type ClassPostMobileDeviceGroupIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
+}
+
+// MarshalXML forces the ClassPostMobileDeviceGroupIds root element name to the wire value
+// declared by the spec (<mobile_device_group_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassPostMobileDeviceGroupIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "mobile_device_group_ids"}
+	type shadow ClassPostMobileDeviceGroupIds
+	return e.EncodeElement(shadow(t), start)
+}
+
 // ClassPostMobileDevices represents a class post mobile devices.
 type ClassPostMobileDevices struct {
 	XMLName      xml.Name
@@ -1337,6 +1454,120 @@ type ClassPostMobileDevicesMobileDeviceItem struct {
 func (t ClassPostMobileDevicesMobileDeviceItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "mobile_device"}
 	type shadow ClassPostMobileDevicesMobileDeviceItem
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ClassPostStudentGroupIds represents a class post student group ids.
+type ClassPostStudentGroupIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
+}
+
+// MarshalXML forces the ClassPostStudentGroupIds root element name to the wire value
+// declared by the spec (<student_group_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassPostStudentGroupIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "student_group_ids"}
+	type shadow ClassPostStudentGroupIds
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ClassPostStudentIds represents a class post student ids.
+type ClassPostStudentIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
+}
+
+// MarshalXML forces the ClassPostStudentIds root element name to the wire value
+// declared by the spec (<student_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassPostStudentIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "student_ids"}
+	type shadow ClassPostStudentIds
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ClassPostStudents represents a class post students.
+type ClassPostStudents struct {
+	XMLName xml.Name
+	Student *[]string `xml:"student,omitempty"`
+}
+
+// MarshalXML forces the ClassPostStudents root element name to the wire value
+// declared by the spec (<students>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassPostStudents) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "students"}
+	type shadow ClassPostStudents
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ClassPostTeacherGroupIds represents a class post teacher group ids.
+type ClassPostTeacherGroupIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
+}
+
+// MarshalXML forces the ClassPostTeacherGroupIds root element name to the wire value
+// declared by the spec (<teacher_group_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassPostTeacherGroupIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "teacher_group_ids"}
+	type shadow ClassPostTeacherGroupIds
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ClassPostTeacherIds represents a class post teacher ids.
+type ClassPostTeacherIds struct {
+	XMLName xml.Name
+	ID      *[]int `xml:"id,omitempty"`
+}
+
+// MarshalXML forces the ClassPostTeacherIds root element name to the wire value
+// declared by the spec (<teacher_ids>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassPostTeacherIds) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "teacher_ids"}
+	type shadow ClassPostTeacherIds
+	return e.EncodeElement(shadow(t), start)
+}
+
+// ClassPostTeachers represents a class post teachers.
+type ClassPostTeachers struct {
+	XMLName xml.Name
+	Teacher *[]string `xml:"teacher,omitempty"`
+}
+
+// MarshalXML forces the ClassPostTeachers root element name to the wire value
+// declared by the spec (<teachers>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t ClassPostTeachers) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "teachers"}
+	type shadow ClassPostTeachers
 	return e.EncodeElement(shadow(t), start)
 }
 
