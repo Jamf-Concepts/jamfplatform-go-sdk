@@ -11248,11 +11248,13 @@ func (t MobileDeviceEnrollmentProfileAttachments) MarshalXML(e *xml.Encoder, sta
 // MobileDeviceEnrollmentProfileGeneral represents a mobile device enrollment profile general.
 type MobileDeviceEnrollmentProfileGeneral struct {
 	XMLName     xml.Name
-	Description *string `xml:"description,omitempty"`
-	ID          *int    `xml:"id,omitempty"`
-	Invitation  *BigInt `xml:"invitation"`
-	Name        *string `xml:"name,omitempty"`
-	UDID        *string `xml:"udid,omitempty"`
+	Description *string     `xml:"description,omitempty"`
+	ID          *int        `xml:"id,omitempty"`
+	Invitation  *BigInt     `xml:"invitation"`
+	Name        *string     `xml:"name,omitempty"`
+	Site        *SiteObject `xml:"site,omitempty"`
+	UDID        *string     `xml:"udid,omitempty"`
+	UUID        *string     `xml:"uuid,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceEnrollmentProfileGeneral root element name to the wire value
@@ -11313,11 +11315,13 @@ func (t MobileDeviceEnrollmentProfilePostAttachments) MarshalXML(e *xml.Encoder,
 // MobileDeviceEnrollmentProfilePostGeneral represents a mobile device enrollment profile post general.
 type MobileDeviceEnrollmentProfilePostGeneral struct {
 	XMLName     xml.Name
-	Description *string `xml:"description,omitempty"`
-	ID          *int    `xml:"id,omitempty"`
-	Invitation  *BigInt `xml:"invitation"`
-	Name        *string `xml:"name,omitempty"`
-	UDID        *string `xml:"udid,omitempty"`
+	Description *string     `xml:"description,omitempty"`
+	ID          *int        `xml:"id,omitempty"`
+	Invitation  *BigInt     `xml:"invitation"`
+	Name        *string     `xml:"name,omitempty"`
+	Site        *SiteObject `xml:"site,omitempty"`
+	UDID        *string     `xml:"udid,omitempty"`
+	UUID        *string     `xml:"uuid,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceEnrollmentProfilePostGeneral root element name to the wire value

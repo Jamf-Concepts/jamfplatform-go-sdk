@@ -4959,6 +4959,14 @@
             }
           }
         },
+        "mobile_device_enrollment_profile": {
+          "general.uuid": { "type": "string" },
+          "general.site": { "$ref": "#/components/schemas/site_object" }
+        },
+        "mobile_device_enrollment_profile_post": {
+          "general.uuid": { "type": "string" },
+          "general.site": { "$ref": "#/components/schemas/site_object" }
+        },
         "computer_extension_attribute": {
           "input_type.platform":      { "type": "string" },
           "input_type.script":        { "type": "string" },
