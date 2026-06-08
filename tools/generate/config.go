@@ -109,6 +109,15 @@ type SpecDef struct {
 	// matching. Affects JSON marshalling only — has no impact on unmarshal
 	// behaviour or XML tags.
 	EmitNullForOptional []string `json:"emitNullForOptional,omitempty"`
+
+	// FieldOrder specifies an explicit property emission order for named
+	// schemas, overriding the default alphabetical sort. Outer key: spec-form
+	// schema name (e.g. "vpp_invitation_general"). Value: ordered list of
+	// property names as they appear in the spec (without deprecation metadata).
+	// Properties not listed are appended alphabetically after the explicit
+	// entries. Used when the server is order-sensitive within an XML element
+	// (e.g. Classic /vppinvitations <general> requires a fixed field order).
+	FieldOrder map[string][]string `json:"fieldOrder,omitempty"`
 }
 
 // baseName derives a Go file base name from the spec file path.

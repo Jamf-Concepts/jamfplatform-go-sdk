@@ -150,3 +150,88 @@ func TestVppInvitation_MarshalElementNames(t *testing.T) {
 		t.Errorf("marshal output missing <last_action_date_epoch>; got:\n%s", out)
 	}
 }
+
+// TestVppInvitation_GeneralFieldOrder verifies that VppInvitationGeneral
+// marshals fields in the server's required wire order:
+//
+//	id, name, vpp_account, distribution_method, sender_name,
+//	sender_email_address, subject, message, require_login,
+//	auto_register_managed_users
+//
+// Classic /vppinvitations returns HTTP 500 when <general> fields arrive in
+// any other order, so this test is the load-bearing guard for the fix.
+func TestVppInvitation_GeneralFieldOrder(t *testing.T) {
+	id := 42
+	name := "test-inv"
+	dist := "Prompt Users to Install"
+	senderName := "Alice"
+	senderEmail := "alice@example.com"
+	subj := "Test Subject"
+	msg := "Test message"
+	req := false
+	autoReg := true
+	vppAccountID := 3
+	in := proclassic.VppInvitationGeneral{
+		ID:                       &id,
+		Name:                     &name,
+		VppAccount:               &proclassic.VppInvitationGeneralVppAccount{ID: &vppAccountID},
+		DistributionMethod:       &dist,
+		SenderName:               &senderName,
+		SenderEmailAddress:       &senderEmail,
+		Subject:                  &subj,
+		Message:                  &msg,
+		RequireLogin:             &req,
+		AutoRegisterManagedUsers: &autoReg,
+	}
+
+	buf, err := xml.Marshal(in)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	out := string(buf)
+
+	idIdx := strings.Index(out, "<id>")
+	nameIdx := strings.Index(out, "<name>")
+	vppIdx := strings.Index(out, "<vpp_account>")
+	distIdx := strings.Index(out, "<distribution_method>")
+	senderNameIdx := strings.Index(out, "<sender_name>")
+	senderEmailIdx := strings.Index(out, "<sender_email_address>")
+	subjIdx := strings.Index(out, "<subject>")
+	msgIdx := strings.Index(out, "<message>")
+	reqIdx := strings.Index(out, "<require_login>")
+	autoRegIdx := strings.Index(out, "<auto_register_managed_users>")
+
+	for elem, idx := range map[string]int{
+		"id": idIdx, "name": nameIdx, "vpp_account": vppIdx,
+		"distribution_method": distIdx, "sender_name": senderNameIdx,
+		"sender_email_address": senderEmailIdx, "subject": subjIdx,
+		"message": msgIdx, "require_login": reqIdx,
+		"auto_register_managed_users": autoRegIdx,
+	} {
+		if idx < 0 {
+			t.Errorf("element <%s> missing from marshal output:\n%s", elem, out)
+		}
+	}
+
+	type check struct {
+		name, a, b string
+		idxA, idxB int
+	}
+	order := []check{
+		{"id<name", "id", "name", idIdx, nameIdx},
+		{"name<vpp_account", "name", "vpp_account", nameIdx, vppIdx},
+		{"vpp_account<distribution_method", "vpp_account", "distribution_method", vppIdx, distIdx},
+		{"distribution_method<sender_name", "distribution_method", "sender_name", distIdx, senderNameIdx},
+		{"sender_name<sender_email_address", "sender_name", "sender_email_address", senderNameIdx, senderEmailIdx},
+		{"sender_email_address<subject", "sender_email_address", "subject", senderEmailIdx, subjIdx},
+		{"subject<message", "subject", "message", subjIdx, msgIdx},
+		{"message<require_login", "message", "require_login", msgIdx, reqIdx},
+		{"require_login<auto_register_managed_users", "require_login", "auto_register_managed_users", reqIdx, autoRegIdx},
+	}
+	for _, c := range order {
+		if c.idxA >= 0 && c.idxB >= 0 && c.idxA >= c.idxB {
+			t.Errorf("wire order violation: <%s> (pos %d) must precede <%s> (pos %d);\nfull output:\n%s",
+				c.a, c.idxA, c.b, c.idxB, out)
+		}
+	}
+}

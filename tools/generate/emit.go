@@ -304,9 +304,11 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 	}
 	currentFieldOverrides = spec.FieldTypeOverrides
 	currentEmitNullForOptional = buildEmitNullForOptionalSet(spec.EmitNullForOptional)
+	currentFieldOrder = spec.FieldOrder
 	types := extractTypes(doc, referencedSchemas, spec.Format)
 	currentFieldOverrides = nil
 	currentEmitNullForOptional = nil
+	currentFieldOrder = nil
 
 	for _, t := range types {
 		emittedTypes[t.Name] = true
@@ -442,9 +444,11 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		}
 		currentFieldOverrides = spec.FieldTypeOverrides
 		currentEmitNullForOptional = buildEmitNullForOptionalSet(spec.EmitNullForOptional)
+		currentFieldOrder = spec.FieldOrder
 		types := extractTypes(doc, refs, spec.Format)
 		currentFieldOverrides = nil
 		currentEmitNullForOptional = nil
+		currentFieldOrder = nil
 		for _, t := range types {
 			pkgEmitted[t.Name] = true
 		}
@@ -555,11 +559,13 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 		}
 		currentFieldOverrides = ls.spec.FieldTypeOverrides
 		currentEmitNullForOptional = buildEmitNullForOptionalSet(ls.spec.EmitNullForOptional)
+		currentFieldOrder = ls.spec.FieldOrder
 		suppressWriteOnly = true
 		types := extractTypes(doc, refs, ls.spec.Format)
 		suppressWriteOnly = false
 		currentFieldOverrides = nil
 		currentEmitNullForOptional = nil
+		currentFieldOrder = nil
 		for _, t := range types {
 			pkgEmitted[t.Name] = true
 		}

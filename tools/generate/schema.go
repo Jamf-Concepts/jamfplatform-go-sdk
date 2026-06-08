@@ -963,6 +963,12 @@ var suppressWriteOnly bool
 // goNameToSpecName), populated by buildEmitNullForOptionalSet.
 var currentEmitNullForOptional map[string]bool
 
+// currentFieldOrder carries the per-spec explicit property-emission order for
+// named schemas (config FieldOrder). Threaded like currentFieldOverrides —
+// set/cleared around extractTypes calls in emit.go. Outer key: spec-form
+// schema name (snake_case). Value: ordered list of property names.
+var currentFieldOrder map[string][]string
+
 // buildEmitNullForOptionalSet normalises a SpecDef.EmitNullForOptional list
 // into the snake_case lookup set the schema walker expects. Returns nil for
 // an empty input so callers can keep the "set then nil-out" pattern.
@@ -1445,7 +1451,7 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 
 	props, requiredList := flattenAllOf(schema)
 	required := toSet(requiredList)
-	for _, pnameRaw := range sortedKeys(props) {
+	for _, pnameRaw := range orderedProps(props, currentFieldOrder[specName]) {
 		propRef := props[pnameRaw]
 		// Classic's spec encodes deprecation inline in property names
 		// (e.g. `management_username deprecated="10.48"`). Everything after

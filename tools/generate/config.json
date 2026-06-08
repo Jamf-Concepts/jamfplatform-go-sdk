@@ -5270,6 +5270,9 @@
           "invitation_usage.usage.last_action_date_epoch": { "type": "integer" }
         }
       },
+      "fieldOrder": {
+        "vpp_invitation_general": ["id","name","vpp_account","distribution_method","sender_name","sender_email_address","subject","message","require_login","auto_register_managed_users"]
+      },
       "excludePaths": [
         "GET /tenant/{tenantId}/byoprofiles",
         "GET /tenant/{tenantId}/byoprofiles/id/{id}",

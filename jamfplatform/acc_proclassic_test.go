@@ -2074,6 +2074,59 @@ func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 	}
 }
 
+// TestAcceptance_Classic_VPPInvitationCRUD creates a VPP invitation via
+// POST /vppinvitations/id/0, asserts 201, then deletes it. This exercises
+// the field-order fix: Classic <general> is order-sensitive and returns HTTP
+// 500 when fields arrive alphabetically instead of the required wire order.
+//
+// Uses VPP account id 3 and distribution_method "Make Available in Self
+// Service" (non-emailing) to avoid triggering invite emails. No %@ is used
+// in any string field (separate known server-500 bug for plist strings).
+func TestAcceptance_Classic_VPPInvitationCRUD(t *testing.T) {
+	c := accClient(t)
+	pc := proclassic.New(c)
+	ctx := context.Background()
+
+	name := "sdk-acc-vpp-inv-" + runSuffix()
+	dist := "Make Available in Self Service"
+	vppAccID := 3
+	req := &proclassic.VppInvitation{
+		General: &proclassic.VppInvitationGeneral{
+			Name:               &name,
+			VppAccount:         &proclassic.VppInvitationGeneralVppAccount{ID: &vppAccID},
+			DistributionMethod: &dist,
+		},
+	}
+
+	created, err := pc.CreateVPPInvitationByID(ctx, "0", req)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateVPPInvitationByID: %v", err)
+	}
+	if created == nil || created.General == nil || created.General.ID == nil {
+		t.Fatal("CreateVPPInvitationByID: nil or missing ID in response")
+	}
+	createdID := strconv.Itoa(*created.General.ID)
+	t.Logf("created VPP invitation id=%s name=%s", createdID, name)
+
+	t.Cleanup(func() {
+		if err := pc.DeleteVPPInvitationByID(ctx, createdID); err != nil {
+			t.Logf("cleanup DeleteVPPInvitationByID(%s): %v", createdID, err)
+		}
+	})
+
+	got, err := pc.GetVPPInvitationByID(ctx, createdID)
+	if err != nil {
+		t.Fatalf("GetVPPInvitationByID(%s): %v", createdID, err)
+	}
+	if got == nil || got.General == nil {
+		t.Fatal("GetVPPInvitationByID: nil or missing General")
+	}
+	if got.General.Name == nil || *got.General.Name != name {
+		t.Errorf("General.Name = %v, want %s", got.General.Name, name)
+	}
+}
+
 func TestAcceptance_Classic_GetComputerHistoryByID(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)

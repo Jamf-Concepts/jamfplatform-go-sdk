@@ -19465,16 +19465,16 @@ func (t VppInvitation) MarshalXML(e *xml.Encoder, start xml.StartElement) error 
 // VppInvitationGeneral represents a vpp invitation general.
 type VppInvitationGeneral struct {
 	XMLName                  xml.Name
-	AutoRegisterManagedUsers *bool                           `xml:"auto_register_managed_users,omitempty"`
-	DistributionMethod       *string                         `xml:"distribution_method,omitempty"`
 	ID                       *int                            `xml:"id,omitempty"`
-	Message                  *string                         `xml:"message,omitempty"`
 	Name                     *string                         `xml:"name,omitempty"`
-	RequireLogin             *bool                           `xml:"require_login,omitempty"`
-	SenderEmailAddress       *string                         `xml:"sender_email_address,omitempty"`
-	SenderName               *string                         `xml:"sender_name,omitempty"`
-	Subject                  *string                         `xml:"subject,omitempty"`
 	VppAccount               *VppInvitationGeneralVppAccount `xml:"vpp_account,omitempty"`
+	DistributionMethod       *string                         `xml:"distribution_method,omitempty"`
+	SenderName               *string                         `xml:"sender_name,omitempty"`
+	SenderEmailAddress       *string                         `xml:"sender_email_address,omitempty"`
+	Subject                  *string                         `xml:"subject,omitempty"`
+	Message                  *string                         `xml:"message,omitempty"`
+	RequireLogin             *bool                           `xml:"require_login,omitempty"`
+	AutoRegisterManagedUsers *bool                           `xml:"auto_register_managed_users,omitempty"`
 }
 
 // MarshalXML forces the VppInvitationGeneral root element name to the wire value
