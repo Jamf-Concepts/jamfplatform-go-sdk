@@ -5267,8 +5267,7 @@
         },
         "vpp_invitation": {
           "general.auto_register_managed_users":           { "type": "boolean" },
-          "invitation_usage.usage.last_action_date_epoch": { "type": "integer" },
-          "scope.exclusions.user_groups.user_group":       { "$ref": "#/components/schemas/id_name" }
+          "invitation_usage.usage.last_action_date_epoch": { "type": "integer" }
         }
       },
       "excludePaths": [

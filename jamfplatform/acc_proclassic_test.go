@@ -2016,15 +2016,13 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 }
 
 // TestAcceptance_Classic_VPPInvitationRead exercises GetVPPInvitationByID against
-// the reference invitation (id 2).  It verifies the four previously broken fields:
+// the reference invitation (id 2).  It verifies the three previously broken fields:
 //   - InvitationUsages block decoded (was silently nil — plural/singular mismatch)
 //   - LastActionDateEpoch populated in usage items (was nil — wrong field name)
 //   - General.AutoRegisterManagedUsers decoded (was absent from struct)
-//   - Exclusions UserGroup carries both ID and Name (was name-only)
 //
-// Defect #4 (exclusions user_group id/name shape) is applied as the safe default
-// (IDName, matching limitations.user_groups). Read shape NOT confirmed live —
-// LDAP group enumeration returned 403; write-probe returned 409 (name-match).
+// Defect #4 (exclusions user_group shape): wire-probed with DataJARLDAPS_JamfPro_Admins
+// — server returns name-only, no <id>. Original spec's name-only struct was correct.
 // Set JAMFPLATFORM_VPP_INVITATION_ID to override the default id "2".
 func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 	c := accClient(t)

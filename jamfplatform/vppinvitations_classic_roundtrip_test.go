@@ -17,6 +17,10 @@ import (
 //  1. <invitation_usages> (plural) — was invitation_usage; whole block lost.
 //  2. <last_action_date_epoch> inside each <usage> — was silently nil.
 //  3. <auto_register_managed_users> in <general> — was absent from generated struct.
+//
+// Defect #4 (exclusions.user_groups.user_group shape): wire-probed with
+// DataJARLDAPS_JamfPro_Admins — server returns name-only (no <id> element).
+// The original spec's name-only struct is correct; no patch needed.
 func TestVppInvitation_DecodeWireFixture(t *testing.T) {
 	const wire = `<vpp_invitation>
   <general>
@@ -51,8 +55,7 @@ func TestVppInvitation_DecodeWireFixture(t *testing.T) {
     <exclusions>
       <user_groups>
         <user_group>
-          <id>5</id>
-          <name>All Users</name>
+          <name>DataJARLDAPS_JamfPro_Admins</name>
         </user_group>
       </user_groups>
     </exclusions>
@@ -89,7 +92,8 @@ func TestVppInvitation_DecodeWireFixture(t *testing.T) {
 		t.Errorf("General.AutoRegisterManagedUsers = %v, want true", got.General.AutoRegisterManagedUsers)
 	}
 
-	// Defect #4: exclusions.user_groups.user_group must carry both id and name.
+	// Defect #4 confirmation: exclusions.user_groups.user_group is name-only (wire-probed).
+	// Server returns <user_group><name>...</name></user_group> with no <id> element.
 	if got.Scope == nil || got.Scope.Exclusions == nil || got.Scope.Exclusions.UserGroups == nil {
 		t.Fatal("Scope.Exclusions.UserGroups nil")
 	}
@@ -98,11 +102,8 @@ func TestVppInvitation_DecodeWireFixture(t *testing.T) {
 		t.Fatalf("exclusions user_groups count = %d, want 1", len(*ugs))
 	}
 	ug := (*ugs)[0]
-	if ug.ID == nil || *ug.ID != 5 {
-		t.Errorf("exclusions UserGroup.ID = %v, want 5 (id field lost — name-only struct)", ug.ID)
-	}
-	if ug.Name == nil || *ug.Name != "All Users" {
-		t.Errorf("exclusions UserGroup.Name = %v, want \"All Users\"", ug.Name)
+	if ug.Name == nil || *ug.Name != "DataJARLDAPS_JamfPro_Admins" {
+		t.Errorf("exclusions UserGroup.Name = %v, want \"DataJARLDAPS_JamfPro_Admins\"", ug.Name)
 	}
 }
 

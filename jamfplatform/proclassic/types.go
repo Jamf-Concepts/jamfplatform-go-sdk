@@ -19641,7 +19641,7 @@ func (t VppInvitationScopeExclusionsJssUsers) MarshalXML(e *xml.Encoder, start x
 // VppInvitationScopeExclusionsUserGroups represents a vpp invitation scope exclusions user groups.
 type VppInvitationScopeExclusionsUserGroups struct {
 	XMLName   xml.Name
-	UserGroup *[]IDName `xml:"user_group,omitempty"`
+	UserGroup *[]VppInvitationScopeExclusionsUserGroupsUserGroupItem `xml:"user_group,omitempty"`
 }
 
 // MarshalXML forces the VppInvitationScopeExclusionsUserGroups root element name to the wire value
@@ -19654,6 +19654,25 @@ type VppInvitationScopeExclusionsUserGroups struct {
 func (t VppInvitationScopeExclusionsUserGroups) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "user_groups"}
 	type shadow VppInvitationScopeExclusionsUserGroups
+	return e.EncodeElement(shadow(t), start)
+}
+
+// VppInvitationScopeExclusionsUserGroupsUserGroupItem represents a vpp invitation scope exclusions user groups user group item.
+type VppInvitationScopeExclusionsUserGroupsUserGroupItem struct {
+	XMLName xml.Name
+	Name    *string `xml:"name,omitempty"`
+}
+
+// MarshalXML forces the VppInvitationScopeExclusionsUserGroupsUserGroupItem root element name to the wire value
+// declared by the spec (<user_group>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t VppInvitationScopeExclusionsUserGroupsUserGroupItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "user_group"}
+	type shadow VppInvitationScopeExclusionsUserGroupsUserGroupItem
 	return e.EncodeElement(shadow(t), start)
 }
 
