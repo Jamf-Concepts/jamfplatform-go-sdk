@@ -2015,11 +2015,65 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 	}
 }
 
-// TestAcceptance_Classic_VPPCRUD tests VPP account create/delete.
-// VPP create requires a real service_token; skip on 409 (spec
-// validation) or 403 (tenant lacks VPP privilege).
-func TestAcceptance_Classic_VPPInvitationCRUD(t *testing.T) {
-	t.Skip("VPP invitation creation needs a real user_id + invitation_type + site; not exercising against live tenant")
+// TestAcceptance_Classic_VPPInvitationRead exercises GetVPPInvitationByID against
+// the reference invitation (id 2).  It verifies the four previously broken fields:
+//   - InvitationUsages block decoded (was silently nil — plural/singular mismatch)
+//   - LastActionDateEpoch populated in usage items (was nil — wrong field name)
+//   - General.AutoRegisterManagedUsers decoded (was absent from struct)
+//   - Exclusions UserGroup carries both ID and Name (was name-only)
+//
+// Defect #4 (exclusions user_group id/name shape) is applied as the safe default
+// (IDName, matching limitations.user_groups). Read shape NOT confirmed live —
+// LDAP group enumeration returned 403; write-probe returned 409 (name-match).
+// Set JAMFPLATFORM_VPP_INVITATION_ID to override the default id "2".
+func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
+	c := accClient(t)
+	pc := proclassic.New(c)
+	ctx := context.Background()
+
+	id := os.Getenv("JAMFPLATFORM_VPP_INVITATION_ID")
+	if id == "" {
+		id = "2"
+	}
+
+	inv, err := pc.GetVPPInvitationByID(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetVPPInvitationByID(%s): %v", id, err)
+	}
+	if inv == nil {
+		t.Fatal("nil VppInvitation")
+	}
+
+	// General block and auto_register_managed_users (Defect #3).
+	if inv.General == nil {
+		t.Fatal("General nil")
+	}
+	t.Logf("General.Name=%v AutoRegisterManagedUsers=%v", inv.General.Name, inv.General.AutoRegisterManagedUsers)
+	if inv.General.AutoRegisterManagedUsers == nil {
+		t.Error("General.AutoRegisterManagedUsers nil — field still missing from struct or not returned by server")
+	}
+
+	// InvitationUsages wrapper (Defect #2).
+	if inv.InvitationUsages == nil {
+		t.Error("InvitationUsages nil — <invitation_usages> wrapper still not decoded")
+	} else {
+		t.Logf("InvitationUsages.Size=%v len(Usage)=%d", inv.InvitationUsages.Size, func() int {
+			if inv.InvitationUsages.Usage == nil {
+				return 0
+			}
+			return len(*inv.InvitationUsages.Usage)
+		}())
+		if inv.InvitationUsages.Usage != nil {
+			for i, u := range *inv.InvitationUsages.Usage {
+				// LastActionDateEpoch (Defect #1).
+				t.Logf("Usage[%d]: Name=%v Status=%v LastActionDateEpoch=%v", i, u.Name, u.Status, u.LastActionDateEpoch)
+				if u.LastActionDateEpoch == nil {
+					t.Errorf("Usage[%d].LastActionDateEpoch nil — last_action_date_epoch still not decoded", i)
+				}
+			}
+		}
+	}
 }
 
 func TestAcceptance_Classic_GetComputerHistoryByID(t *testing.T) {

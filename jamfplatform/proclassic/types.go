@@ -19442,11 +19442,11 @@ func (t VppAssignmentsItemVppAssignment) MarshalXML(e *xml.Encoder, start xml.St
 
 // VppInvitation represents a vpp invitation.
 type VppInvitation struct {
-	XMLName         xml.Name
-	ID              *int                          `xml:"id,omitempty"`
-	General         *VppInvitationGeneral         `xml:"general,omitempty"`
-	InvitationUsage *VppInvitationInvitationUsage `xml:"invitation_usage,omitempty"`
-	Scope           *VppInvitationScope           `xml:"scope,omitempty"`
+	XMLName          xml.Name
+	ID               *int                           `xml:"id,omitempty"`
+	General          *VppInvitationGeneral          `xml:"general,omitempty"`
+	InvitationUsages *VppInvitationInvitationUsages `xml:"invitation_usages,omitempty"`
+	Scope            *VppInvitationScope            `xml:"scope,omitempty"`
 }
 
 // MarshalXML forces the VppInvitation root element name to the wire value
@@ -19464,16 +19464,17 @@ func (t VppInvitation) MarshalXML(e *xml.Encoder, start xml.StartElement) error 
 
 // VppInvitationGeneral represents a vpp invitation general.
 type VppInvitationGeneral struct {
-	XMLName            xml.Name
-	DistributionMethod *string                         `xml:"distribution_method,omitempty"`
-	ID                 *int                            `xml:"id,omitempty"`
-	Message            *string                         `xml:"message,omitempty"`
-	Name               *string                         `xml:"name,omitempty"`
-	RequireLogin       *bool                           `xml:"require_login,omitempty"`
-	SenderEmailAddress *string                         `xml:"sender_email_address,omitempty"`
-	SenderName         *string                         `xml:"sender_name,omitempty"`
-	Subject            *string                         `xml:"subject,omitempty"`
-	VppAccount         *VppInvitationGeneralVppAccount `xml:"vpp_account,omitempty"`
+	XMLName                  xml.Name
+	AutoRegisterManagedUsers *bool                           `xml:"auto_register_managed_users,omitempty"`
+	DistributionMethod       *string                         `xml:"distribution_method,omitempty"`
+	ID                       *int                            `xml:"id,omitempty"`
+	Message                  *string                         `xml:"message,omitempty"`
+	Name                     *string                         `xml:"name,omitempty"`
+	RequireLogin             *bool                           `xml:"require_login,omitempty"`
+	SenderEmailAddress       *string                         `xml:"sender_email_address,omitempty"`
+	SenderName               *string                         `xml:"sender_name,omitempty"`
+	Subject                  *string                         `xml:"subject,omitempty"`
+	VppAccount               *VppInvitationGeneralVppAccount `xml:"vpp_account,omitempty"`
 }
 
 // MarshalXML forces the VppInvitationGeneral root element name to the wire value
@@ -19508,48 +19509,48 @@ func (t VppInvitationGeneralVppAccount) MarshalXML(e *xml.Encoder, start xml.Sta
 	return e.EncodeElement(shadow(t), start)
 }
 
-// VppInvitationInvitationUsage represents a vpp invitation invitation usage.
-type VppInvitationInvitationUsage struct {
+// VppInvitationInvitationUsages represents a vpp invitation invitation usages.
+type VppInvitationInvitationUsages struct {
 	XMLName xml.Name
-	Size    *Size                                    `xml:"size,omitempty"`
-	Usage   *[]VppInvitationInvitationUsageUsageItem `xml:"usage,omitempty"`
+	Size    *Size                                     `xml:"size,omitempty"`
+	Usage   *[]VppInvitationInvitationUsagesUsageItem `xml:"usage,omitempty"`
 }
 
-// MarshalXML forces the VppInvitationInvitationUsage root element name to the wire value
-// declared by the spec (<invitation_usage>) regardless of what XMLName.Local
+// MarshalXML forces the VppInvitationInvitationUsages root element name to the wire value
+// declared by the spec (<invitation_usages>) regardless of what XMLName.Local
 // holds. Classic resources are frequently decoded from polymorphic wire
 // roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
 // stashing the incoming root name in XMLName is useful context but must
 // not leak back into writes. The shadow type suppresses re-entry into
 // this method during encoding.
-func (t VppInvitationInvitationUsage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "invitation_usage"}
-	type shadow VppInvitationInvitationUsage
+func (t VppInvitationInvitationUsages) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "invitation_usages"}
+	type shadow VppInvitationInvitationUsages
 	return e.EncodeElement(shadow(t), start)
 }
 
-// VppInvitationInvitationUsageUsageItem represents a vpp invitation invitation usage usage item.
-type VppInvitationInvitationUsageUsageItem struct {
-	XMLName           xml.Name
-	EmailAddress      *string `xml:"email_address,omitempty"`
-	ID                *int    `xml:"id,omitempty"`
-	LastActionDateUtc *string `xml:"last_action_date_utc,omitempty"`
-	LastActionEpoch   *int    `xml:"last_action_epoch,omitempty"`
-	Name              *string `xml:"name,omitempty"`
-	Status            *string `xml:"status,omitempty"`
-	VppAccount        *string `xml:"vpp_account,omitempty"`
+// VppInvitationInvitationUsagesUsageItem represents a vpp invitation invitation usages usage item.
+type VppInvitationInvitationUsagesUsageItem struct {
+	XMLName             xml.Name
+	EmailAddress        *string `xml:"email_address,omitempty"`
+	ID                  *int    `xml:"id,omitempty"`
+	LastActionDateEpoch *int    `xml:"last_action_date_epoch,omitempty"`
+	LastActionDateUtc   *string `xml:"last_action_date_utc,omitempty"`
+	Name                *string `xml:"name,omitempty"`
+	Status              *string `xml:"status,omitempty"`
+	VppAccount          *string `xml:"vpp_account,omitempty"`
 }
 
-// MarshalXML forces the VppInvitationInvitationUsageUsageItem root element name to the wire value
+// MarshalXML forces the VppInvitationInvitationUsagesUsageItem root element name to the wire value
 // declared by the spec (<usage>) regardless of what XMLName.Local
 // holds. Classic resources are frequently decoded from polymorphic wire
 // roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
 // stashing the incoming root name in XMLName is useful context but must
 // not leak back into writes. The shadow type suppresses re-entry into
 // this method during encoding.
-func (t VppInvitationInvitationUsageUsageItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (t VppInvitationInvitationUsagesUsageItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "usage"}
-	type shadow VppInvitationInvitationUsageUsageItem
+	type shadow VppInvitationInvitationUsagesUsageItem
 	return e.EncodeElement(shadow(t), start)
 }
 
@@ -19640,7 +19641,7 @@ func (t VppInvitationScopeExclusionsJssUsers) MarshalXML(e *xml.Encoder, start x
 // VppInvitationScopeExclusionsUserGroups represents a vpp invitation scope exclusions user groups.
 type VppInvitationScopeExclusionsUserGroups struct {
 	XMLName   xml.Name
-	UserGroup *[]VppInvitationScopeExclusionsUserGroupsUserGroupItem `xml:"user_group,omitempty"`
+	UserGroup *[]IDName `xml:"user_group,omitempty"`
 }
 
 // MarshalXML forces the VppInvitationScopeExclusionsUserGroups root element name to the wire value
@@ -19653,25 +19654,6 @@ type VppInvitationScopeExclusionsUserGroups struct {
 func (t VppInvitationScopeExclusionsUserGroups) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "user_groups"}
 	type shadow VppInvitationScopeExclusionsUserGroups
-	return e.EncodeElement(shadow(t), start)
-}
-
-// VppInvitationScopeExclusionsUserGroupsUserGroupItem represents a vpp invitation scope exclusions user groups user group item.
-type VppInvitationScopeExclusionsUserGroupsUserGroupItem struct {
-	XMLName xml.Name
-	Name    *string `xml:"name,omitempty"`
-}
-
-// MarshalXML forces the VppInvitationScopeExclusionsUserGroupsUserGroupItem root element name to the wire value
-// declared by the spec (<user_group>) regardless of what XMLName.Local
-// holds. Classic resources are frequently decoded from polymorphic wire
-// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
-// stashing the incoming root name in XMLName is useful context but must
-// not leak back into writes. The shadow type suppresses re-entry into
-// this method during encoding.
-func (t VppInvitationScopeExclusionsUserGroupsUserGroupItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name = xml.Name{Local: "user_group"}
-	type shadow VppInvitationScopeExclusionsUserGroupsUserGroupItem
 	return e.EncodeElement(shadow(t), start)
 }
 

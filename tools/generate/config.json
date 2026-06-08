@@ -4906,10 +4906,14 @@
         },
         "mobile_device_invitation_post": {
           "enrolled_into_site": "enroll_into_site"
+        },
+        "vpp_invitation": {
+          "invitation_usage": "invitation_usages"
         }
       },
       "propertyRemovals": {
-        "mac_application": ["self_service.vpp"]
+        "mac_application": ["self_service.vpp"],
+        "vpp_invitation": ["invitation_usages.usage.last_action_epoch"]
       },
       "schemaPatches": {
         "mobile_device_application": {
@@ -5260,6 +5264,11 @@
           "connection.account.password_sha256":                                                                              { "type": "string"  },
           "mappings_for_users.user_group_membership_mappings.group_membership_enabled_when_user_membership_selected":        { "type": "boolean" },
           "mappings_for_users.user_group_membership_mappings.membership_scoping_optimization":                               { "type": "boolean" }
+        },
+        "vpp_invitation": {
+          "general.auto_register_managed_users":           { "type": "boolean" },
+          "invitation_usage.usage.last_action_date_epoch": { "type": "integer" },
+          "scope.exclusions.user_groups.user_group":       { "$ref": "#/components/schemas/id_name" }
         }
       },
       "excludePaths": [
