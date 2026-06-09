@@ -381,7 +381,9 @@
         "prestage_scope_assignment_v2.assignmentDate": "*string",
         "cloud_ldap_keystore.expirationDate": "*string",
         "adcs_certificate.data": "[]byte",
-        "certificate.data": "[]byte"
+        "certificate.data": "[]byte",
+        "adcs_certificate_response.expirationDate": "*string",
+        "certificate_response.expirationDate": "*string"
       },
       "emitNullForOptional": [
         "SamlSettings",

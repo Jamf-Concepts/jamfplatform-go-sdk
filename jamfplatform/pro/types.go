@@ -213,11 +213,11 @@ type AdcsCertificate struct {
 
 // AdcsCertificateResponse represents a adcs certificate response.
 type AdcsCertificateResponse struct {
-	ExpirationDate *time.Time `json:"expirationDate,omitempty"`
-	Filename       string     `json:"filename"`
-	Issuer         string     `json:"issuer"`
-	SerialNumber   string     `json:"serialNumber"`
-	Subject        string     `json:"subject"`
+	ExpirationDate *string `json:"expirationDate"`
+	Filename       string  `json:"filename"`
+	Issuer         string  `json:"issuer"`
+	SerialNumber   string  `json:"serialNumber"`
+	Subject        string  `json:"subject"`
 }
 
 // AdcsDependencies represents a adcs dependencies.
@@ -663,11 +663,11 @@ type CertificateRecord struct {
 
 // CertificateResponse represents a certificate response.
 type CertificateResponse struct {
-	ExpirationDate *time.Time `json:"expirationDate,omitempty"`
-	Filename       string     `json:"filename"`
-	Issuer         string     `json:"issuer"`
-	SerialNumber   string     `json:"serialNumber"`
-	Subject        string     `json:"subject"`
+	ExpirationDate *string `json:"expirationDate"`
+	Filename       string  `json:"filename"`
+	Issuer         string  `json:"issuer"`
+	SerialNumber   string  `json:"serialNumber"`
+	Subject        string  `json:"subject"`
 }
 
 // ChangePassword represents a change password.
