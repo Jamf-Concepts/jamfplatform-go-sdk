@@ -17,7 +17,7 @@ func TestCreateDigicertTrustLifecycleManagerV1(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
-		writeJSON(t, w, http.StatusCreated, []map[string]any{{}})
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
 	})
 
 	result, err := c.CreateDigicertTrustLifecycleManagerV1(context.Background(), &DigiCertSetting{})

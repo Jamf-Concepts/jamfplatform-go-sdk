@@ -62,7 +62,7 @@ func TestAcceptance_Pro_PKI_DigicertValidateCertificate(t *testing.T) {
 	// transport failures.
 	err := p.ValidateDigicertClientCertificateV1(ctx, &pro.Certificate{
 		Filename: "probe.p12",
-		Data:     [][]byte{},
+		Data:     []byte{},
 	})
 	if err == nil {
 		t.Log("ValidateDigicertClientCertificateV1 accepted empty payload")

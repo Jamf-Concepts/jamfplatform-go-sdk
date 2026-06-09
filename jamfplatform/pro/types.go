@@ -205,8 +205,8 @@ type ActiveUsersCount struct {
 
 // AdcsCertificate represents a adcs certificate.
 type AdcsCertificate struct {
-	Data     [][]byte `json:"data"`
-	Filename string   `json:"filename"`
+	Data     []byte `json:"data"`
+	Filename string `json:"filename"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	Password *string `json:"password,omitempty"`
 }
@@ -613,8 +613,8 @@ type CeaTemplatesResults struct {
 
 // Certificate represents a certificate.
 type Certificate struct {
-	Data     [][]byte `json:"data"`
-	Filename string   `json:"filename"`
+	Data     []byte `json:"data"`
+	Filename string `json:"filename"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
 	Password *string `json:"password,omitempty"`
 }

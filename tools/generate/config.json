@@ -379,7 +379,9 @@
         "notification_v1.params": "map[string]any",
         "sso_keystore_details.serialNumber": "json.Number",
         "prestage_scope_assignment_v2.assignmentDate": "*string",
-        "cloud_ldap_keystore.expirationDate": "*string"
+        "cloud_ldap_keystore.expirationDate": "*string",
+        "adcs_certificate.data": "[]byte",
+        "certificate.data": "[]byte"
       },
       "emitNullForOptional": [
         "SamlSettings",
@@ -3992,7 +3994,8 @@
         {
           "op": "POST /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager",
           "name": "CreateDigicertTrustLifecycleManagerV1",
-          "expectedStatus": 201
+          "expectedStatus": 201,
+          "responseType": "HrefResponse"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}",
