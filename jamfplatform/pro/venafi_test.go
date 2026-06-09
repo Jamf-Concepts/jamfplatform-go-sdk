@@ -296,7 +296,7 @@ func TestUploadVenafiProxyTrustStoreV1(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	err := c.UploadVenafiProxyTrustStoreV1(context.Background(), "test-id", new(string))
+	err := c.UploadVenafiProxyTrustStoreV1(context.Background(), "test-id", []byte{})
 	if err != nil {
 		t.Fatal(err)
 	}

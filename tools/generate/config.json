@@ -4082,7 +4082,8 @@
         {
           "op": "POST /v1/tenant/{tenantId}/pki/venafi/{id}/proxy-trust-store",
           "name": "UploadVenafiProxyTrustStoreV1",
-          "expectedStatus": 204
+          "expectedStatus": 204,
+          "requestType": "[]byte"
         },
         {
           "op": "DELETE /v1/tenant/{tenantId}/pki/venafi/{id}/proxy-trust-store",
