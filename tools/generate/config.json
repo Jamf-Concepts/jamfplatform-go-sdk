@@ -390,6 +390,14 @@
         "OidcSettings",
         "EnrollmentSsoConfig"
       ],
+      "schemaPatches": {
+        "ParentApp": {
+          "restrictedTimes": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/components/schemas/TimeFrame" }
+          }
+        }
+      },
       "excludePaths": [
         "POST /v1/tenant/{tenantId}/auth/token",
         "POST /v1/tenant/{tenantId}/auth/keep-alive",

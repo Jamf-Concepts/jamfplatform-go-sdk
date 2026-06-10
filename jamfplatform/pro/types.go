@@ -2105,9 +2105,6 @@ type DashboardSetupTask struct {
 // DataRoamingSetting represents a data roaming setting value.
 type DataRoamingSetting = string
 
-// DayOfWeek represents a day of week value.
-type DayOfWeek = string
-
 // DeclarativeManagementCommand represents a declarative management command.
 type DeclarativeManagementCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
@@ -5028,19 +5025,14 @@ type PagedUserResults struct {
 
 // ParentApp represents a parent app.
 type ParentApp struct {
-	AllowClearPasscode            *bool                    `json:"allowClearPasscode,omitempty"`
-	AllowTemplates                *bool                    `json:"allowTemplates,omitempty"`
-	DeviceGroupID                 int                      `json:"deviceGroupId"`
-	DisassociateOnWipeAndReEnroll *bool                    `json:"disassociateOnWipeAndReEnroll,omitempty"`
-	IsEnabled                     bool                     `json:"isEnabled"`
-	RestrictedTimes               ParentAppRestrictedTimes `json:"restrictedTimes"`
-	SafelistedApps                *[]SafelistedApp         `json:"safelistedApps,omitempty"`
-	TimezoneID                    string                   `json:"timezoneId"`
-}
-
-// ParentAppRestrictedTimes represents a parent app restricted times.
-type ParentAppRestrictedTimes struct {
-	Key *DayOfWeek `json:"key,omitempty"`
+	AllowClearPasscode            *bool                `json:"allowClearPasscode,omitempty"`
+	AllowTemplates                *bool                `json:"allowTemplates,omitempty"`
+	DeviceGroupID                 int                  `json:"deviceGroupId"`
+	DisassociateOnWipeAndReEnroll *bool                `json:"disassociateOnWipeAndReEnroll,omitempty"`
+	IsEnabled                     bool                 `json:"isEnabled"`
+	RestrictedTimes               map[string]TimeFrame `json:"restrictedTimes"`
+	SafelistedApps                *[]SafelistedApp     `json:"safelistedApps,omitempty"`
+	TimezoneID                    string               `json:"timezoneId"`
 }
 
 // PatchPolicies represents a patch policies.
