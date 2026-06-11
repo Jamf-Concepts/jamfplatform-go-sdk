@@ -9963,6 +9963,23 @@
           "expectedStatus": 204
         }
       ]
+    },
+    {
+      "file": "testing/local-admin-password.json",
+      "namespace": "pro",
+      "package": "pro",
+      "specFile": "local_admin_password_api.json",
+      "splitByTag": true,
+      "operations": [
+        {
+          "op": "GET /v2/local-admin-password/settings",
+          "name": "GetLocalAdminPasswordSettingsV2"
+        },
+        {
+          "op": "PUT /v2/local-admin-password/settings",
+          "name": "UpdateLocalAdminPasswordSettingsV2"
+        }
+      ]
     }
   ]
 }

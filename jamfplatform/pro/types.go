@@ -7038,3 +7038,11 @@ type SelfServiceCategory struct {
 	Featured *bool   `json:"featured,omitempty"`
 	ID       *string `json:"id,omitempty"`
 }
+
+// LocalAdminPasswordSettings represents a local admin password settings.
+type LocalAdminPasswordSettings struct {
+	AutoDeployEnabled        bool  `json:"autoDeployEnabled"`
+	AutoRotateEnabled        bool  `json:"autoRotateEnabled"`
+	AutoRotateExpirationTime int64 `json:"autoRotateExpirationTime"`
+	PasswordRotationTime     int64 `json:"passwordRotationTime"`
+}
