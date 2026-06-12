@@ -169,3 +169,138 @@ func TestAccountPrivileges_RoundTrip_PlainCategory(t *testing.T) {
 		}
 	}
 }
+
+// dataJARLDAPSFixture is a representative slice of the real
+// DataJARLDAPS_JamfPro_Admins group GET response captured 2026-06-12
+// (pro-nmartin). It carries ldap_server + three populated privilege
+// categories (casper_* and recon are absent on this group — omitempty
+// must leave them nil). Counts per category match the live dump.
+var dataJARLDAPSFixture = []byte(`
+<group>
+  <id>8</id>
+  <name>DataJARLDAPS_JamfPro_Admins</name>
+  <access_level>Full Access</access_level>
+  <privilege_set>Administrator</privilege_set>
+  <ldap_server><id>31</id><name>ldap.datajar.mobi</name></ldap_server>
+  <site><id>-1</id><name>NONE</name></site>
+  <privileges>
+    <jss_objects>
+      <privilege>Create Cloud Distribution Point</privilege>
+      <privilege>Read Cloud Distribution Point</privilege>
+      <privilege>Update Cloud Distribution Point</privilege>
+      <privilege>Create Custom Paths</privilege>
+      <privilege>Read Custom Paths</privilege>
+      <privilege>Update Custom Paths</privilege>
+      <privilege>Delete Custom Paths</privilege>
+    </jss_objects>
+    <jss_settings>
+      <privilege>Read AD CS Certificate Jobs</privilege>
+      <privilege>Update AD CS Certificate Jobs</privilege>
+      <privilege>Read SSO Settings</privilege>
+      <privilege>Update SSO Settings</privilege>
+      <privilege>Read Computer Inventory Collection Settings</privilege>
+    </jss_settings>
+    <jss_actions>
+      <privilege>Allow User to Enroll</privilege>
+      <privilege>Assign Users to Computers</privilege>
+      <privilege>Assign Users to Mobile Devices</privilege>
+      <privilege>Change Password</privilege>
+    </jss_actions>
+  </privileges>
+  <members/>
+</group>
+`)
+
+// TestGroup_WireFixture_LdapServerAndPrivileges unmarshal the real-dump
+// fixture and asserts that:
+//   - ldap_server.id == 31, ldap_server.name == "ldap.datajar.mobi"
+//   - all three privilege categories survive with correct counts
+//   - absent categories (casper_admin etc.) remain nil
+//   - re-marshal produces ONE wrapper per populated category
+func TestGroup_WireFixture_LdapServerAndPrivileges(t *testing.T) {
+	var g Group
+	if err := xml.Unmarshal(dataJARLDAPSFixture, &g); err != nil {
+		t.Fatalf("unmarshal fixture: %v", err)
+	}
+
+	// Gate C: ldap_server must survive.
+	if g.LdapServer == nil {
+		t.Fatal("LdapServer is nil after unmarshal")
+	}
+	if g.LdapServer.ID == nil || *g.LdapServer.ID != 31 {
+		t.Fatalf("LdapServer.ID: want 31, got %v", g.LdapServer.ID)
+	}
+	if g.LdapServer.Name == nil || *g.LdapServer.Name != "ldap.datajar.mobi" {
+		t.Fatalf("LdapServer.Name: want ldap.datajar.mobi, got %v", g.LdapServer.Name)
+	}
+
+	// Gate A: privilege counts must survive (no collapse).
+	if g.Privileges == nil {
+		t.Fatal("Privileges is nil after unmarshal")
+	}
+	checkPrivCount := func(label string, ptr *[]string, want int) {
+		t.Helper()
+		if ptr == nil {
+			t.Fatalf("%s: slice is nil, want %d items", label, want)
+		}
+		if got := len(*ptr); got != want {
+			t.Fatalf("%s: want %d privileges, got %d: %v", label, want, got, *ptr)
+		}
+	}
+	if g.Privileges.JssObjects == nil {
+		t.Fatal("Privileges.JssObjects is nil")
+	}
+	checkPrivCount("jss_objects", g.Privileges.JssObjects.Privilege, 7)
+	if g.Privileges.JssSettings == nil {
+		t.Fatal("Privileges.JssSettings is nil")
+	}
+	checkPrivCount("jss_settings", g.Privileges.JssSettings.Privilege, 5)
+	if g.Privileges.JssActions == nil {
+		t.Fatal("Privileges.JssActions is nil")
+	}
+	checkPrivCount("jss_actions", g.Privileges.JssActions.Privilege, 4)
+
+	// Absent categories must stay nil (omitempty must not emit empty wrappers).
+	if g.Privileges.CasperAdmin != nil {
+		t.Fatal("CasperAdmin: want nil for absent category, got non-nil")
+	}
+	if g.Privileges.CasperImaging != nil {
+		t.Fatal("CasperImaging: want nil for absent category, got non-nil")
+	}
+	if g.Privileges.CasperRemote != nil {
+		t.Fatal("CasperRemote: want nil for absent category, got non-nil")
+	}
+	if g.Privileges.Recon != nil {
+		t.Fatal("Recon: want nil for absent category, got non-nil")
+	}
+
+	// Re-marshal: each populated category must appear exactly once.
+	out, err := xml.Marshal(g)
+	if err != nil {
+		t.Fatalf("re-marshal: %v", err)
+	}
+	wire := string(out)
+	for _, cat := range []string{"jss_objects", "jss_settings", "jss_actions"} {
+		open := "<" + cat + ">"
+		if n := strings.Count(wire, open); n != 1 {
+			t.Fatalf("re-marshal: want 1 %s wrapper, got %d", open, n)
+		}
+	}
+	// casper_admin must be absent from the re-marshalled output.
+	if strings.Contains(wire, "<casper_admin>") {
+		t.Fatal("re-marshal: casper_admin emitted for nil category")
+	}
+
+	// Round-trip: re-unmarshal the output and verify counts are stable.
+	var g2 Group
+	if err := xml.Unmarshal(out, &g2); err != nil {
+		t.Fatalf("second unmarshal: %v", err)
+	}
+	if g2.LdapServer == nil || g2.LdapServer.ID == nil || *g2.LdapServer.ID != 31 {
+		t.Fatalf("second unmarshal LdapServer.ID: want 31, got %v", g2.LdapServer)
+	}
+	if g2.Privileges == nil || g2.Privileges.JssObjects == nil {
+		t.Fatal("second unmarshal: JssObjects nil")
+	}
+	checkPrivCount("jss_objects (2nd)", g2.Privileges.JssObjects.Privilege, 7)
+}
