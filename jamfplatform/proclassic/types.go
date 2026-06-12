@@ -17,6 +17,7 @@ type Account struct {
 	Enabled             *string            `xml:"enabled,omitempty"`
 	ForcePasswordChange *bool              `xml:"force_password_change,omitempty"`
 	FullName            *string            `xml:"full_name,omitempty"`
+	Groups              *AccountGroups     `xml:"groups,omitempty"`
 	ID                  *int               `xml:"id,omitempty"`
 	LdapServer          *AccountLdapServer `xml:"ldap_server,omitempty"`
 	Name                *string            `xml:"name,omitempty"`
@@ -38,6 +39,206 @@ type Account struct {
 func (t Account) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "account"}
 	type shadow Account
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroups represents a account groups.
+type AccountGroups struct {
+	XMLName xml.Name
+	Group   *[]AccountGroupsGroupItem `xml:"group,omitempty"`
+}
+
+// MarshalXML forces the AccountGroups root element name to the wire value
+// declared by the spec (<groups>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroups) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "groups"}
+	type shadow AccountGroups
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroupsGroupItem represents a account groups group item.
+type AccountGroupsGroupItem struct {
+	XMLName    xml.Name
+	ID         *int                              `xml:"id,omitempty"`
+	Name       *string                           `xml:"name,omitempty"`
+	Privileges *AccountGroupsGroupItemPrivileges `xml:"privileges,omitempty"`
+	Site       *Site                             `xml:"site,omitempty"`
+}
+
+// MarshalXML forces the AccountGroupsGroupItem root element name to the wire value
+// declared by the spec (<group>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroupsGroupItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "group"}
+	type shadow AccountGroupsGroupItem
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroupsGroupItemPrivileges represents a account groups group item privileges.
+type AccountGroupsGroupItemPrivileges struct {
+	XMLName       xml.Name
+	ID            *int                                           `xml:"id,omitempty"`
+	CasperAdmin   *AccountGroupsGroupItemPrivilegesCasperAdmin   `xml:"casper_admin,omitempty"`
+	CasperImaging *AccountGroupsGroupItemPrivilegesCasperImaging `xml:"casper_imaging,omitempty"`
+	CasperRemote  *AccountGroupsGroupItemPrivilegesCasperRemote  `xml:"casper_remote,omitempty"`
+	JssActions    *AccountGroupsGroupItemPrivilegesJssActions    `xml:"jss_actions,omitempty"`
+	JssObjects    *AccountGroupsGroupItemPrivilegesJssObjects    `xml:"jss_objects,omitempty"`
+	JssSettings   *AccountGroupsGroupItemPrivilegesJssSettings   `xml:"jss_settings,omitempty"`
+	Recon         *AccountGroupsGroupItemPrivilegesRecon         `xml:"recon,omitempty"`
+}
+
+// MarshalXML forces the AccountGroupsGroupItemPrivileges root element name to the wire value
+// declared by the spec (<privileges>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroupsGroupItemPrivileges) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "privileges"}
+	type shadow AccountGroupsGroupItemPrivileges
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroupsGroupItemPrivilegesCasperAdmin represents a account groups group item privileges casper admin.
+type AccountGroupsGroupItemPrivilegesCasperAdmin struct {
+	XMLName   xml.Name
+	Privilege *[]string `xml:"privilege,omitempty"`
+}
+
+// MarshalXML forces the AccountGroupsGroupItemPrivilegesCasperAdmin root element name to the wire value
+// declared by the spec (<casper_admin>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroupsGroupItemPrivilegesCasperAdmin) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "casper_admin"}
+	type shadow AccountGroupsGroupItemPrivilegesCasperAdmin
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroupsGroupItemPrivilegesCasperImaging represents a account groups group item privileges casper imaging.
+type AccountGroupsGroupItemPrivilegesCasperImaging struct {
+	XMLName   xml.Name
+	Privilege *[]string `xml:"privilege,omitempty"`
+}
+
+// MarshalXML forces the AccountGroupsGroupItemPrivilegesCasperImaging root element name to the wire value
+// declared by the spec (<casper_imaging>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroupsGroupItemPrivilegesCasperImaging) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "casper_imaging"}
+	type shadow AccountGroupsGroupItemPrivilegesCasperImaging
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroupsGroupItemPrivilegesCasperRemote represents a account groups group item privileges casper remote.
+type AccountGroupsGroupItemPrivilegesCasperRemote struct {
+	XMLName   xml.Name
+	Privilege *[]string `xml:"privilege,omitempty"`
+}
+
+// MarshalXML forces the AccountGroupsGroupItemPrivilegesCasperRemote root element name to the wire value
+// declared by the spec (<casper_remote>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroupsGroupItemPrivilegesCasperRemote) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "casper_remote"}
+	type shadow AccountGroupsGroupItemPrivilegesCasperRemote
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroupsGroupItemPrivilegesJssActions represents a account groups group item privileges jss actions.
+type AccountGroupsGroupItemPrivilegesJssActions struct {
+	XMLName   xml.Name
+	Privilege *[]string `xml:"privilege,omitempty"`
+}
+
+// MarshalXML forces the AccountGroupsGroupItemPrivilegesJssActions root element name to the wire value
+// declared by the spec (<jss_actions>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroupsGroupItemPrivilegesJssActions) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "jss_actions"}
+	type shadow AccountGroupsGroupItemPrivilegesJssActions
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroupsGroupItemPrivilegesJssObjects represents a account groups group item privileges jss objects.
+type AccountGroupsGroupItemPrivilegesJssObjects struct {
+	XMLName   xml.Name
+	Privilege *[]string `xml:"privilege,omitempty"`
+}
+
+// MarshalXML forces the AccountGroupsGroupItemPrivilegesJssObjects root element name to the wire value
+// declared by the spec (<jss_objects>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroupsGroupItemPrivilegesJssObjects) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "jss_objects"}
+	type shadow AccountGroupsGroupItemPrivilegesJssObjects
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroupsGroupItemPrivilegesJssSettings represents a account groups group item privileges jss settings.
+type AccountGroupsGroupItemPrivilegesJssSettings struct {
+	XMLName   xml.Name
+	Privilege *[]string `xml:"privilege,omitempty"`
+}
+
+// MarshalXML forces the AccountGroupsGroupItemPrivilegesJssSettings root element name to the wire value
+// declared by the spec (<jss_settings>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroupsGroupItemPrivilegesJssSettings) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "jss_settings"}
+	type shadow AccountGroupsGroupItemPrivilegesJssSettings
+	return e.EncodeElement(shadow(t), start)
+}
+
+// AccountGroupsGroupItemPrivilegesRecon represents a account groups group item privileges recon.
+type AccountGroupsGroupItemPrivilegesRecon struct {
+	XMLName   xml.Name
+	Privilege *[]string `xml:"privilege,omitempty"`
+}
+
+// MarshalXML forces the AccountGroupsGroupItemPrivilegesRecon root element name to the wire value
+// declared by the spec (<recon>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t AccountGroupsGroupItemPrivilegesRecon) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "recon"}
+	type shadow AccountGroupsGroupItemPrivilegesRecon
 	return e.EncodeElement(shadow(t), start)
 }
 

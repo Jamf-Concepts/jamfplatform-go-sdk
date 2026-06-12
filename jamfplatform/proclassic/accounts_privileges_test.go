@@ -304,3 +304,116 @@ func TestGroup_WireFixture_LdapServerAndPrivileges(t *testing.T) {
 	}
 	checkPrivCount("jss_objects (2nd)", g2.Privileges.JssObjects.Privilege, 7)
 }
+
+// benTomsFixture is a representative slice of the real ben.toms@jamf.com
+// directory account GET response captured 2026-06-12 (pro-nmartin).
+// It exercises Account.Groups (group membership with inherited privileges),
+// Account.LdapServer, and directory_user:true.
+var benTomsFixture = []byte(`
+<account>
+  <id>66</id>
+  <name>ben.toms@jamf.com</name>
+  <directory_user>true</directory_user>
+  <email>ben.toms@jamf.com</email>
+  <email_address>ben.toms@jamf.com</email_address>
+  <password_sha256/>
+  <enabled>Enabled</enabled>
+  <ldap_server><id>31</id><name>ldap.datajar.mobi</name></ldap_server>
+  <access_level>Group Access</access_level>
+  <privilege_set>Custom</privilege_set>
+  <groups>
+    <group>
+      <id>18</id>
+      <name>datajar.mobi Support</name>
+      <site><id>-1</id><name>NONE</name></site>
+      <privileges>
+        <jss_objects>
+          <privilege>Create Computers</privilege>
+          <privilege>Read Computers</privilege>
+          <privilege>Update Computers</privilege>
+        </jss_objects>
+        <jss_settings>
+          <privilege>Read SSO Settings</privilege>
+          <privilege>Read Password Policy</privilege>
+        </jss_settings>
+      </privileges>
+    </group>
+  </groups>
+</account>
+`)
+
+// TestAccount_WireFixture_DirectoryUser asserts that a directory account
+// round-trips correctly:
+//   - LdapServer.ID == 31, LdapServer.Name == "ldap.datajar.mobi"
+//   - DirectoryUser == true
+//   - Groups contains exactly one group with id == 18
+//   - Group privileges decoded without collapse (jss_objects=3, jss_settings=2)
+//   - Write probe: re-marshal contains exactly ONE <groups> wrapper and
+//     ONE <group> child; privilege counts stable after second unmarshal
+func TestAccount_WireFixture_DirectoryUser(t *testing.T) {
+	var a Account
+	if err := xml.Unmarshal(benTomsFixture, &a); err != nil {
+		t.Fatalf("unmarshal fixture: %v", err)
+	}
+
+	if a.LdapServer == nil || a.LdapServer.ID == nil || *a.LdapServer.ID != 31 {
+		t.Fatalf("LdapServer.ID: want 31, got %v", a.LdapServer)
+	}
+	if a.LdapServer.Name == nil || *a.LdapServer.Name != "ldap.datajar.mobi" {
+		t.Fatalf("LdapServer.Name: want ldap.datajar.mobi, got %v", a.LdapServer.Name)
+	}
+	if a.DirectoryUser == nil || !*a.DirectoryUser {
+		t.Fatalf("DirectoryUser: want true, got %v", a.DirectoryUser)
+	}
+	if a.Groups == nil || a.Groups.Group == nil || len(*a.Groups.Group) != 1 {
+		t.Fatalf("Groups: want 1 group, got %v", a.Groups)
+	}
+	g0 := (*a.Groups.Group)[0]
+	if g0.ID == nil || *g0.ID != 18 {
+		t.Fatalf("Groups[0].ID: want 18, got %v", g0.ID)
+	}
+	if g0.Name == nil || *g0.Name != "datajar.mobi Support" {
+		t.Fatalf("Groups[0].Name: want datajar.mobi Support, got %v", g0.Name)
+	}
+	if g0.Privileges == nil || g0.Privileges.JssObjects == nil || g0.Privileges.JssObjects.Privilege == nil {
+		t.Fatal("Groups[0].Privileges.JssObjects is nil")
+	}
+	if got := len(*g0.Privileges.JssObjects.Privilege); got != 3 {
+		t.Fatalf("Groups[0] jss_objects: want 3, got %d", got)
+	}
+	if g0.Privileges.JssSettings == nil || g0.Privileges.JssSettings.Privilege == nil {
+		t.Fatal("Groups[0].Privileges.JssSettings is nil")
+	}
+	if got := len(*g0.Privileges.JssSettings.Privilege); got != 2 {
+		t.Fatalf("Groups[0] jss_settings: want 2, got %d", got)
+	}
+
+	// Re-marshal and verify structure.
+	out, err := xml.Marshal(a)
+	if err != nil {
+		t.Fatalf("re-marshal: %v", err)
+	}
+	wire := string(out)
+	if n := strings.Count(wire, "<groups>"); n != 1 {
+		t.Fatalf("re-marshal: want 1 <groups> wrapper, got %d", n)
+	}
+	if n := strings.Count(wire, "<group>"); n != 1 {
+		t.Fatalf("re-marshal: want 1 <group> child, got %d", n)
+	}
+
+	// Second unmarshal: confirm groups and privileges are stable.
+	var a2 Account
+	if err := xml.Unmarshal(out, &a2); err != nil {
+		t.Fatalf("second unmarshal: %v", err)
+	}
+	if a2.Groups == nil || a2.Groups.Group == nil || len(*a2.Groups.Group) != 1 {
+		t.Fatalf("second unmarshal: Groups: want 1 group, got %v", a2.Groups)
+	}
+	g0b := (*a2.Groups.Group)[0]
+	if g0b.Privileges == nil || g0b.Privileges.JssObjects == nil || g0b.Privileges.JssObjects.Privilege == nil {
+		t.Fatal("second unmarshal: Groups[0].Privileges.JssObjects is nil")
+	}
+	if got := len(*g0b.Privileges.JssObjects.Privilege); got != 3 {
+		t.Fatalf("second unmarshal: Groups[0] jss_objects: want 3, got %d", got)
+	}
+}

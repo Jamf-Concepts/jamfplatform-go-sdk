@@ -5290,7 +5290,35 @@
           "privileges.jss_actions":    { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
           "privileges.jss_objects":    { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
           "privileges.jss_settings":   { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
-          "privileges.recon":          { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } }
+          "privileges.recon":          { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
+          "groups": {
+            "type": "object",
+            "properties": {
+              "group": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id":   { "type": "integer" },
+                    "name": { "type": "string"  },
+                    "site": { "type": "object", "properties": { "id": { "type": "integer" }, "name": { "type": "string" } } },
+                    "privileges": {
+                      "type": "object",
+                      "properties": {
+                        "casper_admin":   { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
+                        "casper_imaging": { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
+                        "casper_remote":  { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
+                        "jss_actions":    { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
+                        "jss_objects":    { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
+                        "jss_settings":   { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
+                        "recon":          { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         },
         "group": {
           "privileges.casper_admin":   { "type": "object", "properties": { "privilege": { "type": "array", "items": { "type": "string" } } } },
