@@ -16,7 +16,7 @@ import (
 func (c *Client) DeleteLogFlush(ctx context.Context, request *Logflush) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := prefix + "/logflush"
-	if err := c.transport.DoWithContentType(ctx, http.MethodDelete, endpoint, request, "application/xml", http.StatusOK, nil); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodDelete, endpoint, request, "application/xml", http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("DeleteLogFlush: %w", err)
 	}
 	return nil
@@ -26,7 +26,7 @@ func (c *Client) DeleteLogFlush(ctx context.Context, request *Logflush) error {
 func (c *Client) DeleteLogFlushByLogIDInterval(ctx context.Context, log string, id string, interval string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/logflush/%s/id/%s/interval/%s", prefix, url.PathEscape(log), url.PathEscape(id), url.PathEscape(interval))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("DeleteLogFlushByLogIDInterval(%s): %w", log, err)
 	}
 	return nil
@@ -36,7 +36,7 @@ func (c *Client) DeleteLogFlushByLogIDInterval(ctx context.Context, log string, 
 func (c *Client) DeleteLogFlushByLogInterval(ctx context.Context, log string, interval string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/logflush/%s/interval/%s", prefix, url.PathEscape(log), url.PathEscape(interval))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("DeleteLogFlushByLogInterval(%s): %w", log, err)
 	}
 	return nil

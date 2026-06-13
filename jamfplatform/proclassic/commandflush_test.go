@@ -17,7 +17,7 @@ func TestDeleteCommandFlush(t *testing.T) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 	})
 
 	err := c.DeleteCommandFlush(context.Background(), &Commandflush{})
@@ -32,7 +32,7 @@ func TestDeleteCommandFlushByIDTypeIDStatus(t *testing.T) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 	})
 
 	err := c.DeleteCommandFlushByIDTypeIDStatus(context.Background(), "test-id", "test-id", "test-id")

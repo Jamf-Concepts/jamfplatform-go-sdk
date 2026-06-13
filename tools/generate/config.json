@@ -8993,11 +8993,13 @@
         },
         {
           "op": "DELETE /tenant/{tenantId}/commandflush",
-          "name": "DeleteCommandFlush"
+          "name": "DeleteCommandFlush",
+          "expectedStatus": 201
         },
         {
           "op": "DELETE /tenant/{tenantId}/commandflush/{idtype}/id/{id}/status/{status}",
           "name": "DeleteCommandFlushByIDTypeIDStatus",
+          "expectedStatus": 201,
           "pathNames": {
             "id": "id"
           }
@@ -9173,18 +9175,21 @@
         },
         {
           "op": "DELETE /tenant/{tenantId}/logflush",
-          "name": "DeleteLogFlush"
+          "name": "DeleteLogFlush",
+          "expectedStatus": 201
         },
         {
           "op": "DELETE /tenant/{tenantId}/logflush/{log}/id/{id}/interval/{interval}",
           "name": "DeleteLogFlushByLogIDInterval",
+          "expectedStatus": 201,
           "pathNames": {
             "id": "id"
           }
         },
         {
           "op": "DELETE /tenant/{tenantId}/logflush/{log}/interval/{interval}",
-          "name": "DeleteLogFlushByLogInterval"
+          "name": "DeleteLogFlushByLogInterval",
+          "expectedStatus": 201
         },
         {
           "op": "GET /tenant/{tenantId}/macapplications/id/{id}/subset/{subset}",
