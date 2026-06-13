@@ -3653,12 +3653,13 @@ type LdapServer struct {
 
 // LinkedConnectProfile represents a linked connect profile.
 type LinkedConnectProfile struct {
-	AutoDeploymentType      *string `json:"autoDeploymentType,omitempty"`
-	ProfileID               *int    `json:"profileId"`
-	ProfileName             *string `json:"profileName,omitempty"`
-	ProfileScopeDescription *string `json:"profileScopeDescription,omitempty"`
-	UUID                    *string `json:"uuid,omitempty"`
-	Version                 *string `json:"version,omitempty"`
+	AutoDeploymentType *string `json:"autoDeploymentType,omitempty"`
+	ProfileID          *int    `json:"profileId"`
+	ProfileName        *string `json:"profileName,omitempty"`
+	ScopeDescription   *string `json:"scopeDescription,omitempty"`
+	SiteID             *string `json:"siteId,omitempty"`
+	UUID               *string `json:"uuid,omitempty"`
+	Version            *string `json:"version,omitempty"`
 }
 
 // LinkedConnectProfileSearchResults represents a linked connect profile search results.

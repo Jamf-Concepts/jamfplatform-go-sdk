@@ -385,6 +385,11 @@
         "adcs_certificate_response.expirationDate": "*string",
         "certificate_response.expirationDate": "*string"
       },
+      "propertyRenames": {
+        "LinkedConnectProfile": {
+          "profileScopeDescription": "scopeDescription"
+        }
+      },
       "emitNullForOptional": [
         "SamlSettings",
         "OidcSettings",
@@ -396,6 +401,9 @@
             "type": "object",
             "additionalProperties": { "$ref": "#/components/schemas/TimeFrame" }
           }
+        },
+        "LinkedConnectProfile": {
+          "siteId": { "type": "string", "readOnly": true }
         }
       },
       "excludePaths": [
