@@ -17,6 +17,8 @@ import (
 )
 
 // ListAppInstallerTitlesV1 get all available App Installer titles.
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ListAppInstallerTitlesV1(ctx context.Context) ([]AppInstallerTitle, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]AppInstallerTitle, bool, error) {
@@ -41,6 +43,8 @@ func (c *Client) ListAppInstallerTitlesV1(ctx context.Context) ([]AppInstallerTi
 }
 
 // GetAppInstallerTitleV1 get an App Installer title by ID.
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) GetAppInstallerTitleV1(ctx context.Context, id string) (*AppInstallerTitle, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AppInstallerTitle
@@ -52,6 +56,8 @@ func (c *Client) GetAppInstallerTitleV1(ctx context.Context, id string) (*AppIns
 }
 
 // ResolveAppInstallerTitleV1IDByName looks up a AppInstallerTitleV1 by its titleName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ResolveAppInstallerTitleV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/app-installers/titles"
@@ -63,6 +69,8 @@ func (c *Client) ResolveAppInstallerTitleV1IDByName(ctx context.Context, name st
 }
 
 // ResolveAppInstallerTitleV1ByName looks up a AppInstallerTitleV1 by its titleName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ResolveAppInstallerTitleV1ByName(ctx context.Context, name string) (*AppInstallerTitle, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/app-installers/titles"

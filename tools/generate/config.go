@@ -30,6 +30,7 @@ type SpecDef struct {
 	Format             string                       `json:"format,omitempty"`     // "json" (default) or "xml" — drives struct tag style and transport codec
 	RawBody            bool                         `json:"rawBody,omitempty"`    // generate methods that take/return []byte instead of typed structs; consumer owns marshaling (used for Classic where spec has no useful types)
 	TypesOnly          bool                         `json:"typesOnly,omitempty"`  // generate only Go types from all schemas — no client methods, no method tests, no client.go; used for specs that define types consumed in other API payloads (e.g. blueprint component configurations)
+	Undocumented       bool                         `json:"undocumented,omitempty"` // all operations in this spec are unofficial/reverse-engineered; emits an "Unofficial:" godoc warning on every generated method
 	Operations         []OperationDef               `json:"operations"`
 	ExcludePaths       []string                     `json:"excludePaths,omitempty"`       // "METHOD /path" entries the generator must refuse to include
 	FieldTypeOverrides map[string]string            `json:"fieldTypeOverrides,omitempty"` // "schema_name.property_name" -> Go type, used to correct spec bugs (e.g. `integer` fields where the server actually returns a non-int64 string). Applied per-spec so upstream spec updates don't get silently overwritten.

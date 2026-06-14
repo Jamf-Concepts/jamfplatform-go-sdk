@@ -7040,6 +7040,33 @@ type SelfServiceCategory struct {
 	ID       *string `json:"id,omitempty"`
 }
 
+// AppInstallerDeploymentProcessControls represents a app installer deployment process controls.
+type AppInstallerDeploymentProcessControls struct {
+	BatchFrequencyInMinutes *int      `json:"batchFrequencyInMinutes,omitempty"`
+	CommandsBatchSize       *int      `json:"commandsBatchSize,omitempty"`
+	DaysOfWeek              *[]string `json:"daysOfWeek,omitempty"`
+	FromTimeOfDay           *string   `json:"fromTimeOfDay,omitempty"`
+	ToTimeOfDay             *string   `json:"toTimeOfDay,omitempty"`
+}
+
+// AppInstallerEndUserExperienceSettings represents a app installer end user experience settings.
+type AppInstallerEndUserExperienceSettings struct {
+	CompleteMessage      *string `json:"completeMessage,omitempty"`
+	Deadline             *int    `json:"deadline,omitempty"`
+	DeadlineMessage      *string `json:"deadlineMessage,omitempty"`
+	NotificationInterval *int    `json:"notificationInterval,omitempty"`
+	NotificationMessage  *string `json:"notificationMessage,omitempty"`
+	QuitDelay            *int    `json:"quitDelay,omitempty"`
+	Relaunch             *bool   `json:"relaunch,omitempty"`
+	Suppress             *bool   `json:"suppress,omitempty"`
+}
+
+// AppInstallerGlobalSettings represents a app installer global settings.
+type AppInstallerGlobalSettings struct {
+	DeploymentProcessControls *AppInstallerDeploymentProcessControls `json:"deploymentProcessControls,omitempty"`
+	EndUserExperienceSettings *AppInstallerEndUserExperienceSettings `json:"endUserExperienceSettings,omitempty"`
+}
+
 // LocalAdminPasswordSettings represents a local admin password settings.
 type LocalAdminPasswordSettings struct {
 	AutoDeployEnabled        bool  `json:"autoDeployEnabled"`

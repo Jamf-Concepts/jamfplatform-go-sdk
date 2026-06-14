@@ -268,6 +268,84 @@ func TestAcceptance_Pro_AppInstallerDeploymentsRandomSweep(t *testing.T) {
 	t.Logf("Swept %d titles: %d CRUDed, %d rejected on create", len(sample), created, failed)
 }
 
+// TestAcceptance_Pro_AppInstallerGlobalSettings exercises GET and PUT
+// on the singleton global settings resource. All fields are nullable;
+// the test snapshots the current state on entry, writes a known payload,
+// verifies the round-trip, then restores the original in t.Cleanup so
+// the tenant isn't left dirty.
+func TestAcceptance_Pro_AppInstallerGlobalSettings(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	original, err := p.GetAppInstallerGlobalSettingsV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetAppInstallerGlobalSettingsV1: %v", err)
+	}
+	t.Logf("AppInstaller global settings retrieved")
+
+	t.Cleanup(func() {
+		if _, err := p.UpdateAppInstallerGlobalSettingsV1(ctx, original); err != nil {
+			t.Logf("WARNING: failed to restore AppInstaller global settings: %v", err)
+		}
+	})
+
+	batchFreq := 60
+	batchSize := 50
+	notifMsg := "Test update pending."
+	notifInterval := 30
+	deadline := 24
+	quitDelay := 5
+	completeMsg := "Update complete."
+	relaunch := true
+	suppress := false
+
+	put := &pro.AppInstallerGlobalSettings{
+		EndUserExperienceSettings: &pro.AppInstallerEndUserExperienceSettings{
+			NotificationMessage:  &notifMsg,
+			NotificationInterval: &notifInterval,
+			Deadline:             &deadline,
+			QuitDelay:            &quitDelay,
+			CompleteMessage:      &completeMsg,
+			Relaunch:             &relaunch,
+			Suppress:             &suppress,
+		},
+		DeploymentProcessControls: &pro.AppInstallerDeploymentProcessControls{
+			CommandsBatchSize:       &batchSize,
+			BatchFrequencyInMinutes: &batchFreq,
+			DaysOfWeek:              &[]string{"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"},
+			FromTimeOfDay:           ptrStr("08:00:00Z"),
+			ToTimeOfDay:             ptrStr("18:00:00Z"),
+		},
+	}
+
+	updated, err := p.UpdateAppInstallerGlobalSettingsV1(ctx, put)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateAppInstallerGlobalSettingsV1: %v", err)
+	}
+
+	if updated.DeploymentProcessControls == nil {
+		t.Fatal("UpdateAppInstallerGlobalSettingsV1: response missing deploymentProcessControls")
+	}
+	if updated.DeploymentProcessControls.BatchFrequencyInMinutes == nil ||
+		*updated.DeploymentProcessControls.BatchFrequencyInMinutes != batchFreq {
+		t.Errorf("batchFrequencyInMinutes: got %v want %d",
+			updated.DeploymentProcessControls.BatchFrequencyInMinutes, batchFreq)
+	}
+	if updated.EndUserExperienceSettings == nil {
+		t.Fatal("UpdateAppInstallerGlobalSettingsV1: response missing endUserExperienceSettings")
+	}
+	if updated.EndUserExperienceSettings.NotificationMessage == nil ||
+		*updated.EndUserExperienceSettings.NotificationMessage != notifMsg {
+		t.Errorf("notificationMessage: got %v want %q",
+			updated.EndUserExperienceSettings.NotificationMessage, notifMsg)
+	}
+
+	t.Logf("AppInstaller global settings updated and verified")
+}
+
 // Helpers -------------------------------------------------------------
 
 // createAppInstallerSmartGroup provisions a throwaway Classic smart

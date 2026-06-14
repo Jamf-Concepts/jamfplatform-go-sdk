@@ -36,6 +36,16 @@ func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
 	if err != nil {
 		return nil, err
 	}
+	if spec.Undocumented {
+		unofficialMsg := "\n//\n// Unofficial: this endpoint is not part of Jamf's published API specification." +
+			" It was reverse-engineered from live API traffic and may change or be removed without notice."
+		for i := range methods {
+			if methods[i].Comment == "" {
+				methods[i].Comment = methods[i].Name + " calls an undocumented Jamf endpoint."
+			}
+			methods[i].Comment += unofficialMsg
+		}
+	}
 	return methods, nil
 }
 
