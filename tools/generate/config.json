@@ -243,10 +243,30 @@
       "package": "ddmreport",
       "splitByTag": true,
       "specFile": "declaration_reporting_service.json",
+      "fieldTypeOverrides": {
+        "error_dto.id": "*string",
+        "status_report_declaration_dto.dateUpdated": "*time.Time",
+        "filtered_result_dto.dateUpdated": "*time.Time",
+        "filtered_result_dto.lastReportTime": "*time.Time"
+      },
       "operations": [
         {
           "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}",
           "name": "GetDeviceDeclarationReport"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}/declarations",
+          "name": "GetDeviceDeclarationReportFiltered",
+          "pagination": "totalCount",
+          "pageSizeParam": "size",
+          "params": [
+            "filter:string",
+            "sort:[]string"
+          ]
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}/channels",
+          "name": "GetDeviceChannels"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/declarations/{declarationIdentifier}",
@@ -254,6 +274,16 @@
           "pagination": "totalCount",
           "pageSizeParam": "size",
           "params": [
+            "sort:[]string"
+          ]
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/declarations/{declarationIdentifier}/devices",
+          "name": "ListDeclarationReportClientsFiltered",
+          "pagination": "totalCount",
+          "pageSizeParam": "size",
+          "params": [
+            "filter:string",
             "sort:[]string"
           ]
         }
@@ -346,7 +376,40 @@
         "managed_software_update_plan_toggle_status.elapsedTime": "*float64",
         "linked_connect_profile.profileId": "*int",
         "user_account.lastPasswordChange": "*string",
-        "notification_v1.params": "map[string]any"
+        "notification_v1.params": "map[string]any",
+        "sso_keystore_details.serialNumber": "json.Number",
+        "prestage_scope_assignment_v2.assignmentDate": "*string",
+        "cloud_ldap_keystore.expirationDate": "*string",
+        "adcs_certificate.data": "[]byte",
+        "certificate.data": "[]byte",
+        "adcs_certificate_response.expirationDate": "*string",
+        "certificate_response.expirationDate": "*string"
+      },
+      "propertyRenames": {
+        "LinkedConnectProfile": {
+          "profileScopeDescription": "scopeDescription"
+        }
+      },
+      "emitNullForOptional": [
+        "SamlSettings",
+        "OidcSettings",
+        "EnrollmentSsoConfig"
+      ],
+      "schemaPatches": {
+        "ParentApp": {
+          "restrictedTimes": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TimeFrame"
+            }
+          }
+        },
+        "LinkedConnectProfile": {
+          "siteId": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
       },
       "excludePaths": [
         "POST /v1/tenant/{tenantId}/auth/token",
@@ -696,6 +759,28 @@
           }
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/smart-groups",
+          "name": "ListSmartComputerGroupsV3",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "SmartComputerGroupV3",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "filtered",
+            "typedReturn": "SmartComputerGroupSearch",
+            "apply": {
+              "createOp": "CreateSmartComputerGroupV3",
+              "updateOp": "UpdateSmartComputerGroupV3",
+              "deleteOp": "DeleteSmartComputerGroupV3",
+              "nameGoField": "Name"
+            }
+          }
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/smart-groups",
           "name": "ListSmartComputerGroupsV2",
           "pagination": "totalCount",
@@ -718,6 +803,13 @@
           }
         },
         {
+          "op": "POST /v3/tenant/{tenantId}/computer-groups/smart-groups",
+          "name": "CreateSmartComputerGroupV3",
+          "params": [
+            "platform:bool"
+          ]
+        },
+        {
           "op": "POST /v2/tenant/{tenantId}/computer-groups/smart-groups",
           "name": "CreateSmartComputerGroupV2",
           "params": [
@@ -725,8 +817,16 @@
           ]
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "name": "GetSmartComputerGroupV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/smart-groups/{id}",
           "name": "GetSmartComputerGroupV2"
+        },
+        {
+          "op": "PUT /v3/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "name": "UpdateSmartComputerGroupV3"
         },
         {
           "op": "PUT /v2/tenant/{tenantId}/computer-groups/smart-groups/{id}",
@@ -734,13 +834,43 @@
           "expectedStatus": 202
         },
         {
+          "op": "DELETE /v3/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "name": "DeleteSmartComputerGroupV3"
+        },
+        {
           "op": "DELETE /v2/tenant/{tenantId}/computer-groups/smart-groups/{id}",
           "name": "DeleteSmartComputerGroupV2",
           "expectedStatus": 204
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/smart-group-membership/{id}",
+          "name": "GetSmartComputerGroupMembershipV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/smart-group-membership/{id}",
           "name": "GetSmartComputerGroupMembershipV2"
+        },
+        {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/static-groups",
+          "name": "ListStaticComputerGroupsV3",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "StaticComputerGroupV3",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "filtered",
+            "typedReturn": "StaticComputerGroupSummary",
+            "apply": {
+              "createOp": "CreateStaticComputerGroupV3",
+              "updateOp": "UpdateStaticComputerGroupV3",
+              "deleteOp": "DeleteStaticComputerGroupV3",
+              "nameGoField": "Name"
+            }
+          }
         },
         {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/static-groups",
@@ -765,6 +895,13 @@
           }
         },
         {
+          "op": "POST /v3/tenant/{tenantId}/computer-groups/static-groups",
+          "name": "CreateStaticComputerGroupV3",
+          "params": [
+            "platform:bool"
+          ]
+        },
+        {
           "op": "POST /v2/tenant/{tenantId}/computer-groups/static-groups",
           "name": "CreateStaticComputerGroupV2",
           "params": [
@@ -772,13 +909,25 @@
           ]
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "name": "GetStaticComputerGroupV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/computer-groups/static-groups/{id}",
           "name": "GetStaticComputerGroupV2"
+        },
+        {
+          "op": "PUT /v3/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "name": "UpdateStaticComputerGroupV3"
         },
         {
           "op": "PUT /v2/tenant/{tenantId}/computer-groups/static-groups/{id}",
           "name": "UpdateStaticComputerGroupV2",
           "expectedStatus": 202
+        },
+        {
+          "op": "DELETE /v3/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "name": "DeleteStaticComputerGroupV3"
         },
         {
           "op": "DELETE /v2/tenant/{tenantId}/computer-groups/static-groups/{id}",
@@ -970,6 +1119,18 @@
           "name": "CreateMobileDeviceExtensionAttributeHistoryNoteV1"
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups",
+          "name": "ListMobileDeviceGroupsV2",
+          "resolver": {
+            "resourceType": "MobileDeviceGroupV2",
+            "nameField": "name",
+            "idField": "id",
+            "idNumeric": true,
+            "mode": "clientFilter",
+            "typedReturn": "MobileDeviceGroup"
+          }
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups",
           "name": "ListMobileDeviceGroupsV1",
           "resolver": {
@@ -979,6 +1140,28 @@
             "idNumeric": true,
             "mode": "clientFilter",
             "typedReturn": "MobileDeviceGroup"
+          }
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/smart-groups",
+          "name": "ListSmartMobileDeviceGroupsV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "SmartMobileDeviceGroupV2",
+            "nameField": "groupName",
+            "idField": "groupId",
+            "mode": "filtered",
+            "typedReturn": "SmartGroup",
+            "apply": {
+              "createOp": "CreateSmartMobileDeviceGroupV2",
+              "updateOp": "UpdateSmartMobileDeviceGroupV2",
+              "deleteOp": "DeleteSmartMobileDeviceGroupV2",
+              "nameGoField": "GroupName"
+            }
           }
         },
         {
@@ -1004,6 +1187,13 @@
           }
         },
         {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-groups/smart-groups",
+          "name": "CreateSmartMobileDeviceGroupV2",
+          "params": [
+            "platform:bool"
+          ]
+        },
+        {
           "op": "POST /v1/tenant/{tenantId}/mobile-device-groups/smart-groups",
           "name": "CreateSmartMobileDeviceGroupV1",
           "params": [
@@ -1011,8 +1201,17 @@
           ]
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "name": "GetSmartMobileDeviceGroupV2"
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
           "name": "GetSmartMobileDeviceGroupV1"
+        },
+        {
+          "op": "PUT /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "name": "UpdateSmartMobileDeviceGroupV2",
+          "expectedStatus": 200
         },
         {
           "op": "PUT /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
@@ -1020,9 +1219,22 @@
           "expectedStatus": 200
         },
         {
+          "op": "DELETE /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "name": "DeleteSmartMobileDeviceGroupV2"
+        },
+        {
           "op": "DELETE /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
           "name": "DeleteSmartMobileDeviceGroupV1",
           "expectedStatus": 204
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/smart-group-membership/{id}",
+          "name": "ListSmartMobileDeviceGroupMembershipV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ]
         },
         {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/smart-group-membership/{id}",
@@ -1032,6 +1244,36 @@
             "sort:[]string",
             "filter"
           ]
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/static-groups",
+          "name": "ListStaticMobileDeviceGroupsV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "StaticMobileDeviceGroupV2",
+            "nameField": "groupName",
+            "idField": "groupId",
+            "mode": "filtered",
+            "typedReturn": "StaticGroup",
+            "apply": {
+              "createOp": "CreateStaticMobileDeviceGroupV2",
+              "updateOp": "PatchStaticMobileDeviceGroupV2",
+              "deleteOp": "DeleteStaticMobileDeviceGroupV2",
+              "nameGoField": "GroupName",
+              "membershipPreFetch": {
+                "fetchOp": "ListStaticMobileDeviceGroupMembershipV2",
+                "sourceIdField": "MobileDeviceID",
+                "assignmentType": "Assignment",
+                "assignmentIdField": "MobileDeviceID",
+                "requestField": "Assignments",
+                "assignmentFieldIsSlicePtr": true
+              }
+            }
+          }
         },
         {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/static-groups",
@@ -1064,6 +1306,13 @@
           }
         },
         {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-groups/static-groups",
+          "name": "CreateStaticMobileDeviceGroupV2",
+          "params": [
+            "platform:bool"
+          ]
+        },
+        {
           "op": "POST /v1/tenant/{tenantId}/mobile-device-groups/static-groups",
           "name": "CreateStaticMobileDeviceGroupV1",
           "params": [
@@ -1071,8 +1320,16 @@
           ]
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "name": "GetStaticMobileDeviceGroupV2"
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
           "name": "GetStaticMobileDeviceGroupV1"
+        },
+        {
+          "op": "DELETE /v2/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "name": "DeleteStaticMobileDeviceGroupV2"
         },
         {
           "op": "DELETE /v1/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
@@ -1080,8 +1337,21 @@
           "expectedStatus": 204
         },
         {
+          "op": "PATCH /v2/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "name": "PatchStaticMobileDeviceGroupV2"
+        },
+        {
           "op": "PATCH /v1/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
           "name": "PatchStaticMobileDeviceGroupV1"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/static-group-membership/{id}",
+          "name": "ListStaticMobileDeviceGroupMembershipV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ]
         },
         {
           "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/static-group-membership/{id}",
@@ -1091,6 +1361,10 @@
             "sort:[]string",
             "filter"
           ]
+        },
+        {
+          "op": "POST /v2/tenant/{tenantId}/mobile-device-groups/{id}/erase",
+          "name": "EraseMobileDeviceGroupV2"
         },
         {
           "op": "POST /v1/tenant/{tenantId}/mobile-device-groups/{id}/erase",
@@ -1169,6 +1443,22 @@
           "expectedStatus": 204
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/groups",
+          "name": "ListGroupsV2",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "GroupV2",
+            "nameField": "groupName",
+            "idField": "groupPlatformId",
+            "mode": "filtered",
+            "typedReturn": "GroupDtoV1"
+          }
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/groups",
           "name": "ListGroupsV1",
           "pagination": "totalCount",
@@ -1185,13 +1475,25 @@
           }
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/groups/{id}",
+          "name": "GetGroupV2"
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/groups/{id}",
           "name": "GetGroupV1"
+        },
+        {
+          "op": "DELETE /v2/tenant/{tenantId}/groups/{id}",
+          "name": "DeleteGroupV2"
         },
         {
           "op": "DELETE /v1/tenant/{tenantId}/groups/{id}",
           "name": "DeleteGroupV1",
           "expectedStatus": 204
+        },
+        {
+          "op": "PATCH /v2/tenant/{tenantId}/groups/{id}",
+          "name": "PatchGroupV2"
         },
         {
           "op": "PATCH /v1/tenant/{tenantId}/groups/{id}",
@@ -3563,15 +3865,6 @@
           "name": "UpdateJamfProServerURLV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-pro-server-url/history",
-          "name": "ListJamfProServerURLHistoryV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ]
-        },
-        {
           "op": "GET /v1/tenant/{tenantId}/device-communication-settings",
           "name": "GetDeviceCommunicationSettingsV1"
         },
@@ -3614,14 +3907,6 @@
           "op": "POST /v3/tenant/{tenantId}/check-in/history",
           "name": "CreateCheckInHistoryNoteV3",
           "expectedStatus": 201
-        },
-        {
-          "op": "GET /v1/tenant/{tenantId}/cache-settings",
-          "name": "GetCacheSettingsV1"
-        },
-        {
-          "op": "PUT /v1/tenant/{tenantId}/cache-settings",
-          "name": "UpdateCacheSettingsV1"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/login-customization",
@@ -3732,7 +4017,8 @@
         {
           "op": "POST /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager",
           "name": "CreateDigicertTrustLifecycleManagerV1",
-          "expectedStatus": 201
+          "expectedStatus": 201,
+          "responseType": "HrefResponse"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}",
@@ -3817,7 +4103,8 @@
         {
           "op": "POST /v1/tenant/{tenantId}/pki/venafi/{id}/proxy-trust-store",
           "name": "UploadVenafiProxyTrustStoreV1",
-          "expectedStatus": 204
+          "expectedStatus": 204,
+          "requestType": "[]byte"
         },
         {
           "op": "DELETE /v1/tenant/{tenantId}/pki/venafi/{id}/proxy-trust-store",
@@ -4508,6 +4795,46 @@
         {
           "op": "POST /v1/tenant/{tenantId}/system/platform-initialize",
           "name": "PlatformInitializeSystemV1"
+        },
+        {
+          "op": "PUT /v1/tenant/{tenantId}/accounts/{id}",
+          "name": "UpdateAccountV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/account-groups",
+          "name": "ListAccountGroupsV1",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "AccountGroupV1",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "filtered",
+            "typedReturn": "AccountGroupV1"
+          }
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/account-groups/{id}",
+          "name": "GetAccountGroupV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/last-login",
+          "name": "GetLastLoginV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/m2m/tenant-id",
+          "name": "GetM2MTenantIDV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/user-sessions/active",
+          "name": "ListActiveUserSessionsV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/user-sessions/count",
+          "name": "GetActiveUsersCountV1"
         }
       ]
     },
@@ -4522,15 +4849,1118 @@
         "*.invitation": "*BigInt",
         "*.expiration_date_epoch": "*BigInt",
         "*.date_sent_epoch": "*BigInt",
-        "*.notification": "*NotificationValue"
+        "*.notification": "*NotificationValue",
+        "*.map_user_membership_to_group_field": "*string",
+        "os_x_configuration_profile_general.payloads": "PayloadsXMLText",
+        "mobile_device_configuration_profile_general.payloads": "PayloadsXMLText"
       },
       "schemaAdditions": {
         "account": {
-          "password": "string:password"
+          "password": "string:password",
+          "password_sha256": "string"
+        },
+        "category": {
+          "priority": "integer"
         },
         "json_web_token_configuration": {
           "encryption_key": "string:password"
+        },
+        "network_segment_post": {
+          "distribution_server": "string",
+          "distribution_point": "string",
+          "url": "string",
+          "swu_server": "string",
+          "building": "string",
+          "department": "string"
+        },
+        "printer": {
+          "shared": "boolean",
+          "os_requirements": "string"
+        },
+        "distribution_point": {
+          "ssh_password_sha256": "string",
+          "read_only_password_sha256": "string",
+          "read_write_password_sha256": "string",
+          "http_password_sha256": "string"
+        },
+        "patch_external_source": {
+          "certificate_validation_enabled": "boolean",
+          "enabled": "boolean"
+        },
+        "webhook": {
+          "header": "string",
+          "hash_algorithm": "string",
+          "smart_group_id": "integer"
         }
+      },
+      "propertyRenames": {
+        "patch_software_title": {
+          "categories": "category"
+        },
+        "class": {
+          "mobile_device_group_id": "mobile_device_group_ids"
+        },
+        "policy": {
+          "self_service.re-install_button_text": "reinstall_button_text",
+          "user_interaction.allow_user_to_defer": "allow_users_to_defer"
+        },
+        "os_x_configuration_profile": {
+          "scope.jss_users.users": "user",
+          "scope.exclusions.jss_users.jss_user": "user",
+          "scope.exclusions.jss_user_groups.jss_user_group": "user_group"
+        },
+        "mobile_device_configuration_profile": {
+          "general.redeploy_Dayss_before_certificate_expires": "redeploy_days_before_certificate_expires",
+          "self_service.security_name": "security"
+        },
+        "mobile_device_extension_attribute": {
+          "date_type": "data_type"
+        },
+        "ldap_server": {
+          "mappings_for_users.user_mappings.map_telephone": "map_phone"
+        },
+        "ldap_server_post": {
+          "mappings_for_users.user_mappings.map_telephone": "map_phone"
+        },
+        "patch_policy": {
+          "general.incremental_updates": "incremental_update"
+        },
+        "computer_invitation": {
+          "multiple_users_allowed": "multiple_uses_allowed"
+        },
+        "mobile_device_invitation": {
+          "enrolled_into_site": "enroll_into_site"
+        },
+        "mobile_device_invitation_post": {
+          "enrolled_into_site": "enroll_into_site"
+        },
+        "vpp_invitation": {
+          "invitation_usage": "invitation_usages"
+        }
+      },
+      "propertyRemovals": {
+        "mac_application": [
+          "self_service.vpp"
+        ],
+        "vpp_invitation": [
+          "invitation_usages.usage.last_action_epoch"
+        ]
+      },
+      "schemaPatches": {
+        "mobile_device_application": {
+          "general.allow_user_to_delete": {
+            "type": "boolean"
+          },
+          "general.keep_app_updated_on_devices": {
+            "type": "boolean"
+          },
+          "general.os_type": {
+            "type": "string"
+          },
+          "general.require_network_tethered": {
+            "type": "boolean"
+          },
+          "self_service.self_service_icon.filename": {
+            "type": "string"
+          },
+          "self_service.self_service_install_button_text": {
+            "type": "string"
+          },
+          "self_service.self_service_after_install_button_text": {
+            "type": "string"
+          }
+        },
+        "patch_software_title": {
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "class": {
+          "students": {
+            "type": "object",
+            "properties": {
+              "student": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "teachers": {
+            "type": "object",
+            "properties": {
+              "teacher": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "student_ids": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "teacher_ids": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "student_group_ids": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "teacher_group_ids": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "mobile_device_group_id": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "mobile_device_configuration_profile": {
+          "self_service.security_name.password": {
+            "type": "string"
+          }
+        },
+        "mobile_device_extension_attribute": {
+          "input_type.popup_choices": {
+            "type": "object",
+            "properties": {
+              "choice": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "mobile_device_provisioning_profile": {
+          "general.creation_date_utc": {
+            "type": "string"
+          },
+          "general.creation_date_epoch": {
+            "type": "integer"
+          },
+          "general.expiration_date_utc": {
+            "type": "string"
+          },
+          "general.expiration_date_epoch": {
+            "type": "integer"
+          },
+          "general.profile": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "data": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "mobile_device_enrollment_profile": {
+          "general.uuid": {
+            "type": "string"
+          },
+          "general.site": {
+            "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "mobile_device_enrollment_profile_post": {
+          "general.uuid": {
+            "type": "string"
+          },
+          "general.site": {
+            "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "computer_extension_attribute": {
+          "input_type.platform": {
+            "type": "string"
+          },
+          "input_type.script": {
+            "type": "string"
+          },
+          "input_type.popup_choices": {
+            "type": "object",
+            "properties": {
+              "choice": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "user_extension_attribute": {
+          "input_type.popup_choices": {
+            "type": "object",
+            "properties": {
+              "choice": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "licensed_software": {
+          "computers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "computer": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "udid": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "disk_encryption_configuration": {
+          "institutional_recovery_key": {
+            "type": "object",
+            "properties": {
+              "certificate_type": {
+                "type": "string"
+              },
+              "data": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "password": {
+                "type": "string"
+              },
+              "password_sha256": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "directory_binding": {
+          "password_sha256": {
+            "type": "string"
+          },
+          "active_directory": {
+            "type": "object",
+            "properties": {
+              "forest": {
+                "type": "string"
+              },
+              "cache_last_user": {
+                "type": "boolean"
+              },
+              "require_confirmation": {
+                "type": "boolean"
+              },
+              "local_home": {
+                "type": "boolean"
+              },
+              "use_unc_path": {
+                "type": "boolean"
+              },
+              "mount_style": {
+                "type": "string"
+              },
+              "default_shell": {
+                "type": "string"
+              },
+              "uid": {
+                "type": "string"
+              },
+              "user_gid": {
+                "type": "string"
+              },
+              "gid": {
+                "type": "string"
+              },
+              "multiple_domains": {
+                "type": "boolean"
+              },
+              "preferred_domain": {
+                "type": "string"
+              },
+              "admin_groups": {
+                "type": "string"
+              }
+            }
+          },
+          "open_directory": {
+            "type": "object",
+            "properties": {
+              "encrypt_using_ssl": {
+                "type": "boolean"
+              },
+              "perform_secure_bind": {
+                "type": "boolean"
+              },
+              "use_for_authentication": {
+                "type": "boolean"
+              },
+              "use_for_contacts": {
+                "type": "boolean"
+              }
+            }
+          },
+          "powerbroker_identity_services": {
+            "type": "object"
+          },
+          "admitmac": {
+            "type": "object",
+            "properties": {
+              "require_confirmation": {
+                "type": "boolean"
+              },
+              "local_home": {
+                "type": "string"
+              },
+              "mount_style": {
+                "type": "string"
+              },
+              "default_shell": {
+                "type": "string"
+              },
+              "mount_network_home": {
+                "type": "boolean"
+              },
+              "place_home_folders": {
+                "type": "string"
+              },
+              "uid": {
+                "type": "string"
+              },
+              "user_gid": {
+                "type": "string"
+              },
+              "gid": {
+                "type": "string"
+              },
+              "admin_group": {
+                "type": "string"
+              },
+              "cached_credentials": {
+                "type": "integer"
+              },
+              "add_user_to_local": {
+                "type": "boolean"
+              },
+              "users_ou": {
+                "type": "string"
+              },
+              "groups_ou": {
+                "type": "string"
+              },
+              "printers_ou": {
+                "type": "string"
+              },
+              "shared_folders_ou": {
+                "type": "string"
+              }
+            }
+          },
+          "centrify": {
+            "type": "object",
+            "properties": {
+              "workstation_mode": {
+                "type": "boolean"
+              },
+              "overwrite_existing": {
+                "type": "boolean"
+              },
+              "update_PAM": {
+                "type": "boolean"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "preferred_domain_server": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "policy": {
+          "general.date_time_limitations.no_execute_on.day": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Sun",
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat"
+              ]
+            }
+          },
+          "general.network_limitations.network_segments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "network_segment": {
+                  "$ref": "#/components/schemas/id_name"
+                }
+              }
+            }
+          },
+          "scope.jss_users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "$ref": "#/components/schemas/id_name"
+                }
+              }
+            }
+          },
+          "scope.jss_user_groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_group": {
+                  "$ref": "#/components/schemas/id_name"
+                }
+              }
+            }
+          },
+          "scope.exclusions.jss_users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "$ref": "#/components/schemas/id_name"
+                }
+              }
+            }
+          },
+          "scope.exclusions.jss_user_groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_group": {
+                  "$ref": "#/components/schemas/id_name"
+                }
+              }
+            }
+          },
+          "scope.limit_to_users.user_groups": {
+            "type": "object",
+            "properties": {
+              "user_group": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "scope.all_jss_users": {
+            "type": "boolean"
+          },
+          "self_service.notification": {
+            "type": "boolean"
+          },
+          "self_service.notification_type": {
+            "type": "string"
+          },
+          "self_service.notification_subject": {
+            "type": "string"
+          },
+          "self_service.notification_message": {
+            "type": "string"
+          },
+          "self_service.self_service_categories.category": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "display_in": {
+                  "type": "boolean"
+                },
+                "feature_in": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "account_maintenance.accounts.account.hint": {
+            "type": "string"
+          },
+          "account_maintenance.accounts.account.secure_token_allowed": {
+            "type": "boolean"
+          },
+          "account_maintenance.accounts.account.password_sha256": {
+            "type": "string"
+          },
+          "account_maintenance.open_firmware_efi_password.of_password_sha256": {
+            "type": "string"
+          },
+          "package_configuration.distribution_point": {
+            "type": "string"
+          },
+          "printers": {
+            "type": "object",
+            "properties": {
+              "size": {
+                "type": "integer"
+              },
+              "leave_existing_default": {
+                "type": "boolean"
+              },
+              "printer": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "install",
+                        "uninstall"
+                      ]
+                    },
+                    "make_default": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "reboot": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "startup_disk": {
+                "type": "string"
+              },
+              "specify_startup": {
+                "type": "string"
+              },
+              "no_user_logged_in": {
+                "type": "string"
+              },
+              "user_logged_in": {
+                "type": "string"
+              },
+              "minutes_until_reboot": {
+                "type": "integer"
+              },
+              "start_reboot_timer_immediately": {
+                "type": "boolean"
+              },
+              "file_vault_2_reboot": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "os_x_configuration_profile": {
+          "self_service.self_service_display_name": {
+            "type": "string"
+          },
+          "self_service.security": {
+            "type": "object",
+            "properties": {
+              "removal_disallowed": {
+                "type": "string"
+              },
+              "password": {
+                "type": "string"
+              }
+            }
+          },
+          "self_service.self_service_categories.category": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "display_in": {
+                  "type": "boolean"
+                },
+                "feature_in": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "scope.limitations.network_segments.network_segment": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "uid": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "ebook": {
+          "self_service.self_service_categories.category": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "display_in": {
+                  "type": "boolean"
+                },
+                "feature_in": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "vpp_account": {
+          "location_name": {
+            "type": "string"
+          }
+        },
+        "mac_application": {
+          "general.deployment_type": {
+            "type": "string"
+          },
+          "vpp": {
+            "type": "object",
+            "properties": {
+              "assign_vpp_device_based_licenses": {
+                "type": "boolean"
+              },
+              "vpp_admin_account_id": {
+                "type": "integer"
+              },
+              "total_vpp_licenses": {
+                "type": "integer"
+              },
+              "remaining_vpp_licenses": {
+                "type": "integer"
+              },
+              "used_vpp_licenses": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "ldap_server": {
+          "connection.is_enabled": {
+            "type": "boolean"
+          },
+          "connection.migrated_to_id": {
+            "type": "integer"
+          },
+          "connection.certificates_used": {
+            "type": "string"
+          },
+          "connection.account.password_sha256": {
+            "type": "string"
+          },
+          "mappings_for_users.user_group_membership_mappings.group_membership_enabled_when_user_membership_selected": {
+            "type": "boolean"
+          },
+          "mappings_for_users.user_group_membership_mappings.membership_scoping_optimization": {
+            "type": "boolean"
+          }
+        },
+        "vpp_invitation": {
+          "general.auto_register_managed_users": {
+            "type": "boolean"
+          },
+          "invitation_usage.usage.last_action_date_epoch": {
+            "type": "integer"
+          }
+        },
+        "account": {
+          "privileges.casper_admin": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.casper_imaging": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.casper_remote": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.jss_actions": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.jss_objects": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.jss_settings": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.recon": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "groups": {
+            "type": "object",
+            "properties": {
+              "group": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "site": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "privileges": {
+                      "type": "object",
+                      "properties": {
+                        "casper_admin": {
+                          "type": "object",
+                          "properties": {
+                            "privilege": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "casper_imaging": {
+                          "type": "object",
+                          "properties": {
+                            "privilege": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "casper_remote": {
+                          "type": "object",
+                          "properties": {
+                            "privilege": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "jss_actions": {
+                          "type": "object",
+                          "properties": {
+                            "privilege": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "jss_objects": {
+                          "type": "object",
+                          "properties": {
+                            "privilege": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "jss_settings": {
+                          "type": "object",
+                          "properties": {
+                            "privilege": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "recon": {
+                          "type": "object",
+                          "properties": {
+                            "privilege": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "group": {
+          "privileges.casper_admin": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.casper_imaging": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.casper_remote": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.jss_actions": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.jss_objects": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.jss_settings": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "privileges.recon": {
+            "type": "object",
+            "properties": {
+              "privilege": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "ldap_server": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "fieldOrder": {
+        "vpp_invitation_general": [
+          "id",
+          "name",
+          "vpp_account",
+          "distribution_method",
+          "sender_name",
+          "sender_email_address",
+          "subject",
+          "message",
+          "require_login",
+          "auto_register_managed_users"
+        ]
       },
       "excludePaths": [
         "GET /tenant/{tenantId}/byoprofiles",
@@ -8183,11 +9613,13 @@
         },
         {
           "op": "DELETE /tenant/{tenantId}/commandflush",
-          "name": "DeleteCommandFlush"
+          "name": "DeleteCommandFlush",
+          "expectedStatus": 201
         },
         {
           "op": "DELETE /tenant/{tenantId}/commandflush/{idtype}/id/{id}/status/{status}",
           "name": "DeleteCommandFlushByIDTypeIDStatus",
+          "expectedStatus": 201,
           "pathNames": {
             "id": "id"
           }
@@ -8363,18 +9795,21 @@
         },
         {
           "op": "DELETE /tenant/{tenantId}/logflush",
-          "name": "DeleteLogFlush"
+          "name": "DeleteLogFlush",
+          "expectedStatus": 201
         },
         {
           "op": "DELETE /tenant/{tenantId}/logflush/{log}/id/{id}/interval/{interval}",
           "name": "DeleteLogFlushByLogIDInterval",
+          "expectedStatus": 201,
           "pathNames": {
             "id": "id"
           }
         },
         {
           "op": "DELETE /tenant/{tenantId}/logflush/{log}/interval/{interval}",
-          "name": "DeleteLogFlushByLogInterval"
+          "name": "DeleteLogFlushByLogInterval",
+          "expectedStatus": 201
         },
         {
           "op": "GET /tenant/{tenantId}/macapplications/id/{id}/subset/{subset}",
@@ -9122,11 +10557,12 @@
       ]
     },
     {
-      "file": "testing/app-installers.yaml",
+      "file": "testing/AppInstallerTitles.yaml",
       "namespace": "pro",
       "package": "pro",
-      "specFile": "app_installers_api.json",
+      "specFile": "app_installer_titles_api.json",
       "splitByTag": true,
+      "undocumented": true,
       "operations": [
         {
           "op": "GET /v1/app-installers/titles",
@@ -9143,7 +10579,35 @@
         {
           "op": "GET /v1/app-installers/titles/{id}",
           "name": "GetAppInstallerTitleV1"
-        },
+        }
+      ]
+    },
+    {
+      "file": "testing/AppInstallerDeployments.yaml",
+      "namespace": "pro",
+      "package": "pro",
+      "specFile": "app_installer_deployments_api.json",
+      "splitByTag": true,
+      "undocumented": true,
+      "schemaRenames": {
+        "SelfServiceSettings": "AppInstallerSelfServiceSettings",
+        "NotificationSettings": "AppInstallerNotificationSettings",
+        "IdName": "AppInstallerNamedRef",
+        "ComputerStatuses": "AppInstallerComputerStatuses",
+        "AppInstallerDeploymentListItem": "AppInstallerDeploymentListEntry",
+        "AppInstallerDeploymentRef": "AppInstallerDeploymentHrefResponse"
+      },
+      "schemaAdditions": {
+        "AppInstallerDeployment": {
+          "categoryId": "string"
+        }
+      },
+      "excludePaths": [
+        "GET /v1/app-installers/deployments/{id}/computers",
+        "GET /v1/app-installers/deployments/{id}/installation-summary",
+        "POST /v1/app-installers/deployments/{id}/computers/installation-retry"
+      ],
+      "operations": [
         {
           "op": "GET /v1/app-installers/deployments",
           "name": "ListAppInstallerDeploymentsV1",
@@ -9179,6 +10643,41 @@
           "op": "DELETE /v1/app-installers/deployments/{id}",
           "name": "DeleteAppInstallerDeploymentV1",
           "expectedStatus": 204
+        }
+      ]
+    },
+    {
+      "file": "testing/AppInstallerGlobalSettings.yaml",
+      "namespace": "pro",
+      "package": "pro",
+      "specFile": "app_installer_global_settings_api.json",
+      "splitByTag": true,
+      "undocumented": true,
+      "operations": [
+        {
+          "op": "GET /v1/app-installers/global-settings",
+          "name": "GetAppInstallerGlobalSettingsV1"
+        },
+        {
+          "op": "PUT /v1/app-installers/global-settings",
+          "name": "UpdateAppInstallerGlobalSettingsV1"
+        }
+      ]
+    },
+    {
+      "file": "testing/local-admin-password.json",
+      "namespace": "pro",
+      "package": "pro",
+      "specFile": "local_admin_password_api.json",
+      "splitByTag": true,
+      "operations": [
+        {
+          "op": "GET /v2/local-admin-password/settings",
+          "name": "GetLocalAdminPasswordSettingsV2"
+        },
+        {
+          "op": "PUT /v2/local-admin-password/settings",
+          "name": "UpdateLocalAdminPasswordSettingsV2"
         }
       ]
     }

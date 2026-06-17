@@ -13,14 +13,14 @@ import (
 )
 
 // CreateDigicertTrustLifecycleManagerV1 create DigiCert Trust Lifecycle Manager configuration with client authentication via client certificate.
-func (c *Client) CreateDigicertTrustLifecycleManagerV1(ctx context.Context, request *DigiCertSetting) ([]byte, error) {
+func (c *Client) CreateDigicertTrustLifecycleManagerV1(ctx context.Context, request *DigiCertSetting) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	var result []byte
+	var result HrefResponse
 	endpoint := prefix + "/pki/digicert/trust-lifecycle-manager"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateDigicertTrustLifecycleManagerV1: %w", err)
 	}
-	return result, nil
+	return &result, nil
 }
 
 // GetDigicertTrustLifecycleManagerV1 retrieve DigiCert Trust Lifecycle Manager configuration.

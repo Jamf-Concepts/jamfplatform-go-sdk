@@ -47,6 +47,13 @@ func publishSpecs(root string, cfg Config) error {
 			return fmt.Errorf("loading %s: %w", spec.File, err)
 		}
 
+		// Apply schemaAdditions before pruning so the published spec documents
+		// every property the SDK actually models. Without this, fields injected
+		// purely via config (e.g. account.password, printer.shared) appear in
+		// generated Go code but not in api/*.json, leaving downstream consumers
+		// of the published spec out of sync with the SDK surface.
+		applySchemaAdditions(doc, spec.SchemaAdditions)
+
 		specFile := toSnakeCase(doc.Info.Title) + ".json"
 		if spec.SpecFile != "" {
 			specFile = spec.SpecFile

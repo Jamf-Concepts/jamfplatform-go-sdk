@@ -147,11 +147,19 @@ func (c *Transport) handleMultipartResponse(ctx context.Context, resp *http.Resp
 		}
 		var apiErr ApiError
 		_ = json.Unmarshal(body, &apiErr) // best-effort; non-JSON bodies leave apiErr zero
-		if len(apiErr.Errors) > 0 {
+		switch {
+		case len(apiErr.Errors) > 0:
 			if apiErr.HTTPStatus > 0 {
 				respErr.StatusCode = apiErr.HTTPStatus
 			}
 			respErr.Errors = apiErr.Errors
+		default:
+			// Classic API errors are an HTML "Status page", not JSON — see
+			// handleResponse for the rationale. Lift the message into a
+			// synthetic structured detail for consistent rendering.
+			if msg, ok := parseClassicErrorMessage(resp.Header, body); ok {
+				respErr.Errors = []Error{{Description: msg}}
+			}
 		}
 		respErr.TraceID = pickTraceID(apiErr.TraceID, resp.Header)
 		return respErr

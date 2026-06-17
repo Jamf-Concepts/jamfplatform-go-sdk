@@ -4,6 +4,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -29,10 +30,95 @@ type SpecDef struct {
 	Format             string                       `json:"format,omitempty"`     // "json" (default) or "xml" — drives struct tag style and transport codec
 	RawBody            bool                         `json:"rawBody,omitempty"`    // generate methods that take/return []byte instead of typed structs; consumer owns marshaling (used for Classic where spec has no useful types)
 	TypesOnly          bool                         `json:"typesOnly,omitempty"`  // generate only Go types from all schemas — no client methods, no method tests, no client.go; used for specs that define types consumed in other API payloads (e.g. blueprint component configurations)
+	Undocumented       bool                         `json:"undocumented,omitempty"` // all operations in this spec are unofficial/reverse-engineered; emits an "Unofficial:" godoc warning on every generated method
 	Operations         []OperationDef               `json:"operations"`
 	ExcludePaths       []string                     `json:"excludePaths,omitempty"`       // "METHOD /path" entries the generator must refuse to include
 	FieldTypeOverrides map[string]string            `json:"fieldTypeOverrides,omitempty"` // "schema_name.property_name" -> Go type, used to correct spec bugs (e.g. `integer` fields where the server actually returns a non-int64 string). Applied per-spec so upstream spec updates don't get silently overwritten.
 	SchemaAdditions    map[string]map[string]string `json:"schemaAdditions,omitempty"`    // "schema_name" -> { "property_name": "openapi_type" }, inject missing properties into a spec schema. Used when the spec omits a field the server accepts but we need to send (e.g. Classic's account schema has no `password` property). openapi_type is one of "string", "integer", "boolean", "string:password" (writeOnly string).
+
+	// SchemaRenames renames schema keys in doc.Components.Schemas and updates
+	// all $ref strings that reference the old name. Applied before all other
+	// patches so downstream fixups see the corrected names. Use when a spec
+	// uses generic schema names that would collide with schemas emitted by
+	// other specs in the same Go package (e.g. "SelfServiceSettings" is a
+	// top-level Pro API type; an app-installer spec reusing that name would
+	// silently shadow it). Outer key: old schema name. Value: new schema name.
+	SchemaRenames map[string]string `json:"schemaRenames,omitempty"`
+
+	// SchemaPatches injects (or replaces) arbitrary OpenAPI schema fragments at
+	// dotted property paths under a named component schema. Used when a spec
+	// omits a richer sub-structure the server actually returns (e.g. policy
+	// missing top-level `reboot`, or scope missing `jss_users`/`jss_user_groups`).
+	// Outer key: schema name (e.g. "policy"). Inner key: dotted path of
+	// properties to walk into, with the last segment being the property whose
+	// schema we set (e.g. "self_service.notification" or
+	// "general.date_time_limitations.no_execute_on.day"). Inner value: raw
+	// JSON for an OpenAPI 3 Schema object. If every walked intermediate
+	// segment is an `object` with `properties`, the patch slots in cleanly.
+	// Existing properties at the final segment are replaced; missing ones are
+	// added. Applied after SchemaAdditions and before PostSymmetry, so a patch
+	// to the read schema also flows into the *_post sibling.
+	SchemaPatches map[string]map[string]json.RawMessage `json:"schemaPatches,omitempty"`
+
+	// PropertyRenames renames property keys at dotted paths under a named
+	// component schema. Outer key: schema name. Inner key: dotted path to the
+	// property to rename (e.g. "self_service.re-install_button_text"). Inner
+	// value: new key name (e.g. "reinstall_button_text"). Used to repair spec
+	// keys that don't match the actual wire (silent decode failures otherwise).
+	// Renames the property *key* in the schema map; downstream Go field naming
+	// follows from the corrected key. Applied before PostSymmetry so the
+	// post sibling sees the corrected name.
+	PropertyRenames map[string]map[string]string `json:"propertyRenames,omitempty"`
+
+	// PropertyRemovals deletes properties at dotted paths under named component
+	// schemas. Outer key: schema name. Value: list of dotted paths to delete
+	// (same path syntax as SchemaPatches / PropertyRenames). Applied after
+	// PropertyRenames and before PostSymmetry so the post sibling inherits the
+	// trimmed shape. Panics on missing paths — a declared removal that can't be
+	// walked is a config typo.
+	//
+	// Targets inline object schemas only. If a path resolves through a shared
+	// $ref component, the deletion affects every schema that references it.
+	PropertyRemovals map[string][]string `json:"propertyRemovals,omitempty"`
+
+	// PostSymmetryExcludes lists, per *_post schema, property names whose
+	// presence in the read sibling should NOT be copied across when the
+	// generator's Post-symmetry pass mirrors read fields onto a post type.
+	// Default is full symmetry — only add an entry here when the server
+	// genuinely cannot accept a field on write (e.g. server-assigned audit
+	// timestamps). Outer key: post schema name (e.g. "policy_post"). Value:
+	// list of property names (top-level on the schema) to skip.
+	PostSymmetryExcludes map[string][]string `json:"postSymmetryExcludes,omitempty"`
+
+	// EmitNullForOptional lists schema names whose optional pointer fields
+	// must marshal as explicit JSON null when nil, rather than being omitted.
+	// Required for endpoints whose server distinguishes "field omitted" (keep
+	// existing tenant value) from "field present with null" (clear / reset).
+	//
+	// Example: Pro v3 PUT /sso. A SAML metadata_source transition from "URL"
+	// to "FILE" succeeds only when the request body sends "idpUrl": null and
+	// "metadataFileName": null alongside the new "metadataSource": "FILE". If
+	// those keys are omitted (the default behaviour produced by ",omitempty"
+	// on a nil *string), the server merges cached URL-mode values against the
+	// new FILE-mode request and rejects with 400 "SAML settings validation
+	// failed". Listing SamlSettings / OidcSettings / EnrollmentSsoConfig here
+	// drops ",omitempty" from their pointer field JSON tags so consumers can
+	// emit explicit nulls.
+	//
+	// Schema names may be supplied in either spec form (snake_case) or Go
+	// form (PascalCase); the generator normalises via toSnakeCase before
+	// matching. Affects JSON marshalling only — has no impact on unmarshal
+	// behaviour or XML tags.
+	EmitNullForOptional []string `json:"emitNullForOptional,omitempty"`
+
+	// FieldOrder specifies an explicit property emission order for named
+	// schemas, overriding the default alphabetical sort. Outer key: spec-form
+	// schema name (e.g. "vpp_invitation_general"). Value: ordered list of
+	// property names as they appear in the spec (without deprecation metadata).
+	// Properties not listed are appended alphabetically after the explicit
+	// entries. Used when the server is order-sensitive within an XML element
+	// (e.g. Classic /vppinvitations <general> requires a fixed field order).
+	FieldOrder map[string][]string `json:"fieldOrder,omitempty"`
 }
 
 // baseName derives a Go file base name from the spec file path.

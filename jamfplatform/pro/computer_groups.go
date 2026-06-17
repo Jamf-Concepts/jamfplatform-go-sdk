@@ -28,7 +28,39 @@ func (c *Client) ListComputerGroupsV1(ctx context.Context) ([]ComputerGroup, err
 	return result, nil
 }
 
+// ListSmartComputerGroupsV3 search for Smart Computer Groups.
+func (c *Client) ListSmartComputerGroupsV3(ctx context.Context, sort []string, filter string) ([]SmartComputerGroupSearch, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := prefix + "/computer-groups/smart-groups"
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int                        `json:"totalCount"`
+			Results    []SmartComputerGroupSearch `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
 // ListSmartComputerGroupsV2 search for Smart Computer Groups.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) ListSmartComputerGroupsV2(ctx context.Context, sort []string, filter string) ([]SmartComputerGroupSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
@@ -58,7 +90,27 @@ func (c *Client) ListSmartComputerGroupsV2(ctx context.Context, sort []string, f
 	})
 }
 
+// CreateSmartComputerGroupV3 create a Smart Computer Group.
+func (c *Client) CreateSmartComputerGroupV3(ctx context.Context, request *SmartComputerGroupV3, platform bool) (*HrefResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result HrefResponse
+	endpoint := prefix + "/computer-groups/smart-groups"
+	params := url.Values{}
+	if platform {
+		params.Set("platform", "true")
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateSmartComputerGroupV3: %w", err)
+	}
+	return &result, nil
+}
+
 // CreateSmartComputerGroupV2 create a Smart Computer Group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) CreateSmartComputerGroupV2(ctx context.Context, request *SmartComputerGroupV2, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -76,7 +128,20 @@ func (c *Client) CreateSmartComputerGroupV2(ctx context.Context, request *SmartC
 	return &result, nil
 }
 
+// GetSmartComputerGroupV3 get Smart Computer Group by Id.
+func (c *Client) GetSmartComputerGroupV3(ctx context.Context, id string) (*SmartComputerGroupV3, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result SmartComputerGroupV3
+	endpoint := fmt.Sprintf("%s/computer-groups/smart-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetSmartComputerGroupV3(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetSmartComputerGroupV2 get Smart Computer Group by Id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) GetSmartComputerGroupV2(ctx context.Context, id string) (*SmartComputerGroupV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmartComputerGroupV2
@@ -87,7 +152,20 @@ func (c *Client) GetSmartComputerGroupV2(ctx context.Context, id string) (*Smart
 	return &result, nil
 }
 
+// UpdateSmartComputerGroupV3 update a Smart Computer Group.
+func (c *Client) UpdateSmartComputerGroupV3(ctx context.Context, id string, request *SmartComputerGroupV3) (*SmartComputerGroupV3, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result SmartComputerGroupV3
+	endpoint := fmt.Sprintf("%s/computer-groups/smart-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
+		return nil, fmt.Errorf("UpdateSmartComputerGroupV3(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // UpdateSmartComputerGroupV2 update a Smart Computer Group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) UpdateSmartComputerGroupV2(ctx context.Context, id string, request *SmartComputerGroupV2) (*SmartComputerGroupV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmartComputerGroupV2
@@ -98,7 +176,19 @@ func (c *Client) UpdateSmartComputerGroupV2(ctx context.Context, id string, requ
 	return &result, nil
 }
 
+// DeleteSmartComputerGroupV3 remove specified Smart Computer Group.
+func (c *Client) DeleteSmartComputerGroupV3(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	endpoint := fmt.Sprintf("%s/computer-groups/smart-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteSmartComputerGroupV3(%s): %w", id, err)
+	}
+	return nil
+}
+
 // DeleteSmartComputerGroupV2 remove specified Smart Computer Group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) DeleteSmartComputerGroupV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computer-groups/smart-groups/%s", prefix, url.PathEscape(id))
@@ -108,7 +198,20 @@ func (c *Client) DeleteSmartComputerGroupV2(ctx context.Context, id string) erro
 	return nil
 }
 
+// GetSmartComputerGroupMembershipV3 get the membership of a Smart Computer Group.
+func (c *Client) GetSmartComputerGroupMembershipV3(ctx context.Context, id string) (*SmartGroupMembership, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result SmartGroupMembership
+	endpoint := fmt.Sprintf("%s/computer-groups/smart-group-membership/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetSmartComputerGroupMembershipV3(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetSmartComputerGroupMembershipV2 get the membership of a Smart Computer Group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) GetSmartComputerGroupMembershipV2(ctx context.Context, id string) (*SmartGroupMembership, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmartGroupMembership
@@ -119,7 +222,39 @@ func (c *Client) GetSmartComputerGroupMembershipV2(ctx context.Context, id strin
 	return &result, nil
 }
 
+// ListStaticComputerGroupsV3 search for Static Computer Groups.
+func (c *Client) ListStaticComputerGroupsV3(ctx context.Context, sort []string, filter string) ([]StaticComputerGroupSummary, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := prefix + "/computer-groups/static-groups"
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int                          `json:"totalCount"`
+			Results    []StaticComputerGroupSummary `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
 // ListStaticComputerGroupsV2 search for Static Computer Groups.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) ListStaticComputerGroupsV2(ctx context.Context, sort []string, filter string) ([]StaticComputerGroupSummary, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
@@ -149,7 +284,27 @@ func (c *Client) ListStaticComputerGroupsV2(ctx context.Context, sort []string, 
 	})
 }
 
+// CreateStaticComputerGroupV3 create membership of a static computer group.
+func (c *Client) CreateStaticComputerGroupV3(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (*HrefResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result HrefResponse
+	endpoint := prefix + "/computer-groups/static-groups"
+	params := url.Values{}
+	if platform {
+		params.Set("platform", "true")
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateStaticComputerGroupV3: %w", err)
+	}
+	return &result, nil
+}
+
 // CreateStaticComputerGroupV2 create membership of a static computer group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) CreateStaticComputerGroupV2(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -167,7 +322,20 @@ func (c *Client) CreateStaticComputerGroupV2(ctx context.Context, request *Stati
 	return &result, nil
 }
 
+// GetStaticComputerGroupV3 get Static Computer Group by Id.
+func (c *Client) GetStaticComputerGroupV3(ctx context.Context, id string) (*StaticComputerGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result StaticComputerGroup
+	endpoint := fmt.Sprintf("%s/computer-groups/static-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetStaticComputerGroupV3(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetStaticComputerGroupV2 get Static Computer Group by Id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) GetStaticComputerGroupV2(ctx context.Context, id string) (*StaticComputerGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result StaticComputerGroup
@@ -178,7 +346,20 @@ func (c *Client) GetStaticComputerGroupV2(ctx context.Context, id string) (*Stat
 	return &result, nil
 }
 
+// UpdateStaticComputerGroupV3 update membership of a static computer group.
+func (c *Client) UpdateStaticComputerGroupV3(ctx context.Context, id string, request *StaticComputerGroupAssignment) (*StaticComputerGroupAssignment, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result StaticComputerGroupAssignment
+	endpoint := fmt.Sprintf("%s/computer-groups/static-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
+		return nil, fmt.Errorf("UpdateStaticComputerGroupV3(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // UpdateStaticComputerGroupV2 update membership of a static computer group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) UpdateStaticComputerGroupV2(ctx context.Context, id string, request *StaticComputerGroupAssignment) (*StaticComputerGroupAssignment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result StaticComputerGroupAssignment
@@ -189,7 +370,19 @@ func (c *Client) UpdateStaticComputerGroupV2(ctx context.Context, id string, req
 	return &result, nil
 }
 
+// DeleteStaticComputerGroupV3 remove Static Computer Group by Id.
+func (c *Client) DeleteStaticComputerGroupV3(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	endpoint := fmt.Sprintf("%s/computer-groups/static-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteStaticComputerGroupV3(%s): %w", id, err)
+	}
+	return nil
+}
+
 // DeleteStaticComputerGroupV2 remove Static Computer Group by Id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) DeleteStaticComputerGroupV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computer-groups/static-groups/%s", prefix, url.PathEscape(id))
@@ -225,6 +418,32 @@ func (c *Client) ResolveComputerGroupV1ByName(ctx context.Context, name string) 
 	return &out, nil
 }
 
+// ResolveSmartComputerGroupV3IDByName looks up a SmartComputerGroupV3 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveSmartComputerGroupV3IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computer-groups/smart-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSmartComputerGroupV3IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveSmartComputerGroupV3ByName looks up a SmartComputerGroupV3 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveSmartComputerGroupV3ByName(ctx context.Context, name string) (*SmartComputerGroupSearch, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computer-groups/smart-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveSmartComputerGroupV3ByName(%s): %w", name, err)
+	}
+	var out SmartComputerGroupSearch
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveSmartComputerGroupV3ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
 // ResolveSmartComputerGroupV2IDByName looks up a SmartComputerGroupV2 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveSmartComputerGroupV2IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
@@ -247,6 +466,32 @@ func (c *Client) ResolveSmartComputerGroupV2ByName(ctx context.Context, name str
 	var out SmartComputerGroupSearch
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveSmartComputerGroupV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveStaticComputerGroupV3IDByName looks up a StaticComputerGroupV3 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveStaticComputerGroupV3IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computer-groups/static-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveStaticComputerGroupV3IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveStaticComputerGroupV3ByName looks up a StaticComputerGroupV3 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveStaticComputerGroupV3ByName(ctx context.Context, name string) (*StaticComputerGroupSummary, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/computer-groups/static-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveStaticComputerGroupV3ByName(%s): %w", name, err)
+	}
+	var out StaticComputerGroupSummary
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveStaticComputerGroupV3ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
 }
@@ -277,6 +522,30 @@ func (c *Client) ResolveStaticComputerGroupV2ByName(ctx context.Context, name st
 	return &out, nil
 }
 
+// ApplySmartComputerGroupV3 creates or updates a SmartComputerGroupV3 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplySmartComputerGroupV3(ctx context.Context, request *SmartComputerGroupV3, platform bool) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplySmartComputerGroupV3: Name must not be empty")
+	}
+	id, err := c.ResolveSmartComputerGroupV3IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateSmartComputerGroupV3(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplySmartComputerGroupV3: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplySmartComputerGroupV3: resolve: %w", err)
+	}
+	_, err = c.UpdateSmartComputerGroupV3(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplySmartComputerGroupV3: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}
+
 // ApplySmartComputerGroupV2 creates or updates a SmartComputerGroupV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
 func (c *Client) ApplySmartComputerGroupV2(ctx context.Context, request *SmartComputerGroupV2, platform bool) (string, bool, error) {
 	name := request.Name
@@ -297,6 +566,30 @@ func (c *Client) ApplySmartComputerGroupV2(ctx context.Context, request *SmartCo
 	_, err = c.UpdateSmartComputerGroupV2(ctx, id, request)
 	if err != nil {
 		return "", false, fmt.Errorf("ApplySmartComputerGroupV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}
+
+// ApplyStaticComputerGroupV3 creates or updates a StaticComputerGroupV3 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyStaticComputerGroupV3(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyStaticComputerGroupV3: Name must not be empty")
+	}
+	id, err := c.ResolveStaticComputerGroupV3IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateStaticComputerGroupV3(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyStaticComputerGroupV3: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyStaticComputerGroupV3: resolve: %w", err)
+	}
+	_, err = c.UpdateStaticComputerGroupV3(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyStaticComputerGroupV3: update(%s): %w", id, err)
 	}
 	return id, false, nil
 }

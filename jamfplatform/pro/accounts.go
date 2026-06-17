@@ -79,6 +79,17 @@ func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
 	return nil
 }
 
+// UpdateAccountV1 updates the user account.
+func (c *Client) UpdateAccountV1(ctx context.Context, id string, request *UserAccount) (*UserAccount, error) {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	var result UserAccount
+	endpoint := fmt.Sprintf("%s/accounts/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateAccountV1(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // ResolveAccountV1IDByName looks up a AccountV1 by its username field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveAccountV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")

@@ -33,7 +33,7 @@ func createWifiProfileFixture(t *testing.T) string {
 	suffix := runSuffix()
 	name := "sdk-acc-wifi-" + suffix
 	desc := "sdk-acc test — safe to delete"
-	payload := fmt.Sprintf(wifiProfilePayloadXML, suffix, suffix)
+	payload := proclassic.PayloadsXMLText(fmt.Sprintf(wifiProfilePayloadXML, suffix, suffix))
 
 	req := &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
@@ -146,10 +146,6 @@ func TestAcceptance_Pro_MdmUpdates_GetDdmStatusItemV1(t *testing.T) {
 
 func TestAcceptance_Pro_MdmUpdates_SyncDdmV1(t *testing.T) {
 	t.Skip("destructive (re-sync MDM state for a real device) — manual curl only")
-}
-
-func TestAcceptance_Pro_MdmUpdates_GetDssDeclarationV1(t *testing.T) {
-	t.Skip("requires a known declaration id — use the declarations returned by ManagedSoftwareUpdatePlan events if available")
 }
 
 // --- managed-software-updates ------------------------------------------

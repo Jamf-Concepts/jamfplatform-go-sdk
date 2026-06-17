@@ -17,7 +17,20 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
+// ListMobileDeviceGroupsV2 return the list of all Mobile Device Groups.
+func (c *Client) ListMobileDeviceGroupsV2(ctx context.Context) ([]MobileDeviceGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result []MobileDeviceGroup
+	endpoint := prefix + "/mobile-device-groups"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListMobileDeviceGroupsV2: %w", err)
+	}
+	return result, nil
+}
+
 // ListMobileDeviceGroupsV1 return the list of all Mobile Device Groups.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) ListMobileDeviceGroupsV1(ctx context.Context) ([]MobileDeviceGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []MobileDeviceGroup
@@ -28,7 +41,39 @@ func (c *Client) ListMobileDeviceGroupsV1(ctx context.Context) ([]MobileDeviceGr
 	return result, nil
 }
 
+// ListSmartMobileDeviceGroupsV2 get Smart Groups.
+func (c *Client) ListSmartMobileDeviceGroupsV2(ctx context.Context, sort []string, filter string) ([]SmartGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := prefix + "/mobile-device-groups/smart-groups"
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int          `json:"totalCount"`
+			Results    []SmartGroup `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
 // ListSmartMobileDeviceGroupsV1 get Smart Groups.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) ListSmartMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]SmartGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
@@ -58,7 +103,27 @@ func (c *Client) ListSmartMobileDeviceGroupsV1(ctx context.Context, sort []strin
 	})
 }
 
+// CreateSmartMobileDeviceGroupV2 create a smart group.
+func (c *Client) CreateSmartMobileDeviceGroupV2(ctx context.Context, request *SmartGroupAssignmentV2, platform bool) (*HrefResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result HrefResponse
+	endpoint := prefix + "/mobile-device-groups/smart-groups"
+	params := url.Values{}
+	if platform {
+		params.Set("platform", "true")
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateSmartMobileDeviceGroupV2: %w", err)
+	}
+	return &result, nil
+}
+
 // CreateSmartMobileDeviceGroupV1 create a smart group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) CreateSmartMobileDeviceGroupV1(ctx context.Context, request *SmartGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -76,7 +141,20 @@ func (c *Client) CreateSmartMobileDeviceGroupV1(ctx context.Context, request *Sm
 	return &result, nil
 }
 
+// GetSmartMobileDeviceGroupV2 get Smart Group by Id.
+func (c *Client) GetSmartMobileDeviceGroupV2(ctx context.Context, id string) (*SmartGroupDetailV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result SmartGroupDetailV2
+	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetSmartMobileDeviceGroupV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetSmartMobileDeviceGroupV1 get Smart Group by Id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) GetSmartMobileDeviceGroupV1(ctx context.Context, id string) (*SmartGroupDetail, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SmartGroupDetail
@@ -87,7 +165,20 @@ func (c *Client) GetSmartMobileDeviceGroupV1(ctx context.Context, id string) (*S
 	return &result, nil
 }
 
+// UpdateSmartMobileDeviceGroupV2 update a smart group.
+func (c *Client) UpdateSmartMobileDeviceGroupV2(ctx context.Context, id string, request *SmartGroupAssignmentV2) (*SmartGroupAssignmentV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result SmartGroupAssignmentV2
+	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateSmartMobileDeviceGroupV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // UpdateSmartMobileDeviceGroupV1 update a smart group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) UpdateSmartMobileDeviceGroupV1(ctx context.Context, id string, request *SmartGroupAssignment) (*SmartGroupAssignment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SmartGroupAssignment
@@ -98,7 +189,19 @@ func (c *Client) UpdateSmartMobileDeviceGroupV1(ctx context.Context, id string, 
 	return &result, nil
 }
 
+// DeleteSmartMobileDeviceGroupV2 remove Smart Group by Id.
+func (c *Client) DeleteSmartMobileDeviceGroupV2(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteSmartMobileDeviceGroupV2(%s): %w", id, err)
+	}
+	return nil
+}
+
 // DeleteSmartMobileDeviceGroupV1 remove Smart Group by Id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
@@ -108,7 +211,39 @@ func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) 
 	return nil
 }
 
+// ListSmartMobileDeviceGroupMembershipV2 get Smart Group Membership by Id.
+func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-group-membership/%s", prefix, url.PathEscape(id))
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int                         `json:"totalCount"`
+			Results    []InventoryListMobileDevice `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
 // ListSmartMobileDeviceGroupMembershipV1 get Smart Group Membership by Id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) ListSmartMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
@@ -138,7 +273,39 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV1(ctx context.Context, id 
 	})
 }
 
+// ListStaticMobileDeviceGroupsV2 get Static Groups.
+func (c *Client) ListStaticMobileDeviceGroupsV2(ctx context.Context, sort []string, filter string) ([]StaticGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := prefix + "/mobile-device-groups/static-groups"
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int           `json:"totalCount"`
+			Results    []StaticGroup `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
 // ListStaticMobileDeviceGroupsV1 get Static Groups.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) ListStaticMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]StaticGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
@@ -168,7 +335,27 @@ func (c *Client) ListStaticMobileDeviceGroupsV1(ctx context.Context, sort []stri
 	})
 }
 
+// CreateStaticMobileDeviceGroupV2 create a static group.
+func (c *Client) CreateStaticMobileDeviceGroupV2(ctx context.Context, request *StaticGroupAssignment, platform bool) (*HrefResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result HrefResponse
+	endpoint := prefix + "/mobile-device-groups/static-groups"
+	params := url.Values{}
+	if platform {
+		params.Set("platform", "true")
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateStaticMobileDeviceGroupV2: %w", err)
+	}
+	return &result, nil
+}
+
 // CreateStaticMobileDeviceGroupV1 create membership of a static group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) CreateStaticMobileDeviceGroupV1(ctx context.Context, request *StaticGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -186,7 +373,20 @@ func (c *Client) CreateStaticMobileDeviceGroupV1(ctx context.Context, request *S
 	return &result, nil
 }
 
+// GetStaticMobileDeviceGroupV2 get Static Group by Id.
+func (c *Client) GetStaticMobileDeviceGroupV2(ctx context.Context, id string) (*StaticGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result StaticGroup
+	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetStaticMobileDeviceGroupV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetStaticMobileDeviceGroupV1 get Static Group by Id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) GetStaticMobileDeviceGroupV1(ctx context.Context, id string) (*StaticGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result StaticGroup
@@ -197,7 +397,19 @@ func (c *Client) GetStaticMobileDeviceGroupV1(ctx context.Context, id string) (*
 	return &result, nil
 }
 
+// DeleteStaticMobileDeviceGroupV2 remove Static Group by Id.
+func (c *Client) DeleteStaticMobileDeviceGroupV2(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeleteStaticMobileDeviceGroupV2(%s): %w", id, err)
+	}
+	return nil
+}
+
 // DeleteStaticMobileDeviceGroupV1 remove Static Group by Id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) DeleteStaticMobileDeviceGroupV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
@@ -207,7 +419,20 @@ func (c *Client) DeleteStaticMobileDeviceGroupV1(ctx context.Context, id string)
 	return nil
 }
 
+// PatchStaticMobileDeviceGroupV2 update a static group.
+func (c *Client) PatchStaticMobileDeviceGroupV2(ctx context.Context, id string, request *StaticGroupAssignment) (*StaticGroupAssignment, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result StaticGroupAssignment
+	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("PatchStaticMobileDeviceGroupV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // PatchStaticMobileDeviceGroupV1 update membership of a static group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, request *StaticGroupAssignment) (*StaticGroupAssignment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result StaticGroupAssignment
@@ -218,7 +443,39 @@ func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, 
 	return &result, nil
 }
 
+// ListStaticMobileDeviceGroupMembershipV2 get Static Group Membership by Id.
+func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := fmt.Sprintf("%s/mobile-device-groups/static-group-membership/%s", prefix, url.PathEscape(id))
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int                         `json:"totalCount"`
+			Results    []InventoryListMobileDevice `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
 // ListStaticMobileDeviceGroupMembershipV1 get Static Group Membership by Id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) ListStaticMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
@@ -248,7 +505,19 @@ func (c *Client) ListStaticMobileDeviceGroupMembershipV1(ctx context.Context, id
 	})
 }
 
+// EraseMobileDeviceGroupV2 erase all devices in the group.
+func (c *Client) EraseMobileDeviceGroupV2(ctx context.Context, id string, request *GroupResetRequest) error {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	endpoint := fmt.Sprintf("%s/mobile-device-groups/%s/erase", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
+		return fmt.Errorf("EraseMobileDeviceGroupV2(%s): %w", id, err)
+	}
+	return nil
+}
+
 // EraseMobileDeviceGroupV1 erase all devices in the group.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 func (c *Client) EraseMobileDeviceGroupV1(ctx context.Context, id string, request *GroupResetRequest) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/%s/erase", prefix, url.PathEscape(id))
@@ -256,6 +525,32 @@ func (c *Client) EraseMobileDeviceGroupV1(ctx context.Context, id string, reques
 		return fmt.Errorf("EraseMobileDeviceGroupV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveMobileDeviceGroupV2IDByName looks up a MobileDeviceGroupV2 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveMobileDeviceGroupV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-device-groups"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveMobileDeviceGroupV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveMobileDeviceGroupV2ByName looks up a MobileDeviceGroupV2 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveMobileDeviceGroupV2ByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-device-groups"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceGroupV2ByName(%s): %w", name, err)
+	}
+	var out MobileDeviceGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveMobileDeviceGroupV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }
 
 // ResolveMobileDeviceGroupV1IDByName looks up a MobileDeviceGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
@@ -280,6 +575,32 @@ func (c *Client) ResolveMobileDeviceGroupV1ByName(ctx context.Context, name stri
 	var out MobileDeviceGroup
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveMobileDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ResolveSmartMobileDeviceGroupV2IDByName looks up a SmartMobileDeviceGroupV2 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveSmartMobileDeviceGroupV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-device-groups/smart-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveSmartMobileDeviceGroupV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveSmartMobileDeviceGroupV2ByName looks up a SmartMobileDeviceGroupV2 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveSmartMobileDeviceGroupV2ByName(ctx context.Context, name string) (*SmartGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-device-groups/smart-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV2ByName(%s): %w", name, err)
+	}
+	var out SmartGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV2ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
 }
@@ -310,6 +631,32 @@ func (c *Client) ResolveSmartMobileDeviceGroupV1ByName(ctx context.Context, name
 	return &out, nil
 }
 
+// ResolveStaticMobileDeviceGroupV2IDByName looks up a StaticMobileDeviceGroupV2 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveStaticMobileDeviceGroupV2IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-device-groups/static-groups"
+	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveStaticMobileDeviceGroupV2IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveStaticMobileDeviceGroupV2ByName looks up a StaticMobileDeviceGroupV2 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveStaticMobileDeviceGroupV2ByName(ctx context.Context, name string) (*StaticGroup, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	listPath := prefix + "/mobile-device-groups/static-groups"
+	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveStaticMobileDeviceGroupV2ByName(%s): %w", name, err)
+	}
+	var out StaticGroup
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveStaticMobileDeviceGroupV2ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
 // ResolveStaticMobileDeviceGroupV1IDByName looks up a StaticMobileDeviceGroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveStaticMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -336,6 +683,30 @@ func (c *Client) ResolveStaticMobileDeviceGroupV1ByName(ctx context.Context, nam
 	return &out, nil
 }
 
+// ApplySmartMobileDeviceGroupV2 creates or updates a SmartMobileDeviceGroupV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplySmartMobileDeviceGroupV2(ctx context.Context, request *SmartGroupAssignmentV2, platform bool) (string, bool, error) {
+	name := request.GroupName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV2: GroupName must not be empty")
+	}
+	id, err := c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateSmartMobileDeviceGroupV2(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV2: resolve: %w", err)
+	}
+	_, err = c.UpdateSmartMobileDeviceGroupV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV2: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}
+
 // ApplySmartMobileDeviceGroupV1 creates or updates a SmartMobileDeviceGroupV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
 func (c *Client) ApplySmartMobileDeviceGroupV1(ctx context.Context, request *SmartGroupAssignment, platform bool) (string, bool, error) {
 	name := request.GroupName
@@ -356,6 +727,45 @@ func (c *Client) ApplySmartMobileDeviceGroupV1(ctx context.Context, request *Sma
 	_, err = c.UpdateSmartMobileDeviceGroupV1(ctx, id, request)
 	if err != nil {
 		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
+}
+
+// ApplyStaticMobileDeviceGroupV2 creates or updates a StaticMobileDeviceGroupV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyStaticMobileDeviceGroupV2(ctx context.Context, request *StaticGroupAssignment, platform bool) (string, bool, error) {
+	name := request.GroupName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV2: GroupName must not be empty")
+	}
+	id, err := c.ResolveStaticMobileDeviceGroupV2IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateStaticMobileDeviceGroupV2(ctx, request, platform)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV2: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV2: resolve: %w", err)
+	}
+	// Fetch current membership to preserve existing devices in the patch.
+	membership, memberErr := c.ListStaticMobileDeviceGroupMembershipV2(ctx, id, nil, "")
+	if memberErr != nil {
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV2: fetch membership(%s): %w", id, memberErr)
+	}
+	assignments := make([]Assignment, 0, len(membership))
+	for _, m := range membership {
+		mid := m.MobileDeviceID
+		sel := true
+		assignments = append(assignments, Assignment{
+			MobileDeviceID: &mid,
+			Selected:       &sel,
+		})
+	}
+	request.Assignments = &assignments
+	_, err = c.PatchStaticMobileDeviceGroupV2(ctx, id, request)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV2: update(%s): %w", id, err)
 	}
 	return id, false, nil
 }

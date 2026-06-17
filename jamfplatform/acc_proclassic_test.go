@@ -400,7 +400,7 @@ func TestAcceptance_Classic_MobileDeviceEACRUD(t *testing.T) {
 	name := "sdk-acc-classic-mdea-" + runSuffix()
 	created, err := pc.CreateMobileDeviceExtensionAttributeByID(ctx, "0", &proclassic.MobileDeviceExtensionAttribute{
 		Name:     classicStrPtr(name),
-		DateType: classicStrPtr("String"), // spec typo: date_type; Jamf spec has this misspelling
+		DataType: classicStrPtr("String"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -937,6 +937,105 @@ func TestAcceptance_Classic_DirectoryBindingCRUD(t *testing.T) {
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
 		t.Fatalf("after delete: want 404, got %v", err)
 	}
+}
+
+// TestAcceptance_Classic_DirectoryBindingNestedAD exercises the per-type
+// nested configuration blocks on DirectoryBinding (here: ActiveDirectory).
+// The flat-8 struct historically dropped active_directory/open_directory/
+// powerbroker_identity_services/admitmac/centrify children on round-trip;
+// this test creates a binding with a populated nested block, re-fetches it,
+// and asserts every field survived. The other four nested types follow
+// the same wire pattern, so coverage on AD is representative.
+func TestAcceptance_Classic_DirectoryBindingNestedAD(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	bp := func(b bool) *bool { return &b }
+	name := "sdk-acc-dirbind-ad-" + runSuffix()
+	want := &proclassic.DirectoryBinding{
+		Name:       classicStrPtr(name),
+		Priority:   func(i int) *int { return &i }(9),
+		Domain:     classicStrPtr("acc.test"),
+		Username:   classicStrPtr("accuser"),
+		Password:   classicStrPtr("placeholder-pw"),
+		ComputerOu: classicStrPtr("OU=acc"),
+		Type:       classicStrPtr("Active Directory"),
+		ActiveDirectory: &proclassic.DirectoryBindingActiveDirectory{
+			CacheLastUser:       bp(true),
+			RequireConfirmation: bp(false),
+			LocalHome:           bp(true),
+			UseUncPath:          bp(false),
+			MountStyle:          classicStrPtr("smb"),
+			DefaultShell:        classicStrPtr("/bin/bash"),
+			Uid:                 classicStrPtr("accuid"),
+			UserGid:             classicStrPtr("accugid"),
+			Gid:                 classicStrPtr("accgid"),
+			MultipleDomains:     bp(false),
+			PreferredDomain:     classicStrPtr("accpref"),
+			AdminGroups:         classicStrPtr("accgrp"),
+		},
+	}
+
+	created, err := pc.CreateDirectoryBindingByID(ctx, "0", want)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("Create: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("no ID: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteDirectoryBindingByID", func() error { return pc.DeleteDirectoryBindingByID(ctx, intToStr(id)) })
+
+	got, err := pc.GetDirectoryBindingByID(ctx, intToStr(id))
+	if err != nil {
+		t.Fatalf("Get: %v", err)
+	}
+	if got.ActiveDirectory == nil {
+		t.Fatalf("ActiveDirectory block dropped on read; want populated")
+	}
+	gotAD := got.ActiveDirectory
+	checks := []struct {
+		field string
+		want  any
+		got   any
+	}{
+		{"CacheLastUser", true, derefBool(gotAD.CacheLastUser)},
+		{"RequireConfirmation", false, derefBool(gotAD.RequireConfirmation)},
+		{"LocalHome", true, derefBool(gotAD.LocalHome)},
+		{"UseUncPath", false, derefBool(gotAD.UseUncPath)},
+		{"MountStyle", "smb", derefStr(gotAD.MountStyle)},
+		{"DefaultShell", "/bin/bash", derefStr(gotAD.DefaultShell)},
+		{"Uid", "accuid", derefStr(gotAD.Uid)},
+		{"UserGid", "accugid", derefStr(gotAD.UserGid)},
+		{"Gid", "accgid", derefStr(gotAD.Gid)},
+		{"MultipleDomains", false, derefBool(gotAD.MultipleDomains)},
+		{"PreferredDomain", "accpref", derefStr(gotAD.PreferredDomain)},
+		{"AdminGroups", "accgrp", derefStr(gotAD.AdminGroups)},
+	}
+	for _, ck := range checks {
+		if ck.want != ck.got {
+			t.Errorf("ActiveDirectory.%s: want %v, got %v", ck.field, ck.want, ck.got)
+		}
+	}
+	if got.PasswordSha256 == nil || *got.PasswordSha256 == "" {
+		t.Errorf("PasswordSha256: want server-emitted hash field, got nil/empty")
+	}
+}
+
+func derefBool(p *bool) bool {
+	if p == nil {
+		return false
+	}
+	return *p
+}
+
+func derefStr(p *string) string {
+	if p == nil {
+		return ""
+	}
+	return *p
 }
 
 func TestAcceptance_Classic_ClassicPackageCRUD(t *testing.T) {
@@ -1916,11 +2015,116 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 	}
 }
 
-// TestAcceptance_Classic_VPPCRUD tests VPP account create/delete.
-// VPP create requires a real service_token; skip on 409 (spec
-// validation) or 403 (tenant lacks VPP privilege).
+// TestAcceptance_Classic_VPPInvitationRead exercises GetVPPInvitationByID against
+// the reference invitation (id 2).  It verifies the three previously broken fields:
+//   - InvitationUsages block decoded (was silently nil — plural/singular mismatch)
+//   - LastActionDateEpoch populated in usage items (was nil — wrong field name)
+//   - General.AutoRegisterManagedUsers decoded (was absent from struct)
+//
+// Defect #4 (exclusions user_group shape): wire-probed with DataJARLDAPS_JamfPro_Admins
+// — server returns name-only, no <id>. Original spec's name-only struct was correct.
+// Set JAMFPLATFORM_VPP_INVITATION_ID to override the default id "2".
+func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
+	c := accClient(t)
+	pc := proclassic.New(c)
+	ctx := context.Background()
+
+	id := os.Getenv("JAMFPLATFORM_VPP_INVITATION_ID")
+	if id == "" {
+		id = "2"
+	}
+
+	inv, err := pc.GetVPPInvitationByID(ctx, id)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetVPPInvitationByID(%s): %v", id, err)
+	}
+	if inv == nil {
+		t.Fatal("nil VppInvitation")
+	}
+
+	// General block and auto_register_managed_users (Defect #3).
+	if inv.General == nil {
+		t.Fatal("General nil")
+	}
+	t.Logf("General.Name=%v AutoRegisterManagedUsers=%v", inv.General.Name, inv.General.AutoRegisterManagedUsers)
+	if inv.General.AutoRegisterManagedUsers == nil {
+		t.Error("General.AutoRegisterManagedUsers nil — field still missing from struct or not returned by server")
+	}
+
+	// InvitationUsages wrapper (Defect #2).
+	if inv.InvitationUsages == nil {
+		t.Error("InvitationUsages nil — <invitation_usages> wrapper still not decoded")
+	} else {
+		t.Logf("InvitationUsages.Size=%v len(Usage)=%d", inv.InvitationUsages.Size, func() int {
+			if inv.InvitationUsages.Usage == nil {
+				return 0
+			}
+			return len(*inv.InvitationUsages.Usage)
+		}())
+		if inv.InvitationUsages.Usage != nil {
+			for i, u := range *inv.InvitationUsages.Usage {
+				// LastActionDateEpoch (Defect #1).
+				t.Logf("Usage[%d]: Name=%v Status=%v LastActionDateEpoch=%v", i, u.Name, u.Status, u.LastActionDateEpoch)
+				if u.LastActionDateEpoch == nil {
+					t.Errorf("Usage[%d].LastActionDateEpoch nil — last_action_date_epoch still not decoded", i)
+				}
+			}
+		}
+	}
+}
+
+// TestAcceptance_Classic_VPPInvitationCRUD creates a VPP invitation via
+// POST /vppinvitations/id/0, asserts 201, then deletes it. This exercises
+// the field-order fix: Classic <general> is order-sensitive and returns HTTP
+// 500 when fields arrive alphabetically instead of the required wire order.
+//
+// Uses VPP account id 3 and distribution_method "Make Available in Self
+// Service" (non-emailing) to avoid triggering invite emails. No %@ is used
+// in any string field (separate known server-500 bug for plist strings).
 func TestAcceptance_Classic_VPPInvitationCRUD(t *testing.T) {
-	t.Skip("VPP invitation creation needs a real user_id + invitation_type + site; not exercising against live tenant")
+	c := accClient(t)
+	pc := proclassic.New(c)
+	ctx := context.Background()
+
+	name := "sdk-acc-vpp-inv-" + runSuffix()
+	dist := "Make Available in Self Service"
+	vppAccID := 3
+	req := &proclassic.VppInvitation{
+		General: &proclassic.VppInvitationGeneral{
+			Name:               &name,
+			VppAccount:         &proclassic.VppInvitationGeneralVppAccount{ID: &vppAccID},
+			DistributionMethod: &dist,
+		},
+	}
+
+	created, err := pc.CreateVPPInvitationByID(ctx, "0", req)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateVPPInvitationByID: %v", err)
+	}
+	if created == nil || created.General == nil || created.General.ID == nil {
+		t.Fatal("CreateVPPInvitationByID: nil or missing ID in response")
+	}
+	createdID := strconv.Itoa(*created.General.ID)
+	t.Logf("created VPP invitation id=%s name=%s", createdID, name)
+
+	t.Cleanup(func() {
+		if err := pc.DeleteVPPInvitationByID(ctx, createdID); err != nil {
+			t.Logf("cleanup DeleteVPPInvitationByID(%s): %v", createdID, err)
+		}
+	})
+
+	got, err := pc.GetVPPInvitationByID(ctx, createdID)
+	if err != nil {
+		t.Fatalf("GetVPPInvitationByID(%s): %v", createdID, err)
+	}
+	if got == nil || got.General == nil {
+		t.Fatal("GetVPPInvitationByID: nil or missing General")
+	}
+	if got.General.Name == nil || *got.General.Name != name {
+		t.Errorf("General.Name = %v, want %s", got.General.Name, name)
+	}
 }
 
 func TestAcceptance_Classic_GetComputerHistoryByID(t *testing.T) {

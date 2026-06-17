@@ -17,6 +17,8 @@ import (
 )
 
 // ListAppInstallerDeploymentsV1 get all App Installer deployments.
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ListAppInstallerDeploymentsV1(ctx context.Context) ([]AppInstallerDeploymentListEntry, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]AppInstallerDeploymentListEntry, bool, error) {
@@ -41,7 +43,9 @@ func (c *Client) ListAppInstallerDeploymentsV1(ctx context.Context) ([]AppInstal
 }
 
 // CreateAppInstallerDeploymentV1 create an App Installer deployment.
-func (c *Client) CreateAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeployment) (*AppInstallerDeploymentHrefResponse, error) {
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
+func (c *Client) CreateAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeploymentCreate) (*AppInstallerDeploymentHrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AppInstallerDeploymentHrefResponse
 	endpoint := prefix + "/app-installers/deployments"
@@ -52,6 +56,8 @@ func (c *Client) CreateAppInstallerDeploymentV1(ctx context.Context, request *Ap
 }
 
 // GetAppInstallerDeploymentV1 get an App Installer deployment by ID.
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) GetAppInstallerDeploymentV1(ctx context.Context, id string) (*AppInstallerDeployment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AppInstallerDeployment
@@ -63,7 +69,9 @@ func (c *Client) GetAppInstallerDeploymentV1(ctx context.Context, id string) (*A
 }
 
 // UpdateAppInstallerDeploymentV1 update an App Installer deployment.
-func (c *Client) UpdateAppInstallerDeploymentV1(ctx context.Context, id string, request *AppInstallerDeployment) (*AppInstallerDeployment, error) {
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
+func (c *Client) UpdateAppInstallerDeploymentV1(ctx context.Context, id string, request *AppInstallerDeploymentCreate) (*AppInstallerDeployment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AppInstallerDeployment
 	endpoint := fmt.Sprintf("%s/app-installers/deployments/%s", prefix, url.PathEscape(id))
@@ -74,6 +82,8 @@ func (c *Client) UpdateAppInstallerDeploymentV1(ctx context.Context, id string, 
 }
 
 // DeleteAppInstallerDeploymentV1 delete an App Installer deployment.
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) DeleteAppInstallerDeploymentV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/app-installers/deployments/%s", prefix, url.PathEscape(id))
@@ -84,6 +94,8 @@ func (c *Client) DeleteAppInstallerDeploymentV1(ctx context.Context, id string) 
 }
 
 // ResolveAppInstallerDeploymentV1IDByName looks up a AppInstallerDeploymentV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ResolveAppInstallerDeploymentV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/app-installers/deployments"
@@ -95,6 +107,8 @@ func (c *Client) ResolveAppInstallerDeploymentV1IDByName(ctx context.Context, na
 }
 
 // ResolveAppInstallerDeploymentV1ByName looks up a AppInstallerDeploymentV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ResolveAppInstallerDeploymentV1ByName(ctx context.Context, name string) (*AppInstallerDeployment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	listPath := prefix + "/app-installers/deployments"
@@ -110,11 +124,10 @@ func (c *Client) ResolveAppInstallerDeploymentV1ByName(ctx context.Context, name
 }
 
 // ApplyAppInstallerDeploymentV1 creates or updates a AppInstallerDeploymentV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
-func (c *Client) ApplyAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeployment) (string, bool, error) {
-	var name string
-	if request.Name != nil {
-		name = *request.Name
-	}
+//
+// Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
+func (c *Client) ApplyAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeploymentCreate) (string, bool, error) {
+	name := request.Name
 	if name == "" {
 		return "", false, fmt.Errorf("ApplyAppInstallerDeploymentV1: Name must not be empty")
 	}

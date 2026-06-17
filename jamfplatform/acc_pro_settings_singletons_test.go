@@ -117,7 +117,7 @@ func TestAcceptance_Pro_Settings_SmtpServerTestV1(t *testing.T) {
 // --- Jamf Pro server URL ----------------------------------------------
 
 // Changing the Jamf Pro server URL would point clients at a different
-// host. Read + history only.
+// host. Read only.
 func TestAcceptance_Pro_Settings_JamfProServerURLV1Read(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -129,13 +129,6 @@ func TestAcceptance_Pro_Settings_JamfProServerURLV1Read(t *testing.T) {
 		t.Fatalf("GetJamfProServerURLV1: %v", err)
 	}
 	t.Logf("Jamf Pro server URL: %s", url.URL)
-
-	hist, err := p.ListJamfProServerURLHistoryV1(ctx, nil, "")
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListJamfProServerURLHistoryV1: %v", err)
-	}
-	t.Logf("Jamf Pro server URL history: %d entries", len(hist))
 }
 
 // --- device-communication settings ------------------------------------
@@ -204,23 +197,6 @@ func TestAcceptance_Pro_Settings_CheckInV3(t *testing.T) {
 		t.Fatalf("ListCheckInHistoryV3: %v", err)
 	}
 	t.Logf("Check-in history: %d entries", len(hist))
-}
-
-// --- cache settings ---------------------------------------------------
-
-// Cache settings drive server-side caching and are tenant-critical.
-// Read-only — echo-PUT could surface latent 403s depending on role, and
-// the blast radius of a corrupted write is tenant-wide.
-func TestAcceptance_Pro_Settings_CacheSettingsV1Read(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-
-	s, err := pro.New(c).GetCacheSettingsV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetCacheSettingsV1: %v", err)
-	}
-	t.Logf("Cache settings: type=%s ttl=%d", s.CacheType, s.TimeToLiveSeconds)
 }
 
 // --- login customization ----------------------------------------------

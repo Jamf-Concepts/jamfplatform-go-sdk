@@ -645,6 +645,44 @@ func TestAcceptance_Pro_Security_GenerateSsoFailoverV1(t *testing.T) {
 	t.Logf("SSO failover URL rotated (URL not logged)")
 }
 
+// --- LAPS (local admin password) settings ---------------------------------
+
+// TestAcceptance_Pro_Security_LocalAdminPasswordSettingsV2 reads the
+// tenant-wide LAPS configuration and round-trips a PUT with the
+// unchanged values. Re-sending the current state is idempotent —
+// rotation times don't change until an admin actively rotates a
+// password, so there is no observable side-effect.
+func TestAcceptance_Pro_Security_LocalAdminPasswordSettingsV2(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	current, err := p.GetLocalAdminPasswordSettingsV2(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetLocalAdminPasswordSettingsV2: %v", err)
+	}
+	t.Logf("LAPS settings: autoDeployEnabled=%v passwordRotationTime=%d autoRotateEnabled=%v autoRotateExpirationTime=%d",
+		current.AutoDeployEnabled,
+		current.PasswordRotationTime,
+		current.AutoRotateEnabled,
+		current.AutoRotateExpirationTime,
+	)
+
+	updated, err := p.UpdateLocalAdminPasswordSettingsV2(ctx, current)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateLocalAdminPasswordSettingsV2 round-trip: %v", err)
+	}
+	if updated.PasswordRotationTime != current.PasswordRotationTime ||
+		updated.AutoRotateExpirationTime != current.AutoRotateExpirationTime {
+		t.Errorf("round-trip mismatch: got passwordRotationTime=%d autoRotateExpirationTime=%d, want %d/%d",
+			updated.PasswordRotationTime, updated.AutoRotateExpirationTime,
+			current.PasswordRotationTime, current.AutoRotateExpirationTime,
+		)
+	}
+}
+
 // min is a tiny helper used in PEM slicing above.
 func min(a, b int) int {
 	if a < b {

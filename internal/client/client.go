@@ -56,7 +56,7 @@ type Transport struct {
 	cacheKey        string
 	cookieJar       http.CookieJar
 	deprecationSeen sync.Map // dedup runtime Deprecation header warnings
-	retryOn4xx      bool
+	throttle        *requestThrottle
 }
 
 // PaginatedResponseRepresentation captures pagination metadata shared by multiple endpoints.
@@ -80,7 +80,7 @@ func WithHTTPClient(httpClient *http.Client) Option {
 				httpClient.Jar = newCookieJar()
 			}
 			c.baseClient = httpClient
-			c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient)
+			c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
 		}
 	}
 }
@@ -111,23 +111,15 @@ func WithCookieJar(jar http.CookieJar) Option {
 	}
 }
 
-// WithRetryOn4xx opts the transport into retrying unexpected 4xx responses
-// (400–499, excluding 401 and 403) with exponential backoff. This handles
-// eventual-consistency windows where a dependent resource deletion hasn't
-// propagated yet. Backoff starts at 2s, caps at 10s; context timeout is the
-// only bound on retry duration. Default is off.
-func WithRetryOn4xx(enabled bool) Option {
+// WithMinRequestInterval sets a client-level minimum elapsed wall-clock time
+// between the start of consecutive outbound HTTP requests. It paces all traffic
+// through the shared transport (which Terraform fans out across parallel
+// goroutines), giving the server breathing room and reducing 429s. A value
+// <= 0 disables the gate. The default is 100ms.
+func WithMinRequestInterval(d time.Duration) Option {
 	return func(c *Transport) {
-		c.retryOn4xx = enabled
+		c.throttle.setInterval(d)
 	}
-}
-
-// is4xxRetryable reports whether a status code warrants a 4xx retry attempt.
-// 401 and 403 are excluded: retrying auth failures is futile and risks rate-limiting.
-func is4xxRetryable(status int) bool {
-	return status >= 400 && status < 500 &&
-		status != http.StatusUnauthorized &&
-		status != http.StatusForbidden
 }
 
 // NewTransport creates a new Jamf Platform API transport.
@@ -143,7 +135,8 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 		TokenURL:     baseURL + "/auth/token",
 	}
 
-	httpClient, baseClient := newOAuth2Client(oauthConfig, userAgent)
+	throttle := newRequestThrottle(defaultMinRequestInterval)
+	httpClient, baseClient := newOAuth2Client(oauthConfig, userAgent, throttle)
 
 	c := &Transport{
 		baseURL:     baseURL,
@@ -151,6 +144,7 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 		baseClient:  baseClient,
 		oauthConfig: oauthConfig,
 		userAgent:   userAgent,
+		throttle:    throttle,
 	}
 	for _, opt := range opts {
 		opt(c)
@@ -199,7 +193,7 @@ func (c *Transport) HTTPClient() *http.Client {
 // SetHTTPClient sets a custom base HTTP client (useful for testing).
 func (c *Transport) SetHTTPClient(httpClient *http.Client) {
 	c.baseClient = httpClient
-	c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient)
+	c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
 }
 
 // SetLogger sets the logger for the client.
@@ -210,7 +204,7 @@ func (c *Transport) SetLogger(logger Logger) {
 // SetUserAgent sets the User-Agent header value used for token and API requests.
 func (c *Transport) SetUserAgent(ua string) {
 	c.userAgent = ua
-	c.httpClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua)
+	c.httpClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua, c.throttle)
 }
 
 // Do performs an authenticated API request and decodes the response.
@@ -242,8 +236,9 @@ func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string
 }
 
 // execute funnels every Do* variant through one place so the 429/Retry-After
-// retry, 4xx eventual-consistency retry, and Deprecation-header logging live
-// in a single hook point.
+// retry and Deprecation-header logging live in a single hook point. Non-success
+// statuses other than a server-instructed 429 surface immediately as an
+// *APIResponseError — eventual-consistency handling is a caller concern.
 func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any) error {
 	resp, classic, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
 	if err != nil {
@@ -273,34 +268,6 @@ func (c *Transport) execute(ctx context.Context, method, path string, body any, 
 		// sees the server's actual error body + traceId, not a synthetic
 		// one. handleResponse builds an APIResponseError for any status !=
 		// expectedStatus, which 429 will be.
-	}
-
-	if c.retryOn4xx {
-		const maxBackoff = 10 * time.Second
-		backoff := 2 * time.Second
-		for resp.StatusCode != expectedStatus && is4xxRetryable(resp.StatusCode) {
-			status := resp.StatusCode
-			// Capture the error from this response before discarding the body
-			// so we can surface it if the context is cancelled during backoff.
-			lastErr := c.handleResponse(ctx, resp, classic, expectedStatus, result)
-			log.Printf("jamfplatform: retrying %s %s after %s (status %d — eventual consistency)", method, path, backoff, status)
-			select {
-			case <-time.After(backoff):
-			case <-ctx.Done():
-				if lastErr != nil {
-					return lastErr
-				}
-				return ctx.Err()
-			}
-			resp, classic, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
-			if err != nil {
-				return err
-			}
-			backoff *= 2
-			if backoff > maxBackoff {
-				backoff = maxBackoff
-			}
-		}
 	}
 
 	return c.handleResponse(ctx, resp, classic, expectedStatus, result)
@@ -459,11 +426,21 @@ func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, cla
 
 		var apiErr ApiError
 		_ = json.Unmarshal(body, &apiErr) // best-effort; non-JSON bodies leave apiErr zero
-		if len(apiErr.Errors) > 0 {
+		switch {
+		case len(apiErr.Errors) > 0:
 			if apiErr.HTTPStatus > 0 {
 				respErr.StatusCode = apiErr.HTTPStatus
 			}
 			respErr.Errors = apiErr.Errors
+		default:
+			// Classic API errors are an HTML "Status page", not JSON. Lift the
+			// message into a synthetic structured detail so it renders through
+			// the same path as Pro errors (Error/Summary/Details/FieldErrors,
+			// and traceId). Non-classic, non-JSON bodies leave Errors empty and
+			// fall back to the raw body.
+			if msg, ok := parseClassicErrorMessage(resp.Header, body); ok {
+				respErr.Errors = []Error{{Description: msg}}
+			}
 		}
 		respErr.TraceID = pickTraceID(apiErr.TraceID, resp.Header)
 

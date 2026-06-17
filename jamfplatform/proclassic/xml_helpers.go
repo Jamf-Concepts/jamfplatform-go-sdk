@@ -124,19 +124,69 @@ func (n *NotificationValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 	return nil
 }
 
-// MarshalXML emits up to two <notification> elements: the bool form if
-// Enabled is set, then the method form if Method is set. Omits both
-// when neither is set.
+// MarshalXML emits up to two <notification> elements: the method form
+// first if Method is set, then the bool form if Enabled is set. Omits
+// both when neither is set.
+//
+// Order matters. The Classic server's self_service parser takes the
+// second <notification> as the "primary" value; sending bool first then
+// method silently drops the bool (server returns false on the next GET
+// regardless of what was sent). Wire-probed on a live tenant and
+// confirmed against the order the Jamf Pro admin UI itself writes —
+// method first, bool second — which is the only order that round-trips
+// cleanly for every resource carrying a Notification field.
 func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if n.Enabled != nil {
-		if err := e.EncodeElement(strconv.FormatBool(*n.Enabled), start); err != nil {
-			return err
-		}
-	}
 	if n.Method != nil {
 		if err := e.EncodeElement(*n.Method, start); err != nil {
 			return err
 		}
 	}
+	if n.Enabled != nil {
+		if err := e.EncodeElement(strconv.FormatBool(*n.Enabled), start); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// PayloadsXMLText wraps the configuration-profile <payloads> chardata
+// (raw .mobileconfig plist XML embedded as element text). MarshalXML
+// emits the standard single-level XML chardata encoding via
+// encoding/xml's default escape (escapes `<`, `>`, `&`; leaves `"`
+// alone, which is legal in chardata). UnmarshalXML decodes one level
+// symmetrically.
+//
+// Single-escape applies on both Create (POST) and Update (PUT), matching
+// the production-tested approach jamf-upload has shipped across the
+// AutoPkg community for years. An earlier double-escape design
+// (commit 70b4cd6, 2026-05-26) was added in response to a POST 409
+// "Unable to update the database" and assumed the server runs an extra
+// entity-decode pass before its plist parser. Wire-probing on 2026-05-27
+// showed that diagnosis was wrong: double-escaping silently corrupted
+// every <string> value containing literal `&`, `<`, or `>` — POSTed
+// values stored as `&amp;`, `&lt;`, `&gt;` doubled to `&amp;amp;` etc.,
+// and the same content 409d (or worse, corrupted) on PUT. Single-escape
+// for both methods matches what the server actually expects and what
+// the Jamf Pro admin UI itself writes.
+type PayloadsXMLText string
+
+// MarshalXML emits the chardata at a single XML entity layer (encoding/
+// xml's default behaviour). Used on both POST and PUT — the server
+// canonicalises the parsed plist after a single chardata decode on POST
+// and stores the post-decode bytes verbatim on PUT, both of which
+// preserve single-escape content correctly.
+func (p PayloadsXMLText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return e.EncodeElement(string(p), start)
+}
+
+// UnmarshalXML decodes the element's text using encoding/xml's default
+// pass (one level of entity unescape) and stores the result verbatim.
+// Symmetric to MarshalXML.
+func (p *PayloadsXMLText) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+	*p = PayloadsXMLText(s)
 	return nil
 }

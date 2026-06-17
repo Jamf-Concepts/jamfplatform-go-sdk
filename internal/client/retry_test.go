@@ -12,221 +12,96 @@ import (
 	"time"
 )
 
-// --- 4xx retry tests ---
+// --- no-retry-on-4xx regression tests ---
+//
+// The transport must NOT retry unexpected 4xx responses. Eventual-consistency
+// handling is a caller concern; the only mechanical retry that survives is the
+// server-instructed 429/Retry-After path (covered below). These guards assert a
+// single dispatch and an immediately-surfaced *APIResponseError.
 
-func TestRetryOn4xx_DefaultOff(t *testing.T) {
+func TestNoRetryOn4xx_DeleteSingleCall(t *testing.T) {
 	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0) // isolate retry behavior from request pacing
 	var calls atomic.Int32
 	mux.HandleFunc("/api/eventual", func(w http.ResponseWriter, _ *http.Request) {
 		calls.Add(1)
 		w.WriteHeader(http.StatusBadRequest)
-	})
-
-	err := c.Do(context.Background(), http.MethodDelete, "/api/eventual", nil, nil)
-	if err == nil {
-		t.Fatal("expected error, got nil")
-	}
-	if calls.Load() != 1 {
-		t.Errorf("expected exactly 1 call (no retry by default), got %d", calls.Load())
-	}
-}
-
-func TestRetryOn4xx_SuccessFirstAttempt(t *testing.T) {
-	c, _, mux := newTestClient(t)
-	c.retryOn4xx = true
-	var calls atomic.Int32
-	mux.HandleFunc("/api/ok", func(w http.ResponseWriter, _ *http.Request) {
-		calls.Add(1)
-		w.WriteHeader(http.StatusOK)
-	})
-
-	err := c.Do(context.Background(), http.MethodGet, "/api/ok", nil, nil)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if calls.Load() != 1 {
-		t.Errorf("expected 1 call (no retry on success), got %d", calls.Load())
-	}
-}
-
-func TestRetryOn4xx_RetryThenSucceed(t *testing.T) {
-	c, _, mux := newTestClient(t)
-	c.retryOn4xx = true
-	var calls atomic.Int32
-	mux.HandleFunc("/api/eventual", func(w http.ResponseWriter, _ *http.Request) {
-		n := calls.Add(1)
-		if n == 1 {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		w.WriteHeader(http.StatusNoContent)
 	})
 
 	start := time.Now()
 	err := c.DoExpect(context.Background(), http.MethodDelete, "/api/eventual", nil, http.StatusNoContent, nil)
 	elapsed := time.Since(start)
 
-	if err != nil {
-		t.Fatalf("expected success after retry, got: %v", err)
-	}
-	if calls.Load() != 2 {
-		t.Errorf("expected 2 calls (initial + one retry), got %d", calls.Load())
-	}
-	if elapsed < 1500*time.Millisecond {
-		t.Errorf("expected ~2s backoff before retry, got %v", elapsed)
-	}
-}
-
-func TestRetryOn4xx_401NotRetried(t *testing.T) {
-	c, _, mux := newTestClient(t)
-	c.retryOn4xx = true
-	var calls atomic.Int32
-	mux.HandleFunc("/api/auth", func(w http.ResponseWriter, _ *http.Request) {
-		calls.Add(1)
-		w.WriteHeader(http.StatusUnauthorized)
-	})
-
-	err := c.Do(context.Background(), http.MethodGet, "/api/auth", nil, nil)
-	if err == nil {
-		t.Fatal("expected error for 401")
-	}
-	var apiErr *APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusUnauthorized) {
-		t.Fatalf("expected APIResponseError(401), got %v", err)
-	}
-	if calls.Load() != 1 {
-		t.Errorf("expected exactly 1 call (401 not retried), got %d", calls.Load())
-	}
-}
-
-func TestRetryOn4xx_403NotRetried(t *testing.T) {
-	c, _, mux := newTestClient(t)
-	c.retryOn4xx = true
-	var calls atomic.Int32
-	mux.HandleFunc("/api/forbidden", func(w http.ResponseWriter, _ *http.Request) {
-		calls.Add(1)
-		w.WriteHeader(http.StatusForbidden)
-	})
-
-	err := c.Do(context.Background(), http.MethodGet, "/api/forbidden", nil, nil)
-	if err == nil {
-		t.Fatal("expected error for 403")
-	}
-	var apiErr *APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusForbidden) {
-		t.Fatalf("expected APIResponseError(403), got %v", err)
-	}
-	if calls.Load() != 1 {
-		t.Errorf("expected exactly 1 call (403 not retried), got %d", calls.Load())
-	}
-}
-
-func TestRetryOn4xx_5xxNotRetried(t *testing.T) {
-	c, _, mux := newTestClient(t)
-	c.retryOn4xx = true
-	var calls atomic.Int32
-	mux.HandleFunc("/api/server-error", func(w http.ResponseWriter, _ *http.Request) {
-		calls.Add(1)
-		w.WriteHeader(http.StatusInternalServerError)
-	})
-
-	err := c.Do(context.Background(), http.MethodGet, "/api/server-error", nil, nil)
-	if err == nil {
-		t.Fatal("expected error for 500")
-	}
-	var apiErr *APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusInternalServerError) {
-		t.Fatalf("expected APIResponseError(500), got %v", err)
-	}
-	if calls.Load() != 1 {
-		t.Errorf("expected exactly 1 call (5xx not retried), got %d", calls.Load())
-	}
-}
-
-func TestRetryOn4xx_ContextCancelled(t *testing.T) {
-	c, _, mux := newTestClient(t)
-	c.retryOn4xx = true
-	mux.HandleFunc("/api/eventual", func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusBadRequest)
-	})
-
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
-	defer cancel()
-
-	err := c.Do(ctx, http.MethodDelete, "/api/eventual", nil, nil)
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
 	var apiErr *APIResponseError
-	if !errors.As(err, &apiErr) {
-		t.Fatalf("expected APIResponseError, got: %v", err)
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusBadRequest) {
+		t.Fatalf("expected APIResponseError(400), got %v", err)
 	}
-	if apiErr.StatusCode != http.StatusBadRequest {
-		t.Errorf("expected status 400, got %d", apiErr.StatusCode)
+	if calls.Load() != 1 {
+		t.Errorf("expected exactly 1 call (no 4xx retry), got %d", calls.Load())
+	}
+	if elapsed > 500*time.Millisecond {
+		t.Errorf("expected immediate surface, got %v (looks like a backoff loop)", elapsed)
 	}
 }
 
-func TestRetryOn4xx_ExponentialBackoff(t *testing.T) {
+func TestNoRetryOn4xx_GetSingleCall(t *testing.T) {
 	c, _, mux := newTestClient(t)
-	c.retryOn4xx = true
+	c.throttle.setInterval(0)
 	var calls atomic.Int32
-	// Fail with 400 twice, succeed on the third call.
-	mux.HandleFunc("/api/multi", func(w http.ResponseWriter, _ *http.Request) {
-		n := calls.Add(1)
-		if n < 3 {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		w.WriteHeader(http.StatusNoContent)
+	mux.HandleFunc("/api/missing", func(w http.ResponseWriter, _ *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusNotFound)
 	})
 
 	start := time.Now()
-	err := c.DoExpect(context.Background(), http.MethodDelete, "/api/multi", nil, http.StatusNoContent, nil)
+	err := c.Do(context.Background(), http.MethodGet, "/api/missing", nil, nil)
 	elapsed := time.Since(start)
 
-	if err != nil {
-		t.Fatalf("expected success after 2 retries, got: %v", err)
+	if err == nil {
+		t.Fatal("expected error, got nil")
 	}
-	if calls.Load() != 3 {
-		t.Errorf("expected 3 calls, got %d", calls.Load())
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %v", err)
 	}
-	// First backoff 2s, second backoff 4s → total ≥ 6s.
-	if elapsed < 5*time.Second {
-		t.Errorf("expected ≥6s total (2s+4s backoffs), got %v", elapsed)
+	if calls.Load() != 1 {
+		t.Errorf("expected exactly 1 call (no 4xx retry), got %d", calls.Load())
 	}
-}
-
-func TestRetryOn4xx_WithOption(t *testing.T) {
-	srv, _ := newTestServer(t)
-	c := NewTransportWithUserAgent(srv.URL, "id", "secret", "test", WithRetryOn4xx(true))
-	if !c.retryOn4xx {
-		t.Error("retryOn4xx should be true when WithRetryOn4xx(true) is applied")
+	if elapsed > 500*time.Millisecond {
+		t.Errorf("expected immediate surface, got %v", elapsed)
 	}
 }
 
-func TestIs4xxRetryable(t *testing.T) {
-	cases := []struct {
-		status int
-		want   bool
-	}{
-		{400, true},
-		{404, true},
-		{409, true},
-		{422, true},
-		{499, true},
-		{401, false},
-		{403, false},
-		{200, false},
-		{301, false},
-		{500, false},
-		{502, false},
+// TestNoRetryOn4xx_Delete404IsError pins the deliberate behavior change: a 404
+// on DELETE now surfaces as *APIResponseError(404) rather than being swallowed
+// as idempotent-delete success. The "404-on-DELETE == success" judgement is a
+// lifecycle semantic the consumer owns.
+func TestNoRetryOn4xx_Delete404IsError(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	var calls atomic.Int32
+	mux.HandleFunc("/api/gone", func(w http.ResponseWriter, _ *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	err := c.DoExpect(context.Background(), http.MethodDelete, "/api/gone", nil, http.StatusNoContent, nil)
+	if err == nil {
+		t.Fatal("expected APIResponseError(404), got nil (404-on-DELETE must no longer be success)")
 	}
-	for _, tc := range cases {
-		if got := is4xxRetryable(tc.status); got != tc.want {
-			t.Errorf("is4xxRetryable(%d) = %v, want %v", tc.status, got, tc.want)
-		}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %v", err)
+	}
+	if calls.Load() != 1 {
+		t.Errorf("expected exactly 1 call, got %d", calls.Load())
 	}
 }
+
+// --- 429/Retry-After tests (the only surviving mechanical retry) ---
 
 func TestRetryAfter_IntegerSeconds(t *testing.T) {
 	c, srv, mux := newTestClient(t)

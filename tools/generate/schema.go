@@ -4,6 +4,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"maps"
 	"sort"
@@ -11,6 +12,102 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
+
+// applySchemaRenames renames schema keys in doc.Components.Schemas and updates
+// all $ref strings that reference the old name throughout the document. Applied
+// before other patches so downstream fixups see corrected names. Only the Ref
+// string on each SchemaRef is updated; the walker stops at $ref boundaries and
+// does not recurse into the referenced schema's Value to avoid cycles.
+func applySchemaRenames(doc *openapi3.T, renames map[string]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(renames) == 0 {
+		return
+	}
+	refMap := make(map[string]string, len(renames))
+	for oldName, newName := range renames {
+		refMap["#/components/schemas/"+oldName] = "#/components/schemas/" + newName
+	}
+	for oldName, newName := range renames {
+		if ref, ok := doc.Components.Schemas[oldName]; ok {
+			doc.Components.Schemas[newName] = ref
+			delete(doc.Components.Schemas, oldName)
+		}
+	}
+
+	visited := make(map[*openapi3.SchemaRef]bool)
+	var walkSchema func(ref *openapi3.SchemaRef)
+	walkSchema = func(ref *openapi3.SchemaRef) {
+		if ref == nil || visited[ref] {
+			return
+		}
+		visited[ref] = true
+		if ref.Ref != "" {
+			if newRef, ok := refMap[ref.Ref]; ok {
+				ref.Ref = newRef
+			}
+			return // stop at ref boundaries; Value is the shared component, walked separately
+		}
+		if ref.Value == nil {
+			return
+		}
+		for _, prop := range ref.Value.Properties {
+			walkSchema(prop)
+		}
+		if ref.Value.Items != nil {
+			walkSchema(ref.Value.Items)
+		}
+		if ref.Value.AdditionalProperties.Schema != nil {
+			walkSchema(ref.Value.AdditionalProperties.Schema)
+		}
+		for _, s := range ref.Value.AllOf {
+			walkSchema(s)
+		}
+		for _, s := range ref.Value.AnyOf {
+			walkSchema(s)
+		}
+		for _, s := range ref.Value.OneOf {
+			walkSchema(s)
+		}
+	}
+
+	for _, ref := range doc.Components.Schemas {
+		walkSchema(ref)
+	}
+	if doc.Paths == nil {
+		return
+	}
+	for _, pathStr := range doc.Paths.InMatchingOrder() {
+		item := doc.Paths.Find(pathStr)
+		if item == nil {
+			continue
+		}
+		for _, op := range []*openapi3.Operation{
+			item.Get, item.Post, item.Put, item.Patch, item.Delete,
+		} {
+			if op == nil {
+				continue
+			}
+			if op.RequestBody != nil && op.RequestBody.Value != nil {
+				for _, content := range op.RequestBody.Value.Content {
+					if content != nil && content.Schema != nil {
+						walkSchema(content.Schema)
+					}
+				}
+			}
+			if op.Responses != nil {
+				for _, respRef := range op.Responses.Map() {
+					if respRef == nil || respRef.Value == nil {
+						continue
+					}
+					for _, content := range respRef.Value.Content {
+						if content != nil && content.Schema != nil {
+							walkSchema(content.Schema)
+						}
+					}
+				}
+			}
+		}
+	}
+}
 
 // applySchemaAdditions injects missing property declarations into named
 // component schemas. Used for specs that omit fields the server actually
@@ -56,6 +153,355 @@ func applySchemaAdditions(doc *openapi3.T, additions map[string]map[string]strin
 	}
 }
 
+// applySchemaPatches inserts or replaces sub-schemas at dotted property paths
+// under named component schemas. Used when a spec omits a structured field the
+// server actually returns or accepts (e.g. policy missing top-level `reboot`,
+// `scope.jss_users`, or self-service notification scalars). Each patch value
+// is a raw OpenAPI 3 Schema JSON fragment; intermediate path segments must
+// resolve to object-with-properties so the walker can descend. Replaces an
+// existing property when the path already terminates somewhere; otherwise
+// adds it. Runs after applySchemaAdditions and before applyPostSymmetry so
+// that *_post schemas inherit the patched read shape.
+func applySchemaPatches(doc *openapi3.T, patches map[string]map[string]json.RawMessage) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(patches) == 0 {
+		return
+	}
+	for schemaName, paths := range patches {
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			continue
+		}
+		for path := range paths {
+			raw := paths[path]
+			if len(raw) == 0 {
+				continue
+			}
+			sub, err := parsePatchSchema(raw)
+			if err != nil {
+				panic(fmt.Sprintf("schemaPatches[%q][%q]: %v", schemaName, path, err))
+			}
+			resolvePatchRefs(sub, doc)
+			parent, leaf, ok := walkPropertyPath(ref.Value, path)
+			if !ok {
+				panic(fmt.Sprintf("schemaPatches[%q]: cannot reach path %q in schema", schemaName, path))
+			}
+			if parent.Properties == nil {
+				parent.Properties = openapi3.Schemas{}
+			}
+			parent.Properties[leaf] = sub
+		}
+	}
+}
+
+// applyPropertyRenames renames property keys at dotted paths inside named
+// component schemas. Used to repair spec keys that don't match the wire so
+// decode actually succeeds (`re-install_button_text` → `reinstall_button_text`,
+// `allow_user_to_defer` → `allow_users_to_defer`). Path's last segment is the
+// current key on the parent; value is the new key. Runs before applyPostSymmetry
+// so the post sibling sees the corrected key.
+func applyPropertyRenames(doc *openapi3.T, renames map[string]map[string]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(renames) == 0 {
+		return
+	}
+	for schemaName, paths := range renames {
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			continue
+		}
+		for path, newKey := range paths {
+			parent, leaf, ok := walkPropertyPath(ref.Value, path)
+			if !ok {
+				panic(fmt.Sprintf("propertyRenames[%q]: cannot reach path %q", schemaName, path))
+			}
+			cur, exists := parent.Properties[leaf]
+			if !exists {
+				panic(fmt.Sprintf("propertyRenames[%q]: property %q missing at path %q", schemaName, leaf, path))
+			}
+			delete(parent.Properties, leaf)
+			parent.Properties[newKey] = cur
+		}
+	}
+}
+
+// applyPropertyRemovals deletes properties at dotted paths inside named
+// component schemas. Used to drop spec properties that are misplaced (e.g.
+// mac_application.self_service.vpp is nested under self_service in the spec
+// but lives at the top level on the wire; the top-level shape is added via
+// schemaPatches, and this removes the phantom nested one so generated Go
+// types expose only the correct field). Runs after applyPropertyRenames and
+// before applyPostSymmetry so the post sibling inherits the trimmed shape.
+// Panics on missing paths — a declared removal whose path can't be resolved
+// is always a config bug.
+func applyPropertyRemovals(doc *openapi3.T, removals map[string][]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(removals) == 0 {
+		return
+	}
+	for schemaName, paths := range removals {
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			continue
+		}
+		for _, path := range paths {
+			parent, leaf, ok := walkPropertyPath(ref.Value, path)
+			if !ok {
+				panic(fmt.Sprintf("propertyRemovals[%q]: cannot reach path %q", schemaName, path))
+			}
+			if _, exists := parent.Properties[leaf]; !exists {
+				panic(fmt.Sprintf("propertyRemovals[%q]: property %q missing at path %q", schemaName, leaf, path))
+			}
+			delete(parent.Properties, leaf)
+		}
+	}
+}
+
+// applyPostSymmetry copies properties from each read schema X into its *_post
+// sibling X_post so write types accept the full field set the server actually
+// honours. Default behaviour for every spec — Jamf's classic specs routinely
+// declare X_post as a minimal "general only" object even when the server
+// accepts (and persists) every other top-level block. Specs that genuinely
+// have write-only fields list them under PostSymmetryExcludes.
+//
+// Copy semantics: when the read schema declares a property the post sibling
+// doesn't, the property's *openapi3.SchemaRef is shared between read and post
+// (cheap; hoistInlineObjects mutates per-schema property map entries, not the
+// underlying inline objects). When the post sibling already declares the same
+// property, the read shape REPLACES it — the brief is explicit that the post
+// must mirror the read, not preserve a slimmer alternative shape (e.g. the
+// existing EbookPostScope all_* booleans only). The post schema's own xml
+// metadata (typically `xml.name = <read-name>`) is preserved.
+func applyPostSymmetry(doc *openapi3.T, excludes map[string][]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
+		return
+	}
+	for postName, ref := range doc.Components.Schemas {
+		if !strings.HasSuffix(postName, "_post") || ref == nil || ref.Value == nil {
+			continue
+		}
+		readName := strings.TrimSuffix(postName, "_post")
+		readRef, ok := doc.Components.Schemas[readName]
+		if !ok || readRef == nil || readRef.Value == nil {
+			continue
+		}
+		post := ref.Value
+		read := readRef.Value
+		if len(read.Properties) == 0 {
+			continue
+		}
+		skip := make(map[string]bool, len(excludes[postName]))
+		for _, p := range excludes[postName] {
+			skip[p] = true
+		}
+		if post.Properties == nil {
+			post.Properties = openapi3.Schemas{}
+		}
+		for propName, propRef := range read.Properties {
+			if skip[propName] {
+				continue
+			}
+			post.Properties[propName] = propRef
+		}
+	}
+}
+
+// parsePatchSchema parses a raw JSON OpenAPI Schema fragment into a SchemaRef.
+// Uses SchemaRef's own UnmarshalJSON so nested `$ref` strings populate the
+// Ref field on the right SchemaRef levels (a direct json.Unmarshal into
+// openapi3.Schema would skip that path for property values and items).
+// Refs in the fragment are left unresolved on purpose — the parent document
+// already carries the target schemas (e.g. id_name), and `openapi3.SchemaRef`
+// callers downstream key off `.Ref` strings rather than `.Value` pointers.
+func parsePatchSchema(raw json.RawMessage) (*openapi3.SchemaRef, error) {
+	var ref openapi3.SchemaRef
+	if err := ref.UnmarshalJSON(raw); err != nil {
+		return nil, err
+	}
+	return &ref, nil
+}
+
+// resolvePatchRefs walks a freshly-parsed patch SchemaRef tree and points
+// each unresolved `$ref` at the matching component schema in the parent
+// doc. Manual unmarshal of a SchemaRef populates `Ref` but leaves `Value`
+// nil; downstream passes (flattenClassicSizeWrappers, hoistInlineObjects)
+// short-circuit on `Value == nil`, treating refs as unknown shape. Loader
+// machinery would normally resolve these but bypassing the loader was
+// chosen to avoid forcing each patch fragment into a standalone document
+// with every transitive $ref target restated.
+func resolvePatchRefs(ref *openapi3.SchemaRef, doc *openapi3.T) {
+	if ref == nil {
+		return
+	}
+	if ref.Ref != "" && ref.Value == nil {
+		if name, ok := strings.CutPrefix(ref.Ref, "#/components/schemas/"); ok {
+			if target, exists := doc.Components.Schemas[name]; exists && target != nil {
+				ref.Value = target.Value
+			}
+		}
+	}
+	if ref.Value == nil {
+		return
+	}
+	for _, p := range ref.Value.Properties {
+		resolvePatchRefs(p, doc)
+	}
+	if ref.Value.Items != nil {
+		resolvePatchRefs(ref.Value.Items, doc)
+	}
+	for _, s := range ref.Value.AllOf {
+		resolvePatchRefs(s, doc)
+	}
+}
+
+// walkPropertyPath traverses dotted `a.b.c` into nested object schemas. Returns
+// the deepest reachable parent schema and the final leaf segment. Auto-descends
+// through array schemas via `.items.value` (Classic spec routinely models
+// repeating XML children as `prop: { type: array, items: { type: object,
+// properties: { child: { … } } } }`; expressing the descent explicitly in the
+// path would force every caller to thread `items.` through every array hop).
+// Non-leaf segments must resolve to an object-with-properties (after array
+// auto-descent); the leaf segment may or may not exist on the returned parent.
+func walkPropertyPath(root *openapi3.Schema, path string) (*openapi3.Schema, string, bool) {
+	if root == nil || path == "" {
+		return nil, "", false
+	}
+	parts := strings.Split(path, ".")
+	cur := root
+	for i := 0; i < len(parts)-1; i++ {
+		seg := parts[i]
+		if cur.Type != nil && cur.Type.Is("array") && cur.Items != nil && cur.Items.Value != nil {
+			cur = cur.Items.Value
+		}
+		if cur.Properties == nil {
+			return nil, "", false
+		}
+		next, ok := cur.Properties[seg]
+		if !ok || next == nil || next.Value == nil {
+			return nil, "", false
+		}
+		cur = next.Value
+	}
+	if cur.Type != nil && cur.Type.Is("array") && cur.Items != nil && cur.Items.Value != nil {
+		cur = cur.Items.Value
+	}
+	return cur, parts[len(parts)-1], true
+}
+
+// flattenClassicSizeWrappers rewrites Jamf Classic's `<wrapper><size>N</size><item>...</item>...</wrapper>`
+// XML containers so they round-trip through encoding/xml without data loss.
+//
+// The Classic spec models these as `wrapper: type:array, items: {size, X}` —
+// implying N wrapper elements, each carrying a size sentinel and a single item.
+// The actual wire emits ONE `<wrapper>` element with a single `<size>` sibling
+// and N repeated `<X>` children. Mapping the spec literally produces
+// `Wrapper *[]Item` in Go; encoding/xml then sees one `<wrapper>` element,
+// allocates one slot, and the N `<X>` children collide into the slot's
+// non-slice X field — only the last survives. Smart groups silently lose every
+// criterion except the final one (confirmed across UserGroup, MobileDeviceGroup,
+// ComputerGroup on real tenant XML).
+//
+// Transform: `wrapper: array of {size, X}` → `wrapper: object {size, X: array of <X-shape>}`.
+// hoistInlineObjects then lifts the new wrapper into its own named schema, and
+// the inner X array hoists / dedups against existing named schemas (criterion,
+// computer, mobile_device, etc.) as usual. Output: callers get
+// `*UserGroupCriteria { Size *int, Criterion []Criterion }` and the full slice
+// survives a decode.
+//
+// Pattern guard — applied only when ALL of the following hold so we don't
+// rewrite legitimate JSON-style arrays-of-{size,item} (none exist in Classic
+// today, but the heuristic should be tight regardless):
+//   - property is `type: array` with inline items (no $ref)
+//   - items.properties has 1 or 2 keys
+//   - one is "size" (optional); exactly one other key, naming a singular wire child
+//   - the other key references or inlines an object schema
+//
+// Runs before hoistInlineObjects so hoisting sees the transformed shape.
+// XML-format specs only — JSON specs may legitimately use the lossy shape.
+func flattenClassicSizeWrappers(doc *openapi3.T) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
+		return
+	}
+	visited := map[*openapi3.Schema]bool{}
+	for _, ref := range doc.Components.Schemas {
+		if ref != nil && ref.Value != nil {
+			flattenClassicSizeWrappersInSchema(ref.Value, visited)
+		}
+	}
+}
+
+func flattenClassicSizeWrappersInSchema(schema *openapi3.Schema, visited map[*openapi3.Schema]bool) {
+	if schema == nil || visited[schema] {
+		return
+	}
+	visited[schema] = true
+	for propName, propRef := range schema.Properties {
+		if propRef == nil || propRef.Value == nil || propRef.Ref != "" {
+			continue
+		}
+		if rewritten := flattenIfClassicWrapper(propRef.Value); rewritten != nil {
+			schema.Properties[propName] = &openapi3.SchemaRef{Value: rewritten}
+		}
+	}
+	for _, propRef := range schema.Properties {
+		if propRef != nil && propRef.Value != nil {
+			flattenClassicSizeWrappersInSchema(propRef.Value, visited)
+		}
+	}
+	if schema.Items != nil && schema.Items.Value != nil {
+		flattenClassicSizeWrappersInSchema(schema.Items.Value, visited)
+	}
+	for _, s := range schema.AllOf {
+		if s != nil && s.Value != nil {
+			flattenClassicSizeWrappersInSchema(s.Value, visited)
+		}
+	}
+}
+
+func flattenIfClassicWrapper(s *openapi3.Schema) *openapi3.Schema {
+	if s == nil || !s.Type.Is("array") || s.Items == nil || s.Items.Ref != "" || s.Items.Value == nil {
+		return nil
+	}
+	items := s.Items.Value
+	if len(items.Properties) == 0 || len(items.Properties) > 2 {
+		return nil
+	}
+	var sizeRef, itemRef *openapi3.SchemaRef
+	var itemKey string
+	for k, v := range items.Properties {
+		switch k {
+		case "size":
+			sizeRef = v
+		default:
+			if itemRef != nil {
+				// More than one non-size key — not a wrapper shape.
+				return nil
+			}
+			itemRef = v
+			itemKey = k
+		}
+	}
+	if itemRef == nil || itemRef.Value == nil {
+		return nil
+	}
+	// The non-size key must reference (or inline) an object schema.
+	if itemRef.Ref == "" && len(itemRef.Value.Properties) == 0 {
+		return nil
+	}
+	newProps := openapi3.Schemas{}
+	if sizeRef != nil {
+		newProps["size"] = sizeRef
+	}
+	newProps[itemKey] = &openapi3.SchemaRef{
+		Value: &openapi3.Schema{
+			Type:  &openapi3.Types{"array"},
+			Items: itemRef,
+		},
+	}
+	return &openapi3.Schema{
+		Type:       &openapi3.Types{"object"},
+		Properties: newProps,
+		XML:        s.XML,
+	}
+}
+
 // hoistInlineObjects promotes every inline object-with-properties found in
 // component schemas to its own named top-level schema and replaces the
 // property with a $ref. Specs that model deeply-nested XML resources
@@ -64,7 +510,7 @@ func applySchemaAdditions(doc *openapi3.T, additions map[string]map[string]strin
 // to map[string]any, which encoding/xml can't populate from structured
 // XML content. Runs in-place on the doc; safe for specs that already use
 // named schemas (no inline objects found → no-op).
-func hoistInlineObjects(doc *openapi3.T) {
+func hoistInlineObjects(doc *openapi3.T, format string) {
 	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
 		return
 	}
@@ -76,7 +522,7 @@ func hoistInlineObjects(doc *openapi3.T) {
 			if schema == nil {
 				continue
 			}
-			if hoistInlineObjectsInSchema(name, schema, doc) {
+			if hoistInlineObjectsInSchema(name, schema, doc, format) {
 				changed = true
 			}
 		}
@@ -85,8 +531,12 @@ func hoistInlineObjects(doc *openapi3.T) {
 
 // hoistInlineObjectsInSchema walks one schema's properties and items, lifting
 // inline typed objects into named top-level schemas. Returns true when any
-// lift happened so the outer loop can revisit schemas added mid-walk.
-func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc *openapi3.T) bool {
+// lift happened so the outer loop can revisit schemas added mid-walk. The
+// format hint enables XML-specific behaviour: empty `type: object` properties
+// are hoisted into named structs (so they round-trip as <element/> rather
+// than freeform map[string]any) — JSON specs continue treating those as
+// freeform per the OpenAPI convention.
+func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc *openapi3.T, format string) bool {
 	if schema == nil {
 		return false
 	}
@@ -114,13 +564,45 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 			return ref
 		}
 		v := ref.Value
-		inlineObject := v.Type.Is("object") && len(v.Properties) > 0
+		// Treat (Type==nil && Properties>0) as object-shape. Classic's
+		// spec frequently omits `type: object` on inline subschemas that
+		// are clearly objects (e.g. user_group.criteria.items, user_group.users.items).
+		// Mirrors the extractTypes nil-type tolerance at the top of this file.
+		//
+		// XML specs also hoist explicit empty `type: object` properties:
+		// Classic emits per-type binding blocks like <powerbroker_identity_services/>
+		// that need to round-trip as an empty struct, not the map[string]any
+		// fallback an unhoisted empty object would produce. JSON specs
+		// continue treating empty `type: object` as freeform per OpenAPI's
+		// convention (the freeform branch in extractTypes turns those into
+		// json.RawMessage).
+		hasObjShape := func(s *openapi3.Schema) bool {
+			if s == nil {
+				return false
+			}
+			if len(s.Properties) > 0 && (s.Type.Is("object") || s.Type == nil) {
+				return true
+			}
+			if format == "xml" && s.Type.Is("object") && s.AdditionalProperties.Schema == nil {
+				return true
+			}
+			return false
+		}
+		inlineObject := hasObjShape(v)
 		inlineArrayOfObject := v.Type.Is("array") && v.Items != nil && v.Items.Ref == "" &&
-			v.Items.Value != nil && v.Items.Value.Type.Is("object") && len(v.Items.Value.Properties) > 0
+			hasObjShape(v.Items.Value)
 		if !inlineObject && !inlineArrayOfObject {
 			return ref
 		}
 		if inlineObject {
+			// Reuse a top-level schema with matching name + property keyset
+			// instead of emitting a near-duplicate hoisted type. Classic's
+			// spec sometimes inlines the same shape that's also defined as
+			// a named component (e.g. user_group.criteria.items.criterion
+			// matches the top-level `criterion` schema verbatim).
+			if existing, ok := doc.Components.Schemas[propName]; ok && sameInlineShapeAsNamed(v, existing) {
+				return &openapi3.SchemaRef{Ref: "#/components/schemas/" + propName, Value: existing.Value}
+			}
 			nested := parentName + exportedGoName(propName)
 			nested = uniqueSchemaName(doc, nested)
 			// Preserve the original property name as the hoisted schema's
@@ -136,7 +618,20 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 			hoisted = true
 			return &openapi3.SchemaRef{Ref: "#/components/schemas/" + nested, Value: v}
 		}
-		// inline array of object — hoist the element schema.
+		// inline array of object — hoist the element schema. First try to
+		// dedup against an existing top-level schema whose name matches the
+		// array's element wire shape (typically the singular of the property
+		// name, e.g. property `criterion` is already singular, property
+		// `users` maps to schema `user`). Mirrors the inline-object dedup
+		// above so wrapper-flattened criteria/users/computers/mobile_devices
+		// arrays point at the shared component schema instead of emitting a
+		// fresh per-parent Item type.
+		for _, candidate := range []string{propName, singularize(propName)} {
+			if existing, ok := doc.Components.Schemas[candidate]; ok && sameInlineShapeAsNamed(v.Items.Value, existing) {
+				v.Items = &openapi3.SchemaRef{Ref: "#/components/schemas/" + candidate, Value: existing.Value}
+				return ref
+			}
+		}
 		nested := parentName + exportedGoName(propName) + "Item"
 		nested = uniqueSchemaName(doc, nested)
 		if v.Items.Value.XML == nil {
@@ -159,6 +654,28 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 	return hoisted
 }
 
+// sameInlineShapeAsNamed reports whether `inline` and `named` (a top-level
+// schema ref) share the same property keyset. Used by hoistInlineObjectsInSchema
+// to deduplicate inline objects against a name-matched top-level schema
+// instead of emitting a near-duplicate hoisted type. Conservative — only
+// matches when key counts AND keys agree exactly; nested property types
+// are not compared, since OpenAPI key collisions across unrelated shapes
+// are rare in Jamf's specs (and tests will catch any divergence).
+func sameInlineShapeAsNamed(inline *openapi3.Schema, named *openapi3.SchemaRef) bool {
+	if inline == nil || named == nil || named.Value == nil {
+		return false
+	}
+	if len(inline.Properties) != len(named.Value.Properties) {
+		return false
+	}
+	for k := range inline.Properties {
+		if _, ok := named.Value.Properties[k]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
 // singularize returns a best-effort singular form of a plural noun — used
 // as the default XML element name for array items when the spec doesn't
 // provide one. Handles the common English plural suffixes Jamf uses
@@ -176,14 +693,32 @@ func singularize(plural string) string {
 }
 
 // uniqueSchemaName disambiguates a proposed schema name if the name is
-// already taken by an unrelated schema.
+// already taken by an unrelated schema. Checks both the spec namespace
+// (exact key collisions) AND the Go-identifier namespace produced by
+// goTypeName (e.g. "computer_extension_attributesItem" and
+// "computerExtensionAttributesItem" are distinct spec keys but map to
+// the same exported Go type "ComputerExtensionAttributesItem"). Without
+// the Go-name check the generator silently emits duplicate Go type
+// declarations and the package fails to compile.
 func uniqueSchemaName(doc *openapi3.T, base string) string {
-	if _, exists := doc.Components.Schemas[base]; !exists {
+	taken := func(s string) bool {
+		if _, exists := doc.Components.Schemas[s]; exists {
+			return true
+		}
+		want := goTypeName(s)
+		for k := range doc.Components.Schemas {
+			if goTypeName(k) == want {
+				return true
+			}
+		}
+		return false
+	}
+	if !taken(base) {
 		return base
 	}
 	for i := 2; ; i++ {
 		candidate := fmt.Sprintf("%s%d", base, i)
-		if _, exists := doc.Components.Schemas[candidate]; !exists {
+		if !taken(candidate) {
 			return candidate
 		}
 	}
@@ -421,6 +956,33 @@ var currentFieldOverrides map[string]string
 // Set to true for typesOnly specs where the writeOnly annotation is misleading.
 var suppressWriteOnly bool
 
+// currentEmitNullForOptional is the per-spec set of schemas whose optional
+// pointer fields must marshal as JSON null (no ",omitempty"). Threaded the
+// same way as currentFieldOverrides — set/cleared around extractTypes calls
+// in emit.go. Keys are snake_case (the form schemaToGoType derives via
+// goNameToSpecName), populated by buildEmitNullForOptionalSet.
+var currentEmitNullForOptional map[string]bool
+
+// currentFieldOrder carries the per-spec explicit property-emission order for
+// named schemas (config FieldOrder). Threaded like currentFieldOverrides —
+// set/cleared around extractTypes calls in emit.go. Outer key: spec-form
+// schema name (snake_case). Value: ordered list of property names.
+var currentFieldOrder map[string][]string
+
+// buildEmitNullForOptionalSet normalises a SpecDef.EmitNullForOptional list
+// into the snake_case lookup set the schema walker expects. Returns nil for
+// an empty input so callers can keep the "set then nil-out" pattern.
+func buildEmitNullForOptionalSet(names []string) map[string]bool {
+	if len(names) == 0 {
+		return nil
+	}
+	out := make(map[string]bool, len(names))
+	for _, n := range names {
+		out[toSnakeCase(n)] = true
+	}
+	return out
+}
+
 func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string) []GoType {
 	names := sortedKeys(doc.Components.Schemas)
 	var types []GoType
@@ -535,8 +1097,19 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 			continue
 		}
 
-		// Freeform object (no properties) → json.RawMessage
+		// Freeform object (no properties): JSON specs treat as
+		// json.RawMessage (the OpenAPI convention for unconstrained shape).
+		// XML specs need an empty struct instead — Classic emits per-type
+		// blocks like <powerbroker_identity_services/> whose presence is
+		// itself semantic and must round-trip as an empty element, not a
+		// freeform body.
 		if len(schema.Properties) == 0 && schema.AdditionalProperties.Schema == nil {
+			if format == "xml" {
+				t := schemaToGoType(name, schema, usage.isRequest, format)
+				t.XMLName = xmlName
+				types = append(types, t)
+				continue
+			}
 			comment := name + " represents a freeform JSON object."
 			if schema.Description != "" {
 				comment = name + " " + lowerFirst(cleanComment(schema.Description))
@@ -603,6 +1176,18 @@ func classicListWrapper(goName, specName string, schema *openapi3.Schema, doc *o
 	if resourceName == "" || resourceProp == nil {
 		return GoType{}, false
 	}
+	// Classic spec quirk: some list specs nest the resource property as
+	// `type: array` inside the items wrapper (computer_groups does this —
+	// `computer_groups.items.computer_group: type: array, items: {...}`)
+	// while the wire is still `<computer_groups><size/><computer_group>...
+	// </computer_group>*</computer_groups>`. Without descending, the
+	// wrapper emits `[][]ComputerGroupsItemComputerGroupItem` — a
+	// double-slice Go can't decode against the flat repeated-child wire.
+	// Drop the inner array; use its element type as the slice element.
+	if resourceProp.Ref == "" && resourceProp.Value != nil &&
+		resourceProp.Value.Type.Is("array") && resourceProp.Value.Items != nil {
+		resourceProp = resourceProp.Value.Items
+	}
 	resourceGo := refName(resourceProp)
 	fields := []GoField{}
 	if sizeProp != nil {
@@ -648,6 +1233,17 @@ func plural(singular string) string {
 // no-op on reads (server never populates it there) and populates cleanly
 // on writes.
 func addTopLevelIDsForClassic(types []GoType) {
+	// Named aliases to scalar types (e.g. `type Size = int`) are written
+	// as `*Size` in fields but are not real sub-objects; without this
+	// registry the loop misclassifies any type with a `*Size` field as
+	// "has a sub-object" and injects a bogus top-level ID into hoisted
+	// wrapper types like UserGroupCriteria / ComputerGroupComputers.
+	scalarAliases := map[string]bool{}
+	for _, t := range types {
+		if t.AliasTarget != "" && isScalar(t.AliasTarget) {
+			scalarAliases[t.Name] = true
+		}
+	}
 	for i := range types {
 		t := &types[i]
 		if len(t.Fields) == 0 || t.AliasTarget != "" || t.IsRawJSON || t.IsListWrapper {
@@ -662,9 +1258,11 @@ func addTopLevelIDsForClassic(types []GoType) {
 			// General, Connection, Scope — is a signal the server probably
 			// returns id at the top level on create while the spec nests it
 			// inside one of these children. Scalar ptr fields (*string, *int,
-			// *bool) and slice/map types don't count.
+			// *bool), scalar-aliased ptr fields (*Size), and slice/map types
+			// don't count.
 			if strings.HasPrefix(f.Type, "*") && !strings.HasPrefix(f.Type, "*[]") &&
 				!isScalar(strings.TrimPrefix(f.Type, "*")) &&
+				!scalarAliases[strings.TrimPrefix(f.Type, "*")] &&
 				!strings.HasPrefix(f.Type, "*map[") {
 				hasSubObject = true
 			}
@@ -853,7 +1451,7 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 
 	props, requiredList := flattenAllOf(schema)
 	required := toSet(requiredList)
-	for _, pnameRaw := range sortedKeys(props) {
+	for _, pnameRaw := range orderedProps(props, currentFieldOrder[specName]) {
 		propRef := props[pnameRaw]
 		// Classic's spec encodes deprecation inline in property names
 		// (e.g. `management_username deprecated="10.48"`). Everything after
@@ -928,6 +1526,17 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 		var fieldComment string
 		if !suppressWriteOnly && prop != nil && (prop.WriteOnly || prop.Format == "password") {
 			fieldComment = "Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update."
+		}
+
+		// Strip ",omitempty" when the enclosing schema is listed in the
+		// per-spec EmitNullForOptional set. Lets callers emit explicit JSON
+		// null for unpopulated optional pointer fields — required by Pro v3
+		// PUT /sso, whose validator rejects when expected fields are absent
+		// from the request body. Pointer wrapping is unchanged; only the
+		// marshal behaviour shifts from "omit when nil" to "emit null when
+		// nil". See SpecDef.EmitNullForOptional for full rationale.
+		if currentEmitNullForOptional[specName] {
+			jsonTag = strings.TrimSuffix(jsonTag, ",omitempty")
 		}
 
 		gt.Fields = append(gt.Fields, GoField{

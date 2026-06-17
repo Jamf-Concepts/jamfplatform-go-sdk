@@ -14,6 +14,15 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
 )
 
+// ptrProclassicPayloads wraps a raw .mobileconfig plist string in the
+// proclassic.PayloadsXMLText alias used by *ConfigurationProfileGeneral
+// since the Classic JSSResource double-decode workaround landed. Tests
+// continue to construct payloads as plain Go strings.
+func ptrProclassicPayloads(s string) *proclassic.PayloadsXMLText {
+	v := proclassic.PayloadsXMLText(s)
+	return &v
+}
+
 // ---------------------------------------------------------------------------
 // Apply acceptance tests — Classic (proclassic) resources + InventoryPreload
 //
@@ -1032,7 +1041,7 @@ func TestAcceptance_ApplyMobileDeviceConfigurationProfile(t *testing.T) {
 	id, created, err := pc.ApplyMobileDeviceConfigurationProfile(ctx, &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
 			Name:     ptrStr(name),
-			Payloads: ptrStr(minimalProfilePayload),
+			Payloads: ptrProclassicPayloads(minimalProfilePayload),
 		},
 	})
 	if err != nil {
@@ -1049,7 +1058,7 @@ func TestAcceptance_ApplyMobileDeviceConfigurationProfile(t *testing.T) {
 	id2, created2, err := pc.ApplyMobileDeviceConfigurationProfile(ctx, &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
 			Name:        ptrStr(name),
-			Payloads:    ptrStr(minimalProfilePayload),
+			Payloads:    ptrProclassicPayloads(minimalProfilePayload),
 			Description: ptrStr("updated"),
 		},
 	})
@@ -1137,7 +1146,7 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttribute(t *testing.T) {
 
 	id, created, err := pc.ApplyMobileDeviceExtensionAttribute(ctx, &proclassic.MobileDeviceExtensionAttribute{
 		Name:             ptrStr(name),
-		DateType:         ptrStr("String"),
+		DataType:         ptrStr("String"),
 		InventoryDisplay: ptrStr("General"),
 		InputType: &proclassic.MobileDeviceExtensionAttributeInputType{
 			Type: ptrStr("Text Field"),
@@ -1156,7 +1165,7 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttribute(t *testing.T) {
 
 	id2, created2, err := pc.ApplyMobileDeviceExtensionAttribute(ctx, &proclassic.MobileDeviceExtensionAttribute{
 		Name:             ptrStr(name),
-		DateType:         ptrStr("String"),
+		DataType:         ptrStr("String"),
 		InventoryDisplay: ptrStr("General"),
 		Description:      ptrStr("updated"),
 		InputType: &proclassic.MobileDeviceExtensionAttributeInputType{
@@ -1306,7 +1315,7 @@ func TestAcceptance_ApplyOSXConfigurationProfile(t *testing.T) {
 	id, created, err := pc.ApplyOSXConfigurationProfile(ctx, &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
 			Name:     ptrStr(name),
-			Payloads: ptrStr(minimalProfilePayload),
+			Payloads: ptrProclassicPayloads(minimalProfilePayload),
 		},
 	})
 	if err != nil {
@@ -1323,7 +1332,7 @@ func TestAcceptance_ApplyOSXConfigurationProfile(t *testing.T) {
 	id2, created2, err := pc.ApplyOSXConfigurationProfile(ctx, &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
 			Name:        ptrStr(name),
-			Payloads:    ptrStr(minimalProfilePayload),
+			Payloads:    ptrProclassicPayloads(minimalProfilePayload),
 			Description: ptrStr("updated"),
 		},
 	})
@@ -1439,6 +1448,81 @@ func TestAcceptance_ApplyPolicy(t *testing.T) {
 	}
 	if id2 != id {
 		t.Errorf("id changed: %s → %s", id, id2)
+	}
+
+	// Update again with the new-shape pure-scalar fields the schemaPatches
+	// pass added: Reboot block, SelfService notification scalars, account
+	// maintenance hint + secure_token_allowed, no_execute_on day list, plus
+	// the two renamed tags (reinstall_button_text, allow_users_to_defer).
+	// External-reference fields (JssUsers/JssUserGroups membership, Printers
+	// item references) are intentionally skipped — they need real tenant
+	// IDs and would make the test brittle.
+	_, _, err = pc.ApplyPolicy(ctx, &proclassic.PolicyPost{
+		General: &proclassic.PolicyPostGeneral{
+			Name:    ptrStr(name),
+			Enabled: ptrBool(true),
+			DateTimeLimitations: &proclassic.PolicyGeneralDateTimeLimitations{
+				NoExecuteOn: &proclassic.PolicyGeneralDateTimeLimitationsNoExecuteOn{
+					Day: &[]string{"Sun", "Sat"},
+				},
+				NoExecuteStart: ptrStr("2:00 AM"),
+				NoExecuteEnd:   ptrStr("4:00 AM"),
+			},
+		},
+		Reboot: &proclassic.PolicyPostReboot{
+			Message:                     ptrStr("SDK acceptance test reboot."),
+			MinutesUntilReboot:          ptrInt(10),
+			StartRebootTimerImmediately: ptrBool(true),
+			FileVault2Reboot:            ptrBool(false),
+		},
+		SelfService: &proclassic.PolicyPostSelfService{
+			UseForSelfService:   ptrBool(true),
+			InstallButtonText:   ptrStr("Install"),
+			ReinstallButtonText: ptrStr("Reinstall"),
+			Notification:        &proclassic.NotificationValue{Enabled: ptrBool(true)},
+			NotificationType:    ptrStr("Self Service"),
+			NotificationSubject: ptrStr("SDK acceptance"),
+			NotificationMessage: ptrStr("hello"),
+		},
+		// AccountMaintenance accounts block omitted: action=Create is
+		// semantically validated by the server ("Problem with create
+		// account fields" 409 even with a full plausible payload), not a
+		// pure metadata round-trip. The Hint / SecureTokenAllowed /
+		// PasswordSha256 additions are still covered by the unit-level
+		// round-trip in policy_classic_roundtrip_test.go.
+		UserInteraction: &proclassic.PolicyPostUserInteraction{
+			MessageStart:         ptrStr("SDK acceptance start."),
+			AllowUsersToDefer:    ptrBool(true),
+			AllowDeferralMinutes: ptrInt(1440),
+		},
+	})
+	if err != nil {
+		t.Fatalf("apply update with new-shape fields: %v", err)
+	}
+
+	// GET back and assert the patched fields decoded — the brief flagged
+	// `re-install_button_text` / `allow_user_to_defer` as silent decode
+	// failures because the spec tags didn't match the wire. The renamed
+	// tags must round-trip through GetPolicyByID for the fix to actually
+	// be load-bearing.
+	got, err := pc.GetPolicyByID(ctx, id)
+	if err != nil {
+		t.Fatalf("get after update: %v", err)
+	}
+	if got.SelfService == nil || got.SelfService.ReinstallButtonText == nil || *got.SelfService.ReinstallButtonText != "Reinstall" {
+		t.Errorf("ReinstallButtonText not round-tripped: %+v", got.SelfService)
+	}
+	if got.UserInteraction == nil || got.UserInteraction.AllowUsersToDefer == nil || !*got.UserInteraction.AllowUsersToDefer {
+		t.Errorf("AllowUsersToDefer not round-tripped: %+v", got.UserInteraction)
+	}
+	if got.Reboot == nil || got.Reboot.MinutesUntilReboot == nil || *got.Reboot.MinutesUntilReboot != 10 {
+		t.Errorf("Reboot.MinutesUntilReboot not round-tripped: %+v", got.Reboot)
+	}
+	if got.General == nil || got.General.DateTimeLimitations == nil ||
+		got.General.DateTimeLimitations.NoExecuteOn == nil ||
+		got.General.DateTimeLimitations.NoExecuteOn.Day == nil ||
+		len(*got.General.DateTimeLimitations.NoExecuteOn.Day) == 0 {
+		t.Errorf("no_execute_on.day list not round-tripped: %+v", got.General)
 	}
 
 	if err := pc.DeletePolicyByID(ctx, id); err != nil {

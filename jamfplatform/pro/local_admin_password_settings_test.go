@@ -11,16 +11,16 @@ import (
 	"testing"
 )
 
-func TestGetCacheSettingsV1(t *testing.T) {
+func TestGetLocalAdminPasswordSettingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cache-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
-	result, err := c.GetCacheSettingsV1(context.Background())
+	result, err := c.GetLocalAdminPasswordSettingsV2(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,9 +29,9 @@ func TestGetCacheSettingsV1(t *testing.T) {
 	}
 }
 
-func TestGetCacheSettingsV1_NotFound(t *testing.T) {
+func TestGetLocalAdminPasswordSettingsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cache-settings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/settings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -39,22 +39,22 @@ func TestGetCacheSettingsV1_NotFound(t *testing.T) {
 		})
 	})
 
-	_, err := c.GetCacheSettingsV1(context.Background())
+	_, err := c.GetLocalAdminPasswordSettingsV2(context.Background())
 	if err == nil {
 		t.Fatal("expected error")
 	}
 }
 
-func TestUpdateCacheSettingsV1(t *testing.T) {
+func TestUpdateLocalAdminPasswordSettingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cache-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
-	result, err := c.UpdateCacheSettingsV1(context.Background(), &CacheSettings{})
+	result, err := c.UpdateLocalAdminPasswordSettingsV2(context.Background(), &LocalAdminPasswordSettings{})
 	if err != nil {
 		t.Fatal(err)
 	}

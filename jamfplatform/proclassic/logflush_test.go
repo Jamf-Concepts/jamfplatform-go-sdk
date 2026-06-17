@@ -17,7 +17,7 @@ func TestDeleteLogFlush(t *testing.T) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 	})
 
 	err := c.DeleteLogFlush(context.Background(), &Logflush{})
@@ -32,7 +32,7 @@ func TestDeleteLogFlushByLogIDInterval(t *testing.T) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 	})
 
 	err := c.DeleteLogFlushByLogIDInterval(context.Background(), "test-id", "test-id", "test-id")
@@ -47,7 +47,7 @@ func TestDeleteLogFlushByLogInterval(t *testing.T) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 	})
 
 	err := c.DeleteLogFlushByLogInterval(context.Background(), "test-id", "test-id")

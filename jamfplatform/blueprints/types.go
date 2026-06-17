@@ -273,6 +273,26 @@ type CreateScope struct {
 	DeviceGroups []string `json:"deviceGroups"`
 }
 
+// CustomDeclaration A single Apple declarative device management declaration entry.
+type CustomDeclaration struct {
+	ChannelType DeclarationChannelType `json:"channelType"`
+	Kind        DeclarationKind        `json:"kind"`
+	Payload     map[string]any         `json:"payload"`
+	PayloadKey  int                    `json:"payloadKey"`
+	Type        string                 `json:"type"`
+}
+
+// CustomDeclarationsComponent Blueprint component that delivers any Apple declarative device management declarations to managed devices.
+type CustomDeclarationsComponent struct {
+	Configuration CustomDeclarationsConfiguration `json:"configuration"`
+	Identifier    string                          `json:"identifier"`
+}
+
+// CustomDeclarationsConfiguration Configuration object containing one or more Apple declarative device management declarations. ### Example — single configuration declaration ```json { "declarations": [ { "type": "com.apple.configuration.passcode.settings", "channelType": "SYSTEM", "kind": "CONFIGURATION", "payload": { "RequirePasscode": true, "MinimumLength": 8, "MaximumFailedAttempts": 10 }, "payloadKey": 1 } ] } ``` ### Example — configuration declaration referencing an asset A configuration declaration can reference an asset declaration defined in the same `declarations` array using the `$PAYLOAD_<payloadKey>` placeholder. The `payloadKey` values are local to the declarations list in this request — they do not need to be globally unique or consistent across requests: ```json { "declarations": [ { "type": "com.apple.asset.credential.userpassword", "channelType": "SYSTEM", "kind": "ASSET", "payload": { "Reference": { "DataURL": "https://example.com/asset-data/credential.json", "ContentType": "application/json" } }, "payloadKey": 1 }, { "type": "com.apple.configuration.account.caldav", "channelType": "SYSTEM", "kind": "CONFIGURATION", "payload": { "HostName": "caldav.example.com", "VisibleName": "Work Calendar", "AuthenticationCredentialsAssetReference": "$PAYLOAD_1" }, "payloadKey": 2 } ] } ```.
+type CustomDeclarationsConfiguration struct {
+	Declarations []CustomDeclaration `json:"declarations"`
+}
+
 // CustomRegex represents a custom regex.
 type CustomRegex struct {
 	Description *map[string]string `json:"Description,omitempty"`
@@ -280,6 +300,12 @@ type CustomRegex struct {
 	Included *bool   `json:"Included,omitempty"`
 	Regex    *string `json:"Regex,omitempty"`
 }
+
+// DeclarationChannelType represents a declaration channel type value.
+type DeclarationChannelType = string
+
+// DeclarationKind represents a declaration kind value.
+type DeclarationKind = string
 
 // Deferrals represents a deferrals.
 type Deferrals struct {
@@ -347,6 +373,40 @@ type InputModes struct {
 	Included       *bool `json:"Included,omitempty"`
 	RPN            bool  `json:"RPN"`
 	UnitConversion bool  `json:"UnitConversion"`
+}
+
+// ManagedAppAttributes Fine-grained app behavior settings. All fields are optional. **iOS 18.1+ note:** `Hideable` and `Lockable` require iOS 18.1 or later. When `Lockable` is `false`, `Hideable` is required and must also be `false`.
+type ManagedAppAttributes struct {
+	AssociatedDomains                      *[]string `json:"AssociatedDomains,omitempty"`
+	AssociatedDomainsEnableDirectDownloads *bool     `json:"AssociatedDomainsEnableDirectDownloads,omitempty"`
+	CellularSliceUUID                      *string   `json:"CellularSliceUUID,omitempty"`
+	DNSProxyUUID                           *string   `json:"DNSProxyUUID,omitempty"`
+	Hideable                               *bool     `json:"Hideable,omitempty"`
+	Lockable                               *bool     `json:"Lockable,omitempty"`
+	TapToPayScreenLock                     *bool     `json:"TapToPayScreenLock,omitempty"`
+}
+
+// ManagedAppComponent Blueprint component that installs and manages volume purchasing apps on managed devices.
+type ManagedAppComponent struct {
+	Configuration ManagedAppConfiguration `json:"configuration"`
+	Identifier    string                  `json:"identifier"`
+}
+
+// ManagedAppConfiguration Configuration for one or more volume purchasing apps. ### Example — single required app ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required", "AutomaticAppUpdates": "AlwaysOn" } ] } ``` ### Example — app with attributes (iOS 18.1+) ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required", "AllowDownloadsOverCellular": "AlwaysOff", "AutomaticAppUpdates": "AlwaysOn", "IncludeInBackup": true, "Attributes": { "Hideable": true, "Lockable": true, "AssociatedDomains": ["corp.example.com"], "AssociatedDomainsEnableDirectDownloads": false } } ] } ``` ### Example — multiple apps in one component ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required" }, { "AssetId": "12345678-0000-0000-0000-000000000001", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Word", "Install": "Optional", "AutomaticAppUpdates": "StoreSettings" } ] } ```.
+type ManagedAppConfiguration struct {
+	Apps []ManagedAppEntry `json:"apps"`
+}
+
+// ManagedAppEntry Configuration for a single volume purchasing app.
+type ManagedAppEntry struct {
+	AllowDownloadsOverCellular *string               `json:"AllowDownloadsOverCellular,omitempty"`
+	AppAndBookTokenID          string                `json:"AppAndBookTokenId"`
+	AppID                      string                `json:"AppId"`
+	AssetID                    string                `json:"AssetId"`
+	Attributes                 *ManagedAppAttributes `json:"Attributes,omitempty"`
+	AutomaticAppUpdates        *string               `json:"AutomaticAppUpdates,omitempty"`
+	IncludeInBackup            *bool                 `json:"IncludeInBackup,omitempty"`
+	Install                    *string               `json:"Install,omitempty"`
 }
 
 // ManagedExtension represents a managed extension.

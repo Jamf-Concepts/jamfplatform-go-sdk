@@ -72,6 +72,14 @@
             "example": "John Smith",
             "type": "string"
           },
+          "password": {
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "password_sha256": {
+            "type": "string"
+          },
           "privilege_set": {
             "enum": [
               "Administrator",
@@ -2189,18 +2197,16 @@
           "general": {
             "properties": {
               "command": {
-                "description": "Command type. (UnlockUserAccount (deprecated on 2025-07-07) and DeleteUser (deprecated on 2025-02-25) require a DEP enrolled device, EnableRemoteDesktop and DisableRemoteDesktop require macOS 10.14.4 or later)",
+                "description": "Command type. (UnlockUserAccount (deprecated on 2025-07-07) requires a DEP enrolled device, EnableRemoteDesktop and DisableRemoteDesktop require macOS 10.14.4 or later)",
                 "enum": [
-                  "BlankPush(BlankPush Deprecated on 2025-05-27)",
                   "UnlockUserAccount(deprecated on 2025-07-07)",
-                  "DeleteUser(DeleteUser on Deprecated 2025-02-25)",
                   "EnableRemoteDesktop (macOS 10.14.4 and later)",
                   "DisableRemoteDesktop (macOS 10.14.4 and later)"
                 ],
                 "type": "string"
               },
               "user_name": {
-                "description": "Username for UnlockUserAccount (deprecated on 2025-07-07) and DeleteUser (deprecated on 2025-02-25) commands",
+                "description": "Username for UnlockUserAccount (deprecated on 2025-07-07) command",
                 "example": "administrator",
                 "type": "string"
               }
@@ -3995,6 +4001,9 @@
             "description": "Password for basic authentication",
             "type": "string"
           },
+          "http_password_sha256": {
+            "type": "string"
+          },
           "http_url": {
             "description": "URL to download packages from",
             "example": "http://ny.company.com/CasperShare",
@@ -4051,6 +4060,9 @@
             "example": "password",
             "type": "string"
           },
+          "read_only_password_sha256": {
+            "type": "string"
+          },
           "read_only_username": {
             "description": "Account with read only privileges to the share",
             "example": "casperinstall",
@@ -4059,6 +4071,9 @@
           "read_write_password": {
             "description": "Password for the read/write account",
             "example": "password",
+            "type": "string"
+          },
+          "read_write_password_sha256": {
             "type": "string"
           },
           "read_write_username": {
@@ -4074,6 +4089,9 @@
           "share_port": {
             "example": 139,
             "type": "integer"
+          },
+          "ssh_password_sha256": {
+            "type": "string"
           },
           "ssh_username": {
             "example": "username",
@@ -5211,9 +5229,7 @@
             "enum": [
               "EraseDevice",
               "DeviceLock",
-              "ClearPasscode",
-              "EnableLostMode",
-              "DisableLostMode"
+              "EnableLostMode"
             ],
             "type": "string"
           },
@@ -5394,6 +5410,11 @@
           "disabled": {
             "default": false,
             "type": "boolean"
+          },
+          "encryption_key": {
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
           },
           "id": {
             "example": 1,
@@ -7905,14 +7926,10 @@
               "command": {
                 "description": "Command to send device",
                 "enum": [
-                  "ClearPasscode (Deprecated on 2025-04-03)",
-                  "UpdateInventory",
-                  "BlankPush",
-                  "Wallpaper (supervised only)",
-                  "RestartDevice (deprecated on 2025-02-25) (supervised only)",
+                  "UpdateInventory (Deprecated on 2026-03-13)",
+                  "Wallpaper (supervised only) (Deprecated on 2026-03-13)",
                   "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) (shared iPad only)",
                   "EnableLostMode (supervised only)",
-                  "DisableLostMode (supervised and in lost mode only) (DisableLostMode deprecated 5-30-2025)",
                   "DeviceLocation (supervised and in lost mode only) (DeviceLocation Deprecated on 2025-06-12)",
                   "PlayLostModeSound (supervised and in lost mode only) (PlayLostModeSound Deprecated on 2025-06-12)"
                 ],
@@ -9791,6 +9808,18 @@
       },
       "network_segment_post": {
         "properties": {
+          "building": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          },
+          "distribution_point": {
+            "type": "string"
+          },
+          "distribution_server": {
+            "type": "string"
+          },
           "ending_address": {
             "example": "10.10.1.1",
             "type": "string"
@@ -9813,6 +9842,12 @@
           },
           "starting_address": {
             "example": "10.1.1.1",
+            "type": "string"
+          },
+          "swu_server": {
+            "type": "string"
+          },
+          "url": {
             "type": "string"
           }
         },
@@ -10434,6 +10469,12 @@
       },
       "patch_external_source": {
         "properties": {
+          "certificate_validation_enabled": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
           "host_name": {
             "example": "patch.url.com/v1",
             "type": "string"
@@ -12350,6 +12391,9 @@
           "notes": {
             "type": "string"
           },
+          "os_requirements": {
+            "type": "string"
+          },
           "ppd": {
             "example": "9th_Floor_HP.ppd",
             "type": "string"
@@ -12360,6 +12404,9 @@
           "ppd_path": {
             "example": "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Resources/Generic.ppd",
             "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
           },
           "uri": {
             "example": "lpd://10.1.20.204/",
@@ -13960,6 +14007,12 @@
             ],
             "type": "string"
           },
+          "hash_algorithm": {
+            "type": "string"
+          },
+          "header": {
+            "type": "string"
+          },
           "id": {
             "example": 1,
             "type": "integer"
@@ -13974,6 +14027,9 @@
           "read_timeout": {
             "default": 2,
             "description": "Number of seconds to wait for a response from the webhooks host server after sending a request",
+            "type": "integer"
+          },
+          "smart_group_id": {
             "type": "integer"
           },
           "url": {
@@ -14031,7 +14087,7 @@
     },
     "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
     "title": "Classic API",
-    "version": "11.26.0"
+    "version": "11.28.0"
   },
   "openapi": "3.0.1",
   "paths": {
@@ -18059,7 +18115,7 @@
         ]
       },
       "post": {
-        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameter | Requirements |\n| ------- | --------- | ------------ |\n| DeleteUser (deprecated on 2025-02-25) (deprecated on 2025-02-25) | user_name | DEP enrolled device and user_name value (string) |\n| DisableRemoteDesktop | N/A | macOS 10.14.4 or later |\n| EnableRemoteDesktop | N/A | macOS 10.14.4 or later |\n| UnlockUserAccount (deprecated on 2025-07-07)| user_name |  DEP enrolled device and user_name value (string) |\n\n\n**Required Permissions:** `create:pro:computer-commands`",
+        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameter | Requirements |\n| ------- | --------- | ------------ |\n| DisableRemoteDesktop | N/A | macOS 10.14.4 or later |\n| EnableRemoteDesktop | N/A | macOS 10.14.4 or later |\n| UnlockUserAccount (deprecated on 2025-07-07)| user_name |  DEP enrolled device and user_name value (string) |\n\n\n**Required Permissions:** `create:pro:computer-commands`",
         "operationId": "createComputerCommandByCommand",
         "parameters": [
           {
@@ -18071,7 +18127,6 @@
             "required": true,
             "schema": {
               "enum": [
-                "BlankPush(BlankPush Deprecated on 2025-05-27)",
                 "EnableRemoteDesktop (macOS 10.14.4 and later)",
                 "DisableRemoteDesktop (macOS 10.14.4 and later)"
               ],
@@ -18115,7 +18170,6 @@
             "required": true,
             "schema": {
               "enum": [
-                "BlankPush (Deprecated on 2025-05-27)",
                 "EnableRemoteDesktop",
                 "DisableRemoteDesktop"
               ],
@@ -27772,7 +27826,7 @@
     },
     "/tenant/{tenantId}/mobiledevicecommands/command": {
       "post": {
-        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values  |\n| ---------- | ------- | ------------ | ------  |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A  |\n| DisableLostMode (DisableLostMode deprecated 5-30-2025) | N/A | Supervised and in lost mode | N/A  |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string  |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string  |\n| EnableLostMode | lost_mode_footnote | optional | string  |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean  |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean  |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer)  |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A  |\n| RestartDevice (deprecated) | N/A | Supervised device | N/A  |\n| Wallpaper | wallpaper_settings | Supervised device | 1 = Lock screen, 2 = Home screen, 3 = both  |\n| Wallpaper | wallpaper_id | Supervised device (required if wallpaper_content is not set) | Jamf Pro icon ID (integer)  |\n| Wallpaper | wallpaper_content | Supervised device (required if wallpaper_id is not set) | base64 encoded PNG or JPEG  |\n| RefreshCellularPlans (RefreshCellularPlans deprecated on 2025-07-15) | e_sim_server_url | N/A | This URL is obtained from each carrier separately |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
+        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values  |\n| ---------- | ------- | ------------ | ------  |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A  |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string  |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string  |\n| EnableLostMode | lost_mode_footnote | optional | string  |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean  |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean  |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer)  |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A  |\n| Wallpaper (Deprecated on 2026-03-13) | wallpaper_settings | Supervised device | 1 = Lock screen, 2 = Home screen, 3 = both  |\n| Wallpaper (Deprecated on 2026-03-13) | wallpaper_id | Supervised device (required if wallpaper_content is not set) | Jamf Pro icon ID (integer)  |\n| Wallpaper (Deprecated on 2026-03-13) | wallpaper_content | Supervised device (required if wallpaper_id is not set) | base64 encoded PNG or JPEG  |\n| RefreshCellularPlans (RefreshCellularPlans deprecated on 2025-07-15) | e_sim_server_url | N/A | This URL is obtained from each carrier separately |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
         "operationId": "createMobileDeviceCommand_tenant_tenantId_mobiledevicecommands_command",
         "parameters": [
           {
@@ -27862,7 +27916,7 @@
         ]
       },
       "post": {
-        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values |\n| ---------- | ------- | ------------ | ------ |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12)| N/A | Supervised and in lost mode | N/A |\n| DisableLostMode (DisableLostMode deprecated 5-30-2025) | N/A | Supervised and in lost mode | N/A |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string |\n| EnableLostMode | lost_mode_footnote | optional | string |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer) |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A |\n| RestartDevice (deprecated) | N/A | Supervised device | N/A |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
+        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values |\n| ---------- | ------- | ------------ | ------ |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12)| N/A | Supervised and in lost mode | N/A |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string |\n| EnableLostMode | lost_mode_footnote | optional | string |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer) |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
         "operationId": "createMobileDeviceCommandURL",
         "parameters": [
           {
@@ -27875,16 +27929,12 @@
             "required": true,
             "schema": {
               "enum": [
-                "BlankPush(Deprecated on 2025-05-27)",
-                "ClearPasscode (Deprecated on 2025-04-03)",
                 "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)",
-                "DisableLostMode (DisableLostMode deprecated 5-30-2025)",
                 "EnableLostMode",
                 "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)",
                 "PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12)",
-                "RestartDevice (deprecated on 2025-02-25)",
                 "Settings",
-                "UpdateInventory"
+                "UpdateInventory (Deprecated on 2026-03-13)"
               ],
               "type": "string"
             }
@@ -27914,7 +27964,7 @@
     },
     "/tenant/{tenantId}/mobiledevicecommands/command/{command}/id/{id_list}": {
       "post": {
-        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values |\n| ---------- | ------- | ------------ | ------ |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12)| N/A | Supervised and in lost mode | N/A |\n| DisableLostMode (DisableLostMode deprecated 5-30-2025) | N/A | Supervised and in lost mode | N/A |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string |\n| EnableLostMode | lost_mode_footnote | optional | string |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer) |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A |\n| RestartDevice (deprecated) | N/A | Supervised device | N/A |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
+        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values |\n| ---------- | ------- | ------------ | ------ |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12)| N/A | Supervised and in lost mode | N/A |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string |\n| EnableLostMode | lost_mode_footnote | optional | string |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer) |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
         "operationId": "createMobileDeviceCommandURL_tenant_tenantId_mobiledevicecommands_command_command_id_id_list",
         "parameters": [
           {
@@ -27936,16 +27986,12 @@
             "required": true,
             "schema": {
               "enum": [
-                "BlankPush(Deprecated on 2025-05-27)",
-                "ClearPasscode (Deprecated on 2025-04-03)",
                 "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)",
-                "DisableLostMode (DisableLostMode deprecated 5-30-2025)",
                 "EnableLostMode",
                 "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)",
                 "PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12)",
-                "RestartDevice (deprecated on 2025-02-25)",
                 "Settings",
-                "UpdateInventory"
+                "UpdateInventory (Deprecated on 2026-03-13)"
               ],
               "type": "string"
             }
@@ -27975,7 +28021,7 @@
     },
     "/tenant/{tenantId}/mobiledevicecommands/command/{command}/{parameter}/id/{id_list}": {
       "post": {
-        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values |\n| ---------- | ------- | ------------ | ------ |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12)| N/A | Supervised and in lost mode | N/A |\n| DisableLostMode (DisableLostMode deprecated 5-30-2025) | N/A | Supervised and in lost mode | N/A |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string |\n| EnableLostMode | lost_mode_footnote | optional | string |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer) |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A |\n| RestartDevice (deprecated) | N/A | Supervised device | N/A |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
+        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values |\n| ---------- | ------- | ------------ | ------ |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12)| N/A | Supervised and in lost mode | N/A |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string |\n| EnableLostMode | lost_mode_footnote | optional | string |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer) |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
         "operationId": "createMobileDeviceCommandURL_tenant_tenantId_mobiledevicecommands_command_command_parameter_id_id_list",
         "parameters": [
           {
@@ -27997,16 +28043,12 @@
             "required": true,
             "schema": {
               "enum": [
-                "BlankPush(Deprecated on 2025-05-27)",
-                "ClearPasscode (Deprecated on 2025-04-03)",
                 "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)",
-                "DisableLostMode (DisableLostMode deprecated 5-30-2025)",
                 "EnableLostMode",
                 "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)",
                 "PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12)",
-                "RestartDevice (deprecated on 2025-02-25)",
                 "Settings",
-                "UpdateInventory"
+                "UpdateInventory (Deprecated on 2026-03-13)"
               ],
               "type": "string"
             }
@@ -28045,7 +28087,7 @@
     },
     "/tenant/{tenantId}/mobiledevicecommands/command/{command}/{parameter}/{version}/id/{id_list}": {
       "post": {
-        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values |\n| ---------- | ------- | ------------ | ------ |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12)| N/A | Supervised and in lost mode | N/A |\n| DisableLostMode (DisableLostMode deprecated 5-30-2025) | N/A | Supervised and in lost mode | N/A |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string |\n| EnableLostMode | lost_mode_footnote | optional | string |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer) |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A |\n| RestartDevice (deprecated) | N/A | Supervised device | N/A |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
+        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values |\n| ---------- | ------- | ------------ | ------ |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12)| N/A | Supervised and in lost mode | N/A |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string |\n| EnableLostMode | lost_mode_footnote | optional | string |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer) |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
         "operationId": "createMobileDeviceCommandURL_tenant_tenantId_mobiledevicecommands_command_command_parameter_version_id_id_list",
         "parameters": [
           {
@@ -28067,16 +28109,12 @@
             "required": true,
             "schema": {
               "enum": [
-                "BlankPush(Deprecated on 2025-05-27)",
-                "ClearPasscode (Deprecated on 2025-04-03)",
                 "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)",
-                "DisableLostMode (DisableLostMode deprecated 5-30-2025)",
                 "EnableLostMode",
                 "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)",
                 "PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12)",
-                "RestartDevice (deprecated on 2025-02-25)",
                 "Settings",
-                "UpdateInventory"
+                "UpdateInventory (Deprecated on 2026-03-13)"
               ],
               "type": "string"
             }
@@ -28172,7 +28210,7 @@
         ]
       },
       "post": {
-        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values  |\n| ---------- | ------- | ------------ | ------  |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A  |\n| DisableLostMode (DisableLostMode deprecated 5-30-2025) | N/A | Supervised and in lost mode | N/A  |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string  |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string  |\n| EnableLostMode | lost_mode_footnote | optional | string  |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean  |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean  |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer)  |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A  |\n| RestartDevice (deprecated) | N/A | Supervised device | N/A  |\n| Wallpaper | wallpaper_settings | Supervised device | 1 = Lock screen, 2 = Home screen, 3 = both  |\n| Wallpaper | wallpaper_id | Supervised device (required if wallpaper_content is not set) | Jamf Pro icon ID (integer)  |\n| Wallpaper | wallpaper_content | Supervised device (required if wallpaper_id is not set) | base64 encoded PNG or JPEG  |\n| RefreshCellularPlans (RefreshCellularPlans deprecated on 2025-07-15) | e_sim_server_url | N/A | This URL is obtained from each carrier separately |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
+        "description": "The chart below includes additional requirements for usage of specific commands\n\n| command | Parameters | Requirements | Values  |\n| ---------- | ------- | ------------ | ------  |\n| DeviceLocation (DeviceLocation Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A  |\n| EnableLostMode | lost_mode_message | Supervised device (required if lost_mode_phone is not set) | string  |\n| EnableLostMode | lost_mode_phone | Supervised device (required if lost_mode_message is not set) | string  |\n| EnableLostMode | lost_mode_footnote | optional | string  |\n| EnableLostMode | always_enforce_lost_mode | optional (defaults to 'true') | boolean  |\n| EnableLostMode | lost_mode_with_sound | optional (defaults to 'false') | boolean  |\n| PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) | passcode_lock_grace_period | Shared iPad | seconds (integer)  |\n| PlayLostModeSound (PlayLostModeSound Deprecated on 2025-06-12) | N/A | Supervised and in lost mode | N/A  |\n| Wallpaper (Deprecated on 2026-03-13) | wallpaper_settings | Supervised device | 1 = Lock screen, 2 = Home screen, 3 = both  |\n| Wallpaper (Deprecated on 2026-03-13) | wallpaper_id | Supervised device (required if wallpaper_content is not set) | Jamf Pro icon ID (integer)  |\n| Wallpaper (Deprecated on 2026-03-13) | wallpaper_content | Supervised device (required if wallpaper_id is not set) | base64 encoded PNG or JPEG  |\n| RefreshCellularPlans (RefreshCellularPlans deprecated on 2025-07-15) | e_sim_server_url | N/A | This URL is obtained from each carrier separately |\n\n\n**Required Permissions:** `create:pro:mobile-devices`, `create:pro:mobile-device-commands`",
         "operationId": "createMobileDeviceCommand",
         "parameters": [
           {

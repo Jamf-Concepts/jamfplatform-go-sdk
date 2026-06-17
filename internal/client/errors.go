@@ -86,13 +86,34 @@ func (e *APIResponseError) Error() string {
 	if len(e.Errors) > 0 {
 		details := make([]string, len(e.Errors))
 		for i, err := range e.Errors {
-			details[i] = fmt.Sprintf("[%s] %s: %s", err.Code, err.Field, err.Description)
+			details[i] = formatDetail(err)
 		}
 		return fmt.Sprintf("API request failed with status %d, traceId %s (%s): %s",
 			e.StatusCode, e.TraceID, requestInfo, strings.Join(details, "; "))
 	}
 
+	if e.TraceID != "" {
+		return fmt.Sprintf("API request failed with status %s, traceId %s (%s): %s", statusDetail, e.TraceID, requestInfo, e.Body)
+	}
 	return fmt.Sprintf("API request failed with status %s (%s): %s", statusDetail, requestInfo, e.Body)
+}
+
+// formatDetail renders a single structured error detail, omitting the Code or
+// Field segment when empty so a code-less or field-less detail — such as one
+// synthesised from a Classic API HTML error page (Description only) — does not
+// produce stray "[] :" noise. Also tidies the Pro case of a present Code with
+// an empty Field.
+func formatDetail(d Error) string {
+	switch {
+	case d.Code != "" && d.Field != "":
+		return fmt.Sprintf("[%s] %s: %s", d.Code, d.Field, d.Description)
+	case d.Code != "":
+		return fmt.Sprintf("[%s] %s", d.Code, d.Description)
+	case d.Field != "":
+		return fmt.Sprintf("%s: %s", d.Field, d.Description)
+	default:
+		return d.Description
+	}
 }
 
 // Details returns the structured error details parsed from the API response

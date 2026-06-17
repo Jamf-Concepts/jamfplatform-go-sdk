@@ -149,6 +149,45 @@ func sortedKeys[V any](m map[string]V) []string {
 	return keys
 }
 
+// orderedProps returns map keys in the order given by explicit, with any
+// remaining keys appended alphabetically. If explicit is nil or empty it
+// degenerates to sortedKeys. Prop keys that carry deprecation metadata
+// (e.g. "field_name deprecated=10.48") are matched by their bare name.
+func orderedProps[V any](m map[string]V, explicit []string) []string {
+	if len(explicit) == 0 {
+		return sortedKeys(m)
+	}
+	// Build a stripped-name → raw-key index so we can match explicit entries
+	// against keys that may carry deprecation suffixes.
+	stripped := make(map[string]string, len(m)) // stripped name → raw map key
+	for k := range m {
+		bare := k
+		if i := strings.IndexAny(bare, " \t"); i >= 0 {
+			bare = bare[:i]
+		}
+		stripped[bare] = k
+	}
+	seen := make(map[string]bool, len(m))
+	result := make([]string, 0, len(m))
+	for _, name := range explicit {
+		raw, ok := stripped[name]
+		if !ok {
+			continue // name in explicit list but absent from map — skip
+		}
+		result = append(result, raw)
+		seen[raw] = true
+	}
+	// Append remaining keys alphabetically.
+	remaining := make([]string, 0, len(m)-len(seen))
+	for k := range m {
+		if !seen[k] {
+			remaining = append(remaining, k)
+		}
+	}
+	sort.Strings(remaining)
+	return append(result, remaining...)
+}
+
 // toSnakeCase converts titles to snake_case filenames.
 // Handles spaces ("Device Inventory API" → "device_inventory_api"),
 // camelCase ("DDMReport" → "ddm_report"), and mixed input.

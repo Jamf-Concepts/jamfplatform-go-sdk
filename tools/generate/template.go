@@ -97,6 +97,8 @@ var funcMap = template.FuncMap{
 		switch t {
 		case "string", "bool", "int", "int32", "int64", "float32", "float64":
 			return "new(" + t + ")"
+		case "[]byte":
+			return "[]byte{}"
 		}
 		return "&" + t + "{}"
 	},
@@ -339,7 +341,7 @@ func (m {{ .Name }}) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(map[string]string{"{{ .Discriminator.PropertyName }}": m.{{ .Discriminator.GoFieldName }}})
 }
-{{- else if .Fields }}
+{{- else if or .Fields (and (eq $.Format "xml") .XMLName) }}
 // {{ .Comment }}
 type {{ .Name }} struct {
 {{- if and (eq $.Format "xml") .XMLName }}
@@ -516,14 +518,14 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 
 {{- define "update" }}
 // {{ .Comment }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 {{- if .ContentType }}
-	if err := c.transport.DoWithContentType(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, nil); err != nil {
+	if err := c.transport.DoWithContentType(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, nil); err != nil {
 {{- else }}
-	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, {{ statusConst .ExpectedStatus }}, nil); err != nil {
+	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, {{ statusConst .ExpectedStatus }}, nil); err != nil {
 {{- end }}
 		return fmt.Errorf({{ errWrap . }})
 	}

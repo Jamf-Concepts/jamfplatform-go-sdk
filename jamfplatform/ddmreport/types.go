@@ -32,6 +32,12 @@ type DeclarationReportDto struct {
 	TotalCount            int64                        `json:"totalCount"`
 }
 
+// DeviceChannelsDto represents a device channels dto.
+type DeviceChannelsDto struct {
+	Channels []string `json:"channels"`
+	DeviceID string   `json:"deviceId"`
+}
+
 // DeviceReportChannelDto represents a device report channel dto.
 type DeviceReportChannelDto struct {
 	Channel        string                       `json:"channel"`
@@ -46,16 +52,45 @@ type DeviceReportDto struct {
 
 // ErrorDto represents a error dto.
 type ErrorDto struct {
-	Code        string `json:"code"`
-	Description string `json:"description"`
-	Field       string `json:"field"`
-	ID          string `json:"id"`
+	Code        string  `json:"code"`
+	Description string  `json:"description"`
+	Field       string  `json:"field"`
+	ID          *string `json:"id"`
+}
+
+// FilteredDeclarationReportDto represents a filtered declaration report dto.
+type FilteredDeclarationReportDto struct {
+	DeclarationIdentifier string              `json:"declarationIdentifier"`
+	Results               []FilteredResultDto `json:"results"`
+	TotalCount            int64               `json:"totalCount"`
+}
+
+// FilteredDeviceReportDto represents a filtered device report dto.
+type FilteredDeviceReportDto struct {
+	DeviceID   string              `json:"deviceId"`
+	Results    []FilteredResultDto `json:"results"`
+	TotalCount int64               `json:"totalCount"`
+}
+
+// FilteredResultDto represents a filtered result dto.
+type FilteredResultDto struct {
+	Active                bool                               `json:"active"`
+	Channel               string                             `json:"channel"`
+	DateUpdated           *time.Time                         `json:"dateUpdated"`
+	DeclarationIdentifier string                             `json:"declarationIdentifier"`
+	DeviceID              string                             `json:"deviceId"`
+	LastReportTime        *time.Time                         `json:"lastReportTime"`
+	Reasons               []StatusReportDeclarationReasonDto `json:"reasons"`
+	ServerToken           string                             `json:"serverToken"`
+	Status                string                             `json:"status"`
+	Type                  string                             `json:"type"`
+	ValidityState         string                             `json:"validityState"`
 }
 
 // StatusReportDeclarationDto represents a status report declaration dto.
 type StatusReportDeclarationDto struct {
 	Active                bool                               `json:"active"`
-	DateUpdated           *time.Time                         `json:"dateUpdated,omitempty"`
+	DateUpdated           *time.Time                         `json:"dateUpdated"`
 	DeclarationIdentifier string                             `json:"declarationIdentifier"`
 	Reasons               []StatusReportDeclarationReasonDto `json:"reasons"`
 	ServerToken           string                             `json:"serverToken"`

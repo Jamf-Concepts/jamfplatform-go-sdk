@@ -155,10 +155,10 @@ func (c *Client) GetVenafiProxyTrustStoreV1(ctx context.Context, id string) ([]b
 }
 
 // UploadVenafiProxyTrustStoreV1 uploads the PKI Proxy Server public key to secure communication between Jamf Pro and a Jamf Pro PKI Proxy Server.
-func (c *Client) UploadVenafiProxyTrustStoreV1(ctx context.Context, id string, request *string) error {
+func (c *Client) UploadVenafiProxyTrustStoreV1(ctx context.Context, id string, body []byte) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/proxy-trust-store", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/pem-certificate-chain", http.StatusNoContent, nil); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, body, "application/pem-certificate-chain", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UploadVenafiProxyTrustStoreV1(%s): %w", id, err)
 	}
 	return nil

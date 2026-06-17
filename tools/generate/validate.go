@@ -43,13 +43,15 @@ var builtinTypeRefs = map[string]bool{
 	"time.Time":       true,
 	"json.RawMessage": true,
 	"xml.Name":        true,
-	// BigInt and NotificationValue are supplemental types the generator
-	// emits into XML packages (see xml_helpers.go) as FieldTypeOverride
-	// targets for spec bugs the XML wire exposes (int overflow, duplicate
-	// repeated elements). Treat them as builtins for validation — the
-	// validator can't see supplemental files and would false-positive.
+	// BigInt, NotificationValue, and PayloadsXMLText are supplemental types
+	// the generator emits into XML packages (see xml_helpers.go) as
+	// FieldTypeOverride targets for spec/wire bugs (int overflow, repeated
+	// duplicate elements, single-escape chardata for Classic <payloads>).
+	// Treat them as builtins for validation — the validator can't see
+	// supplemental files and would false-positive.
 	"BigInt":            true,
 	"NotificationValue": true,
+	"PayloadsXMLText":   true,
 }
 
 // validateTypeReferences reports missing Go types referenced by methods.

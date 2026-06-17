@@ -1,24 +1,243 @@
 {
   "components": {
     "schemas": {
-      "AppInstallerAppRef": {
+      "AppInstallerApp": {
+        "description": "Resolved app-catalog reference as returned in the list response. All fields are read-only server-assigned values.",
         "properties": {
+          "bundleId": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "deployedVersion": {
+            "readOnly": true,
+            "type": "string"
+          },
           "iconUrl": {
+            "readOnly": true,
             "type": "string"
           },
           "id": {
+            "description": "App Installer title ID",
+            "readOnly": true,
             "type": "string"
           },
-          "publisher": {
+          "latestVersion": {
+            "readOnly": true,
             "type": "string"
           },
-          "titleName": {
+          "mediaSourceType": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "selectedVersion": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "titleAvailableInAis": {
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "versionRemoved": {
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "AppInstallerDeployment": {
+        "properties": {
+          "appTitleId": {
+            "description": "ID of the App Installer title to deploy",
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "deploymentType": {
+            "enum": [
+              "INSTALL_AUTOMATICALLY",
+              "SELF_SERVICE"
+            ],
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "id": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "installPredefinedConfigProfiles": {
+            "type": "boolean"
+          },
+          "latestAvailableVersion": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notificationSettings": {
+            "$ref": "#/components/schemas/NotificationSettings"
+          },
+          "selectedVersion": {
+            "type": "string"
+          },
+          "selfServiceSettings": {
+            "$ref": "#/components/schemas/SelfServiceSettings"
+          },
+          "siteId": {
+            "type": "string"
+          },
+          "smartGroupId": {
+            "type": "string"
+          },
+          "titleAvailableInAis": {
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "triggerAdminNotifications": {
+            "type": "boolean"
+          },
+          "updateBehavior": {
+            "enum": [
+              "AUTOMATIC",
+              "MANUAL"
+            ],
+            "type": "string"
+          },
+          "versionRemoved": {
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "AppInstallerDeploymentCreate": {
+        "properties": {
+          "appTitleId": {
+            "description": "ID of the App Installer title to deploy",
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "deploymentType": {
+            "enum": [
+              "INSTALL_AUTOMATICALLY",
+              "SELF_SERVICE"
+            ],
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "installPredefinedConfigProfiles": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notificationSettings": {
+            "$ref": "#/components/schemas/NotificationSettings"
+          },
+          "selfServiceSettings": {
+            "$ref": "#/components/schemas/SelfServiceSettings"
+          },
+          "siteId": {
+            "type": "string"
+          },
+          "smartGroupId": {
+            "type": "string"
+          },
+          "triggerAdminNotifications": {
+            "type": "boolean"
+          },
+          "updateBehavior": {
+            "enum": [
+              "AUTOMATIC",
+              "MANUAL"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "appTitleId",
+          "deploymentType"
+        ],
+        "type": "object"
+      },
+      "AppInstallerDeploymentListItem": {
+        "properties": {
+          "app": {
+            "$ref": "#/components/schemas/AppInstallerApp"
+          },
+          "category": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "computerStatuses": {
+            "$ref": "#/components/schemas/ComputerStatuses"
+          },
+          "deploymentType": {
+            "enum": [
+              "INSTALL_AUTOMATICALLY",
+              "SELF_SERVICE"
+            ],
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "id": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "smartGroup": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "updateBehavior": {
+            "enum": [
+              "AUTOMATIC",
+              "MANUAL"
+            ],
             "type": "string"
           }
         },
         "type": "object"
       },
-      "AppInstallerComputerStatuses": {
+      "AppInstallerDeploymentRef": {
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AppInstallerDeploymentSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/AppInstallerDeploymentListItem"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerStatuses": {
         "properties": {
           "available": {
             "type": "integer"
@@ -38,142 +257,7 @@
         },
         "type": "object"
       },
-      "AppInstallerDeployment": {
-        "description": "Single-item shape for App Installer deployment (used for GET by id,\nPOST create, PUT update). References to other resources are flat IDs\nrather than nested objects.\n",
-        "properties": {
-          "appTitleId": {
-            "type": "string"
-          },
-          "categoryId": {
-            "type": "string"
-          },
-          "deploymentType": {
-            "enum": [
-              "INSTALL_AUTOMATICALLY",
-              "SELF_SERVICE"
-            ],
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "string"
-          },
-          "installPredefinedConfigProfiles": {
-            "type": "boolean"
-          },
-          "latestAvailableVersion": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "notificationSettings": {
-            "$ref": "#/components/schemas/AppInstallerNotificationSettings"
-          },
-          "selectedVersion": {
-            "type": "string"
-          },
-          "selfServiceSettings": {
-            "$ref": "#/components/schemas/AppInstallerSelfServiceSettings"
-          },
-          "siteId": {
-            "type": "string"
-          },
-          "smartGroupId": {
-            "type": "string"
-          },
-          "titleAvailableInAis": {
-            "type": "boolean"
-          },
-          "triggerAdminNotifications": {
-            "type": "boolean"
-          },
-          "updateBehavior": {
-            "enum": [
-              "AUTOMATIC",
-              "MANUAL"
-            ],
-            "type": "string"
-          },
-          "versionRemoved": {
-            "type": "boolean"
-          }
-        },
-        "type": "object"
-      },
-      "AppInstallerDeploymentHrefResponse": {
-        "properties": {
-          "href": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "AppInstallerDeploymentListEntry": {
-        "description": "List-view of an App Installer deployment. The server expands site,\ncategory, smartGroup, and app into nested objects for the list\nendpoint; single-item GET / POST / PUT returns the flat-ID shape\n(AppInstallerDeployment).\n",
-        "properties": {
-          "app": {
-            "$ref": "#/components/schemas/AppInstallerAppRef"
-          },
-          "category": {
-            "$ref": "#/components/schemas/AppInstallerNamedRef"
-          },
-          "computerStatuses": {
-            "$ref": "#/components/schemas/AppInstallerComputerStatuses"
-          },
-          "deploymentType": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "string"
-          },
-          "latestAvailableVersion": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "selectedVersion": {
-            "type": "string"
-          },
-          "site": {
-            "$ref": "#/components/schemas/AppInstallerNamedRef"
-          },
-          "smartGroup": {
-            "$ref": "#/components/schemas/AppInstallerNamedRef"
-          },
-          "updateBehavior": {
-            "type": "string"
-          },
-          "versionRemoved": {
-            "type": "boolean"
-          }
-        },
-        "type": "object"
-      },
-      "AppInstallerDeploymentSearchResults": {
-        "properties": {
-          "results": {
-            "items": {
-              "$ref": "#/components/schemas/AppInstallerDeploymentListEntry"
-            },
-            "type": "array"
-          },
-          "totalCount": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "AppInstallerNamedRef": {
+      "IdName": {
         "properties": {
           "id": {
             "type": "string"
@@ -184,53 +268,55 @@
         },
         "type": "object"
       },
-      "AppInstallerNotificationSettings": {
+      "NotificationSettings": {
         "properties": {
           "completeMessage": {
-            "nullable": true,
             "type": "string"
           },
           "deadline": {
-            "nullable": true,
             "type": "integer"
           },
           "deadlineMessage": {
-            "nullable": true,
             "type": "string"
           },
           "notificationInterval": {
-            "nullable": true,
             "type": "integer"
           },
           "notificationMessage": {
-            "nullable": true,
             "type": "string"
           },
           "quitDelay": {
-            "nullable": true,
             "type": "integer"
           },
           "relaunch": {
-            "nullable": true,
             "type": "boolean"
           },
           "suppress": {
-            "nullable": true,
             "type": "boolean"
           }
         },
         "type": "object"
       },
-      "AppInstallerSelfServiceSettings": {
+      "SelfServiceCategory": {
+        "properties": {
+          "featured": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SelfServiceSettings": {
         "properties": {
           "categories": {
             "items": {
-              "$ref": "#/components/schemas/AppInstallerNamedRef"
+              "$ref": "#/components/schemas/SelfServiceCategory"
             },
             "type": "array"
           },
           "description": {
-            "nullable": true,
             "type": "string"
           },
           "forceViewDescription": {
@@ -244,78 +330,19 @@
           }
         },
         "type": "object"
-      },
-      "AppInstallerTitle": {
-        "properties": {
-          "architecture": {
-            "type": "string"
-          },
-          "availabilityDate": {
-            "type": "string"
-          },
-          "bundleId": {
-            "type": "string"
-          },
-          "iconUrl": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "installationPathShared": {
-            "type": "boolean"
-          },
-          "language": {
-            "type": "string"
-          },
-          "minimumOsVersion": {
-            "type": "string"
-          },
-          "publisher": {
-            "type": "string"
-          },
-          "shortVersion": {
-            "type": "string"
-          },
-          "sizeInBytes": {
-            "type": "integer"
-          },
-          "titleName": {
-            "description": "Display name of the application.",
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "AppInstallerTitleSearchResults": {
-        "properties": {
-          "results": {
-            "items": {
-              "$ref": "#/components/schemas/AppInstallerTitle"
-            },
-            "type": "array"
-          },
-          "totalCount": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
       }
     }
   },
   "info": {
-    "description": "Jamf App Installer catalog: browse available titles from the Jamf App\nCatalog and manage per-tenant deployment configurations. The underlying\nendpoints are live on `/v1/app-installers/*` but aren't published in\nJamf's public pro.json spec — this file is the self-contained schema.\n",
-    "title": "Jamf Pro API - App Installers (Jamf App Catalog)",
-    "version": "0.1.0"
+    "description": "Manage App Installer deployment configurations in Jamf Pro. Deployments define which App Installer titles are deployed to which smart groups, along with update behavior and notification settings.",
+    "title": "Jamf Pro API - App Installer Deployments",
+    "version": "0.0.1"
   },
   "openapi": "3.0.1",
   "paths": {
     "/v1/app-installers/deployments": {
       "get": {
-        "description": "Paginated list of deployed App Installer configurations.",
+        "description": "Retrieves all App Installer deployment configurations (enabled or not)",
         "responses": {
           "200": {
             "content": {
@@ -331,25 +358,30 @@
         "summary": "Get all App Installer deployments",
         "tags": [
           "app-installer-deployments"
+        ],
+        "x-required-privileges": [
+          "Read App Installers"
         ]
       },
       "post": {
+        "description": "Creates a new App Installer deployment configuration",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AppInstallerDeployment"
+                "$ref": "#/components/schemas/AppInstallerDeploymentCreate"
               }
             }
           },
+          "description": "App Installer deployment to create",
           "required": true
         },
         "responses": {
-          "201": {
+          "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AppInstallerDeploymentHrefResponse"
+                  "$ref": "#/components/schemas/AppInstallerDeploymentRef"
                 }
               }
             },
@@ -359,13 +391,18 @@
         "summary": "Create an App Installer deployment",
         "tags": [
           "app-installer-deployments"
+        ],
+        "x-required-privileges": [
+          "Create App Installers"
         ]
       }
     },
     "/v1/app-installers/deployments/{id}": {
       "delete": {
+        "description": "Deletes an App Installer deployment by ID",
         "parameters": [
           {
+            "description": "ID of the deployment",
             "in": "path",
             "name": "id",
             "required": true,
@@ -382,11 +419,16 @@
         "summary": "Delete an App Installer deployment",
         "tags": [
           "app-installer-deployments"
+        ],
+        "x-required-privileges": [
+          "Delete App Installers"
         ]
       },
       "get": {
+        "description": "Retrieves a specific App Installer deployment by its ID",
         "parameters": [
           {
+            "description": "ID of the deployment",
             "in": "path",
             "name": "id",
             "required": true,
@@ -413,11 +455,16 @@
         "summary": "Get an App Installer deployment by ID",
         "tags": [
           "app-installer-deployments"
+        ],
+        "x-required-privileges": [
+          "Read App Installers"
         ]
       },
       "put": {
+        "description": "Updates an existing App Installer deployment configuration",
         "parameters": [
           {
+            "description": "ID of the deployment",
             "in": "path",
             "name": "id",
             "required": true,
@@ -430,10 +477,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AppInstallerDeployment"
+                "$ref": "#/components/schemas/AppInstallerDeploymentCreate"
               }
             }
           },
+          "description": "Updated deployment configuration",
           "required": true
         },
         "responses": {
@@ -451,60 +499,9 @@
         "summary": "Update an App Installer deployment",
         "tags": [
           "app-installer-deployments"
-        ]
-      }
-    },
-    "/v1/app-installers/titles": {
-      "get": {
-        "description": "Paginated list of App Installer titles available in the Jamf App Catalog.",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppInstallerTitleSearchResults"
-                }
-              }
-            },
-            "description": "Successful response"
-          }
-        },
-        "summary": "Get all available App Installer titles",
-        "tags": [
-          "app-installer-titles"
-        ]
-      }
-    },
-    "/v1/app-installers/titles/{id}": {
-      "get": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
         ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppInstallerTitle"
-                }
-              }
-            },
-            "description": "Successful response"
-          },
-          "404": {
-            "description": "Title not found"
-          }
-        },
-        "summary": "Get an App Installer title by ID",
-        "tags": [
-          "app-installer-titles"
+        "x-required-privileges": [
+          "Update App Installers"
         ]
       }
     }

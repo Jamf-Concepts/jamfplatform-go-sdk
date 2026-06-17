@@ -49,7 +49,7 @@ func TestAcceptance_Pro_AppInstallerTitles(t *testing.T) {
 		t.Errorf("first title has missing required fields: %+v", first)
 	}
 
-	// Round-trip by-id lookup.
+	// Round-trip by-id lookup and verify the new fields are present.
 	got, err := p.GetAppInstallerTitleV1(ctx, first.ID)
 	if err != nil {
 		skipOnServerError(t, err)
@@ -58,13 +58,23 @@ func TestAcceptance_Pro_AppInstallerTitles(t *testing.T) {
 	if got.ID != first.ID {
 		t.Errorf("title round-trip id mismatch: got %s want %s", got.ID, first.ID)
 	}
+	// New fields added by the spec refresh — log so we can see real wire values.
+	t.Logf("title %s (%s):", got.ID, got.TitleName)
+	t.Logf("  packageSigningIdentity=%q", got.PackageSigningIdentity)
+	t.Logf("  installerPackageHashType=%q installerPackageHash=%q", got.InstallerPackageHashType, got.InstallerPackageHash)
+	t.Logf("  launchDaemonIncluded=%v notificationAvailable=%v suppressAutoUpdate=%v",
+		got.LaunchDaemonIncluded, got.NotificationAvailable, got.SuppressAutoUpdate)
+	t.Logf("  originalMediaSources=%d entries", len(got.OriginalMediaSources))
+	for i, src := range got.OriginalMediaSources {
+		t.Logf("    [%d] hashType=%q hash=%q url=%q", i, src.HashType, src.Hash, src.URL)
+	}
 }
 
 // TestAcceptance_Pro_AppInstallerDeploymentCRUD exercises the full
 // deployment lifecycle against a single title. Creates a throwaway
 // empty smart group as the deployment target, picks the first
 // catalog title, creates a disabled SELF_SERVICE deployment, round-
-// trips GET, PUTs, then cleans up.
+// trips GET, PUTs with SelfServiceCategory, then cleans up.
 func TestAcceptance_Pro_AppInstallerDeploymentCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -82,8 +92,8 @@ func TestAcceptance_Pro_AppInstallerDeploymentCRUD(t *testing.T) {
 	}
 	title := titles[0]
 
-	created := createDeployment(t, p, title.ID, groupID, "sdk-acc-appinst-"+runSuffix())
-	id := *created.ID
+	dep := createDeployment(t, p, title.ID, groupID, "sdk-acc-appinst-"+runSuffix())
+	id := dep.ID
 	cleanupDelete(t, "AppInstallerDeployment "+id, func() error { return p.DeleteAppInstallerDeploymentV1(ctx, id) })
 	t.Logf("Created app-installer deployment id=%s for title %s (%s)", id, title.ID, title.TitleName)
 
@@ -92,19 +102,90 @@ func TestAcceptance_Pro_AppInstallerDeploymentCRUD(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("GetAppInstallerDeploymentV1(%s): %v", id, err)
 	}
-	if got.AppTitleID == nil || *got.AppTitleID != title.ID {
-		t.Errorf("deployment round-trip appTitleId mismatch: got %v want %s", got.AppTitleID, title.ID)
+	if got.AppTitleID != title.ID {
+		t.Errorf("deployment round-trip appTitleId mismatch: got %q want %q", got.AppTitleID, title.ID)
 	}
-	if got.Enabled == nil || *got.Enabled {
+	if got.Enabled {
 		t.Errorf("deployment enabled=%v, expected false (disabled create)", got.Enabled)
 	}
 
-	// Update — flip enabled still to false (no-op semantic but verifies PUT).
-	disabled := false
-	got.Enabled = &disabled
-	if _, err := p.UpdateAppInstallerDeploymentV1(ctx, id, got); err != nil {
+	// Wire-test: PUT to verify update round-trip and selfServiceSettings shape.
+	updateReq := &pro.AppInstallerDeploymentCreate{
+		Name:           got.Name,
+		AppTitleID:     got.AppTitleID,
+		DeploymentType: got.DeploymentType,
+		UpdateBehavior: &got.UpdateBehavior,
+		SmartGroupID:   &groupID,
+		SelfServiceSettings: &pro.AppInstallerSelfServiceSettings{
+			ForceViewDescription: ptrFalse(),
+		},
+	}
+	updated, err := p.UpdateAppInstallerDeploymentV1(ctx, id, updateReq)
+	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateAppInstallerDeploymentV1: %v", err)
+	}
+	// selfServiceSettings.categories is an []SelfServiceCategory in the response.
+	// Log what the server echoes back so we can inspect the wire shape.
+	if updated.SelfServiceSettings != nil && updated.SelfServiceSettings.Categories != nil {
+		cats := *updated.SelfServiceSettings.Categories
+		t.Logf("selfServiceSettings.categories after PUT: %d entries", len(cats))
+		for i, cat := range cats {
+			catIDVal, featuredVal := "<nil>", "<nil>"
+			if cat.ID != nil {
+				catIDVal = *cat.ID
+			}
+			if cat.Featured != nil {
+				featuredVal = strconv.FormatBool(*cat.Featured)
+			}
+			t.Logf("  [%d] id=%s featured=%s", i, catIDVal, featuredVal)
+		}
+	} else {
+		t.Logf("selfServiceSettings.categories: nil/absent (no categories configured on this tenant)")
+	}
+
+	// Wire-test: SelfServiceCategory type has both ID and Featured fields.
+	// Compile-time proof: if the type were still {id,name} this wouldn't build.
+	_ = pro.SelfServiceCategory{ID: ptrStr("test"), Featured: ptrFalse()}
+}
+
+// TestAcceptance_Pro_AppInstallerDeploymentListShape verifies the list
+// endpoint returns AppInstallerDeploymentListEntry items with the
+// expected wire fields (id, name, deploymentType, bundleId, etc.).
+func TestAcceptance_Pro_AppInstallerDeploymentListShape(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	items, err := p.ListAppInstallerDeploymentsV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListAppInstallerDeploymentsV1: %v", err)
+	}
+	if len(items) == 0 {
+		t.Skip("no app installer deployments in tenant — skipping shape check")
+	}
+	t.Logf("App Installer deployments: %d", len(items))
+	first := items[0]
+	bundleID := ""
+	if first.App != nil {
+		bundleID = first.App.BundleID
+	}
+	t.Logf("first deployment: id=%s name=%q deploymentType=%s updateBehavior=%s bundleId=%q",
+		first.ID, first.Name, first.DeploymentType, first.UpdateBehavior, bundleID)
+	// Verify nested app object populated by wire
+	if first.App == nil {
+		t.Error("first list entry has nil App — nested app object missing from wire decode")
+	} else {
+		t.Logf("  app: titleId=%s bundleId=%q latestVersion=%q selectedVersion=%q deployedVersion=%q versionRemoved=%v titleAvailableInAis=%v mediaSourceType=%q",
+			first.App.ID, first.App.BundleID, first.App.LatestVersion, first.App.SelectedVersion,
+			first.App.DeployedVersion, first.App.VersionRemoved, first.App.TitleAvailableInAis, first.App.MediaSourceType)
+	}
+	if first.ID == "" {
+		t.Error("first list entry has empty ID")
+	}
+	if first.Name == "" {
+		t.Error("first list entry has empty Name")
 	}
 }
 
@@ -145,11 +226,10 @@ func TestAcceptance_Pro_AppInstallerDeploymentsRandomSweep(t *testing.T) {
 	var created, failed int
 	for i, title := range sample {
 		name := "sdk-acc-sweep-" + suffix + "-" + strconv.Itoa(i)
-		dep, err := p.CreateAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeployment{
-			Name:           &name,
-			AppTitleID:     &title.ID,
-			Enabled:        ptrFalse(),
-			DeploymentType: ptrStr("SELF_SERVICE"),
+		dep, err := p.CreateAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeploymentCreate{
+			Name:           name,
+			AppTitleID:     title.ID,
+			DeploymentType: "SELF_SERVICE",
 			UpdateBehavior: ptrStr("AUTOMATIC"),
 			CategoryID:     ptrStr("-1"),
 			SiteID:         ptrStr("-1"),
@@ -174,8 +254,8 @@ func TestAcceptance_Pro_AppInstallerDeploymentsRandomSweep(t *testing.T) {
 			skipOnServerError(t, err)
 			t.Fatalf("get[%d] %s: %v", i, id, err)
 		}
-		if got.AppTitleID == nil || *got.AppTitleID != title.ID {
-			t.Errorf("get[%d] appTitleId mismatch: got %v want %s", i, got.AppTitleID, title.ID)
+		if got.AppTitleID != title.ID {
+			t.Errorf("get[%d] appTitleId mismatch: got %q want %q", i, got.AppTitleID, title.ID)
 		}
 
 		// Delete immediately to avoid accumulating state.
@@ -186,6 +266,84 @@ func TestAcceptance_Pro_AppInstallerDeploymentsRandomSweep(t *testing.T) {
 		created++
 	}
 	t.Logf("Swept %d titles: %d CRUDed, %d rejected on create", len(sample), created, failed)
+}
+
+// TestAcceptance_Pro_AppInstallerGlobalSettings exercises GET and PUT
+// on the singleton global settings resource. All fields are nullable;
+// the test snapshots the current state on entry, writes a known payload,
+// verifies the round-trip, then restores the original in t.Cleanup so
+// the tenant isn't left dirty.
+func TestAcceptance_Pro_AppInstallerGlobalSettings(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	original, err := p.GetAppInstallerGlobalSettingsV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetAppInstallerGlobalSettingsV1: %v", err)
+	}
+	t.Logf("AppInstaller global settings retrieved")
+
+	t.Cleanup(func() {
+		if _, err := p.UpdateAppInstallerGlobalSettingsV1(ctx, original); err != nil {
+			t.Logf("WARNING: failed to restore AppInstaller global settings: %v", err)
+		}
+	})
+
+	batchFreq := 60
+	batchSize := 50
+	notifMsg := "Test update pending."
+	notifInterval := 30
+	deadline := 24
+	quitDelay := 5
+	completeMsg := "Update complete."
+	relaunch := true
+	suppress := false
+
+	put := &pro.AppInstallerGlobalSettings{
+		EndUserExperienceSettings: &pro.AppInstallerEndUserExperienceSettings{
+			NotificationMessage:  &notifMsg,
+			NotificationInterval: &notifInterval,
+			Deadline:             &deadline,
+			QuitDelay:            &quitDelay,
+			CompleteMessage:      &completeMsg,
+			Relaunch:             &relaunch,
+			Suppress:             &suppress,
+		},
+		DeploymentProcessControls: &pro.AppInstallerDeploymentProcessControls{
+			CommandsBatchSize:       &batchSize,
+			BatchFrequencyInMinutes: &batchFreq,
+			DaysOfWeek:              &[]string{"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"},
+			FromTimeOfDay:           ptrStr("08:00:00Z"),
+			ToTimeOfDay:             ptrStr("18:00:00Z"),
+		},
+	}
+
+	updated, err := p.UpdateAppInstallerGlobalSettingsV1(ctx, put)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateAppInstallerGlobalSettingsV1: %v", err)
+	}
+
+	if updated.DeploymentProcessControls == nil {
+		t.Fatal("UpdateAppInstallerGlobalSettingsV1: response missing deploymentProcessControls")
+	}
+	if updated.DeploymentProcessControls.BatchFrequencyInMinutes == nil ||
+		*updated.DeploymentProcessControls.BatchFrequencyInMinutes != batchFreq {
+		t.Errorf("batchFrequencyInMinutes: got %v want %d",
+			updated.DeploymentProcessControls.BatchFrequencyInMinutes, batchFreq)
+	}
+	if updated.EndUserExperienceSettings == nil {
+		t.Fatal("UpdateAppInstallerGlobalSettingsV1: response missing endUserExperienceSettings")
+	}
+	if updated.EndUserExperienceSettings.NotificationMessage == nil ||
+		*updated.EndUserExperienceSettings.NotificationMessage != notifMsg {
+		t.Errorf("notificationMessage: got %v want %q",
+			updated.EndUserExperienceSettings.NotificationMessage, notifMsg)
+	}
+
+	t.Logf("AppInstaller global settings updated and verified")
 }
 
 // Helpers -------------------------------------------------------------
@@ -220,32 +378,34 @@ func createAppInstallerSmartGroup(t *testing.T, p *pro.Client) string {
 	return id
 }
 
+// createDeployment creates a disabled SELF_SERVICE deployment for a given
+// title and smart group, returning the hydrated GET response.
 func createDeployment(t *testing.T, p *pro.Client, titleID, smartGroupID, name string) *pro.AppInstallerDeployment {
 	t.Helper()
 	ctx := context.Background()
-	dep, err := p.CreateAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeployment{
-		Name:           &name,
-		AppTitleID:     &titleID,
-		Enabled:        ptrFalse(),
-		DeploymentType: ptrStr("SELF_SERVICE"),
+	ref, err := p.CreateAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeploymentCreate{
+		Name:           name,
+		AppTitleID:     titleID,
+		DeploymentType: "SELF_SERVICE",
 		UpdateBehavior: ptrStr("AUTOMATIC"),
 		CategoryID:     ptrStr("-1"),
 		SiteID:         ptrStr("-1"),
 		SmartGroupID:   &smartGroupID,
+		Enabled:        ptrFalse(),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateAppInstallerDeploymentV1: %v", err)
 	}
-	if dep == nil || dep.ID == "" {
+	if ref == nil || ref.ID == "" {
 		t.Fatal("CreateAppInstallerDeploymentV1 returned empty id")
 	}
 	// Hydrate to a full deployment by re-reading — the href response
 	// only carries id + href.
-	full, err := p.GetAppInstallerDeploymentV1(ctx, dep.ID)
+	full, err := p.GetAppInstallerDeploymentV1(ctx, ref.ID)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetAppInstallerDeploymentV1(%s) after create: %v", dep.ID, err)
+		t.Fatalf("GetAppInstallerDeploymentV1(%s) after create: %v", ref.ID, err)
 	}
 	return full
 }

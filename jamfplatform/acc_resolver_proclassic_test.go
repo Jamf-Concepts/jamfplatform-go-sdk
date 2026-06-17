@@ -733,7 +733,7 @@ func TestAcceptance_Classic_ResolveMobileDeviceExtensionAttributeByName(t *testi
 	// preserved here because generator tracks the spec verbatim.
 	created, err := pc.CreateMobileDeviceExtensionAttributeByID(ctx, "0", &proclassic.MobileDeviceExtensionAttribute{
 		Name:     classicStrPtr(name),
-		DateType: classicStrPtr("String"),
+		DataType: classicStrPtr("String"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
