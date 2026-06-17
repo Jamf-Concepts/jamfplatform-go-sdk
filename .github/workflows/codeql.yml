@@ -33,7 +33,7 @@ jobs:
       - name: Build
         run: |
           go mod download
-          go build -v .
+          go build -v ./...
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
