@@ -420,6 +420,14 @@
       ],
       "operations": [
         {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/settings",
+          "name": "GetLocalAdminPasswordSettingsV2"
+        },
+        {
+          "op": "PUT /v2/tenant/{tenantId}/local-admin-password/settings",
+          "name": "UpdateLocalAdminPasswordSettingsV2"
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/buildings",
           "name": "ListBuildingsV1",
           "pagination": "totalCount",
@@ -10628,8 +10636,7 @@
         },
         {
           "op": "POST /v1/app-installers/deployments",
-          "name": "CreateAppInstallerDeploymentV1",
-          "expectedStatus": 201
+          "name": "CreateAppInstallerDeploymentV1"
         },
         {
           "op": "GET /v1/app-installers/deployments/{id}",
@@ -10641,8 +10648,7 @@
         },
         {
           "op": "DELETE /v1/app-installers/deployments/{id}",
-          "name": "DeleteAppInstallerDeploymentV1",
-          "expectedStatus": 204
+          "name": "DeleteAppInstallerDeploymentV1"
         }
       ]
     },
@@ -10661,23 +10667,6 @@
         {
           "op": "PUT /v1/app-installers/global-settings",
           "name": "UpdateAppInstallerGlobalSettingsV1"
-        }
-      ]
-    },
-    {
-      "file": "testing/local-admin-password.json",
-      "namespace": "pro",
-      "package": "pro",
-      "specFile": "local_admin_password_api.json",
-      "splitByTag": true,
-      "operations": [
-        {
-          "op": "GET /v2/local-admin-password/settings",
-          "name": "GetLocalAdminPasswordSettingsV2"
-        },
-        {
-          "op": "PUT /v2/local-admin-password/settings",
-          "name": "UpdateLocalAdminPasswordSettingsV2"
         }
       ]
     }

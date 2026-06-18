@@ -11,10 +11,10 @@ import (
 	"net/http"
 )
 
-// GetLocalAdminPasswordSettingsV2 get LAPS settings.
-func (c *Client) GetLocalAdminPasswordSettingsV2(ctx context.Context) (*LocalAdminPasswordSettings, error) {
+// GetLocalAdminPasswordSettingsV2 get the current LAPS settings.
+func (c *Client) GetLocalAdminPasswordSettingsV2(ctx context.Context) (*LapsSettingsResponseV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	var result LocalAdminPasswordSettings
+	var result LapsSettingsResponseV2
 	endpoint := prefix + "/local-admin-password/settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetLocalAdminPasswordSettingsV2: %w", err)
@@ -22,10 +22,10 @@ func (c *Client) GetLocalAdminPasswordSettingsV2(ctx context.Context) (*LocalAdm
 	return &result, nil
 }
 
-// UpdateLocalAdminPasswordSettingsV2 update LAPS settings.
-func (c *Client) UpdateLocalAdminPasswordSettingsV2(ctx context.Context, request *LocalAdminPasswordSettings) (*LocalAdminPasswordSettings, error) {
+// UpdateLocalAdminPasswordSettingsV2 update settings for LAPS.
+func (c *Client) UpdateLocalAdminPasswordSettingsV2(ctx context.Context, request *LapsSettingsRequestV2) (*LapsSettingsResponseV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	var result LocalAdminPasswordSettings
+	var result LapsSettingsResponseV2
 	endpoint := prefix + "/local-admin-password/settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("UpdateLocalAdminPasswordSettingsV2: %w", err)

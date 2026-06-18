@@ -974,6 +974,7 @@ type ComputerConfigurationProfile struct {
 	ProfileIdentifier string     `json:"profileIdentifier"`
 	Removable         bool       `json:"removable"`
 	Username          string     `json:"username"`
+	UUID              *string    `json:"uuid,omitempty"`
 }
 
 // ComputerConfigurationProfileCreate represents a computer configuration profile create.
@@ -1216,6 +1217,8 @@ type ComputerGeneral struct {
 	LastIPAddress                            string                       `json:"lastIpAddress"`
 	LastLoggedInUsernameBinary               *string                      `json:"lastLoggedInUsernameBinary,omitempty"`
 	LastLoggedInUsernameBinaryTimestamp      *time.Time                   `json:"lastLoggedInUsernameBinaryTimestamp,omitempty"`
+	LastLoggedInUsernameMDM                  *string                      `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time                   `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
 	LastLoggedInUsernameSelfService          *string                      `json:"lastLoggedInUsernameSelfService,omitempty"`
 	LastLoggedInUsernameSelfServiceTimestamp *time.Time                   `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
 	LastReportedIp                           string                       `json:"lastReportedIp"`
@@ -1228,7 +1231,7 @@ type ComputerGeneral struct {
 	Platform                                 string                       `json:"platform"`
 	RemoteManagement                         *ComputerRemoteManagement    `json:"remoteManagement,omitempty"`
 	ReportDate                               *time.Time                   `json:"reportDate,omitempty"`
-	Site                                     *V1SiteBase                  `json:"site,omitempty"`
+	Site                                     *ComputerSite                `json:"site,omitempty"`
 	Supervised                               bool                         `json:"supervised"`
 	UserApprovedMDM                          bool                         `json:"userApprovedMdm"`
 }
@@ -1763,7 +1766,6 @@ type ComputerPrestageSearchResultsV3 struct {
 // ComputerPrestageV3 represents a computer prestage v3.
 type ComputerPrestageV3 struct {
 	AnchorCertificates                 *[]string                       `json:"anchorCertificates,omitempty"`
-	AuthURL                            *string                         `json:"authUrl,omitempty"`
 	AuthenticationPrompt               string                          `json:"authenticationPrompt"`
 	AutoAdvanceSetup                   bool                            `json:"autoAdvanceSetup"`
 	CustomPackageDistributionPointID   string                          `json:"customPackageDistributionPointId"`
@@ -1901,6 +1903,12 @@ type ComputerService struct {
 // ComputerServiceCreate represents a computer service create.
 type ComputerServiceCreate struct {
 	Name *string `json:"name,omitempty"`
+}
+
+// ComputerSite represents a computer site.
+type ComputerSite struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // ComputerSmartGroupCriteriaV2 represents a computer smart group criteria v2.
@@ -2903,7 +2911,6 @@ type FontPath struct {
 type GetComputerPrestageV3 struct {
 	AccountSettings                    *AccountSettingsResponse         `json:"accountSettings,omitempty"`
 	AnchorCertificates                 []string                         `json:"anchorCertificates"`
-	AuthURL                            *string                          `json:"authUrl,omitempty"`
 	AuthenticationPrompt               string                           `json:"authenticationPrompt"`
 	AutoAdvanceSetup                   bool                             `json:"autoAdvanceSetup"`
 	CustomPackageDistributionPointID   string                           `json:"customPackageDistributionPointId"`
@@ -3392,6 +3399,8 @@ type InventoryListMobileDevice struct {
 	LastCloudBackupDate                         *time.Time                `json:"lastCloudBackupDate,omitempty"`
 	LastEnrolledDate                            *time.Time                `json:"lastEnrolledDate,omitempty"`
 	LastInventoryUpdateDate                     *time.Time                `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                     *string                   `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp            *time.Time                `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
 	LastLoggedInUsernameSelfService             *string                   `json:"lastLoggedInUsernameSelfService,omitempty"`
 	LastLoggedInUsernameSelfServiceTimestamp    *time.Time                `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
 	LeaseExpirationDate                         *time.Time                `json:"leaseExpirationDate,omitempty"`
@@ -3602,6 +3611,22 @@ type JamfProtectPlan struct {
 type LanguageCode struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
+}
+
+// LapsSettingsRequestV2 represents a laps settings request v2.
+type LapsSettingsRequestV2 struct {
+	AutoDeployEnabled        bool `json:"autoDeployEnabled"`
+	AutoRotateEnabled        bool `json:"autoRotateEnabled"`
+	AutoRotateExpirationTime int  `json:"autoRotateExpirationTime"`
+	PasswordRotationTime     int  `json:"passwordRotationTime"`
+}
+
+// LapsSettingsResponseV2 represents a laps settings response v2.
+type LapsSettingsResponseV2 struct {
+	AutoDeployEnabled        bool `json:"autoDeployEnabled"`
+	AutoRotateEnabled        bool `json:"autoRotateEnabled"`
+	AutoRotateExpirationTime int  `json:"autoRotateExpirationTime"`
+	PasswordRotationTime     int  `json:"passwordRotationTime"`
 }
 
 // LastLoginResponse represents a last login response.
@@ -4008,6 +4033,7 @@ type MobileDeviceApplication struct {
 
 // MobileDeviceApplicationInventoryDetail represents a mobile device application inventory detail.
 type MobileDeviceApplicationInventoryDetail struct {
+	AppClip          bool   `json:"appClip"`
 	BundleSize       string `json:"bundleSize"`
 	DynamicSize      string `json:"dynamicSize"`
 	Identifier       string `json:"identifier"`
@@ -4185,6 +4211,8 @@ type MobileDeviceGeneral struct {
 	IPAddress                                string                           `json:"ipAddress"`
 	LastEnrolledDate                         *time.Time                       `json:"lastEnrolledDate,omitempty"`
 	LastInventoryUpdateDate                  *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                  *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
 	LastLoggedInUsernameSelfService          *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
 	LastLoggedInUsernameSelfServiceTimestamp *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
 	Managed                                  bool                             `json:"managed"`
@@ -4276,6 +4304,8 @@ type MobileDeviceIosGeneral struct {
 	LastCloudBackupDate                         *time.Time                       `json:"lastCloudBackupDate,omitempty"`
 	LastEnrolledDate                            *time.Time                       `json:"lastEnrolledDate,omitempty"`
 	LastInventoryUpdateDate                     *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                     *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp            *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
 	LastLoggedInUsernameSelfService             *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
 	LastLoggedInUsernameSelfServiceTimestamp    *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
 	LocationServicesForSelfServiceMobileEnabled bool                             `json:"locationServicesForSelfServiceMobileEnabled"`
@@ -4546,10 +4576,11 @@ type MobileDevicePurchasing struct {
 
 // MobileDeviceResponse is a polymorphic response keyed by deviceType. Exactly one variant pointer is populated after unmarshaling.
 type MobileDeviceResponse struct {
-	DeviceType string                        `json:"deviceType"`
-	IOS        *MobileDeviceIosInventory     `json:"-"`
-	TvOS       *MobileDeviceTvOsInventory    `json:"-"`
-	WatchOS    *MobileDeviceWatchOsInventory `json:"-"`
+	DeviceType string                         `json:"deviceType"`
+	IOS        *MobileDeviceIosInventory      `json:"-"`
+	TvOS       *MobileDeviceTvOsInventory     `json:"-"`
+	VisionOS   *MobileDeviceVisionOsInventory `json:"-"`
+	WatchOS    *MobileDeviceWatchOsInventory  `json:"-"`
 }
 
 // UnmarshalJSON dispatches the payload to the variant matching the
@@ -4570,6 +4601,9 @@ func (m *MobileDeviceResponse) UnmarshalJSON(data []byte) error {
 	case "tvOS":
 		m.TvOS = new(MobileDeviceTvOsInventory)
 		return json.Unmarshal(data, m.TvOS)
+	case "visionOS":
+		m.VisionOS = new(MobileDeviceVisionOsInventory)
+		return json.Unmarshal(data, m.VisionOS)
 	case "watchOS":
 		m.WatchOS = new(MobileDeviceWatchOsInventory)
 		return json.Unmarshal(data, m.WatchOS)
@@ -4585,6 +4619,8 @@ func (m MobileDeviceResponse) MarshalJSON() ([]byte, error) {
 		return json.Marshal(m.IOS)
 	case "tvOS":
 		return json.Marshal(m.TvOS)
+	case "visionOS":
+		return json.Marshal(m.VisionOS)
 	case "watchOS":
 		return json.Marshal(m.WatchOS)
 	}
@@ -4674,6 +4710,8 @@ type MobileDeviceTvOsGeneral struct {
 	Languages                                string                           `json:"languages"`
 	LastEnrolledDate                         *time.Time                       `json:"lastEnrolledDate,omitempty"`
 	LastInventoryUpdateDate                  *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                  *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
 	LastLoggedInUsernameSelfService          *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
 	LastLoggedInUsernameSelfServiceTimestamp *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
 	Locales                                  string                           `json:"locales"`
@@ -4749,6 +4787,61 @@ type MobileDeviceV2 struct {
 	WifiMacAddress         string `json:"wifiMacAddress"`
 }
 
+// MobileDeviceVisionOsGeneral represents a mobile device vision os general.
+type MobileDeviceVisionOsGeneral struct {
+	AppAnalyticsEnabled                      bool                             `json:"appAnalyticsEnabled"`
+	AssetTag                                 string                           `json:"assetTag"`
+	CloudBackupEnabled                       bool                             `json:"cloudBackupEnabled"`
+	DeclarativeDeviceManagementEnabled       bool                             `json:"declarativeDeviceManagementEnabled"`
+	DeviceLocatorServiceEnabled              bool                             `json:"deviceLocatorServiceEnabled"`
+	DeviceOwnershipType                      string                           `json:"deviceOwnershipType"`
+	DiagnosticAndUsageReportingEnabled       bool                             `json:"diagnosticAndUsageReportingEnabled"`
+	DisplayName                              string                           `json:"displayName"`
+	DoNotDisturbEnabled                      bool                             `json:"doNotDisturbEnabled"`
+	EnrollmentMethodPrestage                 *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
+	EnrollmentSessionTokenValid              bool                             `json:"enrollmentSessionTokenValid"`
+	ExtensionAttributes                      []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
+	IPAddress                                string                           `json:"ipAddress"`
+	ItunesStoreAccountActive                 bool                             `json:"itunesStoreAccountActive"`
+	LastCloudBackupDate                      *time.Time                       `json:"lastCloudBackupDate,omitempty"`
+	LastEnrolledDate                         *time.Time                       `json:"lastEnrolledDate,omitempty"`
+	LastInventoryUpdateDate                  *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                  *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
+	LastLoggedInUsernameSelfService          *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	Managed                                  bool                             `json:"managed"`
+	ManagementID                             string                           `json:"managementId"`
+	MDMProfileExpirationDate                 *time.Time                       `json:"mdmProfileExpirationDate,omitempty"`
+	OsBuild                                  string                           `json:"osBuild"`
+	OsRapidSecurityResponse                  string                           `json:"osRapidSecurityResponse"`
+	OsSupplementalBuildVersion               string                           `json:"osSupplementalBuildVersion"`
+	OsVersion                                string                           `json:"osVersion"`
+	SiteID                                   string                           `json:"siteId"`
+	SoftwareUpdateDeviceID                   string                           `json:"softwareUpdateDeviceId"`
+	Supervised                               bool                             `json:"supervised"`
+	TimeZone                                 string                           `json:"timeZone"`
+	UDID                                     string                           `json:"udid"`
+}
+
+// MobileDeviceVisionOsInventory represents a mobile device vision os inventory.
+type MobileDeviceVisionOsInventory struct {
+	Applications         []MobileDeviceApplicationInventoryDetail `json:"applications"`
+	Certificates         []MobileDeviceCertificate                `json:"certificates"`
+	DeviceType           string                                   `json:"deviceType"`
+	ExtensionAttributes  []MobileDeviceExtensionAttribute         `json:"extensionAttributes"`
+	General              *MobileDeviceVisionOsGeneral             `json:"general,omitempty"`
+	Groups               []MobileDeviceInventoryGroup             `json:"groups"`
+	Hardware             *MobileDeviceHardware                    `json:"hardware,omitempty"`
+	MobileDeviceID       string                                   `json:"mobileDeviceId"`
+	Network              *MobileDeviceNetwork                     `json:"network,omitempty"`
+	Profiles             []MobileDeviceProfile                    `json:"profiles"`
+	ProvisioningProfiles *[]MobileDeviceProvisioningProfiles      `json:"provisioningProfiles,omitempty"`
+	Purchasing           *MobileDevicePurchasing                  `json:"purchasing,omitempty"`
+	Security             *MobileDeviceSecurity                    `json:"security,omitempty"`
+	UserAndLocation      *MobileDeviceUserAndLocation             `json:"userAndLocation,omitempty"`
+}
+
 // MobileDeviceWatchOsGeneral represents a mobile device watch os general.
 type MobileDeviceWatchOsGeneral struct {
 	AppAnalyticsEnabled                      bool                             `json:"appAnalyticsEnabled"`
@@ -4767,6 +4860,8 @@ type MobileDeviceWatchOsGeneral struct {
 	LastCloudBackupDate                      *time.Time                       `json:"lastCloudBackupDate,omitempty"`
 	LastEnrolledDate                         *time.Time                       `json:"lastEnrolledDate,omitempty"`
 	LastInventoryUpdateDate                  *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                  *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
 	LastLoggedInUsernameSelfService          *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
 	LastLoggedInUsernameSelfServiceTimestamp *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
 	Managed                                  bool                             `json:"managed"`
@@ -5357,7 +5452,6 @@ type PolicyPropertiesV1 struct {
 type PostComputerPrestageV3 struct {
 	AccountSettings                    *AccountSettingsRequest         `json:"accountSettings,omitempty"`
 	AnchorCertificates                 *[]string                       `json:"anchorCertificates,omitempty"`
-	AuthURL                            *string                         `json:"authUrl,omitempty"`
 	AuthenticationPrompt               string                          `json:"authenticationPrompt"`
 	AutoAdvanceSetup                   bool                            `json:"autoAdvanceSetup"`
 	CustomPackageDistributionPointID   string                          `json:"customPackageDistributionPointId"`
@@ -5556,7 +5650,6 @@ type PurchasingV2 struct {
 type PutComputerPrestageV3 struct {
 	AccountSettings                    *AccountSettingsRequest         `json:"accountSettings,omitempty"`
 	AnchorCertificates                 *[]string                       `json:"anchorCertificates,omitempty"`
-	AuthURL                            *string                         `json:"authUrl,omitempty"`
 	AuthenticationPrompt               string                          `json:"authenticationPrompt"`
 	AutoAdvanceSetup                   bool                            `json:"autoAdvanceSetup"`
 	CustomPackageDistributionPointID   string                          `json:"customPackageDistributionPointId"`
@@ -6661,8 +6754,9 @@ type V1Site struct {
 
 // V1SiteBase represents a v1 site base.
 type V1SiteBase struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	DivisionID *string `json:"divisionId,omitempty"`
+	ID         string  `json:"id"`
+	Name       string  `json:"name"`
 }
 
 // ValidateApplicationsCommand represents a validate applications command.
@@ -6978,7 +7072,7 @@ type AppInstallerDeploymentCreate struct {
 	SiteID                          *string                           `json:"siteId,omitempty"`
 	SmartGroupID                    *string                           `json:"smartGroupId,omitempty"`
 	TriggerAdminNotifications       *bool                             `json:"triggerAdminNotifications,omitempty"`
-	UpdateBehavior                  *string                           `json:"updateBehavior,omitempty"`
+	UpdateBehavior                  string                            `json:"updateBehavior"`
 }
 
 // AppInstallerDeploymentHrefResponse represents a app installer deployment href response.
@@ -7065,12 +7159,4 @@ type AppInstallerEndUserExperienceSettings struct {
 type AppInstallerGlobalSettings struct {
 	DeploymentProcessControls *AppInstallerDeploymentProcessControls `json:"deploymentProcessControls,omitempty"`
 	EndUserExperienceSettings *AppInstallerEndUserExperienceSettings `json:"endUserExperienceSettings,omitempty"`
-}
-
-// LocalAdminPasswordSettings represents a local admin password settings.
-type LocalAdminPasswordSettings struct {
-	AutoDeployEnabled        bool  `json:"autoDeployEnabled"`
-	AutoRotateEnabled        bool  `json:"autoRotateEnabled"`
-	AutoRotateExpirationTime int64 `json:"autoRotateExpirationTime"`
-	PasswordRotationTime     int64 `json:"passwordRotationTime"`
 }
