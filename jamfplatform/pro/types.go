@@ -7072,7 +7072,7 @@ type AppInstallerDeploymentCreate struct {
 	SiteID                          *string                           `json:"siteId,omitempty"`
 	SmartGroupID                    *string                           `json:"smartGroupId,omitempty"`
 	TriggerAdminNotifications       *bool                             `json:"triggerAdminNotifications,omitempty"`
-	UpdateBehavior                  *string                           `json:"updateBehavior,omitempty"`
+	UpdateBehavior                  string                            `json:"updateBehavior"`
 }
 
 // AppInstallerDeploymentHrefResponse represents a app installer deployment href response.

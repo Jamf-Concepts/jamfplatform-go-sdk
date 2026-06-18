@@ -154,6 +154,7 @@
             "type": "boolean"
           },
           "updateBehavior": {
+            "description": "Required on create. Must be a valid enum value; the server rejects a missing, empty, or unrecognised value with 400 INVALID_FIELD.",
             "enum": [
               "AUTOMATIC",
               "MANUAL"
@@ -164,7 +165,8 @@
         "required": [
           "name",
           "appTitleId",
-          "deploymentType"
+          "deploymentType",
+          "updateBehavior"
         ],
         "type": "object"
       },

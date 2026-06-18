@@ -1008,7 +1008,7 @@ func TestAcceptance_ApplyAppInstallerDeploymentV1(t *testing.T) {
 		Name:           name,
 		AppTitleID:     titleID,
 		DeploymentType: "INSTALL_AUTOMATICALLY",
-		UpdateBehavior: ptrStr("AUTOMATIC"),
+		UpdateBehavior: "AUTOMATIC",
 	}
 
 	id, created, err := p.ApplyAppInstallerDeploymentV1(ctx, req)
