@@ -669,7 +669,13 @@ func TestAcceptance_Pro_Security_LocalAdminPasswordSettingsV2(t *testing.T) {
 		current.AutoRotateExpirationTime,
 	)
 
-	updated, err := p.UpdateLocalAdminPasswordSettingsV2(ctx, current)
+	req := &pro.LapsSettingsRequestV2{
+		AutoDeployEnabled:        current.AutoDeployEnabled,
+		PasswordRotationTime:     current.PasswordRotationTime,
+		AutoRotateEnabled:        current.AutoRotateEnabled,
+		AutoRotateExpirationTime: current.AutoRotateExpirationTime,
+	}
+	updated, err := p.UpdateLocalAdminPasswordSettingsV2(ctx, req)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateLocalAdminPasswordSettingsV2 round-trip: %v", err)

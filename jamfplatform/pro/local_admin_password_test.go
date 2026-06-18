@@ -54,7 +54,7 @@ func TestUpdateLocalAdminPasswordSettingsV2(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
-	result, err := c.UpdateLocalAdminPasswordSettingsV2(context.Background(), &LocalAdminPasswordSettings{})
+	result, err := c.UpdateLocalAdminPasswordSettingsV2(context.Background(), &LapsSettingsRequestV2{})
 	if err != nil {
 		t.Fatal(err)
 	}
