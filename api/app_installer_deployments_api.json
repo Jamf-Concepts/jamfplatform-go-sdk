@@ -342,7 +342,32 @@
   "paths": {
     "/v1/app-installers/deployments": {
       "get": {
-        "description": "Retrieves all App Installer deployment configurations (enabled or not)",
+        "description": "Retrieves all App Installer deployment configurations (enabled or not). Results are paginated; the response carries the unfiltered totalCount so callers can page through the full set.",
+        "parameters": [
+          {
+            "description": "Zero-based page index. Defaults to 0 when omitted.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of results per page. Defaults to 100 when omitted.",
+            "in": "query",
+            "name": "page-size",
+            "schema": {
+              "default": 100,
+              "format": "int32",
+              "maximum": 1000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -377,7 +402,7 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
                 "schema": {

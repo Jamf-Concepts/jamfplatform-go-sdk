@@ -10636,8 +10636,7 @@
         },
         {
           "op": "POST /v1/app-installers/deployments",
-          "name": "CreateAppInstallerDeploymentV1",
-          "expectedStatus": 201
+          "name": "CreateAppInstallerDeploymentV1"
         },
         {
           "op": "GET /v1/app-installers/deployments/{id}",
@@ -10649,8 +10648,7 @@
         },
         {
           "op": "DELETE /v1/app-installers/deployments/{id}",
-          "name": "DeleteAppInstallerDeploymentV1",
-          "expectedStatus": 204
+          "name": "DeleteAppInstallerDeploymentV1"
         }
       ]
     },
