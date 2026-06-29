@@ -12,6 +12,8 @@ import (
 )
 
 // GetActivationCode finds the Jamf Pro activation code.
+//
+// Required privileges: read:pro:activation-code.
 func (c *Client) GetActivationCode(ctx context.Context) (*ActivationCode, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ActivationCode
@@ -23,6 +25,8 @@ func (c *Client) GetActivationCode(ctx context.Context) (*ActivationCode, error)
 }
 
 // UpdateActivationCode updates the Jamf Pro activation code.
+//
+// Required privileges: update:pro:activation-code.
 func (c *Client) UpdateActivationCode(ctx context.Context, request *ActivationCode) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := prefix + "/activationcode"

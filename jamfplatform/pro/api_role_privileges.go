@@ -13,6 +13,8 @@ import (
 )
 
 // ListApiRolePrivilegesV1 get the current Jamf API Role Privileges.
+//
+// Required privileges: read:pro:api-roles. Legacy Jamf Pro privilege name(s): Read API Roles.
 func (c *Client) ListApiRolePrivilegesV1(ctx context.Context) (*ApiRolePrivileges, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ApiRolePrivileges
@@ -24,6 +26,8 @@ func (c *Client) ListApiRolePrivilegesV1(ctx context.Context) (*ApiRolePrivilege
 }
 
 // SearchApiRolePrivilegesV1 search the current Jamf API Role Privileges.
+//
+// Required privileges: read:pro:api-roles. Legacy Jamf Pro privilege name(s): Read API Roles.
 func (c *Client) SearchApiRolePrivilegesV1(ctx context.Context, name string, limit string) (*ApiRolePrivileges, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ApiRolePrivileges

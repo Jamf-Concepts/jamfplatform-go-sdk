@@ -68,6 +68,21 @@ type GoMethod struct {
 	Format           string      // carried from SpecDef so per-method templates can branch without $-scope
 	Resolver         *GoResolver // populated on synthetic resolver methods (Category resolverID/resolverTyped)
 	Apply            *GoApply    // populated on synthetic apply (upsert) methods
+
+	// Required-privilege metadata, sourced from the operation's
+	// x-required-privileges / x-required-privileges-legacy vendor extensions.
+	// PrivilegesKnown is true only for spec-derived methods (those built by
+	// buildMethod); it stays false on synthetic resolver/apply methods, which
+	// compose underlying endpoints rather than mapping to one operation. A
+	// spec-derived method with no declared privileges has PrivilegesKnown=true
+	// and empty slices — that means the endpoint needs no special privilege
+	// (any authenticated API client may call it), which is distinct from
+	// "unknown". ScopedPrivileges and LegacyPrivileges are NOT index-aligned:
+	// a single legacy name can cover multiple scoped IDs, and the legacy form
+	// is published only for the Pro family.
+	PrivilegesKnown  bool
+	ScopedPrivileges []string // modern scoped privilege IDs, e.g. "create:pro:buildings"
+	LegacyPrivileges []string // human-readable Jamf Pro privilege names, e.g. "Create Buildings"
 }
 
 // GoResolver carries the config needed by resolver method templates.

@@ -13,6 +13,8 @@ import (
 )
 
 // GetPeripheralTypeByID finds peripheral types by ID.
+//
+// Required privileges: read:pro:peripheral-types.
 func (c *Client) GetPeripheralTypeByID(ctx context.Context, id string) (*PeripheralType, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PeripheralType
@@ -24,6 +26,8 @@ func (c *Client) GetPeripheralTypeByID(ctx context.Context, id string) (*Periphe
 }
 
 // CreatePeripheralTypeByID creates a new peripheral by ID.
+//
+// Required privileges: create:pro:peripheral-types.
 func (c *Client) CreatePeripheralTypeByID(ctx context.Context, id string, request *PeripheralType) (*PeripheralType, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PeripheralType
@@ -35,6 +39,8 @@ func (c *Client) CreatePeripheralTypeByID(ctx context.Context, id string, reques
 }
 
 // UpdatePeripheralTypeByID updates an existing peripheral by ID.
+//
+// Required privileges: update:pro:peripheral-types.
 func (c *Client) UpdatePeripheralTypeByID(ctx context.Context, id string, request *PeripheralType) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/peripheraltypes/id/%s", prefix, url.PathEscape(id))
@@ -45,6 +51,8 @@ func (c *Client) UpdatePeripheralTypeByID(ctx context.Context, id string, reques
 }
 
 // DeletePeripheralTypeByID deletes a peripheral by ID.
+//
+// Required privileges: delete:pro:peripheral-types.
 func (c *Client) DeletePeripheralTypeByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/peripheraltypes/id/%s", prefix, url.PathEscape(id))
@@ -55,6 +63,8 @@ func (c *Client) DeletePeripheralTypeByID(ctx context.Context, id string) error 
 }
 
 // ListPeripheralTypes finds all peripheral types.
+//
+// Required privileges: read:pro:peripheral-types.
 func (c *Client) ListPeripheralTypes(ctx context.Context) (*PeripheralTypes, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PeripheralTypes

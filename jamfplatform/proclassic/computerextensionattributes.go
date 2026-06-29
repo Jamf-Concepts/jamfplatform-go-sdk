@@ -16,6 +16,8 @@ import (
 )
 
 // GetComputerExtensionAttributeByID finds computer extension attributes by ID.
+//
+// Required privileges: read:pro:computer-extension-attributes.
 func (c *Client) GetComputerExtensionAttributeByID(ctx context.Context, id string) (*ComputerExtensionAttribute, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerExtensionAttribute
@@ -27,6 +29,8 @@ func (c *Client) GetComputerExtensionAttributeByID(ctx context.Context, id strin
 }
 
 // CreateComputerExtensionAttributeByID creates a new computer extension attribute by ID.
+//
+// Required privileges: create:pro:computer-extension-attributes.
 func (c *Client) CreateComputerExtensionAttributeByID(ctx context.Context, id string, request *ComputerExtensionAttribute) (*ComputerExtensionAttribute, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerExtensionAttribute
@@ -38,6 +42,8 @@ func (c *Client) CreateComputerExtensionAttributeByID(ctx context.Context, id st
 }
 
 // UpdateComputerExtensionAttributeByID updates an existing computer extension attribute by ID.
+//
+// Required privileges: update:pro:computer-extension-attributes.
 func (c *Client) UpdateComputerExtensionAttributeByID(ctx context.Context, id string, request *ComputerExtensionAttribute) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateComputerExtensionAttributeByID(ctx context.Context, id st
 }
 
 // DeleteComputerExtensionAttributeByID deletes a computer extension attribute by ID.
+//
+// Required privileges: delete:pro:computer-extension-attributes.
 func (c *Client) DeleteComputerExtensionAttributeByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteComputerExtensionAttributeByID(ctx context.Context, id st
 }
 
 // GetComputerExtensionAttributeByName finds computer extension attributes by name.
+//
+// Required privileges: read:pro:computer-extension-attributes.
 func (c *Client) GetComputerExtensionAttributeByName(ctx context.Context, name string) (*ComputerExtensionAttribute, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerExtensionAttribute
@@ -69,6 +79,8 @@ func (c *Client) GetComputerExtensionAttributeByName(ctx context.Context, name s
 }
 
 // UpdateComputerExtensionAttributeByName updates an existing computer extension attribute by name.
+//
+// Required privileges: update:pro:computer-extension-attributes.
 func (c *Client) UpdateComputerExtensionAttributeByName(ctx context.Context, name string, request *ComputerExtensionAttribute) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateComputerExtensionAttributeByName(ctx context.Context, nam
 }
 
 // DeleteComputerExtensionAttributeByName deletes a computer extension attribute by name.
+//
+// Required privileges: delete:pro:computer-extension-attributes.
 func (c *Client) DeleteComputerExtensionAttributeByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteComputerExtensionAttributeByName(ctx context.Context, nam
 }
 
 // ListComputerExtensionAttributes finds all computer extension attributes.
+//
+// Required privileges: read:pro:computer-extension-attributes.
 func (c *Client) ListComputerExtensionAttributes(ctx context.Context) (*ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerExtensionAttributes
@@ -100,6 +116,8 @@ func (c *Client) ListComputerExtensionAttributes(ctx context.Context) (*Computer
 }
 
 // CreateComputerExtensionAttributeByName creates a new computer extension attribute by ID.
+//
+// Required privileges: create:pro:computer-extension-attributes.
 func (c *Client) CreateComputerExtensionAttributeByName(ctx context.Context, name string, request *ComputerExtensionAttribute) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))

@@ -12,6 +12,8 @@ import (
 )
 
 // GetSsoFailoverV1 retrieve the current failover settings.
+//
+// Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) GetSsoFailoverV1(ctx context.Context) (*SsoFailoverData, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SsoFailoverData
@@ -23,6 +25,8 @@ func (c *Client) GetSsoFailoverV1(ctx context.Context) (*SsoFailoverData, error)
 }
 
 // GenerateSsoFailoverV1 regenerates failover url.
+//
+// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) GenerateSsoFailoverV1(ctx context.Context) (*SsoFailoverData, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SsoFailoverData

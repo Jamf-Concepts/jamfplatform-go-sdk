@@ -17,6 +17,8 @@ import (
 )
 
 // UpdateActivationCodeV1 updates Activation Code.
+//
+// Required privileges: update:pro:activation-code. Legacy Jamf Pro privilege name(s): Update Activation Code.
 func (c *Client) UpdateActivationCodeV1(ctx context.Context, request *ActivationCode) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/activation-code"
@@ -27,6 +29,8 @@ func (c *Client) UpdateActivationCodeV1(ctx context.Context, request *Activation
 }
 
 // ListActivationCodeHistoryV1 get Activation Code history object.
+//
+// Required privileges: read:pro:activation-code. Legacy Jamf Pro privilege name(s): Read Activation Code.
 func (c *Client) ListActivationCodeHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -57,6 +61,8 @@ func (c *Client) ListActivationCodeHistoryV1(ctx context.Context, sort []string,
 }
 
 // CreateActivationCodeHistoryNoteV1 add Activation Code object note.
+//
+// Required privileges: update:pro:activation-code. Legacy Jamf Pro privilege name(s): Update Activation Code.
 func (c *Client) CreateActivationCodeHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory
@@ -68,6 +74,8 @@ func (c *Client) CreateActivationCodeHistoryNoteV1(ctx context.Context, request 
 }
 
 // ExportActivationCodeHistoryV1 export history object collection in specified format for Activation Code.
+//
+// Required privileges: read:pro:activation-code. Legacy Jamf Pro privilege name(s): Read Activation Code.
 func (c *Client) ExportActivationCodeHistoryV1(ctx context.Context, request *ExportParameters) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -79,6 +87,8 @@ func (c *Client) ExportActivationCodeHistoryV1(ctx context.Context, request *Exp
 }
 
 // UpdateActivationCodeOrganizationNameV1 updates Organization Name.
+//
+// Required privileges: update:pro:activation-code. Legacy Jamf Pro privilege name(s): Update Activation Code.
 func (c *Client) UpdateActivationCodeOrganizationNameV1(ctx context.Context, request *OrganizationName) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/activation-code/organization-name"

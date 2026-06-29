@@ -16,6 +16,8 @@ import (
 )
 
 // GetIBeaconByID finds iBeacon regions by ID.
+//
+// Required privileges: read:pro:ibeacon.
 func (c *Client) GetIBeaconByID(ctx context.Context, id string) (*Ibeacon, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Ibeacon
@@ -27,6 +29,8 @@ func (c *Client) GetIBeaconByID(ctx context.Context, id string) (*Ibeacon, error
 }
 
 // CreateIBeaconByID creates a new iBeacon region by ID.
+//
+// Required privileges: create:pro:ibeacon.
 func (c *Client) CreateIBeaconByID(ctx context.Context, id string, request *Ibeacon) (*Ibeacon, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Ibeacon
@@ -38,6 +42,8 @@ func (c *Client) CreateIBeaconByID(ctx context.Context, id string, request *Ibea
 }
 
 // UpdateIBeaconByID updates an existing iBeacon region by ID.
+//
+// Required privileges: update:pro:ibeacon.
 func (c *Client) UpdateIBeaconByID(ctx context.Context, id string, request *Ibeacon) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateIBeaconByID(ctx context.Context, id string, request *Ibea
 }
 
 // DeleteIBeaconByID deletes an iBeacon region by ID.
+//
+// Required privileges: delete:pro:ibeacon.
 func (c *Client) DeleteIBeaconByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteIBeaconByID(ctx context.Context, id string) error {
 }
 
 // GetIBeaconByName finds iBeacon regions by name.
+//
+// Required privileges: read:pro:ibeacon.
 func (c *Client) GetIBeaconByName(ctx context.Context, name string) (*Ibeacon, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Ibeacon
@@ -69,6 +79,8 @@ func (c *Client) GetIBeaconByName(ctx context.Context, name string) (*Ibeacon, e
 }
 
 // UpdateIBeaconByName updates an existing iBeacon region by name.
+//
+// Required privileges: update:pro:ibeacon.
 func (c *Client) UpdateIBeaconByName(ctx context.Context, name string, request *Ibeacon) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateIBeaconByName(ctx context.Context, name string, request *
 }
 
 // DeleteIBeaconByName deletes an iBeacon region by name.
+//
+// Required privileges: delete:pro:ibeacon.
 func (c *Client) DeleteIBeaconByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteIBeaconByName(ctx context.Context, name string) error {
 }
 
 // ListIBeacons finds all iBeacon regions.
+//
+// Required privileges: read:pro:ibeacon.
 func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Ibeacons
@@ -100,6 +116,8 @@ func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
 }
 
 // CreateIBeaconByName creates a new iBeacon region by ID.
+//
+// Required privileges: create:pro:ibeacon.
 func (c *Client) CreateIBeaconByName(ctx context.Context, name string, request *Ibeacon) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))

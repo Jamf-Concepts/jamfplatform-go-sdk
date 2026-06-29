@@ -16,6 +16,8 @@ import (
 )
 
 // GetUserByID finds users by ID.
+//
+// Required privileges: read:pro:user.
 func (c *Client) GetUserByID(ctx context.Context, id string) (*User, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result User
@@ -27,6 +29,8 @@ func (c *Client) GetUserByID(ctx context.Context, id string) (*User, error) {
 }
 
 // CreateUserByID creates a new user by ID.
+//
+// Required privileges: create:pro:user.
 func (c *Client) CreateUserByID(ctx context.Context, id string, request *UserPost) (*User, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result User
@@ -38,6 +42,8 @@ func (c *Client) CreateUserByID(ctx context.Context, id string, request *UserPos
 }
 
 // UpdateUserByID updates an existing user by ID.
+//
+// Required privileges: update:pro:user.
 func (c *Client) UpdateUserByID(ctx context.Context, id string, request *UserPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateUserByID(ctx context.Context, id string, request *UserPos
 }
 
 // DeleteUserByID deletes a user by ID.
+//
+// Required privileges: delete:pro:user.
 func (c *Client) DeleteUserByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteUserByID(ctx context.Context, id string) error {
 }
 
 // GetUserByName finds users by name.
+//
+// Required privileges: read:pro:user.
 func (c *Client) GetUserByName(ctx context.Context, name string) (*User, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result User
@@ -69,6 +79,8 @@ func (c *Client) GetUserByName(ctx context.Context, name string) (*User, error) 
 }
 
 // UpdateUserByName updates an existing user by name.
+//
+// Required privileges: update:pro:user.
 func (c *Client) UpdateUserByName(ctx context.Context, name string, request *UserPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateUserByName(ctx context.Context, name string, request *Use
 }
 
 // DeleteUserByName deletes a user by name.
+//
+// Required privileges: delete:pro:user.
 func (c *Client) DeleteUserByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteUserByName(ctx context.Context, name string) error {
 }
 
 // GetUserByEmail finds users by email address.
+//
+// Required privileges: read:pro:user.
 func (c *Client) GetUserByEmail(ctx context.Context, email string) (*User, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result User
@@ -100,6 +116,8 @@ func (c *Client) GetUserByEmail(ctx context.Context, email string) (*User, error
 }
 
 // ListUsers finds all users.
+//
+// Required privileges: read:pro:user.
 func (c *Client) ListUsers(ctx context.Context) (*Users, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Users
@@ -111,6 +129,8 @@ func (c *Client) ListUsers(ctx context.Context) (*Users, error) {
 }
 
 // CreateUserByName creates a new user by ID.
+//
+// Required privileges: create:pro:user.
 func (c *Client) CreateUserByName(ctx context.Context, name string, request *UserPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))

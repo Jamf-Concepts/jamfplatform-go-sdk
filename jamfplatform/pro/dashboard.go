@@ -12,6 +12,8 @@ import (
 )
 
 // GetDashboardV1 get all the dashboard setup information.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetDashboardV1(ctx context.Context) (*DashboardSetup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DashboardSetup
@@ -23,6 +25,8 @@ func (c *Client) GetDashboardV1(ctx context.Context) (*DashboardSetup, error) {
 }
 
 // ToggleDashboardObjectV1 add or remove an object to the Jamf Pro dashboard.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) ToggleDashboardObjectV1(ctx context.Context, request *DashboardObject) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse

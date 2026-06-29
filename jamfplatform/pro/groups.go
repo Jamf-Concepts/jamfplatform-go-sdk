@@ -18,6 +18,9 @@ import (
 )
 
 // ListGroupsV2 returns group information for all Mobile Device and Computer groups.
+//
+// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
@@ -50,6 +53,9 @@ func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string)
 // ListGroupsV1 returns group information for all Mobile Device and Computer groups.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
@@ -80,6 +86,9 @@ func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string)
 }
 
 // GetGroupV2 returns group information for the given platform UUID.
+//
+// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetGroupV2(ctx context.Context, id string) (*GroupWithCriteriaDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result GroupWithCriteriaDtoV1
@@ -93,6 +102,9 @@ func (c *Client) GetGroupV2(ctx context.Context, id string) (*GroupWithCriteriaD
 // GetGroupV1 returns group information for the given platform UUID.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GroupWithCriteriaDtoV1
@@ -104,6 +116,9 @@ func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaD
 }
 
 // DeleteGroupV2 delete a group by platform UUID.
+//
+// Required privileges: delete:pro:computer-groups, delete:pro:mobile-device-groups.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) DeleteGroupV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
@@ -116,6 +131,9 @@ func (c *Client) DeleteGroupV2(ctx context.Context, id string) error {
 // DeleteGroupV1 delete a group by platform UUID.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: delete:pro:computer-groups, delete:pro:mobile-device-groups.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
@@ -126,6 +144,9 @@ func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
 }
 
 // PatchGroupV2 update a group by platform UUID.
+//
+// Required privileges: update:pro:computer-groups, update:pro:mobile-device-groups.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) PatchGroupV2(ctx context.Context, id string, request *GroupUpdateDtoV2) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
@@ -138,6 +159,9 @@ func (c *Client) PatchGroupV2(ctx context.Context, id string, request *GroupUpda
 // PatchGroupV1 update a group by platform UUID.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: update:pro:computer-groups, update:pro:mobile-device-groups.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) PatchGroupV1(ctx context.Context, id string, request *GroupUpdateDtoV1) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))

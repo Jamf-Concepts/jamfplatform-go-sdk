@@ -16,6 +16,8 @@ import (
 )
 
 // GetMobileDeviceEnrollmentProfileByID finds mobile device enrollment profiles by ID.
+//
+// Required privileges: read:pro:enrollment-profiles.
 func (c *Client) GetMobileDeviceEnrollmentProfileByID(ctx context.Context, id string) (*MobileDeviceEnrollmentProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
@@ -27,6 +29,8 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByID(ctx context.Context, id st
 }
 
 // CreateMobileDeviceEnrollmentProfileByID creates a new mobile device enrollment profile by ID.
+//
+// Required privileges: create:pro:enrollment-profiles.
 func (c *Client) CreateMobileDeviceEnrollmentProfileByID(ctx context.Context, id string, request *MobileDeviceEnrollmentProfilePost) (*MobileDeviceEnrollmentProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
@@ -38,6 +42,8 @@ func (c *Client) CreateMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 }
 
 // UpdateMobileDeviceEnrollmentProfileByID updates an existing mobile device enrollment profile by ID.
+//
+// Required privileges: update:pro:enrollment-profiles.
 func (c *Client) UpdateMobileDeviceEnrollmentProfileByID(ctx context.Context, id string, request *MobileDeviceEnrollmentProfilePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 }
 
 // DeleteMobileDeviceEnrollmentProfileByID deletes a mobile device enrollment profile by ID.
+//
+// Required privileges: delete:pro:enrollment-profiles.
 func (c *Client) DeleteMobileDeviceEnrollmentProfileByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 }
 
 // GetMobileDeviceEnrollmentProfileByName finds mobile device enrollment profiles by name.
+//
+// Required privileges: read:pro:enrollment-profiles.
 func (c *Client) GetMobileDeviceEnrollmentProfileByName(ctx context.Context, name string) (*MobileDeviceEnrollmentProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
@@ -69,6 +79,8 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByName(ctx context.Context, nam
 }
 
 // DeleteMobileDeviceEnrollmentProfileByName deletes a mobile device enrollment profile by name.
+//
+// Required privileges: delete:pro:enrollment-profiles.
 func (c *Client) DeleteMobileDeviceEnrollmentProfileByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByName(ctx context.Context, 
 }
 
 // GetMobileDeviceEnrollmentProfileByInvitation finds mobile device enrollment profiles by invitation.
+//
+// Required privileges: read:pro:enrollment-profiles.
 func (c *Client) GetMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string) (*MobileDeviceEnrollmentProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
@@ -90,6 +104,8 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByInvitation(ctx context.Contex
 }
 
 // ListMobileDeviceEnrollmentProfiles finds all mobile device enrollment profiles.
+//
+// Required privileges: read:pro:enrollment-profiles.
 func (c *Client) ListMobileDeviceEnrollmentProfiles(ctx context.Context) (*MobileDeviceEnrollmentProfiles, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfiles
@@ -101,6 +117,8 @@ func (c *Client) ListMobileDeviceEnrollmentProfiles(ctx context.Context) (*Mobil
 }
 
 // GetMobileDeviceEnrollmentProfileByIDSubset finds a subset of data for an enrollment profile.
+//
+// Required privileges: read:pro:enrollment-profiles.
 func (c *Client) GetMobileDeviceEnrollmentProfileByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceEnrollmentProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
@@ -112,6 +130,8 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByIDSubset(ctx context.Context,
 }
 
 // DeleteMobileDeviceEnrollmentProfileByInvitation deletes a mobile device enrollment profile by invitation.
+//
+// Required privileges: delete:pro:enrollment-profiles.
 func (c *Client) DeleteMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
@@ -122,6 +142,8 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByInvitation(ctx context.Con
 }
 
 // UpdateMobileDeviceEnrollmentProfileByInvitation updates an existing mobile device enrollment profile by invitation.
+//
+// Required privileges: update:pro:enrollment-profiles.
 func (c *Client) UpdateMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string, request *MobileDeviceEnrollmentProfilePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
@@ -132,6 +154,8 @@ func (c *Client) UpdateMobileDeviceEnrollmentProfileByInvitation(ctx context.Con
 }
 
 // UpdateMobileDeviceEnrollmentProfileByName updates an existing mobile device enrollment profile by name.
+//
+// Required privileges: update:pro:enrollment-profiles.
 func (c *Client) UpdateMobileDeviceEnrollmentProfileByName(ctx context.Context, name string, request *MobileDeviceEnrollmentProfilePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
@@ -142,6 +166,8 @@ func (c *Client) UpdateMobileDeviceEnrollmentProfileByName(ctx context.Context, 
 }
 
 // GetMobileDeviceEnrollmentProfileByNameSubset finds a subset of data for mobile device enrollment profiles by name.
+//
+// Required privileges: read:pro:enrollment-profiles.
 func (c *Client) GetMobileDeviceEnrollmentProfileByNameSubset(ctx context.Context, name string, subset string) (*MobileDeviceEnrollmentProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
@@ -153,6 +179,8 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByNameSubset(ctx context.Contex
 }
 
 // GetMobileDeviceEnrollmentProfileByInvitationSubset finds a subset of data for an enrollment profile.
+//
+// Required privileges: read:pro:enrollment-profiles.
 func (c *Client) GetMobileDeviceEnrollmentProfileByInvitationSubset(ctx context.Context, invitation string, subset string) (*MobileDeviceEnrollmentProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
@@ -164,6 +192,8 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByInvitationSubset(ctx context.
 }
 
 // CreateMobileDeviceEnrollmentProfileByInvitation creates a new mobile device enrollment profile by ID.
+//
+// Required privileges: create:pro:enrollment-profiles.
 func (c *Client) CreateMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string, request *MobileDeviceEnrollmentProfilePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
@@ -174,6 +204,8 @@ func (c *Client) CreateMobileDeviceEnrollmentProfileByInvitation(ctx context.Con
 }
 
 // CreateMobileDeviceEnrollmentProfileByName creates a new mobile device enrollment profile by ID.
+//
+// Required privileges: create:pro:enrollment-profiles.
 func (c *Client) CreateMobileDeviceEnrollmentProfileByName(ctx context.Context, name string, request *MobileDeviceEnrollmentProfilePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))

@@ -13,6 +13,8 @@ import (
 )
 
 // GetComputerHistoryByID finds computer history by ID.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHistoryByID(ctx context.Context, id string) (*ComputerHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHistory
@@ -24,6 +26,8 @@ func (c *Client) GetComputerHistoryByID(ctx context.Context, id string) (*Comput
 }
 
 // GetComputerHistoryByName finds computer history by name.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHistoryByName(ctx context.Context, name string) (*ComputerHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHistory
@@ -35,6 +39,8 @@ func (c *Client) GetComputerHistoryByName(ctx context.Context, name string) (*Co
 }
 
 // GetComputerHistoryByUDID finds computer history by UDID.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHistoryByUDID(ctx context.Context, udid string) (*ComputerHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHistory
@@ -46,6 +52,8 @@ func (c *Client) GetComputerHistoryByUDID(ctx context.Context, udid string) (*Co
 }
 
 // GetComputerHistoryBySerialNumber finds computer history by serial number.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHistoryBySerialNumber(ctx context.Context, serialNumber string) (*ComputerHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHistory
@@ -57,6 +65,8 @@ func (c *Client) GetComputerHistoryBySerialNumber(ctx context.Context, serialNum
 }
 
 // GetComputerHistoryByMacAddress finds computer history by MAC address.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHistoryByMacAddress(ctx context.Context, macAddress string) (*ComputerHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHistory
@@ -68,6 +78,8 @@ func (c *Client) GetComputerHistoryByMacAddress(ctx context.Context, macAddress 
 }
 
 // GetComputerHistoryByIDSubset finds a subset of computer history data by ID.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHistoryByIDSubset(ctx context.Context, id string, subset string) (*ComputerHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHistory

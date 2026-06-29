@@ -12,6 +12,8 @@ import (
 )
 
 // GetStartupStatus retrieve information about application startup.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetStartupStatus(ctx context.Context) (*StartupStatus, error) {
 	prefix := c.transport.TenantPrefix("pro", "")
 	var result StartupStatus

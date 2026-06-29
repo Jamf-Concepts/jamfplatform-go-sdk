@@ -13,6 +13,8 @@ import (
 )
 
 // GetInfrastructureManagerByID finds infrastructure manager by ID.
+//
+// Required privileges: read:pro:infrastructure-managers.
 func (c *Client) GetInfrastructureManagerByID(ctx context.Context, id string) (*InfrastructureManager, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result InfrastructureManager
@@ -24,6 +26,8 @@ func (c *Client) GetInfrastructureManagerByID(ctx context.Context, id string) (*
 }
 
 // UpdateInfrastructureManagerByID updates an existing infrastructure manager by ID.
+//
+// Required privileges: update:pro:infrastructure-managers.
 func (c *Client) UpdateInfrastructureManagerByID(ctx context.Context, id string, request *InfrastructureManager) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/infrastructuremanager/id/%s", prefix, url.PathEscape(id))
@@ -34,6 +38,8 @@ func (c *Client) UpdateInfrastructureManagerByID(ctx context.Context, id string,
 }
 
 // ListInfrastructureManagers find all Infrastructure Managers.
+//
+// Required privileges: read:pro:infrastructure-managers.
 func (c *Client) ListInfrastructureManagers(ctx context.Context) (*InfrastructureManagers, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result InfrastructureManagers
@@ -45,6 +51,8 @@ func (c *Client) ListInfrastructureManagers(ctx context.Context) (*Infrastructur
 }
 
 // DeleteInfrastructureManagerByID updates an existing infrastructure manager by ID.
+//
+// Required privileges: delete:pro:infrastructure-managers.
 func (c *Client) DeleteInfrastructureManagerByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/infrastructuremanager/id/%s", prefix, url.PathEscape(id))

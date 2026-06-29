@@ -16,6 +16,8 @@ import (
 )
 
 // GetSiteByID finds sites by ID.
+//
+// Required privileges: read:pro:sites.
 func (c *Client) GetSiteByID(ctx context.Context, id string) (*Site, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Site
@@ -27,6 +29,8 @@ func (c *Client) GetSiteByID(ctx context.Context, id string) (*Site, error) {
 }
 
 // CreateSiteByID creates a new site by ID.
+//
+// Required privileges: create:pro:sites.
 func (c *Client) CreateSiteByID(ctx context.Context, id string, request *Site) (*Site, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Site
@@ -38,6 +42,8 @@ func (c *Client) CreateSiteByID(ctx context.Context, id string, request *Site) (
 }
 
 // UpdateSiteByID updates an existing site by ID.
+//
+// Required privileges: update:pro:sites.
 func (c *Client) UpdateSiteByID(ctx context.Context, id string, request *Site) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateSiteByID(ctx context.Context, id string, request *Site) e
 }
 
 // DeleteSiteByID deletes a site by ID.
+//
+// Required privileges: delete:pro:sites.
 func (c *Client) DeleteSiteByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteSiteByID(ctx context.Context, id string) error {
 }
 
 // GetSiteByName finds sites by name.
+//
+// Required privileges: read:pro:sites.
 func (c *Client) GetSiteByName(ctx context.Context, name string) (*Site, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Site
@@ -69,6 +79,8 @@ func (c *Client) GetSiteByName(ctx context.Context, name string) (*Site, error) 
 }
 
 // UpdateSiteByName updates an existing site by name.
+//
+// Required privileges: update:pro:sites.
 func (c *Client) UpdateSiteByName(ctx context.Context, name string, request *Site) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateSiteByName(ctx context.Context, name string, request *Sit
 }
 
 // DeleteSiteByName deletes a site by name.
+//
+// Required privileges: delete:pro:sites.
 func (c *Client) DeleteSiteByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteSiteByName(ctx context.Context, name string) error {
 }
 
 // ListSites finds all sites.
+//
+// Required privileges: read:pro:sites.
 func (c *Client) ListSites(ctx context.Context) (*Sites, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Sites
@@ -100,6 +116,8 @@ func (c *Client) ListSites(ctx context.Context) (*Sites, error) {
 }
 
 // CreateSiteByName creates a new site by ID.
+//
+// Required privileges: create:pro:sites.
 func (c *Client) CreateSiteByName(ctx context.Context, name string, request *Site) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))

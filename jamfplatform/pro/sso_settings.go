@@ -17,6 +17,8 @@ import (
 )
 
 // GetSsoSettingsV3 retrieve the current Single Sign On configuration settings.
+//
+// Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) GetSsoSettingsV3(ctx context.Context) (*SsoSettingsV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result SsoSettingsV3
@@ -28,6 +30,8 @@ func (c *Client) GetSsoSettingsV3(ctx context.Context) (*SsoSettingsV3, error) {
 }
 
 // UpdateSsoSettingsV3 updates the current Single Sign On configuration settings.
+//
+// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) UpdateSsoSettingsV3(ctx context.Context, request *SsoSettingsV3) (*SsoSettingsV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result SsoSettingsV3
@@ -39,6 +43,8 @@ func (c *Client) UpdateSsoSettingsV3(ctx context.Context, request *SsoSettingsV3
 }
 
 // GetSsoDependenciesV3 retrieve the list of Enrollment Customizations using SSO.
+//
+// Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) GetSsoDependenciesV3(ctx context.Context) (*EnrollmentCustomizationDependencies, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result EnrollmentCustomizationDependencies
@@ -50,6 +56,8 @@ func (c *Client) GetSsoDependenciesV3(ctx context.Context) (*EnrollmentCustomiza
 }
 
 // DisableSsoV3 disable SSO.
+//
+// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) DisableSsoV3(ctx context.Context) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := prefix + "/sso/disable"
@@ -60,6 +68,8 @@ func (c *Client) DisableSsoV3(ctx context.Context) error {
 }
 
 // ListSsoHistoryV3 get SSO history object.
+//
+// Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) ListSsoHistoryV3(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -90,6 +100,8 @@ func (c *Client) ListSsoHistoryV3(ctx context.Context, sort []string, filter str
 }
 
 // CreateSsoHistoryNoteV3 add SSO history object notes.
+//
+// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) CreateSsoHistoryNoteV3(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result HrefResponse
@@ -101,6 +113,8 @@ func (c *Client) CreateSsoHistoryNoteV3(ctx context.Context, request *ObjectHist
 }
 
 // DownloadSsoMetadataV3 download the Jamf Pro SAML metadata file.
+//
+// Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) DownloadSsoMetadataV3(ctx context.Context) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result []byte

@@ -16,6 +16,8 @@ import (
 )
 
 // GetClassicPackageByID finds packages by ID.
+//
+// Required privileges: read:pro:packages.
 func (c *Client) GetClassicPackageByID(ctx context.Context, id string) (*Package, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Package
@@ -27,6 +29,8 @@ func (c *Client) GetClassicPackageByID(ctx context.Context, id string) (*Package
 }
 
 // CreateClassicPackageByID creates a new package by ID.
+//
+// Required privileges: create:pro:packages.
 func (c *Client) CreateClassicPackageByID(ctx context.Context, id string, request *Package) (*Package, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Package
@@ -38,6 +42,8 @@ func (c *Client) CreateClassicPackageByID(ctx context.Context, id string, reques
 }
 
 // UpdateClassicPackageByID updates an existing package by ID.
+//
+// Required privileges: update:pro:packages.
 func (c *Client) UpdateClassicPackageByID(ctx context.Context, id string, request *Package) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateClassicPackageByID(ctx context.Context, id string, reques
 }
 
 // DeleteClassicPackageByID deletes a package by ID.
+//
+// Required privileges: delete:pro:packages.
 func (c *Client) DeleteClassicPackageByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteClassicPackageByID(ctx context.Context, id string) error 
 }
 
 // ListClassicPackages finds all packages.
+//
+// Required privileges: read:pro:packages.
 func (c *Client) ListClassicPackages(ctx context.Context) (*Packages, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Packages
@@ -69,6 +79,8 @@ func (c *Client) ListClassicPackages(ctx context.Context) (*Packages, error) {
 }
 
 // DeleteClassicPackageByName deletes a package by name.
+//
+// Required privileges: delete:pro:packages.
 func (c *Client) DeleteClassicPackageByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) DeleteClassicPackageByName(ctx context.Context, name string) er
 }
 
 // GetClassicPackageByName finds packages by name.
+//
+// Required privileges: read:pro:packages.
 func (c *Client) GetClassicPackageByName(ctx context.Context, name string) (*Package, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Package
@@ -90,6 +104,8 @@ func (c *Client) GetClassicPackageByName(ctx context.Context, name string) (*Pac
 }
 
 // UpdateClassicPackageByName updates an existing package by name.
+//
+// Required privileges: update:pro:packages.
 func (c *Client) UpdateClassicPackageByName(ctx context.Context, name string, request *Package) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
@@ -100,6 +116,8 @@ func (c *Client) UpdateClassicPackageByName(ctx context.Context, name string, re
 }
 
 // CreateClassicPackageByName creates a new package by ID.
+//
+// Required privileges: create:pro:packages.
 func (c *Client) CreateClassicPackageByName(ctx context.Context, name string, request *Package) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))

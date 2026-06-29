@@ -13,6 +13,8 @@ import (
 )
 
 // GetComputerApplicationByApplication finds computer applications by name.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerApplicationByApplication(ctx context.Context, application string) (*ComputerApplications, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerApplications
@@ -24,6 +26,8 @@ func (c *Client) GetComputerApplicationByApplication(ctx context.Context, applic
 }
 
 // GetComputerApplicationByApplicationInventory finds computer applications by name with additional display fields.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerApplicationByApplicationInventory(ctx context.Context, application string, inventory string) (*ComputerApplications, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerApplications
@@ -35,6 +39,8 @@ func (c *Client) GetComputerApplicationByApplicationInventory(ctx context.Contex
 }
 
 // GetComputerApplicationByApplicationVersion finds computer applications by name and version.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerApplicationByApplicationVersion(ctx context.Context, application string, version string) (*ComputerApplications, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerApplications
@@ -46,6 +52,8 @@ func (c *Client) GetComputerApplicationByApplicationVersion(ctx context.Context,
 }
 
 // GetComputerApplicationByApplicationVersionInventory finds computer applications by name and version.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerApplicationByApplicationVersionInventory(ctx context.Context, application string, version string, inventory string) (*ComputerApplications, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerApplications

@@ -12,6 +12,8 @@ import (
 )
 
 // GetLocalAdminPasswordSettingsV2 get the current LAPS settings.
+//
+// Required privileges: update:pro:local-admin-password-settings. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment, Update Local Admin Password Settings.
 func (c *Client) GetLocalAdminPasswordSettingsV2(ctx context.Context) (*LapsSettingsResponseV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result LapsSettingsResponseV2
@@ -23,6 +25,8 @@ func (c *Client) GetLocalAdminPasswordSettingsV2(ctx context.Context) (*LapsSett
 }
 
 // UpdateLocalAdminPasswordSettingsV2 update settings for LAPS.
+//
+// Required privileges: update:pro:local-admin-password-settings. Legacy Jamf Pro privilege name(s): Update Local Admin Password Settings.
 func (c *Client) UpdateLocalAdminPasswordSettingsV2(ctx context.Context, request *LapsSettingsRequestV2) (*LapsSettingsResponseV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result LapsSettingsResponseV2

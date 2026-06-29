@@ -16,6 +16,8 @@ import (
 )
 
 // GetOSXConfigurationProfileByID finds OS X configuration profiles by ID.
+//
+// Required privileges: read:pro:macos-configuration-profiles.
 func (c *Client) GetOSXConfigurationProfileByID(ctx context.Context, id string) (*OsXConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result OsXConfigurationProfile
@@ -27,6 +29,8 @@ func (c *Client) GetOSXConfigurationProfileByID(ctx context.Context, id string) 
 }
 
 // CreateOSXConfigurationProfileByID creates a new OS X configuration profile by ID.
+//
+// Required privileges: create:pro:macos-configuration-profiles.
 func (c *Client) CreateOSXConfigurationProfileByID(ctx context.Context, id string, request *OsXConfigurationProfile) (*OsXConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result OsXConfigurationProfile
@@ -38,6 +42,8 @@ func (c *Client) CreateOSXConfigurationProfileByID(ctx context.Context, id strin
 }
 
 // UpdateOSXConfigurationProfileByID updates an existing OS X configuration profile by ID.
+//
+// Required privileges: update:pro:macos-configuration-profiles.
 func (c *Client) UpdateOSXConfigurationProfileByID(ctx context.Context, id string, request *OsXConfigurationProfile) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateOSXConfigurationProfileByID(ctx context.Context, id strin
 }
 
 // DeleteOSXConfigurationProfileByID deletes a OS X configuration profile by ID.
+//
+// Required privileges: delete:pro:macos-configuration-profiles.
 func (c *Client) DeleteOSXConfigurationProfileByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteOSXConfigurationProfileByID(ctx context.Context, id strin
 }
 
 // GetOSXConfigurationProfileByName finds OS X configuration profiles by name.
+//
+// Required privileges: read:pro:macos-configuration-profiles.
 func (c *Client) GetOSXConfigurationProfileByName(ctx context.Context, name string) (*OsXConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result OsXConfigurationProfile
@@ -69,6 +79,8 @@ func (c *Client) GetOSXConfigurationProfileByName(ctx context.Context, name stri
 }
 
 // UpdateOSXConfigurationProfileByName updates an existing OS X configuration profile by name.
+//
+// Required privileges: update:pro:macos-configuration-profiles.
 func (c *Client) UpdateOSXConfigurationProfileByName(ctx context.Context, name string, request *OsXConfigurationProfile) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateOSXConfigurationProfileByName(ctx context.Context, name s
 }
 
 // DeleteOSXConfigurationProfileByName deletes a OS X configuration profile by name.
+//
+// Required privileges: delete:pro:macos-configuration-profiles.
 func (c *Client) DeleteOSXConfigurationProfileByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteOSXConfigurationProfileByName(ctx context.Context, name s
 }
 
 // ListOSXConfigurationProfiles finds all OS X configuration profiles.
+//
+// Required privileges: read:pro:macos-configuration-profiles.
 func (c *Client) ListOSXConfigurationProfiles(ctx context.Context) (*OsXConfigurationProfiles, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result OsXConfigurationProfiles
@@ -100,6 +116,8 @@ func (c *Client) ListOSXConfigurationProfiles(ctx context.Context) (*OsXConfigur
 }
 
 // GetOsxConfigurationProfileByIDSubset finds a subset of data for an OS X configuration profile.
+//
+// Required privileges: read:pro:macos-configuration-profiles.
 func (c *Client) GetOsxConfigurationProfileByIDSubset(ctx context.Context, id string, subset string) (*OsXConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result OsXConfigurationProfile
@@ -111,6 +129,8 @@ func (c *Client) GetOsxConfigurationProfileByIDSubset(ctx context.Context, id st
 }
 
 // GetOsxConfigurationProfileByNameSubset finds a subset of data for OS X configuration profiles by name.
+//
+// Required privileges: read:pro:macos-configuration-profiles.
 func (c *Client) GetOsxConfigurationProfileByNameSubset(ctx context.Context, name string, subset string) (*OsXConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result OsXConfigurationProfile
@@ -122,6 +142,8 @@ func (c *Client) GetOsxConfigurationProfileByNameSubset(ctx context.Context, nam
 }
 
 // CreateOSXConfigurationProfileByName creates a new OS X configuration profile by ID.
+//
+// Required privileges: create:pro:macos-configuration-profiles.
 func (c *Client) CreateOSXConfigurationProfileByName(ctx context.Context, name string, request *OsXConfigurationProfile) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))

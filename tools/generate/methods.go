@@ -230,8 +230,9 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 			if requestType == "" {
 				return nil, fmt.Errorf("apply on %s: createOp %q has no request type", r.ResourceType, ac.CreateOp)
 			}
-			// Determine how to extract ID from create response.
-			createReturnID := "resp.ID"
+			// Determine how to extract ID from create response. Every branch
+			// below assigns createReturnID before use, so no initializer.
+			var createReturnID string
 			if spec.Format == "xml" {
 				// Classic: ID is *int
 				createReturnID = `fmt.Sprintf("%d", *resp.ID)`
@@ -645,6 +646,62 @@ func isRateLimited(op *openapi3.Operation) bool {
 	}
 }
 
+// stringSliceExtension decodes a vendor extension whose value is a JSON array
+// of strings (e.g. x-required-privileges). kin-openapi stores extensions as
+// raw JSON bytes keyed by the extension name; the value may already be a
+// decoded []interface{} on some versions, so handle both. Returns nil when
+// the extension is absent or malformed — privileges are advisory metadata, so
+// a decode failure degrades to "unknown" rather than aborting generation.
+func stringSliceExtension(op *openapi3.Operation, key string) []string {
+	if op == nil {
+		return nil
+	}
+	raw, ok := op.Extensions[key]
+	if !ok {
+		return nil
+	}
+	var out []string
+	switch v := raw.(type) {
+	case []string:
+		out = append(out, v...)
+	case []any:
+		for _, e := range v {
+			if s, ok := e.(string); ok {
+				out = append(out, s)
+			}
+		}
+	case json.RawMessage:
+		_ = json.Unmarshal(v, &out)
+	case []byte:
+		_ = json.Unmarshal(v, &out)
+	case string:
+		_ = json.Unmarshal([]byte(v), &out)
+	}
+	return out
+}
+
+// privilegeComment renders the godoc line listing the privileges a method
+// requires, mirroring the deprecation/rate-limit lines. Returns "" when the
+// method carries no privilege metadata (synthetic methods). Spec-derived
+// methods with no declared privileges report "none" so the absence is
+// explicit rather than ambiguous.
+func privilegeComment(m GoMethod) string {
+	if !m.PrivilegesKnown {
+		return ""
+	}
+	if len(m.ScopedPrivileges) == 0 {
+		return "\n//\n// Required privileges: none (callable by any authenticated API client)."
+	}
+	line := "\n//\n// Required privileges: " + strings.Join(m.ScopedPrivileges, ", ") + "."
+	if len(m.LegacyPrivileges) > 0 {
+		line += " Legacy Jamf Pro privilege name(s): " + strings.Join(m.LegacyPrivileges, ", ") + "."
+	}
+	if len(m.ScopedPrivileges) > 1 {
+		line += "\n// The Jamf API spec does not encode whether these are required together or as alternatives."
+	}
+	return line
+}
+
 func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, error) {
 	httpMethod, specPath := opDef.parseOp()
 
@@ -702,6 +759,28 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 		}
 		depMsg += " and may be removed in a future release."
 		m.Comment += depMsg
+	}
+
+	// Privilege metadata. Spec-derived methods from a documented spec are
+	// always marked known, even when the operation declares no privileges
+	// (some endpoints — health checks, dashboards, icon downloads — require
+	// none); the empty-slice case is meaningful and surfaced as "none" in
+	// godoc and the registry. Undocumented (reverse-engineered) specs are left
+	// unknown by default — "none" cannot be asserted for an endpoint we never
+	// saw published — unless the operation carries an explicit
+	// x-required-privileges annotation, which means someone has verified its
+	// privileges out of band; honour that.
+	_, hasPrivExt := op.Extensions["x-required-privileges"]
+	if !spec.Undocumented || hasPrivExt {
+		m.PrivilegesKnown = true
+		m.ScopedPrivileges = stringSliceExtension(op, "x-required-privileges")
+		m.LegacyPrivileges = stringSliceExtension(op, "x-required-privileges-legacy")
+		if c := privilegeComment(m); c != "" {
+			if m.Comment == "" {
+				m.Comment = opDef.Name + " calls a Jamf Platform API endpoint."
+			}
+			m.Comment += c
+		}
 	}
 
 	m.PathParams = extractPathParams(m.ResourcePath, opDef.PathNames)

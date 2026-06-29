@@ -17,6 +17,8 @@ import (
 )
 
 // GetTeacherAppSettingsV1 get the Jamf Teacher settings that you have access to see.
+//
+// Required privileges: read:pro:teacher-app-settings. Legacy Jamf Pro privilege name(s): Read Teacher App Settings.
 func (c *Client) GetTeacherAppSettingsV1(ctx context.Context) (*TeacherSettingsResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result TeacherSettingsResponse
@@ -28,6 +30,8 @@ func (c *Client) GetTeacherAppSettingsV1(ctx context.Context) (*TeacherSettingsR
 }
 
 // UpdateTeacherAppSettingsV1 update a Jamf Teacher settings object.
+//
+// Required privileges: update:pro:teacher-app-settings. Legacy Jamf Pro privilege name(s): Update Teacher App Settings.
 func (c *Client) UpdateTeacherAppSettingsV1(ctx context.Context, request *TeacherSettingsRequest) (*TeacherSettingsResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result TeacherSettingsResponse
@@ -39,6 +43,8 @@ func (c *Client) UpdateTeacherAppSettingsV1(ctx context.Context, request *Teache
 }
 
 // ListTeacherAppHistoryV1 get Jamf Teacher app settings history.
+//
+// Required privileges: read:pro:teacher-app-settings. Legacy Jamf Pro privilege name(s): Read Teacher App Settings.
 func (c *Client) ListTeacherAppHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -69,6 +75,8 @@ func (c *Client) ListTeacherAppHistoryV1(ctx context.Context, sort []string, fil
 }
 
 // CreateTeacherAppHistoryNoteV1 add Jamf Teacher app settings history notes.
+//
+// Required privileges: update:pro:teacher-app-settings. Legacy Jamf Pro privilege name(s): Update Teacher App Settings.
 func (c *Client) CreateTeacherAppHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse

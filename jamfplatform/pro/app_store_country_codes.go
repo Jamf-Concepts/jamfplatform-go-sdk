@@ -12,6 +12,8 @@ import (
 )
 
 // ListAppStoreCountryCodesV1 return a list of Countries and the associated Codes.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) ListAppStoreCountryCodesV1(ctx context.Context) (*CountryCodes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result CountryCodes

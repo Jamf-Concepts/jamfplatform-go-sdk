@@ -13,6 +13,8 @@ import (
 )
 
 // CreateDockItemV1 create a DockItem.
+//
+// Required privileges: create:pro:dock-items. Legacy Jamf Pro privilege name(s): Create Dock Items.
 func (c *Client) CreateDockItemV1(ctx context.Context, request *DockItem) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -24,6 +26,8 @@ func (c *Client) CreateDockItemV1(ctx context.Context, request *DockItem) (*Href
 }
 
 // GetDockItemV1 retrieve a full dockItem object.
+//
+// Required privileges: read:pro:dock-items. Legacy Jamf Pro privilege name(s): Read Dock Items.
 func (c *Client) GetDockItemV1(ctx context.Context, id string) (*DockItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DockItem
@@ -35,6 +39,8 @@ func (c *Client) GetDockItemV1(ctx context.Context, id string) (*DockItem, error
 }
 
 // UpdateDockItemV1 replace the dockItem at the id with the supplied information.
+//
+// Required privileges: update:pro:dock-items. Legacy Jamf Pro privilege name(s): Update Dock Items.
 func (c *Client) UpdateDockItemV1(ctx context.Context, id string, request *DockItem) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -46,6 +52,8 @@ func (c *Client) UpdateDockItemV1(ctx context.Context, id string, request *DockI
 }
 
 // DeleteDockItemV1 delete a DockItem at the specified id.
+//
+// Required privileges: delete:pro:dock-items. Legacy Jamf Pro privilege name(s): Delete Dock Items.
 func (c *Client) DeleteDockItemV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/dock-items/%s", prefix, url.PathEscape(id))

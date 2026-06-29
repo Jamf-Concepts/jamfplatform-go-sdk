@@ -14,6 +14,8 @@ import (
 // GetJSSUser returns basic information about Jamf Pro, as well as privileges of the person requesting the resource. (Deprecated).
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: read:pro:accounts.
 func (c *Client) GetJSSUser(ctx context.Context) (*JssUser, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result JssUser

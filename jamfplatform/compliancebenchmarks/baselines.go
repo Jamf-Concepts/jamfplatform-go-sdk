@@ -13,6 +13,8 @@ import (
 )
 
 // ListBaselines return list of the mSCP baselines.
+//
+// Required privileges: read:pro:compliance-benchmarks.
 func (c *Client) ListBaselines(ctx context.Context) (*BaselinesResponse, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BaselinesResponse

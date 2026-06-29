@@ -18,6 +18,8 @@ import (
 )
 
 // ListComputerGroupsV1 returns the list of all computer groups.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups, Read Static Computer Groups.
 func (c *Client) ListComputerGroupsV1(ctx context.Context) ([]ComputerGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []ComputerGroup
@@ -29,6 +31,8 @@ func (c *Client) ListComputerGroupsV1(ctx context.Context) ([]ComputerGroup, err
 }
 
 // ListSmartComputerGroupsV3 search for Smart Computer Groups.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups.
 func (c *Client) ListSmartComputerGroupsV3(ctx context.Context, sort []string, filter string) ([]SmartComputerGroupSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
@@ -61,6 +65,8 @@ func (c *Client) ListSmartComputerGroupsV3(ctx context.Context, sort []string, f
 // ListSmartComputerGroupsV2 search for Smart Computer Groups.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups.
 func (c *Client) ListSmartComputerGroupsV2(ctx context.Context, sort []string, filter string) ([]SmartComputerGroupSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
@@ -91,6 +97,8 @@ func (c *Client) ListSmartComputerGroupsV2(ctx context.Context, sort []string, f
 }
 
 // CreateSmartComputerGroupV3 create a Smart Computer Group.
+//
+// Required privileges: create:pro:computer-groups. Legacy Jamf Pro privilege name(s): Create Smart Computer Groups.
 func (c *Client) CreateSmartComputerGroupV3(ctx context.Context, request *SmartComputerGroupV3, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result HrefResponse
@@ -111,6 +119,8 @@ func (c *Client) CreateSmartComputerGroupV3(ctx context.Context, request *SmartC
 // CreateSmartComputerGroupV2 create a Smart Computer Group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: create:pro:computer-groups. Legacy Jamf Pro privilege name(s): Create Smart Computer Groups.
 func (c *Client) CreateSmartComputerGroupV2(ctx context.Context, request *SmartComputerGroupV2, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -129,6 +139,8 @@ func (c *Client) CreateSmartComputerGroupV2(ctx context.Context, request *SmartC
 }
 
 // GetSmartComputerGroupV3 get Smart Computer Group by Id.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups.
 func (c *Client) GetSmartComputerGroupV3(ctx context.Context, id string) (*SmartComputerGroupV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result SmartComputerGroupV3
@@ -142,6 +154,8 @@ func (c *Client) GetSmartComputerGroupV3(ctx context.Context, id string) (*Smart
 // GetSmartComputerGroupV2 get Smart Computer Group by Id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups.
 func (c *Client) GetSmartComputerGroupV2(ctx context.Context, id string) (*SmartComputerGroupV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmartComputerGroupV2
@@ -153,6 +167,8 @@ func (c *Client) GetSmartComputerGroupV2(ctx context.Context, id string) (*Smart
 }
 
 // UpdateSmartComputerGroupV3 update a Smart Computer Group.
+//
+// Required privileges: update:pro:computer-groups. Legacy Jamf Pro privilege name(s): Update Smart Computer Groups.
 func (c *Client) UpdateSmartComputerGroupV3(ctx context.Context, id string, request *SmartComputerGroupV3) (*SmartComputerGroupV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result SmartComputerGroupV3
@@ -166,6 +182,8 @@ func (c *Client) UpdateSmartComputerGroupV3(ctx context.Context, id string, requ
 // UpdateSmartComputerGroupV2 update a Smart Computer Group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: update:pro:computer-groups. Legacy Jamf Pro privilege name(s): Update Smart Computer Groups.
 func (c *Client) UpdateSmartComputerGroupV2(ctx context.Context, id string, request *SmartComputerGroupV2) (*SmartComputerGroupV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmartComputerGroupV2
@@ -177,6 +195,8 @@ func (c *Client) UpdateSmartComputerGroupV2(ctx context.Context, id string, requ
 }
 
 // DeleteSmartComputerGroupV3 remove specified Smart Computer Group.
+//
+// Required privileges: delete:pro:computer-groups. Legacy Jamf Pro privilege name(s): Delete Smart Computer Groups.
 func (c *Client) DeleteSmartComputerGroupV3(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/computer-groups/smart-groups/%s", prefix, url.PathEscape(id))
@@ -189,6 +209,8 @@ func (c *Client) DeleteSmartComputerGroupV3(ctx context.Context, id string) erro
 // DeleteSmartComputerGroupV2 remove specified Smart Computer Group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: delete:pro:computer-groups. Legacy Jamf Pro privilege name(s): Delete Smart Computer Groups.
 func (c *Client) DeleteSmartComputerGroupV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computer-groups/smart-groups/%s", prefix, url.PathEscape(id))
@@ -199,6 +221,8 @@ func (c *Client) DeleteSmartComputerGroupV2(ctx context.Context, id string) erro
 }
 
 // GetSmartComputerGroupMembershipV3 get the membership of a Smart Computer Group.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups.
 func (c *Client) GetSmartComputerGroupMembershipV3(ctx context.Context, id string) (*SmartGroupMembership, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result SmartGroupMembership
@@ -212,6 +236,8 @@ func (c *Client) GetSmartComputerGroupMembershipV3(ctx context.Context, id strin
 // GetSmartComputerGroupMembershipV2 get the membership of a Smart Computer Group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups.
 func (c *Client) GetSmartComputerGroupMembershipV2(ctx context.Context, id string) (*SmartGroupMembership, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmartGroupMembership
@@ -223,6 +249,8 @@ func (c *Client) GetSmartComputerGroupMembershipV2(ctx context.Context, id strin
 }
 
 // ListStaticComputerGroupsV3 search for Static Computer Groups.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Static Computer Groups.
 func (c *Client) ListStaticComputerGroupsV3(ctx context.Context, sort []string, filter string) ([]StaticComputerGroupSummary, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
@@ -255,6 +283,8 @@ func (c *Client) ListStaticComputerGroupsV3(ctx context.Context, sort []string, 
 // ListStaticComputerGroupsV2 search for Static Computer Groups.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Static Computer Groups.
 func (c *Client) ListStaticComputerGroupsV2(ctx context.Context, sort []string, filter string) ([]StaticComputerGroupSummary, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
@@ -285,6 +315,8 @@ func (c *Client) ListStaticComputerGroupsV2(ctx context.Context, sort []string, 
 }
 
 // CreateStaticComputerGroupV3 create membership of a static computer group.
+//
+// Required privileges: create:pro:computer-groups. Legacy Jamf Pro privilege name(s): Create Static Computer Groups.
 func (c *Client) CreateStaticComputerGroupV3(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result HrefResponse
@@ -305,6 +337,8 @@ func (c *Client) CreateStaticComputerGroupV3(ctx context.Context, request *Stati
 // CreateStaticComputerGroupV2 create membership of a static computer group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: create:pro:computer-groups. Legacy Jamf Pro privilege name(s): Create Static Computer Groups.
 func (c *Client) CreateStaticComputerGroupV2(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -323,6 +357,8 @@ func (c *Client) CreateStaticComputerGroupV2(ctx context.Context, request *Stati
 }
 
 // GetStaticComputerGroupV3 get Static Computer Group by Id.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Static Computer Groups.
 func (c *Client) GetStaticComputerGroupV3(ctx context.Context, id string) (*StaticComputerGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result StaticComputerGroup
@@ -336,6 +372,8 @@ func (c *Client) GetStaticComputerGroupV3(ctx context.Context, id string) (*Stat
 // GetStaticComputerGroupV2 get Static Computer Group by Id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Static Computer Groups.
 func (c *Client) GetStaticComputerGroupV2(ctx context.Context, id string) (*StaticComputerGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result StaticComputerGroup
@@ -347,6 +385,8 @@ func (c *Client) GetStaticComputerGroupV2(ctx context.Context, id string) (*Stat
 }
 
 // UpdateStaticComputerGroupV3 update membership of a static computer group.
+//
+// Required privileges: update:pro:computer-groups. Legacy Jamf Pro privilege name(s): Update Static Computer Groups.
 func (c *Client) UpdateStaticComputerGroupV3(ctx context.Context, id string, request *StaticComputerGroupAssignment) (*StaticComputerGroupAssignment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result StaticComputerGroupAssignment
@@ -360,6 +400,8 @@ func (c *Client) UpdateStaticComputerGroupV3(ctx context.Context, id string, req
 // UpdateStaticComputerGroupV2 update membership of a static computer group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: update:pro:computer-groups. Legacy Jamf Pro privilege name(s): Update Static Computer Groups.
 func (c *Client) UpdateStaticComputerGroupV2(ctx context.Context, id string, request *StaticComputerGroupAssignment) (*StaticComputerGroupAssignment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result StaticComputerGroupAssignment
@@ -371,6 +413,8 @@ func (c *Client) UpdateStaticComputerGroupV2(ctx context.Context, id string, req
 }
 
 // DeleteStaticComputerGroupV3 remove Static Computer Group by Id.
+//
+// Required privileges: delete:pro:computer-groups. Legacy Jamf Pro privilege name(s): Delete Static Computer Groups.
 func (c *Client) DeleteStaticComputerGroupV3(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/computer-groups/static-groups/%s", prefix, url.PathEscape(id))
@@ -383,6 +427,8 @@ func (c *Client) DeleteStaticComputerGroupV3(ctx context.Context, id string) err
 // DeleteStaticComputerGroupV2 remove Static Computer Group by Id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: delete:pro:computer-groups. Legacy Jamf Pro privilege name(s): Delete Static Computer Groups.
 func (c *Client) DeleteStaticComputerGroupV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computer-groups/static-groups/%s", prefix, url.PathEscape(id))

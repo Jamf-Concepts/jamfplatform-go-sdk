@@ -17,6 +17,8 @@ import (
 )
 
 // GetCloudDistributionPointV1 get the cloud distribution point Details.
+//
+// Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
 func (c *Client) GetCloudDistributionPointV1(ctx context.Context) (*CloudDistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result CloudDistributionPoint
@@ -28,6 +30,8 @@ func (c *Client) GetCloudDistributionPointV1(ctx context.Context) (*CloudDistrib
 }
 
 // CreateCloudDistributionPointV1 create cloud distribution point.
+//
+// Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
 func (c *Client) CreateCloudDistributionPointV1(ctx context.Context, request *CloudDistributionPoint) (*CloudDistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result CloudDistributionPoint
@@ -39,6 +43,8 @@ func (c *Client) CreateCloudDistributionPointV1(ctx context.Context, request *Cl
 }
 
 // DeleteCloudDistributionPointV1 delete cloud distribution point.
+//
+// Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
 func (c *Client) DeleteCloudDistributionPointV1(ctx context.Context) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/cloud-distribution-point"
@@ -49,6 +55,8 @@ func (c *Client) DeleteCloudDistributionPointV1(ctx context.Context) error {
 }
 
 // UpdateCloudDistributionPointV1 update specific fields on a cloud distribution point.
+//
+// Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
 func (c *Client) UpdateCloudDistributionPointV1(ctx context.Context, request *CloudDistributionPoint) (*CloudDistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result CloudDistributionPoint
@@ -60,6 +68,8 @@ func (c *Client) UpdateCloudDistributionPointV1(ctx context.Context, request *Cl
 }
 
 // FailCloudDistributionPointUploadV1 marks a specific file upload as failed for the currently configured cloud distribution point.
+//
+// Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
 func (c *Client) FailCloudDistributionPointUploadV1(ctx context.Context, id string, fileName string, uploadType string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/cloud-distribution-point/fail-upload/%s", prefix, url.PathEscape(id))
@@ -80,6 +90,8 @@ func (c *Client) FailCloudDistributionPointUploadV1(ctx context.Context, id stri
 }
 
 // ListCloudDistributionPointFilesV1 get the cloud distribution point Inventory files details.
+//
+// Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
 func (c *Client) ListCloudDistributionPointFilesV1(ctx context.Context, sort []string, filter string) ([]CloudDistributionPointInventoryFileInfo, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]CloudDistributionPointInventoryFileInfo, bool, error) {
@@ -110,6 +122,8 @@ func (c *Client) ListCloudDistributionPointFilesV1(ctx context.Context, sort []s
 }
 
 // ListCloudDistributionPointHistoryV1 get cloud distribution point history details.
+//
+// Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
 func (c *Client) ListCloudDistributionPointHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -140,6 +154,8 @@ func (c *Client) ListCloudDistributionPointHistoryV1(ctx context.Context, sort [
 }
 
 // CreateCloudDistributionPointHistoryNoteV1 add specified cloud distribution point history object notes.
+//
+// Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
 func (c *Client) CreateCloudDistributionPointHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory
@@ -151,6 +167,8 @@ func (c *Client) CreateCloudDistributionPointHistoryNoteV1(ctx context.Context, 
 }
 
 // RefreshCloudDistributionPointInventoryV1 updates inventory data for the currently configured cloud distribution point.
+//
+// Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
 func (c *Client) RefreshCloudDistributionPointInventoryV1(ctx context.Context, fileName string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/cloud-distribution-point/refresh-inventory"
@@ -168,6 +186,8 @@ func (c *Client) RefreshCloudDistributionPointInventoryV1(ctx context.Context, f
 }
 
 // TestCloudDistributionPointConnectionV1 get the cloud distribution point test connection details.
+//
+// Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
 func (c *Client) TestCloudDistributionPointConnectionV1(ctx context.Context) (*CloudDistributionPointTestConnection, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result CloudDistributionPointTestConnection
@@ -179,6 +199,8 @@ func (c *Client) TestCloudDistributionPointConnectionV1(ctx context.Context) (*C
 }
 
 // GetCloudDistributionPointUploadCapabilityV1 finds specific information for the currently configured cloud distribution point.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetCloudDistributionPointUploadCapabilityV1(ctx context.Context) (*CloudDistributionPointUploadCapability, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result CloudDistributionPointUploadCapability

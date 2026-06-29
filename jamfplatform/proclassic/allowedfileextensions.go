@@ -13,6 +13,8 @@ import (
 )
 
 // GetAllowedFileExtensionByID finds an allowed file extension value by ID.
+//
+// Required privileges: read:pro:allowed-file-extension.
 func (c *Client) GetAllowedFileExtensionByID(ctx context.Context, id string) (*AllowedFileExtension, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AllowedFileExtension
@@ -24,6 +26,8 @@ func (c *Client) GetAllowedFileExtensionByID(ctx context.Context, id string) (*A
 }
 
 // CreateAllowedFileExtensionByID creates a new allowed file extension value by ID.
+//
+// Required privileges: create:pro:allowed-file-extension.
 func (c *Client) CreateAllowedFileExtensionByID(ctx context.Context, id string, request *AllowedFileExtension) (*AllowedFileExtension, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AllowedFileExtension
@@ -35,6 +39,8 @@ func (c *Client) CreateAllowedFileExtensionByID(ctx context.Context, id string, 
 }
 
 // DeleteAllowedFileExtensionByID deletes an allowed file extension value by ID.
+//
+// Required privileges: delete:pro:allowed-file-extension.
 func (c *Client) DeleteAllowedFileExtensionByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/allowedfileextensions/id/%s", prefix, url.PathEscape(id))
@@ -45,6 +51,8 @@ func (c *Client) DeleteAllowedFileExtensionByID(ctx context.Context, id string) 
 }
 
 // GetAllowedFileExtensionByExtension finds an allowed file extension value by name.
+//
+// Required privileges: read:pro:allowed-file-extension.
 func (c *Client) GetAllowedFileExtensionByExtension(ctx context.Context, extension string) (*AllowedFileExtension, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AllowedFileExtension
@@ -56,6 +64,8 @@ func (c *Client) GetAllowedFileExtensionByExtension(ctx context.Context, extensi
 }
 
 // ListAllowedFileExtensions finds the allowed file extensions.
+//
+// Required privileges: read:pro:allowed-file-extension.
 func (c *Client) ListAllowedFileExtensions(ctx context.Context) (*AllowedFileExtensions, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AllowedFileExtensions

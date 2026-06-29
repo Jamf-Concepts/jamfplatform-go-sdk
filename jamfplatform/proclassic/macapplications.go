@@ -16,6 +16,8 @@ import (
 )
 
 // GetMacApplicationByID finds mac applications by ID.
+//
+// Required privileges: read:pro:mac-applications.
 func (c *Client) GetMacApplicationByID(ctx context.Context, id string) (*MacApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MacApplication
@@ -27,6 +29,8 @@ func (c *Client) GetMacApplicationByID(ctx context.Context, id string) (*MacAppl
 }
 
 // CreateMacApplicationByID creates a new mac application by ID.
+//
+// Required privileges: create:pro:mac-applications.
 func (c *Client) CreateMacApplicationByID(ctx context.Context, id string, request *MacApplication) (*MacApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MacApplication
@@ -38,6 +42,8 @@ func (c *Client) CreateMacApplicationByID(ctx context.Context, id string, reques
 }
 
 // UpdateMacApplicationByID updates an existing mac application by ID.
+//
+// Required privileges: update:pro:mac-applications.
 func (c *Client) UpdateMacApplicationByID(ctx context.Context, id string, request *MacApplication) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateMacApplicationByID(ctx context.Context, id string, reques
 }
 
 // DeleteMacApplicationByID deletes a mac application by ID.
+//
+// Required privileges: delete:pro:mac-applications.
 func (c *Client) DeleteMacApplicationByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteMacApplicationByID(ctx context.Context, id string) error 
 }
 
 // GetMacApplicationByName finds mac applications by name.
+//
+// Required privileges: read:pro:mac-applications.
 func (c *Client) GetMacApplicationByName(ctx context.Context, name string) (*MacApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MacApplication
@@ -69,6 +79,8 @@ func (c *Client) GetMacApplicationByName(ctx context.Context, name string) (*Mac
 }
 
 // UpdateMacApplicationByName updates an existing mac application by name.
+//
+// Required privileges: update:pro:mac-applications.
 func (c *Client) UpdateMacApplicationByName(ctx context.Context, name string, request *MacApplication) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateMacApplicationByName(ctx context.Context, name string, re
 }
 
 // DeleteMacApplicationByName deletes a mac application by name.
+//
+// Required privileges: delete:pro:mac-applications.
 func (c *Client) DeleteMacApplicationByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteMacApplicationByName(ctx context.Context, name string) er
 }
 
 // ListMacApplications finds all mac applications.
+//
+// Required privileges: read:pro:mac-applications.
 func (c *Client) ListMacApplications(ctx context.Context) (*MacApplications, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MacApplications
@@ -100,6 +116,8 @@ func (c *Client) ListMacApplications(ctx context.Context) (*MacApplications, err
 }
 
 // GetMacApplicationByIDSubset finds a subset of date for a mac application by ID.
+//
+// Required privileges: read:pro:mac-applications.
 func (c *Client) GetMacApplicationByIDSubset(ctx context.Context, id string, subset string) (*MacApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MacApplication
@@ -111,6 +129,8 @@ func (c *Client) GetMacApplicationByIDSubset(ctx context.Context, id string, sub
 }
 
 // GetMacApplicationByNameSubset finds a subset of data for mac applications by name.
+//
+// Required privileges: read:pro:mac-applications.
 func (c *Client) GetMacApplicationByNameSubset(ctx context.Context, name string, subset string) (*MacApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MacApplication
@@ -122,6 +142,8 @@ func (c *Client) GetMacApplicationByNameSubset(ctx context.Context, name string,
 }
 
 // CreateMacApplicationByName creates a new mac application by ID.
+//
+// Required privileges: create:pro:mac-applications.
 func (c *Client) CreateMacApplicationByName(ctx context.Context, name string, request *MacApplication) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))

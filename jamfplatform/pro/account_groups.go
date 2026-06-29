@@ -18,6 +18,8 @@ import (
 )
 
 // ListAccountGroupsV1 get account groups.
+//
+// Required privileges: read:pro:account-groups. Legacy Jamf Pro privilege name(s): Read Account Groups.
 func (c *Client) ListAccountGroupsV1(ctx context.Context, sort []string, filter string) ([]AccountGroupV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]AccountGroupV1, bool, error) {
@@ -48,6 +50,8 @@ func (c *Client) ListAccountGroupsV1(ctx context.Context, sort []string, filter 
 }
 
 // GetAccountGroupV1 gets the account group.
+//
+// Required privileges: read:pro:account-groups. Legacy Jamf Pro privilege name(s): Read Account Groups.
 func (c *Client) GetAccountGroupV1(ctx context.Context, id string) (*AccountGroupV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AccountGroupV1

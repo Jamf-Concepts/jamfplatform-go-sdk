@@ -18,6 +18,8 @@ import (
 )
 
 // ListDepartmentsV1 search for Departments.
+//
+// Required privileges: read:pro:departments. Legacy Jamf Pro privilege name(s): Read Departments.
 func (c *Client) ListDepartmentsV1(ctx context.Context, sort []string, filter string) ([]Department, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Department, bool, error) {
@@ -48,6 +50,8 @@ func (c *Client) ListDepartmentsV1(ctx context.Context, sort []string, filter st
 }
 
 // CreateDepartmentV1 create department record.
+//
+// Required privileges: create:pro:departments. Legacy Jamf Pro privilege name(s): Create Departments.
 func (c *Client) CreateDepartmentV1(ctx context.Context, request *Department) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -59,6 +63,8 @@ func (c *Client) CreateDepartmentV1(ctx context.Context, request *Department) (*
 }
 
 // DeleteMultipleDepartmentsV1 deletes all departments by ids passed in body.
+//
+// Required privileges: delete:pro:departments. Legacy Jamf Pro privilege name(s): Delete Departments.
 func (c *Client) DeleteMultipleDepartmentsV1(ctx context.Context, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/departments/delete-multiple"
@@ -69,6 +75,8 @@ func (c *Client) DeleteMultipleDepartmentsV1(ctx context.Context, request *Ids) 
 }
 
 // GetDepartmentV1 get specified Department object.
+//
+// Required privileges: read:pro:departments. Legacy Jamf Pro privilege name(s): Read Departments.
 func (c *Client) GetDepartmentV1(ctx context.Context, id string) (*Department, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Department
@@ -80,6 +88,8 @@ func (c *Client) GetDepartmentV1(ctx context.Context, id string) (*Department, e
 }
 
 // UpdateDepartmentV1 update specified department object.
+//
+// Required privileges: update:pro:departments. Legacy Jamf Pro privilege name(s): Update Departments.
 func (c *Client) UpdateDepartmentV1(ctx context.Context, id string, request *Department) (*Department, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Department
@@ -91,6 +101,8 @@ func (c *Client) UpdateDepartmentV1(ctx context.Context, id string, request *Dep
 }
 
 // DeleteDepartmentV1 remove specified department record.
+//
+// Required privileges: delete:pro:departments. Legacy Jamf Pro privilege name(s): Delete Departments.
 func (c *Client) DeleteDepartmentV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/departments/%s", prefix, url.PathEscape(id))
@@ -101,6 +113,8 @@ func (c *Client) DeleteDepartmentV1(ctx context.Context, id string) error {
 }
 
 // ListDepartmentHistoryV1 get specified Department history object.
+//
+// Required privileges: read:pro:departments. Legacy Jamf Pro privilege name(s): Read Departments.
 func (c *Client) ListDepartmentHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -131,6 +145,8 @@ func (c *Client) ListDepartmentHistoryV1(ctx context.Context, id string, sort []
 }
 
 // CreateDepartmentHistoryNoteV1 add specified Department history object notes.
+//
+// Required privileges: update:pro:departments. Legacy Jamf Pro privilege name(s): Update Departments.
 func (c *Client) CreateDepartmentHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse

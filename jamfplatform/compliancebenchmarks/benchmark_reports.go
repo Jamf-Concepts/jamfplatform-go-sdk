@@ -16,6 +16,8 @@ import (
 )
 
 // ListBenchmarkRulesStats get benchmark rules for a tenant.
+//
+// Required privileges: read:pro:compliance-benchmarks.
 func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort string, ruleSearch string) ([]RuleResult, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]RuleResult, bool, error) {
@@ -45,6 +47,8 @@ func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort st
 }
 
 // ListBenchmarkRuleDevices get devices for a benchmark report rule.
+//
+// Required privileges: read:pro:compliance-benchmarks.
 func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID string, sort string, deviceSearch string, ruleResult string) ([]DeviceRuleResult, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceRuleResult, bool, error) {
@@ -80,6 +84,8 @@ func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID
 }
 
 // GetBenchmarkCompliancePercentage get compliance percentage for a benchmark report.
+//
+// Required privileges: read:pro:compliance-benchmarks.
 func (c *Client) GetBenchmarkCompliancePercentage(ctx context.Context, id string) (*CompliancePercentage, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result CompliancePercentage

@@ -12,6 +12,8 @@ import (
 )
 
 // GetUserSessionV1 return all Jamf Pro user acounts.
+//
+// Required privileges: read:pro:accounts. Legacy Jamf Pro privilege name(s): Read Accounts.
 func (c *Client) GetUserSessionV1(ctx context.Context) ([]Account, error) {
 	prefix := c.transport.TenantPrefix("pro", "")
 	var result []Account
@@ -23,6 +25,8 @@ func (c *Client) GetUserSessionV1(ctx context.Context) ([]Account, error) {
 }
 
 // UpdateUserSessionV1 update values in the User's current session.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) UpdateUserSessionV1(ctx context.Context, request *Session) (*Session, error) {
 	prefix := c.transport.TenantPrefix("pro", "")
 	var result Session

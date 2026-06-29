@@ -12,6 +12,8 @@ import (
 )
 
 // GetLastLoginV1 get the date of the last login event.
+//
+// Required privileges: read:pro:user-sessions. Legacy Jamf Pro privilege name(s): Read Last Login.
 func (c *Client) GetLastLoginV1(ctx context.Context) (*LastLoginResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result LastLoginResponse

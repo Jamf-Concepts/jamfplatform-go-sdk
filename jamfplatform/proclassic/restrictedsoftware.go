@@ -16,6 +16,8 @@ import (
 )
 
 // GetRestrictedSoftwareByID finds restricted software by ID.
+//
+// Required privileges: read:pro:restricted-software.
 func (c *Client) GetRestrictedSoftwareByID(ctx context.Context, id string) (*RestrictedSoftware, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result RestrictedSoftware
@@ -27,6 +29,8 @@ func (c *Client) GetRestrictedSoftwareByID(ctx context.Context, id string) (*Res
 }
 
 // CreateRestrictedSoftwareByID creates a new restricted software by ID.
+//
+// Required privileges: create:pro:restricted-software.
 func (c *Client) CreateRestrictedSoftwareByID(ctx context.Context, id string, request *RestrictedSoftware) (*RestrictedSoftware, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result RestrictedSoftware
@@ -38,6 +42,8 @@ func (c *Client) CreateRestrictedSoftwareByID(ctx context.Context, id string, re
 }
 
 // UpdateRestrictedSoftwareByID updates an existing restricted software by ID.
+//
+// Required privileges: update:pro:restricted-software.
 func (c *Client) UpdateRestrictedSoftwareByID(ctx context.Context, id string, request *RestrictedSoftware) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateRestrictedSoftwareByID(ctx context.Context, id string, re
 }
 
 // DeleteRestrictedSoftwareByID deletes a restricted software by ID.
+//
+// Required privileges: delete:pro:restricted-software.
 func (c *Client) DeleteRestrictedSoftwareByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteRestrictedSoftwareByID(ctx context.Context, id string) er
 }
 
 // GetRestrictedSoftwareByName finds restricted software by name.
+//
+// Required privileges: read:pro:restricted-software.
 func (c *Client) GetRestrictedSoftwareByName(ctx context.Context, name string) (*RestrictedSoftware, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result RestrictedSoftware
@@ -69,6 +79,8 @@ func (c *Client) GetRestrictedSoftwareByName(ctx context.Context, name string) (
 }
 
 // UpdateRestrictedSoftwareByName updates an existing restricted software by name.
+//
+// Required privileges: update:pro:restricted-software.
 func (c *Client) UpdateRestrictedSoftwareByName(ctx context.Context, name string, request *RestrictedSoftware) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateRestrictedSoftwareByName(ctx context.Context, name string
 }
 
 // DeleteRestrictedSoftwareByName deletes a restricted software by name.
+//
+// Required privileges: delete:pro:restricted-software.
 func (c *Client) DeleteRestrictedSoftwareByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteRestrictedSoftwareByName(ctx context.Context, name string
 }
 
 // ListRestrictedSoftware finds all restricted software.
+//
+// Required privileges: read:pro:restricted-software.
 func (c *Client) ListRestrictedSoftware(ctx context.Context) (*RestrictedSoftwareAll, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result RestrictedSoftwareAll
@@ -100,6 +116,8 @@ func (c *Client) ListRestrictedSoftware(ctx context.Context) (*RestrictedSoftwar
 }
 
 // CreateRestrictedSoftwareByName creates a new restricted software by ID.
+//
+// Required privileges: create:pro:restricted-software.
 func (c *Client) CreateRestrictedSoftwareByName(ctx context.Context, name string, request *RestrictedSoftware) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))

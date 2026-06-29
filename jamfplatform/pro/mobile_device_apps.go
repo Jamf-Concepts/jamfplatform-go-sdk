@@ -12,6 +12,8 @@ import (
 )
 
 // ReinstallMobileDeviceAppConfigV1 reinstall App Config for Managed iOS Apps.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) ReinstallMobileDeviceAppConfigV1(ctx context.Context, request *AppConfigReinstallCode) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/mobile-device-apps/reinstall-app-config"

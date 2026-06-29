@@ -16,6 +16,8 @@ import (
 )
 
 // GetRemovableMacAddressByID finds removable Mac addresses by ID.
+//
+// Required privileges: read:pro:removable-mac-address.
 func (c *Client) GetRemovableMacAddressByID(ctx context.Context, id string) (*RemovableMacAddress, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result RemovableMacAddress
@@ -27,6 +29,8 @@ func (c *Client) GetRemovableMacAddressByID(ctx context.Context, id string) (*Re
 }
 
 // CreateRemovableMacAddressByID creates a new removable Mac address by ID.
+//
+// Required privileges: create:pro:removable-mac-address.
 func (c *Client) CreateRemovableMacAddressByID(ctx context.Context, id string, request *RemovableMacAddress) (*RemovableMacAddress, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result RemovableMacAddress
@@ -38,6 +42,8 @@ func (c *Client) CreateRemovableMacAddressByID(ctx context.Context, id string, r
 }
 
 // UpdateRemovableMacAddressByID updates an existing removable Mac address by ID.
+//
+// Required privileges: update:pro:removable-mac-address.
 func (c *Client) UpdateRemovableMacAddressByID(ctx context.Context, id string, request *RemovableMacAddress) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateRemovableMacAddressByID(ctx context.Context, id string, r
 }
 
 // DeleteRemovableMacAddressByID deletes a removable Mac address by ID.
+//
+// Required privileges: delete:pro:removable-mac-address.
 func (c *Client) DeleteRemovableMacAddressByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteRemovableMacAddressByID(ctx context.Context, id string) e
 }
 
 // GetRemovableMacAddressByName finds removable Mac addresses by name.
+//
+// Required privileges: read:pro:removable-mac-address.
 func (c *Client) GetRemovableMacAddressByName(ctx context.Context, name string) (*RemovableMacAddress, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result RemovableMacAddress
@@ -69,6 +79,8 @@ func (c *Client) GetRemovableMacAddressByName(ctx context.Context, name string) 
 }
 
 // UpdateRemovableMacAddressByName updates an existing removable Mac address by name.
+//
+// Required privileges: update:pro:removable-mac-address.
 func (c *Client) UpdateRemovableMacAddressByName(ctx context.Context, name string, request *RemovableMacAddress) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateRemovableMacAddressByName(ctx context.Context, name strin
 }
 
 // DeleteRemovableMacAddressByName deletes a removable Mac address by name.
+//
+// Required privileges: delete:pro:removable-mac-address.
 func (c *Client) DeleteRemovableMacAddressByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteRemovableMacAddressByName(ctx context.Context, name strin
 }
 
 // ListRemovableMacAddresses finds all removable Mac addresses.
+//
+// Required privileges: read:pro:removable-mac-address.
 func (c *Client) ListRemovableMacAddresses(ctx context.Context) (*RemovableMacAddresses, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result RemovableMacAddresses
@@ -100,6 +116,8 @@ func (c *Client) ListRemovableMacAddresses(ctx context.Context) (*RemovableMacAd
 }
 
 // CreateRemovableMacAddressByName creates a new removable Mac address by ID.
+//
+// Required privileges: create:pro:removable-mac-address.
 func (c *Client) CreateRemovableMacAddressByName(ctx context.Context, name string, request *RemovableMacAddress) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))

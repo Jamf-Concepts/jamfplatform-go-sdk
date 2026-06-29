@@ -14,6 +14,8 @@ import (
 // GetAccountPreferencesV2 get Jamf Pro account preferences.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetAccountPreferencesV2(ctx context.Context) (*AccountPreferencesV5, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result AccountPreferencesV5
@@ -25,6 +27,8 @@ func (c *Client) GetAccountPreferencesV2(ctx context.Context) (*AccountPreferenc
 }
 
 // GetAccountPreferencesV3 get Jamf Pro account preferences.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferencesV6, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result AccountPreferencesV6
@@ -38,6 +42,8 @@ func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferenc
 // UpdateAccountPreferencesV2 update Jamf Pro account preferences.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) UpdateAccountPreferencesV2(ctx context.Context, request *AccountPreferencesV5) (*AccountPreferencesV5, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result AccountPreferencesV5
@@ -49,6 +55,8 @@ func (c *Client) UpdateAccountPreferencesV2(ctx context.Context, request *Accoun
 }
 
 // UpdateAccountPreferencesV3 update Jamf Pro account preferences.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) UpdateAccountPreferencesV3(ctx context.Context, request *AccountPreferencesV6) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := prefix + "/account-preferences"

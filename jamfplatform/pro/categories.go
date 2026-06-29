@@ -18,6 +18,9 @@ import (
 )
 
 // ListCategoriesV1 get Category objects.
+//
+// Required privileges: read:pro:categories, read:pro:self-service. Legacy Jamf Pro privilege name(s): Read Categories, Read Self Service.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListCategoriesV1(ctx context.Context, sort []string, filter string) ([]Category, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Category, bool, error) {
@@ -48,6 +51,8 @@ func (c *Client) ListCategoriesV1(ctx context.Context, sort []string, filter str
 }
 
 // CreateCategoryV1 create Category record.
+//
+// Required privileges: create:pro:categories. Legacy Jamf Pro privilege name(s): Create Categories.
 func (c *Client) CreateCategoryV1(ctx context.Context, request *Category) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -59,6 +64,8 @@ func (c *Client) CreateCategoryV1(ctx context.Context, request *Category) (*Href
 }
 
 // DeleteMultipleCategoriesV1 delete multiple Categories by their IDs.
+//
+// Required privileges: delete:pro:categories. Legacy Jamf Pro privilege name(s): Delete Categories.
 func (c *Client) DeleteMultipleCategoriesV1(ctx context.Context, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/categories/delete-multiple"
@@ -69,6 +76,8 @@ func (c *Client) DeleteMultipleCategoriesV1(ctx context.Context, request *Ids) e
 }
 
 // GetCategoryV1 get specified Category object.
+//
+// Required privileges: read:pro:categories. Legacy Jamf Pro privilege name(s): Read Categories.
 func (c *Client) GetCategoryV1(ctx context.Context, id string) (*Category, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Category
@@ -80,6 +89,8 @@ func (c *Client) GetCategoryV1(ctx context.Context, id string) (*Category, error
 }
 
 // UpdateCategoryV1 update specified Category object.
+//
+// Required privileges: update:pro:categories. Legacy Jamf Pro privilege name(s): Update Categories.
 func (c *Client) UpdateCategoryV1(ctx context.Context, id string, request *Category) (*Category, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Category
@@ -91,6 +102,8 @@ func (c *Client) UpdateCategoryV1(ctx context.Context, id string, request *Categ
 }
 
 // DeleteCategoryV1 remove specified Category record.
+//
+// Required privileges: delete:pro:categories. Legacy Jamf Pro privilege name(s): Delete Categories.
 func (c *Client) DeleteCategoryV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/categories/%s", prefix, url.PathEscape(id))
@@ -101,6 +114,8 @@ func (c *Client) DeleteCategoryV1(ctx context.Context, id string) error {
 }
 
 // ListCategoryHistoryV1 get specified Category history object.
+//
+// Required privileges: read:pro:categories. Legacy Jamf Pro privilege name(s): Read Categories.
 func (c *Client) ListCategoryHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -131,6 +146,8 @@ func (c *Client) ListCategoryHistoryV1(ctx context.Context, id string, sort []st
 }
 
 // CreateCategoryHistoryNoteV1 add specified Category history object notes.
+//
+// Required privileges: update:pro:categories. Legacy Jamf Pro privilege name(s): Update Categories.
 func (c *Client) CreateCategoryHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory

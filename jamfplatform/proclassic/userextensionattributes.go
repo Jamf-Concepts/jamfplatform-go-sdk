@@ -16,6 +16,8 @@ import (
 )
 
 // GetUserExtensionAttributeByID finds user extension attributes by ID.
+//
+// Required privileges: read:pro:user-extension-attributes.
 func (c *Client) GetUserExtensionAttributeByID(ctx context.Context, id string) (*UserExtensionAttribute, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result UserExtensionAttribute
@@ -27,6 +29,8 @@ func (c *Client) GetUserExtensionAttributeByID(ctx context.Context, id string) (
 }
 
 // CreateUserExtensionAttributeByID creates a new user extension attribute by ID.
+//
+// Required privileges: create:pro:user-extension-attributes.
 func (c *Client) CreateUserExtensionAttributeByID(ctx context.Context, id string, request *UserExtensionAttribute) (*UserExtensionAttribute, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result UserExtensionAttribute
@@ -38,6 +42,8 @@ func (c *Client) CreateUserExtensionAttributeByID(ctx context.Context, id string
 }
 
 // UpdateUserExtensionAttributeByID updates an existing user extension attribute by ID.
+//
+// Required privileges: update:pro:user-extension-attributes.
 func (c *Client) UpdateUserExtensionAttributeByID(ctx context.Context, id string, request *UserExtensionAttribute) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateUserExtensionAttributeByID(ctx context.Context, id string
 }
 
 // DeleteUserExtensionAttributeByID deletes a user extension attribute by ID.
+//
+// Required privileges: delete:pro:user-extension-attributes.
 func (c *Client) DeleteUserExtensionAttributeByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteUserExtensionAttributeByID(ctx context.Context, id string
 }
 
 // GetUserExtensionAttributeByName finds user extension attributes by name.
+//
+// Required privileges: read:pro:user-extension-attributes.
 func (c *Client) GetUserExtensionAttributeByName(ctx context.Context, name string) (*UserExtensionAttribute, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result UserExtensionAttribute
@@ -69,6 +79,8 @@ func (c *Client) GetUserExtensionAttributeByName(ctx context.Context, name strin
 }
 
 // UpdateUserExtensionAttributeByName updates an existing user extension attribute by name.
+//
+// Required privileges: update:pro:user-extension-attributes.
 func (c *Client) UpdateUserExtensionAttributeByName(ctx context.Context, name string, request *UserExtensionAttribute) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateUserExtensionAttributeByName(ctx context.Context, name st
 }
 
 // DeleteUserExtensionAttributeByName deletes a user extension attribute by name.
+//
+// Required privileges: delete:pro:user-extension-attributes.
 func (c *Client) DeleteUserExtensionAttributeByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteUserExtensionAttributeByName(ctx context.Context, name st
 }
 
 // ListUserExtensionAttributes finds all user extension attributes.
+//
+// Required privileges: read:pro:user-extension-attributes.
 func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result UserExtensionAttributes
@@ -100,6 +116,8 @@ func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensio
 }
 
 // CreateUserExtensionAttributeByName creates a new user extension attribute by ID.
+//
+// Required privileges: create:pro:user-extension-attributes.
 func (c *Client) CreateUserExtensionAttributeByName(ctx context.Context, name string, request *UserExtensionAttribute) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/name/%s", prefix, url.PathEscape(name))

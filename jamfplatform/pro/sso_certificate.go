@@ -12,6 +12,8 @@ import (
 )
 
 // GetSsoCertificateV2 retrieve the certificate currently configured for use with SSO.
+//
+// Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) GetSsoCertificateV2(ctx context.Context) (*SsoKeystoreResponseWithDetails, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SsoKeystoreResponseWithDetails
@@ -23,6 +25,8 @@ func (c *Client) GetSsoCertificateV2(ctx context.Context) (*SsoKeystoreResponseW
 }
 
 // UpdateSsoCertificateV2 update the certificate used by Jamf Pro to sign SSO requests to the identify provider.
+//
+// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) UpdateSsoCertificateV2(ctx context.Context, request *SsoKeystore) (*SsoKeystoreResponseWithDetails, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SsoKeystoreResponseWithDetails
@@ -34,6 +38,8 @@ func (c *Client) UpdateSsoCertificateV2(ctx context.Context, request *SsoKeystor
 }
 
 // GenerateSsoCertificateV2 jamf Pro will generate a new certificate and use it to sign SSO.
+//
+// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) GenerateSsoCertificateV2(ctx context.Context) (*SsoKeystoreResponseWithDetails, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SsoKeystoreResponseWithDetails
@@ -45,6 +51,8 @@ func (c *Client) GenerateSsoCertificateV2(ctx context.Context) (*SsoKeystoreResp
 }
 
 // DeleteSsoCertificateV2 delete the currently configured certificate used by SSO.
+//
+// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) DeleteSsoCertificateV2(ctx context.Context) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := prefix + "/sso/cert"
@@ -55,6 +63,8 @@ func (c *Client) DeleteSsoCertificateV2(ctx context.Context) error {
 }
 
 // DownloadSsoCertificateV2 download the certificate currently configured for use with Jamf Pro's SSO configuration.
+//
+// Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) DownloadSsoCertificateV2(ctx context.Context) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []byte
@@ -66,6 +76,8 @@ func (c *Client) DownloadSsoCertificateV2(ctx context.Context) ([]byte, error) {
 }
 
 // ParseSsoCertificateV2 parse the certificate to get details about certificate type and keys needed to upload certificate file.
+//
+// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) ParseSsoCertificateV2(ctx context.Context, request *SsoKeystoreParse) (*SsoKeystoreCertParseResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SsoKeystoreCertParseResponse

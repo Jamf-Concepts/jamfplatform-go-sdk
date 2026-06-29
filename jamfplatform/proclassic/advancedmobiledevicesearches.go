@@ -16,6 +16,8 @@ import (
 )
 
 // GetAdvancedMobileDeviceSearchByID finds mobile device searches by ID.
+//
+// Required privileges: read:pro:advanced-mobile-device-searches.
 func (c *Client) GetAdvancedMobileDeviceSearchByID(ctx context.Context, id string) (*AdvancedMobileDeviceSearch, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedMobileDeviceSearch
@@ -27,6 +29,8 @@ func (c *Client) GetAdvancedMobileDeviceSearchByID(ctx context.Context, id strin
 }
 
 // CreateAdvancedMobileDeviceSearchByID creates a new advanced mobile device search.
+//
+// Required privileges: create:pro:advanced-mobile-device-searches.
 func (c *Client) CreateAdvancedMobileDeviceSearchByID(ctx context.Context, id string, request *AdvancedMobileDeviceSearch) (*AdvancedMobileDeviceSearch, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedMobileDeviceSearch
@@ -38,6 +42,8 @@ func (c *Client) CreateAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 }
 
 // UpdateAdvancedMobileDeviceSearchByID updates an existing advanced mobile device search by ID.
+//
+// Required privileges: update:pro:advanced-mobile-device-searches.
 func (c *Client) UpdateAdvancedMobileDeviceSearchByID(ctx context.Context, id string, request *AdvancedMobileDeviceSearch) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 }
 
 // DeleteAdvancedMobileDeviceSearchByID deletes a mobile device search by ID.
+//
+// Required privileges: delete:pro:advanced-mobile-device-searches.
 func (c *Client) DeleteAdvancedMobileDeviceSearchByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 }
 
 // GetAdvancedMobileDeviceSearchByName finds advanced mobile device searches by name.
+//
+// Required privileges: read:pro:advanced-mobile-device-searches.
 func (c *Client) GetAdvancedMobileDeviceSearchByName(ctx context.Context, name string) (*AdvancedMobileDeviceSearch, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedMobileDeviceSearch
@@ -69,6 +79,8 @@ func (c *Client) GetAdvancedMobileDeviceSearchByName(ctx context.Context, name s
 }
 
 // DeleteAdvancedMobileDeviceSearchByName deletes a mobile device search by name.
+//
+// Required privileges: delete:pro:advanced-mobile-device-searches.
 func (c *Client) DeleteAdvancedMobileDeviceSearchByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 }
 
 // ListAdvancedMobileDeviceSearches finds all advanced mobile device searches.
+//
+// Required privileges: read:pro:advanced-mobile-device-searches.
 func (c *Client) ListAdvancedMobileDeviceSearches(ctx context.Context) (*AdvancedMobileDeviceSearches, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedMobileDeviceSearches
@@ -90,6 +104,8 @@ func (c *Client) ListAdvancedMobileDeviceSearches(ctx context.Context) (*Advance
 }
 
 // UpdateAdvancedMobileDeviceSearchByName updates an existing advanced mobile device search by name.
+//
+// Required privileges: update:pro:advanced-mobile-device-searches.
 func (c *Client) UpdateAdvancedMobileDeviceSearchByName(ctx context.Context, name string, request *AdvancedMobileDeviceSearch) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
@@ -100,6 +116,8 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 }
 
 // CreateAdvancedMobileDeviceSearchByName creates a new advanced mobile device search.
+//
+// Required privileges: create:pro:advanced-mobile-device-searches.
 func (c *Client) CreateAdvancedMobileDeviceSearchByName(ctx context.Context, name string, request *AdvancedMobileDeviceSearch) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))

@@ -16,6 +16,8 @@ import (
 )
 
 // GetDockItemByID finds dock items by ID.
+//
+// Required privileges: read:pro:dock-items.
 func (c *Client) GetDockItemByID(ctx context.Context, id string) (*DockItem, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DockItem
@@ -27,6 +29,8 @@ func (c *Client) GetDockItemByID(ctx context.Context, id string) (*DockItem, err
 }
 
 // CreateDockItemByID creates a new dock item by ID.
+//
+// Required privileges: create:pro:dock-items.
 func (c *Client) CreateDockItemByID(ctx context.Context, id string, request *DockItem) (*DockItem, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DockItem
@@ -38,6 +42,8 @@ func (c *Client) CreateDockItemByID(ctx context.Context, id string, request *Doc
 }
 
 // UpdateDockItemByID updates an existing dock item by ID.
+//
+// Required privileges: update:pro:dock-items.
 func (c *Client) UpdateDockItemByID(ctx context.Context, id string, request *DockItem) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateDockItemByID(ctx context.Context, id string, request *Doc
 }
 
 // DeleteDockItemByID deletes a dock item by ID.
+//
+// Required privileges: delete:pro:dock-items.
 func (c *Client) DeleteDockItemByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteDockItemByID(ctx context.Context, id string) error {
 }
 
 // GetDockItemByName finds dock items by name.
+//
+// Required privileges: read:pro:dock-items.
 func (c *Client) GetDockItemByName(ctx context.Context, name string) (*DockItem, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DockItem
@@ -69,6 +79,8 @@ func (c *Client) GetDockItemByName(ctx context.Context, name string) (*DockItem,
 }
 
 // UpdateDockItemByName updates an existing dock item by name.
+//
+// Required privileges: update:pro:dock-items.
 func (c *Client) UpdateDockItemByName(ctx context.Context, name string, request *DockItem) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateDockItemByName(ctx context.Context, name string, request 
 }
 
 // DeleteDockItemByName deletes a dock item by name.
+//
+// Required privileges: delete:pro:dock-items.
 func (c *Client) DeleteDockItemByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteDockItemByName(ctx context.Context, name string) error {
 }
 
 // ListDockItems finds all dock items.
+//
+// Required privileges: read:pro:dock-items.
 func (c *Client) ListDockItems(ctx context.Context) (*DockItems, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DockItems
@@ -100,6 +116,8 @@ func (c *Client) ListDockItems(ctx context.Context) (*DockItems, error) {
 }
 
 // CreateDockItemByName creates a new dock item by ID.
+//
+// Required privileges: create:pro:dock-items.
 func (c *Client) CreateDockItemByName(ctx context.Context, name string, request *DockItem) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))

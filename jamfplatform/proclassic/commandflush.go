@@ -13,6 +13,8 @@ import (
 )
 
 // DeleteCommandFlush flushes commands based on information specified in an XML file.
+//
+// Required privileges: delete:pro:computer-commands.
 func (c *Client) DeleteCommandFlush(ctx context.Context, request *Commandflush) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := prefix + "/commandflush"
@@ -23,6 +25,8 @@ func (c *Client) DeleteCommandFlush(ctx context.Context, request *Commandflush) 
 }
 
 // DeleteCommandFlushByIDTypeIDStatus flushes commands for devices.
+//
+// Required privileges: delete:pro:computer-commands.
 func (c *Client) DeleteCommandFlushByIDTypeIDStatus(ctx context.Context, idtype string, id string, status string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/commandflush/%s/id/%s/status/%s", prefix, url.PathEscape(idtype), url.PathEscape(id), url.PathEscape(status))

@@ -13,6 +13,8 @@ import (
 )
 
 // GetJsonWebTokenConfigurationByID find JSON Web Token configuration by ID.
+//
+// Required privileges: read:pro:json-web-token-configuration.
 func (c *Client) GetJsonWebTokenConfigurationByID(ctx context.Context, id string) (*JsonWebTokenConfiguration, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result JsonWebTokenConfiguration
@@ -24,6 +26,8 @@ func (c *Client) GetJsonWebTokenConfigurationByID(ctx context.Context, id string
 }
 
 // CreateJsonWebTokenConfigurationByID creates a new JSON Web Token configuration by ID.
+//
+// Required privileges: create:pro:json-web-token-configuration.
 func (c *Client) CreateJsonWebTokenConfigurationByID(ctx context.Context, id string, request *JsonWebTokenConfiguration) (*JsonWebTokenConfiguration, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result JsonWebTokenConfiguration
@@ -35,6 +39,8 @@ func (c *Client) CreateJsonWebTokenConfigurationByID(ctx context.Context, id str
 }
 
 // UpdateJsonWebTokenConfigurationByID updates an existing JSON Web Token configuration by ID.
+//
+// Required privileges: update:pro:json-web-token-configuration.
 func (c *Client) UpdateJsonWebTokenConfigurationByID(ctx context.Context, id string, request *JsonWebTokenConfiguration) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/jsonwebtokenconfigurations/id/%s", prefix, url.PathEscape(id))
@@ -45,6 +51,8 @@ func (c *Client) UpdateJsonWebTokenConfigurationByID(ctx context.Context, id str
 }
 
 // DeleteJsonWebTokenConfigurationByID deletes a JSON Web Token configuration by ID.
+//
+// Required privileges: delete:pro:json-web-token-configuration.
 func (c *Client) DeleteJsonWebTokenConfigurationByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/jsonwebtokenconfigurations/id/%s", prefix, url.PathEscape(id))
@@ -55,6 +63,8 @@ func (c *Client) DeleteJsonWebTokenConfigurationByID(ctx context.Context, id str
 }
 
 // ListJsonWebTokenConfigurations finds all JSON Web Token configurations.
+//
+// Required privileges: read:pro:json-web-token-configuration.
 func (c *Client) ListJsonWebTokenConfigurations(ctx context.Context) (*JsonWebTokenConfigurations, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result JsonWebTokenConfigurations

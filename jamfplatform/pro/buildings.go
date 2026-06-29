@@ -18,6 +18,8 @@ import (
 )
 
 // ListBuildingsV1 search for sorted and paged Buildings.
+//
+// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
 func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter string) ([]Building, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Building, bool, error) {
@@ -48,6 +50,8 @@ func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter stri
 }
 
 // CreateBuildingV1 create Building record.
+//
+// Required privileges: create:pro:buildings. Legacy Jamf Pro privilege name(s): Create Buildings.
 func (c *Client) CreateBuildingV1(ctx context.Context, request *Building) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -59,6 +63,8 @@ func (c *Client) CreateBuildingV1(ctx context.Context, request *Building) (*Href
 }
 
 // GetBuildingV1 get specified Building object.
+//
+// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
 func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Building
@@ -70,6 +76,8 @@ func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error
 }
 
 // UpdateBuildingV1 update specified Building object.
+//
+// Required privileges: update:pro:buildings. Legacy Jamf Pro privilege name(s): Update Buildings.
 func (c *Client) UpdateBuildingV1(ctx context.Context, id string, request *Building) (*Building, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Building
@@ -81,6 +89,8 @@ func (c *Client) UpdateBuildingV1(ctx context.Context, id string, request *Build
 }
 
 // DeleteBuildingV1 remove specified Building record.
+//
+// Required privileges: delete:pro:buildings. Legacy Jamf Pro privilege name(s): Delete Buildings.
 func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/buildings/%s", prefix, url.PathEscape(id))
@@ -91,6 +101,8 @@ func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
 }
 
 // ExportBuildingsV1 export Buildings collection.
+//
+// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
 func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameters, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -112,6 +124,8 @@ func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameter
 }
 
 // ListBuildingHistoryV1 get specified Building History object.
+//
+// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
 func (c *Client) ListBuildingHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -142,6 +156,8 @@ func (c *Client) ListBuildingHistoryV1(ctx context.Context, id string, sort []st
 }
 
 // DeleteMultipleBuildingsV1 delete multiple Buildings by their ids.
+//
+// Required privileges: delete:pro:buildings. Legacy Jamf Pro privilege name(s): Delete Buildings.
 func (c *Client) DeleteMultipleBuildingsV1(ctx context.Context, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/buildings/delete-multiple"
@@ -152,6 +168,8 @@ func (c *Client) DeleteMultipleBuildingsV1(ctx context.Context, request *Ids) er
 }
 
 // CreateBuildingHistoryNoteV1 add specified Building history object notes.
+//
+// Required privileges: update:pro:buildings. Legacy Jamf Pro privilege name(s): Update Buildings.
 func (c *Client) CreateBuildingHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory
@@ -163,6 +181,8 @@ func (c *Client) CreateBuildingHistoryNoteV1(ctx context.Context, id string, req
 }
 
 // ExportBuildingHistoryV1 export history object collection in specified format for specified Buildings.
+//
+// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
 func (c *Client) ExportBuildingHistoryV1(ctx context.Context, id string, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte

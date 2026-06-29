@@ -13,6 +13,9 @@ import (
 )
 
 // DeleteLogFlush flushes a log specified in an XML file.
+//
+// Required privileges: delete:pro:policies, execute:pro:flush-policy-logs.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) DeleteLogFlush(ctx context.Context, request *Logflush) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := prefix + "/logflush"
@@ -23,6 +26,9 @@ func (c *Client) DeleteLogFlush(ctx context.Context, request *Logflush) error {
 }
 
 // DeleteLogFlushByLogIDInterval flushes a single log for a given interval.
+//
+// Required privileges: delete:pro:policies, execute:pro:flush-policy-logs.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) DeleteLogFlushByLogIDInterval(ctx context.Context, log string, id string, interval string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/logflush/%s/id/%s/interval/%s", prefix, url.PathEscape(log), url.PathEscape(id), url.PathEscape(interval))
@@ -33,6 +39,9 @@ func (c *Client) DeleteLogFlushByLogIDInterval(ctx context.Context, log string, 
 }
 
 // DeleteLogFlushByLogInterval flushes all logs for a given interval.
+//
+// Required privileges: delete:pro:policies, execute:pro:flush-policy-logs.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) DeleteLogFlushByLogInterval(ctx context.Context, log string, interval string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/logflush/%s/interval/%s", prefix, url.PathEscape(log), url.PathEscape(interval))

@@ -16,6 +16,8 @@ import (
 )
 
 // GetMobileDeviceProvisioningProfileByID finds a mobile device provisioning profiles by id.
+//
+// Required privileges: read:pro:provisioning-profiles.
 func (c *Client) GetMobileDeviceProvisioningProfileByID(ctx context.Context, id string) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
@@ -27,6 +29,8 @@ func (c *Client) GetMobileDeviceProvisioningProfileByID(ctx context.Context, id 
 }
 
 // CreateMobileDeviceProvisioningProfileByID creates a mobile device provisioning profiles by id.
+//
+// Required privileges: create:pro:provisioning-profiles.
 func (c *Client) CreateMobileDeviceProvisioningProfileByID(ctx context.Context, id string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
@@ -38,6 +42,8 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByID(ctx context.Context, 
 }
 
 // UpdateMobileDeviceProvisioningProfileByID updates an existing mobile device provisioning profiles by id.
+//
+// Required privileges: update:pro:provisioning-profiles.
 func (c *Client) UpdateMobileDeviceProvisioningProfileByID(ctx context.Context, id string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
@@ -49,6 +55,8 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByID(ctx context.Context, 
 }
 
 // DeleteMobileDeviceProvisioningProfileByID deletes a mobile device provisioning profiles by id.
+//
+// Required privileges: delete:pro:provisioning-profiles.
 func (c *Client) DeleteMobileDeviceProvisioningProfileByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/id/%s", prefix, url.PathEscape(id))
@@ -59,6 +67,8 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByID(ctx context.Context, 
 }
 
 // GetMobileDeviceProvisioningProfileByName finds a mobile device provisioning profiles by name.
+//
+// Required privileges: read:pro:provisioning-profiles.
 func (c *Client) GetMobileDeviceProvisioningProfileByName(ctx context.Context, name string) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
@@ -70,6 +80,8 @@ func (c *Client) GetMobileDeviceProvisioningProfileByName(ctx context.Context, n
 }
 
 // DeleteMobileDeviceProvisioningProfileByName deletes a mobile device provisioning profiles by name.
+//
+// Required privileges: delete:pro:provisioning-profiles.
 func (c *Client) DeleteMobileDeviceProvisioningProfileByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/name/%s", prefix, url.PathEscape(name))
@@ -80,6 +92,8 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByName(ctx context.Context
 }
 
 // GetMobileDeviceProvisioningProfileByUUID finds a mobile device provisioning profiles by uuid.
+//
+// Required privileges: read:pro:provisioning-profiles.
 func (c *Client) GetMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
@@ -91,6 +105,8 @@ func (c *Client) GetMobileDeviceProvisioningProfileByUUID(ctx context.Context, u
 }
 
 // DeleteMobileDeviceProvisioningProfileByUUID deletes a mobile device provisioning profiles by uuid.
+//
+// Required privileges: delete:pro:provisioning-profiles.
 func (c *Client) DeleteMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/uuid/%s", prefix, url.PathEscape(uuid))
@@ -101,6 +117,8 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByUUID(ctx context.Context
 }
 
 // ListMobileDeviceProvisioningProfiles finds all mobile device provisioning profiles.
+//
+// Required privileges: read:pro:provisioning-profiles.
 func (c *Client) ListMobileDeviceProvisioningProfiles(ctx context.Context) (*MobileDeviceProvisioningProfiles, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfiles
@@ -112,6 +130,8 @@ func (c *Client) ListMobileDeviceProvisioningProfiles(ctx context.Context) (*Mob
 }
 
 // CreateMobileDeviceProvisioningProfileByName creates a mobile device provisioning profiles by name.
+//
+// Required privileges: create:pro:provisioning-profiles.
 func (c *Client) CreateMobileDeviceProvisioningProfileByName(ctx context.Context, name string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
@@ -123,6 +143,8 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByName(ctx context.Context
 }
 
 // UpdateMobileDeviceProvisioningProfileByName updates an existing mobile device provisioning profiles by name.
+//
+// Required privileges: update:pro:provisioning-profiles.
 func (c *Client) UpdateMobileDeviceProvisioningProfileByName(ctx context.Context, name string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
@@ -134,6 +156,8 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByName(ctx context.Context
 }
 
 // CreateMobileDeviceProvisioningProfileByUUID creates a mobile device provisioning profiles by uuid.
+//
+// Required privileges: create:pro:provisioning-profiles.
 func (c *Client) CreateMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
@@ -145,6 +169,8 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByUUID(ctx context.Context
 }
 
 // UpdateMobileDeviceProvisioningProfileByUUID updates an existing mobile device provisioning profiles by uuid.
+//
+// Required privileges: update:pro:provisioning-profiles.
 func (c *Client) UpdateMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
@@ -156,6 +182,8 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByUUID(ctx context.Context
 }
 
 // GetMobileDeviceProvisioningProfileByIDSubset finds a mobile device provisioning profiles by id.
+//
+// Required privileges: read:pro:provisioning-profiles.
 func (c *Client) GetMobileDeviceProvisioningProfileByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceProvisioningProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile

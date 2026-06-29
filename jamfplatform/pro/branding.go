@@ -13,6 +13,8 @@ import (
 )
 
 // DownloadBrandingImageV1 download a self service branding image.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) DownloadBrandingImageV1(ctx context.Context, id string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte

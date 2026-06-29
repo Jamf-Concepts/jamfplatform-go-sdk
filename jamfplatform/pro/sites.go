@@ -18,6 +18,8 @@ import (
 )
 
 // ListSitesV1 find all sites.
+//
+// Required privileges: read:pro:sites. Legacy Jamf Pro privilege name(s): Read Sites.
 func (c *Client) ListSitesV1(ctx context.Context) ([]V1Site, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []V1Site
@@ -29,6 +31,8 @@ func (c *Client) ListSitesV1(ctx context.Context) ([]V1Site, error) {
 }
 
 // ListSiteObjectsV1 find and filter site objects for a site ID.
+//
+// Required privileges: read:pro:sites. Legacy Jamf Pro privilege name(s): Read Sites.
 func (c *Client) ListSiteObjectsV1(ctx context.Context, id string, sort []string, filter string) ([]SiteObject, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SiteObject, bool, error) {

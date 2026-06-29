@@ -17,6 +17,8 @@ import (
 )
 
 // ListDevicesForUser get devices for a user.
+//
+// Required privileges: read:pro:devices.
 func (c *Client) ListDevicesForUser(ctx context.Context, userID string, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {

@@ -13,6 +13,8 @@ import (
 )
 
 // ListDeviceGroupsForDevice get device groups for a device.
+//
+// Required privileges: read:pro:device-groups.
 func (c *Client) ListDeviceGroupsForDevice(ctx context.Context, deviceID string) ([]DeviceGroupMemberOfRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s/device-groups", prefix, url.PathEscape(deviceID))

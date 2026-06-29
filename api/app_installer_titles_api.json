@@ -124,7 +124,10 @@
           "app-installer-titles"
         ],
         "x-required-privileges": [
-          "Read App Installers"
+          "read:pro:mac-applications"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Mac Applications"
         ]
       }
     },
@@ -162,7 +165,10 @@
           "app-installer-titles"
         ],
         "x-required-privileges": [
-          "Read App Installers"
+          "read:pro:mac-applications"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Mac Applications"
         ]
       }
     }

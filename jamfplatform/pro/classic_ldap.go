@@ -13,6 +13,8 @@ import (
 )
 
 // GetClassicLdapMappingsV1 get mappings for OnPrem Ldap configuration with given id.
+//
+// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) GetClassicLdapMappingsV1(ctx context.Context, id string) (*ClassicLdapMappings, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ClassicLdapMappings

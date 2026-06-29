@@ -18,6 +18,8 @@ import (
 
 // ListAppInstallerTitlesV1 get all available App Installer titles.
 //
+// Required privileges: read:pro:mac-applications. Legacy Jamf Pro privilege name(s): Read Mac Applications.
+//
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ListAppInstallerTitlesV1(ctx context.Context) ([]AppInstallerTitle, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -43,6 +45,8 @@ func (c *Client) ListAppInstallerTitlesV1(ctx context.Context) ([]AppInstallerTi
 }
 
 // GetAppInstallerTitleV1 get an App Installer title by ID.
+//
+// Required privileges: read:pro:mac-applications. Legacy Jamf Pro privilege name(s): Read Mac Applications.
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) GetAppInstallerTitleV1(ctx context.Context, id string) (*AppInstallerTitle, error) {

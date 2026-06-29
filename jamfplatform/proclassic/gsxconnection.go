@@ -12,6 +12,8 @@ import (
 )
 
 // GetGSXConnection finds the Jamf Pro GSX connection information.
+//
+// Required privileges: read:pro:gsx-connection.
 func (c *Client) GetGSXConnection(ctx context.Context) (*GsxConnection, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result GsxConnection
@@ -23,6 +25,8 @@ func (c *Client) GetGSXConnection(ctx context.Context) (*GsxConnection, error) {
 }
 
 // UpdateGSXConnection updates the Jamf Pro GSX connection information.
+//
+// Required privileges: update:pro:gsx-connection.
 func (c *Client) UpdateGSXConnection(ctx context.Context, request *GsxConnection) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := prefix + "/gsxconnection"

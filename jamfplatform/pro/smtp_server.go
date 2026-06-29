@@ -17,6 +17,8 @@ import (
 )
 
 // GetSmtpServerV2 finds the Jamf Pro SMTP Server information.
+//
+// Required privileges: read:pro:smtp-server. Legacy Jamf Pro privilege name(s): Read SMTP Server.
 func (c *Client) GetSmtpServerV2(ctx context.Context) (*SmtpServerV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmtpServerV2
@@ -28,6 +30,8 @@ func (c *Client) GetSmtpServerV2(ctx context.Context) (*SmtpServerV2, error) {
 }
 
 // UpdateSmtpServerV2 updates Jamf Pro SMTP Server information.
+//
+// Required privileges: update:pro:smtp-server. Legacy Jamf Pro privilege name(s): Update SMTP Server.
 func (c *Client) UpdateSmtpServerV2(ctx context.Context, request *SmtpServerV2) (*SmtpServerV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmtpServerV2
@@ -39,6 +43,8 @@ func (c *Client) UpdateSmtpServerV2(ctx context.Context, request *SmtpServerV2) 
 }
 
 // ListSmtpServerHistoryV1 get specified SMTP Server history object.
+//
+// Required privileges: read:pro:smtp-server. Legacy Jamf Pro privilege name(s): Read SMTP Server.
 func (c *Client) ListSmtpServerHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistoryV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistoryV1, bool, error) {
@@ -69,6 +75,8 @@ func (c *Client) ListSmtpServerHistoryV1(ctx context.Context, sort []string, fil
 }
 
 // CreateSmtpServerHistoryNoteV1 add SMTP Server history object notes.
+//
+// Required privileges: update:pro:smtp-server. Legacy Jamf Pro privilege name(s): Update SMTP Server.
 func (c *Client) CreateSmtpServerHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -80,6 +88,8 @@ func (c *Client) CreateSmtpServerHistoryNoteV1(ctx context.Context, request *Obj
 }
 
 // TestSmtpServerV1 test functionality of an SMTP Server.
+//
+// Required privileges: read:pro:smtp-server. Legacy Jamf Pro privilege name(s): Read SMTP Server.
 func (c *Client) TestSmtpServerV1(ctx context.Context, request *SmtpServerTest) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/smtp-server/test"

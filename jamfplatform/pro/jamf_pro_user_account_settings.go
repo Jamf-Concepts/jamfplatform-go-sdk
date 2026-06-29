@@ -13,6 +13,8 @@ import (
 )
 
 // GetUserPreferencesSettingsV1 get the user preferences for the authenticated user and key.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetUserPreferencesSettingsV1(ctx context.Context, keyID string) (*UserPreferencesSettings, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserPreferencesSettings
@@ -24,6 +26,8 @@ func (c *Client) GetUserPreferencesSettingsV1(ctx context.Context, keyID string)
 }
 
 // GetUserPreferenceV1 get the user setting for the authenticated user and key.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetUserPreferenceV1(ctx context.Context, keyID string) (*UserPreferencesJson, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserPreferencesJson
@@ -35,6 +39,8 @@ func (c *Client) GetUserPreferenceV1(ctx context.Context, keyID string) (*UserPr
 }
 
 // UpdateUserPreferenceV1 persist the user setting.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) UpdateUserPreferenceV1(ctx context.Context, keyID string, request *map[string]any) (*UserPreferencesJson, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserPreferencesJson
@@ -46,6 +52,8 @@ func (c *Client) UpdateUserPreferenceV1(ctx context.Context, keyID string, reque
 }
 
 // DeleteUserPreferenceV1 remove specified setting for authenticated user.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) DeleteUserPreferenceV1(ctx context.Context, keyID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/user/preferences/%s", prefix, url.PathEscape(keyID))

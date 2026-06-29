@@ -17,6 +17,8 @@ import (
 )
 
 // ListPatchPolicyLogsV2 retrieve Patch Policy Logs.
+//
+// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 func (c *Client) ListPatchPolicyLogsV2(ctx context.Context, id string, sort []string, filter string) ([]PatchPolicyLogV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchPolicyLogV2, bool, error) {
@@ -47,6 +49,8 @@ func (c *Client) ListPatchPolicyLogsV2(ctx context.Context, id string, sort []st
 }
 
 // GetPatchPolicyEligibleRetryCountV2 return the count of the Patch Policy Logs for the patch policy id that are eligible for a retry attempt.
+//
+// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 func (c *Client) GetPatchPolicyEligibleRetryCountV2(ctx context.Context, id string) (*PatchPolicyLogEligibleRetryCount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PatchPolicyLogEligibleRetryCount
@@ -58,6 +62,8 @@ func (c *Client) GetPatchPolicyEligibleRetryCountV2(ctx context.Context, id stri
 }
 
 // RetryPatchPolicyLogsV2 send retry attempts for specific devices.
+//
+// Required privileges: update:pro:patch-policies. Legacy Jamf Pro privilege name(s): Update Patch Policies.
 func (c *Client) RetryPatchPolicyLogsV2(ctx context.Context, id string, request *PatchPolicyLogRetry) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-policies/%s/logs/retry", prefix, url.PathEscape(id))
@@ -68,6 +74,8 @@ func (c *Client) RetryPatchPolicyLogsV2(ctx context.Context, id string, request 
 }
 
 // RetryAllPatchPolicyLogsV2 send retry attempts for all devices.
+//
+// Required privileges: update:pro:patch-policies. Legacy Jamf Pro privilege name(s): Update Patch Policies.
 func (c *Client) RetryAllPatchPolicyLogsV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-policies/%s/logs/retry-all", prefix, url.PathEscape(id))
@@ -78,6 +86,8 @@ func (c *Client) RetryAllPatchPolicyLogsV2(ctx context.Context, id string) error
 }
 
 // GetPatchPolicyLogForDeviceV2 retrieves a single Patch Policy Log.
+//
+// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 func (c *Client) GetPatchPolicyLogForDeviceV2(ctx context.Context, id string, deviceID string) (*PatchPolicyLogV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PatchPolicyLogV2
@@ -89,6 +99,8 @@ func (c *Client) GetPatchPolicyLogForDeviceV2(ctx context.Context, id string, de
 }
 
 // ListPatchPolicyLogDetailsForDeviceV2 return attempt details for a specific log.
+//
+// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 func (c *Client) ListPatchPolicyLogDetailsForDeviceV2(ctx context.Context, id string, deviceID string) ([]PatchPolicyLogDetail, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []PatchPolicyLogDetail

@@ -13,6 +13,8 @@ import (
 )
 
 // GetVPPAssignmentByID finds VPP Assignment by ID.
+//
+// Required privileges: read:pro:vpp-assignment.
 func (c *Client) GetVPPAssignmentByID(ctx context.Context, id string) (*VppAssignment, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result VppAssignment
@@ -24,6 +26,8 @@ func (c *Client) GetVPPAssignmentByID(ctx context.Context, id string) (*VppAssig
 }
 
 // CreateVPPAssignmentByID creates a new VPP assignment by ID.
+//
+// Required privileges: create:pro:vpp-assignment.
 func (c *Client) CreateVPPAssignmentByID(ctx context.Context, id string, request *VppAssignmentPost) (*VppAssignment, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result VppAssignment
@@ -35,6 +39,8 @@ func (c *Client) CreateVPPAssignmentByID(ctx context.Context, id string, request
 }
 
 // UpdateVPPAssignmentByID updates a VPP assignment by ID.
+//
+// Required privileges: update:pro:vpp-assignment.
 func (c *Client) UpdateVPPAssignmentByID(ctx context.Context, id string, request *VppAssignmentPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppassignments/id/%s", prefix, url.PathEscape(id))
@@ -45,6 +51,8 @@ func (c *Client) UpdateVPPAssignmentByID(ctx context.Context, id string, request
 }
 
 // DeleteVPPAssignmentByID deletes a VPP assignment by ID.
+//
+// Required privileges: delete:pro:vpp-assignment.
 func (c *Client) DeleteVPPAssignmentByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppassignments/id/%s", prefix, url.PathEscape(id))
@@ -55,6 +63,8 @@ func (c *Client) DeleteVPPAssignmentByID(ctx context.Context, id string) error {
 }
 
 // ListVPPAssignments finds all VPP Assignments.
+//
+// Required privileges: read:pro:vpp-assignment.
 func (c *Client) ListVPPAssignments(ctx context.Context) (*VppAssignments, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result VppAssignments
