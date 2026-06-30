@@ -16,6 +16,8 @@ import (
 )
 
 // GetDiskEncryptionConfigurationByID finds disk encryption configurations by ID.
+//
+// Required privileges: read:pro:disk-encryption-configurations.
 func (c *Client) GetDiskEncryptionConfigurationByID(ctx context.Context, id string) (*DiskEncryptionConfiguration, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DiskEncryptionConfiguration
@@ -27,6 +29,8 @@ func (c *Client) GetDiskEncryptionConfigurationByID(ctx context.Context, id stri
 }
 
 // CreateDiskEncryptionConfigurationByID creates a new disk encryption configuration by ID.
+//
+// Required privileges: create:pro:disk-encryption-configurations.
 func (c *Client) CreateDiskEncryptionConfigurationByID(ctx context.Context, id string, request *DiskEncryptionConfiguration) (*DiskEncryptionConfiguration, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DiskEncryptionConfiguration
@@ -38,6 +42,8 @@ func (c *Client) CreateDiskEncryptionConfigurationByID(ctx context.Context, id s
 }
 
 // UpdateDiskEncryptionConfigurationByID updates an existing disk encryption configuration by ID.
+//
+// Required privileges: update:pro:disk-encryption-configurations.
 func (c *Client) UpdateDiskEncryptionConfigurationByID(ctx context.Context, id string, request *DiskEncryptionConfiguration) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateDiskEncryptionConfigurationByID(ctx context.Context, id s
 }
 
 // DeleteDiskEncryptionConfigurationByID deletes a disk encryption configuration by ID.
+//
+// Required privileges: delete:pro:disk-encryption-configurations.
 func (c *Client) DeleteDiskEncryptionConfigurationByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteDiskEncryptionConfigurationByID(ctx context.Context, id s
 }
 
 // GetDiskEncryptionConfigurationByName finds disk encryption configurations by name.
+//
+// Required privileges: read:pro:disk-encryption-configurations.
 func (c *Client) GetDiskEncryptionConfigurationByName(ctx context.Context, name string) (*DiskEncryptionConfiguration, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DiskEncryptionConfiguration
@@ -69,6 +79,8 @@ func (c *Client) GetDiskEncryptionConfigurationByName(ctx context.Context, name 
 }
 
 // UpdateDiskEncryptionConfigurationByName updates an existing disk encryption configuration by name.
+//
+// Required privileges: update:pro:disk-encryption-configurations.
 func (c *Client) UpdateDiskEncryptionConfigurationByName(ctx context.Context, name string, request *DiskEncryptionConfiguration) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateDiskEncryptionConfigurationByName(ctx context.Context, na
 }
 
 // DeleteDiskEncryptionConfigurationByName deletes a disk encryption configuration by name.
+//
+// Required privileges: delete:pro:disk-encryption-configurations.
 func (c *Client) DeleteDiskEncryptionConfigurationByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteDiskEncryptionConfigurationByName(ctx context.Context, na
 }
 
 // ListDiskEncryptionConfigurations finds all disk encryption configurations.
+//
+// Required privileges: read:pro:disk-encryption-configurations.
 func (c *Client) ListDiskEncryptionConfigurations(ctx context.Context) (*DiskEncryptionConfigurations, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DiskEncryptionConfigurations
@@ -100,6 +116,8 @@ func (c *Client) ListDiskEncryptionConfigurations(ctx context.Context) (*DiskEnc
 }
 
 // CreateDiskEncryptionConfigurationByName creates a new disk encryption configuration by ID.
+//
+// Required privileges: create:pro:disk-encryption-configurations.
 func (c *Client) CreateDiskEncryptionConfigurationByName(ctx context.Context, name string, request *DiskEncryptionConfiguration) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))

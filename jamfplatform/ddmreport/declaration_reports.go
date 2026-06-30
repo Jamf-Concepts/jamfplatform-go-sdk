@@ -19,6 +19,9 @@ import (
 // ListDeclarationReportClients get declaration report devices.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-17) and may be removed in a future release.
+//
+// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationIdentifier string, sort []string) ([]DeclarationReportClientDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeclarationReportClientDto, bool, error) {
@@ -46,6 +49,9 @@ func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationId
 }
 
 // ListDeclarationReportClientsFiltered get filtered declaration report devices.
+//
+// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListDeclarationReportClientsFiltered(ctx context.Context, declarationIdentifier string, filter string, sort []string) ([]FilteredResultDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {

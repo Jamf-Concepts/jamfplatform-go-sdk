@@ -16,6 +16,8 @@ import (
 )
 
 // GetScriptByID finds scripts by ID.
+//
+// Required privileges: read:pro:scripts.
 func (c *Client) GetScriptByID(ctx context.Context, id string) (*Script, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Script
@@ -27,6 +29,8 @@ func (c *Client) GetScriptByID(ctx context.Context, id string) (*Script, error) 
 }
 
 // CreateScriptByID creates a new script by ID.
+//
+// Required privileges: create:pro:scripts.
 func (c *Client) CreateScriptByID(ctx context.Context, id string, request *Script) (*Script, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Script
@@ -38,6 +42,8 @@ func (c *Client) CreateScriptByID(ctx context.Context, id string, request *Scrip
 }
 
 // UpdateScriptByID updates an existing script by ID.
+//
+// Required privileges: update:pro:scripts.
 func (c *Client) UpdateScriptByID(ctx context.Context, id string, request *Script) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/scripts/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateScriptByID(ctx context.Context, id string, request *Scrip
 }
 
 // DeleteScriptByID deletes a script by ID.
+//
+// Required privileges: delete:pro:scripts.
 func (c *Client) DeleteScriptByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/scripts/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteScriptByID(ctx context.Context, id string) error {
 }
 
 // GetScriptByName finds scripts by name.
+//
+// Required privileges: read:pro:scripts.
 func (c *Client) GetScriptByName(ctx context.Context, name string) (*Script, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Script
@@ -69,6 +79,8 @@ func (c *Client) GetScriptByName(ctx context.Context, name string) (*Script, err
 }
 
 // UpdateScriptByName updates an existing script by name.
+//
+// Required privileges: update:pro:scripts.
 func (c *Client) UpdateScriptByName(ctx context.Context, name string, request *Script) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/scripts/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateScriptByName(ctx context.Context, name string, request *S
 }
 
 // DeleteScriptByName deletes a script by name.
+//
+// Required privileges: delete:pro:scripts.
 func (c *Client) DeleteScriptByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/scripts/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteScriptByName(ctx context.Context, name string) error {
 }
 
 // ListScripts finds all scripts.
+//
+// Required privileges: read:pro:scripts.
 func (c *Client) ListScripts(ctx context.Context) (*Scripts, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Scripts
@@ -100,6 +116,8 @@ func (c *Client) ListScripts(ctx context.Context) (*Scripts, error) {
 }
 
 // CreateScriptByName creates a new script by ID.
+//
+// Required privileges: create:pro:scripts.
 func (c *Client) CreateScriptByName(ctx context.Context, name string, request *Script) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/scripts/name/%s", prefix, url.PathEscape(name))

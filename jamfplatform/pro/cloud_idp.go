@@ -18,6 +18,8 @@ import (
 )
 
 // ListCloudIdpV1 get information about all Cloud Identity Providers configurations.
+//
+// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) ListCloudIdpV1(ctx context.Context, sort []string) ([]CloudIDPCommonResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]CloudIDPCommonResponse, bool, error) {
@@ -45,6 +47,8 @@ func (c *Client) ListCloudIdpV1(ctx context.Context, sort []string) ([]CloudIDPC
 }
 
 // ExportCloudIdpV1 export Cloud Identity Providers collection.
+//
+// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) ExportCloudIdpV1(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -72,6 +76,8 @@ func (c *Client) ExportCloudIdpV1(ctx context.Context, request *ExportParameters
 }
 
 // GetCloudIdpV1 get Cloud Identity Provider configuration with given ID.
+//
+// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) GetCloudIdpV1(ctx context.Context, id string) (*CloudIDPCommon, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result CloudIDPCommon
@@ -83,6 +89,8 @@ func (c *Client) GetCloudIdpV1(ctx context.Context, id string) (*CloudIDPCommon,
 }
 
 // ListCloudIdpHistoryV1 get Cloud Identity Provider history.
+//
+// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) ListCloudIdpHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -113,6 +121,8 @@ func (c *Client) ListCloudIdpHistoryV1(ctx context.Context, id string, sort []st
 }
 
 // CreateCloudIdpHistoryNoteV1 add Cloud Identity Provider history note.
+//
+// Required privileges: update:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
 func (c *Client) CreateCloudIdpHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory
@@ -124,6 +134,8 @@ func (c *Client) CreateCloudIdpHistoryNoteV1(ctx context.Context, id string, req
 }
 
 // TestCloudIdpGroupV1 get group test search.
+//
+// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) TestCloudIdpGroupV1(ctx context.Context, id string, request *GroupTestSearchRequest) (*GroupTestSearchResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GroupTestSearchResponse
@@ -135,6 +147,8 @@ func (c *Client) TestCloudIdpGroupV1(ctx context.Context, id string, request *Gr
 }
 
 // TestCloudIdpUserV1 get user test search.
+//
+// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) TestCloudIdpUserV1(ctx context.Context, id string, request *UserTestSearchRequest) (*UserTestSearchResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserTestSearchResponse
@@ -146,6 +160,8 @@ func (c *Client) TestCloudIdpUserV1(ctx context.Context, id string, request *Use
 }
 
 // TestCloudIdpUserMembershipV1 get membership test search.
+//
+// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) TestCloudIdpUserMembershipV1(ctx context.Context, id string, request *MembershipTestSearchRequest) (*MembershipTestSearchResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result MembershipTestSearchResponse

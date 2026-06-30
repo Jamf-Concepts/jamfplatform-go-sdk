@@ -17,6 +17,8 @@ import (
 )
 
 // CreateVenafiV1 create a PKI configuration in Jamf Pro for Venafi.
+//
+// Required privileges: update:pro:pki. Legacy Jamf Pro privilege name(s): Update PKI.
 func (c *Client) CreateVenafiV1(ctx context.Context, request *VenafiCaRecord) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -28,6 +30,8 @@ func (c *Client) CreateVenafiV1(ctx context.Context, request *VenafiCaRecord) (*
 }
 
 // GetVenafiV1 retrieve a Venafi PKI configuration from Jamf Pro.
+//
+// Required privileges: read:pro:pki. Legacy Jamf Pro privilege name(s): Read PKI.
 func (c *Client) GetVenafiV1(ctx context.Context, id string) (*VenafiCaRecord, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result VenafiCaRecord
@@ -39,6 +43,8 @@ func (c *Client) GetVenafiV1(ctx context.Context, id string) (*VenafiCaRecord, e
 }
 
 // UpdateVenafiV1 update a Venafi PKI configuration in Jamf Pro.
+//
+// Required privileges: update:pro:pki. Legacy Jamf Pro privilege name(s): Update PKI.
 func (c *Client) UpdateVenafiV1(ctx context.Context, id string, request *VenafiCaRecord) (*VenafiCaRecord, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result VenafiCaRecord
@@ -50,6 +56,8 @@ func (c *Client) UpdateVenafiV1(ctx context.Context, id string, request *VenafiC
 }
 
 // DeleteVenafiV1 delete a Venafi PKI configuration from Jamf Pro.
+//
+// Required privileges: update:pro:pki. Legacy Jamf Pro privilege name(s): Update PKI.
 func (c *Client) DeleteVenafiV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s", prefix, url.PathEscape(id))
@@ -60,6 +68,8 @@ func (c *Client) DeleteVenafiV1(ctx context.Context, id string) error {
 }
 
 // GetVenafiConnectionStatusV1 tests the communication between Jamf Pro and a Jamf Pro PKI Proxy Server.
+//
+// Required privileges: read:pro:pki. Legacy Jamf Pro privilege name(s): Read PKI.
 func (c *Client) GetVenafiConnectionStatusV1(ctx context.Context, id string) (*VenafiServiceStatus, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result VenafiServiceStatus
@@ -71,6 +81,8 @@ func (c *Client) GetVenafiConnectionStatusV1(ctx context.Context, id string) (*V
 }
 
 // GetVenafiDependentProfilesV1 get configuration profile data using specified Venafi CA object.
+//
+// Required privileges: read:pro:pki. Legacy Jamf Pro privilege name(s): Read PKI.
 func (c *Client) GetVenafiDependentProfilesV1(ctx context.Context, id string) (*VenafiPkiPayloadRecordSearchResults, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result VenafiPkiPayloadRecordSearchResults
@@ -82,6 +94,8 @@ func (c *Client) GetVenafiDependentProfilesV1(ctx context.Context, id string) (*
 }
 
 // ListVenafiHistoryV1 get specified Venafi CA history object.
+//
+// Required privileges: read:pro:pki. Legacy Jamf Pro privilege name(s): Read PKI.
 func (c *Client) ListVenafiHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -112,6 +126,8 @@ func (c *Client) ListVenafiHistoryV1(ctx context.Context, id string, sort []stri
 }
 
 // CreateVenafiHistoryNoteV1 add specified Venafi CA Object Note.
+//
+// Required privileges: update:pro:pki. Legacy Jamf Pro privilege name(s): Update PKI.
 func (c *Client) CreateVenafiHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -123,6 +139,8 @@ func (c *Client) CreateVenafiHistoryNoteV1(ctx context.Context, id string, reque
 }
 
 // GetVenafiJamfPublicKeyV1 downloads a certificate used to secure communication between Jamf Pro and a Jamf Pro PKI Proxy Server.
+//
+// Required privileges: read:pro:pki. Legacy Jamf Pro privilege name(s): Read PKI.
 func (c *Client) GetVenafiJamfPublicKeyV1(ctx context.Context, id string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -134,6 +152,8 @@ func (c *Client) GetVenafiJamfPublicKeyV1(ctx context.Context, id string) ([]byt
 }
 
 // RegenerateVenafiJamfPublicKeyV1 regenerates a certificate used to secure communication between Jamf Pro and a Jamf Pro PKI Proxy Server.
+//
+// Required privileges: update:pro:pki. Legacy Jamf Pro privilege name(s): Update PKI.
 func (c *Client) RegenerateVenafiJamfPublicKeyV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/jamf-public-key/regenerate", prefix, url.PathEscape(id))
@@ -144,6 +164,8 @@ func (c *Client) RegenerateVenafiJamfPublicKeyV1(ctx context.Context, id string)
 }
 
 // GetVenafiProxyTrustStoreV1 downloads the PKI Proxy Server public key to secure communication between Jamf Pro and a Jamf Pro PKI Proxy Server.
+//
+// Required privileges: read:pro:pki. Legacy Jamf Pro privilege name(s): Read PKI.
 func (c *Client) GetVenafiProxyTrustStoreV1(ctx context.Context, id string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -155,6 +177,8 @@ func (c *Client) GetVenafiProxyTrustStoreV1(ctx context.Context, id string) ([]b
 }
 
 // UploadVenafiProxyTrustStoreV1 uploads the PKI Proxy Server public key to secure communication between Jamf Pro and a Jamf Pro PKI Proxy Server.
+//
+// Required privileges: update:pro:pki. Legacy Jamf Pro privilege name(s): Update PKI.
 func (c *Client) UploadVenafiProxyTrustStoreV1(ctx context.Context, id string, body []byte) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/proxy-trust-store", prefix, url.PathEscape(id))
@@ -165,6 +189,8 @@ func (c *Client) UploadVenafiProxyTrustStoreV1(ctx context.Context, id string, b
 }
 
 // DeleteVenafiProxyTrustStoreV1 removes the PKI Proxy Server public key used to secure communication between Jamf Pro and a Jamf Pro PKI Proxy Server.
+//
+// Required privileges: update:pro:pki. Legacy Jamf Pro privilege name(s): Update PKI.
 func (c *Client) DeleteVenafiProxyTrustStoreV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/proxy-trust-store", prefix, url.PathEscape(id))

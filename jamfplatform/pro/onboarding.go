@@ -17,6 +17,8 @@ import (
 )
 
 // GetOnboardingV1 get the current onboarding settings configuration.
+//
+// Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
 func (c *Client) GetOnboardingV1(ctx context.Context) (*OnboardingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result OnboardingConfiguration
@@ -28,6 +30,8 @@ func (c *Client) GetOnboardingV1(ctx context.Context) (*OnboardingConfiguration,
 }
 
 // UpdateOnboardingV1 update the onboarding configuration.
+//
+// Required privileges: update:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Update Onboarding Configuration.
 func (c *Client) UpdateOnboardingV1(ctx context.Context, request *OnboardingConfiguration) (*OnboardingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result OnboardingConfiguration
@@ -39,6 +43,8 @@ func (c *Client) UpdateOnboardingV1(ctx context.Context, request *OnboardingConf
 }
 
 // ListOnboardingEligibleAppsV1 retrieves a list of applications that are eligible to be used in an onboarding configuration.
+//
+// Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
 func (c *Client) ListOnboardingEligibleAppsV1(ctx context.Context, sort []string) ([]OnboardingEligibleItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
@@ -66,6 +72,8 @@ func (c *Client) ListOnboardingEligibleAppsV1(ctx context.Context, sort []string
 }
 
 // ListOnboardingEligibleConfigurationProfilesV1 retrieves a list of configuration profiles that are eligible to be used in an onboarding configuration.
+//
+// Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
 func (c *Client) ListOnboardingEligibleConfigurationProfilesV1(ctx context.Context, sort []string) ([]OnboardingEligibleItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
@@ -93,6 +101,8 @@ func (c *Client) ListOnboardingEligibleConfigurationProfilesV1(ctx context.Conte
 }
 
 // ListOnboardingEligiblePoliciesV1 retrieves a list of policies that are eligible to be used in an onboarding configuration.
+//
+// Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
 func (c *Client) ListOnboardingEligiblePoliciesV1(ctx context.Context, sort []string) ([]OnboardingEligibleItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
@@ -120,6 +130,8 @@ func (c *Client) ListOnboardingEligiblePoliciesV1(ctx context.Context, sort []st
 }
 
 // ListOnboardingHistoryV1 get Onboarding history object.
+//
+// Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
 func (c *Client) ListOnboardingHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -150,6 +162,8 @@ func (c *Client) ListOnboardingHistoryV1(ctx context.Context, sort []string, fil
 }
 
 // CreateOnboardingHistoryNoteV1 add Onboarding history object notes.
+//
+// Required privileges: update:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Update Onboarding Configuration.
 func (c *Client) CreateOnboardingHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -161,6 +175,8 @@ func (c *Client) CreateOnboardingHistoryNoteV1(ctx context.Context, request *Obj
 }
 
 // ExportOnboardingHistoryV1 export history object collection in specified format for Onboarding.
+//
+// Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
 func (c *Client) ExportOnboardingHistoryV1(ctx context.Context, request *ExportParameters) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte

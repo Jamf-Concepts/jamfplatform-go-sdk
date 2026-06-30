@@ -15,6 +15,8 @@ import (
 // GetComputerInventoryCollectionSettingsV1 returns computer inventory settings.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+//
+// Required privileges: read:pro:computer-inventory-collection-settings. Legacy Jamf Pro privilege name(s): Read Computer Inventory Collection Settings.
 func (c *Client) GetComputerInventoryCollectionSettingsV1(ctx context.Context) (*ComputerInventoryCollectionSettings, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerInventoryCollectionSettings
@@ -26,6 +28,8 @@ func (c *Client) GetComputerInventoryCollectionSettingsV1(ctx context.Context) (
 }
 
 // GetComputerInventoryCollectionSettingsV2 returns computer inventory settings.
+//
+// Required privileges: read:pro:computer-inventory-collection-settings. Legacy Jamf Pro privilege name(s): Read Computer Inventory Collection Settings.
 func (c *Client) GetComputerInventoryCollectionSettingsV2(ctx context.Context) (*ComputerInventoryCollectionSettingsV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryCollectionSettingsV2
@@ -39,6 +43,8 @@ func (c *Client) GetComputerInventoryCollectionSettingsV2(ctx context.Context) (
 // UpdateComputerInventoryCollectionSettingsV1 update computer inventory settings.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+//
+// Required privileges: update:pro:computer-inventory-collection-settings. Legacy Jamf Pro privilege name(s): Update Computer Inventory Collection Settings.
 func (c *Client) UpdateComputerInventoryCollectionSettingsV1(ctx context.Context, request *ComputerInventoryCollectionSettings) (*ComputerInventoryCollectionSettings, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerInventoryCollectionSettings
@@ -50,6 +56,8 @@ func (c *Client) UpdateComputerInventoryCollectionSettingsV1(ctx context.Context
 }
 
 // UpdateComputerInventoryCollectionSettingsV2 update computer inventory settings.
+//
+// Required privileges: update:pro:computer-inventory-collection-settings. Legacy Jamf Pro privilege name(s): Update Computer Inventory Collection Settings.
 func (c *Client) UpdateComputerInventoryCollectionSettingsV2(ctx context.Context, request *ComputerInventoryCollectionSettingsV2) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := prefix + "/computer-inventory-collection-settings"
@@ -62,6 +70,8 @@ func (c *Client) UpdateComputerInventoryCollectionSettingsV2(ctx context.Context
 // CreateComputerInventoryCollectionCustomPathV1 create Computer Inventory Collection Settings Custom Path.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+//
+// Required privileges: create:pro:custom-paths. Legacy Jamf Pro privilege name(s): Create Custom Paths.
 func (c *Client) CreateComputerInventoryCollectionCustomPathV1(ctx context.Context, request *CreatePath) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -73,6 +83,8 @@ func (c *Client) CreateComputerInventoryCollectionCustomPathV1(ctx context.Conte
 }
 
 // CreateComputerInventoryCollectionCustomPathV2 create Computer Inventory Collection Settings Custom Path.
+//
+// Required privileges: create:pro:custom-paths. Legacy Jamf Pro privilege name(s): Create Custom Paths.
 func (c *Client) CreateComputerInventoryCollectionCustomPathV2(ctx context.Context, request *CreatePathV2) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -86,6 +98,8 @@ func (c *Client) CreateComputerInventoryCollectionCustomPathV2(ctx context.Conte
 // DeleteComputerInventoryCollectionCustomPathV1 delete Custom Path from Computer Inventory Collection Settings.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
+//
+// Required privileges: delete:pro:custom-paths. Legacy Jamf Pro privilege name(s): Delete Custom Paths.
 func (c *Client) DeleteComputerInventoryCollectionCustomPathV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/computer-inventory-collection-settings/custom-path/%s", prefix, url.PathEscape(id))
@@ -96,6 +110,8 @@ func (c *Client) DeleteComputerInventoryCollectionCustomPathV1(ctx context.Conte
 }
 
 // DeleteComputerInventoryCollectionCustomPathV2 delete Custom Path from Computer Inventory Collection Settings.
+//
+// Required privileges: delete:pro:custom-paths. Legacy Jamf Pro privilege name(s): Delete Custom Paths.
 func (c *Client) DeleteComputerInventoryCollectionCustomPathV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computer-inventory-collection-settings/custom-path/%s", prefix, url.PathEscape(id))

@@ -18,6 +18,8 @@ import (
 
 // ListAppInstallerDeploymentsV1 get all App Installer deployments.
 //
+// Required privileges: read:pro:mac-applications. Legacy Jamf Pro privilege name(s): Read Mac Applications.
+//
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ListAppInstallerDeploymentsV1(ctx context.Context) ([]AppInstallerDeploymentListEntry, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -44,6 +46,8 @@ func (c *Client) ListAppInstallerDeploymentsV1(ctx context.Context) ([]AppInstal
 
 // CreateAppInstallerDeploymentV1 create an App Installer deployment.
 //
+// Required privileges: create:pro:mac-applications. Legacy Jamf Pro privilege name(s): Create Mac Applications.
+//
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) CreateAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeploymentCreate) (*AppInstallerDeploymentHrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -56,6 +60,8 @@ func (c *Client) CreateAppInstallerDeploymentV1(ctx context.Context, request *Ap
 }
 
 // GetAppInstallerDeploymentV1 get an App Installer deployment by ID.
+//
+// Required privileges: read:pro:mac-applications. Legacy Jamf Pro privilege name(s): Read Mac Applications.
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) GetAppInstallerDeploymentV1(ctx context.Context, id string) (*AppInstallerDeployment, error) {
@@ -70,6 +76,8 @@ func (c *Client) GetAppInstallerDeploymentV1(ctx context.Context, id string) (*A
 
 // UpdateAppInstallerDeploymentV1 update an App Installer deployment.
 //
+// Required privileges: update:pro:mac-applications. Legacy Jamf Pro privilege name(s): Update Mac Applications.
+//
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) UpdateAppInstallerDeploymentV1(ctx context.Context, id string, request *AppInstallerDeploymentCreate) (*AppInstallerDeployment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -82,6 +90,8 @@ func (c *Client) UpdateAppInstallerDeploymentV1(ctx context.Context, id string, 
 }
 
 // DeleteAppInstallerDeploymentV1 delete an App Installer deployment.
+//
+// Required privileges: delete:pro:mac-applications. Legacy Jamf Pro privilege name(s): Delete Mac Applications.
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) DeleteAppInstallerDeploymentV1(ctx context.Context, id string) error {

@@ -19,6 +19,8 @@ import (
 )
 
 // ParseEnrollmentCustomizationMarkdownV1 parse the given string as markdown text and return Html output.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) ParseEnrollmentCustomizationMarkdownV1(ctx context.Context, request *Markdown) (*Markdown, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Markdown
@@ -30,6 +32,8 @@ func (c *Client) ParseEnrollmentCustomizationMarkdownV1(ctx context.Context, req
 }
 
 // ListEnrollmentCustomizationPanelsV1 get all Panels for single Enrollment Customization.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) ListEnrollmentCustomizationPanelsV1(ctx context.Context, id string) (*EnrollmentCustomizationPanelList, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result EnrollmentCustomizationPanelList
@@ -41,6 +45,8 @@ func (c *Client) ListEnrollmentCustomizationPanelsV1(ctx context.Context, id str
 }
 
 // GetEnrollmentCustomizationPanelV1 get a single Panel for a single Enrollment Customization.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) GetEnrollmentCustomizationPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanel, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanel
@@ -52,6 +58,8 @@ func (c *Client) GetEnrollmentCustomizationPanelV1(ctx context.Context, id strin
 }
 
 // DeleteEnrollmentCustomizationPanelV1 delete a single Panel from an Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) DeleteEnrollmentCustomizationPanelV1(ctx context.Context, id string, panelID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/all/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
@@ -62,6 +70,8 @@ func (c *Client) DeleteEnrollmentCustomizationPanelV1(ctx context.Context, id st
 }
 
 // CreateEnrollmentCustomizationLdapPanelV1 create an LDAP Panel for a single Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) CreateEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, request *EnrollmentCustomizationPanelLdapAuth) (*GetEnrollmentCustomizationPanelLdapAuth, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelLdapAuth
@@ -73,6 +83,8 @@ func (c *Client) CreateEnrollmentCustomizationLdapPanelV1(ctx context.Context, i
 }
 
 // GetEnrollmentCustomizationLdapPanelV1 get a single LDAP panel for a single Enrollment Customization.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) GetEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanelLdapAuth, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelLdapAuth
@@ -84,6 +96,8 @@ func (c *Client) GetEnrollmentCustomizationLdapPanelV1(ctx context.Context, id s
 }
 
 // UpdateEnrollmentCustomizationLdapPanelV1 update a single LDAP Panel for a single Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) UpdateEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, panelID string, request *EnrollmentCustomizationPanelLdapAuth) (*GetEnrollmentCustomizationPanelLdapAuth, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelLdapAuth
@@ -95,6 +109,8 @@ func (c *Client) UpdateEnrollmentCustomizationLdapPanelV1(ctx context.Context, i
 }
 
 // DeleteEnrollmentCustomizationLdapPanelV1 delete an LDAP single panel from an Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) DeleteEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, panelID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/ldap/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
@@ -105,6 +121,8 @@ func (c *Client) DeleteEnrollmentCustomizationLdapPanelV1(ctx context.Context, i
 }
 
 // CreateEnrollmentCustomizationSsoPanelV1 create an SSO Panel for a single Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) CreateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, request *EnrollmentCustomizationPanelSsoAuth) (*GetEnrollmentCustomizationPanelSsoAuth, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelSsoAuth
@@ -116,6 +134,8 @@ func (c *Client) CreateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id
 }
 
 // GetEnrollmentCustomizationSsoPanelV1 get a single SSO Panel for a single Enrollment Customization.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) GetEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanelSsoAuth, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelSsoAuth
@@ -127,6 +147,8 @@ func (c *Client) GetEnrollmentCustomizationSsoPanelV1(ctx context.Context, id st
 }
 
 // UpdateEnrollmentCustomizationSsoPanelV1 update a single SSO Panel for a single Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) UpdateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, panelID string, request *EnrollmentCustomizationPanelSsoAuth) (*GetEnrollmentCustomizationPanelSsoAuth, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelSsoAuth
@@ -138,6 +160,8 @@ func (c *Client) UpdateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id
 }
 
 // DeleteEnrollmentCustomizationSsoPanelV1 delete a single SSO Panel from an Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) DeleteEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, panelID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/sso/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
@@ -148,6 +172,8 @@ func (c *Client) DeleteEnrollmentCustomizationSsoPanelV1(ctx context.Context, id
 }
 
 // CreateEnrollmentCustomizationTextPanelV1 create a Text Panel for a single Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) CreateEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, request *EnrollmentCustomizationPanelText) (*GetEnrollmentCustomizationPanelText, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelText
@@ -159,6 +185,8 @@ func (c *Client) CreateEnrollmentCustomizationTextPanelV1(ctx context.Context, i
 }
 
 // GetEnrollmentCustomizationTextPanelV1 get a single Text Panel for a single Enrollment Customization.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) GetEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanelText, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelText
@@ -170,6 +198,8 @@ func (c *Client) GetEnrollmentCustomizationTextPanelV1(ctx context.Context, id s
 }
 
 // UpdateEnrollmentCustomizationTextPanelV1 update a single Text Panel for a single Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) UpdateEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, panelID string, request *EnrollmentCustomizationPanelText) (*GetEnrollmentCustomizationPanelText, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelText
@@ -181,6 +211,8 @@ func (c *Client) UpdateEnrollmentCustomizationTextPanelV1(ctx context.Context, i
 }
 
 // DeleteEnrollmentCustomizationTextPanelV1 delete a Text single Panel from an Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) DeleteEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, panelID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
@@ -191,6 +223,8 @@ func (c *Client) DeleteEnrollmentCustomizationTextPanelV1(ctx context.Context, i
 }
 
 // GetEnrollmentCustomizationTextPanelMarkdownV1 get the markdown output of a single Text Panel for a single Enrollment.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) GetEnrollmentCustomizationTextPanelMarkdownV1(ctx context.Context, id string, panelID string) (*Markdown, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Markdown
@@ -202,6 +236,8 @@ func (c *Client) GetEnrollmentCustomizationTextPanelMarkdownV1(ctx context.Conte
 }
 
 // ListEnrollmentCustomizationsV2 retrieve sorted and paged Enrollment Customizations.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) ListEnrollmentCustomizationsV2(ctx context.Context, sort []string) ([]EnrollmentCustomizationV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]EnrollmentCustomizationV2, bool, error) {
@@ -229,6 +265,8 @@ func (c *Client) ListEnrollmentCustomizationsV2(ctx context.Context, sort []stri
 }
 
 // CreateEnrollmentCustomizationV2 create an Enrollment Customization.
+//
+// Required privileges: create:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Create Enrollment Customizations.
 func (c *Client) CreateEnrollmentCustomizationV2(ctx context.Context, request *EnrollmentCustomizationV2) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -240,6 +278,8 @@ func (c *Client) CreateEnrollmentCustomizationV2(ctx context.Context, request *E
 }
 
 // UploadEnrollmentCustomizationImageV2 upload an image.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -260,6 +300,8 @@ func (c *Client) UploadEnrollmentCustomizationImageV2(ctx context.Context, fileF
 }
 
 // DownloadEnrollmentCustomizationImageV2 download an enrollment customization image.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) DownloadEnrollmentCustomizationImageV2(ctx context.Context, id string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []byte
@@ -271,6 +313,8 @@ func (c *Client) DownloadEnrollmentCustomizationImageV2(ctx context.Context, id 
 }
 
 // GetEnrollmentCustomizationV2 retrieve an Enrollment Customization with the supplied id.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) GetEnrollmentCustomizationV2(ctx context.Context, id string) (*EnrollmentCustomizationV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result EnrollmentCustomizationV2
@@ -282,6 +326,8 @@ func (c *Client) GetEnrollmentCustomizationV2(ctx context.Context, id string) (*
 }
 
 // UpdateEnrollmentCustomizationV2 update an Enrollment Customization.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) UpdateEnrollmentCustomizationV2(ctx context.Context, id string, request *EnrollmentCustomizationV2) (*EnrollmentCustomizationV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result EnrollmentCustomizationV2
@@ -293,6 +339,9 @@ func (c *Client) UpdateEnrollmentCustomizationV2(ctx context.Context, id string,
 }
 
 // DeleteEnrollmentCustomizationV2 delete an Enrollment Customization with the supplied id.
+//
+// Required privileges: delete:pro:enrollment-customizations, read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Delete Enrollment Customizations, Read Enrollment Customizations.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) DeleteEnrollmentCustomizationV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s", prefix, url.PathEscape(id))
@@ -303,6 +352,8 @@ func (c *Client) DeleteEnrollmentCustomizationV2(ctx context.Context, id string)
 }
 
 // ListEnrollmentCustomizationHistoryV2 get sorted and paged Enrollment Customization history objects.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) ListEnrollmentCustomizationHistoryV2(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -330,6 +381,8 @@ func (c *Client) ListEnrollmentCustomizationHistoryV2(ctx context.Context, id st
 }
 
 // CreateEnrollmentCustomizationHistoryNoteV2 add Enrollment Customization history object notes.
+//
+// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 func (c *Client) CreateEnrollmentCustomizationHistoryNoteV2(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ObjectHistory
@@ -341,6 +394,8 @@ func (c *Client) CreateEnrollmentCustomizationHistoryNoteV2(ctx context.Context,
 }
 
 // ListEnrollmentCustomizationPrestagesV2 retrieve the list of Prestages using this Enrollment Customization.
+//
+// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) ListEnrollmentCustomizationPrestagesV2(ctx context.Context, id string) (*PrestageDependencies, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PrestageDependencies

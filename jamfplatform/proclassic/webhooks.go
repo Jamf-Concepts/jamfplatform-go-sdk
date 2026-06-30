@@ -16,6 +16,8 @@ import (
 )
 
 // GetWebhookByID finds webhooks by ID.
+//
+// Required privileges: read:pro:webhooks.
 func (c *Client) GetWebhookByID(ctx context.Context, id string) (*Webhook, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Webhook
@@ -27,6 +29,8 @@ func (c *Client) GetWebhookByID(ctx context.Context, id string) (*Webhook, error
 }
 
 // CreateWebhookByID creates a new webhook by ID.
+//
+// Required privileges: create:pro:webhooks.
 func (c *Client) CreateWebhookByID(ctx context.Context, id string, request *Webhook) (*Webhook, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Webhook
@@ -38,6 +42,8 @@ func (c *Client) CreateWebhookByID(ctx context.Context, id string, request *Webh
 }
 
 // UpdateWebhookByID updates an existing webhook by ID.
+//
+// Required privileges: update:pro:webhooks.
 func (c *Client) UpdateWebhookByID(ctx context.Context, id string, request *Webhook) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateWebhookByID(ctx context.Context, id string, request *Webh
 }
 
 // DeleteWebhookByID deletes a webhook by ID.
+//
+// Required privileges: delete:pro:webhooks.
 func (c *Client) DeleteWebhookByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteWebhookByID(ctx context.Context, id string) error {
 }
 
 // GetWebhookByName finds webhooks by name.
+//
+// Required privileges: read:pro:webhooks.
 func (c *Client) GetWebhookByName(ctx context.Context, name string) (*Webhook, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Webhook
@@ -69,6 +79,8 @@ func (c *Client) GetWebhookByName(ctx context.Context, name string) (*Webhook, e
 }
 
 // UpdateWebhookByName updates an existing webhook by name.
+//
+// Required privileges: update:pro:webhooks.
 func (c *Client) UpdateWebhookByName(ctx context.Context, name string, request *Webhook) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateWebhookByName(ctx context.Context, name string, request *
 }
 
 // DeleteWebhookByName deletes a webhook by name.
+//
+// Required privileges: delete:pro:webhooks.
 func (c *Client) DeleteWebhookByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteWebhookByName(ctx context.Context, name string) error {
 }
 
 // ListWebhooks finds all webhooks.
+//
+// Required privileges: read:pro:webhooks.
 func (c *Client) ListWebhooks(ctx context.Context) (*Webhooks, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Webhooks
@@ -100,6 +116,8 @@ func (c *Client) ListWebhooks(ctx context.Context) (*Webhooks, error) {
 }
 
 // CreateWebhookByName creates a new webhook by ID.
+//
+// Required privileges: create:pro:webhooks.
 func (c *Client) CreateWebhookByName(ctx context.Context, name string, request *Webhook) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))

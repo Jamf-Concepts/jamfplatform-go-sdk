@@ -16,6 +16,8 @@ import (
 )
 
 // GetAdvancedComputerSearchByID finds computer searches by ID.
+//
+// Required privileges: read:pro:advanced-computer-searches.
 func (c *Client) GetAdvancedComputerSearchByID(ctx context.Context, id string) (*AdvancedComputerSearch, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedComputerSearch
@@ -27,6 +29,8 @@ func (c *Client) GetAdvancedComputerSearchByID(ctx context.Context, id string) (
 }
 
 // CreateAdvancedComputerSearchByID creates a new advanced computer search.
+//
+// Required privileges: create:pro:advanced-computer-searches.
 func (c *Client) CreateAdvancedComputerSearchByID(ctx context.Context, id string, request *AdvancedComputerSearch) (*AdvancedComputerSearch, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedComputerSearch
@@ -38,6 +42,8 @@ func (c *Client) CreateAdvancedComputerSearchByID(ctx context.Context, id string
 }
 
 // UpdateAdvancedComputerSearchByID updates an existing advanced computer search by ID.
+//
+// Required privileges: update:pro:advanced-computer-searches.
 func (c *Client) UpdateAdvancedComputerSearchByID(ctx context.Context, id string, request *AdvancedComputerSearch) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateAdvancedComputerSearchByID(ctx context.Context, id string
 }
 
 // DeleteAdvancedComputerSearchByID deletes a computer search by ID.
+//
+// Required privileges: delete:pro:advanced-computer-searches.
 func (c *Client) DeleteAdvancedComputerSearchByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteAdvancedComputerSearchByID(ctx context.Context, id string
 }
 
 // GetAdvancedComputerSearchByName finds advanced computer searches by name.
+//
+// Required privileges: read:pro:advanced-computer-searches.
 func (c *Client) GetAdvancedComputerSearchByName(ctx context.Context, name string) (*AdvancedComputerSearch, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedComputerSearch
@@ -69,6 +79,8 @@ func (c *Client) GetAdvancedComputerSearchByName(ctx context.Context, name strin
 }
 
 // DeleteAdvancedComputerSearchByName deletes a computer search by name.
+//
+// Required privileges: delete:pro:advanced-computer-searches.
 func (c *Client) DeleteAdvancedComputerSearchByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) DeleteAdvancedComputerSearchByName(ctx context.Context, name st
 }
 
 // ListAdvancedComputerSearches finds all advanced computer searches.
+//
+// Required privileges: read:pro:advanced-computer-searches.
 func (c *Client) ListAdvancedComputerSearches(ctx context.Context) (*AdvancedComputerSearches, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedComputerSearches
@@ -90,6 +104,8 @@ func (c *Client) ListAdvancedComputerSearches(ctx context.Context) (*AdvancedCom
 }
 
 // UpdateAdvancedComputerSearchByName updates an existing advanced computer search by name.
+//
+// Required privileges: update:pro:advanced-computer-searches.
 func (c *Client) UpdateAdvancedComputerSearchByName(ctx context.Context, name string, request *AdvancedComputerSearch) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
@@ -100,6 +116,8 @@ func (c *Client) UpdateAdvancedComputerSearchByName(ctx context.Context, name st
 }
 
 // CreateAdvancedComputerSearchByName creates a new advanced computer search.
+//
+// Required privileges: create:pro:advanced-computer-searches.
 func (c *Client) CreateAdvancedComputerSearchByName(ctx context.Context, name string, request *AdvancedComputerSearch) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))

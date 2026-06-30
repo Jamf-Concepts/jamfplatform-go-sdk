@@ -13,6 +13,8 @@ import (
 )
 
 // GetVPPInvitationByID finds a VPP Invitation by ID.
+//
+// Required privileges: read:pro:vpp-invitations.
 func (c *Client) GetVPPInvitationByID(ctx context.Context, id string) (*VppInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result VppInvitation
@@ -24,6 +26,8 @@ func (c *Client) GetVPPInvitationByID(ctx context.Context, id string) (*VppInvit
 }
 
 // CreateVPPInvitationByID creates a new VPP invitation by ID.
+//
+// Required privileges: create:pro:vpp-invitations.
 func (c *Client) CreateVPPInvitationByID(ctx context.Context, id string, request *VppInvitation) (*VppInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result VppInvitation
@@ -35,6 +39,8 @@ func (c *Client) CreateVPPInvitationByID(ctx context.Context, id string, request
 }
 
 // UpdateVPPInvitationByID updates a VPP invitation by ID.
+//
+// Required privileges: update:pro:vpp-invitations.
 func (c *Client) UpdateVPPInvitationByID(ctx context.Context, id string, request *VppInvitation) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppinvitations/id/%s", prefix, url.PathEscape(id))
@@ -45,6 +51,8 @@ func (c *Client) UpdateVPPInvitationByID(ctx context.Context, id string, request
 }
 
 // DeleteVPPInvitationByID deletes a VPP invitation by ID.
+//
+// Required privileges: delete:pro:vpp-invitations.
 func (c *Client) DeleteVPPInvitationByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppinvitations/id/%s", prefix, url.PathEscape(id))
@@ -55,6 +63,8 @@ func (c *Client) DeleteVPPInvitationByID(ctx context.Context, id string) error {
 }
 
 // ListVPPInvitations finds all VPP Invitations.
+//
+// Required privileges: read:pro:vpp-invitations.
 func (c *Client) ListVPPInvitations(ctx context.Context) (*VppInvitations, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result VppInvitations
@@ -66,6 +76,8 @@ func (c *Client) ListVPPInvitations(ctx context.Context) (*VppInvitations, error
 }
 
 // GetVPPInvitationByIDSubset finds a subset of data for a VPP invitation.
+//
+// Required privileges: read:pro:vpp-invitations.
 func (c *Client) GetVPPInvitationByIDSubset(ctx context.Context, id string, subset string) (*VppInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result VppInvitation

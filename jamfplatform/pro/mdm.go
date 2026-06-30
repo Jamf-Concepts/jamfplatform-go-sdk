@@ -17,6 +17,8 @@ import (
 )
 
 // DeployPackageV1 deploy packages using MDM.
+//
+// Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Remote Command to Install Package.
 func (c *Client) DeployPackageV1(ctx context.Context, request *InstallPackage, verbose bool) (*VerbosePackageDeploymentResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result VerbosePackageDeploymentResponse
@@ -35,6 +37,9 @@ func (c *Client) DeployPackageV1(ctx context.Context, request *InstallPackage, v
 }
 
 // RenewMdmProfileV1 renew MDM Profile.
+//
+// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) RenewMdmProfileV1(ctx context.Context, request *Udids) (*RenewMDMProfileResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result RenewMDMProfileResponse
@@ -46,6 +51,9 @@ func (c *Client) RenewMdmProfileV1(ctx context.Context, request *Udids) (*RenewM
 }
 
 // SendMdmBlankPushV2 send blank push notifications to a list of client management IDs.
+//
+// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) SendMdmBlankPushV2(ctx context.Context, request *BlankPushRequest) (*BlankPushResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result BlankPushResponse
@@ -59,6 +67,9 @@ func (c *Client) SendMdmBlankPushV2(ctx context.Context, request *BlankPushReque
 // ListMdmCommandsV1 get information about mdm commands made by Jamf Pro.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2023-10-16) and may be removed in a future release.
+//
+// Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListMdmCommandsV1(ctx context.Context, uuids []string, clientManagementID string) ([]MDMCommand, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []MDMCommand
@@ -80,6 +91,9 @@ func (c *Client) ListMdmCommandsV1(ctx context.Context, uuids []string, clientMa
 }
 
 // ListMdmCommandsV2 get information about mdm commands made by Jamf Pro.
+//
+// Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListMdmCommandsV2(ctx context.Context, sort []string, filter string) ([]MDMCommand, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MDMCommand, bool, error) {
@@ -110,6 +124,9 @@ func (c *Client) ListMdmCommandsV2(ctx context.Context, sort []string, filter st
 }
 
 // SendMdmCommandV2 post a command for creation and queuing.
+//
+// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) SendMdmCommandV2(ctx context.Context, request *MDMCommandRequest) ([]HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []HrefResponse

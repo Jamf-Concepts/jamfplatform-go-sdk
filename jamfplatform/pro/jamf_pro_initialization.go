@@ -12,6 +12,8 @@ import (
 )
 
 // InitializeSystemV1 set up fresh installed Jamf Pro Server.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) InitializeSystemV1(ctx context.Context, request *InitializeV1) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/system/initialize"
@@ -22,6 +24,8 @@ func (c *Client) InitializeSystemV1(ctx context.Context, request *InitializeV1) 
 }
 
 // PlatformInitializeSystemV1 set up fresh installed Jamf Pro Server for Platform.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) PlatformInitializeSystemV1(ctx context.Context, request *PlatformInitializeV1) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/system/platform-initialize"

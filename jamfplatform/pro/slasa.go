@@ -12,6 +12,8 @@ import (
 )
 
 // GetSlasaAcceptanceV1 get the status of SLASA.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetSlasaAcceptanceV1(ctx context.Context) (*SlasaAcceptance, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SlasaAcceptance
@@ -23,6 +25,9 @@ func (c *Client) GetSlasaAcceptanceV1(ctx context.Context) (*SlasaAcceptance, er
 }
 
 // AcceptSlasaV1 accept the SLASA.
+//
+// Required privileges: update:pro:activation-code, read:pro:jss-information. Legacy Jamf Pro privilege name(s): Update Activation Code, View JSS Information.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) AcceptSlasaV1(ctx context.Context) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/slasa"

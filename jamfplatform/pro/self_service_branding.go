@@ -16,6 +16,8 @@ import (
 
 // UploadBrandingImageV1 upload an image.
 //
+// Required privileges: update:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Update Self Service Branding Configuration.
+//
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
 // Content-Length and retry once on a 429/Retry-After. A plain

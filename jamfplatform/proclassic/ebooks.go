@@ -16,6 +16,8 @@ import (
 )
 
 // GetEbookByID finds ebooks by ID.
+//
+// Required privileges: read:pro:ebooks.
 func (c *Client) GetEbookByID(ctx context.Context, id string) (*Ebook, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Ebook
@@ -27,6 +29,8 @@ func (c *Client) GetEbookByID(ctx context.Context, id string) (*Ebook, error) {
 }
 
 // CreateEbookByID creates a new ebook by ID.
+//
+// Required privileges: create:pro:ebooks.
 func (c *Client) CreateEbookByID(ctx context.Context, id string, request *EbookPost) (*Ebook, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Ebook
@@ -38,6 +42,8 @@ func (c *Client) CreateEbookByID(ctx context.Context, id string, request *EbookP
 }
 
 // UpdateEbookByID updates an existing ebook by ID.
+//
+// Required privileges: update:pro:ebooks.
 func (c *Client) UpdateEbookByID(ctx context.Context, id string, request *EbookPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateEbookByID(ctx context.Context, id string, request *EbookP
 }
 
 // DeleteEbookByID deletes an ebook by ID.
+//
+// Required privileges: delete:pro:ebooks.
 func (c *Client) DeleteEbookByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteEbookByID(ctx context.Context, id string) error {
 }
 
 // GetEbookByName finds ebooks by name.
+//
+// Required privileges: read:pro:ebooks.
 func (c *Client) GetEbookByName(ctx context.Context, name string) (*Ebook, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Ebook
@@ -69,6 +79,8 @@ func (c *Client) GetEbookByName(ctx context.Context, name string) (*Ebook, error
 }
 
 // UpdateEbookByName updates an existing ebook by name.
+//
+// Required privileges: update:pro:ebooks.
 func (c *Client) UpdateEbookByName(ctx context.Context, name string, request *EbookPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateEbookByName(ctx context.Context, name string, request *Eb
 }
 
 // DeleteEbookByName deletes an ebook by name.
+//
+// Required privileges: delete:pro:ebooks.
 func (c *Client) DeleteEbookByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteEbookByName(ctx context.Context, name string) error {
 }
 
 // ListEbooks finds all ebooks.
+//
+// Required privileges: read:pro:ebooks.
 func (c *Client) ListEbooks(ctx context.Context) (*Ebooks, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Ebooks
@@ -100,6 +116,8 @@ func (c *Client) ListEbooks(ctx context.Context) (*Ebooks, error) {
 }
 
 // GetEbookByIDSubset finds a subset of data for an ebook by ID.
+//
+// Required privileges: read:pro:ebooks.
 func (c *Client) GetEbookByIDSubset(ctx context.Context, id string, subset string) (*Ebook, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Ebook
@@ -111,6 +129,8 @@ func (c *Client) GetEbookByIDSubset(ctx context.Context, id string, subset strin
 }
 
 // CreateEbookByName creates a new ebook by ID.
+//
+// Required privileges: create:pro:ebooks.
 func (c *Client) CreateEbookByName(ctx context.Context, name string, request *EbookPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))

@@ -18,6 +18,8 @@ import (
 )
 
 // ListPatchPoliciesV2 retrieve Patch Policies.
+//
+// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 func (c *Client) ListPatchPoliciesV2(ctx context.Context, sort []string, filter string) ([]PatchPolicyListView, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchPolicyListView, bool, error) {
@@ -48,6 +50,8 @@ func (c *Client) ListPatchPoliciesV2(ctx context.Context, sort []string, filter 
 }
 
 // ListPatchPolicyDetailsV2 retrieve Patch Policies.
+//
+// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 func (c *Client) ListPatchPolicyDetailsV2(ctx context.Context, sort []string, filter string) ([]PatchPolicyDetail, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchPolicyDetail, bool, error) {
@@ -78,6 +82,8 @@ func (c *Client) ListPatchPolicyDetailsV2(ctx context.Context, sort []string, fi
 }
 
 // GetPatchPolicyDashboardStatusV2 return whether or not the requested patch policy is on the dashboard.
+//
+// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 func (c *Client) GetPatchPolicyDashboardStatusV2(ctx context.Context, id string) (*PatchPolicyV2OnDashboard, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PatchPolicyV2OnDashboard
@@ -89,6 +95,8 @@ func (c *Client) GetPatchPolicyDashboardStatusV2(ctx context.Context, id string)
 }
 
 // AddPatchPolicyToDashboardV2 add a patch policy to the dashboard.
+//
+// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 func (c *Client) AddPatchPolicyToDashboardV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-policies/%s/dashboard", prefix, url.PathEscape(id))
@@ -99,6 +107,8 @@ func (c *Client) AddPatchPolicyToDashboardV2(ctx context.Context, id string) err
 }
 
 // RemovePatchPolicyFromDashboardV2 remove a patch policy from the dashboard.
+//
+// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 func (c *Client) RemovePatchPolicyFromDashboardV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-policies/%s/dashboard", prefix, url.PathEscape(id))

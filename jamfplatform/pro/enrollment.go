@@ -18,6 +18,8 @@ import (
 )
 
 // GetADUESessionTokenSettingsV1 retrieve the Account Driven User Enrollment Session Token Settings.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) GetADUESessionTokenSettingsV1(ctx context.Context) (*AccountDrivenUserEnrollmentSessionTokenSettings, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AccountDrivenUserEnrollmentSessionTokenSettings
@@ -29,6 +31,8 @@ func (c *Client) GetADUESessionTokenSettingsV1(ctx context.Context) (*AccountDri
 }
 
 // UpdateADUESessionTokenSettingsV1 update Account Driven User Enrollment Session Token Settings.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) UpdateADUESessionTokenSettingsV1(ctx context.Context, request *AccountDrivenUserEnrollmentSessionTokenSettings) (*AccountDrivenUserEnrollmentSessionTokenSettings, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AccountDrivenUserEnrollmentSessionTokenSettings
@@ -40,6 +44,8 @@ func (c *Client) UpdateADUESessionTokenSettingsV1(ctx context.Context, request *
 }
 
 // ListEnrollmentHistoryV2 get sorted and paged Enrollment history object.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) ListEnrollmentHistoryV2(ctx context.Context, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -67,6 +73,8 @@ func (c *Client) ListEnrollmentHistoryV2(ctx context.Context, sort []string) ([]
 }
 
 // CreateEnrollmentHistoryNoteV2 add Enrollment history object notes.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) CreateEnrollmentHistoryNoteV2(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -78,6 +86,8 @@ func (c *Client) CreateEnrollmentHistoryNoteV2(ctx context.Context, request *Obj
 }
 
 // ExportEnrollmentHistoryV2 export enrollment history collection.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) ExportEnrollmentHistoryV2(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []byte
@@ -105,6 +115,8 @@ func (c *Client) ExportEnrollmentHistoryV2(ctx context.Context, request *ExportP
 }
 
 // ListEnrollmentAccessGroupsV3 retrieve the configured LDAP groups configured for User-Initiated Enrollment.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) ListEnrollmentAccessGroupsV3(ctx context.Context, sort []string, allUsersOptionFirst bool) ([]EnrollmentAccessGroupPreview, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]EnrollmentAccessGroupPreview, bool, error) {
@@ -135,6 +147,8 @@ func (c *Client) ListEnrollmentAccessGroupsV3(ctx context.Context, sort []string
 }
 
 // CreateEnrollmentAccessGroupV3 add the configured LDAP group for User-Initiated Enrollment.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) CreateEnrollmentAccessGroupV3(ctx context.Context, request *EnrollmentAccessGroupPreview) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result HrefResponse
@@ -146,6 +160,8 @@ func (c *Client) CreateEnrollmentAccessGroupV3(ctx context.Context, request *Enr
 }
 
 // GetEnrollmentAccessGroupV3 retrieve the configured LDAP groups configured for User-Initiated Enrollment.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) GetEnrollmentAccessGroupV3(ctx context.Context, id string) (*EnrollmentAccessGroupPreview, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result EnrollmentAccessGroupPreview
@@ -157,6 +173,8 @@ func (c *Client) GetEnrollmentAccessGroupV3(ctx context.Context, id string) (*En
 }
 
 // UpdateEnrollmentAccessGroupV3 modify the configured LDAP groups configured for User-Initiated Enrollment. Only exiting Access Groups can be updated.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) UpdateEnrollmentAccessGroupV3(ctx context.Context, id string, request *EnrollmentAccessGroupPreview) (*EnrollmentAccessGroupPreview, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result EnrollmentAccessGroupPreview
@@ -168,6 +186,8 @@ func (c *Client) UpdateEnrollmentAccessGroupV3(ctx context.Context, id string, r
 }
 
 // DeleteEnrollmentAccessGroupV3 delete an LDAP group's access to user initiated Enrollment.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) DeleteEnrollmentAccessGroupV3(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/enrollment/access-groups/%s", prefix, url.PathEscape(id))
@@ -178,6 +198,8 @@ func (c *Client) DeleteEnrollmentAccessGroupV3(ctx context.Context, id string) e
 }
 
 // ListFilteredEnrollmentLanguageCodesV3 retrieve the list of languages and corresponding ISO 639-1 Codes but only those not already added to Enrollment.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) ListFilteredEnrollmentLanguageCodesV3(ctx context.Context) ([]LanguageCode, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result []LanguageCode
@@ -189,6 +211,8 @@ func (c *Client) ListFilteredEnrollmentLanguageCodesV3(ctx context.Context) ([]L
 }
 
 // ListEnrollmentLanguageCodesV3 retrieve the list of languages and corresponding ISO 639-1 Codes.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) ListEnrollmentLanguageCodesV3(ctx context.Context) ([]LanguageCode, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result []LanguageCode
@@ -200,6 +224,8 @@ func (c *Client) ListEnrollmentLanguageCodesV3(ctx context.Context) ([]LanguageC
 }
 
 // ListEnrollmentLanguagesV3 get an array of the language codes that have Enrollment messaging.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) ListEnrollmentLanguagesV3(ctx context.Context, sort []string) ([]EnrollmentProcessTextObject, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]EnrollmentProcessTextObject, bool, error) {
@@ -227,6 +253,8 @@ func (c *Client) ListEnrollmentLanguagesV3(ctx context.Context, sort []string) (
 }
 
 // DeleteMultipleEnrollmentLanguagesV3 delete multiple configured languages from User-Initiated Enrollment settings.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) DeleteMultipleEnrollmentLanguagesV3(ctx context.Context, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := prefix + "/enrollment/languages/delete-multiple"
@@ -237,6 +265,8 @@ func (c *Client) DeleteMultipleEnrollmentLanguagesV3(ctx context.Context, reques
 }
 
 // GetEnrollmentLanguageV3 retrieve the Enrollment messaging for a language.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) GetEnrollmentLanguageV3(ctx context.Context, languageID string) (*EnrollmentProcessTextObject, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result EnrollmentProcessTextObject
@@ -248,6 +278,8 @@ func (c *Client) GetEnrollmentLanguageV3(ctx context.Context, languageID string)
 }
 
 // UpdateEnrollmentLanguageV3 edit Enrollment messaging for a language.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) UpdateEnrollmentLanguageV3(ctx context.Context, languageID string, request *EnrollmentProcessTextObject) (*EnrollmentProcessTextObject, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result EnrollmentProcessTextObject
@@ -259,6 +291,8 @@ func (c *Client) UpdateEnrollmentLanguageV3(ctx context.Context, languageID stri
 }
 
 // DeleteEnrollmentLanguageV3 delete the Enrollment messaging for a language.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) DeleteEnrollmentLanguageV3(ctx context.Context, languageID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/enrollment/languages/%s", prefix, url.PathEscape(languageID))
@@ -269,6 +303,8 @@ func (c *Client) DeleteEnrollmentLanguageV3(ctx context.Context, languageID stri
 }
 
 // GetEnrollmentSettingsV4 get Enrollment object and Re-enrollment settings.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) GetEnrollmentSettingsV4(ctx context.Context) (*EnrollmentSettingsV4, error) {
 	prefix := c.transport.TenantPrefix("pro", "v4")
 	var result EnrollmentSettingsV4
@@ -280,6 +316,8 @@ func (c *Client) GetEnrollmentSettingsV4(ctx context.Context) (*EnrollmentSettin
 }
 
 // UpdateEnrollmentSettingsV4 update Enrollment object.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) UpdateEnrollmentSettingsV4(ctx context.Context, request *EnrollmentSettingsV4) (*EnrollmentSettingsV4, error) {
 	prefix := c.transport.TenantPrefix("pro", "v4")
 	var result EnrollmentSettingsV4
@@ -291,6 +329,8 @@ func (c *Client) UpdateEnrollmentSettingsV4(ctx context.Context, request *Enroll
 }
 
 // GetEnrollmentAccessManagementV4 get Access Management settings.
+//
+// Required privileges: read:pro:access-management-setting. Legacy Jamf Pro privilege name(s): Access Management Setting Read.
 func (c *Client) GetEnrollmentAccessManagementV4(ctx context.Context) (*AccessManagementSetting, error) {
 	prefix := c.transport.TenantPrefix("pro", "v4")
 	var result AccessManagementSetting
@@ -302,6 +342,8 @@ func (c *Client) GetEnrollmentAccessManagementV4(ctx context.Context) (*AccessMa
 }
 
 // UpdateEnrollmentAccessManagementV4 configure Access Management settings.
+//
+// Required privileges: update:pro:access-management-setting. Legacy Jamf Pro privilege name(s): Access Management Setting Update.
 func (c *Client) UpdateEnrollmentAccessManagementV4(ctx context.Context, request *AccessManagementSetting) (*AccessManagementSetting, error) {
 	prefix := c.transport.TenantPrefix("pro", "v4")
 	var result AccessManagementSetting

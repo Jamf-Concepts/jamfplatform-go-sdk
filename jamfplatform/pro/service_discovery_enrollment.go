@@ -12,6 +12,8 @@ import (
 )
 
 // GetServiceDiscoveryEnrollmentWellKnownSettingsV1 get service discovery well-known settings for all organizations.
+//
+// Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) GetServiceDiscoveryEnrollmentWellKnownSettingsV1(ctx context.Context) (*WellKnownSettingsResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result WellKnownSettingsResponse
@@ -23,6 +25,8 @@ func (c *Client) GetServiceDiscoveryEnrollmentWellKnownSettingsV1(ctx context.Co
 }
 
 // UpdateServiceDiscoveryEnrollmentWellKnownSettingsV1 update service discovery well-known settings.
+//
+// Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) UpdateServiceDiscoveryEnrollmentWellKnownSettingsV1(ctx context.Context, request *WellKnownSettingsRequest) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/service-discovery-enrollment/well-known-settings"

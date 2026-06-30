@@ -13,6 +13,8 @@ import (
 )
 
 // GetMobileDeviceCommandByUUID finds a mobile device command by UUID.
+//
+// Required privileges: read:pro:mobile-device-commands.
 func (c *Client) GetMobileDeviceCommandByUUID(ctx context.Context, uuid string) (*MobileDeviceCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceCommand
@@ -24,6 +26,9 @@ func (c *Client) GetMobileDeviceCommandByUUID(ctx context.Context, uuid string) 
 }
 
 // IssueMobileDeviceCommand creates a new mobile device command.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) IssueMobileDeviceCommand(ctx context.Context, request *MobileDeviceCommandPost) (*MobileDeviceCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceCommand
@@ -35,6 +40,8 @@ func (c *Client) IssueMobileDeviceCommand(ctx context.Context, request *MobileDe
 }
 
 // GetMobileDeviceCommandByName finds all mobile device commands by command name.
+//
+// Required privileges: read:pro:mobile-device-commands.
 func (c *Client) GetMobileDeviceCommandByName(ctx context.Context, name string) (*MobileDeviceCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceCommand
@@ -46,6 +53,8 @@ func (c *Client) GetMobileDeviceCommandByName(ctx context.Context, name string) 
 }
 
 // ListMobileDeviceCommands finds all mobile device commands.
+//
+// Required privileges: read:pro:mobile-device-commands.
 func (c *Client) ListMobileDeviceCommands(ctx context.Context) (*MobileDeviceCommands, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceCommands
@@ -57,6 +66,8 @@ func (c *Client) ListMobileDeviceCommands(ctx context.Context) (*MobileDeviceCom
 }
 
 // GetMobileDeviceCommandByCommand finds all mobile device commands for specified command.
+//
+// Required privileges: read:pro:mobile-device-commands.
 func (c *Client) GetMobileDeviceCommandByCommand(ctx context.Context, command string) (*MobileDeviceCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceCommand
@@ -68,6 +79,9 @@ func (c *Client) GetMobileDeviceCommandByCommand(ctx context.Context, command st
 }
 
 // CreateMobileDeviceCommandByCommandID creates a new mobile device command.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, command string, id_list string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(id_list))
@@ -78,6 +92,9 @@ func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, comma
 }
 
 // CreateMobileDeviceCommandByCommand creates a new mobile device command.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceCommandByCommand(ctx context.Context, command string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s", prefix, url.PathEscape(command))
@@ -88,6 +105,9 @@ func (c *Client) CreateMobileDeviceCommandByCommand(ctx context.Context, command
 }
 
 // CreateMobileDeviceCommandWithParameterByIDList creates a new mobile device command.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceCommandWithParameterByIDList(ctx context.Context, command string, parameter string, idList string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(parameter), url.PathEscape(idList))
@@ -98,6 +118,9 @@ func (c *Client) CreateMobileDeviceCommandWithParameterByIDList(ctx context.Cont
 }
 
 // CreateMobileDeviceCommandWithParameterVersionByIDList creates a new mobile device command.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceCommandWithParameterVersionByIDList(ctx context.Context, command string, parameter string, version string, idList string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/%s/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(parameter), url.PathEscape(version), url.PathEscape(idList))
@@ -108,6 +131,9 @@ func (c *Client) CreateMobileDeviceCommandWithParameterVersionByIDList(ctx conte
 }
 
 // CreateMobileDeviceCommandByName creates a new mobile device command.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceCommandByName(ctx context.Context, name string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/name/%s", prefix, url.PathEscape(name))

@@ -13,6 +13,8 @@ import (
 )
 
 // GetHealthcareListenerByID finds healthcare listener by ID.
+//
+// Required privileges: read:pro:infrastructure-managers.
 func (c *Client) GetHealthcareListenerByID(ctx context.Context, id string) (*HealthcareListener, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result HealthcareListener
@@ -24,6 +26,8 @@ func (c *Client) GetHealthcareListenerByID(ctx context.Context, id string) (*Hea
 }
 
 // UpdateHealthcareListenerByID updates an existing healthcare listener by ID.
+//
+// Required privileges: update:pro:infrastructure-managers.
 func (c *Client) UpdateHealthcareListenerByID(ctx context.Context, id string, request *HealthcareListener) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/healthcarelistener/id/%s", prefix, url.PathEscape(id))
@@ -34,6 +38,8 @@ func (c *Client) UpdateHealthcareListenerByID(ctx context.Context, id string, re
 }
 
 // ListHealthcareListeners find all Healthcare Listeners.
+//
+// Required privileges: read:pro:infrastructure-managers.
 func (c *Client) ListHealthcareListeners(ctx context.Context) (*HealthcareListeners, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result HealthcareListeners

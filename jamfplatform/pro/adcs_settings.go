@@ -17,6 +17,8 @@ import (
 )
 
 // CreateAdcsSettingsV1 create AD CS Settings configuration for either inbound or outbound mode.
+//
+// Required privileges: create:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Create AD CS Settings.
 func (c *Client) CreateAdcsSettingsV1(ctx context.Context, request *AdcsSettings) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -28,6 +30,9 @@ func (c *Client) CreateAdcsSettingsV1(ctx context.Context, request *AdcsSettings
 }
 
 // ValidateAdcsCertificateV1 validate AD CS Settings server certificate.
+//
+// Required privileges: update:pro:ad-cs-settings, create:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Update AD CS Settings, Create AD CS Settings.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ValidateAdcsCertificateV1(ctx context.Context, request *AdcsCertificate) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/pki/adcs-settings/validate-certificate"
@@ -38,6 +43,9 @@ func (c *Client) ValidateAdcsCertificateV1(ctx context.Context, request *AdcsCer
 }
 
 // ValidateAdcsClientCertificateV1 validate AD CS Settings client certificate.
+//
+// Required privileges: update:pro:ad-cs-settings, create:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Update AD CS Settings, Create AD CS Settings.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ValidateAdcsClientCertificateV1(ctx context.Context, request *AdcsCertificate) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/pki/adcs-settings/validate-client-certificate"
@@ -48,6 +56,8 @@ func (c *Client) ValidateAdcsClientCertificateV1(ctx context.Context, request *A
 }
 
 // GetAdcsSettingsV1 get AD CS Settings configuration for the ID value.
+//
+// Required privileges: read:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Read AD CS Settings.
 func (c *Client) GetAdcsSettingsV1(ctx context.Context, id string) (*AdcsSettingsResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AdcsSettingsResponse
@@ -59,6 +69,8 @@ func (c *Client) GetAdcsSettingsV1(ctx context.Context, id string) (*AdcsSetting
 }
 
 // DeleteAdcsSettingsV1 delete AD CS Settings configuration by ID.
+//
+// Required privileges: delete:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Delete AD CS Settings.
 func (c *Client) DeleteAdcsSettingsV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/adcs-settings/%s", prefix, url.PathEscape(id))
@@ -69,6 +81,8 @@ func (c *Client) DeleteAdcsSettingsV1(ctx context.Context, id string) error {
 }
 
 // UpdateAdcsSettingsV1 update AD CS Settings configuration.
+//
+// Required privileges: update:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Update AD CS Settings.
 func (c *Client) UpdateAdcsSettingsV1(ctx context.Context, id string, request *AdcsSettings) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/adcs-settings/%s", prefix, url.PathEscape(id))
@@ -79,6 +93,8 @@ func (c *Client) UpdateAdcsSettingsV1(ctx context.Context, id string, request *A
 }
 
 // GetAdcsSettingsDependenciesV1 retrieve list of AD CS Settings dependencies.
+//
+// Required privileges: read:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Read AD CS Settings.
 func (c *Client) GetAdcsSettingsDependenciesV1(ctx context.Context, id string) (*AdcsDependencies, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AdcsDependencies
@@ -90,6 +106,8 @@ func (c *Client) GetAdcsSettingsDependenciesV1(ctx context.Context, id string) (
 }
 
 // ListAdcsSettingsHistoryV1 get specified AD CS Settings history object.
+//
+// Required privileges: read:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Read AD CS Settings.
 func (c *Client) ListAdcsSettingsHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -120,6 +138,8 @@ func (c *Client) ListAdcsSettingsHistoryV1(ctx context.Context, id string, sort 
 }
 
 // CreateAdcsSettingsHistoryNoteV1 add specified AD CS Settings object note.
+//
+// Required privileges: update:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Update AD CS Settings.
 func (c *Client) CreateAdcsSettingsHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse

@@ -13,6 +13,9 @@ import (
 )
 
 // ListDdmStatusItemsV1 retrieve the Status Items from the latest Status Report for a device.
+//
+// Required privileges: read:pro:mobile-devices, read:pro:computers. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListDdmStatusItemsV1(ctx context.Context, clientManagementID string) (*StatusItems, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result StatusItems
@@ -24,6 +27,9 @@ func (c *Client) ListDdmStatusItemsV1(ctx context.Context, clientManagementID st
 }
 
 // GetDdmStatusItemV1 retrieve a Status Item from the latest Status Report for a device.
+//
+// Required privileges: read:pro:mobile-devices, read:pro:computers. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetDdmStatusItemV1(ctx context.Context, clientManagementID string, key string) (*StatusItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result StatusItem
@@ -35,6 +41,9 @@ func (c *Client) GetDdmStatusItemV1(ctx context.Context, clientManagementID stri
 }
 
 // SyncDdmV1 force a device DDM sync.
+//
+// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Declarative Management Command.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) SyncDdmV1(ctx context.Context, clientManagementID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/ddm/%s/sync", prefix, url.PathEscape(clientManagementID))

@@ -118,7 +118,10 @@
           "app-installer-global-settings"
         ],
         "x-required-privileges": [
-          "Read App Installers"
+          "read:pro:mac-applications"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Mac Applications"
         ]
       },
       "put": {
@@ -151,7 +154,10 @@
           "app-installer-global-settings"
         ],
         "x-required-privileges": [
-          "Update App Installers"
+          "update:pro:mac-applications"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Mac Applications"
         ]
       }
     }

@@ -13,6 +13,8 @@ import (
 )
 
 // GetComputerManagementByID finds computer management information by ID.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerManagementByID(ctx context.Context, id string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement
@@ -24,6 +26,8 @@ func (c *Client) GetComputerManagementByID(ctx context.Context, id string) (*Com
 }
 
 // GetComputerManagementByName finds computer management information by name.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerManagementByName(ctx context.Context, name string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement
@@ -35,6 +39,8 @@ func (c *Client) GetComputerManagementByName(ctx context.Context, name string) (
 }
 
 // GetComputerManagementByUDID finds computer management information by UDID.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerManagementByUDID(ctx context.Context, udid string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement
@@ -46,6 +52,8 @@ func (c *Client) GetComputerManagementByUDID(ctx context.Context, udid string) (
 }
 
 // GetComputerManagementBySerialNumber finds computer management information by serial number.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerManagementBySerialNumber(ctx context.Context, serialNumber string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement
@@ -57,6 +65,8 @@ func (c *Client) GetComputerManagementBySerialNumber(ctx context.Context, serial
 }
 
 // GetComputerManagementByMacAddress finds computer management information by MAC address.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerManagementByMacAddress(ctx context.Context, macAddress string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement
@@ -68,6 +78,8 @@ func (c *Client) GetComputerManagementByMacAddress(ctx context.Context, macAddre
 }
 
 // GetComputerManagementByIDPatchFilter display patch management information for a computer and filter.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerManagementByIDPatchFilter(ctx context.Context, id string, filter string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement
@@ -79,6 +91,8 @@ func (c *Client) GetComputerManagementByIDPatchFilter(ctx context.Context, id st
 }
 
 // GetComputerManagementByIDSubset finds a subset of computer management information by ID.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerManagementByIDSubset(ctx context.Context, id string, subset string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement
@@ -90,6 +104,8 @@ func (c *Client) GetComputerManagementByIDSubset(ctx context.Context, id string,
 }
 
 // GetComputerManagementByIDUsername finds management information for a computer and username.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerManagementByIDUsername(ctx context.Context, id string, username string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement
@@ -101,6 +117,8 @@ func (c *Client) GetComputerManagementByIDUsername(ctx context.Context, id strin
 }
 
 // GetComputerManagementByIDUsernameSubset finds a subset of management information for a computer and username.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerManagementByIDUsernameSubset(ctx context.Context, id string, username string, subset string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement

@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -120,24 +121,24 @@ func loadSpec(path string, allowed map[string]bool) (*openapi3.T, error) {
 // external param refs are pure documentation and cannot be resolved without
 // the referenced file.
 func stripExternalParamRefs(data []byte) []byte {
-	var top map[string]interface{}
+	var top map[string]any
 	if err := json.Unmarshal(data, &top); err != nil {
 		return data
 	}
-	paths, ok := top["paths"].(map[string]interface{})
+	paths, ok := top["paths"].(map[string]any)
 	if !ok {
 		return data
 	}
 	modified := false
 	httpMethods := []string{"get", "post", "put", "patch", "delete", "head", "options", "trace"}
-	filterParams := func(obj map[string]interface{}) {
-		params, ok := obj["parameters"].([]interface{})
+	filterParams := func(obj map[string]any) {
+		params, ok := obj["parameters"].([]any)
 		if !ok {
 			return
 		}
-		filtered := make([]interface{}, 0, len(params))
+		filtered := make([]any, 0, len(params))
 		for _, p := range params {
-			pm, ok := p.(map[string]interface{})
+			pm, ok := p.(map[string]any)
 			if !ok {
 				filtered = append(filtered, p)
 				continue
@@ -156,13 +157,13 @@ func stripExternalParamRefs(data []byte) []byte {
 		}
 	}
 	for _, item := range paths {
-		pathItem, ok := item.(map[string]interface{})
+		pathItem, ok := item.(map[string]any)
 		if !ok {
 			continue
 		}
 		filterParams(pathItem)
 		for _, method := range httpMethods {
-			if op, ok := pathItem[method].(map[string]interface{}); ok {
+			if op, ok := pathItem[method].(map[string]any); ok {
 				filterParams(op)
 			}
 		}
@@ -472,6 +473,14 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	}
 
 	if err := emitPkgClient(pkgDir, cfg, goPkgName); err != nil {
+		return err
+	}
+
+	var allMethods []GoMethod
+	for _, sm := range allSpecs {
+		allMethods = append(allMethods, sm.methods...)
+	}
+	if err := emitPkgPrivileges(pkgDir, cfg, goPkgName, allMethods); err != nil {
 		return err
 	}
 
@@ -838,7 +847,7 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 // PayloadsXMLText wraps the configuration-profile <payloads> chardata
 // (raw .mobileconfig plist XML embedded as element text). MarshalXML
 // emits the standard single-level XML chardata encoding via
-// encoding/xml's default escape (escapes ` + "`<`" + `, ` + "`>`" + `, ` + "`&`" + `; leaves ` + "`\"`" + `
+// encoding/xml's default escape (escapes `+"`<`"+`, `+"`>`"+`, `+"`&`"+`; leaves `+"`\"`"+`
 // alone, which is legal in chardata). UnmarshalXML decodes one level
 // symmetrically.
 //
@@ -849,8 +858,8 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 // "Unable to update the database" and assumed the server runs an extra
 // entity-decode pass before its plist parser. Wire-probing on 2026-05-27
 // showed that diagnosis was wrong: double-escaping silently corrupted
-// every <string> value containing literal ` + "`&`" + `, ` + "`<`" + `, or ` + "`>`" + ` — POSTed
-// values stored as ` + "`&amp;`" + `, ` + "`&lt;`" + `, ` + "`&gt;`" + ` doubled to ` + "`&amp;amp;`" + ` etc.,
+// every <string> value containing literal `+"`&`"+`, `+"`<`"+`, or `+"`>`"+` — POSTed
+// values stored as `+"`&amp;`"+`, `+"`&lt;`"+`, `+"`&gt;`"+` doubled to `+"`&amp;amp;`"+` etc.,
 // and the same content 409d (or worse, corrupted) on PUT. Single-escape
 // for both methods matches what the server actually expects and what
 // the Jamf Pro admin UI itself writes.
@@ -1191,7 +1200,7 @@ func TestAccountPrivileges_RoundTrip_PlainCategory(t *testing.T) {
 // (pro-nmartin). It carries ldap_server + three populated privilege
 // categories (casper_* and recon are absent on this group — omitempty
 // must leave them nil). Counts per category match the live dump.
-var dataJARLDAPSFixture = []byte(` + "`" + `
+var dataJARLDAPSFixture = []byte(`+"`"+`
 <group>
   <id>8</id>
   <name>DataJARLDAPS_JamfPro_Admins</name>
@@ -1225,7 +1234,7 @@ var dataJARLDAPSFixture = []byte(` + "`" + `
   </privileges>
   <members/>
 </group>
-` + "`" + `)
+`+"`"+`)
 
 // TestGroup_WireFixture_LdapServerAndPrivileges unmarshal the real-dump
 // fixture and asserts that:
@@ -1325,7 +1334,7 @@ func TestGroup_WireFixture_LdapServerAndPrivileges(t *testing.T) {
 // directory account GET response captured 2026-06-12 (pro-nmartin).
 // It exercises Account.Groups (group membership with inherited privileges),
 // Account.LdapServer, and directory_user:true.
-var benTomsFixture = []byte(` + "`" + `
+var benTomsFixture = []byte(`+"`"+`
 <account>
   <id>66</id>
   <name>ben.toms@jamf.com</name>
@@ -1356,7 +1365,7 @@ var benTomsFixture = []byte(` + "`" + `
     </group>
   </groups>
 </account>
-` + "`" + `)
+`+"`"+`)
 
 // TestAccount_WireFixture_DirectoryUser asserts that a directory account
 // round-trips correctly:
@@ -1720,6 +1729,96 @@ func New(base *jamfplatform.Client) *Client {
 	return nil
 }
 
+// goStringSliceLiteral renders ss as a Go source expression: "nil" for an
+// empty slice, otherwise a []string composite literal. Used to emit the
+// Scoped/Legacy fields of the per-package privilege registry.
+func goStringSliceLiteral(ss []string) string {
+	if len(ss) == 0 {
+		return "nil"
+	}
+	quoted := make([]string, len(ss))
+	for i, s := range ss {
+		quoted[i] = strconv.Quote(s)
+	}
+	return "[]string{" + strings.Join(quoted, ", ") + "}"
+}
+
+// emitPkgPrivileges writes permissions.go into a sub-package: a Privileges map
+// keyed by method name plus a PrivilegesFor lookup helper. Only spec-derived
+// methods (PrivilegesKnown) are included; synthetic resolver/apply methods are
+// omitted because they compose multiple endpoints rather than mapping to one
+// operation. Entries are emitted in method-name order for deterministic
+// output so CI's git-diff check stays stable.
+func emitPkgPrivileges(pkgDir string, cfg Config, pkgName string, methods []GoMethod) error {
+	type entry struct {
+		method GoMethod
+		path   string
+	}
+	var entries []entry
+	seen := make(map[string]bool)
+	for _, m := range methods {
+		if !m.PrivilegesKnown || seen[m.Name] {
+			continue
+		}
+		seen[m.Name] = true
+		path := "/" + m.Version + m.ResourcePath
+		entries = append(entries, entry{method: m, path: path})
+	}
+	sort.Slice(entries, func(i, j int) bool { return entries[i].method.Name < entries[j].method.Name })
+
+	var b strings.Builder
+	fmt.Fprintf(&b, `// Code generated by tools/generate; DO NOT EDIT.
+
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package %s
+
+import "%s/jamfplatform"
+
+// Privileges maps each %s SDK method name to the Jamf API privileges it
+// requires, sourced from the x-required-privileges vendor extensions in the
+// Jamf OpenAPI specs. Methods that require no special privilege have an empty
+// Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
+// document the privileges of the operations they call instead.
+var Privileges = map[string]jamfplatform.MethodPrivileges{
+`, pkgName, cfg.Module, pkgName)
+
+	for _, e := range entries {
+		m := e.method
+		fmt.Fprintf(&b, "\t%s: {Method: %s, HTTPMethod: %s, Path: %s, Scoped: %s, Legacy: %s},\n",
+			strconv.Quote(m.Name),
+			strconv.Quote(m.Name),
+			strconv.Quote(m.HTTPMethod),
+			strconv.Quote(e.path),
+			goStringSliceLiteral(m.ScopedPrivileges),
+			goStringSliceLiteral(m.LegacyPrivileges),
+		)
+	}
+
+	b.WriteString(`}
+
+// PrivilegesFor returns the privilege metadata for the named SDK method and
+// true when the method is present in the registry, or the zero value and
+// false otherwise.
+func PrivilegesFor(method string) (jamfplatform.MethodPrivileges, bool) {
+	p, ok := Privileges[method]
+	return p, ok
+}
+`)
+
+	outPath := filepath.Join(pkgDir, "permissions.go")
+	formatted, err := imports.Process(outPath, []byte(b.String()), &imports.Options{Comments: true})
+	if err != nil {
+		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, b.String())
+	}
+	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+		return fmt.Errorf("writing %s: %w", outPath, err)
+	}
+	log.Printf("wrote %s", outPath)
+	return nil
+}
+
 // emitPkgHelpersTest writes the per-sub-package helpers_test.go — test-only
 // shims that alias jamfplatform.Option and WithTenantID into the sub-package
 // namespace so generated test files can use them unqualified.
@@ -1972,6 +2071,53 @@ func AsAPIError(err error) *APIResponseError {
 	return client.AsAPIError(err)
 }
 `, pkg, mod),
+
+		"jamfplatform/permissions.go": fmt.Sprintf(`// Code generated by tools/generate; DO NOT EDIT.
+
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package %s
+
+// MethodPrivileges describes the Jamf API privileges required to call a
+// generated SDK method. It is sourced from the x-required-privileges and
+// x-required-privileges-legacy vendor extensions the Jamf OpenAPI specs
+// attach to each operation.
+//
+// Each generated sub-package (pro, devices, devicegroups, proclassic, ...)
+// exposes a package-level Privileges map keyed by method name plus a
+// PrivilegesFor helper. Consumers that need to document the permissions a
+// given operation requires — for example a Terraform provider emitting a
+// table of required privileges per resource — look the method up there.
+//
+// Only methods built directly from a spec operation appear in the registry.
+// Synthetic convenience methods (Resolve<X>ByName, Apply<X>) compose one or
+// more underlying endpoints and are intentionally absent; document the
+// privileges of the operations they call instead.
+type MethodPrivileges struct {
+	// Method is the generated Go method name, e.g. "CreateBuildingV1".
+	Method string
+	// HTTPMethod is the HTTP verb of the underlying endpoint, e.g. "POST".
+	HTTPMethod string
+	// Path is the endpoint's resource path relative to the tenant prefix,
+	// e.g. "/buildings/{id}".
+	Path string
+	// Scoped lists the modern scoped privilege identifiers in
+	// action:scope:resource form, e.g. "create:pro:buildings". An empty
+	// slice means the endpoint requires no special privilege: any
+	// authenticated API client may call it. Where more than one identifier
+	// is present, the Jamf spec does not encode whether they are required
+	// together (AND) or as alternatives (OR); consumers should present the
+	// full set and avoid asserting a relationship.
+	Scoped []string
+	// Legacy lists the human-readable Jamf Pro privilege names, e.g.
+	// "Create Buildings". It is populated for the Pro API family only —
+	// other families do not publish legacy names. Legacy is NOT
+	// index-aligned with Scoped: a single legacy name may correspond to
+	// multiple scoped identifiers.
+	Legacy []string
+}
+`, pkg),
 
 		"jamfplatform/rsql.go": fmt.Sprintf(`// Code generated by tools/generate; DO NOT EDIT.
 

@@ -13,6 +13,8 @@ import (
 )
 
 // CreateDigicertTrustLifecycleManagerV1 create DigiCert Trust Lifecycle Manager configuration with client authentication via client certificate.
+//
+// Required privileges: create:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Create DigiCert Settings.
 func (c *Client) CreateDigicertTrustLifecycleManagerV1(ctx context.Context, request *DigiCertSetting) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -24,6 +26,8 @@ func (c *Client) CreateDigicertTrustLifecycleManagerV1(ctx context.Context, requ
 }
 
 // GetDigicertTrustLifecycleManagerV1 retrieve DigiCert Trust Lifecycle Manager configuration.
+//
+// Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
 func (c *Client) GetDigicertTrustLifecycleManagerV1(ctx context.Context, id string) (*DigiCertSettingResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DigiCertSettingResponse
@@ -35,6 +39,8 @@ func (c *Client) GetDigicertTrustLifecycleManagerV1(ctx context.Context, id stri
 }
 
 // UpdateDigicertTrustLifecycleManagerV1 update DigiCert Trust Lifecycle Manager configuration.
+//
+// Required privileges: update:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Update DigiCert Settings.
 func (c *Client) UpdateDigicertTrustLifecycleManagerV1(ctx context.Context, id string, request *DigiCertSetting) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s", prefix, url.PathEscape(id))
@@ -45,6 +51,8 @@ func (c *Client) UpdateDigicertTrustLifecycleManagerV1(ctx context.Context, id s
 }
 
 // DeleteDigicertTrustLifecycleManagerV1 delete DigiCert Trust Lifecycle Manager configuration.
+//
+// Required privileges: delete:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Delete DigiCert Settings.
 func (c *Client) DeleteDigicertTrustLifecycleManagerV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s", prefix, url.PathEscape(id))
@@ -55,6 +63,8 @@ func (c *Client) DeleteDigicertTrustLifecycleManagerV1(ctx context.Context, id s
 }
 
 // GetDigicertTrustLifecycleManagerConnectionStatusV1 get connection status of DigiCert Trust Lifecycle Manager for a given ID.
+//
+// Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
 func (c *Client) GetDigicertTrustLifecycleManagerConnectionStatusV1(ctx context.Context, id string) (*DigicertConnectionStatus, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DigicertConnectionStatus
@@ -66,6 +76,8 @@ func (c *Client) GetDigicertTrustLifecycleManagerConnectionStatusV1(ctx context.
 }
 
 // GetDigicertTrustLifecycleManagerDependenciesV1 retrieve list of DigiCert Trust Lifecycle Manager Settings dependencies.
+//
+// Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
 func (c *Client) GetDigicertTrustLifecycleManagerDependenciesV1(ctx context.Context, id string) (*DigicertDependencies, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DigicertDependencies
@@ -77,6 +89,9 @@ func (c *Client) GetDigicertTrustLifecycleManagerDependenciesV1(ctx context.Cont
 }
 
 // ValidateDigicertClientCertificateV1 validate DigiCert Trust Lifecycle Manager client certificate.
+//
+// Required privileges: create:pro:digicert-settings, update:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Create DigiCert Settings, Update DigiCert Settings.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ValidateDigicertClientCertificateV1(ctx context.Context, request *Certificate) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/pki/digicert/trust-lifecycle-manager/validate-client-certificate"

@@ -18,6 +18,8 @@ import (
 )
 
 // ListScriptsV1 search for sorted and paged Scripts.
+//
+// Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
 func (c *Client) ListScriptsV1(ctx context.Context, sort []string, filter string) ([]Script, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Script, bool, error) {
@@ -48,6 +50,8 @@ func (c *Client) ListScriptsV1(ctx context.Context, sort []string, filter string
 }
 
 // CreateScriptV1 create a Script.
+//
+// Required privileges: create:pro:scripts. Legacy Jamf Pro privilege name(s): Create Scripts.
 func (c *Client) CreateScriptV1(ctx context.Context, request *Script) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -59,6 +63,8 @@ func (c *Client) CreateScriptV1(ctx context.Context, request *Script) (*HrefResp
 }
 
 // GetScriptV1 retrieve a full script object.
+//
+// Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
 func (c *Client) GetScriptV1(ctx context.Context, id string) (*Script, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Script
@@ -70,6 +76,8 @@ func (c *Client) GetScriptV1(ctx context.Context, id string) (*Script, error) {
 }
 
 // UpdateScriptV1 replace the script at the id with the supplied information.
+//
+// Required privileges: update:pro:scripts. Legacy Jamf Pro privilege name(s): Update Scripts.
 func (c *Client) UpdateScriptV1(ctx context.Context, id string, request *Script) (*Script, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Script
@@ -81,6 +89,8 @@ func (c *Client) UpdateScriptV1(ctx context.Context, id string, request *Script)
 }
 
 // DeleteScriptV1 delete a Script at the specified id.
+//
+// Required privileges: delete:pro:scripts. Legacy Jamf Pro privilege name(s): Delete Scripts.
 func (c *Client) DeleteScriptV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/scripts/%s", prefix, url.PathEscape(id))
@@ -91,6 +101,8 @@ func (c *Client) DeleteScriptV1(ctx context.Context, id string) error {
 }
 
 // DownloadScriptV1 download a text file of the Script contents.
+//
+// Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
 func (c *Client) DownloadScriptV1(ctx context.Context, id string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -102,6 +114,8 @@ func (c *Client) DownloadScriptV1(ctx context.Context, id string) ([]byte, error
 }
 
 // ListScriptHistoryV1 get specified Script history object.
+//
+// Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
 func (c *Client) ListScriptHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -132,6 +146,8 @@ func (c *Client) ListScriptHistoryV1(ctx context.Context, id string, sort []stri
 }
 
 // CreateScriptHistoryNoteV1 add specified Script history object notes.
+//
+// Required privileges: update:pro:scripts. Legacy Jamf Pro privilege name(s): Update Scripts.
 func (c *Client) CreateScriptHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory

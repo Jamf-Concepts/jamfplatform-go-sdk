@@ -17,6 +17,8 @@ import (
 )
 
 // GetCheckInSettingsV3 get Client Check-In settings.
+//
+// Required privileges: read:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Read Computer Check-In.
 func (c *Client) GetCheckInSettingsV3(ctx context.Context) (*ClientCheckInV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result ClientCheckInV3
@@ -28,6 +30,8 @@ func (c *Client) GetCheckInSettingsV3(ctx context.Context) (*ClientCheckInV3, er
 }
 
 // UpdateCheckInSettingsV3 update Client Check-In object.
+//
+// Required privileges: update:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Update Computer Check-In.
 func (c *Client) UpdateCheckInSettingsV3(ctx context.Context, request *ClientCheckInV3) (*ClientCheckInV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result ClientCheckInV3
@@ -39,6 +43,8 @@ func (c *Client) UpdateCheckInSettingsV3(ctx context.Context, request *ClientChe
 }
 
 // ListCheckInHistoryV3 get Client Check-In history object.
+//
+// Required privileges: read:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Read Computer Check-In.
 func (c *Client) ListCheckInHistoryV3(ctx context.Context, sort []string, filter string) ([]ObjectHistoryV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistoryV1, bool, error) {
@@ -69,6 +75,8 @@ func (c *Client) ListCheckInHistoryV3(ctx context.Context, sort []string, filter
 }
 
 // CreateCheckInHistoryNoteV3 add a Note to Client Check-In History.
+//
+// Required privileges: update:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Update Computer Check-In.
 func (c *Client) CreateCheckInHistoryNoteV3(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result HrefResponse

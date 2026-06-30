@@ -16,6 +16,8 @@ import (
 )
 
 // GetSoftwareUpdateServerByID finds software update servers by ID.
+//
+// Required privileges: read:pro:software-update-servers.
 func (c *Client) GetSoftwareUpdateServerByID(ctx context.Context, id string) (*SoftwareUpdateServer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SoftwareUpdateServer
@@ -27,6 +29,8 @@ func (c *Client) GetSoftwareUpdateServerByID(ctx context.Context, id string) (*S
 }
 
 // CreateSoftwareUpdateServerByID creates a new software update server by ID.
+//
+// Required privileges: create:pro:software-update-servers.
 func (c *Client) CreateSoftwareUpdateServerByID(ctx context.Context, id string, request *SoftwareUpdateServer) (*SoftwareUpdateServer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SoftwareUpdateServer
@@ -38,6 +42,8 @@ func (c *Client) CreateSoftwareUpdateServerByID(ctx context.Context, id string, 
 }
 
 // UpdateSoftwareUpdateServerByID updates an existing software update server by ID.
+//
+// Required privileges: update:pro:software-update-servers.
 func (c *Client) UpdateSoftwareUpdateServerByID(ctx context.Context, id string, request *SoftwareUpdateServer) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateSoftwareUpdateServerByID(ctx context.Context, id string, 
 }
 
 // DeleteSoftwareUpdateServerByID deletes a software update server by ID.
+//
+// Required privileges: delete:pro:software-update-servers.
 func (c *Client) DeleteSoftwareUpdateServerByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteSoftwareUpdateServerByID(ctx context.Context, id string) 
 }
 
 // GetSoftwareUpdateServerByName finds software update servers by name.
+//
+// Required privileges: read:pro:software-update-servers.
 func (c *Client) GetSoftwareUpdateServerByName(ctx context.Context, name string) (*SoftwareUpdateServer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SoftwareUpdateServer
@@ -69,6 +79,8 @@ func (c *Client) GetSoftwareUpdateServerByName(ctx context.Context, name string)
 }
 
 // UpdateSoftwareUpdateServerByName updates an existing software update server by name.
+//
+// Required privileges: update:pro:software-update-servers.
 func (c *Client) UpdateSoftwareUpdateServerByName(ctx context.Context, name string, request *SoftwareUpdateServer) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateSoftwareUpdateServerByName(ctx context.Context, name stri
 }
 
 // DeleteSoftwareUpdateServerByName deletes a software update server by name.
+//
+// Required privileges: delete:pro:software-update-servers.
 func (c *Client) DeleteSoftwareUpdateServerByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteSoftwareUpdateServerByName(ctx context.Context, name stri
 }
 
 // ListSoftwareUpdateServers finds all software update servers.
+//
+// Required privileges: read:pro:software-update-servers.
 func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdateServers, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SoftwareUpdateServers
@@ -100,6 +116,8 @@ func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdate
 }
 
 // CreateSoftwareUpdateServerByName creates a new software update server by ID.
+//
+// Required privileges: create:pro:software-update-servers.
 func (c *Client) CreateSoftwareUpdateServerByName(ctx context.Context, name string, request *SoftwareUpdateServer) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))

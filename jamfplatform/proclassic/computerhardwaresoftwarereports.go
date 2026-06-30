@@ -13,6 +13,8 @@ import (
 )
 
 // GetComputerHardwareSoftwareReportByIDDateRange finds hardware/software reports by computer ID.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHardwareSoftwareReportByIDDateRange(ctx context.Context, id string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
@@ -24,6 +26,8 @@ func (c *Client) GetComputerHardwareSoftwareReportByIDDateRange(ctx context.Cont
 }
 
 // GetComputerHardwareSoftwareReportByIDDateRangeSubset finds a subset of hardware/software reports by computer ID.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHardwareSoftwareReportByIDDateRangeSubset(ctx context.Context, id string, start_date string, end_date string, subset string) (*ComputerHardwareSoftwareReports, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
@@ -35,6 +39,8 @@ func (c *Client) GetComputerHardwareSoftwareReportByIDDateRangeSubset(ctx contex
 }
 
 // GetComputerHardwareSoftwareReportByMacAddressDateRange finds hardware/software reports by computer MAC address.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHardwareSoftwareReportByMacAddressDateRange(ctx context.Context, macaddress string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
@@ -46,6 +52,8 @@ func (c *Client) GetComputerHardwareSoftwareReportByMacAddressDateRange(ctx cont
 }
 
 // GetComputerHardwareSoftwareReportByNameDateRange finds hardware/software reports by computer name.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHardwareSoftwareReportByNameDateRange(ctx context.Context, name string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
@@ -57,6 +65,8 @@ func (c *Client) GetComputerHardwareSoftwareReportByNameDateRange(ctx context.Co
 }
 
 // GetComputerHardwareSoftwareReportBySerialNumberDateRange finds hardware/software reports by computer serial number.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHardwareSoftwareReportBySerialNumberDateRange(ctx context.Context, serialnumber string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
@@ -68,6 +78,8 @@ func (c *Client) GetComputerHardwareSoftwareReportBySerialNumberDateRange(ctx co
 }
 
 // GetComputerHardwareSoftwareReportByUDIDDateRange finds hardware/software reports by computer UDID.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerHardwareSoftwareReportByUDIDDateRange(ctx context.Context, udid string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports

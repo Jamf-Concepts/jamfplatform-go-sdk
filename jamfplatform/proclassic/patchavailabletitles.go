@@ -13,6 +13,8 @@ import (
 )
 
 // ListPatchAvailableTitlesBySourceID finds all available title from a source by ID.
+//
+// Required privileges: read:pro:patch-management-software-titles.
 func (c *Client) ListPatchAvailableTitlesBySourceID(ctx context.Context, id string) (*PatchAvailableTitles, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchAvailableTitles

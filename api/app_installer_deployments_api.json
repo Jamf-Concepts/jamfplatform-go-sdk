@@ -387,7 +387,10 @@
           "app-installer-deployments"
         ],
         "x-required-privileges": [
-          "Read App Installers"
+          "read:pro:mac-applications"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Mac Applications"
         ]
       },
       "post": {
@@ -420,7 +423,10 @@
           "app-installer-deployments"
         ],
         "x-required-privileges": [
-          "Create App Installers"
+          "create:pro:mac-applications"
+        ],
+        "x-required-privileges-legacy": [
+          "Create Mac Applications"
         ]
       }
     },
@@ -448,7 +454,10 @@
           "app-installer-deployments"
         ],
         "x-required-privileges": [
-          "Delete App Installers"
+          "delete:pro:mac-applications"
+        ],
+        "x-required-privileges-legacy": [
+          "Delete Mac Applications"
         ]
       },
       "get": {
@@ -484,7 +493,10 @@
           "app-installer-deployments"
         ],
         "x-required-privileges": [
-          "Read App Installers"
+          "read:pro:mac-applications"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Mac Applications"
         ]
       },
       "put": {
@@ -528,7 +540,10 @@
           "app-installer-deployments"
         ],
         "x-required-privileges": [
-          "Update App Installers"
+          "update:pro:mac-applications"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Mac Applications"
         ]
       }
     }

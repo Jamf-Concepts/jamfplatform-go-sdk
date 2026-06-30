@@ -13,6 +13,8 @@ import (
 )
 
 // ListNotificationsV1 get Notifications for user and site.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) ListNotificationsV1(ctx context.Context) ([]NotificationV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []NotificationV1
@@ -24,6 +26,8 @@ func (c *Client) ListNotificationsV1(ctx context.Context) ([]NotificationV1, err
 }
 
 // DeleteNotificationV1 delete Notifications.
+//
+// Required privileges: execute:pro:dismiss-notifications. Legacy Jamf Pro privilege name(s): Dismiss Notifications.
 func (c *Client) DeleteNotificationV1(ctx context.Context, notificationType string, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/notifications/%s/%s", prefix, url.PathEscape(notificationType), url.PathEscape(id))

@@ -15,6 +15,8 @@ import (
 // ListSavedSearches finds all saved searches (Deprecated - use advancedcomputersearches, advancedmobiledevicesearches and advancedusersearches).
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: read:pro:advanced-computer-searches.
 func (c *Client) ListSavedSearches(ctx context.Context) (*SavedSearches, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SavedSearches
@@ -28,6 +30,8 @@ func (c *Client) ListSavedSearches(ctx context.Context) (*SavedSearches, error) 
 // GetSavedSearchByID finds saved searches by ID (Deprecated - use advancedcomputersearches, advancedmobiledevicesearches and advancedusersearches).
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: read:pro:advanced-computer-searches.
 func (c *Client) GetSavedSearchByID(ctx context.Context, id string) (*SavedSearches, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SavedSearches
@@ -41,6 +45,8 @@ func (c *Client) GetSavedSearchByID(ctx context.Context, id string) (*SavedSearc
 // GetSavedSearchByName finds saved searches by name (Deprecated - use advancedcomputersearches, advancedmobiledevicesearches and advancedusersearches).
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: read:pro:advanced-computer-searches.
 func (c *Client) GetSavedSearchByName(ctx context.Context, name string) (*SavedSearches, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SavedSearches

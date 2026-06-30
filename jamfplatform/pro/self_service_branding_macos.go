@@ -18,6 +18,9 @@ import (
 )
 
 // ListMacOSBrandingConfigurationsV1 search for sorted and paged macOS branding configurations.
+//
+// Required privileges: read:pro:self-service-branding-configuration, read:pro:self-service. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration, Read Self Service.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListMacOSBrandingConfigurationsV1(ctx context.Context, sort []string) ([]MacOsBrandingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MacOsBrandingConfiguration, bool, error) {
@@ -45,6 +48,8 @@ func (c *Client) ListMacOSBrandingConfigurationsV1(ctx context.Context, sort []s
 }
 
 // CreateMacOSBrandingConfigurationV1 create a Self Service macOS branding configuration with the supplied.
+//
+// Required privileges: create:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Create Self Service Branding Configuration.
 func (c *Client) CreateMacOSBrandingConfigurationV1(ctx context.Context, request *MacOsBrandingConfiguration) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -56,6 +61,8 @@ func (c *Client) CreateMacOSBrandingConfigurationV1(ctx context.Context, request
 }
 
 // GetMacOSBrandingConfigurationV1 read a single Self Service macOS branding configuration indicated by the provided id.
+//
+// Required privileges: read:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration.
 func (c *Client) GetMacOSBrandingConfigurationV1(ctx context.Context, id string) (*MacOsBrandingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result MacOsBrandingConfiguration
@@ -67,6 +74,8 @@ func (c *Client) GetMacOSBrandingConfigurationV1(ctx context.Context, id string)
 }
 
 // UpdateMacOSBrandingConfigurationV1 update a Self Service macOS branding configuration with the supplied details.
+//
+// Required privileges: update:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Update Self Service Branding Configuration.
 func (c *Client) UpdateMacOSBrandingConfigurationV1(ctx context.Context, id string, request *MacOsBrandingConfiguration) (*MacOsBrandingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result MacOsBrandingConfiguration
@@ -78,6 +87,8 @@ func (c *Client) UpdateMacOSBrandingConfigurationV1(ctx context.Context, id stri
 }
 
 // DeleteMacOSBrandingConfigurationV1 delete the Self Service macOS branding configuration indicated by the provided id.
+//
+// Required privileges: delete:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Delete Self Service Branding Configuration.
 func (c *Client) DeleteMacOSBrandingConfigurationV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/self-service/branding/macos/%s", prefix, url.PathEscape(id))

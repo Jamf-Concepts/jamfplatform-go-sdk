@@ -18,6 +18,8 @@ import (
 )
 
 // ListDistributionPointsV1 finds all Distribution Points.
+//
+// Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
 func (c *Client) ListDistributionPointsV1(ctx context.Context, sort []string, filter string) ([]DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DistributionPoint, bool, error) {
@@ -48,6 +50,8 @@ func (c *Client) ListDistributionPointsV1(ctx context.Context, sort []string, fi
 }
 
 // CreateDistributionPointV1 create distribution point.
+//
+// Required privileges: create:pro:distribution-points. Legacy Jamf Pro privilege name(s): Create Distribution Points.
 func (c *Client) CreateDistributionPointV1(ctx context.Context, request *DistributionPoint) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -59,6 +63,8 @@ func (c *Client) CreateDistributionPointV1(ctx context.Context, request *Distrib
 }
 
 // DeleteMultipleDistributionPointsV1 delete multiple distribution points at once.
+//
+// Required privileges: delete:pro:distribution-points. Legacy Jamf Pro privilege name(s): Delete Distribution Points.
 func (c *Client) DeleteMultipleDistributionPointsV1(ctx context.Context, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/distribution-points/delete-multiple"
@@ -69,6 +75,8 @@ func (c *Client) DeleteMultipleDistributionPointsV1(ctx context.Context, request
 }
 
 // GetDistributionPointV1 get specified distribution point.
+//
+// Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
 func (c *Client) GetDistributionPointV1(ctx context.Context, id string) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DistributionPoint
@@ -80,6 +88,9 @@ func (c *Client) GetDistributionPointV1(ctx context.Context, id string) (*Distri
 }
 
 // UpdateDistributionPointV1 update specified distribution point object.
+//
+// Required privileges: read:pro:distribution-points, update:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points, Update Distribution Points.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) UpdateDistributionPointV1(ctx context.Context, id string, request *DistributionPoint) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DistributionPoint
@@ -91,6 +102,8 @@ func (c *Client) UpdateDistributionPointV1(ctx context.Context, id string, reque
 }
 
 // DeleteDistributionPointV1 remove specified distribution point.
+//
+// Required privileges: delete:pro:distribution-points. Legacy Jamf Pro privilege name(s): Delete Distribution Points.
 func (c *Client) DeleteDistributionPointV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/distribution-points/%s", prefix, url.PathEscape(id))
@@ -101,6 +114,9 @@ func (c *Client) DeleteDistributionPointV1(ctx context.Context, id string) error
 }
 
 // PatchDistributionPointV1 update specified distribution point object.
+//
+// Required privileges: read:pro:distribution-points, update:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points, Update Distribution Points.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) PatchDistributionPointV1(ctx context.Context, id string, request *DistributionPoint) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DistributionPoint
@@ -112,6 +128,8 @@ func (c *Client) PatchDistributionPointV1(ctx context.Context, id string, reques
 }
 
 // ListDistributionPointHistoryV1 get specified distribution point History object.
+//
+// Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
 func (c *Client) ListDistributionPointHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -142,6 +160,8 @@ func (c *Client) ListDistributionPointHistoryV1(ctx context.Context, id string, 
 }
 
 // CreateDistributionPointHistoryNoteV1 add specified distribution point History object notes.
+//
+// Required privileges: update:pro:distribution-points. Legacy Jamf Pro privilege name(s): Update Distribution Points.
 func (c *Client) CreateDistributionPointHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory

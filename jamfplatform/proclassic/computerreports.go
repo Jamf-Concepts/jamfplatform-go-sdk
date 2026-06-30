@@ -13,6 +13,8 @@ import (
 )
 
 // GetComputerReportByID finds computer reports by id.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerReportByID(ctx context.Context, id string) (*ComputerReport, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerReport
@@ -24,6 +26,8 @@ func (c *Client) GetComputerReportByID(ctx context.Context, id string) (*Compute
 }
 
 // GetComputerReportByName finds computer reports by name.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) GetComputerReportByName(ctx context.Context, name string) (*ComputerReport, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerReport
@@ -35,6 +39,8 @@ func (c *Client) GetComputerReportByName(ctx context.Context, name string) (*Com
 }
 
 // ListComputerReports finds all computer reports.
+//
+// Required privileges: read:pro:computers.
 func (c *Client) ListComputerReports(ctx context.Context) (*ComputerReports, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerReports

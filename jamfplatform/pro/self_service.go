@@ -17,6 +17,8 @@ import (
 )
 
 // GetSelfServiceSettingsV1 get an object representation of Self Service settings.
+//
+// Required privileges: read:pro:self-service. Legacy Jamf Pro privilege name(s): Read Self Service.
 func (c *Client) GetSelfServiceSettingsV1(ctx context.Context) (*SelfServiceSettings, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SelfServiceSettings
@@ -28,6 +30,8 @@ func (c *Client) GetSelfServiceSettingsV1(ctx context.Context) (*SelfServiceSett
 }
 
 // UpdateSelfServiceSettingsV1 put an object representation of Self Service settings.
+//
+// Required privileges: update:pro:self-service. Legacy Jamf Pro privilege name(s): Update Self Service.
 func (c *Client) UpdateSelfServiceSettingsV1(ctx context.Context, request *SelfServiceSettings) (*SelfServiceSettings, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SelfServiceSettings
@@ -39,6 +43,8 @@ func (c *Client) UpdateSelfServiceSettingsV1(ctx context.Context, request *SelfS
 }
 
 // ListSelfServiceSettingsHistoryV1 get a page of Self Service settings history.
+//
+// Required privileges: read:pro:self-service. Legacy Jamf Pro privilege name(s): Read Self Service.
 func (c *Client) ListSelfServiceSettingsHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -69,6 +75,8 @@ func (c *Client) ListSelfServiceSettingsHistoryV1(ctx context.Context, sort []st
 }
 
 // CreateSelfServiceSettingsHistoryNoteV1 add Self Service settings history notes.
+//
+// Required privileges: update:pro:self-service. Legacy Jamf Pro privilege name(s): Update Self Service.
 func (c *Client) CreateSelfServiceSettingsHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse

@@ -18,6 +18,8 @@ import (
 )
 
 // ListAccountsV1 get user accounts.
+//
+// Required privileges: read:pro:accounts. Legacy Jamf Pro privilege name(s): Read Accounts.
 func (c *Client) ListAccountsV1(ctx context.Context, sort []string, filter string) ([]UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]UserAccount, bool, error) {
@@ -48,6 +50,8 @@ func (c *Client) ListAccountsV1(ctx context.Context, sort []string, filter strin
 }
 
 // CreateAccountV1 adds new account.
+//
+// Required privileges: create:pro:accounts. Legacy Jamf Pro privilege name(s): Create Accounts.
 func (c *Client) CreateAccountV1(ctx context.Context, request *UserAccount) (*UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserAccount
@@ -59,6 +63,8 @@ func (c *Client) CreateAccountV1(ctx context.Context, request *UserAccount) (*Us
 }
 
 // GetAccountV1 gets the user account.
+//
+// Required privileges: read:pro:accounts. Legacy Jamf Pro privilege name(s): Read Accounts.
 func (c *Client) GetAccountV1(ctx context.Context, id string) (*UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserAccount
@@ -70,6 +76,8 @@ func (c *Client) GetAccountV1(ctx context.Context, id string) (*UserAccount, err
 }
 
 // DeleteAccountV1 deletes the user account.
+//
+// Required privileges: delete:pro:accounts. Legacy Jamf Pro privilege name(s): Delete Accounts.
 func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/accounts/%s", prefix, url.PathEscape(id))
@@ -80,6 +88,8 @@ func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
 }
 
 // UpdateAccountV1 updates the user account.
+//
+// Required privileges: update:pro:accounts. Legacy Jamf Pro privilege name(s): Update Accounts.
 func (c *Client) UpdateAccountV1(ctx context.Context, id string, request *UserAccount) (*UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserAccount

@@ -18,6 +18,8 @@ import (
 )
 
 // ListMobileDeviceGroupsV2 return the list of all Mobile Device Groups.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
 func (c *Client) ListMobileDeviceGroupsV2(ctx context.Context) ([]MobileDeviceGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []MobileDeviceGroup
@@ -31,6 +33,8 @@ func (c *Client) ListMobileDeviceGroupsV2(ctx context.Context) ([]MobileDeviceGr
 // ListMobileDeviceGroupsV1 return the list of all Mobile Device Groups.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
 func (c *Client) ListMobileDeviceGroupsV1(ctx context.Context) ([]MobileDeviceGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []MobileDeviceGroup
@@ -42,6 +46,8 @@ func (c *Client) ListMobileDeviceGroupsV1(ctx context.Context) ([]MobileDeviceGr
 }
 
 // ListSmartMobileDeviceGroupsV2 get Smart Groups.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
 func (c *Client) ListSmartMobileDeviceGroupsV2(ctx context.Context, sort []string, filter string) ([]SmartGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
@@ -74,6 +80,8 @@ func (c *Client) ListSmartMobileDeviceGroupsV2(ctx context.Context, sort []strin
 // ListSmartMobileDeviceGroupsV1 get Smart Groups.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
 func (c *Client) ListSmartMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]SmartGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
@@ -104,6 +112,8 @@ func (c *Client) ListSmartMobileDeviceGroupsV1(ctx context.Context, sort []strin
 }
 
 // CreateSmartMobileDeviceGroupV2 create a smart group.
+//
+// Required privileges: create:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Create Smart Mobile Device Groups.
 func (c *Client) CreateSmartMobileDeviceGroupV2(ctx context.Context, request *SmartGroupAssignmentV2, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -124,6 +134,8 @@ func (c *Client) CreateSmartMobileDeviceGroupV2(ctx context.Context, request *Sm
 // CreateSmartMobileDeviceGroupV1 create a smart group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: create:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Create Smart Mobile Device Groups.
 func (c *Client) CreateSmartMobileDeviceGroupV1(ctx context.Context, request *SmartGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -142,6 +154,8 @@ func (c *Client) CreateSmartMobileDeviceGroupV1(ctx context.Context, request *Sm
 }
 
 // GetSmartMobileDeviceGroupV2 get Smart Group by Id.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
 func (c *Client) GetSmartMobileDeviceGroupV2(ctx context.Context, id string) (*SmartGroupDetailV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmartGroupDetailV2
@@ -155,6 +169,8 @@ func (c *Client) GetSmartMobileDeviceGroupV2(ctx context.Context, id string) (*S
 // GetSmartMobileDeviceGroupV1 get Smart Group by Id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
 func (c *Client) GetSmartMobileDeviceGroupV1(ctx context.Context, id string) (*SmartGroupDetail, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SmartGroupDetail
@@ -166,6 +182,8 @@ func (c *Client) GetSmartMobileDeviceGroupV1(ctx context.Context, id string) (*S
 }
 
 // UpdateSmartMobileDeviceGroupV2 update a smart group.
+//
+// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Smart Mobile Device Groups.
 func (c *Client) UpdateSmartMobileDeviceGroupV2(ctx context.Context, id string, request *SmartGroupAssignmentV2) (*SmartGroupAssignmentV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SmartGroupAssignmentV2
@@ -179,6 +197,8 @@ func (c *Client) UpdateSmartMobileDeviceGroupV2(ctx context.Context, id string, 
 // UpdateSmartMobileDeviceGroupV1 update a smart group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Smart Mobile Device Groups.
 func (c *Client) UpdateSmartMobileDeviceGroupV1(ctx context.Context, id string, request *SmartGroupAssignment) (*SmartGroupAssignment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SmartGroupAssignment
@@ -190,6 +210,8 @@ func (c *Client) UpdateSmartMobileDeviceGroupV1(ctx context.Context, id string, 
 }
 
 // DeleteSmartMobileDeviceGroupV2 remove Smart Group by Id.
+//
+// Required privileges: delete:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Delete Smart Mobile Device Groups.
 func (c *Client) DeleteSmartMobileDeviceGroupV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
@@ -202,6 +224,8 @@ func (c *Client) DeleteSmartMobileDeviceGroupV2(ctx context.Context, id string) 
 // DeleteSmartMobileDeviceGroupV1 remove Smart Group by Id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: delete:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Delete Smart Mobile Device Groups.
 func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
@@ -212,6 +236,9 @@ func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) 
 }
 
 // ListSmartMobileDeviceGroupMembershipV2 get Smart Group Membership by Id.
+//
+// Required privileges: read:pro:mobile-device-groups, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Mobile Devices.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
@@ -244,6 +271,9 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id 
 // ListSmartMobileDeviceGroupMembershipV1 get Smart Group Membership by Id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:mobile-device-groups, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Mobile Devices.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListSmartMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
@@ -274,6 +304,8 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV1(ctx context.Context, id 
 }
 
 // ListStaticMobileDeviceGroupsV2 get Static Groups.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
 func (c *Client) ListStaticMobileDeviceGroupsV2(ctx context.Context, sort []string, filter string) ([]StaticGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
@@ -306,6 +338,8 @@ func (c *Client) ListStaticMobileDeviceGroupsV2(ctx context.Context, sort []stri
 // ListStaticMobileDeviceGroupsV1 get Static Groups.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
 func (c *Client) ListStaticMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]StaticGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
@@ -336,6 +370,8 @@ func (c *Client) ListStaticMobileDeviceGroupsV1(ctx context.Context, sort []stri
 }
 
 // CreateStaticMobileDeviceGroupV2 create a static group.
+//
+// Required privileges: create:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Create Static Mobile Device Groups.
 func (c *Client) CreateStaticMobileDeviceGroupV2(ctx context.Context, request *StaticGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -356,6 +392,8 @@ func (c *Client) CreateStaticMobileDeviceGroupV2(ctx context.Context, request *S
 // CreateStaticMobileDeviceGroupV1 create membership of a static group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: create:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Create Static Mobile Device Groups.
 func (c *Client) CreateStaticMobileDeviceGroupV1(ctx context.Context, request *StaticGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -374,6 +412,8 @@ func (c *Client) CreateStaticMobileDeviceGroupV1(ctx context.Context, request *S
 }
 
 // GetStaticMobileDeviceGroupV2 get Static Group by Id.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
 func (c *Client) GetStaticMobileDeviceGroupV2(ctx context.Context, id string) (*StaticGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result StaticGroup
@@ -387,6 +427,8 @@ func (c *Client) GetStaticMobileDeviceGroupV2(ctx context.Context, id string) (*
 // GetStaticMobileDeviceGroupV1 get Static Group by Id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
 func (c *Client) GetStaticMobileDeviceGroupV1(ctx context.Context, id string) (*StaticGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result StaticGroup
@@ -398,6 +440,8 @@ func (c *Client) GetStaticMobileDeviceGroupV1(ctx context.Context, id string) (*
 }
 
 // DeleteStaticMobileDeviceGroupV2 remove Static Group by Id.
+//
+// Required privileges: delete:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Delete Static Mobile Device Groups.
 func (c *Client) DeleteStaticMobileDeviceGroupV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
@@ -410,6 +454,8 @@ func (c *Client) DeleteStaticMobileDeviceGroupV2(ctx context.Context, id string)
 // DeleteStaticMobileDeviceGroupV1 remove Static Group by Id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: delete:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Delete Static Mobile Device Groups.
 func (c *Client) DeleteStaticMobileDeviceGroupV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
@@ -420,6 +466,8 @@ func (c *Client) DeleteStaticMobileDeviceGroupV1(ctx context.Context, id string)
 }
 
 // PatchStaticMobileDeviceGroupV2 update a static group.
+//
+// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Static Mobile Device Groups.
 func (c *Client) PatchStaticMobileDeviceGroupV2(ctx context.Context, id string, request *StaticGroupAssignment) (*StaticGroupAssignment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result StaticGroupAssignment
@@ -433,6 +481,8 @@ func (c *Client) PatchStaticMobileDeviceGroupV2(ctx context.Context, id string, 
 // PatchStaticMobileDeviceGroupV1 update membership of a static group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Static Mobile Device Groups.
 func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, request *StaticGroupAssignment) (*StaticGroupAssignment, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result StaticGroupAssignment
@@ -444,6 +494,9 @@ func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, 
 }
 
 // ListStaticMobileDeviceGroupMembershipV2 get Static Group Membership by Id.
+//
+// Required privileges: read:pro:mobile-device-groups, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups, Read Mobile Devices.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
@@ -476,6 +529,9 @@ func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id
 // ListStaticMobileDeviceGroupMembershipV1 get Static Group Membership by Id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: read:pro:mobile-device-groups, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups, Read Mobile Devices.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListStaticMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
@@ -506,6 +562,9 @@ func (c *Client) ListStaticMobileDeviceGroupMembershipV1(ctx context.Context, id
 }
 
 // EraseMobileDeviceGroupV2 erase all devices in the group.
+//
+// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) EraseMobileDeviceGroupV2(ctx context.Context, id string, request *GroupResetRequest) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/%s/erase", prefix, url.PathEscape(id))
@@ -518,6 +577,9 @@ func (c *Client) EraseMobileDeviceGroupV2(ctx context.Context, id string, reques
 // EraseMobileDeviceGroupV1 erase all devices in the group.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
+//
+// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) EraseMobileDeviceGroupV1(ctx context.Context, id string, request *GroupResetRequest) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/%s/erase", prefix, url.PathEscape(id))

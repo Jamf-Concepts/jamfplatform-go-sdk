@@ -16,6 +16,8 @@ import (
 )
 
 // GetPolicyByID finds policies by ID.
+//
+// Required privileges: read:pro:policies.
 func (c *Client) GetPolicyByID(ctx context.Context, id string) (*Policy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Policy
@@ -27,6 +29,8 @@ func (c *Client) GetPolicyByID(ctx context.Context, id string) (*Policy, error) 
 }
 
 // GetPolicyByName finds policies by name.
+//
+// Required privileges: read:pro:policies.
 func (c *Client) GetPolicyByName(ctx context.Context, name string) (*Policy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Policy
@@ -38,6 +42,8 @@ func (c *Client) GetPolicyByName(ctx context.Context, name string) (*Policy, err
 }
 
 // CreatePolicyByID creates a new policy by ID.
+//
+// Required privileges: create:pro:policies.
 func (c *Client) CreatePolicyByID(ctx context.Context, id string, request *PolicyPost) (*Policy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Policy
@@ -49,6 +55,8 @@ func (c *Client) CreatePolicyByID(ctx context.Context, id string, request *Polic
 }
 
 // UpdatePolicyByID updates an existing policy by ID.
+//
+// Required privileges: update:pro:policies.
 func (c *Client) UpdatePolicyByID(ctx context.Context, id string, request *PolicyPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/id/%s", prefix, url.PathEscape(id))
@@ -59,6 +67,8 @@ func (c *Client) UpdatePolicyByID(ctx context.Context, id string, request *Polic
 }
 
 // UpdatePolicyByName updates an existing policy by name.
+//
+// Required privileges: update:pro:policies.
 func (c *Client) UpdatePolicyByName(ctx context.Context, name string, request *PolicyPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/name/%s", prefix, url.PathEscape(name))
@@ -69,6 +79,8 @@ func (c *Client) UpdatePolicyByName(ctx context.Context, name string, request *P
 }
 
 // DeletePolicyByID deletes a policy by ID.
+//
+// Required privileges: delete:pro:policies.
 func (c *Client) DeletePolicyByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/id/%s", prefix, url.PathEscape(id))
@@ -79,6 +91,8 @@ func (c *Client) DeletePolicyByID(ctx context.Context, id string) error {
 }
 
 // DeletePolicyByName deletes a policy by name.
+//
+// Required privileges: delete:pro:policies.
 func (c *Client) DeletePolicyByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeletePolicyByName(ctx context.Context, name string) error {
 }
 
 // ListPolicies finds all policies.
+//
+// Required privileges: read:pro:policies.
 func (c *Client) ListPolicies(ctx context.Context) (*Policies, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Policies
@@ -100,6 +116,8 @@ func (c *Client) ListPolicies(ctx context.Context) (*Policies, error) {
 }
 
 // GetPolicyByCategory finds all policies by category.
+//
+// Required privileges: read:pro:policies.
 func (c *Client) GetPolicyByCategory(ctx context.Context, category string) (*Policy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Policy
@@ -111,6 +129,8 @@ func (c *Client) GetPolicyByCategory(ctx context.Context, category string) (*Pol
 }
 
 // GetPolicyByCreatedBy finds all policies by type.
+//
+// Required privileges: read:pro:policies.
 func (c *Client) GetPolicyByCreatedBy(ctx context.Context, createdBy string) (*Policy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Policy
@@ -122,6 +142,8 @@ func (c *Client) GetPolicyByCreatedBy(ctx context.Context, createdBy string) (*P
 }
 
 // GetPolicyByIDSubset finds a subset of data for a policy.
+//
+// Required privileges: read:pro:policies.
 func (c *Client) GetPolicyByIDSubset(ctx context.Context, id string, subset string) (*Policy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Policy
@@ -133,6 +155,8 @@ func (c *Client) GetPolicyByIDSubset(ctx context.Context, id string, subset stri
 }
 
 // CreatePolicyByName creates a new policy by ID.
+//
+// Required privileges: create:pro:policies.
 func (c *Client) CreatePolicyByName(ctx context.Context, name string, request *PolicyPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/name/%s", prefix, url.PathEscape(name))

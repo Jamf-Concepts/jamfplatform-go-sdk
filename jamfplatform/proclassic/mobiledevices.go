@@ -13,6 +13,8 @@ import (
 )
 
 // GetMobileDeviceByID finds mobile devices by ID.
+//
+// Required privileges: read:pro:mobile-devices.
 func (c *Client) GetMobileDeviceByID(ctx context.Context, id string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice
@@ -24,6 +26,8 @@ func (c *Client) GetMobileDeviceByID(ctx context.Context, id string) (*MobileDev
 }
 
 // GetMobileDeviceByName finds mobile devices by name.
+//
+// Required privileges: read:pro:mobile-devices.
 func (c *Client) GetMobileDeviceByName(ctx context.Context, name string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice
@@ -35,6 +39,8 @@ func (c *Client) GetMobileDeviceByName(ctx context.Context, name string) (*Mobil
 }
 
 // GetMobileDeviceBySerialNumber finds mobile devices by serial number.
+//
+// Required privileges: read:pro:mobile-devices.
 func (c *Client) GetMobileDeviceBySerialNumber(ctx context.Context, serialNumber string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice
@@ -46,6 +52,8 @@ func (c *Client) GetMobileDeviceBySerialNumber(ctx context.Context, serialNumber
 }
 
 // GetMobileDeviceByUDID finds mobile devices by UDID.
+//
+// Required privileges: read:pro:mobile-devices.
 func (c *Client) GetMobileDeviceByUDID(ctx context.Context, udid string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice
@@ -57,6 +65,8 @@ func (c *Client) GetMobileDeviceByUDID(ctx context.Context, udid string) (*Mobil
 }
 
 // GetMobileDeviceByMacAddress finds mobile devices by Mac address.
+//
+// Required privileges: read:pro:mobile-devices.
 func (c *Client) GetMobileDeviceByMacAddress(ctx context.Context, macAddress string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice
@@ -68,6 +78,9 @@ func (c *Client) GetMobileDeviceByMacAddress(ctx context.Context, macAddress str
 }
 
 // CreateMobileDeviceByID creates a new mobile device by ID.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceByID(ctx context.Context, id string, request *MobileDevicePost) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice
@@ -79,6 +92,9 @@ func (c *Client) CreateMobileDeviceByID(ctx context.Context, id string, request 
 }
 
 // UpdateMobileDeviceByID updates an existing mobile device by ID.
+//
+// Required privileges: update:pro:mobile-devices, update:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) UpdateMobileDeviceByID(ctx context.Context, id string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/id/%s", prefix, url.PathEscape(id))
@@ -89,6 +105,9 @@ func (c *Client) UpdateMobileDeviceByID(ctx context.Context, id string, request 
 }
 
 // UpdateMobileDeviceByName updates an existing mobile device by name.
+//
+// Required privileges: update:pro:mobile-devices, update:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) UpdateMobileDeviceByName(ctx context.Context, name string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s", prefix, url.PathEscape(name))
@@ -99,6 +118,9 @@ func (c *Client) UpdateMobileDeviceByName(ctx context.Context, name string, requ
 }
 
 // UpdateMobileDeviceBySerialNumber updates an existing mobile device by serial number.
+//
+// Required privileges: update:pro:mobile-devices, update:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) UpdateMobileDeviceBySerialNumber(ctx context.Context, serialNumber string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s", prefix, url.PathEscape(serialNumber))
@@ -109,6 +131,9 @@ func (c *Client) UpdateMobileDeviceBySerialNumber(ctx context.Context, serialNum
 }
 
 // UpdateMobileDeviceByUDID updates an existing mobile device by UDID.
+//
+// Required privileges: update:pro:mobile-devices, update:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) UpdateMobileDeviceByUDID(ctx context.Context, udid string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s", prefix, url.PathEscape(udid))
@@ -119,6 +144,9 @@ func (c *Client) UpdateMobileDeviceByUDID(ctx context.Context, udid string, requ
 }
 
 // UpdateMobileDeviceByMacAddress updates an existing mobile device by Mac address.
+//
+// Required privileges: update:pro:mobile-devices, update:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) UpdateMobileDeviceByMacAddress(ctx context.Context, macAddress string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s", prefix, url.PathEscape(macAddress))
@@ -129,6 +157,8 @@ func (c *Client) UpdateMobileDeviceByMacAddress(ctx context.Context, macAddress 
 }
 
 // DeleteMobileDeviceByID deletes a mobile device by ID.
+//
+// Required privileges: delete:pro:mobile-devices.
 func (c *Client) DeleteMobileDeviceByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/id/%s", prefix, url.PathEscape(id))
@@ -139,6 +169,8 @@ func (c *Client) DeleteMobileDeviceByID(ctx context.Context, id string) error {
 }
 
 // DeleteMobileDeviceByName deletes a mobile device by name.
+//
+// Required privileges: delete:pro:mobile-devices.
 func (c *Client) DeleteMobileDeviceByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s", prefix, url.PathEscape(name))
@@ -149,6 +181,8 @@ func (c *Client) DeleteMobileDeviceByName(ctx context.Context, name string) erro
 }
 
 // DeleteMobileDeviceBySerialNumber deletes a mobile device by serial number.
+//
+// Required privileges: delete:pro:mobile-devices.
 func (c *Client) DeleteMobileDeviceBySerialNumber(ctx context.Context, serialNumber string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s", prefix, url.PathEscape(serialNumber))
@@ -159,6 +193,8 @@ func (c *Client) DeleteMobileDeviceBySerialNumber(ctx context.Context, serialNum
 }
 
 // DeleteMobileDeviceByUDID deletes a mobile device by UDID.
+//
+// Required privileges: delete:pro:mobile-devices.
 func (c *Client) DeleteMobileDeviceByUDID(ctx context.Context, udid string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s", prefix, url.PathEscape(udid))
@@ -169,6 +205,8 @@ func (c *Client) DeleteMobileDeviceByUDID(ctx context.Context, udid string) erro
 }
 
 // DeleteMobileDeviceByMacAddress deletes a mobile device by Mac address.
+//
+// Required privileges: delete:pro:mobile-devices.
 func (c *Client) DeleteMobileDeviceByMacAddress(ctx context.Context, macAddress string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s", prefix, url.PathEscape(macAddress))
@@ -179,6 +217,8 @@ func (c *Client) DeleteMobileDeviceByMacAddress(ctx context.Context, macAddress 
 }
 
 // ListMobileDevices finds all mobile devices.
+//
+// Required privileges: read:pro:mobile-devices.
 func (c *Client) ListMobileDevices(ctx context.Context) (*MobileDevices, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevices
@@ -190,6 +230,8 @@ func (c *Client) ListMobileDevices(ctx context.Context) (*MobileDevices, error) 
 }
 
 // GetMobileDeviceByIDSubset finds a subset of data for a mobile device.
+//
+// Required privileges: read:pro:mobile-devices.
 func (c *Client) GetMobileDeviceByIDSubset(ctx context.Context, id string, subset string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice
@@ -201,6 +243,8 @@ func (c *Client) GetMobileDeviceByIDSubset(ctx context.Context, id string, subse
 }
 
 // GetMobileDeviceByMatch searches for mobile devices that match the provided parameter.
+//
+// Required privileges: read:pro:mobile-devices.
 func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice
@@ -212,6 +256,9 @@ func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*Mob
 }
 
 // CreateMobileDeviceByName creates a new mobile device by ID.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceByName(ctx context.Context, name string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s", prefix, url.PathEscape(name))
@@ -222,6 +269,9 @@ func (c *Client) CreateMobileDeviceByName(ctx context.Context, name string, requ
 }
 
 // CreateMobileDeviceBySerialNumber creates a new mobile device by ID.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceBySerialNumber(ctx context.Context, serialNumber string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s", prefix, url.PathEscape(serialNumber))
@@ -232,6 +282,9 @@ func (c *Client) CreateMobileDeviceBySerialNumber(ctx context.Context, serialNum
 }
 
 // CreateMobileDeviceByMacAddress creates a new mobile device by ID.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceByMacAddress(ctx context.Context, macaddress string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s", prefix, url.PathEscape(macaddress))
@@ -242,6 +295,9 @@ func (c *Client) CreateMobileDeviceByMacAddress(ctx context.Context, macaddress 
 }
 
 // CreateMobileDeviceByUDID creates a new mobile device by ID.
+//
+// Required privileges: create:pro:mobile-devices, create:pro:users.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateMobileDeviceByUDID(ctx context.Context, udid string, request *MobileDevicePost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s", prefix, url.PathEscape(udid))

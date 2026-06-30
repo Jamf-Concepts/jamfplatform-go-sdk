@@ -24,12 +24,12 @@ type Config struct {
 type SpecDef struct {
 	File               string                       `json:"file"`
 	Namespace          string                       `json:"namespace"`
-	SpecFile           string                       `json:"specFile,omitempty"`   // override published spec filename
-	Package            string                       `json:"package,omitempty"`    // target Go sub-package under jamfplatform/; empty emits to root (legacy)
-	SplitByTag         bool                         `json:"splitByTag,omitempty"` // emit one methods file per OpenAPI tag instead of one per spec
-	Format             string                       `json:"format,omitempty"`     // "json" (default) or "xml" — drives struct tag style and transport codec
-	RawBody            bool                         `json:"rawBody,omitempty"`    // generate methods that take/return []byte instead of typed structs; consumer owns marshaling (used for Classic where spec has no useful types)
-	TypesOnly          bool                         `json:"typesOnly,omitempty"`  // generate only Go types from all schemas — no client methods, no method tests, no client.go; used for specs that define types consumed in other API payloads (e.g. blueprint component configurations)
+	SpecFile           string                       `json:"specFile,omitempty"`     // override published spec filename
+	Package            string                       `json:"package,omitempty"`      // target Go sub-package under jamfplatform/; empty emits to root (legacy)
+	SplitByTag         bool                         `json:"splitByTag,omitempty"`   // emit one methods file per OpenAPI tag instead of one per spec
+	Format             string                       `json:"format,omitempty"`       // "json" (default) or "xml" — drives struct tag style and transport codec
+	RawBody            bool                         `json:"rawBody,omitempty"`      // generate methods that take/return []byte instead of typed structs; consumer owns marshaling (used for Classic where spec has no useful types)
+	TypesOnly          bool                         `json:"typesOnly,omitempty"`    // generate only Go types from all schemas — no client methods, no method tests, no client.go; used for specs that define types consumed in other API payloads (e.g. blueprint component configurations)
 	Undocumented       bool                         `json:"undocumented,omitempty"` // all operations in this spec are unofficial/reverse-engineered; emits an "Unofficial:" godoc warning on every generated method
 	Operations         []OperationDef               `json:"operations"`
 	ExcludePaths       []string                     `json:"excludePaths,omitempty"`       // "METHOD /path" entries the generator must refuse to include

@@ -16,6 +16,8 @@ import (
 )
 
 // GetPrinterByID finds printers by ID.
+//
+// Required privileges: read:pro:printers.
 func (c *Client) GetPrinterByID(ctx context.Context, id string) (*Printer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Printer
@@ -27,6 +29,8 @@ func (c *Client) GetPrinterByID(ctx context.Context, id string) (*Printer, error
 }
 
 // CreatePrinterByID creates a new printer by ID.
+//
+// Required privileges: create:pro:printers.
 func (c *Client) CreatePrinterByID(ctx context.Context, id string, request *Printer) (*Printer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Printer
@@ -38,6 +42,8 @@ func (c *Client) CreatePrinterByID(ctx context.Context, id string, request *Prin
 }
 
 // UpdatePrinterByID updates an existing printer by ID.
+//
+// Required privileges: update:pro:printers.
 func (c *Client) UpdatePrinterByID(ctx context.Context, id string, request *Printer) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdatePrinterByID(ctx context.Context, id string, request *Prin
 }
 
 // DeletePrinterByID deletes a printer by ID.
+//
+// Required privileges: delete:pro:printers.
 func (c *Client) DeletePrinterByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeletePrinterByID(ctx context.Context, id string) error {
 }
 
 // GetPrinterByName finds printers by name.
+//
+// Required privileges: read:pro:printers.
 func (c *Client) GetPrinterByName(ctx context.Context, name string) (*Printer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Printer
@@ -69,6 +79,8 @@ func (c *Client) GetPrinterByName(ctx context.Context, name string) (*Printer, e
 }
 
 // UpdatePrinterByName updates an existing printer by name.
+//
+// Required privileges: update:pro:printers.
 func (c *Client) UpdatePrinterByName(ctx context.Context, name string, request *Printer) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdatePrinterByName(ctx context.Context, name string, request *
 }
 
 // DeletePrinterByName deletes a printer by name.
+//
+// Required privileges: delete:pro:printers.
 func (c *Client) DeletePrinterByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeletePrinterByName(ctx context.Context, name string) error {
 }
 
 // ListPrinters finds all printers.
+//
+// Required privileges: read:pro:printers.
 func (c *Client) ListPrinters(ctx context.Context) (*Printers, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Printers
@@ -100,6 +116,8 @@ func (c *Client) ListPrinters(ctx context.Context) (*Printers, error) {
 }
 
 // CreatePrinterByName creates a new printer by ID.
+//
+// Required privileges: create:pro:printers.
 func (c *Client) CreatePrinterByName(ctx context.Context, name string, request *Printer) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))

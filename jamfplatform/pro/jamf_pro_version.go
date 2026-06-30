@@ -12,6 +12,8 @@ import (
 )
 
 // GetJamfProVersionV1 return information about the Jamf Pro including the current version.
+//
+// Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetJamfProVersionV1(ctx context.Context) (*JamfProVersion, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result JamfProVersion

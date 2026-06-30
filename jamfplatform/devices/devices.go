@@ -18,6 +18,8 @@ import (
 )
 
 // ListDevices get all devices.
+//
+// Required privileges: read:pro:devices.
 func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
@@ -47,6 +49,8 @@ func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) 
 }
 
 // GetDevice get a device by ID.
+//
+// Required privileges: read:pro:devices.
 func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	var result DeviceReadRepresentationV1
@@ -58,6 +62,8 @@ func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresent
 }
 
 // UpdateDevice update a device.
+//
+// Required privileges: update:pro:devices.
 func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpdateRepresentationV1) error {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
@@ -68,6 +74,8 @@ func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpd
 }
 
 // DeleteDevice delete a device.
+//
+// Required privileges: delete:pro:devices.
 func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
@@ -78,6 +86,8 @@ func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 }
 
 // ListDeviceApplications get installed applications for a device.
+//
+// Required privileges: read:pro:devices.
 func (c *Client) ListDeviceApplications(ctx context.Context, id string, sort []string, filter string) ([]DeviceInstalledApplicationReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceInstalledApplicationReadRepresentationV1, bool, error) {

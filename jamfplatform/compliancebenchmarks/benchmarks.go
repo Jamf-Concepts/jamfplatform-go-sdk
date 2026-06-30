@@ -14,6 +14,8 @@ import (
 )
 
 // ListBenchmarks return list of tenant benchmarks.
+//
+// Required privileges: read:pro:compliance-benchmarks.
 func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarksResponseV2
@@ -25,6 +27,8 @@ func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, err
 }
 
 // CreateBenchmark create a new benchmark from provided benchmark request.
+//
+// Required privileges: create:pro:compliance-benchmarks.
 func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV2) (*BenchmarkResponseV2, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
@@ -36,6 +40,8 @@ func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV
 }
 
 // GetBenchmark return benchmark for given benchmark ID.
+//
+// Required privileges: read:pro:compliance-benchmarks.
 func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkResponseV2, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
@@ -47,6 +53,8 @@ func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkRespons
 }
 
 // DeleteBenchmark remove benchmark with given benchmark ID.
+//
+// Required privileges: delete:pro:compliance-benchmarks.
 func (c *Client) DeleteBenchmark(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	endpoint := fmt.Sprintf("%s/benchmarks/%s", prefix, url.PathEscape(id))

@@ -16,6 +16,8 @@ import (
 )
 
 // GetLDAPServerByID finds LDAP servers by ID.
+//
+// Required privileges: read:pro:ldap-servers.
 func (c *Client) GetLDAPServerByID(ctx context.Context, id string) (*LdapServer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LdapServer
@@ -27,6 +29,8 @@ func (c *Client) GetLDAPServerByID(ctx context.Context, id string) (*LdapServer,
 }
 
 // CreateLDAPServerByID creates a new LDAP server by ID.
+//
+// Required privileges: create:pro:ldap-servers.
 func (c *Client) CreateLDAPServerByID(ctx context.Context, id string, request *LdapServerPost) (*LdapServer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LdapServer
@@ -38,6 +42,8 @@ func (c *Client) CreateLDAPServerByID(ctx context.Context, id string, request *L
 }
 
 // UpdateLDAPServerByID updates an existing LDAP server by ID.
+//
+// Required privileges: update:pro:ldap-servers.
 func (c *Client) UpdateLDAPServerByID(ctx context.Context, id string, request *LdapServerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateLDAPServerByID(ctx context.Context, id string, request *L
 }
 
 // DeleteLDAPServerByID deletes an LDAP server by ID.
+//
+// Required privileges: delete:pro:ldap-servers.
 func (c *Client) DeleteLDAPServerByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteLDAPServerByID(ctx context.Context, id string) error {
 }
 
 // GetLDAPServerByName finds LDAP servers by name.
+//
+// Required privileges: read:pro:ldap-servers.
 func (c *Client) GetLDAPServerByName(ctx context.Context, name string) (*LdapServer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LdapServer
@@ -69,6 +79,8 @@ func (c *Client) GetLDAPServerByName(ctx context.Context, name string) (*LdapSer
 }
 
 // UpdateLDAPServerByName updates an existing LDAP server by name.
+//
+// Required privileges: update:pro:ldap-servers.
 func (c *Client) UpdateLDAPServerByName(ctx context.Context, name string, request *LdapServerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateLDAPServerByName(ctx context.Context, name string, reques
 }
 
 // DeleteLDAPServerByName deletes an LDAP server by name.
+//
+// Required privileges: delete:pro:ldap-servers.
 func (c *Client) DeleteLDAPServerByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteLDAPServerByName(ctx context.Context, name string) error 
 }
 
 // ListLDAPServers finds all LDAP servers.
+//
+// Required privileges: read:pro:ldap-servers.
 func (c *Client) ListLDAPServers(ctx context.Context) (*LdapServers, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LdapServers
@@ -100,6 +116,8 @@ func (c *Client) ListLDAPServers(ctx context.Context) (*LdapServers, error) {
 }
 
 // GetLDAPServerByIDGroup display information for matching groups for an LDAP server.
+//
+// Required privileges: read:pro:ldap-servers.
 func (c *Client) GetLDAPServerByIDGroup(ctx context.Context, id string, group string) (*LdapServer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LdapServer
@@ -111,6 +129,8 @@ func (c *Client) GetLDAPServerByIDGroup(ctx context.Context, id string, group st
 }
 
 // GetLDAPServerByIDGroupUser display information about user membership in a group for an LDAP server.
+//
+// Required privileges: read:pro:ldap-servers.
 func (c *Client) GetLDAPServerByIDGroupUser(ctx context.Context, id string, group string, user string) (*LdapServer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LdapServer
@@ -122,6 +142,8 @@ func (c *Client) GetLDAPServerByIDGroupUser(ctx context.Context, id string, grou
 }
 
 // GetLDAPServerByIDUser display information for matching users for an LDAP server.
+//
+// Required privileges: read:pro:ldap-servers.
 func (c *Client) GetLDAPServerByIDUser(ctx context.Context, id string, user string) (*LdapServer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LdapServer
@@ -133,6 +155,8 @@ func (c *Client) GetLDAPServerByIDUser(ctx context.Context, id string, user stri
 }
 
 // CreateLDAPServerByName creates a new LDAP server by ID.
+//
+// Required privileges: create:pro:ldap-servers.
 func (c *Client) CreateLDAPServerByName(ctx context.Context, name string, request *LdapServerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))

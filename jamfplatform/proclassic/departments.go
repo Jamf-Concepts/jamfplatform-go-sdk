@@ -16,6 +16,8 @@ import (
 )
 
 // GetDepartmentByID finds departments by ID.
+//
+// Required privileges: read:pro:departments.
 func (c *Client) GetDepartmentByID(ctx context.Context, id string) (*Department, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Department
@@ -27,6 +29,8 @@ func (c *Client) GetDepartmentByID(ctx context.Context, id string) (*Department,
 }
 
 // CreateDepartmentByID creates a new department by ID.
+//
+// Required privileges: create:pro:departments.
 func (c *Client) CreateDepartmentByID(ctx context.Context, id string, request *Department) (*Department, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Department
@@ -38,6 +42,8 @@ func (c *Client) CreateDepartmentByID(ctx context.Context, id string, request *D
 }
 
 // UpdateDepartmentByID updates an existing department by ID.
+//
+// Required privileges: update:pro:departments.
 func (c *Client) UpdateDepartmentByID(ctx context.Context, id string, request *Department) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateDepartmentByID(ctx context.Context, id string, request *D
 }
 
 // DeleteDepartmentByID deletes a department by ID.
+//
+// Required privileges: delete:pro:departments.
 func (c *Client) DeleteDepartmentByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteDepartmentByID(ctx context.Context, id string) error {
 }
 
 // GetDepartmentByName finds departments by name.
+//
+// Required privileges: read:pro:departments.
 func (c *Client) GetDepartmentByName(ctx context.Context, name string) (*Department, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Department
@@ -69,6 +79,8 @@ func (c *Client) GetDepartmentByName(ctx context.Context, name string) (*Departm
 }
 
 // UpdateDepartmentByName updates an existing department by name.
+//
+// Required privileges: update:pro:departments.
 func (c *Client) UpdateDepartmentByName(ctx context.Context, name string, request *Department) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateDepartmentByName(ctx context.Context, name string, reques
 }
 
 // DeleteDepartmentByName deletes a department by name.
+//
+// Required privileges: delete:pro:departments.
 func (c *Client) DeleteDepartmentByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteDepartmentByName(ctx context.Context, name string) error 
 }
 
 // ListDepartments finds all departments.
+//
+// Required privileges: read:pro:departments.
 func (c *Client) ListDepartments(ctx context.Context) (*Departments, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Departments
@@ -100,6 +116,8 @@ func (c *Client) ListDepartments(ctx context.Context) (*Departments, error) {
 }
 
 // CreateDepartmentByName creates a new department by ID.
+//
+// Required privileges: create:pro:departments.
 func (c *Client) CreateDepartmentByName(ctx context.Context, name string, request *Department) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))

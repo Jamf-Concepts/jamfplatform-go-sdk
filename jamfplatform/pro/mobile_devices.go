@@ -18,6 +18,8 @@ import (
 )
 
 // ListMobileDevicesDetailV2 return paginated Mobile Device Inventory records.
+//
+// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string, sort []string, filter string) ([]MobileDeviceResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
@@ -51,6 +53,8 @@ func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string
 }
 
 // ListMobileDevicesV2 get Mobile Device objects.
+//
+// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 func (c *Client) ListMobileDevicesV2(ctx context.Context, sort []string) ([]MobileDeviceV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceV2, bool, error) {
@@ -78,6 +82,8 @@ func (c *Client) ListMobileDevicesV2(ctx context.Context, sort []string) ([]Mobi
 }
 
 // GetMobileDeviceV2 get Mobile Device.
+//
+// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 func (c *Client) GetMobileDeviceV2(ctx context.Context, id string) (*MobileDeviceV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result MobileDeviceV2
@@ -89,6 +95,8 @@ func (c *Client) GetMobileDeviceV2(ctx context.Context, id string) (*MobileDevic
 }
 
 // PatchMobileDeviceV2 update fields on a mobile device that are allowed to be modified by users.
+//
+// Required privileges: update:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Update Mobile Devices.
 func (c *Client) PatchMobileDeviceV2(ctx context.Context, id string, request *UpdateMobileDeviceV2) (*MobileDeviceDetailsV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result MobileDeviceDetailsV2
@@ -100,6 +108,8 @@ func (c *Client) PatchMobileDeviceV2(ctx context.Context, id string, request *Up
 }
 
 // GetMobileDeviceDetailV2 get Mobile Device.
+//
+// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 func (c *Client) GetMobileDeviceDetailV2(ctx context.Context, id string) (*MobileDeviceDetailsGetV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result MobileDeviceDetailsGetV2
@@ -111,6 +121,8 @@ func (c *Client) GetMobileDeviceDetailV2(ctx context.Context, id string) (*Mobil
 }
 
 // EraseMobileDeviceV2 erase a Mobile Device.
+//
+// Required privileges: execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Mobile Device Remote Wipe Command.
 func (c *Client) EraseMobileDeviceV2(ctx context.Context, id string, request *EraseDeviceMobileDeviceRequest) (*EraseDeviceMobileDeviceResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result EraseDeviceMobileDeviceResponse
@@ -122,6 +134,8 @@ func (c *Client) EraseMobileDeviceV2(ctx context.Context, id string, request *Er
 }
 
 // ListMobileDevicePairedDevicesV2 return paginated Mobile Device Inventory records of all paired devices for the device.
+//
+// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 func (c *Client) ListMobileDevicePairedDevicesV2(ctx context.Context, id string, section []string, sort []string, filter string) ([]MobileDeviceResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
@@ -155,6 +169,8 @@ func (c *Client) ListMobileDevicePairedDevicesV2(ctx context.Context, id string,
 }
 
 // UnmanageMobileDeviceV2 unmanage a Mobile Device.
+//
+// Required privileges: execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Unmanage Mobile Devices.
 func (c *Client) UnmanageMobileDeviceV2(ctx context.Context, id string) (*UnmanageMobileDeviceResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result UnmanageMobileDeviceResponse

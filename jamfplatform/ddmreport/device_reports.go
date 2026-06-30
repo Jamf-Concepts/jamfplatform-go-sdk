@@ -19,6 +19,9 @@ import (
 // GetDeviceDeclarationReport get device report declarations.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-17) and may be removed in a future release.
+//
+// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string) (*DeviceReportDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	var result DeviceReportDto
@@ -30,6 +33,9 @@ func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string
 }
 
 // GetDeviceDeclarationReportFiltered get filtered device report declarations.
+//
+// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceID string, filter string, sort []string) ([]FilteredResultDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
@@ -60,6 +66,9 @@ func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceI
 }
 
 // GetDeviceChannels get device channels.
+//
+// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetDeviceChannels(ctx context.Context, deviceID string) (*DeviceChannelsDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	var result DeviceChannelsDto

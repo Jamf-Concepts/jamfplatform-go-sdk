@@ -18,6 +18,9 @@ import (
 )
 
 // GetJamfConnectSettingsV1 get the Jamf Connect settings that you have access to see.
+//
+// Required privileges: read:pro:jamf-connect-deployments, read:pro:jamf-connect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Connect Settings, Read Jamf Connect Deployments.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetJamfConnectSettingsV1(ctx context.Context) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/jamf-connect"
@@ -28,6 +31,8 @@ func (c *Client) GetJamfConnectSettingsV1(ctx context.Context) error {
 }
 
 // ListJamfConnectConfigProfilesV1 search for config profiles linked to Jamf Connect.
+//
+// Required privileges: read:pro:jamf-connect-deployments. Legacy Jamf Pro privilege name(s): Read Jamf Connect Deployments.
 func (c *Client) ListJamfConnectConfigProfilesV1(ctx context.Context, sort []string, filter string) ([]LinkedConnectProfile, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]LinkedConnectProfile, bool, error) {
@@ -58,6 +63,8 @@ func (c *Client) ListJamfConnectConfigProfilesV1(ctx context.Context, sort []str
 }
 
 // UpdateJamfConnectConfigProfileV1 update the way the Jamf Connect app gets updated on computers within scope of the associated configuration profile.
+//
+// Required privileges: update:pro:jamf-connect-deployments. Legacy Jamf Pro privilege name(s): Update Jamf Connect Deployments.
 func (c *Client) UpdateJamfConnectConfigProfileV1(ctx context.Context, id string, request *LinkedConnectProfile) (*LinkedConnectProfile, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result LinkedConnectProfile
@@ -69,6 +76,8 @@ func (c *Client) UpdateJamfConnectConfigProfileV1(ctx context.Context, id string
 }
 
 // ListJamfConnectDeploymentTasksV1 search for deployment tasks for a config profile linked to Jamf Connect.
+//
+// Required privileges: read:pro:jamf-connect-deployments. Legacy Jamf Pro privilege name(s): Read Jamf Connect Deployments.
 func (c *Client) ListJamfConnectDeploymentTasksV1(ctx context.Context, id string, sort []string, filter string) ([]DeploymentTask, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
@@ -99,6 +108,8 @@ func (c *Client) ListJamfConnectDeploymentTasksV1(ctx context.Context, id string
 }
 
 // RetryJamfConnectDeploymentTasksV1 request a retry of Connect install tasks.
+//
+// Required privileges: deploy:pro:jamf-connect-deployment-retry. Legacy Jamf Pro privilege name(s): Jamf Connect Deployment Retry.
 func (c *Client) RetryJamfConnectDeploymentTasksV1(ctx context.Context, id string, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/jamf-connect/deployments/%s/tasks/retry", prefix, url.PathEscape(id))
@@ -109,6 +120,8 @@ func (c *Client) RetryJamfConnectDeploymentTasksV1(ctx context.Context, id strin
 }
 
 // ListJamfConnectHistoryV1 get Jamf Connect history.
+//
+// Required privileges: read:pro:jamf-connect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Connect Settings.
 func (c *Client) ListJamfConnectHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -139,6 +152,8 @@ func (c *Client) ListJamfConnectHistoryV1(ctx context.Context, sort []string, fi
 }
 
 // CreateJamfConnectHistoryNoteV1 add Jamf Connect history notes.
+//
+// Required privileges: update:pro:jamf-connect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Connect Settings.
 func (c *Client) CreateJamfConnectHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse

@@ -14,6 +14,8 @@ import (
 // ChangeUserPasswordV1 changes the user account password.
 //
 // This endpoint is rate-limited. The transport retries a 429 response once if the server returns a bounded Retry-After; otherwise the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy.
+//
+// Required privileges: execute:pro:change-password. Legacy Jamf Pro privilege name(s): Change Password.
 func (c *Client) ChangeUserPasswordV1(ctx context.Context, request *ChangePassword) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/user/change-password"

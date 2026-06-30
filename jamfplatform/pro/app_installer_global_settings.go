@@ -13,6 +13,8 @@ import (
 
 // GetAppInstallerGlobalSettingsV1 get App Installer global settings.
 //
+// Required privileges: read:pro:mac-applications. Legacy Jamf Pro privilege name(s): Read Mac Applications.
+//
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) GetAppInstallerGlobalSettingsV1(ctx context.Context) (*AppInstallerGlobalSettings, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -25,6 +27,8 @@ func (c *Client) GetAppInstallerGlobalSettingsV1(ctx context.Context) (*AppInsta
 }
 
 // UpdateAppInstallerGlobalSettingsV1 update App Installer global settings.
+//
+// Required privileges: update:pro:mac-applications. Legacy Jamf Pro privilege name(s): Update Mac Applications.
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) UpdateAppInstallerGlobalSettingsV1(ctx context.Context, request *AppInstallerGlobalSettings) (*AppInstallerGlobalSettings, error) {

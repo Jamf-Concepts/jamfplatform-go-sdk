@@ -16,6 +16,8 @@ import (
 )
 
 // GetLicensedSoftwareByID finds licensed software by ID.
+//
+// Required privileges: read:pro:licensed-software.
 func (c *Client) GetLicensedSoftwareByID(ctx context.Context, id string) (*LicensedSoftware, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LicensedSoftware
@@ -27,6 +29,8 @@ func (c *Client) GetLicensedSoftwareByID(ctx context.Context, id string) (*Licen
 }
 
 // CreateLicensedSoftwareByID creates new licensed software by ID.
+//
+// Required privileges: create:pro:licensed-software.
 func (c *Client) CreateLicensedSoftwareByID(ctx context.Context, id string, request *LicensedSoftware) (*LicensedSoftware, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LicensedSoftware
@@ -38,6 +42,8 @@ func (c *Client) CreateLicensedSoftwareByID(ctx context.Context, id string, requ
 }
 
 // UpdateLicensedSoftwareByID updates existing licensed software by ID.
+//
+// Required privileges: update:pro:licensed-software.
 func (c *Client) UpdateLicensedSoftwareByID(ctx context.Context, id string, request *LicensedSoftware) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/id/%s", prefix, url.PathEscape(id))
@@ -48,6 +54,8 @@ func (c *Client) UpdateLicensedSoftwareByID(ctx context.Context, id string, requ
 }
 
 // DeleteLicensedSoftwareByID deletes licensed software by ID.
+//
+// Required privileges: delete:pro:licensed-software.
 func (c *Client) DeleteLicensedSoftwareByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/id/%s", prefix, url.PathEscape(id))
@@ -58,6 +66,8 @@ func (c *Client) DeleteLicensedSoftwareByID(ctx context.Context, id string) erro
 }
 
 // GetLicensedSoftwareByName finds licensed software by name.
+//
+// Required privileges: read:pro:licensed-software.
 func (c *Client) GetLicensedSoftwareByName(ctx context.Context, name string) (*LicensedSoftware, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LicensedSoftware
@@ -69,6 +79,8 @@ func (c *Client) GetLicensedSoftwareByName(ctx context.Context, name string) (*L
 }
 
 // UpdateLicensedSoftwareByName updates an existing licensed software by name.
+//
+// Required privileges: update:pro:licensed-software.
 func (c *Client) UpdateLicensedSoftwareByName(ctx context.Context, name string, request *LicensedSoftware) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
@@ -79,6 +91,8 @@ func (c *Client) UpdateLicensedSoftwareByName(ctx context.Context, name string, 
 }
 
 // DeleteLicensedSoftwareByName deletes licensed software by name.
+//
+// Required privileges: delete:pro:licensed-software.
 func (c *Client) DeleteLicensedSoftwareByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
@@ -89,6 +103,8 @@ func (c *Client) DeleteLicensedSoftwareByName(ctx context.Context, name string) 
 }
 
 // ListLicensedSoftware finds all licensed software.
+//
+// Required privileges: read:pro:licensed-software.
 func (c *Client) ListLicensedSoftware(ctx context.Context) (*LicensedSoftwareAll, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result LicensedSoftwareAll
@@ -100,6 +116,8 @@ func (c *Client) ListLicensedSoftware(ctx context.Context) (*LicensedSoftwareAll
 }
 
 // CreateLicensedSoftwareByName creates new licensed software by ID.
+//
+// Required privileges: create:pro:licensed-software.
 func (c *Client) CreateLicensedSoftwareByName(ctx context.Context, name string, request *LicensedSoftware) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))

@@ -12,6 +12,8 @@ import (
 )
 
 // GetJamfProServerURLV1 get Jamf Pro Server URL settings.
+//
+// Required privileges: read:pro:jss-url. Legacy Jamf Pro privilege name(s): Read JSS URL.
 func (c *Client) GetJamfProServerURLV1(ctx context.Context) (*JamfProServerURL, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result JamfProServerURL
@@ -23,6 +25,8 @@ func (c *Client) GetJamfProServerURLV1(ctx context.Context) (*JamfProServerURL, 
 }
 
 // UpdateJamfProServerURLV1 update Jamf Pro Server URL settings.
+//
+// Required privileges: update:pro:jss-url. Legacy Jamf Pro privilege name(s): Update JSS URL.
 func (c *Client) UpdateJamfProServerURLV1(ctx context.Context, request *JamfProServerURL) (*JamfProServerURL, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result JamfProServerURL

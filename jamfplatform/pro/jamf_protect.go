@@ -17,6 +17,9 @@ import (
 )
 
 // GetJamfProtectSettingsV1 jamf Protect integration settings.
+//
+// Required privileges: read:pro:jamf-protect-deployments, read:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Protect Settings, Read Jamf Protect Deployments.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetJamfProtectSettingsV1(ctx context.Context) (*ProtectSettingsResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ProtectSettingsResponse
@@ -28,6 +31,8 @@ func (c *Client) GetJamfProtectSettingsV1(ctx context.Context) (*ProtectSettings
 }
 
 // UpdateJamfProtectSettingsV1 jamf Protect integration settings.
+//
+// Required privileges: update:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Protect Settings.
 func (c *Client) UpdateJamfProtectSettingsV1(ctx context.Context, request *ProtectUpdatableSettingsRequest) (*ProtectSettingsResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ProtectSettingsResponse
@@ -39,6 +44,8 @@ func (c *Client) UpdateJamfProtectSettingsV1(ctx context.Context, request *Prote
 }
 
 // UnregisterJamfProtectV1 delete Jamf Protect API registration.
+//
+// Required privileges: update:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Protect Settings.
 func (c *Client) UnregisterJamfProtectV1(ctx context.Context) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/jamf-protect"
@@ -49,6 +56,8 @@ func (c *Client) UnregisterJamfProtectV1(ctx context.Context) error {
 }
 
 // ListJamfProtectDeploymentTasksV1 search for deployment tasks for a config profile linked to Jamf Protect.
+//
+// Required privileges: read:pro:jamf-protect-deployments. Legacy Jamf Pro privilege name(s): Read Jamf Protect Deployments.
 func (c *Client) ListJamfProtectDeploymentTasksV1(ctx context.Context, id string, sort []string, filter string) ([]DeploymentTask, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
@@ -79,6 +88,8 @@ func (c *Client) ListJamfProtectDeploymentTasksV1(ctx context.Context, id string
 }
 
 // RetryJamfProtectDeploymentTasksV1 request a retry of Protect install tasks.
+//
+// Required privileges: deploy:pro:jamf-protect-deployment-retry. Legacy Jamf Pro privilege name(s): Jamf Protect Deployment Retry.
 func (c *Client) RetryJamfProtectDeploymentTasksV1(ctx context.Context, id string, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/jamf-protect/deployments/%s/tasks/retry", prefix, url.PathEscape(id))
@@ -89,6 +100,8 @@ func (c *Client) RetryJamfProtectDeploymentTasksV1(ctx context.Context, id strin
 }
 
 // ListJamfProtectHistoryV1 get Jamf Protect history.
+//
+// Required privileges: read:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Protect Settings.
 func (c *Client) ListJamfProtectHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -119,6 +132,8 @@ func (c *Client) ListJamfProtectHistoryV1(ctx context.Context, sort []string, fi
 }
 
 // CreateJamfProtectHistoryNoteV1 add Jamf Protect history notes.
+//
+// Required privileges: update:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Protect Settings.
 func (c *Client) CreateJamfProtectHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -130,6 +145,8 @@ func (c *Client) CreateJamfProtectHistoryNoteV1(ctx context.Context, request *Ob
 }
 
 // ListJamfProtectPlansV1 get all of the previously synced Jamf Protect Plans with information about their associated configuration profile.
+//
+// Required privileges: read:pro:jamf-protect-deployments. Legacy Jamf Pro privilege name(s): Read Jamf Protect Deployments.
 func (c *Client) ListJamfProtectPlansV1(ctx context.Context, sort []string, filter string) ([]JamfProtectPlan, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]JamfProtectPlan, bool, error) {
@@ -160,6 +177,8 @@ func (c *Client) ListJamfProtectPlansV1(ctx context.Context, sort []string, filt
 }
 
 // SyncJamfProtectPlansV1 sync Plans with Jamf Protect.
+//
+// Required privileges: read:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Protect Settings.
 func (c *Client) SyncJamfProtectPlansV1(ctx context.Context) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/jamf-protect/plans/sync"
@@ -170,6 +189,8 @@ func (c *Client) SyncJamfProtectPlansV1(ctx context.Context) error {
 }
 
 // RegisterJamfProtectV1 register a Jamf Protect API configuration with Jamf Pro.
+//
+// Required privileges: update:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Protect Settings.
 func (c *Client) RegisterJamfProtectV1(ctx context.Context, request *ProtectRegistrationRequest) (*ProtectSettingsResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ProtectSettingsResponse
