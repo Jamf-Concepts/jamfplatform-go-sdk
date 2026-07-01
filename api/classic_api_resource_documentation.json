@@ -50,6 +50,118 @@
             "example": "John Smith",
             "type": "string"
           },
+          "groups": {
+            "properties": {
+              "group": {
+                "items": {
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "privileges": {
+                      "properties": {
+                        "casper_admin": {
+                          "properties": {
+                            "privilege": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "casper_imaging": {
+                          "properties": {
+                            "privilege": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "casper_remote": {
+                          "properties": {
+                            "privilege": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "jss_actions": {
+                          "properties": {
+                            "privilege": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "jss_objects": {
+                          "properties": {
+                            "privilege": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "jss_settings": {
+                          "properties": {
+                            "privilege": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "recon": {
+                          "properties": {
+                            "privilege": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "site": {
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
           "id": {
             "example": 1,
             "type": "integer"
@@ -92,81 +204,81 @@
           "privileges": {
             "properties": {
               "casper_admin": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "casper_imaging": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "casper_remote": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "jss_actions": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "jss_objects": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "jss_settings": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "recon": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               }
             },
             "type": "object"
@@ -819,17 +931,16 @@
           "mobile_device_group": {
             "$ref": "#/components/schemas/id_name"
           },
-          "mobile_device_group_id": {
-            "items": {
-              "properties": {
-                "id": {
-                  "example": 1,
+          "mobile_device_group_ids": {
+            "properties": {
+              "id": {
+                "items": {
                   "type": "integer"
-                }
-              },
-              "type": "object"
+                },
+                "type": "array"
+              }
             },
-            "type": "array"
+            "type": "object"
           },
           "mobile_devices": {
             "items": {
@@ -870,63 +981,70 @@
             "type": "string"
           },
           "student_group_ids": {
-            "items": {
-              "properties": {
-                "id": {
+            "properties": {
+              "id": {
+                "items": {
                   "type": "integer"
-                }
-              },
-              "type": "object"
+                },
+                "type": "array"
+              }
             },
-            "type": "array"
+            "type": "object"
+          },
+          "student_ids": {
+            "properties": {
+              "id": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
           },
           "students": {
-            "items": {
-              "properties": {
-                "student": {
-                  "description": "Name of the student",
-                  "example": "Joey",
+            "properties": {
+              "student": {
+                "items": {
                   "type": "string"
-                }
-              },
-              "type": "object"
+                },
+                "type": "array"
+              }
             },
-            "type": "array"
+            "type": "object"
           },
           "teacher_group_ids": {
-            "items": {
-              "properties": {
-                "id": {
+            "properties": {
+              "id": {
+                "items": {
                   "type": "integer"
-                }
-              },
-              "type": "object"
+                },
+                "type": "array"
+              }
             },
-            "type": "array"
+            "type": "object"
           },
           "teacher_ids": {
-            "items": {
-              "properties": {
-                "id": {
+            "properties": {
+              "id": {
+                "items": {
                   "type": "integer"
-                }
-              },
-              "type": "object"
+                },
+                "type": "array"
+              }
             },
-            "type": "array"
+            "type": "object"
           },
           "teachers": {
-            "items": {
-              "properties": {
-                "teacher": {
-                  "description": "Name of the teacher",
-                  "example": "Mr. Smith",
+            "properties": {
+              "teacher": {
+                "items": {
                   "type": "string"
-                }
-              },
-              "type": "object"
+                },
+                "type": "array"
+              }
             },
-            "type": "array"
+            "type": "object"
           }
         },
         "required": [
@@ -937,10 +1055,44 @@
       },
       "class_post": {
         "properties": {
+          "apple_tvs": {
+            "items": {
+              "properties": {
+                "apple_tv": {
+                  "properties": {
+                    "airplay_password": {
+                      "example": "password",
+                      "type": "string"
+                    },
+                    "device_id": {
+                      "example": "E0:AC:CB:97:36:g5",
+                      "type": "string"
+                    },
+                    "name": {
+                      "example": "Apple TV",
+                      "type": "string"
+                    },
+                    "udid": {
+                      "example": "3e8c9775cb3302ed9e645adf632cfa533adc3aa8",
+                      "type": "string"
+                    },
+                    "wifi_mac_address": {
+                      "example": "E0:AC:CB:97:36:G4",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
           "description": {
             "type": "string"
           },
           "id": {
+            "example": 1,
             "type": "integer"
           },
           "meeting_times": {
@@ -974,6 +1126,46 @@
             },
             "type": "object"
           },
+          "mobile_device_group": {
+            "$ref": "#/components/schemas/id_name"
+          },
+          "mobile_device_group_ids": {
+            "properties": {
+              "id": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "mobile_devices": {
+            "items": {
+              "properties": {
+                "mobile_device": {
+                  "properties": {
+                    "name": {
+                      "description": "Name of the device",
+                      "example": "Tinas iPad",
+                      "type": "string"
+                    },
+                    "udid": {
+                      "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                      "type": "string"
+                    },
+                    "wifi_mac_address": {
+                      "example": "E0:AC:CB:97:36:G4",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
           "name": {
             "description": "Name of the class",
             "example": "Math 101",
@@ -985,6 +1177,72 @@
           "source": {
             "example": "N/A",
             "type": "string"
+          },
+          "student_group_ids": {
+            "properties": {
+              "id": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "student_ids": {
+            "properties": {
+              "id": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "students": {
+            "properties": {
+              "student": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "teacher_group_ids": {
+            "properties": {
+              "id": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "teacher_ids": {
+            "properties": {
+              "id": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "teachers": {
+            "properties": {
+              "teacher": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
           }
         },
         "required": [
@@ -2184,36 +2442,68 @@
                   "id": {
                     "example": 1,
                     "type": "integer"
+                  },
+                  "serial_number": {
+                    "example": "C02Q7KHTGFWF",
+                    "type": "string"
+                  },
+                  "udid": {
+                    "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                    "type": "string"
                   }
                 },
-                "required": [
-                  "id"
-                ],
                 "type": "object"
+              },
+              "size": {
+                "$ref": "#/components/schemas/size"
               }
             },
             "type": "object"
           },
           "general": {
             "properties": {
-              "command": {
-                "description": "Command type. (UnlockUserAccount (deprecated on 2025-07-07) requires a DEP enrolled device, EnableRemoteDesktop and DisableRemoteDesktop require macOS 10.14.4 or later)",
-                "enum": [
-                  "UnlockUserAccount(deprecated on 2025-07-07)",
-                  "EnableRemoteDesktop (macOS 10.14.4 and later)",
-                  "DisableRemoteDesktop (macOS 10.14.4 and later)"
-                ],
+              "apns_result_status": {
+                "example": "Acknowledged",
                 "type": "string"
               },
-              "user_name": {
-                "description": "Username for UnlockUserAccount (deprecated on 2025-07-07) command",
-                "example": "administrator",
+              "command": {
+                "description": "Command type",
+                "example": "InstallProfile",
+                "type": "string"
+              },
+              "date_sent": {
+                "example": "2017-07-07T18:37:04.000Z",
+                "type": "string"
+              },
+              "date_sent_epoch": {
+                "example": 1499470624555,
+                "type": "string"
+              },
+              "date_sent_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "id": {
+                "example": 1002,
+                "type": "integer"
+              },
+              "profile_id": {
+                "example": 121,
+                "type": "integer"
+              },
+              "profile_udid": {
+                "example": "A083D99E-5FD0-4A80-A9F4-0CF8BC790C74",
+                "type": "string"
+              },
+              "udid": {
+                "example": "002d47b9-ad68-4d58-9fc7-0c4a50950020",
+                "type": "string"
+              },
+              "uuid": {
+                "example": "002d47b9-ad68-4d58-9fc7-0c4a50950020",
                 "type": "string"
               }
             },
-            "required": [
-              "command"
-            ],
             "type": "object"
           }
         },
@@ -2317,6 +2607,23 @@
           },
           "input_type": {
             "properties": {
+              "platform": {
+                "type": "string"
+              },
+              "popup_choices": {
+                "properties": {
+                  "choice": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "script": {
+                "type": "string"
+              },
               "type": {
                 "default": "Text Field",
                 "enum": [
@@ -2451,11 +2758,51 @@
       },
       "computer_group_post": {
         "properties": {
+          "computers": {
+            "items": {
+              "properties": {
+                "computer": {
+                  "properties": {
+                    "alt_mac_address": {
+                      "example": "E0:AC:CB:67:36:T4",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "mac_address": {
+                      "example": "E0:AC:CB:97:36:G4",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Name of the computer",
+                      "example": "Joes iMac",
+                      "type": "string"
+                    },
+                    "serial_number": {
+                      "example": "C02Q7KHTGFWF",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
           "criteria": {
             "items": {
               "properties": {
                 "criterion": {
                   "$ref": "#/components/schemas/criterion"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
                 }
               },
               "type": "object"
@@ -2463,6 +2810,7 @@
             "type": "array"
           },
           "id": {
+            "example": 1,
             "type": "integer"
           },
           "is_smart": {
@@ -3404,7 +3752,7 @@
             "default": false,
             "type": "boolean"
           },
-          "multiple_users_allowed": {
+          "multiple_uses_allowed": {
             "default": false,
             "type": "boolean"
           },
@@ -3618,33 +3966,231 @@
       },
       "computer_post": {
         "properties": {
+          "certificates": {
+            "items": {
+              "properties": {
+                "certificate": {
+                  "properties": {
+                    "common_name": {
+                      "example": "JSS Built-in Certificate Authority",
+                      "type": "string"
+                    },
+                    "expires_epoch": {
+                      "example": 1709345569000,
+                      "type": "integer"
+                    },
+                    "expires_utc": {
+                      "example": "2024-03-02T02:12:49.000+0000",
+                      "type": "string"
+                    },
+                    "identify": {
+                      "example": false,
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "configuration_profiles": {
+            "items": {
+              "properties": {
+                "configuration_profile": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "is_removable": {
+                      "example": false,
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "extension_attributes": {
+            "items": {
+              "properties": {
+                "extension_attribute": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Battery Cycle Count",
+                      "type": "string"
+                    },
+                    "type": {
+                      "example": "String",
+                      "type": "string"
+                    },
+                    "value": {
+                      "example": 191,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
           "general": {
             "properties": {
-              "building": {
-                "example": "East",
+              "alt_mac_address": {
+                "example": "E0:AC:CB:97:36:G4",
                 "type": "string"
               },
-              "department": {
-                "example": "Accounting",
+              "alt_network_adapter_type": {
+                "example": "IEEE80211",
+                "type": "string"
+              },
+              "asset_tag": {
+                "type": "string"
+              },
+              "barcode_1": {
+                "type": "string"
+              },
+              "barcode_2": {
+                "type": "string"
+              },
+              "distribution_point": {
                 "type": "string"
               },
               "id": {
+                "example": 1,
                 "type": "integer"
+              },
+              "initial_entry_date": {
+                "example": "2017-07-07T18:37:04.000Z",
+                "type": "string"
+              },
+              "initial_entry_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "initial_entry_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "ip_address": {
+                "example": "10.1.1.1",
+                "type": "string"
+              },
+              "itunes_store_account_is_active": {
+                "type": "boolean"
+              },
+              "jamf_version": {
+                "example": "9.99.0-t1494340586",
+                "type": "string"
+              },
+              "last_cloud_backup_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_cloud_backup_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_contact_time": {
+                "example": "2017-07-07T18:37:04.000Z",
+                "type": "string"
+              },
+              "last_contact_time_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_contact_time_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_enrolled_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_enrolled_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_reported_ip": {
+                "example": "192.0.0.1",
+                "type": "string"
               },
               "mac_address": {
                 "example": "E0:AC:CB:97:36:G4",
                 "type": "string"
               },
-              "managed": {
+              "management_status": {
+                "properties": {
+                  "enrolled_via_dep": {
+                    "type": "boolean"
+                  },
+                  "user_approved_enrollment": {
+                    "type": "boolean"
+                  },
+                  "user_approved_mdm": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              },
+              "mdm_capable": {
                 "type": "boolean"
               },
-              "model": {
-                "example": "13-inch MacBook Pro (Mid 2016)",
-                "type": "string"
+              "mdm_capable_users": {
+                "properties": {
+                  "mdm_capable_user": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
               },
               "name": {
-                "description": "Name of the computer",
-                "example": "Lauras MacBook Pro",
+                "description": "Name of computer",
+                "example": "Admins iMac",
+                "type": "string"
+              },
+              "network_adapter_type": {
+                "example": "Ethernet",
+                "type": "string"
+              },
+              "platform": {
+                "example": "Mac",
+                "type": "string"
+              },
+              "remote_management": {
+                "properties": {
+                  "managed": {
+                    "type": "boolean"
+                  },
+                  "management_username deprecated=\"10.48\"": {
+                    "example": "deprecated",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "report_date": {
+                "example": "2017-07-07T18:37:04.000Z",
                 "type": "string"
               },
               "report_date_epoch": {
@@ -3659,12 +4205,627 @@
                 "example": "C02Q7KHTGFWF",
                 "type": "string"
               },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
+              "sus": {
+                "type": "string"
+              },
               "udid": {
                 "example": "55900BDC-347C-58B1-D249-F32244B11D30",
                 "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "groups_accounts": {
+            "properties": {
+              "computer_group_memberships": {
+                "items": {
+                  "properties": {
+                    "group": {
+                      "example": "All Managed Clients",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
               },
-              "username": {
-                "example": "Laura",
+              "local_accounts": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "properties": {
+                        "administrator": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "filevault_enabled": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "home": {
+                          "example": "/var/virusmails",
+                          "type": "string"
+                        },
+                        "home_size": {
+                          "example": "-1MB",
+                          "type": "string"
+                        },
+                        "home_size_mb": {
+                          "example": -1,
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "_amavisd",
+                          "type": "string"
+                        },
+                        "realname": {
+                          "example": "AMaViS Daemon",
+                          "type": "string"
+                        },
+                        "uid": {
+                          "example": 83,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "hardware": {
+            "properties": {
+              "active_directory_status": {
+                "example": "AD.company.com",
+                "type": "string"
+              },
+              "available_ram_slots": {
+                "example": 0,
+                "type": "integer"
+              },
+              "battery_capacity": {
+                "example": 90,
+                "type": "integer"
+              },
+              "ble_capable": {
+                "type": "boolean"
+              },
+              "boot_rom": {
+                "example": "MBP111.0142.B00",
+                "type": "string"
+              },
+              "bus_speed": {
+                "example": 0,
+                "type": "integer"
+              },
+              "bus_speed_mhz": {
+                "example": 0,
+                "type": "integer"
+              },
+              "cache_size": {
+                "example": 3072,
+                "type": "integer"
+              },
+              "cache_size_kb": {
+                "example": 3072,
+                "type": "integer"
+              },
+              "disk_encryption_configuration": {
+                "example": "Individual and Institutional Encryption",
+                "type": "string"
+              },
+              "filevault_2_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "example": "admin",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "gatekeeper_status": {
+                "example": "App Store and identified developers",
+                "type": "string"
+              },
+              "institutional_recovery_key": {
+                "example": "Not Present",
+                "type": "string"
+              },
+              "make": {
+                "example": "Apple",
+                "type": "string"
+              },
+              "mapped_printers": {
+                "items": {
+                  "properties": {
+                    "printer": {
+                      "properties": {
+                        "location": {
+                          "example": "2nd Floor / Stairwell",
+                          "type": "string"
+                        },
+                        "name": {
+                          "example": "2nd Floor HP",
+                          "type": "string"
+                        },
+                        "type": {
+                          "example": "HP LaserJet 500 color MFP M575",
+                          "type": "string"
+                        },
+                        "uri": {
+                          "example": "lpd://10.11.182.21/",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "master_password_set": {
+                "type": "boolean"
+              },
+              "model": {
+                "example": "13-inch Retina MacBook Pro (Late 2013)",
+                "type": "string"
+              },
+              "model_identifier": {
+                "example": "MacBookPro11,1",
+                "type": "string"
+              },
+              "nic_speed": {
+                "example": "n/a",
+                "type": "string"
+              },
+              "number_cores": {
+                "example": 2,
+                "type": "integer"
+              },
+              "number_processors": {
+                "example": 1,
+                "type": "integer"
+              },
+              "optical_drive": {
+                "type": "string"
+              },
+              "os_build": {
+                "example": "17C88",
+                "type": "string"
+              },
+              "os_name": {
+                "example": "Mac OS X",
+                "type": "string"
+              },
+              "os_version": {
+                "example": "10.13.2",
+                "type": "string"
+              },
+              "processor_architechture": {
+                "example": "x86_64",
+                "type": "string"
+              },
+              "processor_speed": {
+                "example": 2600,
+                "type": "string"
+              },
+              "processor_speed_mhz": {
+                "example": 2600,
+                "type": "string"
+              },
+              "processor_type": {
+                "example": "Intel Core i5",
+                "type": "string"
+              },
+              "service_pack": {
+                "type": "string"
+              },
+              "sip_status": {
+                "enum": [
+                  "Enabled",
+                  "Disabled"
+                ],
+                "type": "string"
+              },
+              "smc_version": {
+                "example": "2.16f68",
+                "type": "string"
+              },
+              "storage": {
+                "items": {
+                  "properties": {
+                    "device": {
+                      "properties": {
+                        "connection_type": {
+                          "example": "NO",
+                          "type": "string"
+                        },
+                        "disk": {
+                          "example": "disk0",
+                          "type": "string"
+                        },
+                        "drive_capacity_mb": {
+                          "example": 512287,
+                          "type": "integer"
+                        },
+                        "model": {
+                          "example": "Apple SSD SM0512F",
+                          "type": "string"
+                        },
+                        "partition": {
+                          "items": {
+                            "properties": {
+                              "boot_drive_available_mb": {
+                                "example": 425198,
+                                "type": "integer"
+                              },
+                              "filevault2_percent": {
+                                "example": 100,
+                                "type": "integer"
+                              },
+                              "filevault2_status": {
+                                "example": "Encrypted",
+                                "type": "string"
+                              },
+                              "filevault_percent": {
+                                "example": 100,
+                                "type": "integer"
+                              },
+                              "filevault_status": {
+                                "example": "Encrypted",
+                                "type": "string"
+                              },
+                              "lvUUID": {
+                                "type": "string"
+                              },
+                              "lvgUUID": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "example": "Macintosh HD",
+                                "type": "string"
+                              },
+                              "partition_capacity_mb": {
+                                "example": 94128,
+                                "type": "integer"
+                              },
+                              "percentage_full": {
+                                "example": 17,
+                                "type": "integer"
+                              },
+                              "pvUUID": {
+                                "type": "string"
+                              },
+                              "size": {
+                                "example": 94128,
+                                "type": "integer"
+                              },
+                              "type": {
+                                "example": "boot",
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "type": "array"
+                        },
+                        "revision": {
+                          "example": "UXM2JA1Q",
+                          "type": "string"
+                        },
+                        "serial_number": {
+                          "example": "S1K5NYADC12934",
+                          "type": "string"
+                        },
+                        "size": {
+                          "example": 512287,
+                          "type": "integer"
+                        },
+                        "smart_status": {
+                          "example": "Verified",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "total_ram": {
+                "example": 16384,
+                "type": "integer"
+              },
+              "total_ram_mb": {
+                "example": 16384,
+                "type": "integer"
+              },
+              "xprotect_version": {
+                "example": 2098,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "location": {
+            "$ref": "#/components/schemas/location"
+          },
+          "peripherals": {
+            "properties": {
+              "peripherals": {
+                "items": {
+                  "properties": {
+                    "attachments": {
+                      "items": {
+                        "properties": {
+                          "attachment": {
+                            "$ref": "#/components/schemas/attachment"
+                          },
+                          "size": {
+                            "$ref": "#/components/schemas/size"
+                          }
+                        }
+                      },
+                      "type": "array"
+                    },
+                    "peripheral": {
+                      "properties": {
+                        "bar_code_1": {
+                          "type": "string"
+                        },
+                        "bar_code_2": {
+                          "type": "string"
+                        },
+                        "fields": {
+                          "properties": {
+                            "field": {
+                              "properties": {
+                                "name": {
+                                  "example": "Peripheral Field Name",
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "example": "Value for menu type",
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "type": {
+                          "description": "Name of the peripheral type",
+                          "example": "Peripheral Type Name",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "purchasing": {
+                      "$ref": "#/components/schemas/purchasing"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "size": {
+                "$ref": "#/components/schemas/size"
+              }
+            }
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/purchasing"
+          },
+          "security": {
+            "properties": {
+              "activation_lock": {
+                "example": false,
+                "type": "boolean"
+              },
+              "external_boot_level": {
+                "example": "unknown",
+                "type": "string"
+              },
+              "firewall_enabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "recovery_lock_enabled": {
+                "example": false,
+                "type": "boolean"
+              },
+              "secure_boot_level": {
+                "example": "unknown",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "software": {
+            "properties": {
+              "applications": {
+                "items": {
+                  "properties": {
+                    "application": {
+                      "properties": {
+                        "name": {
+                          "example": "Activity Monitor.app",
+                          "type": "string"
+                        },
+                        "path": {
+                          "example": "/Applications/Utilities/Activity Monitor.app",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": 10.13,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "available_software_updates": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "example": "iTunesXPatch-12.7.3",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "available_updates": {
+                "items": {
+                  "properties": {
+                    "update": {
+                      "properties": {
+                        "name": {
+                          "example": "iTunes",
+                          "type": "string"
+                        },
+                        "package_name": {
+                          "example": "iTunesXPatch-12.7.3",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "12.7.3",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "cached_by_casper": {
+                "items": {
+                  "properties": {
+                    "package": {
+                      "example": "GoogleChrome.pkg",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "fonts": {
+                "items": {
+                  "properties": {
+                    "font": {
+                      "properties": {
+                        "name": {
+                          "example": "Al Nile.ttc",
+                          "type": "string"
+                        },
+                        "path": {
+                          "example": "/Library/Fonts/Al Nile.ttc",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "n/a",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "installed_by_casper": {
+                "items": {
+                  "properties": {
+                    "package": {
+                      "example": "FireFox.pkg",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "installed_by_installer_swu": {
+                "items": {
+                  "properties": {
+                    "package": {
+                      "example": "com.apple.pkg.iTunesX",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "licensed_software": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "example": "Adobe CS5",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "plugins": {
+                "items": {
+                  "properties": {
+                    "plugin": {
+                      "properties": {
+                        "name": {
+                          "example": "QuickTime Plugin.plugin",
+                          "type": "string"
+                        },
+                        "path": {
+                          "example": "/Library/Internet Plug-Ins/Disabled Plug-Ins/QuickTime Plugin.plugin",
+                          "type": "string"
+                        },
+                        "version": {
+                          "example": "7.7.3",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "running_services": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "example": "com.apple.airportd",
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "unix_executables": {
                 "type": "string"
               }
             },
@@ -3867,6 +5028,123 @@
       },
       "directory_binding": {
         "properties": {
+          "active_directory": {
+            "properties": {
+              "admin_groups": {
+                "type": "string"
+              },
+              "cache_last_user": {
+                "type": "boolean"
+              },
+              "default_shell": {
+                "type": "string"
+              },
+              "forest": {
+                "type": "string"
+              },
+              "gid": {
+                "type": "string"
+              },
+              "local_home": {
+                "type": "boolean"
+              },
+              "mount_style": {
+                "type": "string"
+              },
+              "multiple_domains": {
+                "type": "boolean"
+              },
+              "preferred_domain": {
+                "type": "string"
+              },
+              "require_confirmation": {
+                "type": "boolean"
+              },
+              "uid": {
+                "type": "string"
+              },
+              "use_unc_path": {
+                "type": "boolean"
+              },
+              "user_gid": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "admitmac": {
+            "properties": {
+              "add_user_to_local": {
+                "type": "boolean"
+              },
+              "admin_group": {
+                "type": "string"
+              },
+              "cached_credentials": {
+                "type": "integer"
+              },
+              "default_shell": {
+                "type": "string"
+              },
+              "gid": {
+                "type": "string"
+              },
+              "groups_ou": {
+                "type": "string"
+              },
+              "local_home": {
+                "type": "string"
+              },
+              "mount_network_home": {
+                "type": "boolean"
+              },
+              "mount_style": {
+                "type": "string"
+              },
+              "place_home_folders": {
+                "type": "string"
+              },
+              "printers_ou": {
+                "type": "string"
+              },
+              "require_confirmation": {
+                "type": "boolean"
+              },
+              "shared_folders_ou": {
+                "type": "string"
+              },
+              "uid": {
+                "type": "string"
+              },
+              "user_gid": {
+                "type": "string"
+              },
+              "users_ou": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "centrify": {
+            "properties": {
+              "overwrite_existing": {
+                "type": "boolean"
+              },
+              "preferred_domain_server": {
+                "type": "string"
+              },
+              "update_PAM": {
+                "type": "boolean"
+              },
+              "workstation_mode": {
+                "type": "boolean"
+              },
+              "zone": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
           "computer_ou": {
             "description": "OU to bind computers to",
             "example": "CN=Computers,DC=ad,DC=company,DC=com",
@@ -3885,9 +5163,32 @@
             "example": "AD Binding",
             "type": "string"
           },
+          "open_directory": {
+            "properties": {
+              "encrypt_using_ssl": {
+                "type": "boolean"
+              },
+              "perform_secure_bind": {
+                "type": "boolean"
+              },
+              "use_for_authentication": {
+                "type": "boolean"
+              },
+              "use_for_contacts": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
           "password": {
             "description": "Password for the network administrator account",
             "type": "string"
+          },
+          "password_sha256": {
+            "type": "string"
+          },
+          "powerbroker_identity_services": {
+            "type": "object"
           },
           "priority": {
             "example": 1,
@@ -3934,6 +5235,26 @@
           "id": {
             "example": 1,
             "type": "integer"
+          },
+          "institutional_recovery_key": {
+            "properties": {
+              "certificate_type": {
+                "type": "string"
+              },
+              "data": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "password": {
+                "type": "string"
+              },
+              "password_sha256": {
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "key_type": {
             "default": "Individual",
@@ -4134,15 +5455,21 @@
             "type": "boolean"
           },
           "failover_point": {
-            "description": "Name of a file distribution point or \"Cloud Distribution Point\" to use as failover.",
+            "type": "string"
+          },
+          "failover_point_url": {
             "type": "string"
           },
           "http_downloads_enabled": {
+            "default": false,
+            "example": true,
             "type": "boolean"
           },
           "http_password": {
             "description": "Password for basic authentication",
-            "example": "password",
+            "type": "string"
+          },
+          "http_password_sha256": {
             "type": "string"
           },
           "http_url": {
@@ -4156,6 +5483,7 @@
             "type": "string"
           },
           "id": {
+            "example": 1,
             "type": "integer"
           },
           "ip_address": {
@@ -4164,8 +5492,12 @@
             "type": "string"
           },
           "is_master": {
+            "default": false,
             "description": "Only one share can be set as master",
             "type": "boolean"
+          },
+          "local_path": {
+            "type": "string"
           },
           "name": {
             "description": "Name of the distribution point",
@@ -4174,7 +5506,6 @@
           },
           "no_authentication_required": {
             "default": true,
-            "example": false,
             "type": "boolean"
           },
           "password": {
@@ -4197,6 +5528,9 @@
             "example": "password",
             "type": "string"
           },
+          "read_only_password_sha256": {
+            "type": "string"
+          },
           "read_only_username": {
             "description": "Account with read only privileges to the share",
             "example": "casperinstall",
@@ -4205,6 +5539,9 @@
           "read_write_password": {
             "description": "Password for the read/write account",
             "example": "password",
+            "type": "string"
+          },
+          "read_write_password_sha256": {
             "type": "string"
           },
           "read_write_username": {
@@ -4221,13 +5558,15 @@
             "example": 139,
             "type": "integer"
           },
+          "ssh_password_sha256": {
+            "type": "string"
+          },
           "ssh_username": {
-            "example": "casperadmin",
+            "example": "username",
             "type": "string"
           },
           "username_password_required": {
             "default": false,
-            "example": true,
             "type": "boolean"
           },
           "workgroup_or_domain": {
@@ -4774,25 +6113,24 @@
               "self_service_categories": {
                 "properties": {
                   "category": {
-                    "properties": {
-                      "display_in": {
-                        "description": "Self Service categories to be displayed ebook in",
-                        "type": "string"
+                    "items": {
+                      "properties": {
+                        "display_in": {
+                          "type": "boolean"
+                        },
+                        "feature_in": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
                       },
-                      "feature_in": {
-                        "type": "boolean"
-                      },
-                      "id": {
-                        "example": 1,
-                        "type": "integer"
-                      },
-                      "name": {
-                        "description": "Name of the category",
-                        "example": "eBooks",
-                        "type": "string"
-                      }
+                      "type": "object"
                     },
-                    "type": "object"
+                    "type": "array"
                   }
                 },
                 "type": "object"
@@ -4845,7 +6183,6 @@
                   "Make Available in Self Service",
                   "Install Automatically/Prompt Users to Install"
                 ],
-                "example": "Install Automatically/Prompt Users to Install",
                 "type": "string"
               },
               "file_type": {
@@ -4857,10 +6194,10 @@
                 "type": "string"
               },
               "free": {
-                "example": true,
                 "type": "boolean"
               },
               "id": {
+                "example": 1,
                 "type": "integer"
               },
               "name": {
@@ -4869,7 +6206,20 @@
                 "type": "string"
               },
               "self_service_icon": {
-                "type": "string"
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "uri": {
+                    "example": "https://company.jamfcloud.com/iconservlet/?id=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
               },
               "site": {
                 "$ref": "#/components/schemas/site_object"
@@ -4880,7 +6230,6 @@
                 "type": "string"
               },
               "version": {
-                "example": 1,
                 "type": "string"
               }
             },
@@ -4902,6 +6251,429 @@
               "all_mobile_devices": {
                 "default": false,
                 "type": "boolean"
+              },
+              "buildings": {
+                "items": {
+                  "properties": {
+                    "building": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "classes": {
+                "items": {
+                  "properties": {
+                    "class": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computer_groups": {
+                "items": {
+                  "properties": {
+                    "computer_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computers": {
+                "items": {
+                  "properties": {
+                    "computer": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "description": "Name of the computer",
+                          "example": "Admins MacBook Pro",
+                          "type": "string"
+                        },
+                        "udid": {
+                          "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "departments": {
+                "items": {
+                  "properties": {
+                    "department": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "exclusions": {
+                "properties": {
+                  "buildings": {
+                    "items": {
+                      "properties": {
+                        "building": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computer_groups": {
+                    "items": {
+                      "properties": {
+                        "computer_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computers": {
+                    "items": {
+                      "properties": {
+                        "computer": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the computer",
+                              "example": "Johns iMac",
+                              "type": "string"
+                            },
+                            "udid": {
+                              "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "departments": {
+                    "items": {
+                      "properties": {
+                        "department": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "mobile_device_groups": {
+                    "items": {
+                      "properties": {
+                        "mobile_device_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "mobile_devices": {
+                    "items": {
+                      "properties": {
+                        "mobile_device": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the device",
+                              "example": "Johns iPad",
+                              "type": "string"
+                            },
+                            "udid": {
+                              "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                              "type": "string"
+                            },
+                            "wifi_mac_address": {
+                              "example": "E0:AC:CB:97:36:G4",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the network segment",
+                              "example": "New York",
+                              "type": "string"
+                            },
+                            "uid": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "properties": {
+                            "name": {
+                              "example": "Adam",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "jss_user_groups": {
+                "items": {
+                  "properties": {
+                    "user_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "limitations": {
+                "properties": {
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "mobile_device_groups": {
+                "items": {
+                  "properties": {
+                    "mobile_device_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "mobile_devices": {
+                "items": {
+                  "properties": {
+                    "mobile_device": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "description": "Name of the device",
+                          "example": "Admins iPad",
+                          "type": "string"
+                        },
+                        "udid": {
+                          "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                          "type": "string"
+                        },
+                        "wifi_mac_address": {
+                          "example": "E0:AC:CB:97:36:G4",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "self_service": {
+            "properties": {
+              "feature_on_main_page": {
+                "type": "boolean"
+              },
+              "force_users_to_view_description": {
+                "type": "boolean"
+              },
+              "install_button_text": {
+                "example": "Install",
+                "type": "string"
+              },
+              "notification": {
+                "type": "boolean"
+              },
+              "notification_message": {
+                "type": "string"
+              },
+              "notification_subject": {
+                "type": "string"
+              },
+              "self_service_categories": {
+                "properties": {
+                  "category": {
+                    "items": {
+                      "properties": {
+                        "display_in": {
+                          "type": "boolean"
+                        },
+                        "feature_in": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "self_service_description": {
+                "type": "string"
+              },
+              "self_service_display_name": {
+                "example": "iPhone User Guide for iOS 10.3",
+                "type": "string"
+              },
+              "self_service_icon": {
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "uri": {
+                    "example": "https://company.jamfcloud.com/iconservlet/?id=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
               }
             },
             "type": "object"
@@ -4940,6 +6712,17 @@
             "example": 1,
             "type": "integer"
           },
+          "ldap_server": {
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
           "members": {
             "items": {
               "properties": {
@@ -4968,81 +6751,81 @@
           "privileges": {
             "properties": {
               "casper_admin": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "casper_imaging": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "casper_remote": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "jss_actions": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "jss_objects": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "jss_settings": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               },
               "recon": {
-                "items": {
-                  "properties": {
-                    "privilege": {
+                "properties": {
+                  "privilege": {
+                    "items": {
                       "type": "string"
-                    }
-                  },
-                  "type": "object"
+                    },
+                    "type": "array"
+                  }
                 },
-                "type": "array"
+                "type": "object"
               }
             },
             "type": "object"
@@ -5493,6 +7276,9 @@
                   "password": {
                     "example": "password",
                     "type": "string"
+                  },
+                  "password_sha256": {
+                    "type": "string"
                   }
                 },
                 "type": "object"
@@ -5506,6 +7292,9 @@
                 ],
                 "type": "string"
               },
+              "certificates_used": {
+                "type": "string"
+              },
               "hostname": {
                 "description": "Hostname or IP address of the server",
                 "example": "company.ad.com",
@@ -5513,6 +7302,12 @@
               },
               "id": {
                 "example": 1,
+                "type": "integer"
+              },
+              "is_enabled": {
+                "type": "boolean"
+              },
+              "migrated_to_id": {
                 "type": "integer"
               },
               "name": {
@@ -5614,6 +7409,9 @@
                     "example": "uSNCreated",
                     "type": "string"
                   },
+                  "group_membership_enabled_when_user_membership_selected": {
+                    "type": "boolean"
+                  },
                   "map_group_membership_to_user_field": {
                     "example": "memberOf",
                     "type": "string"
@@ -5629,6 +7427,9 @@
                     "type": "boolean"
                   },
                   "map_user_membership_use_dn": {
+                    "type": "boolean"
+                  },
+                  "membership_scoping_optimization": {
                     "type": "boolean"
                   },
                   "object_classes": {
@@ -5694,6 +7495,10 @@
                     ],
                     "type": "string"
                   },
+                  "map_phone": {
+                    "example": "telephoneNumber",
+                    "type": "string"
+                  },
                   "map_position": {
                     "example": "title",
                     "type": "string"
@@ -5704,10 +7509,6 @@
                   },
                   "map_room": {
                     "example": "room",
-                    "type": "string"
-                  },
-                  "map_telephone": {
-                    "example": "telephoneNumber",
                     "type": "string"
                   },
                   "map_user_id": {
@@ -5759,6 +7560,9 @@
                   "password": {
                     "example": "password",
                     "type": "string"
+                  },
+                  "password_sha256": {
+                    "type": "string"
                   }
                 },
                 "type": "object"
@@ -5772,13 +7576,7 @@
                 ],
                 "type": "string"
               },
-              "certificate_used": {
-                "description": "Supports PEM and based64 encoded DER formats",
-                "example": "MIIEuzCCA6OgAwIBAgIBAjANBgkqhkiG9w0BAQUFADBiMQswCQYDVQQGEwJVUzETMBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxFjAUBgNVBAMTDUFwcGxlIFJvb3QgQ0EwHhcNMDYwNDI1MjE0MDM2WhcNMzUwMjA5MjE0MDM2WjBiMQswCQYDVQQGEwJVUzETMBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxFjAUBgNVBAMTDUFwcGxlIFJvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDkkakJH5HbHkdQ6wXtXnmELes2oldMVeyLGYne+Uts9QerIjAC6Bg++FAJ039BqJj50cpmnCRrEdCju+QbKsMflZ56DKRHi1vUFjczy8QPTc4UadHJGXL1XQ7Vf1+b8iUDulWPTV0N8WQ1IxVLFVkds5T39pyez1C6wVhQZ48ItCD3y6wsIG9wtj8BMIy3Q88PnT3zK0koGsj+zrW5DtleHNbLPbU6rfQPDgCSC7EhFi501TwN22IWq6NxkkdTVcGvL0Gz+PvjcM3mo0xFfh9Ma1CWQYnEdGILEINBhzOKgbEwWOxaBDKMaLOPHd5lc/9nXmW8Sdh2nzMUZaF3lMktAgMBAAGjggF6MIIBdjAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUK9BpR5R2Cf70a40uQKb3R01/CF4wHwYDVR0jBBgwFoAUK9BpR5R2Cf70a40uQKb3R01/CF4wggERBgNVHSAEggEIMIIBBDCCAQAGCSqGSIb3Y2QFATCB8jAqBggrBgEFBQcCARYeaHR0cHM6Ly93d3cuYXBwbGUuY29tL2FwcGxlY2EvMIHDBggrBgEFBQcCAjCBthqBs1JlbGlhbmNlIG9uIHRoaXMgY2VydGlmaWNhdGUgYnkgYW55IHBhcnR5IGFzc3VtZXMgYWNjZXB0YW5jZSBvZiB0aGUgdGhlbiBhcHBsaWNhYmxlIHN0YW5kYXJkIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIHVzZSwgY2VydGlmaWNhdGUgcG9saWN5IGFuZCBjZXJ0aWZpY2F0aW9uIHByYWN0aWNlIHN0YXRlbWVudHMuMA0GCSqGSIb3DQEBBQUAA4IBAQBcNplMLXi37Yyb3PN3m/J20ncwT8EfhYOFG5k9RzfyqZtAjizUsZAS2L70c5vu0mQPy3lPNNiiPvl4/2vIB+x9OYOLUyDTOMSxv5pPCmv/K/xZpwUJfBdAVhEedNO3iyM7R6PVbyTi69G3cN8PReEnyvFteO3ntRcXqNx+IjXKJdXZD9Zr1KIkIxH3oayPc4FgxhtbCS+SsvhESPBgOJ4V9T0mZyCKM2r3DYLP3uujL/lTaltkwGMzd/c6ByxW69oPIQ7aunMZT7XZNn/Bh1XZp5m5MkL72NVxnn6hUrcbvZNCJBIqxw8dtk2cXmPIS4AXUKqK1drk/NAJBzewdXUh",
-                "type": "string"
-              },
-              "connection_is_used_for": {
-                "default": "users",
+              "certificates_used": {
                 "type": "string"
               },
               "hostname": {
@@ -5788,6 +7586,12 @@
               },
               "id": {
                 "example": 1,
+                "type": "integer"
+              },
+              "is_enabled": {
+                "type": "boolean"
+              },
+              "migrated_to_id": {
                 "type": "integer"
               },
               "name": {
@@ -5827,7 +7631,6 @@
               },
               "use_ssl": {
                 "default": false,
-                "example": true,
                 "type": "boolean"
               },
               "use_wildcards": {
@@ -5890,6 +7693,9 @@
                     "example": "uSNCreated",
                     "type": "string"
                   },
+                  "group_membership_enabled_when_user_membership_selected": {
+                    "type": "boolean"
+                  },
                   "map_group_membership_to_user_field": {
                     "example": "memberOf",
                     "type": "string"
@@ -5905,6 +7711,9 @@
                     "type": "boolean"
                   },
                   "map_user_membership_use_dn": {
+                    "type": "boolean"
+                  },
+                  "membership_scoping_optimization": {
                     "type": "boolean"
                   },
                   "object_classes": {
@@ -5970,6 +7779,10 @@
                     ],
                     "type": "string"
                   },
+                  "map_phone": {
+                    "example": "telephoneNumber",
+                    "type": "string"
+                  },
                   "map_position": {
                     "example": "title",
                     "type": "string"
@@ -5980,10 +7793,6 @@
                   },
                   "map_room": {
                     "example": "room",
-                    "type": "string"
-                  },
-                  "map_telephone": {
-                    "example": "telephoneNumber",
                     "type": "string"
                   },
                   "map_user_id": {
@@ -6038,6 +7847,28 @@
       },
       "licensed_software": {
         "properties": {
+          "computers": {
+            "items": {
+              "properties": {
+                "computer": {
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "udid": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
           "font_definitions": {
             "items": {
               "properties": {
@@ -6372,6 +8203,9 @@
               },
               "category": {
                 "$ref": "#/components/schemas/category_object"
+              },
+              "deployment_type": {
+                "type": "string"
               },
               "id": {
                 "example": 1,
@@ -6747,19 +8581,26 @@
                   }
                 },
                 "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "vpp": {
+            "properties": {
+              "assign_vpp_device_based_licenses": {
+                "type": "boolean"
               },
-              "vpp": {
-                "properties": {
-                  "assign_vpp_device_based_licenses": {
-                    "default": false,
-                    "type": "boolean"
-                  },
-                  "vpp_admin_account_id": {
-                    "default": -1,
-                    "type": "integer"
-                  }
-                },
-                "type": "object"
+              "remaining_vpp_licenses": {
+                "type": "integer"
+              },
+              "total_vpp_licenses": {
+                "type": "integer"
+              },
+              "used_vpp_licenses": {
+                "type": "integer"
+              },
+              "vpp_admin_account_id": {
+                "type": "integer"
               }
             },
             "type": "object"
@@ -7310,6 +9151,9 @@
           },
           "general": {
             "properties": {
+              "allow_user_to_delete": {
+                "type": "boolean"
+              },
               "bundle_id": {
                 "example": "com.jamfsoftware.selfservice",
                 "type": "string"
@@ -7399,6 +9243,9 @@
               "itunes_sync_time": {
                 "type": "integer"
               },
+              "keep_app_updated_on_devices": {
+                "type": "boolean"
+              },
               "keep_description_and_icon_up_to_date": {
                 "type": "boolean"
               },
@@ -7412,10 +9259,16 @@
                 "example": "Self Service Mobile",
                 "type": "string"
               },
+              "os_type": {
+                "type": "string"
+              },
               "prevent_backup_of_app_data": {
                 "type": "boolean"
               },
               "remove_app_when_mdm_profile_is_removed": {
+                "type": "boolean"
+              },
+              "require_network_tethered": {
                 "type": "boolean"
               },
               "site": {
@@ -7729,6 +9582,9 @@
                 "example": "New App Avaialble",
                 "type": "string"
               },
+              "self_service_after_install_button_text": {
+                "type": "string"
+              },
               "self_service_categories": {
                 "items": {
                   "properties": {
@@ -7763,6 +9619,9 @@
                     "description": "base64 encoded",
                     "type": "string"
                   },
+                  "filename": {
+                    "type": "string"
+                  },
                   "id": {
                     "example": 1,
                     "type": "integer"
@@ -7777,6 +9636,9 @@
                   }
                 },
                 "type": "object"
+              },
+              "self_service_install_button_text": {
+                "type": "string"
               }
             },
             "type": "object"
@@ -7917,85 +9779,45 @@
         "properties": {
           "general": {
             "properties": {
-              "always_enforce_lost_mode": {
-                "default": true,
-                "description": "Whether Lost Mode should be enabled after the device is wiped and re-enrolled (optional, but defaults to true)",
-                "example": "Whether Lost Mode should be enabled after the device is wiped and re-enrolled (optional, but defaults to true)",
-                "type": "boolean"
+              "apns_result_status": {
+                "example": "Acknowledged",
+                "type": "string"
               },
               "command": {
-                "description": "Command to send device",
-                "enum": [
-                  "UpdateInventory (Deprecated on 2026-03-13)",
-                  "Wallpaper (supervised only) (Deprecated on 2026-03-13)",
-                  "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26) (shared iPad only)",
-                  "EnableLostMode (supervised only)",
-                  "DeviceLocation (supervised and in lost mode only) (DeviceLocation Deprecated on 2025-06-12)",
-                  "PlayLostModeSound (supervised and in lost mode only) (PlayLostModeSound Deprecated on 2025-06-12)"
-                ],
+                "example": "ClearPasscode",
                 "type": "string"
               },
-              "disallow_proximity_setup": {
-                "default": false,
-                "description": "If true, on the next reboot Proximity Setup is not allowed and the pane in Setup Assistant will be skipped. Defaults to false.",
-                "example": "If true, on the next reboot Proximity Setup is not allowed and the pane in Setup Assistant will be skipped. Defaults to false.",
-                "type": "boolean"
-              },
-              "e_sim_server_url": {
-                "description": "The carrier's eSIM server URL to query. This URL is obtained from each carrier separately.",
-                "example": "https://support.apple.com/en-us/HT209096",
+              "date_sent": {
+                "example": "2017-07-07T18:37:04.000Z",
                 "type": "string"
               },
-              "lost_mode_footnote": {
-                "description": "The footnote to be displayed for the EnableLostMode command (optional)",
-                "example": "The footnote to be displayed for the EnableLostMode command (optional)",
+              "date_sent_epoch": {
+                "example": 1499470624555,
                 "type": "string"
               },
-              "lost_mode_message": {
-                "description": "The message to be displayed on the lost device (Required for EnableLostMode command if lost_mode_phone is not specified)",
-                "example": "The message to be displayed on the lost device (Required for EnableLostMode command if lost_mode_phone is not specified)",
+              "date_sent_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
                 "type": "string"
               },
-              "lost_mode_phone": {
-                "description": "The phone number to be displayed on the lost device (Required for EnableLostMode command if lost_mode_message is not specified)",
-                "example": "The phone number to be displayed on the lost device (Required for EnableLostMode command if lost_mode_message is not specified)",
-                "type": "string"
-              },
-              "lost_mode_with_sound": {
-                "default": false,
-                "description": "Whether to play a sound on the device when the EnableLostMode command is sent (optional)",
-                "example": "Whether to play a sound on the device when the EnableLostMode command is sent (optional)",
-                "type": "boolean"
-              },
-              "passcode_lock_grace_period": {
-                "description": "Number of seconds the screen must be locked before unlock attempts will require the device passcode (Required for PasscodeLockGracePeriod command)",
-                "example": "Number of seconds the screen must be locked before unlock attempts will require the device passcode (Required for PasscodeLockGracePeriod command)",
+              "id": {
+                "example": 1,
                 "type": "integer"
               },
-              "wallpaper_content": {
-                "description": "Wallpaper image in PNG or JPEG format, encoded using base64 (required for Wallpaper command if wallpaper_id is not specified)",
-                "example": "Wallpaper image in PNG or JPEG format, encoded using base64 (required for Wallpaper command if wallpaper_id is not specified)",
+              "profile_id": {
+                "type": "integer"
+              },
+              "profile_udid": {
                 "type": "string"
               },
-              "wallpaper_id": {
-                "description": "ID of existing icon within Jamf Pro to use (required for Wallpaper command if wallpaper_content is not specified)",
-                "example": "ID of existing icon within Jamf Pro to use (required for Wallpaper command if wallpaper_content is not specified)",
-                "type": "integer"
+              "udid": {
+                "example": "be597b7d-d0a4-42e6-ab98-18d1fd0c5640",
+                "type": "string"
               },
-              "wallpaper_setting": {
-                "description": "Where to set wallpaper (Required for Wallpaper command.) Possible values include - 1 (Lock screen), 2 (Home screen), 3 (Lock and home screens)",
-                "enum": [
-                  1,
-                  2,
-                  3
-                ],
-                "example": "Where to set wallpaper (Required for Wallpaper command.) Possible values include - 1 (Lock screen), 2 (Home screen), 3 (Lock and home screens)",
-                "type": "integer"
+              "uuid": {
+                "example": "be597b7d-d0a4-42e6-ab98-18d1fd0c5640",
+                "type": "string"
               }
             },
-            "required": [
-              "command"
-            ],
             "type": "object"
           },
           "mobile_devices": {
@@ -8005,12 +9827,28 @@
                   "id": {
                     "example": 1,
                     "type": "integer"
+                  },
+                  "phone_number": {
+                    "example": "123-555-6789",
+                    "type": "string"
+                  },
+                  "serial_number": {
+                    "example": "F19QMFBYFRY7",
+                    "type": "string"
+                  },
+                  "udid": {
+                    "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
+                    "type": "string"
+                  },
+                  "wifi_mac_address": {
+                    "example": "E0:AC:CB:97:36:G4",
+                    "type": "string"
                   }
                 },
-                "required": [
-                  "id"
-                ],
                 "type": "object"
+              },
+              "size": {
+                "$ref": "#/components/schemas/size"
               }
             },
             "type": "object"
@@ -8122,7 +9960,7 @@
               "payloads": {
                 "type": "string"
               },
-              "redeploy_Dayss_before_certificate_expires": {
+              "redeploy_days_before_certificate_expires": {
                 "type": "integer"
               },
               "redeploy_on_update": {
@@ -8446,8 +10284,11 @@
               "feature_on_main_page": {
                 "type": "boolean"
               },
-              "security_name": {
+              "security": {
                 "properties": {
+                  "password": {
+                    "type": "string"
+                  },
                   "removal_disallowed": {
                     "example": "Never",
                     "type": "string"
@@ -8551,8 +10392,14 @@
                 "example": "Configurator Enrollment Profile",
                 "type": "string"
               },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
               "udid": {
                 "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                "type": "string"
+              },
+              "uuid": {
                 "type": "string"
               }
             },
@@ -8572,12 +10419,23 @@
       },
       "mobile_device_enrollment_profile_post": {
         "properties": {
+          "attachments": {
+            "items": {
+              "properties": {
+                "attachment": {
+                  "$ref": "#/components/schemas/attachment"
+                }
+              }
+            },
+            "type": "array"
+          },
           "general": {
             "properties": {
               "description": {
                 "type": "string"
               },
               "id": {
+                "example": 1,
                 "type": "integer"
               },
               "invitation": {
@@ -8589,8 +10447,14 @@
                 "example": "Configurator Enrollment Profile",
                 "type": "string"
               },
+              "site": {
+                "$ref": "#/components/schemas/site_object"
+              },
               "udid": {
                 "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                "type": "string"
+              },
+              "uuid": {
                 "type": "string"
               }
             },
@@ -8598,6 +10462,12 @@
               "name"
             ],
             "type": "object"
+          },
+          "location": {
+            "$ref": "#/components/schemas/location"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/purchasing"
           }
         },
         "type": "object",
@@ -8635,7 +10505,7 @@
       },
       "mobile_device_extension_attribute": {
         "properties": {
-          "date_type": {
+          "data_type": {
             "default": "String",
             "enum": [
               "String",
@@ -8653,6 +10523,17 @@
           },
           "input_type": {
             "properties": {
+              "popup_choices": {
+                "properties": {
+                  "choice": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
               "type": {
                 "default": "Text Field",
                 "enum": [
@@ -9242,7 +11123,7 @@
             "readOnly": true,
             "type": "string"
           },
-          "enrolled_into_site": {
+          "enroll_into_site": {
             "properties": {
               "id": {
                 "default": -1,
@@ -9359,7 +11240,7 @@
             "readOnly": true,
             "type": "string"
           },
-          "enrolled_into_site": {
+          "enroll_into_site": {
             "properties": {
               "id": {
                 "default": -1,
@@ -9411,8 +11292,16 @@
             "readOnly": true,
             "type": "string"
           },
+          "login_required": {
+            "default": true,
+            "type": "boolean"
+          },
           "message": {
             "type": "string"
+          },
+          "multiple_uses_allowed": {
+            "default": false,
+            "type": "boolean"
           },
           "reply_to": {
             "example": "it@company.com",
@@ -9497,6 +11386,109 @@
       },
       "mobile_device_post": {
         "properties": {
+          "applications": {
+            "items": {
+              "properties": {
+                "application": {
+                  "properties": {
+                    "application_name": {
+                      "example": "Self Service Mobile",
+                      "type": "string"
+                    },
+                    "application_version": {
+                      "example": "10.1.1",
+                      "type": "string"
+                    },
+                    "identifier": {
+                      "example": "com.jamfsoftware.selfservice",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "properties": {
+                "certificate": {
+                  "properties": {
+                    "common_name": {
+                      "example": "JSS Built-in Certificate Authority",
+                      "type": "string"
+                    },
+                    "identity": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "configuration_profiles": {
+            "items": {
+              "properties": {
+                "configuration_profile": {
+                  "properties": {
+                    "display_name": {
+                      "example": "WiFi",
+                      "type": "string"
+                    },
+                    "identifier": {
+                      "example": "279889AF-1564-4480-A61D-860DF5EFDF26",
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "example": "279889AF-1564-4480-A61D-860DF5EFDF26",
+                      "type": "string"
+                    },
+                    "version": {
+                      "example": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "extension_attributes": {
+            "items": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "example": "Asset Selector",
+                  "type": "string"
+                },
+                "type": {
+                  "example": "String",
+                  "type": "string"
+                },
+                "value": {
+                  "example": "Sample Value",
+                  "type": "string"
+                }
+              }
+            },
+            "type": "array"
+          },
           "general": {
             "properties": {
               "asset_tag": {
@@ -9514,6 +11506,9 @@
                 "example": 95,
                 "type": "integer"
               },
+              "ble_capable": {
+                "type": "boolean"
+              },
               "bluetooth_mac_address": {
                 "example": "E0:AC:CB:97:36:G6",
                 "type": "string"
@@ -9525,6 +11520,12 @@
               "capacity_mb": {
                 "example": 12159,
                 "type": "integer"
+              },
+              "cloud_backup_enabled": {
+                "type": "boolean"
+              },
+              "device_locator_service_enabled": {
+                "type": "boolean"
               },
               "device_name": {
                 "example": "Tinas iPad",
@@ -9538,24 +11539,70 @@
                 "example": "Tinas iPad",
                 "type": "string"
               },
+              "do_not_disturb_enabled": {
+                "type": "boolean"
+              },
+              "exchange_activesync_device_identifier": {
+                "example": "TUCLLFJHPL779ACL9DCJQFN39F",
+                "type": "string"
+              },
               "id": {
+                "example": 1,
                 "type": "integer"
               },
               "initial_entry_date_epoch": {
                 "example": 1499470624555,
                 "type": "integer"
               },
+              "initial_entry_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
               "ip_address": {
                 "example": "192.0.0.1",
+                "type": "string"
+              },
+              "itunes_store_account_is_active": {
+                "type": "boolean"
+              },
+              "last_backup_time_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_backup_time_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_cloud_backup_date_epoch": {
+                "example": 1499470624555,
+                "type": "integer"
+              },
+              "last_cloud_backup_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
                 "type": "string"
               },
               "last_enrollment_epoch": {
                 "example": 1499470624555,
                 "type": "integer"
               },
+              "last_enrollment_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "last_inventory_update": {
+                "example": "2017-07-07T18:37:04.000Z",
+                "type": "string"
+              },
               "last_inventory_update_epoch": {
                 "example": 1499470624555,
                 "type": "integer"
+              },
+              "last_inventory_update_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "location_services_enabled": {
+                "type": "boolean"
               },
               "managed": {
                 "type": "boolean"
@@ -9608,8 +11655,14 @@
                 "example": "C02Q7KHTGFWF",
                 "type": "string"
               },
+              "shared": {
+                "type": "string"
+              },
               "supervised": {
                 "type": "boolean"
+              },
+              "tethered": {
+                "type": "string"
               },
               "udid": {
                 "example": "270aae10800b6e61a2ee2bbc285eb967050b5984",
@@ -9626,6 +11679,217 @@
               "serial_number"
             ],
             "type": "object"
+          },
+          "location": {
+            "$ref": "#/components/schemas/location"
+          },
+          "mobile_device_groups": {
+            "items": {
+              "properties": {
+                "mobile_device_group": {
+                  "$ref": "#/components/schemas/id_name"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "network": {
+            "properties": {
+              "carrier_settings_version": {
+                "example": 20,
+                "type": "string"
+              },
+              "cellular_technology": {
+                "example": "Unknown",
+                "type": "string"
+              },
+              "current_carrier_network": {
+                "type": "string"
+              },
+              "current_mobile_country_code": {
+                "example": 311,
+                "type": "string"
+              },
+              "current_mobile_network_code": {
+                "example": 480,
+                "type": "string"
+              },
+              "data_roaming_enabled": {
+                "type": "boolean"
+              },
+              "home_carrier_network": {
+                "example": "Verizon",
+                "type": "string"
+              },
+              "home_mobile_country_code": {
+                "example": 311,
+                "type": "string"
+              },
+              "home_mobile_network_code": {
+                "example": 480,
+                "type": "string"
+              },
+              "iccid": {
+                "example": "8914 8000 0010 0254 6259",
+                "type": "string"
+              },
+              "imei": {
+                "example": "35 200706 056227 1",
+                "type": "string"
+              },
+              "phone_number": {
+                "example": 5555555555,
+                "type": "string"
+              },
+              "voice_roaming_enabled": {
+                "example": "Yes",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "provisioning_profiles": {
+            "items": {
+              "properties": {
+                "mobile_device_provisioning_profile": {
+                  "properties": {
+                    "display_name": {
+                      "example": "In-House App Provisioning Profile",
+                      "type": "string"
+                    },
+                    "expiration_date": {
+                      "example": "2018-01-29T00:00:00.000Z",
+                      "type": "string"
+                    },
+                    "expiration_date_epoch": {
+                      "type": "integer"
+                    },
+                    "expiration_date_utc": {
+                      "example": "2018-01-29T14:18:02.000-0600",
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "example": "279889AF-1564-4480-A61D-860DF5EFDF26",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/purchasing"
+          },
+          "security_object": {
+            "properties": {
+              "activation_lock_enabled": {
+                "type": "boolean"
+              },
+              "block_level_encryption_capable": {
+                "type": "boolean"
+              },
+              "data_protection": {
+                "type": "boolean"
+              },
+              "file_level_encryption_capable": {
+                "type": "boolean"
+              },
+              "hardware_encryption": {
+                "type": "string"
+              },
+              "jailbreak_detected": {
+                "example": "Normal",
+                "type": "string"
+              },
+              "lost_location_altitude": {
+                "example": 242.88067627,
+                "type": "string"
+              },
+              "lost_location_course": {
+                "example": -1,
+                "type": "string"
+              },
+              "lost_location_epoch": {
+                "example": 1517598680459,
+                "type": "integer"
+              },
+              "lost_location_horizontal_accuracy": {
+                "example": 65,
+                "type": "string"
+              },
+              "lost_location_latitude": {
+                "example": 44.81436821,
+                "type": "string"
+              },
+              "lost_location_longitude": {
+                "example": -91.502672,
+                "type": "string"
+              },
+              "lost_location_speed": {
+                "example": -1,
+                "type": "string"
+              },
+              "lost_location_utc": {
+                "example": "2018-02-02T13:11:20.459-0600",
+                "type": "string"
+              },
+              "lost_location_vertical_accuracy": {
+                "example": 10,
+                "type": "string"
+              },
+              "lost_mode_enable_issued_epoch": {
+                "example": 1517598768512,
+                "type": "integer"
+              },
+              "lost_mode_enable_issued_utc": {
+                "example": "2018-02-02T13:12:48.512-0600",
+                "type": "string"
+              },
+              "lost_mode_enabled": {
+                "example": true,
+                "type": "string"
+              },
+              "lost_mode_enforced": {
+                "example": true,
+                "type": "boolean"
+              },
+              "lost_mode_footnote": {
+                "type": "string"
+              },
+              "lost_mode_message": {
+                "example": "Please return to Company",
+                "type": "string"
+              },
+              "lost_mode_phone": {
+                "example": "555-555-5555",
+                "type": "string"
+              },
+              "passcode_compliant": {
+                "type": "boolean"
+              },
+              "passcode_compliant_with_profile": {
+                "type": "boolean"
+              },
+              "passcode_lock_grace_period_enforced": {
+                "example": "Not Available",
+                "type": "string"
+              },
+              "passcode_present": {
+                "type": "boolean"
+              }
+            },
+            "type": "object",
+            "xml": {
+              "name": "security"
+            }
           }
         },
         "type": "object",
@@ -9637,8 +11901,20 @@
         "properties": {
           "general": {
             "properties": {
+              "creation_date_epoch": {
+                "type": "integer"
+              },
+              "creation_date_utc": {
+                "type": "string"
+              },
               "display_name": {
                 "example": "in-house app profile",
+                "type": "string"
+              },
+              "expiration_date_epoch": {
+                "type": "integer"
+              },
+              "expiration_date_utc": {
                 "type": "string"
               },
               "id": {
@@ -9648,6 +11924,23 @@
               "name": {
                 "example": "in-house app profile",
                 "type": "string"
+              },
+              "profile": {
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "uri": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
               },
               "uuid": {
                 "example": "116AF1E6-7EB5-4335-B598-276CDE5E015B",
@@ -9825,6 +12118,7 @@
             "type": "string"
           },
           "id": {
+            "example": 1,
             "type": "integer"
           },
           "name": {
@@ -10093,7 +12387,7 @@
                   "jss_user_groups": {
                     "items": {
                       "properties": {
-                        "jss_user_group": {
+                        "user_group": {
                           "$ref": "#/components/schemas/id_name"
                         }
                       },
@@ -10104,7 +12398,7 @@
                   "jss_users": {
                     "items": {
                       "properties": {
-                        "jss_user": {
+                        "user": {
                           "$ref": "#/components/schemas/id_name"
                         }
                       },
@@ -10182,7 +12476,7 @@
               "jss_users": {
                 "items": {
                   "properties": {
-                    "users": {
+                    "user": {
                       "$ref": "#/components/schemas/id_name"
                     }
                   },
@@ -10207,7 +12501,18 @@
                     "items": {
                       "properties": {
                         "network_segment": {
-                          "$ref": "#/components/schemas/id_name"
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "uid": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
                         }
                       },
                       "type": "object"
@@ -10265,33 +12570,46 @@
                 "example": "Install Me!!!",
                 "type": "string"
               },
+              "security": {
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "removal_disallowed": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
               "self_service_categories": {
                 "properties": {
                   "category": {
-                    "properties": {
-                      "display_in": {
-                        "default": true,
-                        "type": "boolean"
+                    "items": {
+                      "properties": {
+                        "display_in": {
+                          "type": "boolean"
+                        },
+                        "feature_in": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
                       },
-                      "feature_in": {
-                        "default": false,
-                        "type": "boolean"
-                      },
-                      "id": {
-                        "example": 1,
-                        "type": "integer"
-                      },
-                      "name": {
-                        "example": "Compliance",
-                        "type": "string"
-                      }
+                      "type": "object"
                     },
-                    "type": "object"
+                    "type": "array"
                   }
                 },
                 "type": "object"
               },
               "self_service_description": {
+                "type": "string"
+              },
+              "self_service_display_name": {
                 "type": "string"
               },
               "self_service_icon": {
@@ -10613,7 +12931,7 @@
                 "example": 1,
                 "type": "integer"
               },
-              "incremental_updates": {
+              "incremental_update": {
                 "example": false,
                 "type": "boolean"
               },
@@ -11001,7 +13319,7 @@
       },
       "patch_software_title": {
         "properties": {
-          "categories": {
+          "category": {
             "$ref": "#/components/schemas/category_object"
           },
           "id": {
@@ -11028,6 +13346,9 @@
               }
             },
             "type": "object"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
           },
           "source_id": {
             "example": 1,
@@ -11159,6 +13480,16 @@
       },
       "peripheral_post": {
         "properties": {
+          "attachments": {
+            "items": {
+              "properties": {
+                "attachment": {
+                  "$ref": "#/components/schemas/attachment"
+                }
+              }
+            },
+            "type": "array"
+          },
           "general": {
             "properties": {
               "bar_code_1": {
@@ -11168,24 +13499,27 @@
                 "type": "string"
               },
               "fields": {
-                "properties": {
-                  "field": {
-                    "properties": {
-                      "name": {
-                        "example": "Peripheral Field Name",
-                        "type": "string"
+                "items": {
+                  "properties": {
+                    "field": {
+                      "properties": {
+                        "name": {
+                          "example": "Peripheral Field Name",
+                          "type": "string"
+                        },
+                        "value": {
+                          "example": "Value for menu type",
+                          "type": "string"
+                        }
                       },
-                      "value": {
-                        "example": "Value for menu type",
-                        "type": "string"
-                      }
-                    },
-                    "type": "object"
+                      "type": "object"
+                    }
                   }
                 },
-                "type": "object"
+                "type": "array"
               },
               "id": {
+                "example": 1,
                 "type": "integer"
               },
               "type": {
@@ -11198,6 +13532,12 @@
               "type"
             ],
             "type": "object"
+          },
+          "location": {
+            "$ref": "#/components/schemas/location"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/purchasing"
           }
         },
         "type": "object",
@@ -11351,11 +13691,17 @@
                         "filevault_enabled": {
                           "type": "boolean"
                         },
+                        "hint": {
+                          "type": "string"
+                        },
                         "home": {
                           "example": "/Users/admin",
                           "type": "string"
                         },
                         "password": {
+                          "type": "string"
+                        },
+                        "password_sha256": {
                           "type": "string"
                         },
                         "picture": {
@@ -11365,6 +13711,9 @@
                         "realname": {
                           "example": "Administrator",
                           "type": "string"
+                        },
+                        "secure_token_allowed": {
+                          "type": "boolean"
                         },
                         "username": {
                           "example": "admin",
@@ -11423,6 +13772,9 @@
                     "type": "string"
                   },
                   "of_password": {
+                    "type": "string"
+                  },
+                  "of_password_sha256": {
                     "type": "string"
                   }
                 },
@@ -11566,16 +13918,19 @@
                   "no_execute_on": {
                     "properties": {
                       "day": {
-                        "enum": [
-                          "Sun",
-                          "Mon",
-                          "Tue",
-                          "Wed",
-                          "Thu",
-                          "Fri",
-                          "Sat"
-                        ],
-                        "type": "string"
+                        "items": {
+                          "enum": [
+                            "Sun",
+                            "Mon",
+                            "Tue",
+                            "Wed",
+                            "Thu",
+                            "Fri",
+                            "Sat"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
                       }
                     },
                     "type": "object"
@@ -11624,6 +13979,17 @@
                       "Ethernet"
                     ],
                     "type": "string"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
                   }
                 },
                 "type": "object"
@@ -11752,6 +14118,9 @@
           },
           "package_configuration": {
             "properties": {
+              "distribution_point": {
+                "type": "string"
+              },
               "packages": {
                 "items": {
                   "properties": {
@@ -11796,12 +14165,12 @@
             "type": "object"
           },
           "printers": {
-            "items": {
-              "properties": {
-                "leave_existing_default": {
-                  "type": "string"
-                },
-                "printer": {
+            "properties": {
+              "leave_existing_default": {
+                "type": "boolean"
+              },
+              "printer": {
+                "items": {
                   "properties": {
                     "action": {
                       "enum": [
@@ -11811,30 +14180,61 @@
                       "type": "string"
                     },
                     "id": {
-                      "example": 1,
                       "type": "integer"
                     },
                     "make_default": {
                       "type": "boolean"
                     },
                     "name": {
-                      "example": "Kyocera",
                       "type": "string"
                     }
                   },
                   "type": "object"
                 },
-                "size": {
-                  "$ref": "#/components/schemas/size"
-                }
+                "type": "array"
+              },
+              "size": {
+                "type": "integer"
               }
             },
-            "type": "array"
+            "type": "object"
+          },
+          "reboot": {
+            "properties": {
+              "file_vault_2_reboot": {
+                "type": "boolean"
+              },
+              "message": {
+                "type": "string"
+              },
+              "minutes_until_reboot": {
+                "type": "integer"
+              },
+              "no_user_logged_in": {
+                "type": "string"
+              },
+              "specify_startup": {
+                "type": "string"
+              },
+              "start_reboot_timer_immediately": {
+                "type": "boolean"
+              },
+              "startup_disk": {
+                "type": "string"
+              },
+              "user_logged_in": {
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "scope": {
             "properties": {
               "all_computers": {
                 "default": false,
+                "type": "boolean"
+              },
+              "all_jss_users": {
                 "type": "boolean"
               },
               "buildings": {
@@ -11968,6 +14368,28 @@
                     },
                     "type": "array"
                   },
+                  "jss_user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
                   "network_segments": {
                     "items": {
                       "properties": {
@@ -12023,18 +14445,40 @@
                 },
                 "type": "object"
               },
+              "jss_user_groups": {
+                "items": {
+                  "properties": {
+                    "user_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
               "limit_to_users": {
                 "properties": {
                   "user_groups": {
-                    "items": {
-                      "properties": {
-                        "user_group": {
-                          "example": "Teachers",
+                    "properties": {
+                      "user_group": {
+                        "items": {
                           "type": "string"
-                        }
+                        },
+                        "type": "array"
                       }
                     },
-                    "type": "array"
+                    "type": "object"
                   }
                 },
                 "type": "object"
@@ -12159,32 +14603,43 @@
                 "example": "Encrypt",
                 "type": "string"
               },
-              "re-install_button_text": {
+              "notification": {
+                "type": "boolean"
+              },
+              "notification_message": {
+                "type": "string"
+              },
+              "notification_subject": {
+                "type": "string"
+              },
+              "notification_type": {
+                "type": "string"
+              },
+              "reinstall_button_text": {
                 "example": "Re-encrypt",
                 "type": "string"
               },
               "self_service_categories": {
                 "properties": {
                   "category": {
-                    "properties": {
-                      "display_in": {
-                        "default": true,
-                        "type": "boolean"
+                    "items": {
+                      "properties": {
+                        "display_in": {
+                          "type": "boolean"
+                        },
+                        "feature_in": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
                       },
-                      "feature_in": {
-                        "default": false,
-                        "type": "boolean"
-                      },
-                      "id": {
-                        "example": 2,
-                        "type": "integer"
-                      },
-                      "name": {
-                        "example": "Compliance",
-                        "type": "string"
-                      }
+                      "type": "object"
                     },
-                    "type": "object"
+                    "type": "array"
                   }
                 },
                 "type": "object"
@@ -12231,7 +14686,7 @@
                 "example": "2019-01-01T01:00:00.000-0600",
                 "type": "string"
               },
-              "allow_user_to_defer": {
+              "allow_users_to_defer": {
                 "type": "boolean"
               },
               "message_finish": {
@@ -12250,10 +14705,285 @@
       },
       "policy_post": {
         "properties": {
+          "account_maintenance": {
+            "properties": {
+              "accounts": {
+                "items": {
+                  "properties": {
+                    "account": {
+                      "properties": {
+                        "action": {
+                          "enum": [
+                            "Create",
+                            "Reset",
+                            "Delete",
+                            "DisableFileVault"
+                          ],
+                          "type": "string"
+                        },
+                        "admin": {
+                          "type": "boolean"
+                        },
+                        "archive_home_directory": {
+                          "type": "boolean"
+                        },
+                        "archive_home_directory_to": {
+                          "example": "/Users/Deleted Users/admin.dmg",
+                          "type": "string"
+                        },
+                        "filevault_enabled": {
+                          "type": "boolean"
+                        },
+                        "hint": {
+                          "type": "string"
+                        },
+                        "home": {
+                          "example": "/Users/admin",
+                          "type": "string"
+                        },
+                        "password": {
+                          "type": "string"
+                        },
+                        "password_sha256": {
+                          "type": "string"
+                        },
+                        "picture": {
+                          "example": "/Library/User Pictures/Animals/Eagle.tif",
+                          "type": "string"
+                        },
+                        "realname": {
+                          "example": "Administrator",
+                          "type": "string"
+                        },
+                        "secure_token_allowed": {
+                          "type": "boolean"
+                        },
+                        "username": {
+                          "example": "admin",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "directory_bindings": {
+                "items": {
+                  "properties": {
+                    "binding": {
+                      "$ref": "#/components/schemas/id_name"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "management_account": {
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "rotate",
+                      "doNotChange"
+                    ],
+                    "type": "string"
+                  },
+                  "managed_password": {
+                    "type": "string"
+                  },
+                  "managed_password_length": {
+                    "description": "Only necessary when utilizing the random action",
+                    "example": 8,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "open_firmware_efi_password": {
+                "properties": {
+                  "of_mode": {
+                    "enum": [
+                      "command",
+                      "none"
+                    ],
+                    "type": "string"
+                  },
+                  "of_password": {
+                    "type": "string"
+                  },
+                  "of_password_sha256": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "disk_encryption": {
+            "properties": {
+              "action": {
+                "enum": [
+                  "apply",
+                  "remediate"
+                ],
+                "type": "string"
+              },
+              "auth_restart": {
+                "type": "boolean"
+              },
+              "disk_encryption_configuration_id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "remediate_disk_encryption_configuration_id": {
+                "description": "disk encryption ID to utilize for remediating institutional recovery key types.",
+                "example": 1,
+                "type": "integer"
+              },
+              "remediate_key_type": {
+                "enum": [
+                  "Individual",
+                  "Institutional",
+                  "Individual And Institutional"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "dock_items": {
+            "items": {
+              "properties": {
+                "dock_item": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "Add To Beginning",
+                        "Add To End",
+                        "Remove"
+                      ],
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Safari",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "size": {
+                  "$ref": "#/components/schemas/size"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "files_processes": {
+            "properties": {
+              "delete_file": {
+                "type": "boolean"
+              },
+              "kill_process": {
+                "type": "boolean"
+              },
+              "locate_file": {
+                "example": "/Library/Fonts/testFont.ttc",
+                "type": "string"
+              },
+              "run_command": {
+                "example": "echo \"foobar\"",
+                "type": "string"
+              },
+              "search_by_path": {
+                "example": "/Applications/appName.app",
+                "type": "string"
+              },
+              "search_for_process": {
+                "example": "processName",
+                "type": "string"
+              },
+              "spotlight_search": {
+                "example": "Screenshot.pdf",
+                "type": "string"
+              },
+              "update_locate_database": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
           "general": {
             "properties": {
               "category": {
                 "$ref": "#/components/schemas/category_object"
+              },
+              "date_time_limitations": {
+                "properties": {
+                  "activation_date": {
+                    "example": "2017-07-07T18:37:04.000Z",
+                    "type": "string"
+                  },
+                  "activation_date_epoch": {
+                    "example": 1499470624555,
+                    "type": "integer"
+                  },
+                  "activation_date_utc": {
+                    "example": "2017-07-07T18:37:04.555-0500",
+                    "type": "string"
+                  },
+                  "expiration_date": {
+                    "example": "2017-07-07T18:37:04.000Z",
+                    "type": "string"
+                  },
+                  "expiration_date_epoch": {
+                    "example": 1499470624555,
+                    "type": "integer"
+                  },
+                  "expiration_date_utc": {
+                    "example": "2017-07-07T18:37:04.555-0500",
+                    "type": "string"
+                  },
+                  "no_execute_end": {
+                    "example": "4:00 AM",
+                    "type": "string"
+                  },
+                  "no_execute_on": {
+                    "properties": {
+                      "day": {
+                        "items": {
+                          "enum": [
+                            "Sun",
+                            "Mon",
+                            "Tue",
+                            "Wed",
+                            "Thu",
+                            "Fri",
+                            "Sat"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "no_execute_start": {
+                    "example": "2:00 AM",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
               },
               "enabled": {
                 "type": "boolean"
@@ -12271,10 +15001,10 @@
                 "type": "string"
               },
               "id": {
+                "example": 1,
                 "type": "integer"
               },
               "location_user_only": {
-                "default": false,
                 "type": "boolean"
               },
               "name": {
@@ -12292,6 +15022,17 @@
                       "Ethernet"
                     ],
                     "type": "string"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
                   }
                 },
                 "type": "object"
@@ -12303,9 +15044,42 @@
                 ],
                 "type": "string"
               },
-              "offline": {
+              "notify_on_each_failed_retry": {
                 "default": false,
                 "type": "boolean"
+              },
+              "offline": {
+                "type": "boolean"
+              },
+              "override_default_settings": {
+                "properties": {
+                  "distribution_point": {
+                    "type": "string"
+                  },
+                  "force_afp_smb": {
+                    "type": "boolean"
+                  },
+                  "sus": {
+                    "type": "string"
+                  },
+                  "target_drive": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "retry_attempts": {
+                "default": -1,
+                "type": "integer"
+              },
+              "retry_event": {
+                "default": "none",
+                "enum": [
+                  "none",
+                  "trigger",
+                  "check-in"
+                ],
+                "type": "string"
               },
               "site": {
                 "$ref": "#/components/schemas/site_object"
@@ -12348,6 +15122,625 @@
             "required": [
               "name"
             ],
+            "type": "object"
+          },
+          "maintenance": {
+            "properties": {
+              "byhost": {
+                "type": "boolean"
+              },
+              "heal": {
+                "type": "boolean"
+              },
+              "install_all_cached_packages": {
+                "type": "boolean"
+              },
+              "permissions": {
+                "type": "boolean"
+              },
+              "prebindings": {
+                "type": "boolean"
+              },
+              "recon": {
+                "type": "boolean"
+              },
+              "reset_name": {
+                "type": "boolean"
+              },
+              "system_cache": {
+                "type": "boolean"
+              },
+              "user_cache": {
+                "type": "boolean"
+              },
+              "verify": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "package_configuration": {
+            "properties": {
+              "distribution_point": {
+                "type": "string"
+              },
+              "packages": {
+                "items": {
+                  "properties": {
+                    "package": {
+                      "properties": {
+                        "action": {
+                          "enum": [
+                            "Install",
+                            "Cache",
+                            "Install Cached"
+                          ],
+                          "type": "string"
+                        },
+                        "feu": {
+                          "type": "boolean"
+                        },
+                        "fut": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "example": "Firefox.dmg",
+                          "type": "string"
+                        },
+                        "update_autorun": {
+                          "type": "boolean"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "size": {
+                      "$ref": "#/components/schemas/size"
+                    }
+                  }
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "printers": {
+            "properties": {
+              "leave_existing_default": {
+                "type": "boolean"
+              },
+              "printer": {
+                "items": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "install",
+                        "uninstall"
+                      ],
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "integer"
+                    },
+                    "make_default": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "size": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "reboot": {
+            "properties": {
+              "file_vault_2_reboot": {
+                "type": "boolean"
+              },
+              "message": {
+                "type": "string"
+              },
+              "minutes_until_reboot": {
+                "type": "integer"
+              },
+              "no_user_logged_in": {
+                "type": "string"
+              },
+              "specify_startup": {
+                "type": "string"
+              },
+              "start_reboot_timer_immediately": {
+                "type": "boolean"
+              },
+              "startup_disk": {
+                "type": "string"
+              },
+              "user_logged_in": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "scope": {
+            "properties": {
+              "all_computers": {
+                "default": false,
+                "type": "boolean"
+              },
+              "all_jss_users": {
+                "type": "boolean"
+              },
+              "buildings": {
+                "items": {
+                  "properties": {
+                    "building": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computer_groups": {
+                "items": {
+                  "properties": {
+                    "computer_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "computers": {
+                "items": {
+                  "properties": {
+                    "computer": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "description": "Name of the computer",
+                          "example": "Admins MacBook Pro",
+                          "type": "string"
+                        },
+                        "udid": {
+                          "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "departments": {
+                "items": {
+                  "properties": {
+                    "department": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "exclusions": {
+                "properties": {
+                  "buildings": {
+                    "items": {
+                      "properties": {
+                        "building": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computer_groups": {
+                    "items": {
+                      "properties": {
+                        "computer_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "computers": {
+                    "items": {
+                      "properties": {
+                        "computer": {
+                          "properties": {
+                            "id": {
+                              "example": 1,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the computer",
+                              "example": "Johns iMac",
+                              "type": "string"
+                            },
+                            "udid": {
+                              "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "departments": {
+                    "items": {
+                      "properties": {
+                        "department": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "ibeacons": {
+                    "items": {
+                      "properties": {
+                        "ibeacon": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "jss_users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "description": "Name of the network segment",
+                              "example": "New York",
+                              "type": "string"
+                            },
+                            "uid": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "properties": {
+                            "name": {
+                              "example": "Adam",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "jss_user_groups": {
+                "items": {
+                  "properties": {
+                    "user_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "jss_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "limit_to_users": {
+                "properties": {
+                  "user_groups": {
+                    "properties": {
+                      "user_group": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "properties": {
+                  "ibeacons": {
+                    "items": {
+                      "properties": {
+                        "ibeacon": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "network_segments": {
+                    "items": {
+                      "properties": {
+                        "network_segment": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "scripts": {
+            "properties": {
+              "script": {
+                "items": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "mountNetworkShare.sh",
+                      "type": "string"
+                    },
+                    "parameter10": {
+                      "type": "string"
+                    },
+                    "parameter11": {
+                      "type": "string"
+                    },
+                    "parameter4": {
+                      "type": "string"
+                    },
+                    "parameter5": {
+                      "type": "string"
+                    },
+                    "parameter6": {
+                      "type": "string"
+                    },
+                    "parameter7": {
+                      "type": "string"
+                    },
+                    "parameter8": {
+                      "type": "string"
+                    },
+                    "parameter9": {
+                      "type": "string"
+                    },
+                    "priority": {
+                      "enum": [
+                        "Before",
+                        "After"
+                      ],
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "size": {
+                "$ref": "#/components/schemas/size"
+              }
+            },
+            "type": "object"
+          },
+          "self_service": {
+            "properties": {
+              "feature_on_main_page": {
+                "default": false,
+                "type": "boolean"
+              },
+              "force_users_to_view_description": {
+                "default": false,
+                "type": "boolean"
+              },
+              "install_button_text": {
+                "example": "Encrypt",
+                "type": "string"
+              },
+              "notification": {
+                "type": "boolean"
+              },
+              "notification_message": {
+                "type": "string"
+              },
+              "notification_subject": {
+                "type": "string"
+              },
+              "notification_type": {
+                "type": "string"
+              },
+              "reinstall_button_text": {
+                "example": "Re-encrypt",
+                "type": "string"
+              },
+              "self_service_categories": {
+                "properties": {
+                  "category": {
+                    "items": {
+                      "properties": {
+                        "display_in": {
+                          "type": "boolean"
+                        },
+                        "feature_in": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "self_service_description": {
+                "example": "Encrypt the boot drive of this device",
+                "type": "string"
+              },
+              "self_service_display_name": {
+                "example": "Disk Encryption",
+                "type": "string"
+              },
+              "self_service_icon": {
+                "properties": {
+                  "filename": {
+                    "example": "Encryption.png",
+                    "type": "string"
+                  },
+                  "id": {
+                    "example": 1,
+                    "type": "integer"
+                  },
+                  "uri": {
+                    "example": "https://jssURL.jamfcloud.com/iconservlet/?id=1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "use_for_self_service": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "user_interaction": {
+            "properties": {
+              "allow_deferral_minutes": {
+                "example": 0,
+                "type": "integer"
+              },
+              "allow_deferral_until_utc": {
+                "example": "2019-01-01T01:00:00.000-0600",
+                "type": "string"
+              },
+              "allow_users_to_defer": {
+                "type": "boolean"
+              },
+              "message_finish": {
+                "example": "Policy completed",
+                "type": "string"
+              },
+              "message_start": {
+                "example": "Policy is begining execution",
+                "type": "string"
+              }
+            },
             "type": "object"
           }
         },
@@ -13205,6 +16598,17 @@
           },
           "input_type": {
             "properties": {
+              "popup_choices": {
+                "properties": {
+                  "choice": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
               "type": {
                 "default": "Text Field",
                 "enum": [
@@ -13381,6 +16785,9 @@
       },
       "user_post": {
         "properties": {
+          "custom_photo_url": {
+            "type": "string"
+          },
           "email": {
             "example": "aharrison@company.com",
             "type": "string"
@@ -13389,12 +16796,101 @@
             "example": "aharrison@company.com",
             "type": "string"
           },
+          "enable_custom_photo_url": {
+            "type": "boolean"
+          },
+          "extension_attributes": {
+            "items": {
+              "properties": {
+                "extension_attribute": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Teacher ID",
+                      "type": "string"
+                    },
+                    "type": {
+                      "enum": [
+                        "String",
+                        "Integer",
+                        "Date"
+                      ],
+                      "type": "string"
+                    },
+                    "value": {
+                      "example": "K12",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
           "full_name": {
             "example": "Ashley Harrison",
             "type": "string"
           },
           "id": {
+            "example": 1,
             "type": "integer"
+          },
+          "ldap_server": {
+            "properties": {
+              "id": {
+                "example": -1,
+                "type": "integer"
+              },
+              "name": {
+                "example": "None",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "links": {
+            "properties": {
+              "computers": {
+                "properties": {
+                  "computer": {
+                    "$ref": "#/components/schemas/id_name"
+                  }
+                },
+                "type": "object"
+              },
+              "mobile_devices": {
+                "properties": {
+                  "mobile_device": {
+                    "$ref": "#/components/schemas/id_name"
+                  }
+                },
+                "type": "object"
+              },
+              "peripherals": {
+                "properties": {
+                  "peripheral": {
+                    "$ref": "#/components/schemas/id_name"
+                  }
+                },
+                "type": "object"
+              },
+              "total_vpp_code_count": {
+                "type": "integer"
+              },
+              "vpp_assignments": {
+                "properties": {
+                  "vpp_assignment": {
+                    "$ref": "#/components/schemas/id_name"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
           },
           "name": {
             "description": "Name of the user",
@@ -13470,6 +16966,9 @@
           "id": {
             "example": 1,
             "type": "integer"
+          },
+          "location_name": {
+            "type": "string"
           },
           "name": {
             "description": "Name of the VPP account",
@@ -13686,9 +17185,30 @@
       },
       "vpp_assignment_post": {
         "properties": {
+          "ebooks": {
+            "items": {
+              "properties": {
+                "ebook": {
+                  "properties": {
+                    "adam_id": {
+                      "example": 1058120411,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Algebra 1",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
           "general": {
             "properties": {
               "id": {
+                "example": 1,
                 "type": "integer"
               },
               "name": {
@@ -13698,12 +17218,140 @@
               "vpp_admin_account_id": {
                 "example": 1,
                 "type": "integer"
+              },
+              "vpp_admin_account_name": {
+                "example": "Company Name",
+                "type": "string"
               }
             },
             "required": [
               "name",
               "vpp_admin_account_id"
             ],
+            "type": "object"
+          },
+          "ios_apps": {
+            "items": {
+              "properties": {
+                "ios_app": {
+                  "properties": {
+                    "adam_id": {
+                      "example": 767319014,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Angry Birds",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "mac_apps": {
+            "items": {
+              "properties": {
+                "mac_app": {
+                  "properties": {
+                    "adam_id": {
+                      "example": 803453959,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "Slack",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "scope": {
+            "properties": {
+              "all_jss_users": {
+                "type": "boolean"
+              },
+              "exclusions": {
+                "properties": {
+                  "jss_user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "jss_users": {
+                    "items": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  },
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "properties": {
+                            "name": {
+                              "example": "LDAP User Group Name",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "jss_user_groups": {
+                "items": {
+                  "properties": {
+                    "user_group": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "jss_users": {
+                "items": {
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/id_name"
+                    }
+                  }
+                },
+                "type": "array"
+              },
+              "limitations": {
+                "properties": {
+                  "user_groups": {
+                    "items": {
+                      "properties": {
+                        "user_group": {
+                          "$ref": "#/components/schemas/id_name"
+                        }
+                      }
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
             "type": "object"
           }
         },
@@ -13740,6 +17388,9 @@
         "properties": {
           "general": {
             "properties": {
+              "auto_register_managed_users": {
+                "type": "boolean"
+              },
               "distribution_method": {
                 "enum": [
                   "Prompt users to accept/make available in Self Service",
@@ -13790,7 +17441,7 @@
             ],
             "type": "object"
           },
-          "invitation_usage": {
+          "invitation_usages": {
             "items": {
               "properties": {
                 "size": {
@@ -13806,13 +17457,12 @@
                       "example": 1,
                       "type": "integer"
                     },
+                    "last_action_date_epoch": {
+                      "type": "integer"
+                    },
                     "last_action_date_utc": {
                       "example": "2017-07-07T18:37:04.555-0500",
                       "type": "string"
-                    },
-                    "last_action_epoch": {
-                      "example": 1499470624555,
-                      "type": "integer"
                     },
                     "name": {
                       "example": "Username",

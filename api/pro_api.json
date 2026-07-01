@@ -8071,18 +8071,6 @@
         "example": "ENABLE_DATA_ROAMING",
         "type": "string"
       },
-      "DayOfWeek": {
-        "enum": [
-          "MONDAY",
-          "TUESDAY",
-          "WEDNESDAY",
-          "THURSDAY",
-          "FRIDAY",
-          "SATURDAY",
-          "SUNDAY"
-        ],
-        "type": "string"
-      },
       "DeclarativeManagementCommand": {
         "allOf": [
           {
@@ -13086,8 +13074,12 @@
             "readOnly": true,
             "type": "string"
           },
-          "profileScopeDescription": {
+          "scopeDescription": {
             "example": "Plan for all of the mouse computers at our org",
+            "readOnly": true,
+            "type": "string"
+          },
+          "siteId": {
             "readOnly": true,
             "type": "string"
           },
@@ -17492,17 +17484,6 @@
           "restrictedTimes": {
             "additionalProperties": {
               "$ref": "#/components/schemas/TimeFrame"
-            },
-            "example": {
-              "SUNDAY": {
-                "beginTime": "08:30:00",
-                "endTime": "15:45:00"
-              }
-            },
-            "properties": {
-              "key": {
-                "$ref": "#/components/schemas/DayOfWeek"
-              }
             },
             "type": "object"
           },
