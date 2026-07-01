@@ -4962,6 +4962,11 @@
             "$ref": "#/components/schemas/site_object"
           }
         },
+        "patch_software_titles": {
+          "patch_software_title.name": {
+            "type": "string"
+          }
+        },
         "class": {
           "students": {
             "type": "object",

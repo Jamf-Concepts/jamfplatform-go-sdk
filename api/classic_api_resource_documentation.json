@@ -13395,6 +13395,9 @@
                   "example": 1,
                   "type": "integer"
                 },
+                "name": {
+                  "type": "string"
+                },
                 "name_id": {
                   "example": "GoogleChromne",
                   "type": "string"
