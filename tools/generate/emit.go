@@ -273,17 +273,29 @@ func resolveSpecPath(root string, cfg Config, spec SpecDef) (path string, usedFa
 	return fallback, true, nil
 }
 
-func processSpec(root string, cfg Config, spec SpecDef, specPath string, emittedTypes map[string]bool) error {
+func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFallback bool, emittedTypes map[string]bool) error {
 	doc, err := loadSpec(specPath, allowedOpsSet(spec))
 	if err != nil {
 		return fmt.Errorf("loading spec: %w", err)
 	}
 
-	applySchemaRenames(doc, spec.SchemaRenames)
-	applySchemaAdditions(doc, spec.SchemaAdditions)
-	applySchemaPatches(doc, spec.SchemaPatches)
-	applyPropertyRenames(doc, spec.PropertyRenames)
-	applyPropertyRemovals(doc, spec.PropertyRemovals)
+	// Fallback (api/*.json) specs already have these five passes baked in by
+	// publishSpecs, in this exact order, before the file is written — see the
+	// comment in publish.go. Re-running them against the already-transformed
+	// doc panics or corrupts state whenever a later pass's target key/path was
+	// itself produced by an earlier one (e.g. a propertyRenames source key
+	// that a prior schemaPatches entry populated no longer exists once the
+	// rename has already happened). applyPostSymmetry is the exception: its
+	// pointer-sharing between a read schema and its *_post sibling must be
+	// re-established in this process for hoistInlineObjects' dedup to work,
+	// and unlike the others it's provably safe to re-run (see its doc comment).
+	if !usedFallback {
+		applySchemaRenames(doc, spec.SchemaRenames)
+		applySchemaAdditions(doc, spec.SchemaAdditions)
+		applySchemaPatches(doc, spec.SchemaPatches)
+		applyPropertyRenames(doc, spec.PropertyRenames)
+		applyPropertyRemovals(doc, spec.PropertyRemovals)
+	}
 	applyPostSymmetry(doc, spec.PostSymmetryExcludes)
 	if spec.Format == "xml" {
 		flattenClassicSizeWrappers(doc)
@@ -363,8 +375,9 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, emitted
 
 // loadedSpec pairs a SpecDef with the resolved filesystem path to its spec.
 type loadedSpec struct {
-	spec     SpecDef
-	specPath string
+	spec         SpecDef
+	specPath     string
+	usedFallback bool
 }
 
 // processPackage emits a sub-package under jamfplatform/<pkgName>/ containing:
@@ -416,11 +429,20 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	for _, ls := range specs {
 		doc, err := loadSpec(ls.specPath, allowedOpsSet(ls.spec))
 		if err == nil {
-			applySchemaRenames(doc, ls.spec.SchemaRenames)
-			applySchemaAdditions(doc, ls.spec.SchemaAdditions)
-			applySchemaPatches(doc, ls.spec.SchemaPatches)
-			applyPropertyRenames(doc, ls.spec.PropertyRenames)
-			applyPropertyRemovals(doc, ls.spec.PropertyRemovals)
+			// See the comment in processSpec: fallback (api/*.json) sources
+			// already have these five passes baked in by publishSpecs, so
+			// re-running them panics or corrupts state on cross-pass
+			// dependencies (a rename source key a prior patch populated, an
+			// already-deleted property, etc). applyPostSymmetry always runs —
+			// its read/post pointer-sharing must happen in this process for
+			// hoistInlineObjects' dedup to work, and it's safe to re-run.
+			if !ls.usedFallback {
+				applySchemaRenames(doc, ls.spec.SchemaRenames)
+				applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+				applySchemaPatches(doc, ls.spec.SchemaPatches)
+				applyPropertyRenames(doc, ls.spec.PropertyRenames)
+				applyPropertyRemovals(doc, ls.spec.PropertyRemovals)
+			}
 			applyPostSymmetry(doc, ls.spec.PostSymmetryExcludes)
 			if ls.spec.Format == "xml" {
 				flattenClassicSizeWrappers(doc)

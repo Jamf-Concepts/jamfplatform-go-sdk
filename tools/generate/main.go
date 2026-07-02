@@ -63,11 +63,11 @@ func main() {
 			hasSourceSpecs = false
 		}
 		if spec.Package == "" {
-			if err := processSpec(*rootDir, cfg, spec, specPath, emittedTypes); err != nil {
+			if err := processSpec(*rootDir, cfg, spec, specPath, usedFallback, emittedTypes); err != nil {
 				log.Fatalf("spec %s: %v", spec.File, err)
 			}
 		} else {
-			pkgBuckets[spec.Package] = append(pkgBuckets[spec.Package], loadedSpec{spec: spec, specPath: specPath})
+			pkgBuckets[spec.Package] = append(pkgBuckets[spec.Package], loadedSpec{spec: spec, specPath: specPath, usedFallback: usedFallback})
 		}
 	}
 
