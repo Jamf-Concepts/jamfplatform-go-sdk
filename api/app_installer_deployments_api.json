@@ -44,6 +44,26 @@
         },
         "type": "object"
       },
+      "AppInstallerComputerStatuses": {
+        "properties": {
+          "available": {
+            "type": "integer"
+          },
+          "failed": {
+            "type": "integer"
+          },
+          "inProgress": {
+            "type": "integer"
+          },
+          "installed": {
+            "type": "integer"
+          },
+          "unqualified": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "AppInstallerDeployment": {
         "properties": {
           "appTitleId": {
@@ -78,13 +98,13 @@
             "type": "string"
           },
           "notificationSettings": {
-            "$ref": "#/components/schemas/NotificationSettings"
+            "$ref": "#/components/schemas/AppInstallerNotificationSettings"
           },
           "selectedVersion": {
             "type": "string"
           },
           "selfServiceSettings": {
-            "$ref": "#/components/schemas/SelfServiceSettings"
+            "$ref": "#/components/schemas/AppInstallerSelfServiceSettings"
           },
           "siteId": {
             "type": "string"
@@ -139,10 +159,10 @@
             "type": "string"
           },
           "notificationSettings": {
-            "$ref": "#/components/schemas/NotificationSettings"
+            "$ref": "#/components/schemas/AppInstallerNotificationSettings"
           },
           "selfServiceSettings": {
-            "$ref": "#/components/schemas/SelfServiceSettings"
+            "$ref": "#/components/schemas/AppInstallerSelfServiceSettings"
           },
           "siteId": {
             "type": "string"
@@ -170,16 +190,27 @@
         ],
         "type": "object"
       },
-      "AppInstallerDeploymentListItem": {
+      "AppInstallerDeploymentHrefResponse": {
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AppInstallerDeploymentListEntry": {
         "properties": {
           "app": {
             "$ref": "#/components/schemas/AppInstallerApp"
           },
           "category": {
-            "$ref": "#/components/schemas/IdName"
+            "$ref": "#/components/schemas/AppInstallerNamedRef"
           },
           "computerStatuses": {
-            "$ref": "#/components/schemas/ComputerStatuses"
+            "$ref": "#/components/schemas/AppInstallerComputerStatuses"
           },
           "deploymentType": {
             "enum": [
@@ -199,10 +230,10 @@
             "type": "string"
           },
           "site": {
-            "$ref": "#/components/schemas/IdName"
+            "$ref": "#/components/schemas/AppInstallerNamedRef"
           },
           "smartGroup": {
-            "$ref": "#/components/schemas/IdName"
+            "$ref": "#/components/schemas/AppInstallerNamedRef"
           },
           "updateBehavior": {
             "enum": [
@@ -214,22 +245,11 @@
         },
         "type": "object"
       },
-      "AppInstallerDeploymentRef": {
-        "properties": {
-          "href": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
       "AppInstallerDeploymentSearchResults": {
         "properties": {
           "results": {
             "items": {
-              "$ref": "#/components/schemas/AppInstallerDeploymentListItem"
+              "$ref": "#/components/schemas/AppInstallerDeploymentListEntry"
             },
             "type": "array"
           },
@@ -239,27 +259,7 @@
         },
         "type": "object"
       },
-      "ComputerStatuses": {
-        "properties": {
-          "available": {
-            "type": "integer"
-          },
-          "failed": {
-            "type": "integer"
-          },
-          "inProgress": {
-            "type": "integer"
-          },
-          "installed": {
-            "type": "integer"
-          },
-          "unqualified": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "IdName": {
+      "AppInstallerNamedRef": {
         "properties": {
           "id": {
             "type": "string"
@@ -270,7 +270,7 @@
         },
         "type": "object"
       },
-      "NotificationSettings": {
+      "AppInstallerNotificationSettings": {
         "properties": {
           "completeMessage": {
             "type": "string"
@@ -299,18 +299,7 @@
         },
         "type": "object"
       },
-      "SelfServiceCategory": {
-        "properties": {
-          "featured": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "SelfServiceSettings": {
+      "AppInstallerSelfServiceSettings": {
         "properties": {
           "categories": {
             "items": {
@@ -329,6 +318,17 @@
           },
           "includeInFeaturedCategory": {
             "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "SelfServiceCategory": {
+        "properties": {
+          "featured": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -411,7 +411,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AppInstallerDeploymentRef"
+                  "$ref": "#/components/schemas/AppInstallerDeploymentHrefResponse"
                 }
               }
             },

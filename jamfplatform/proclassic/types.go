@@ -15349,6 +15349,7 @@ func (t PatchSoftwareTitlesItem) MarshalXML(e *xml.Encoder, start xml.StartEleme
 type PatchSoftwareTitlesItemPatchSoftwareTitle struct {
 	XMLName  xml.Name
 	ID       *int    `xml:"id,omitempty"`
+	Name     *string `xml:"name,omitempty"`
 	NameID   *string `xml:"name_id,omitempty"`
 	SourceID *int    `xml:"source_id,omitempty"`
 }

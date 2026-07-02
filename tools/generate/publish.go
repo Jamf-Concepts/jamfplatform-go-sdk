@@ -47,12 +47,21 @@ func publishSpecs(root string, cfg Config) error {
 			return fmt.Errorf("loading %s: %w", spec.File, err)
 		}
 
-		// Apply schemaAdditions before pruning so the published spec documents
-		// every property the SDK actually models. Without this, fields injected
-		// purely via config (e.g. account.password, printer.shared) appear in
-		// generated Go code but not in api/*.json, leaving downstream consumers
-		// of the published spec out of sync with the SDK surface.
+		// Apply the same schema-correctness passes as Go code generation
+		// (processSpec/processPackage), in the same order, before pruning.
+		// Without this, fixups like schemaPatches, propertyRenames, and
+		// PostSymmetry's read→post field mirroring appear in generated Go
+		// code but not in api/*.json, leaving downstream consumers of the
+		// published spec out of sync with the SDK surface. XML-specific
+		// Go-type-shaping passes (flattenClassicSizeWrappers, hoistInlineObjects)
+		// are deliberately excluded — they restructure schemas purely for Go
+		// struct emission and don't affect what the published spec documents.
+		applySchemaRenames(doc, spec.SchemaRenames)
 		applySchemaAdditions(doc, spec.SchemaAdditions)
+		applySchemaPatches(doc, spec.SchemaPatches)
+		applyPropertyRenames(doc, spec.PropertyRenames)
+		applyPropertyRemovals(doc, spec.PropertyRemovals)
+		applyPostSymmetry(doc, spec.PostSymmetryExcludes)
 
 		specFile := toSnakeCase(doc.Info.Title) + ".json"
 		if spec.SpecFile != "" {

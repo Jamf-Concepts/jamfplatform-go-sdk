@@ -411,13 +411,6 @@
           }
         }
       },
-      "excludePaths": [
-        "POST /v1/tenant/{tenantId}/auth/token",
-        "POST /v1/tenant/{tenantId}/auth/keep-alive",
-        "POST /v1/tenant/{tenantId}/auth/invalidate-token",
-        "GET /tenant/{tenantId}/auth/current",
-        "POST /v1/tenant/{tenantId}/oauth/token"
-      ],
       "operations": [
         {
           "op": "GET /v2/tenant/{tenantId}/local-admin-password/settings",
@@ -4867,19 +4860,8 @@
           "password": "string:password",
           "password_sha256": "string"
         },
-        "category": {
-          "priority": "integer"
-        },
         "json_web_token_configuration": {
           "encryption_key": "string:password"
-        },
-        "network_segment_post": {
-          "distribution_server": "string",
-          "distribution_point": "string",
-          "url": "string",
-          "swu_server": "string",
-          "building": "string",
-          "department": "string"
         },
         "printer": {
           "shared": "boolean",
@@ -4925,9 +4907,6 @@
           "date_type": "data_type"
         },
         "ldap_server": {
-          "mappings_for_users.user_mappings.map_telephone": "map_phone"
-        },
-        "ldap_server_post": {
           "mappings_for_users.user_mappings.map_telephone": "map_phone"
         },
         "patch_policy": {
@@ -4981,6 +4960,11 @@
         "patch_software_title": {
           "site": {
             "$ref": "#/components/schemas/site_object"
+          }
+        },
+        "patch_software_titles": {
+          "patch_software_title.name": {
+            "type": "string"
           }
         },
         "class": {
@@ -5112,14 +5096,6 @@
           }
         },
         "mobile_device_enrollment_profile": {
-          "general.uuid": {
-            "type": "string"
-          },
-          "general.site": {
-            "$ref": "#/components/schemas/site_object"
-          }
-        },
-        "mobile_device_enrollment_profile_post": {
           "general.uuid": {
             "type": "string"
           },
@@ -5970,16 +5946,6 @@
           "auto_register_managed_users"
         ]
       },
-      "excludePaths": [
-        "GET /tenant/{tenantId}/byoprofiles",
-        "GET /tenant/{tenantId}/byoprofiles/id/{id}",
-        "POST /tenant/{tenantId}/byoprofiles/id/{id}",
-        "PUT /tenant/{tenantId}/byoprofiles/id/{id}",
-        "DELETE /tenant/{tenantId}/byoprofiles/id/{id}",
-        "GET /tenant/{tenantId}/byoprofiles/name/{name}",
-        "PUT /tenant/{tenantId}/byoprofiles/name/{name}",
-        "DELETE /tenant/{tenantId}/byoprofiles/name/{name}"
-      ],
       "operations": [
         {
           "op": "GET /tenant/{tenantId}/computers/id/{id}",
