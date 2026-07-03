@@ -2163,12 +2163,12 @@ type DependencyObjectResultsResultsItem struct {
 
 // DeploymentTask represents a deployment task.
 type DeploymentTask struct {
-	ComputerID   string     `json:"computerId"`
-	ComputerName string     `json:"computerName"`
-	ID           string     `json:"id"`
-	Status       string     `json:"status"`
-	Updated      *time.Time `json:"updated,omitempty"`
-	Version      string     `json:"version"`
+	ComputerID   *json.Number `json:"computerId,omitempty"`
+	ComputerName string       `json:"computerName"`
+	ID           *json.Number `json:"id,omitempty"`
+	Status       string       `json:"status"`
+	Updated      *time.Time   `json:"updated,omitempty"`
+	Version      string       `json:"version"`
 }
 
 // DeploymentTaskSearchResults represents a deployment task search results.
