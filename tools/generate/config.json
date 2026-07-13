@@ -290,7 +290,7 @@
       ]
     },
     {
-      "file": "testing/jamf-compliance-benchmark-engine-api.json",
+      "file": "testing/jamf-compliance-benchmark-engine-api.yaml",
       "namespace": "compliance-benchmarks",
       "package": "compliancebenchmarks",
       "splitByTag": true,
