@@ -1,6 +1,6 @@
 module github.com/Jamf-Concepts/jamfplatform-go-sdk/tools/generate
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/getkin/kin-openapi v0.140.0

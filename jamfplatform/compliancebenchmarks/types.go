@@ -37,30 +37,32 @@ type BaselinesResponse struct {
 
 // BenchmarkRequestV2 represents a benchmark request v2.
 type BenchmarkRequestV2 struct {
-	Description      *string       `json:"description,omitempty"`
-	EnforcementMode  string        `json:"enforcementMode"`
-	Rules            []RuleRequest `json:"rules"`
-	SourceBaselineID string        `json:"sourceBaselineId"`
-	Sources          []Source      `json:"sources"`
-	Target           TargetV2      `json:"target"`
-	Title            string        `json:"title"`
+	Description        *string       `json:"description,omitempty"`
+	EnforcementMode    string        `json:"enforcementMode"`
+	Rules              []RuleRequest `json:"rules"`
+	SelectedOsVersions *[]OsVersion  `json:"selectedOsVersions,omitempty"`
+	SourceBaselineID   string        `json:"sourceBaselineId"`
+	Target             TargetV2      `json:"target"`
+	Title              string        `json:"title"`
 }
 
 // BenchmarkResponseV2 represents a benchmark response v2.
 type BenchmarkResponseV2 struct {
-	BaselineID         string     `json:"baselineId"`
-	BenchmarkID        string     `json:"benchmarkId"`
-	CanSwitchToEnforce bool       `json:"canSwitchToEnforce"`
-	Deleted            bool       `json:"deleted"`
-	Description        string     `json:"description"`
-	EnforcementMode    string     `json:"enforcementMode"`
-	LastUpdatedAt      time.Time  `json:"lastUpdatedAt"`
-	Rules              []RuleInfo `json:"rules"`
-	Sources            []Source   `json:"sources"`
-	Target             *TargetV2  `json:"target,omitempty"`
-	TenantID           string     `json:"tenantId"`
-	Title              string     `json:"title"`
-	UpdateAvailable    bool       `json:"updateAvailable"`
+	AvailableOsVersions []OsVersion `json:"availableOsVersions"`
+	BaselineID          string      `json:"baselineId"`
+	BenchmarkID         string      `json:"benchmarkId"`
+	CanSwitchToEnforce  bool        `json:"canSwitchToEnforce"`
+	Deleted             bool        `json:"deleted"`
+	Description         string      `json:"description"`
+	EnforcementMode     string      `json:"enforcementMode"`
+	LastUpdatedAt       time.Time   `json:"lastUpdatedAt"`
+	Rules               []RuleInfo  `json:"rules"`
+	SelectedOsVersions  []OsVersion `json:"selectedOsVersions"`
+	Sources             []Source    `json:"sources"`
+	Target              *TargetV2   `json:"target,omitempty"`
+	TenantID            string      `json:"tenantId"`
+	Title               string      `json:"title"`
+	UpdateAvailable     bool        `json:"updateAvailable"`
 }
 
 // BenchmarkRuleDevicesResponse Representation of devices for a benchmark rule. Used for drill-down view controller.
@@ -137,6 +139,12 @@ type OsSpecificRuleInfo struct {
 	Title       string             `json:"title"`
 }
 
+// OsVersion represents a os version.
+type OsVersion struct {
+	OsType    string `json:"osType"`
+	OsVersion int    `json:"osVersion"`
+}
+
 // RuleInfo represents a rule info.
 type RuleInfo struct {
 	Description        string                        `json:"description"`
@@ -191,8 +199,9 @@ type Source struct {
 
 // SourcedRules represents a sourced rules.
 type SourcedRules struct {
-	Rules   []RuleInfo `json:"rules"`
-	Sources []Source   `json:"sources"`
+	AvailableOsVersions []OsVersion `json:"availableOsVersions"`
+	Rules               []RuleInfo  `json:"rules"`
+	Sources             []Source    `json:"sources"`
 }
 
 // TargetV2 represents a target v2.
