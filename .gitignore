@@ -29,3 +29,7 @@ coverage.html
 # Testing
 testing/
 tools/generate/generate
+
+# Python
+__pycache__/
+*.pyc

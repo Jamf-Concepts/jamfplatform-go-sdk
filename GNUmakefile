@@ -1,5 +1,11 @@
 default: test lint
 
+# Refresh the private testing/ source specs from a Jamf Platform APIs GitOps
+# archive, then regenerate as usual: `make ingest ZIP=path/to/archive.zip`.
+# App Installer specs are a manual exception and are left untouched.
+ingest:
+	python3 tools/scripts/ingest_specs.py --zip $(ZIP)
+
 generate:
 	cd tools/generate && go run . -root $(CURDIR)
 
@@ -18,4 +24,4 @@ lint:
 	cd tools/generate && golangci-lint run ./...
 	cd tools && golangci-lint run ./acctargets/...
 
-.PHONY: default generate test testacc lint
+.PHONY: default ingest generate test testacc lint
