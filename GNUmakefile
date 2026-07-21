@@ -4,7 +4,13 @@ default: test lint
 # archive, then regenerate as usual: `make ingest ZIP=path/to/archive.zip`.
 # App Installer specs are a manual exception and are left untouched.
 ingest:
-	python3 tools/scripts/ingest_specs.py --zip $(ZIP)
+	cd tools/generate && go run ./ingest -root "$(CURDIR)" -zip "$(ZIP)"
+
+# Reconcile config.json with the Pro spec after Jamf publishes a new endpoint
+# version: synthesize any missing spec version by cloning its closest config
+# sibling. Idempotent; re-run `make generate` afterwards.
+backfill:
+	cd tools/generate && go run ./backfill -root "$(CURDIR)"
 
 generate:
 	cd tools/generate && go run . -root $(CURDIR)
@@ -24,4 +30,4 @@ lint:
 	cd tools/generate && golangci-lint run ./...
 	cd tools && golangci-lint run ./acctargets/...
 
-.PHONY: default ingest generate test testacc lint
+.PHONY: default ingest backfill generate test testacc lint

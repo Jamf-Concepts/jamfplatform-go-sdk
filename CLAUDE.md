@@ -36,11 +36,11 @@ The `testing/` source specs are gitignored (private). The generator falls back t
 The `testing/` specs are populated from a single Jamf Platform APIs GitOps archive (`jamf-platform-apis-gitops-vNNN-*.zip`, built from `jamf/public-apis-oas`) rather than sourced by hand:
 
 ```bash
-make ingest ZIP=path/to/archive.zip   # tools/scripts/ingest_specs.py -> testing/
+make ingest ZIP=path/to/archive.zip   # tools/generate/ingest -> testing/
 make generate                          # regenerate jamfplatform/ + api/ as usual
 ```
 
-`ingest_specs.py` maps each family to its archive member and writes the file under the exact name `config.json` already expects (no config change). Selection rule per family F: try `F-beta-beta`, then `F-beta`, then `F`, and pick the first that both exists and carries `x-required-privileges`. This matters because:
+The `ingest` command (`tools/generate/ingest`, a sibling `main` package to the generator, run via `go run ./ingest` — no Python) maps each family to its archive member and writes the file under the exact name `config.json` already expects (no config change). Selection rule per family F: try `F-beta-beta`, then `F-beta`, then `F`, and pick the first that both exists and carries `x-required-privileges`. This matters because:
 
 - Only the **beta** variants keep the `/v1/tenant/{tenantId}/...` path shape the config whitelist matches; production variants strip the tenant segment, so every op lookup would miss and the generator would emit nothing.
 - Only the **beta** variants carry `x-required-privileges` (the source of `Required privileges:` godoc + per-package `Privileges` registries); production variants have zero.
@@ -68,7 +68,7 @@ Jamf publishes new versions of Pro endpoints (V1 → V2 → V3 …) and keeps pr
 
 Each version has its own resolver / apply sugar: `ResolveComputerInventoryV1ByName`, `ResolveComputerInventoryV2ByName`, etc. The `resourceType` in the resolver config carries the V<N> suffix to keep method names disambiguated. `typedReturn` falls back to the unsuffixed Go type when the spec hasn't suffixed the V1 schema (e.g. V1 returns `*ComputerInventory`, V2 returns `*ComputerInventoryV2`).
 
-When Jamf publishes a new endpoint version, run `python3 tools/scripts/backfill_versions.py` from the repo root — it synthesizes missing version entries by cloning the closest sibling in config and version-suffixing the names. Re-run `make generate` afterwards. The script is idempotent.
+When Jamf publishes a new endpoint version, run `make backfill` (`tools/generate/backfill`, a sibling `main` package to the generator, run via `go run ./backfill` — no Python) — it synthesizes missing version entries by cloning the closest sibling in config and version-suffixing the names. Re-run `make generate` afterwards. It is idempotent, and rewrites `config.json` through an order-preserving JSON model so a no-op run leaves the file byte-for-byte unchanged.
 
 Endpoints marked `deprecated: true` in the spec are always emitted; the generator adds a `// Deprecated:` godoc line that includes the `x-deprecation-date` value (normalised to `YYYY-MM-DD`) so consumers see the removal window. There is no `skipDeprecated` knob — deprecation is opt-out by retaining the entry in config, opt-in (i.e. removed) by deleting it once Jamf drops the path.
 
