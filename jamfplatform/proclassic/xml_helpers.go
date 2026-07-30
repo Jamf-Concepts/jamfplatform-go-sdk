@@ -17,6 +17,7 @@ import (
 	"encoding/xml"
 	"math/big"
 	"strconv"
+	"strings"
 )
 
 // BigInt is an arbitrary-precision integer with XML/JSON codecs. The zero
@@ -149,39 +150,106 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 	return nil
 }
 
-// PayloadsXMLText wraps the configuration-profile <payloads> chardata
-// (raw .mobileconfig plist XML embedded as element text). MarshalXML
-// emits the standard single-level XML chardata encoding via
-// encoding/xml's default escape (escapes `<`, `>`, `&`; leaves `"`
-// alone, which is legal in chardata). UnmarshalXML decodes one level
-// symmetrically.
+// PayloadsXMLText wraps the configuration-profile <payloads> content
+// (raw .mobileconfig plist XML). MarshalXML emits a single CDATA section
+// with every `&` escaped once; UnmarshalXML decodes the server's
+// entity-escaped text form once. The two directions are deliberately
+// asymmetric because the server itself is asymmetric.
 //
-// Single-escape applies on both Create (POST) and Update (PUT), matching
-// the production-tested approach jamf-upload has shipped across the
-// AutoPkg community for years. An earlier double-escape design
-// (commit 70b4cd6, 2026-05-26) was added in response to a POST 409
-// "Unable to update the database" and assumed the server runs an extra
-// entity-decode pass before its plist parser. Wire-probing on 2026-05-27
-// showed that diagnosis was wrong: double-escaping silently corrupted
-// every <string> value containing literal `&`, `<`, or `>` — POSTed
-// values stored as `&amp;`, `&lt;`, `&gt;` doubled to `&amp;amp;` etc.,
-// and the same content 409d (or worse, corrupted) on PUT. Single-escape
-// for both methods matches what the server actually expects and what
-// the Jamf Pro admin UI itself writes.
+// The Classic API does not treat <payloads> content per XML 1.0
+// (PI-827). Wire-verified model (2026-07-30, two Jamf Pro 11.x tenants;
+// full matrix in acc_proclassic_profile_payloads_test.go):
+//
+//   - Validation: the server entity-decodes the submitted content once
+//     and rejects the write with 409 "Unable to update the database"
+//     when the result contains a bare `&` or `<`. Spec-correct raw
+//     CDATA is therefore rejected for ANY plist containing `&amp;` or
+//     `&lt;` — the escape-once form this type emits is the only
+//     submittable one for such profiles.
+//   - Storage is per-payload-type: fragments of types the server
+//     re-renders (com.apple.ManagedClient.preferences custom settings —
+//     values and dict keys — and com.apple.notificationsettings) are
+//     entity-decoded once, so this wire form stores them byte-exact.
+//     Fragments of every other payload type (TCC, direct
+//     com.apple.loginwindow, all mobiledeviceconfigurationprofiles
+//     payloads) are stored verbatim, keeping one extra entity layer —
+//     values containing `&`/`<` in those types cannot be stored
+//     faithfully by ANY client. Consumers doing read-back comparison
+//     (e.g. terraform-provider-jamfplatform) surface that as drift; it
+//     is a server defect, not an SDK bug.
+//
+// Historical note: the 2026-05-27 probes that shipped single-escape
+// element text used a corpus with no `&`/`<` inside <string> values,
+// so the validation 409 went unseen; the 2026-05-26 "double-escape" era
+// (html.EscapeString on top of encoding/xml) corrupted content it could
+// have stored. Both observations are consistent with the model above.
+//
+// The `]]>` guard keeps the emitted document well-formed (XML 1.0
+// §2.4/§2.7) when a plist legitimately contains the terminator (embedded
+// CDATA sections). A single CDATA section is used rather than Go's
+// `xml:",cdata"` tag because that tag splits content on `]]>` into
+// multiple sections, which the server's substring-based extractor would
+// truncate.
+//
+// Note the server canonicalises stored plists regardless of input form:
+// entities for `&` `<` `>`, literals for `"` `'`, sorted keys,
+// and leading/trailing whitespace inside string values is trimmed.
+// Byte-identical round-trips are impossible by design; consumers must
+// compare payloads structurally, never byte-wise.
 type PayloadsXMLText string
 
-// MarshalXML emits the chardata at a single XML entity layer (encoding/
-// xml's default behaviour). Used on both POST and PUT — the server
-// canonicalises the parsed plist after a single chardata decode on POST
-// and stores the post-decode bytes verbatim on PUT, both of which
-// preserve single-escape content correctly.
+// stripPayloadCDATASections rewrites every <![CDATA[...]]> section in a
+// plist as equivalent escaped character data. The parsed document is
+// unchanged (CDATA content is literal text by definition — XML 1.0
+// §2.7), but the literal `]]>` terminators disappear so the plist can
+// itself be CDATA-wrapped. Textual rewrite by design: plist
+// parse/re-serialise round trips are not byte-faithful for CDATA text.
+// Content after an unterminated <![CDATA[ is left untouched.
+func stripPayloadCDATASections(s string) string {
+	esc := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;")
+	var b strings.Builder
+	for {
+		si := strings.Index(s, "<![CDATA[")
+		if si < 0 {
+			break
+		}
+		ei := strings.Index(s[si:], "]]>")
+		if ei < 0 {
+			break
+		}
+		b.WriteString(s[:si])
+		b.WriteString(esc.Replace(s[si+len("<![CDATA[") : si+ei]))
+		s = s[si+ei+len("]]>"):]
+	}
+	if b.Len() == 0 {
+		return s
+	}
+	b.WriteString(s)
+	return b.String()
+}
+
+// MarshalXML emits the plist as a single CDATA section with embedded
+// CDATA sections rewritten as escaped character data, any remaining
+// `]]>` entity-guarded, and every `&` escaped once — the one wire
+// form the Classic API stores byte-exact (see the type comment). The
+// innerxml field is used because xml.Encoder has no raw-CDATA API.
 func (p PayloadsXMLText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	return e.EncodeElement(string(p), start)
+	s := string(p)
+	if strings.Contains(s, "]]>") {
+		s = stripPayloadCDATASections(s)
+		s = strings.ReplaceAll(s, "]]>", "]]&gt;")
+	}
+	s = strings.ReplaceAll(s, "&", "&amp;")
+	return e.EncodeElement(struct {
+		S string `xml:",innerxml"`
+	}{S: "<![CDATA[" + s + "]]>"}, start)
 }
 
 // UnmarshalXML decodes the element's text using encoding/xml's default
-// pass (one level of entity unescape) and stores the result verbatim.
-// Symmetric to MarshalXML.
+// pass (one level of entity unescape) and stores the result verbatim —
+// correct for GET responses, which the server escapes properly. Not the
+// inverse of MarshalXML: decoding our own marshalled form would return
+// the pre-escaped wire bytes, but the SDK never reads its own writes.
 func (p *PayloadsXMLText) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var s string
 	if err := d.DecodeElement(&s, &start); err != nil {

@@ -3,36 +3,37 @@
 
 //go:build acceptance
 
-// Wire-level proof that configuration-profile <payloads> bodies survive
-// both Create (POST) and Update (PUT) round-trips through Jamf Pro
-// Classic without entity-layer corruption.
+// Wire-level documentation of how configuration-profile <payloads>
+// bodies survive Create (POST) and Update (PUT) through Jamf Pro
+// Classic. These tests encode the server's actual behaviour — including
+// its defects — so any server-side change breaks them loudly.
 //
-// Background: the JSSResource POST handler runs an extra XML-entity-decode
-// pass on <payloads> chardata and then canonicalises the parsed plist
-// before storage, while the PUT handler does neither — it stores the
-// post-XML-decode bytes verbatim. To compensate the SDK has historically
-// double-escaped the <payloads> wire form via PayloadsXMLText. That fix
-// is correct for POST, but on PUT it persists literal "&amp;#34;" (8
-// bytes) where the caller wrote "\"" (1 byte) and breaks downstream
-// device-side parsing of CodeRequirement / TCC / PPPC payloads.
+// Server model (PI-827; wire-verified 2026-07-30 against two Jamf Pro
+// 11.x tenants, superseding the 2026-05-27 probe conclusions recorded in
+// earlier revisions of this file):
 //
-// SDK fix: PUT endpoints now take *OsXConfigurationProfileUpdate /
-// *MobileDeviceConfigurationProfileUpdate, whose <general>.<payloads>
-// field is wired to PayloadsXMLTextSingleEscape (single-escape, the
-// spec-correct XML chardata form). These tests confirm the round-trip
-// holds on a live EU tenant.
+//  1. Validation: the server entity-decodes submitted payload content
+//     once and 409s ("Unable to update the database") when the result
+//     contains a bare `&` or `<`. Raw spec-correct CDATA is therefore
+//     rejected for ANY plist containing `&amp;`/`&lt;`; the escape-once
+//     CDATA form PayloadsXMLText emits is the only submittable one.
+//  2. Storage is per-payload-type: fragments of types the server
+//     re-renders (com.apple.ManagedClient.preferences custom settings —
+//     values and dict keys — and com.apple.notificationsettings) are
+//     entity-decoded once, so the wire form stores them BYTE-EXACT.
+//     Fragments of every other payload type (TCC, direct loginwindow,
+//     all mobiledeviceconfigurationprofiles payloads) are stored
+//     VERBATIM, keeping one extra entity layer — values with `&`/`<` in
+//     those types cannot be stored faithfully by any client. Tests for
+//     that category assert the defect's exact shape.
 //
-// The probe payload is a minimal valid mobileconfig plist containing
-// both bug markers in one string:
-//   - literal `"` chars (the TCC CodeRequirement quote syntax)
-//   - the pre-encoded `&amp;` entity (any embedded ampersand in plist
-//     source must be entity-encoded for the plist XML to be well-formed)
-//
-// Assertions inspect the SDK-decoded payload string returned from GET
-// after Create and again after Update. They look for the buggy
-// double-encoded forms (`&amp;amp;`, `&amp;#34;`, `&amp;quot;`) and fail
-// the test if any are present — those forms only appear when the wire
-// form was double-escaped on the way in.
+// The server canonicalises stored plists regardless of input form:
+// entities for `&` `<` `>` (`&amp;` `&lt;` `&gt;` — a raw `>` is stored
+// as `&gt;`), literals for `"` `'` (even when sent as `&quot;`/`&#39;`),
+// numeric refs collapsed to those canonical forms, keys sorted, and
+// leading/trailing whitespace inside string values trimmed. Assertions
+// therefore compare against the canonical stored form, never the input
+// representation.
 
 package jamfplatform_test
 
@@ -191,9 +192,9 @@ func assertQuoteRoundtrip(t *testing.T, stage, got string) {
 
 // assertAmpersandRoundtrip is the stricter variant: also requires that
 // an inbound `&amp;` survives without becoming `&amp;amp;` (9 bytes) or
-// any further-doubled form. Currently fails on POST too — the existing
-// double-escape PayloadsXMLText wrapper corrupts `&`-content even on
-// Create. Wire-evidenced 2026-05-27; see project memory.
+// any further-doubled form. Passes with PayloadsXMLText's CDATA wire
+// form (wire-verified 2026-07-30); failed under both earlier text-form
+// designs — single-escape 409d, double-escape corrupted.
 func assertAmpersandRoundtrip(t *testing.T, stage, got string) {
 	t.Helper()
 	for _, bad := range []string{"&amp;amp;"} {
@@ -278,27 +279,15 @@ func TestAcceptance_Classic_OSXProfile_QuoteRoundtrip(t *testing.T) {
 	}
 }
 
-// TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip exercises plist
-// content with both `"` and `&amp;` markers in `<string>` values. It is
-// currently expected to fail with HTTP 409 "Unable to update the
-// database" on POST — wire-confirmed 2026-05-27, EU tenant.
-//
-// Root cause is NOT the SDK escape strategy. Single-escape on the wire
-// (matching jamf-upload's production-tested approach) decodes to
-// well-formed plist XML server-side; the plist parser then decodes
-// `&amp;` to a literal `&` string value; the server's DB-write layer
-// rejects literal `&` in stored plist `<string>` values regardless of
-// how the wire was framed. Double-escaping the wire only side-steps
-// this by storing the entity ref `&amp;` as the value (8 bytes of
-// `&amp;amp;` chardata in the saved mobileconfig) — that's silent
-// content corruption, not a fix. The SDK chooses single-escape (Option
-// B) to surface the limitation as a clean 409 instead of hiding it.
-//
-// Skipped under default acc-test runs because the failure is
-// server-side. Unskip locally to track if Jamf fixes the underlying API
-// behaviour.
+// TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip exercises `&amp;`
+// and `&lt;` markers inside a TCC payload — a payload type the server
+// stores VERBATIM (category 2b in the file header). The write now
+// succeeds (escape-once passes validation), but the stored fragment
+// keeps the wire's extra entity layer: the device would see `&amp;`
+// where `&` was meant. That is a server defect (PI-827) no client can
+// avoid; this test asserts its exact shape so a server-side fix is
+// detected the moment it ships.
 func TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip(t *testing.T) {
-	t.Skip("server-side limitation: Classic API rejects literal `&` in plist <string> values regardless of wire escape level. SDK fix not possible; see test docstring.")
 	c := accClient(t)
 	ctx := context.Background()
 	pc := proclassic.New(c)
@@ -333,8 +322,7 @@ func TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip(t *testing.T) {
 		t.Fatalf("GET after create: profile or payloads missing: %+v", afterCreate)
 	}
 	got := string(*afterCreate.General.Payloads)
-	assertQuoteRoundtrip(t, "after Create (POST)", got)
-	assertAmpersandRoundtrip(t, "after Create (POST)", got)
+	assertVerbatimStorageDefect(t, "after Create (POST)", got)
 	t.Logf("after Create: payload chardata:\n%s", got)
 
 	updatePayload := osxProfilePlist(name, "update-marker-amp-\"-and-&amp;", true)
@@ -358,12 +346,26 @@ func TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip(t *testing.T) {
 		t.Fatalf("GET after update: profile or payloads missing: %+v", afterUpdate)
 	}
 	got = string(*afterUpdate.General.Payloads)
-	assertQuoteRoundtrip(t, "after Update (PUT)", got)
-	assertAmpersandRoundtrip(t, "after Update (PUT)", got)
+	assertVerbatimStorageDefect(t, "after Update (PUT)", got)
 	t.Logf("after Update: payload chardata:\n%s", got)
 
 	if !strings.Contains(got, "update-marker") {
 		t.Fatalf("after Update: payload still contains create-marker, server did not apply the update. Got:\n%s", got)
+	}
+}
+
+// assertVerbatimStorageDefect pins the exact shape of the server's
+// verbatim storage of TCC fragments: the wire's extra entity layer is
+// kept (`&amp;amp;`, `&amp;lt;`), while entity-free strings like the
+// CodeRequirement stay intact. If Jamf ever fixes PI-827 ingest, the
+// first assertion flips and this test fails — the desired signal.
+func assertVerbatimStorageDefect(t *testing.T, stage, got string) {
+	t.Helper()
+	if !strings.Contains(got, "Foo &amp;amp; Bar &amp;lt;br/&amp;gt; baz") {
+		t.Fatalf("%s: TCC description no longer stored with the verbatim extra entity layer — server ingest behaviour changed (PI-827 fixed?). Got:\n%s", stage, got)
+	}
+	if !strings.Contains(got, `identifier "com.example.sdk" and anchor apple generic`) {
+		t.Fatalf("%s: entity-free CodeRequirement corrupted. Got:\n%s", stage, got)
 	}
 }
 
@@ -484,12 +486,11 @@ func minimalNotificationsPlist(displayName, marker string) string {
 // TestAcceptance_Classic_OSXProfile_NotificationsFixtureRoundtrip uses
 // a fixture mirroring terraform-provider-jamfplatform's
 // minimal_notifications.mobileconfig: a URL with `&amp;` and a string
-// containing `&lt;br/&gt;`. Same 409 server-side limitation as
-// AmpersandRoundtrip — Classic API rejects literal `&` / `<` / `>` in
-// plist `<string>` values regardless of SDK escape level. Skipped for
-// the same reason.
+// containing `&lt;br/&gt;`. Previously skipped alongside
+// AmpersandRoundtrip under the disproven "server-side limitation"
+// diagnosis — see that test's docstring. Passes with the CDATA wire
+// form.
 func TestAcceptance_Classic_OSXProfile_NotificationsFixtureRoundtrip(t *testing.T) {
-	t.Skip("server-side limitation: Classic API rejects literal `&`/`<`/`>` in plist <string> values regardless of wire escape level. SDK fix not possible; see test docstring.")
 	c := accClient(t)
 	ctx := context.Background()
 	pc := proclassic.New(c)
@@ -568,4 +569,243 @@ func TestAcceptance_Classic_OSXProfile_NotificationsFixtureRoundtrip(t *testing.
 func payloadsXMLPtr(s string) *proclassic.PayloadsXMLText {
 	v := proclassic.PayloadsXMLText(s)
 	return &v
+}
+
+// reservedCharCase pairs one mcx_preference_settings entry with the
+// canonical <key>…</key><string>…</string> fragment the server stores
+// for it. Canonical form (wire-verified 2026-07-30): entities for
+// `&` `<` `>`, literals for `"` `'`, numeric refs collapsed.
+type reservedCharCase struct {
+	key    string // dict key, also used to locate the stored fragment
+	input  string // value as written in the submitted plist source
+	stored string // value as the server's canonical plist source stores it
+}
+
+// reservedCharCases is the full matrix: every reserved XML character in
+// every legal plist-source representation, plus the compound cases that
+// caught real-world regressions (CEL expressions, literal entity text,
+// embedded CDATA sections).
+var reservedCharCases = []reservedCharCase{
+	{"amp_entity", "A &amp; B", "A &amp; B"},
+	{"amp_decimal", "A &#38; B", "A &amp; B"},
+	{"amp_hex", "A &#x26; B", "A &amp; B"},
+	{"lt_entity", "a &lt; b", "a &lt; b"},
+	{"lt_decimal", "a &#60; b", "a &lt; b"},
+	{"lt_hex", "a &#x3C; b", "a &lt; b"},
+	{"gt_raw", "x > y", "x &gt; y"},
+	{"gt_entity", "x &gt; y", "x &gt; y"},
+	{"gt_decimal", "x &#62; y", "x &gt; y"},
+	{"quot_raw", `q " q`, `q " q`},
+	{"quot_entity", "q &quot; q", `q " q`},
+	{"quot_decimal", "q &#34; q", `q " q`},
+	{"apos_raw", "p ' p", "p ' p"},
+	{"apos_entity", "p &apos; p", "p ' p"},
+	{"apos_decimal", "p &#39; p", "p ' p"},
+	{"literal_entity_text", "shows &amp;amp; and &amp;lt; as text", "shows &amp;amp; and &amp;lt; as text"},
+	{"all_five_mixed", `&amp; &lt; > " ' &#38; &#60; &gt; &quot; &apos; end`, `&amp; &lt; &gt; " ' &amp; &lt; &gt; " ' end`},
+	{"cel_expression", `target.signing_time >= timestamp('2025-05-31T00:00:00Z') &amp;&amp; target.team_id == "EQHXZ8M8AV"`, `target.signing_time &gt;= timestamp('2025-05-31T00:00:00Z') &amp;&amp; target.team_id == "EQHXZ8M8AV"`},
+	{"embedded_cdata", `<![CDATA[cdata section: & < > " ' kept literal]]>`, `cdata section: &amp; &lt; &gt; " ' kept literal`},
+}
+
+// matrixProfilePlist embeds the full reserved-character corpus in an MCX
+// custom-settings payload — the server preserves mcx_preference_settings
+// string values verbatim (modulo canonicalisation), unlike some typed
+// payload fields it rewrites or validates.
+func matrixProfilePlist(displayName string) string {
+	var b strings.Builder
+	for _, c := range reservedCharCases {
+		b.WriteString("\t\t\t\t\t\t\t\t<key>" + c.key + "</key>\n")
+		b.WriteString("\t\t\t\t\t\t\t\t<string>" + c.input + "</string>\n")
+	}
+	return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadType</key>
+			<string>com.apple.ManagedClient.preferences</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>PayloadIdentifier</key>
+			<string>com.example.sdkacc.charmatrix.mcx</string>
+			<key>PayloadUUID</key>
+			<string>3b1f5c77-4c1e-4f7a-9a55-0d9e2f6a1c01</string>
+			<key>PayloadDisplayName</key>
+			<string>reserved char matrix settings</string>
+			<key>PayloadContent</key>
+			<dict>
+				<key>com.example.sdkacc.charmatrix</key>
+				<dict>
+					<key>Forced</key>
+					<array>
+						<dict>
+							<key>mcx_preference_settings</key>
+							<dict>
+` + b.String() + `							</dict>
+						</dict>
+					</array>
+				</dict>
+			</dict>
+		</dict>
+	</array>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+	<key>PayloadIdentifier</key>
+	<string>com.example.sdkacc.charmatrix</string>
+	<key>PayloadUUID</key>
+	<string>9e8d7c6b-5a49-4838-a7b6-c5d4e3f2a101</string>
+	<key>PayloadDisplayName</key>
+	<string>` + displayName + `</string>
+	<key>PayloadScope</key>
+	<string>System</string>
+</dict>
+</plist>
+`
+}
+
+// verbatimStored computes the stored form for endpoints/payload types the
+// server stores VERBATIM (category 2b): the wire fragment as-is — i.e.
+// the client's single `&` escape retained — with raw `>` canonicalised
+// to `&gt;`. Embedded CDATA sections are rewritten client-side before
+// the wire escape, so that case starts from the rewritten source.
+func verbatimStored(c reservedCharCase) string {
+	src := c.input
+	if c.key == "embedded_cdata" {
+		src = `cdata section: &amp; &lt; &gt; " ' kept literal`
+	}
+	src = strings.ReplaceAll(src, "&", "&amp;")
+	return strings.ReplaceAll(src, ">", "&gt;")
+}
+
+// assertMatrixStored verifies every corpus entry appears in the stored
+// plist source in the expected form: the byte-exact canonical form for
+// MCX-family storage (verbatim=false), or the extra-entity-layer form
+// for verbatim storage (verbatim=true — the PI-827 defect's exact
+// shape; a failure there means the server behaviour changed). The
+// server re-serialises compactly (<key>k</key><string>v</string>
+// adjacent, keys sorted), so a direct substring check on the
+// whitespace-stripped payload is exact.
+func assertMatrixStored(t *testing.T, stage, got string, verbatim bool) {
+	t.Helper()
+	compact := strings.NewReplacer("\n", "", "\t", "").Replace(got)
+	for _, c := range reservedCharCases {
+		expect := c.stored
+		if verbatim {
+			expect = verbatimStored(c)
+		}
+		want := "<key>" + c.key + "</key><string>" + expect + "</string>"
+		if !strings.Contains(compact, want) {
+			t.Errorf("%s: stored payload missing expected fragment for %q:\n  want fragment: %s", stage, c.key, want)
+		}
+	}
+	if t.Failed() {
+		t.Fatalf("%s: stored payload was:\n%s", stage, got)
+	}
+}
+
+// TestAcceptance_Classic_OSXProfile_ReservedCharacterMatrix proves every
+// reserved XML character in every legal representation round-trips
+// byte-exact (to the server's canonical form) through Create and Update.
+func TestAcceptance_Classic_OSXProfile_ReservedCharacterMatrix(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-osxcp-charmatrix-" + runSuffix()
+
+	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
+		General: &proclassic.OsXConfigurationProfileGeneral{
+			Name:     classicStrPtr(name),
+			Payloads: payloadsXMLPtr(matrixProfilePlist(name)),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateOSXConfigurationProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateOSXConfigurationProfileByID: no ID returned: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteOSXConfigurationProfileByID", func() error {
+		return pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id))
+	})
+
+	afterCreate, err := pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetOSXConfigurationProfileByID after create: %v", err)
+	}
+	if afterCreate == nil || afterCreate.General == nil || afterCreate.General.Payloads == nil {
+		t.Fatalf("GET after create: profile or payloads missing: %+v", afterCreate)
+	}
+	assertMatrixStored(t, "after Create (POST)", string(*afterCreate.General.Payloads), false)
+
+	// Update with the identical corpus — exercises the PUT path and the
+	// server's identifier-preserving replace.
+	if err := pc.UpdateOSXConfigurationProfileByID(ctx, intToStr(id), &proclassic.OsXConfigurationProfile{
+		General: &proclassic.OsXConfigurationProfileGeneral{
+			Name:     classicStrPtr(name),
+			Payloads: payloadsXMLPtr(matrixProfilePlist(name)),
+		},
+	}); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateOSXConfigurationProfileByID: %v", err)
+	}
+
+	afterUpdate, err := pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetOSXConfigurationProfileByID after update: %v", err)
+	}
+	if afterUpdate == nil || afterUpdate.General == nil || afterUpdate.General.Payloads == nil {
+		t.Fatalf("GET after update: profile or payloads missing: %+v", afterUpdate)
+	}
+	assertMatrixStored(t, "after Update (PUT)", string(*afterUpdate.General.Payloads), false)
+}
+
+// TestAcceptance_Classic_MobileDeviceProfile_ReservedCharacterMatrix
+// mirrors the matrix for the mobile device resource. Mobile payloads are
+// stored VERBATIM (category 2b in the file header): entity-bearing
+// values keep the wire's extra layer — the PI-827 defect — while
+// raw-character values survive. Asserted exactly so a server-side fix
+// is detected the moment it ships.
+func TestAcceptance_Classic_MobileDeviceProfile_ReservedCharacterMatrix(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-mdcp-charmatrix-" + runSuffix()
+
+	created, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
+		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
+			Name:     classicStrPtr(name),
+			Payloads: payloadsXMLPtr(matrixProfilePlist(name)),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateMobileDeviceConfigurationProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateMobileDeviceConfigurationProfileByID: no ID returned: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteMobileDeviceConfigurationProfileByID", func() error {
+		return pc.DeleteMobileDeviceConfigurationProfileByID(ctx, intToStr(id))
+	})
+
+	afterCreate, err := pc.GetMobileDeviceConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceConfigurationProfileByID after create: %v", err)
+	}
+	if afterCreate == nil || afterCreate.General == nil || afterCreate.General.Payloads == nil {
+		t.Fatalf("GET after create: profile or payloads missing: %+v", afterCreate)
+	}
+	assertMatrixStored(t, "after Create (POST)", string(*afterCreate.General.Payloads), true)
 }

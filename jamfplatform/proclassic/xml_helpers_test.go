@@ -20,48 +20,90 @@ type payloadsTestParent struct {
 	Payloads *PayloadsXMLText `xml:"payloads,omitempty"`
 }
 
-func TestPayloadsXMLText_MarshalSingleEncodesEntities(t *testing.T) {
-	// Caller submits raw plist XML containing chardata-special characters
-	// (`<`, `>`, `&`). The wrapper must emit those at a single XML entity
-	// layer — encoding/xml's default chardata escape — matching what
-	// jamf-upload writes (production-tested across the AutoPkg community)
-	// and what the Jamf Pro admin UI itself writes.
-	v := PayloadsXMLText(`<string>a & b</string>`)
-	parent := payloadsTestParent{Payloads: &v}
-	out, err := xml.Marshal(parent)
+// marshalPayloads marshals the plist through the parent struct and
+// returns the raw content between the CDATA markers, failing the test
+// if the wire form is not exactly one well-formed CDATA section.
+func marshalPayloads(t *testing.T, plist string) string {
+	t.Helper()
+	v := PayloadsXMLText(plist)
+	out, err := xml.Marshal(payloadsTestParent{Payloads: &v})
 	if err != nil {
 		t.Fatalf("marshal: %v", err)
 	}
 	got := string(out)
-	if strings.Contains(got, "&amp;amp;") {
-		t.Fatalf("wire form is double-escaped (corrupts content): %s", got)
+	const openMark = "<payloads><![CDATA["
+	const closeMark = "]]></payloads>"
+	si := strings.Index(got, openMark)
+	ei := strings.LastIndex(got, closeMark)
+	if si < 0 || ei < 0 {
+		t.Fatalf("wire form is not a CDATA-wrapped <payloads> element: %s", got)
 	}
-	if !strings.Contains(got, "&amp;") || !strings.Contains(got, "&lt;string&gt;") {
-		t.Fatalf("wire form not single-escaped as expected: %s", got)
+	inner := got[si+len(openMark) : ei]
+	if strings.Contains(inner, "]]>") {
+		t.Fatalf("CDATA content contains a raw terminator — document is malformed: %s", got)
+	}
+	return inner
+}
+
+// serverIngest simulates the Classic API's single entity-decode of
+// MCX-family payload fragments (PI-827; wire-verified 2026-07-30) — the
+// storage path this wire form targets byte-exact. Other payload types
+// store the wire content verbatim (see the PayloadsXMLText type comment).
+// Every `&` in marshalled output is part of an `&amp;` sequence, so one
+// non-overlapping replacement is an exact model of the decode.
+func serverIngest(inner string) string {
+	return strings.ReplaceAll(inner, "&amp;", "&")
+}
+
+func TestPayloadsXMLText_ServerDecodeRestoresPlistExactly(t *testing.T) {
+	// The marshalled form must be exactly one escape layer above the
+	// plist bytes: the server's single decode restores them byte-exact.
+	// Covers every reserved character in every legal representation.
+	plists := []string{
+		"<string>R&amp;D</string>",
+		"<string>a &lt; b &gt; c</string>",
+		"<string>A &#38; B &#x26; C</string>",
+		"<string>x > y</string>",
+		`<string>q " q and p ' p</string>`,
+		"<string>literal &amp;amp; entity text</string>",
+		"<string>target.signing_time >= timestamp('2025-05-31T00:00:00Z') &amp;&amp; ok</string>",
+		`identifier "com.foo" and anchor apple generic`,
+	}
+	for _, p := range plists {
+		if got := serverIngest(marshalPayloads(t, p)); got != p {
+			t.Fatalf("server would store %q, want %q", got, p)
+		}
 	}
 }
 
-func TestPayloadsXMLText_MarshalSingleEscapesQuotes(t *testing.T) {
-	// Go's encoding/xml conservatively escapes `"` in chardata to `&#34;`
-	// (legal but not strictly required per XML spec). The chosen form
-	// must be a single entity layer — never `&amp;#34;` (double-escape, the
-	// regression form that breaks device-side parsing of CodeRequirement
-	// / TCC / PPPC string content).
-	v := PayloadsXMLText(`identifier "com.foo" and anchor apple generic`)
-	parent := payloadsTestParent{Payloads: &v}
-	out, err := xml.Marshal(parent)
-	if err != nil {
-		t.Fatalf("marshal: %v", err)
+func TestPayloadsXMLText_EmbeddedCDATARewrittenNotTruncated(t *testing.T) {
+	// A plist may legitimately contain a CDATA section; its literal
+	// terminator must not end the wire wrapper early. The section is
+	// rewritten as equivalent escaped character data (value-preserving,
+	// including edge whitespace — the reason this is textual, not a
+	// plist re-serialise).
+	inner := marshalPayloads(t, "<string><![CDATA[x & y ]]></string>")
+	want := "<string>x &amp; y </string>"
+	if got := serverIngest(inner); got != want {
+		t.Fatalf("server would store %q, want %q", got, want)
 	}
-	got := string(out)
-	if strings.Contains(got, "&amp;#34;") || strings.Contains(got, "&amp;quot;") {
-		t.Fatalf("wire form double-escapes literal quote: %s", got)
+}
+
+func TestPayloadsXMLText_StrayTerminatorGuarded(t *testing.T) {
+	// A bare "]]>" outside any CDATA section (malformed plist input) is
+	// entity-guarded rather than emitted raw; the server decode leaves
+	// the valid entity form in the stored plist.
+	inner := marshalPayloads(t, "<string>a]]>b</string>")
+	want := "<string>a]]&gt;b</string>"
+	if got := serverIngest(inner); got != want {
+		t.Fatalf("server would store %q, want %q", got, want)
 	}
 }
 
 func TestPayloadsXMLText_UnmarshalSingleDecodes(t *testing.T) {
-	// Server returns chardata at one level of XML entity encoding. The
-	// decoder unescapes once; the wrapper stores the result verbatim.
+	// Server returns chardata at one level of XML entity encoding (GET
+	// responses are escaped correctly — the ingest quirk is write-only).
+	// The decoder unescapes once; the wrapper stores the result verbatim.
 	wire := []byte("<parent><payloads>ab&amp;cd&lt;br/&gt;ef</payloads></parent>")
 	var got payloadsTestParent
 	if err := xml.Unmarshal(wire, &got); err != nil {

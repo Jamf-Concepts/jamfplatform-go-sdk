@@ -361,7 +361,7 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 		if err != nil {
 			return fmt.Errorf("goimports %s: %w\n---raw---\n%s", pair.out, err, buf.String())
 		}
-		if err := os.WriteFile(filepath.Join(root, pair.out), formatted, 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(root, pair.out), formatted, 0o644); err != nil {
 			return fmt.Errorf("writing %s: %w", pair.out, err)
 		}
 		log.Printf("wrote %s", pair.out)
@@ -398,7 +398,7 @@ type loadedSpec struct {
 // directories. The Go package declaration uses only the last path segment.
 func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec) error {
 	pkgDir := filepath.Join(root, "jamfplatform", pkgName)
-	if err := os.MkdirAll(pkgDir, 0755); err != nil {
+	if err := os.MkdirAll(pkgDir, 0o755); err != nil {
 		return fmt.Errorf("creating package dir: %w", err)
 	}
 
@@ -697,7 +697,7 @@ func TestRoundTrip_%s(t *testing.T) {
 	if err != nil {
 		return fmt.Errorf("formatting types_test.go: %w\n---raw---\n%s", err, buf.String())
 	}
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -734,6 +734,7 @@ import (
 	"encoding/xml"
 	"math/big"
 	"strconv"
+	"strings"
 )
 
 // BigInt is an arbitrary-precision integer with XML/JSON codecs. The zero
@@ -866,39 +867,106 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 	return nil
 }
 
-// PayloadsXMLText wraps the configuration-profile <payloads> chardata
-// (raw .mobileconfig plist XML embedded as element text). MarshalXML
-// emits the standard single-level XML chardata encoding via
-// encoding/xml's default escape (escapes `+"`<`"+`, `+"`>`"+`, `+"`&`"+`; leaves `+"`\"`"+`
-// alone, which is legal in chardata). UnmarshalXML decodes one level
-// symmetrically.
+// PayloadsXMLText wraps the configuration-profile <payloads> content
+// (raw .mobileconfig plist XML). MarshalXML emits a single CDATA section
+// with every `+"`&`"+` escaped once; UnmarshalXML decodes the server's
+// entity-escaped text form once. The two directions are deliberately
+// asymmetric because the server itself is asymmetric.
 //
-// Single-escape applies on both Create (POST) and Update (PUT), matching
-// the production-tested approach jamf-upload has shipped across the
-// AutoPkg community for years. An earlier double-escape design
-// (commit 70b4cd6, 2026-05-26) was added in response to a POST 409
-// "Unable to update the database" and assumed the server runs an extra
-// entity-decode pass before its plist parser. Wire-probing on 2026-05-27
-// showed that diagnosis was wrong: double-escaping silently corrupted
-// every <string> value containing literal `+"`&`"+`, `+"`<`"+`, or `+"`>`"+` — POSTed
-// values stored as `+"`&amp;`"+`, `+"`&lt;`"+`, `+"`&gt;`"+` doubled to `+"`&amp;amp;`"+` etc.,
-// and the same content 409d (or worse, corrupted) on PUT. Single-escape
-// for both methods matches what the server actually expects and what
-// the Jamf Pro admin UI itself writes.
+// The Classic API does not treat <payloads> content per XML 1.0
+// (PI-827). Wire-verified model (2026-07-30, two Jamf Pro 11.x tenants;
+// full matrix in acc_proclassic_profile_payloads_test.go):
+//
+//   - Validation: the server entity-decodes the submitted content once
+//     and rejects the write with 409 "Unable to update the database"
+//     when the result contains a bare `+"`&`"+` or `+"`<`"+`. Spec-correct raw
+//     CDATA is therefore rejected for ANY plist containing `+"`&amp;`"+` or
+//     `+"`&lt;`"+` — the escape-once form this type emits is the only
+//     submittable one for such profiles.
+//   - Storage is per-payload-type: fragments of types the server
+//     re-renders (com.apple.ManagedClient.preferences custom settings —
+//     values and dict keys — and com.apple.notificationsettings) are
+//     entity-decoded once, so this wire form stores them byte-exact.
+//     Fragments of every other payload type (TCC, direct
+//     com.apple.loginwindow, all mobiledeviceconfigurationprofiles
+//     payloads) are stored verbatim, keeping one extra entity layer —
+//     values containing `+"`&`"+`/`+"`<`"+` in those types cannot be stored
+//     faithfully by ANY client. Consumers doing read-back comparison
+//     (e.g. terraform-provider-jamfplatform) surface that as drift; it
+//     is a server defect, not an SDK bug.
+//
+// Historical note: the 2026-05-27 probes that shipped single-escape
+// element text used a corpus with no `+"`&`"+`/`+"`<`"+` inside <string> values,
+// so the validation 409 went unseen; the 2026-05-26 "double-escape" era
+// (html.EscapeString on top of encoding/xml) corrupted content it could
+// have stored. Both observations are consistent with the model above.
+//
+// The `+"`]]>`"+` guard keeps the emitted document well-formed (XML 1.0
+// §2.4/§2.7) when a plist legitimately contains the terminator (embedded
+// CDATA sections). A single CDATA section is used rather than Go's
+// `+"`xml:\",cdata\"`"+` tag because that tag splits content on `+"`]]>`"+` into
+// multiple sections, which the server's substring-based extractor would
+// truncate.
+//
+// Note the server canonicalises stored plists regardless of input form:
+// entities for `+"`&`"+` `+"`<`"+` `+"`>`"+`, literals for `+"`\"`"+` `+"`'`"+`, sorted keys,
+// and leading/trailing whitespace inside string values is trimmed.
+// Byte-identical round-trips are impossible by design; consumers must
+// compare payloads structurally, never byte-wise.
 type PayloadsXMLText string
 
-// MarshalXML emits the chardata at a single XML entity layer (encoding/
-// xml's default behaviour). Used on both POST and PUT — the server
-// canonicalises the parsed plist after a single chardata decode on POST
-// and stores the post-decode bytes verbatim on PUT, both of which
-// preserve single-escape content correctly.
+// stripPayloadCDATASections rewrites every <![CDATA[...]]> section in a
+// plist as equivalent escaped character data. The parsed document is
+// unchanged (CDATA content is literal text by definition — XML 1.0
+// §2.7), but the literal `+"`]]>`"+` terminators disappear so the plist can
+// itself be CDATA-wrapped. Textual rewrite by design: plist
+// parse/re-serialise round trips are not byte-faithful for CDATA text.
+// Content after an unterminated <![CDATA[ is left untouched.
+func stripPayloadCDATASections(s string) string {
+	esc := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;")
+	var b strings.Builder
+	for {
+		si := strings.Index(s, "<![CDATA[")
+		if si < 0 {
+			break
+		}
+		ei := strings.Index(s[si:], "]]>")
+		if ei < 0 {
+			break
+		}
+		b.WriteString(s[:si])
+		b.WriteString(esc.Replace(s[si+len("<![CDATA[") : si+ei]))
+		s = s[si+ei+len("]]>"):]
+	}
+	if b.Len() == 0 {
+		return s
+	}
+	b.WriteString(s)
+	return b.String()
+}
+
+// MarshalXML emits the plist as a single CDATA section with embedded
+// CDATA sections rewritten as escaped character data, any remaining
+// `+"`]]>`"+` entity-guarded, and every `+"`&`"+` escaped once — the one wire
+// form the Classic API stores byte-exact (see the type comment). The
+// innerxml field is used because xml.Encoder has no raw-CDATA API.
 func (p PayloadsXMLText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	return e.EncodeElement(string(p), start)
+	s := string(p)
+	if strings.Contains(s, "]]>") {
+		s = stripPayloadCDATASections(s)
+		s = strings.ReplaceAll(s, "]]>", "]]&gt;")
+	}
+	s = strings.ReplaceAll(s, "&", "&amp;")
+	return e.EncodeElement(struct {
+		S string `+"`xml:\",innerxml\"`"+`
+	}{S: "<![CDATA[" + s + "]]>"}, start)
 }
 
 // UnmarshalXML decodes the element's text using encoding/xml's default
-// pass (one level of entity unescape) and stores the result verbatim.
-// Symmetric to MarshalXML.
+// pass (one level of entity unescape) and stores the result verbatim —
+// correct for GET responses, which the server escapes properly. Not the
+// inverse of MarshalXML: decoding our own marshalled form would return
+// the pre-escaped wire bytes, but the SDK never reads its own writes.
 func (p *PayloadsXMLText) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var s string
 	if err := d.DecodeElement(&s, &start); err != nil {
@@ -913,7 +981,7 @@ func (p *PayloadsXMLText) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 	if err != nil {
 		return fmt.Errorf("formatting xml_helpers.go: %w", err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -951,48 +1019,90 @@ type payloadsTestParent struct {
 	Payloads *PayloadsXMLText  %sxml:"payloads,omitempty"%s
 }
 
-func TestPayloadsXMLText_MarshalSingleEncodesEntities(t *testing.T) {
-	// Caller submits raw plist XML containing chardata-special characters
-	// (%s, %s, %s). The wrapper must emit those at a single XML entity
-	// layer — encoding/xml's default chardata escape — matching what
-	// jamf-upload writes (production-tested across the AutoPkg community)
-	// and what the Jamf Pro admin UI itself writes.
-	v := PayloadsXMLText(%s<string>a & b</string>%s)
-	parent := payloadsTestParent{Payloads: &v}
-	out, err := xml.Marshal(parent)
+// marshalPayloads marshals the plist through the parent struct and
+// returns the raw content between the CDATA markers, failing the test
+// if the wire form is not exactly one well-formed CDATA section.
+func marshalPayloads(t *testing.T, plist string) string {
+	t.Helper()
+	v := PayloadsXMLText(plist)
+	out, err := xml.Marshal(payloadsTestParent{Payloads: &v})
 	if err != nil {
 		t.Fatalf("marshal: %%v", err)
 	}
 	got := string(out)
-	if strings.Contains(got, "&amp;amp;") {
-		t.Fatalf("wire form is double-escaped (corrupts content): %%s", got)
+	const openMark = "<payloads><![CDATA["
+	const closeMark = "]]></payloads>"
+	si := strings.Index(got, openMark)
+	ei := strings.LastIndex(got, closeMark)
+	if si < 0 || ei < 0 {
+		t.Fatalf("wire form is not a CDATA-wrapped <payloads> element: %%s", got)
 	}
-	if !strings.Contains(got, "&amp;") || !strings.Contains(got, "&lt;string&gt;") {
-		t.Fatalf("wire form not single-escaped as expected: %%s", got)
+	inner := got[si+len(openMark) : ei]
+	if strings.Contains(inner, "]]>") {
+		t.Fatalf("CDATA content contains a raw terminator — document is malformed: %%s", got)
+	}
+	return inner
+}
+
+// serverIngest simulates the Classic API's single entity-decode of
+// MCX-family payload fragments (PI-827; wire-verified 2026-07-30) — the
+// storage path this wire form targets byte-exact. Other payload types
+// store the wire content verbatim (see the PayloadsXMLText type comment).
+// Every %s in marshalled output is part of an %s sequence, so one
+// non-overlapping replacement is an exact model of the decode.
+func serverIngest(inner string) string {
+	return strings.ReplaceAll(inner, "&amp;", "&")
+}
+
+func TestPayloadsXMLText_ServerDecodeRestoresPlistExactly(t *testing.T) {
+	// The marshalled form must be exactly one escape layer above the
+	// plist bytes: the server's single decode restores them byte-exact.
+	// Covers every reserved character in every legal representation.
+	plists := []string{
+		"<string>R&amp;D</string>",
+		"<string>a &lt; b &gt; c</string>",
+		"<string>A &#38; B &#x26; C</string>",
+		"<string>x > y</string>",
+		%s<string>q " q and p ' p</string>%s,
+		"<string>literal &amp;amp; entity text</string>",
+		"<string>target.signing_time >= timestamp('2025-05-31T00:00:00Z') &amp;&amp; ok</string>",
+		%sidentifier "com.foo" and anchor apple generic%s,
+	}
+	for _, p := range plists {
+		if got := serverIngest(marshalPayloads(t, p)); got != p {
+			t.Fatalf("server would store %%q, want %%q", got, p)
+		}
 	}
 }
 
-func TestPayloadsXMLText_MarshalSingleEscapesQuotes(t *testing.T) {
-	// Go's encoding/xml conservatively escapes %s in chardata to %s
-	// (legal but not strictly required per XML spec). The chosen form
-	// must be a single entity layer — never %s (double-escape, the
-	// regression form that breaks device-side parsing of CodeRequirement
-	// / TCC / PPPC string content).
-	v := PayloadsXMLText(%sidentifier "com.foo" and anchor apple generic%s)
-	parent := payloadsTestParent{Payloads: &v}
-	out, err := xml.Marshal(parent)
-	if err != nil {
-		t.Fatalf("marshal: %%v", err)
+func TestPayloadsXMLText_EmbeddedCDATARewrittenNotTruncated(t *testing.T) {
+	// A plist may legitimately contain a CDATA section; its literal
+	// terminator must not end the wire wrapper early. The section is
+	// rewritten as equivalent escaped character data (value-preserving,
+	// including edge whitespace — the reason this is textual, not a
+	// plist re-serialise).
+	inner := marshalPayloads(t, "<string><![CDATA[x & y ]]></string>")
+	want := "<string>x &amp; y </string>"
+	if got := serverIngest(inner); got != want {
+		t.Fatalf("server would store %%q, want %%q", got, want)
 	}
-	got := string(out)
-	if strings.Contains(got, "&amp;#34;") || strings.Contains(got, "&amp;quot;") {
-		t.Fatalf("wire form double-escapes literal quote: %%s", got)
+}
+
+func TestPayloadsXMLText_StrayTerminatorGuarded(t *testing.T) {
+	// A bare "]]>" outside any CDATA section (malformed plist input) is
+	// entity-guarded rather than emitted raw; the server decode leaves
+	// the valid entity form in the stored plist.
+	inner := marshalPayloads(t, "<string>a]]>b</string>")
+	want := "<string>a]]&gt;b</string>"
+	if got := serverIngest(inner); got != want {
+		t.Fatalf("server would store %%q, want %%q", got, want)
 	}
 }
 
 func TestPayloadsXMLText_UnmarshalSingleDecodes(t *testing.T) {
-	// Server returns chardata at one level of XML entity encoding. The
-	// decoder unescapes once; the wrapper stores the result verbatim.
+	// Server returns chardata at one level of XML entity encoding (GET
+	// responses are escaped correctly — the ingest quirk is write-only).
+	// The decoder unescapes once; the wrapper stores the result verbatim.
 	wire := []byte("<parent><payloads>ab&amp;cd&lt;br/&gt;ef</payloads></parent>")
 	var got payloadsTestParent
 	if err := xml.Unmarshal(wire, &got); err != nil {
@@ -1018,16 +1128,15 @@ func TestPayloadsXMLText_NilOmitsField(t *testing.T) {
 	}
 }
 `, pkgName, "`", "`", "`", "`",
-		"`<`", "`>`", "`&`",
+		"`&`", "`&amp;`",
 		"`", "`",
-		"`\"`", "`&#34;`", "`&amp;#34;`",
 		"`", "`")
 	outPath := filepath.Join(pkgDir, "xml_helpers_test.go")
 	formatted, err := formatGo("xml_helpers_test.go", []byte(src))
 	if err != nil {
 		return fmt.Errorf("formatting xml_helpers_test.go: %w\n---raw---\n%s", err, src)
 	}
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1470,7 +1579,7 @@ func TestAccount_WireFixture_DirectoryUser(t *testing.T) {
 	if err != nil {
 		return fmt.Errorf("formatting accounts_privileges_test.go: %w\n---raw---\n%s", err, src)
 	}
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1599,7 +1708,7 @@ func injectVersionLock(dst, src reflect.Value) {
 	if err != nil {
 		return fmt.Errorf("formatting version_lock_helpers.go: %w", err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1705,7 +1814,7 @@ func emitTemplated(tmpl *template.Template, data any, outPath string) error {
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, buf.String())
 	}
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1744,7 +1853,7 @@ func New(base *jamfplatform.Client) *Client {
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w", outPath, err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1834,7 +1943,7 @@ func PrivilegesFor(method string) (jamfplatform.MethodPrivileges, bool) {
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, b.String())
 	}
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1930,7 +2039,7 @@ func ptrStr(s string) *string { return &s }%s
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w", outPath, err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2267,7 +2376,7 @@ func ptrStr(s string) *string { return &s }
 		if err != nil {
 			return fmt.Errorf("formatting %s: %w", relPath, err)
 		}
-		if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+		if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 			return fmt.Errorf("writing %s: %w", relPath, err)
 		}
 		log.Printf("wrote %s", relPath)
