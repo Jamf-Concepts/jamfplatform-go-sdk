@@ -55,23 +55,59 @@ func serverIngest(inner string) string {
 	return strings.ReplaceAll(inner, "&amp;", "&")
 }
 
-func TestPayloadsXMLText_ServerDecodeRestoresPlistExactly(t *testing.T) {
+func TestPayloadsXMLText_ServerDecodeRestoresMinimalSource(t *testing.T) {
 	// The marshalled form must be exactly one escape layer above the
-	// plist bytes: the server's single decode restores them byte-exact.
-	// Covers every reserved character in every legal representation.
+	// minimal-escaping plist source: the server's single decode restores
+	// that source, which parses to the same values as the input. Covers
+	// every reserved character in every legal representation.
 	plists := []string{
 		"<string>R&amp;D</string>",
 		"<string>a &lt; b &gt; c</string>",
 		"<string>A &#38; B &#x26; C</string>",
 		"<string>x > y</string>",
 		`<string>q " q and p ' p</string>`,
+		"<string>q &quot; q and p &#39; p and tab&#9;end</string>",
 		"<string>literal &amp;amp; entity text</string>",
 		"<string>target.signing_time >= timestamp('2025-05-31T00:00:00Z') &amp;&amp; ok</string>",
 		`identifier "com.foo" and anchor apple generic`,
+		`identifier &#34;com.foo&#34; and anchor apple generic`,
 	}
 	for _, p := range plists {
-		if got := serverIngest(marshalPayloads(t, p)); got != p {
-			t.Fatalf("server would store %q, want %q", got, p)
+		want := strings.ReplaceAll(minimizePlistSourceEscaping(p), "]]>", "]]&gt;")
+		if got := serverIngest(marshalPayloads(t, p)); got != want {
+			t.Fatalf("server would store %q, want %q", got, want)
+		}
+	}
+}
+
+func TestPayloadsXMLText_MinimizeSourceEscaping(t *testing.T) {
+	// Avoidable references decode to literal characters; the references
+	// encoding `&` and `<` (named or numeric) must survive untouched, as
+	// must non-reference ampersands and unknown entities.
+	cases := map[string]string{
+		"&quot;":    `"`,
+		"&#34;":     `"`,
+		"&#x22;":    `"`,
+		"&apos;":    "'",
+		"&#39;":     "'",
+		"&gt;":      ">",
+		"&#62;":     ">",
+		"&#xA;":     "\n",
+		"&#9;":      "\t",
+		"&amp;":     "&amp;",
+		"&lt;":      "&lt;",
+		"&#38;":     "&#38;",
+		"&#x26;":    "&#x26;",
+		"&#60;":     "&#60;",
+		"&#x3C;":    "&#x3C;",
+		"&bogus;":   "&bogus;",
+		"A & B; C":  "A & B; C",
+		"&amp;#34;": "&amp;#34;",
+		"a]]&gt;b":  "a]]>b",
+	}
+	for in, want := range cases {
+		if got := minimizePlistSourceEscaping(in); got != want {
+			t.Fatalf("minimize(%q) = %q, want %q", in, got, want)
 		}
 	}
 }

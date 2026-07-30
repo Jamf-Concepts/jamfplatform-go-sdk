@@ -915,6 +915,63 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 // compare payloads structurally, never byte-wise.
 type PayloadsXMLText string
 
+// minimizePlistSourceEscaping decodes every character/entity reference in
+// plist XML source EXCEPT those encoding `+"`&`"+` and `+"`<`"+` — i.e.
+// `+"`&quot;`"+`/`+"`&#34;`"+` become literal `+"`\"`"+`, `+"`&#xA;`"+` a literal
+// newline, `+"`&gt;`"+` a literal `+"`>`"+`, and so on. The parsed document is
+// unchanged (both representations decode to identical values), but the
+// representation matters on the wire: the server stores verbatim-category
+// payload fragments with zero decodes, so every avoidable entity in the
+// source surfaces as literal text in stored values. Serialisers built on
+// encoding/xml (howett.net/plist — used by consumers that re-serialise
+// payloads before sending, e.g. UUID injection) escape `+"`\"`"+` `+"`'`"+` and
+// value newlines/tabs numerically, which corrupted TCC CodeRequirement
+// strings on update until normalised here. `+"`&amp;`"+`/`+"`&lt;`"+` (and their
+// numeric forms) must stay escaped — decoding them would make the plist
+// source invalid XML.
+func minimizePlistSourceEscaping(s string) string {
+	var b strings.Builder
+	for i := 0; i < len(s); {
+		c := s[i]
+		if c != '&' {
+			b.WriteByte(c)
+			i++
+			continue
+		}
+		semi := strings.IndexByte(s[i:], ';')
+		if semi < 0 || semi > 12 {
+			b.WriteByte(c)
+			i++
+			continue
+		}
+		ref := s[i+1 : i+semi]
+		var r rune = -1
+		switch {
+		case ref == "quot":
+			r = '"'
+		case ref == "apos":
+			r = '\''
+		case ref == "gt":
+			r = '>'
+		case strings.HasPrefix(ref, "#x") || strings.HasPrefix(ref, "#X"):
+			if n, err := strconv.ParseInt(ref[2:], 16, 32); err == nil {
+				r = rune(n)
+			}
+		case strings.HasPrefix(ref, "#"):
+			if n, err := strconv.ParseInt(ref[1:], 10, 32); err == nil {
+				r = rune(n)
+			}
+		}
+		if r < 0 || r == '&' || r == '<' {
+			b.WriteString(s[i : i+semi+1])
+		} else {
+			b.WriteRune(r)
+		}
+		i += semi + 1
+	}
+	return b.String()
+}
+
 // stripPayloadCDATASections rewrites every <![CDATA[...]]> section in a
 // plist as equivalent escaped character data. The parsed document is
 // unchanged (CDATA content is literal text by definition — XML 1.0
@@ -945,17 +1002,22 @@ func stripPayloadCDATASections(s string) string {
 	return b.String()
 }
 
-// MarshalXML emits the plist as a single CDATA section with embedded
-// CDATA sections rewritten as escaped character data, any remaining
-// `+"`]]>`"+` entity-guarded, and every `+"`&`"+` escaped once — the one wire
-// form the Classic API stores byte-exact (see the type comment). The
-// innerxml field is used because xml.Encoder has no raw-CDATA API.
+// MarshalXML emits the plist as a single CDATA section: embedded CDATA
+// sections rewritten as escaped character data, source escaping minimised
+// (see minimizePlistSourceEscaping — avoidable entities become literal
+// text in verbatim-stored values otherwise), any `+"`]]>`"+` entity-guarded,
+// and every `+"`&`"+` escaped once. The innerxml field is used because
+// xml.Encoder has no raw-CDATA API. Ordering is load-bearing: CDATA
+// sections must be rewritten before minimising (their content is literal
+// text whose references must NOT be decoded), and the `+"`]]>`"+` guard must
+// follow minimising (decoding `+"`&gt;`"+` can resurrect the terminator).
 func (p PayloadsXMLText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	s := string(p)
 	if strings.Contains(s, "]]>") {
 		s = stripPayloadCDATASections(s)
-		s = strings.ReplaceAll(s, "]]>", "]]&gt;")
 	}
+	s = minimizePlistSourceEscaping(s)
+	s = strings.ReplaceAll(s, "]]>", "]]&gt;")
 	s = strings.ReplaceAll(s, "&", "&amp;")
 	return e.EncodeElement(struct {
 		S string `+"`xml:\",innerxml\"`"+`
@@ -1054,23 +1116,59 @@ func serverIngest(inner string) string {
 	return strings.ReplaceAll(inner, "&amp;", "&")
 }
 
-func TestPayloadsXMLText_ServerDecodeRestoresPlistExactly(t *testing.T) {
+func TestPayloadsXMLText_ServerDecodeRestoresMinimalSource(t *testing.T) {
 	// The marshalled form must be exactly one escape layer above the
-	// plist bytes: the server's single decode restores them byte-exact.
-	// Covers every reserved character in every legal representation.
+	// minimal-escaping plist source: the server's single decode restores
+	// that source, which parses to the same values as the input. Covers
+	// every reserved character in every legal representation.
 	plists := []string{
 		"<string>R&amp;D</string>",
 		"<string>a &lt; b &gt; c</string>",
 		"<string>A &#38; B &#x26; C</string>",
 		"<string>x > y</string>",
 		%s<string>q " q and p ' p</string>%s,
+		"<string>q &quot; q and p &#39; p and tab&#9;end</string>",
 		"<string>literal &amp;amp; entity text</string>",
 		"<string>target.signing_time >= timestamp('2025-05-31T00:00:00Z') &amp;&amp; ok</string>",
 		%sidentifier "com.foo" and anchor apple generic%s,
+		%sidentifier &#34;com.foo&#34; and anchor apple generic%s,
 	}
 	for _, p := range plists {
-		if got := serverIngest(marshalPayloads(t, p)); got != p {
-			t.Fatalf("server would store %%q, want %%q", got, p)
+		want := strings.ReplaceAll(minimizePlistSourceEscaping(p), "]]>", "]]&gt;")
+		if got := serverIngest(marshalPayloads(t, p)); got != want {
+			t.Fatalf("server would store %%q, want %%q", got, want)
+		}
+	}
+}
+
+func TestPayloadsXMLText_MinimizeSourceEscaping(t *testing.T) {
+	// Avoidable references decode to literal characters; the references
+	// encoding %s and %s (named or numeric) must survive untouched, as
+	// must non-reference ampersands and unknown entities.
+	cases := map[string]string{
+		"&quot;":        %s"%s,
+		"&#34;":         %s"%s,
+		"&#x22;":        %s"%s,
+		"&apos;":        "'",
+		"&#39;":         "'",
+		"&gt;":          ">",
+		"&#62;":         ">",
+		"&#xA;":         "\n",
+		"&#9;":          "\t",
+		"&amp;":         "&amp;",
+		"&lt;":          "&lt;",
+		"&#38;":         "&#38;",
+		"&#x26;":        "&#x26;",
+		"&#60;":         "&#60;",
+		"&#x3C;":        "&#x3C;",
+		"&bogus;":       "&bogus;",
+		"A & B; C":      "A & B; C",
+		"&amp;#34;":     "&amp;#34;",
+		"a]]&gt;b":      "a]]>b",
+	}
+	for in, want := range cases {
+		if got := minimizePlistSourceEscaping(in); got != want {
+			t.Fatalf("minimize(%%q) = %%q, want %%q", in, got, want)
 		}
 	}
 }
@@ -1129,6 +1227,11 @@ func TestPayloadsXMLText_NilOmitsField(t *testing.T) {
 }
 `, pkgName, "`", "`", "`", "`",
 		"`&`", "`&amp;`",
+		"`", "`",
+		"`", "`",
+		"`", "`",
+		"`&`", "`<`",
+		"`", "`",
 		"`", "`",
 		"`", "`")
 	outPath := filepath.Join(pkgDir, "xml_helpers_test.go")

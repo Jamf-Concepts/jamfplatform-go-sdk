@@ -361,7 +361,10 @@ func TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip(t *testing.T) {
 // first assertion flips and this test fails — the desired signal.
 func assertVerbatimStorageDefect(t *testing.T, stage, got string) {
 	t.Helper()
-	if !strings.Contains(got, "Foo &amp;amp; Bar &amp;lt;br/&amp;gt; baz") {
+	// Note the tail: the source's &gt; is minimised to a literal ">" on
+	// the wire and the server canonicalises it back — value-correct. Only
+	// the &/< references keep the verbatim extra layer.
+	if !strings.Contains(got, "Foo &amp;amp; Bar &amp;lt;br/&gt; baz") {
 		t.Fatalf("%s: TCC description no longer stored with the verbatim extra entity layer — server ingest behaviour changed (PI-827 fixed?). Got:\n%s", stage, got)
 	}
 	if !strings.Contains(got, `identifier "com.example.sdk" and anchor apple generic`) {
@@ -677,6 +680,15 @@ func verbatimStored(c reservedCharCase) string {
 	if c.key == "embedded_cdata" {
 		src = `cdata section: &amp; &lt; &gt; " ' kept literal`
 	}
+	// Mirror PayloadsXMLText's source-escaping minimisation: references for
+	// `>` `"` `'` decode to literals on the wire, so they store
+	// value-correct even through verbatim storage. Only `&`/`<` references
+	// must stay encoded and therefore still gain the extra layer.
+	src = strings.NewReplacer(
+		"&gt;", ">", "&#62;", ">",
+		"&quot;", `"`, "&#34;", `"`,
+		"&apos;", "'", "&#39;", "'",
+	).Replace(src)
 	src = strings.ReplaceAll(src, "&", "&amp;")
 	return strings.ReplaceAll(src, ">", "&gt;")
 }
