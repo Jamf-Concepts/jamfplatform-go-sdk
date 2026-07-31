@@ -140,6 +140,37 @@ func TestMarkChangedEscalatesImplicitDispatch(t *testing.T) {
 	}
 }
 
+// TestWalkContinuesThroughImplicitReceiver guards the reachability hole found
+// after PR #45 landed: a change to a helper that is only called by an
+// implicitly-dispatched method (PayloadsXMLText.MarshalXML) must still reach the
+// tests that flow that type. Escalating only when the METHOD itself changes is
+// not enough — the walk has to escalate when it arrives at one.
+func TestWalkContinuesThroughImplicitReceiver(t *testing.T) {
+	idx := &moduleIndex{byRef: map[string][]*decl{}}
+	add := func(d *decl) *decl {
+		idx.decls = append(idx.decls, d)
+		return d
+	}
+	helper := add(&decl{name: "minimizePlistSourceEscaping"})
+	marshal := add(&decl{name: "MarshalXML", recvType: "PayloadsXMLText", implicitRecv: true})
+	payloadType := add(&decl{name: "PayloadsXMLText"})
+	profileType := add(&decl{name: "OsxConfigurationProfile"})
+	test := add(&decl{name: "TestAcceptance_Classic_OSXProfile_QuoteRoundtrip", isTest: true})
+
+	// MarshalXML calls the helper; the profile struct fields the payload type;
+	// the test references the profile struct. Nothing references MarshalXML —
+	// that is the point.
+	idx.byRef["minimizePlistSourceEscaping"] = []*decl{marshal}
+	idx.byRef["PayloadsXMLText"] = []*decl{profileType}
+	idx.byRef["OsxConfigurationProfile"] = []*decl{test}
+	_, _ = helper, payloadType
+
+	got := idx.testsAffectedBy(map[string]bool{"minimizePlistSourceEscaping": true})
+	if len(got) != 1 || got[0] != test.name {
+		t.Errorf("testsAffectedBy = %v, want [%s] — the walk stopped at the implicitly-dispatched method", got, test.name)
+	}
+}
+
 func keysOf(m map[string]declMeta) []string {
 	out := make([]string, 0, len(m))
 	for k := range m {

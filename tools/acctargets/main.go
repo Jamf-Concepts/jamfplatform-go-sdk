@@ -213,9 +213,14 @@ func run() error {
 // Methods are keyed by bare method name — receiver types are not resolved, which
 // is what makes the graph type-free (and conservatively over-linked).
 type decl struct {
-	name   string
-	isTest bool            // `func TestXxx` in an acceptance-tagged file
-	refs   map[string]bool // declared names referenced by this declaration
+	name string
+	// recvType is set for methods, and implicitRecv marks the subset whose
+	// callers are invisible to a name-matched graph (see implicitDispatch).
+	// Reaching such a method during the walk continues through its receiver type.
+	recvType     string
+	implicitRecv bool
+	isTest       bool            // `func TestXxx` in an acceptance-tagged file
+	refs         map[string]bool // declared names referenced by this declaration
 }
 
 type moduleIndex struct {
@@ -252,9 +257,11 @@ func indexModule(root string) (*moduleIndex, error) {
 
 		for _, d := range topLevelDecls(f, fset, src) {
 			dd := &decl{
-				name:   d.name,
-				isTest: acceptance && isTestFuncName(d.name) && d.isFunc && !d.hasRecv,
-				refs:   referencedNames(d.node),
+				name:         d.name,
+				recvType:     d.recvType,
+				implicitRecv: d.recvType != "" && implicitDispatch[d.name],
+				isTest:       acceptance && isTestFuncName(d.name) && d.isFunc && !d.hasRecv,
+				refs:         referencedNames(d.node),
 			}
 			idx.decls = append(idx.decls, dd)
 			declared[dd.name] = true
@@ -282,11 +289,14 @@ func (idx *moduleIndex) testsAffectedBy(changed map[string]bool) []string {
 	seenDecl := map[*decl]bool{}
 	var queue []string
 
-	for name := range changed {
-		if !seenName[name] {
+	enqueue := func(name string) {
+		if name != "" && !seenName[name] {
 			seenName[name] = true
 			queue = append(queue, name)
 		}
+	}
+	for name := range changed {
+		enqueue(name)
 	}
 
 	found := map[string]bool{}
@@ -312,10 +322,14 @@ func (idx *moduleIndex) testsAffectedBy(changed map[string]bool) []string {
 				// reason to keep walking from its name.
 				continue
 			}
-			if !seenName[d.name] {
-				seenName[d.name] = true
-				queue = append(queue, d.name)
+			// An implicitly-dispatched method is a dead end by name — nothing
+			// mentions MarshalXML, encoding/xml calls it — so the walk has to
+			// continue through the receiver type instead. Without this, a change
+			// to a helper called only by such a method reaches no tests at all.
+			if d.implicitRecv {
+				enqueue(d.recvType)
 			}
+			enqueue(d.name)
 		}
 	}
 
