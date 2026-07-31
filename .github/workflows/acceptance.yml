@@ -60,17 +60,21 @@ jobs:
           echo "Scope: $scope"
 
       - name: Scope summary
+        # SCOPE goes through the environment rather than being interpolated into
+        # the script: the value is a regex full of shell metacharacters.
+        env:
+          SCOPE: ${{ steps.scope.outputs.run }}
         run: |
           {
             echo "## Acceptance scope"
             echo
-            case "${{ steps.scope.outputs.run }}" in
+            case "$SCOPE" in
               ALL)  echo "Full suite." ;;
               NONE) echo "No acceptance-relevant changes — suite skipped." ;;
               *)    echo "Change-scoped subset:"
                     echo
                     echo '```'
-                    echo "${{ steps.scope.outputs.run }}" | tr '|' '\n' | sed -E 's/^\^\(//; s/\)\$$//'
+                    echo "$SCOPE" | tr '|' '\n' | sed -E 's/^\^\(//; s/\)\$$//'
                     echo '```' ;;
             esac
           } >> "$GITHUB_STEP_SUMMARY"
