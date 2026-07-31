@@ -1341,8 +1341,8 @@ func TestAcceptance_ApplyVolumePurchasingLocationV1(t *testing.T) {
 //	PUT computer-prestages/{id}       500 {"httpStatus":500,"errors":[]}, displayName applied, versionLock 0 → 1
 //	PUT mobile-device-prestages/{id}  500 {"httpStatus":500,"errors":[]}, displayName applied, versionLock 1 → 2
 //
-// PI-1414 (Triaged, regression since 11.28) covers the computer endpoint. The
-// mobile endpoint has the same shape and no PI.
+// PI-1414 (Triaged, regression since 11.28) covers the computer endpoint;
+// PI-1529 covers the mobile endpoint.
 //
 // Deliberately narrow: it matches only 500 with an EMPTY error list, so a 500
 // that carries real detail, or any other status, still fails the test. Callers
@@ -1354,7 +1354,7 @@ func prestagePut500(t *testing.T, err error, endpoint string) bool {
 	if apiErr == nil || !apiErr.HasStatus(http.StatusInternalServerError) || len(apiErr.Details()) > 0 {
 		return false
 	}
-	t.Logf("tolerating known %s-prestage PUT 500 (write commits; PI-1414 for computer, unfiled for mobile): %v", endpoint, err)
+	t.Logf("tolerating known %s-prestage PUT 500 (write commits; PI-1414 computer / PI-1529 mobile): %v", endpoint, err)
 	return true
 }
 
@@ -1578,8 +1578,8 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 			// Same defect as PI-1414, on the mobile endpoint: PUT
 			// /api/v3/mobile-device-prestages/{id} answers 500 with an empty
 			// error list while committing the write (wire-probed 2026-07-31,
-			// versionLock 1 → 2 on a renaming PUT). No PI covers the mobile
-			// endpoint yet; PI-1414 names only computer-prestages.
+			// versionLock 1 → 2 on a renaming PUT). Filed as PI-1529;
+			// PI-1414 names only computer-prestages.
 			if !prestagePut500(t, err, "mobile-device") {
 				t.Fatalf("apply update: %v", err)
 			}
