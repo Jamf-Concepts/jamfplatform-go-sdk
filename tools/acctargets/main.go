@@ -51,12 +51,13 @@
 // acceptance helpers, CI surface, and any changed non-Go file that isn't on the
 // ignore list. Over-running is a cost; under-running is a missed regression.
 //
-// Changes under tools/generate/** and testing/** are deliberately IGNORED: a
-// generator or spec change only reaches consumers through regenerated files,
-// which appear in the same diff and are scoped precisely. This is safe only
-// while the caller verifies generated output is current BEFORE trusting the
-// scope — the acceptance workflow's plan job runs `make generate` and a
-// `git diff --exit-code` first.
+// Changes under tools/generate/** and api/** are deliberately IGNORED. All
+// generated output is committed, and the source specs under testing/ are
+// gitignored, so a change set's effective SDK surface is exactly its committed
+// .go diff. A generator edit whose regenerated files are absent from the diff
+// has not changed anything the acceptance suite can exercise; when the files ARE
+// present, they are scoped precisely by declaration. CI's "Generated Code" job
+// remains the check that regeneration was actually committed.
 //
 // # Output
 //

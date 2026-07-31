@@ -4,6 +4,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      full:
+        description: "Run the full suite instead of the change-scoped subset"
+        type: boolean
+        default: true
   schedule:
     - cron: "0 6 * * 1-5" # Weekdays at 06:00 UTC
 
@@ -11,17 +16,97 @@ permissions:
   contents: read
 
 jobs:
+  # Decide which acceptance tests this run needs. PRs get the change-scoped
+  # subset (tools/acctargets); the scheduled run and workflow_dispatch default to
+  # the full suite so nothing hides behind scoping forever. Scoping can be
+  # overridden per-PR with the `full-acceptance` label.
+  plan:
+    name: Plan Acceptance Scope
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      run: ${{ steps.scope.outputs.run }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Full history so the merge base against the PR base branch resolves.
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      # No generated-currency gate here. Generated output is committed, and the
+      # source specs under testing/ are gitignored, so a PR's effective SDK
+      # surface IS its committed .go diff — which acctargets scopes precisely.
+      # CI's "Generated Code" job (ci.yml) remains the currency check.
+      - name: Compute scope
+        id: scope
+        env:
+          # Scheduled runs are the backstop and always run everything. Manual
+          # runs default to full but can opt into scoping. A PR can opt out of
+          # scoping with the `full-acceptance` label.
+          FORCE_FULL: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.full) || contains(github.event.pull_request.labels.*.name, 'full-acceptance') }}
+          BASE_BRANCH: ${{ github.base_ref || github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          if [ "$FORCE_FULL" = "true" ]; then
+            echo "run=ALL" >> "$GITHUB_OUTPUT"
+            echo "Full suite (event=${{ github.event_name }})."
+            exit 0
+          fi
+          git fetch --no-tags origin "+refs/heads/${BASE_BRANCH}:refs/remotes/origin/${BASE_BRANCH}"
+          scope="$(cd tools && ACCTARGETS_DEBUG=1 go run ./acctargets "origin/${BASE_BRANCH}")"
+          echo "run=$scope" >> "$GITHUB_OUTPUT"
+          echo "Scope: $scope"
+
+      - name: Scope summary
+        run: |
+          {
+            echo "## Acceptance scope"
+            echo
+            case "${{ steps.scope.outputs.run }}" in
+              ALL)  echo "Full suite." ;;
+              NONE) echo "No acceptance-relevant changes — suite skipped." ;;
+              *)    echo "Change-scoped subset:"
+                    echo
+                    echo '```'
+                    echo "${{ steps.scope.outputs.run }}" | tr '|' '\n' | sed -E 's/^\^\(//; s/\)\$$//'
+                    echo '```' ;;
+            esac
+          } >> "$GITHUB_STEP_SUMMARY"
+
   acceptance:
     name: Acceptance Tests
+    needs: plan
+    if: needs.plan.outputs.run != 'NONE'
     runs-on: ubuntu-latest
     environment: acceptance
+    # Serialise across ALL PRs, branches, and the scheduled run: the suite
+    # mutates a single shared Jamf tenant, so only one acceptance run may execute
+    # at a time. The group is a constant (NOT github.ref) so a second run queues
+    # behind the in-progress one instead of racing it for the same fixtures.
+    # cancel-in-progress: false never kills a running suite.
+    concurrency:
+      group: acceptance-tenant
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
-      - run: JAMFPLATFORM_ACC=1 go test -v -cover -count=1 -tags acceptance -timeout 120m -p=1 ./...
+      - name: Acceptance tests
+        run: |
+          set -euo pipefail
+          if [ "$SCOPE" = "ALL" ]; then
+            echo "Running full suite."
+            go test -v -cover -count=1 -tags acceptance -timeout 120m -p=1 ./...
+          else
+            echo "Running scoped subset: $SCOPE"
+            go test -v -cover -count=1 -tags acceptance -timeout 120m -p=1 -run "$SCOPE" ./...
+          fi
         env:
+          SCOPE: ${{ needs.plan.outputs.run }}
+          JAMFPLATFORM_ACC: "1"
           # Required credentials — all suites fail/skip without these.
           JAMFPLATFORM_BASE_URL: ${{ secrets.JAMFPLATFORM_BASE_URL }}
           JAMFPLATFORM_CLIENT_ID: ${{ secrets.JAMFPLATFORM_CLIENT_ID }}
