@@ -15,6 +15,16 @@ on:
 permissions:
   contents: read
 
+# Workflow-level: supersede this PR's own earlier run when a new commit lands.
+# Without it every push queues another full suite behind the last one, which on a
+# CI-touching PR means hours of tenant time spent on superseded commits. Scoped by
+# ref, so PRs (refs/pull/N/merge) never cancel each other or the scheduled run
+# (refs/heads/main). Cross-PR serialisation is a SEPARATE, job-level group below —
+# GitHub allows one group per scope, and the two scopes compose.
+concurrency:
+  group: acceptance-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Decide which acceptance tests this run needs. PRs get the change-scoped
   # subset (tools/acctargets); the scheduled run and workflow_dispatch default to
@@ -85,11 +95,12 @@ jobs:
     if: needs.plan.outputs.run != 'NONE'
     runs-on: ubuntu-latest
     environment: acceptance
-    # Serialise across ALL PRs, branches, and the scheduled run: the suite
-    # mutates a single shared Jamf tenant, so only one acceptance run may execute
-    # at a time. The group is a constant (NOT github.ref) so a second run queues
-    # behind the in-progress one instead of racing it for the same fixtures.
-    # cancel-in-progress: false never kills a running suite.
+    # Job-level: serialise across ALL PRs, branches, and the scheduled run. The
+    # suite mutates a single shared Jamf tenant, so only one acceptance run may
+    # execute at a time. The group is a constant (NOT github.ref) so a second run
+    # queues behind the in-progress one instead of racing it for the same
+    # fixtures, and cancel-in-progress: false never kills a running suite.
+    # Same-PR supersede is handled by the workflow-level group above.
     concurrency:
       group: acceptance-tenant
       cancel-in-progress: false
