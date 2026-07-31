@@ -590,7 +590,7 @@ func isTestFuncName(name string) bool {
 	}
 	// Test followed by a lowercase letter is not a test function per `go test`.
 	r := name[len("Test")]
-	return !(r >= 'a' && r <= 'z')
+	return r < 'a' || r > 'z'
 }
 
 type fileClass int
@@ -690,7 +690,7 @@ func changedFiles(root, diffBase string) ([]string, error) {
 }
 
 func addLines(set map[string]bool, out string) {
-	for _, l := range strings.Split(out, "\n") {
+	for l := range strings.SplitSeq(out, "\n") {
 		if l = strings.TrimSpace(l); l != "" {
 			set[l] = true
 		}

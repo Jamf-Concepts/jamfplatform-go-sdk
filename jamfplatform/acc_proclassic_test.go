@@ -2023,7 +2023,12 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 //
 // Defect #4 (exclusions user_group shape): wire-probed with DataJARLDAPS_JamfPro_Admins
 // — server returns name-only, no <id>. Original spec's name-only struct was correct.
-// Set JAMFPLATFORM_VPP_INVITATION_ID to override the default id "2".
+//
+// The id is discovered from ListVPPInvitations rather than hardcoded. It used to
+// default to "2", which 404s on any tenant that never had that record — the
+// acceptance tenant has zero VPP invitations (wire-probed 2026-07-31), so the
+// test was reporting a missing fixture as an endpoint failure. Set
+// JAMFPLATFORM_VPP_INVITATION_ID to pin a specific record.
 func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)
@@ -2031,7 +2036,19 @@ func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 
 	id := os.Getenv("JAMFPLATFORM_VPP_INVITATION_ID")
 	if id == "" {
-		id = "2"
+		list, err := pc.ListVPPInvitations(ctx)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("ListVPPInvitations: %v", err)
+		}
+		if list == nil || len(list.VppInvitations) == 0 {
+			t.Skip("tenant has no VPP invitations; set JAMFPLATFORM_VPP_INVITATION_ID to override")
+		}
+		first := list.VppInvitations[0]
+		if first.ID == nil {
+			t.Fatalf("first VPP invitation has no ID: %+v", first)
+		}
+		id = intToStr(*first.ID)
 	}
 
 	inv, err := pc.GetVPPInvitationByID(ctx, id)
@@ -2079,17 +2096,37 @@ func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 // the field-order fix: Classic <general> is order-sensitive and returns HTTP
 // 500 when fields arrive alphabetically instead of the required wire order.
 //
-// Uses VPP account id 3 and distribution_method "Make Available in Self
-// Service" (non-emailing) to avoid triggering invite emails. No %@ is used
-// in any string field (separate known server-500 bug for plist strings).
+// Uses distribution_method "Make Available in Self Service" (non-emailing) to
+// avoid triggering invite emails. No %@ is used in any string field (separate
+// known server-500 bug for plist strings).
+//
+// The VPP account is discovered rather than hardcoded to id 3. An invitation
+// referencing a nonexistent VPP account is rejected with a misleading
+// `409 Invalid distribution method` — wire-probed 2026-07-31, where every
+// distribution_method value (including "Email", "Self Service" and "") returned
+// that same 409 on a tenant with zero VPP accounts. Without a real account the
+// endpoint cannot be exercised at all, so the test skips instead of reporting an
+// unconfigured prerequisite as an endpoint defect.
 func TestAcceptance_Classic_VPPInvitationCRUD(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)
 	ctx := context.Background()
 
+	accts, err := pc.ListVPPAccounts(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListVPPAccounts: %v", err)
+	}
+	if accts == nil || len(accts.VppAccounts) == 0 {
+		t.Skip("tenant has no VPP accounts (no content token configured); VPP invitations cannot be created")
+	}
+	if accts.VppAccounts[0].ID == nil {
+		t.Fatalf("first VPP account has no ID: %+v", accts.VppAccounts[0])
+	}
+	vppAccID := *accts.VppAccounts[0].ID
+
 	name := "sdk-acc-vpp-inv-" + runSuffix()
 	dist := "Make Available in Self Service"
-	vppAccID := 3
 	req := &proclassic.VppInvitation{
 		General: &proclassic.VppInvitationGeneral{
 			Name:               &name,

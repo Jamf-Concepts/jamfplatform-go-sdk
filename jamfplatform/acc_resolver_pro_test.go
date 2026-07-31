@@ -2637,6 +2637,33 @@ func TestAcceptance_ResolveJamfConnectConfigProfileV1IDByName_NotFound(t *testin
 	t.Log("not-found ✓")
 }
 
+// uniqueJamfConnectProfile returns a profile whose name is held by exactly one
+// record, skipping the test when no such profile exists.
+//
+// Jamf Connect config profile names are not unique. On the acceptance tenant all
+// four profiles are named "App Installers - Custom values for Jamf Connect"
+// (ids 1780, 1782, 1783, 1787 — wire-probed 2026-07-31), because App Installers
+// creates one identically-named profile per deployment. Resolving items[0]'s name
+// therefore returned a correct *AmbiguousMatchError, which the test read as a
+// resolver failure. Name-based resolution is only meaningful for a name with a
+// single holder.
+func uniqueJamfConnectProfile(t *testing.T, items []pro.LinkedConnectProfile) pro.LinkedConnectProfile {
+	t.Helper()
+	counts := map[string]int{}
+	for _, it := range items {
+		if it.ProfileName != nil {
+			counts[*it.ProfileName]++
+		}
+	}
+	for _, it := range items {
+		if it.ProfileName != nil && it.ProfileID != nil && counts[*it.ProfileName] == 1 {
+			return it
+		}
+	}
+	t.Skipf("no uniquely-named Jamf Connect config profile in tenant (%d profiles, %d distinct names) — name resolution is ambiguous by construction", len(items), len(counts))
+	return pro.LinkedConnectProfile{}
+}
+
 func TestAcceptance_ResolveJamfConnectConfigProfileV1IDByName_Existing(t *testing.T) {
 	c := pro.New(accClient(t))
 	ctx := context.Background()
@@ -2649,10 +2676,7 @@ func TestAcceptance_ResolveJamfConnectConfigProfileV1IDByName_Existing(t *testin
 	if len(items) == 0 {
 		t.Skip("no Jamf Connect config profiles in tenant — skipping")
 	}
-	first := items[0]
-	if first.ProfileName == nil || first.ProfileID == nil {
-		t.Skip("first profile has nil name or id — skipping")
-	}
+	first := uniqueJamfConnectProfile(t, items)
 	gotID, err := c.ResolveJamfConnectConfigProfileV1IDByName(ctx, *first.ProfileName)
 	if err != nil {
 		t.Fatalf("resolve: %v", err)
@@ -2676,10 +2700,7 @@ func TestAcceptance_ResolveJamfConnectConfigProfileV1ByName_Existing(t *testing.
 	if len(items) == 0 {
 		t.Skip("no Jamf Connect config profiles in tenant — skipping")
 	}
-	first := items[0]
-	if first.ProfileName == nil {
-		t.Skip("first profile has nil name — skipping")
-	}
+	first := uniqueJamfConnectProfile(t, items)
 	got, err := c.ResolveJamfConnectConfigProfileV1ByName(ctx, *first.ProfileName)
 	if err != nil {
 		t.Fatalf("resolve typed: %v", err)
