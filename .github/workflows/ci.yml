@@ -16,6 +16,9 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go test -v -cover -count=1 -timeout=120s ./...
+      # Separate module: the root run never reaches the generator's own unit
+      # tests (config validation, parameter doc rendering, enum naming).
+      - run: cd tools/generate && go test -count=1 -timeout=120s ./...
 
   vet:
     name: Vet
@@ -30,12 +33,23 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # One entry per Go module. The generator is its own module, so the
+        # root-only run never descended into it and its findings went
+        # unreported. tools/ is deliberately absent: its only file is a
+        # build-tagged blank import of copywrite (a main package) that exists
+        # to pin the dependency, and typecheck rightly rejects it.
+        module: [".", "tools/generate"]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version-file: ${{ matrix.module }}/go.mod
       - uses: golangci/golangci-lint-action@v9
+        with:
+          working-directory: ${{ matrix.module }}
 
   generate:
     name: Generated Code
@@ -60,6 +74,10 @@ jobs:
       - run: git diff --exit-code go.mod go.sum
       - run: cd tools && go mod tidy
       - run: git diff --exit-code tools/go.mod tools/go.sum
+      # tools/generate is where dependabot lands most of its bumps
+      # (kin-openapi, x/tools), so drift here is the likeliest to go unnoticed.
+      - run: cd tools/generate && go mod tidy
+      - run: git diff --exit-code tools/generate/go.mod tools/generate/go.sum
 
   copyright:
     name: Copyright Headers
