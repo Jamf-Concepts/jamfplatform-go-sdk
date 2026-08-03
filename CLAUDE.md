@@ -56,21 +56,35 @@ Each generated method carries a `// Parameters:` godoc list built from the spec'
 
 This is the only place a caller can learn what a `filter` or `sort` argument accepts: Jamf documents the RSQL-filterable and sortable field lists in the parameter description and nowhere else, so a bare `filter string` signature is unusable without the block. Same for Classic's `subset` path params, whose legal values (`General`, `Location`, `Purchasing`, …) are a path-param enum.
 
-Parameter types stay exactly as config declares them — the block is documentation, never signature. That is what makes it safe to quote enum values verbatim: Jamf's Classic enums include values unusable as Go identifiers (`Pending+Failed`, `EnableRemoteDesktop (macOS 10.14.4 and later)`) and one typo (`Hardwre`), all of which are still what the server accepts. Where an enum *is* clean and named by the spec, it also gets constants — see below.
+Parameter types stay exactly as config declares them — the block is documentation, never signature. That is what makes it safe to quote enum values verbatim, including ones no Go identifier can spell (`EnableRemoteDesktop (macOS 10.14.4 and later)`) and the spec's typo `Hardwre`, all of which are still what the server accepts. Enums the generator *can* name get constants too — see below.
+
+Struct fields are documented the same way, from each property's `description` (1198 fields, 1726 doc lines), with the write-only note appended as trailing metadata. Both share `docParagraphs` in `util.go`.
 
 ### Enum constants
 
-A named `type: string` schema with an `enum` is emitted as `type X = string` plus one typed constant per value (`enumConsts` in `schema.go`, rendered by the fieldless-type branch of the types template). 21 such types exist today, carrying 162 constants — 15 types in `pro`, 3 in `devicegroups`, 2 in `blueprints`, 1 in `compliancebenchmarks`.
+Every string enum in a spec becomes a Go type plus one constant per value, in a per-package `enums.go` (never `types.go` — see `partitionEnumTypes`). 331 types carrying 1430 constants: 204 in `pro`, 92 in `proclassic`, 15 in `blueprints`, 8 in `compliancebenchmarks`, 7 in `ddmreport`, 3 in `devicegroups`, 2 in `devices`.
 
-The alias is deliberately `=` (a type alias, not a defined type), so a constant typed `NotificationType` assigns to any existing `notificationType string` parameter with no cast. Promoting these to defined types would break every call site and is not worth it.
+Two sources feed it:
 
-Constant names are `<TypeName><TitleCasedValue>`: `NotificationTypeApnsCertRevoked = "APNS_CERT_REVOKED"`. Segment title-casing is deliberate over preserving all-caps runs — `APNS_CERT_REVOKED` is a wire-format artefact, not an acronym the spec is asserting. The wire value sits on the same line as the identifier, so no per-value godoc is emitted and the spec's own misspellings (`MII_UNATHORIZED_RESPONSE_NOTIFICATION`, `PATCH_EXTENTION_ATTRIBUTE`) stay greppable.
+- **Spec-named enum schemas** keep their own name (`NotificationType`). These are emitted by the fieldless-type branch of the schema walker via `enumConsts`.
+- **Inline property enums** are synthesised as `<Owner><Property>` by `registerPropertyEnum` (`PolicyTrigger`, `AccountGroupV1AccessLevel`). Nothing shorter is safe — `type` alone carries 14 distinct value sets across 18 schemas. Identical value sets under different owners are duplicated rather than folded into a shared type: folding means inventing a name, and that name then churns whenever Jamf changes one owner's values but not the other's.
 
-Where a parameter's schema `$ref`s one of these types, its doc block says `Allowed values: see the NotificationType constants.` instead of listing them — godoc groups the constants under the type they're declared with. The check is against the set of schemas actually being emitted (`namedEnumTypes`), because an enum reachable *only* from a parameter is never emitted as a type; those keep their inline list. That is why `section` on the computer-inventory endpoints still lists its 22 values inline.
+The alias is deliberately `=` (a type alias, not a defined type), so a constant typed `NotificationType` assigns to any existing `notificationType string` parameter with no cast. Promoting these to defined types, or retyping the struct fields that carry them (`State DeploymentState` instead of `State string`), would churn the whole tree and entangle with the pointer/three-state design. Field types are left alone.
 
-Values that yield no Go identifier, and the second of any two values colliding on one identifier, are skipped with a log line rather than silently dropped — a missing constant reads as "the server doesn't accept this". No spec currently triggers either case.
+Constant names are `<TypeName><TitleCasedValue>`: `NotificationTypeApnsCertRevoked = "APNS_CERT_REVOKED"`. Title-casing each segment is deliberate over preserving all-caps runs — `APNS_CERT_REVOKED` is a wire-format artefact, not an acronym the spec is asserting. The wire value sits on the same line as the identifier, so no per-value godoc is emitted and the spec's own misspellings (`MII_UNATHORIZED_RESPONSE_NOTIFICATION`, `PATCH_EXTENTION_ATTRIBUTE`) stay greppable.
 
-Inline **property** enums (151 distinct property names, 23 of which carry conflicting value sets across schemas — `type` alone has 14) are *not* generated. They need owner-qualified naming plus a collision resolver. Classic path-param enums are also excluded: their values include `Pending+Failed`, `EnableRemoteDesktop (macOS 10.14.4 and later)` and the typo `Hardwre`, which need a sanitiser before they can become identifiers.
+Classic is where this pays off most: its values are prose, not identifiers — `Full Access`, `Text Field`, `Pop-up Menu`, `Current or Next User`, `Pending+Failed`. Callers had no way to guess the exact spacing and casing. The title-caser handles them with no special sanitiser because it splits on non-alphanumerics.
+
+Each type also gets `<Type>Values() []<Type>` returning every value in spec order — for `stringvalidator.OneOf(pro.PolicyTriggerValues()...)` in the Terraform provider, and anything else that enumerates rather than names. A function, not a var: a var would let one consumer mutate the set for the whole process. It cannot be a method — Go forbids methods on an alias to a predeclared type, and that alias is what keeps constants assignable to plain `string`.
+
+Fields and parameters point at the type instead of re-listing values (`Allowed values: see the NotificationType constants.`), since godoc groups constants under their declared type. 309 such references. Two cases keep an inline list instead:
+
+- A parameter whose enum schema is never emitted as a type (reachable only from that parameter) — which is why `section` on the computer-inventory endpoints still lists all 22 values.
+- A `$ref`'d property, where the field's own type already names the enum.
+
+Skipped, each deliberately: non-string enums (constants are typed to a `= string` alias), single-value sets, values yielding no Go identifier, the second of any two values colliding on one identifier, and any synthesised name the spec already uses — checked for both `<Owner><Property>` and `<Owner><Property>Values`, since the accessor shares the namespace. Every skip logs. `Deployment.State` is the only one firing today (`DeploymentState` is a struct); its values remain reachable as `DeploymentStateState`.
+
+**The collision check must happen at registration, not when draining the collected enums.** Draining late still writes the field's `see the X constants` line, leaving it pointing at a type that carries no constants.
 
 Spec prose is wrapped at 100 columns, paragraph by paragraph (blank-line separated), with HTML tags (`</br>`, `<br/>`) stripped and entities decoded. Angle-bracket placeholders like `<field_name>` are deliberately preserved — the tag stripper matches an explicit HTML tag allowlist, not a generic `<...>` pattern. Long descriptions are never truncated: a half-printed RSQL field list is worse than none, since the caller can't tell whether their field was in the dropped tail.
 
