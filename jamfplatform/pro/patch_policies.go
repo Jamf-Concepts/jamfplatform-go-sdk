@@ -22,14 +22,13 @@ import (
 // Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//   - filter: Query in the RSQL format, allowing to filter Patch Policy collection.
-//     Default filter is empty query - returning all results for the requested
-//     page. Fields allowed in the query: id, policyName, policyEnabled,
-//     policyTargetVersion, policyDeploymentMethod, softwareTitle,
-//     softwareTitleConfigurationId, pending, completed, deferred, and failed. This
-//     param can be combined with paging and sorting.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Patch Policy collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: id, policyName,
+//     policyEnabled, policyTargetVersion, policyDeploymentMethod, softwareTitle,
+//     softwareTitleConfigurationId, pending, completed, deferred, and failed. This param can be combined
+//     with paging and sorting.
 func (c *Client) ListPatchPoliciesV2(ctx context.Context, sort []string, filter string) ([]PatchPolicyListView, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchPolicyListView, bool, error) {
@@ -64,16 +63,14 @@ func (c *Client) ListPatchPoliciesV2(ctx context.Context, sort []string, filter 
 // Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//   - filter: Query in the RSQL format, allowing to filter Patch Policy collection.
-//     Default filter is empty query - returning all results for the requested
-//     page. Fields allowed in the query: id, name, enabled, targetPatchVersion,
-//     deploymentMethod, softwareTitleId, softwareTitleConfigurationId,
-//     killAppsDelayMinutes, killAppsMessage, isDowngrade, isPatchUnknownVersion,
-//     notificationHeader, selfServiceEnforceDeadline, selfServiceDeadline,
-//     installButtonText, selfServiceDescription, iconId, reminderFrequency,
-//     reminderEnabled. This param can be combined with paging and sorting.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Patch Policy collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: id, name, enabled,
+//     targetPatchVersion, deploymentMethod, softwareTitleId, softwareTitleConfigurationId,
+//     killAppsDelayMinutes, killAppsMessage, isDowngrade, isPatchUnknownVersion, notificationHeader,
+//     selfServiceEnforceDeadline, selfServiceDeadline, installButtonText, selfServiceDescription, iconId,
+//     reminderFrequency, reminderEnabled. This param can be combined with paging and sorting.
 func (c *Client) ListPatchPolicyDetailsV2(ctx context.Context, sort []string, filter string) ([]PatchPolicyDetail, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchPolicyDetail, bool, error) {

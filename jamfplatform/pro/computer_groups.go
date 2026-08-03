@@ -35,14 +35,12 @@ func (c *Client) ListComputerGroupsV1(ctx context.Context) ([]ComputerGroup, err
 // Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=name:asc.
-//   - filter: Query in the RSQL format, allowing to filter smart computer group
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: id, name, siteId. The siteId
-//     field can only be filtered by admins with full access. Any sited admin will
-//     have siteId filtered automatically. Example: name=="*group*".
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=name:asc.
+//   - filter: Query in the RSQL format, allowing to filter smart computer group collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query: id, name,
+//     siteId. The siteId field can only be filtered by admins with full access. Any sited admin will have
+//     siteId filtered automatically. Example: name=="*group*".
 func (c *Client) ListSmartComputerGroupsV3(ctx context.Context, sort []string, filter string) ([]SmartComputerGroupSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
@@ -79,14 +77,12 @@ func (c *Client) ListSmartComputerGroupsV3(ctx context.Context, sort []string, f
 // Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=name:asc.
-//   - filter: Query in the RSQL format, allowing to filter smart computer group
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: id, name, siteId. The siteId
-//     field can only be filtered by admins with full access. Any sited admin will
-//     have siteId filtered automatically. Example: name=="*group*".
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=name:asc.
+//   - filter: Query in the RSQL format, allowing to filter smart computer group collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query: id, name,
+//     siteId. The siteId field can only be filtered by admins with full access. Any sited admin will have
+//     siteId filtered automatically. Example: name=="*group*".
 func (c *Client) ListSmartComputerGroupsV2(ctx context.Context, sort []string, filter string) ([]SmartComputerGroupSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
@@ -121,8 +117,7 @@ func (c *Client) ListSmartComputerGroupsV2(ctx context.Context, sort []string, f
 // Required privileges: create:pro:computer-groups. Legacy Jamf Pro privilege name(s): Create Smart Computer Groups.
 //
 // Parameters:
-//   - platform: Optional. Return platform identifiers instead of internal identifiers when
-//     set to true.
+//   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) CreateSmartComputerGroupV3(ctx context.Context, request *SmartComputerGroupV3, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result HrefResponse
@@ -147,8 +142,7 @@ func (c *Client) CreateSmartComputerGroupV3(ctx context.Context, request *SmartC
 // Required privileges: create:pro:computer-groups. Legacy Jamf Pro privilege name(s): Create Smart Computer Groups.
 //
 // Parameters:
-//   - platform: Optional. Return platform identifiers instead of internal identifiers when
-//     set to true.
+//   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) CreateSmartComputerGroupV2(ctx context.Context, request *SmartComputerGroupV2, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -305,14 +299,12 @@ func (c *Client) GetSmartComputerGroupMembershipV2(ctx context.Context, id strin
 // Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Static Computer Groups.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=name:asc.
-//   - filter: Query in the RSQL format, allowing to filter static computer group
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: id, name, siteId. The siteId
-//     field can only be filtered by admins with full access. Any sited admin will
-//     have siteId filtered automatically. Example: name=="*group*".
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=name:asc.
+//   - filter: Query in the RSQL format, allowing to filter static computer group collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query: id, name,
+//     siteId. The siteId field can only be filtered by admins with full access. Any sited admin will have
+//     siteId filtered automatically. Example: name=="*group*".
 func (c *Client) ListStaticComputerGroupsV3(ctx context.Context, sort []string, filter string) ([]StaticComputerGroupSummary, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
@@ -349,14 +341,12 @@ func (c *Client) ListStaticComputerGroupsV3(ctx context.Context, sort []string, 
 // Required privileges: read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Static Computer Groups.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=name:asc.
-//   - filter: Query in the RSQL format, allowing to filter static computer group
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: id, name, siteId. The siteId
-//     field can only be filtered by admins with full access. Any sited admin will
-//     have siteId filtered automatically. Example: name=="*group*".
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=name:asc.
+//   - filter: Query in the RSQL format, allowing to filter static computer group collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query: id, name,
+//     siteId. The siteId field can only be filtered by admins with full access. Any sited admin will have
+//     siteId filtered automatically. Example: name=="*group*".
 func (c *Client) ListStaticComputerGroupsV2(ctx context.Context, sort []string, filter string) ([]StaticComputerGroupSummary, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
@@ -391,8 +381,7 @@ func (c *Client) ListStaticComputerGroupsV2(ctx context.Context, sort []string, 
 // Required privileges: create:pro:computer-groups. Legacy Jamf Pro privilege name(s): Create Static Computer Groups.
 //
 // Parameters:
-//   - platform: Optional. Return platform identifiers instead of internal identifiers when
-//     set to true.
+//   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) CreateStaticComputerGroupV3(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result HrefResponse
@@ -417,8 +406,7 @@ func (c *Client) CreateStaticComputerGroupV3(ctx context.Context, request *Stati
 // Required privileges: create:pro:computer-groups. Legacy Jamf Pro privilege name(s): Create Static Computer Groups.
 //
 // Parameters:
-//   - platform: Optional. Return platform identifiers instead of internal identifiers when
-//     set to true.
+//   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) CreateStaticComputerGroupV2(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse

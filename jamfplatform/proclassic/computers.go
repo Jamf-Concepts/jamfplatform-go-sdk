@@ -191,9 +191,8 @@ func (c *Client) ListComputers(ctx context.Context) (*Computers, error) {
 // Parameters:
 //   - id: ID to filter by.
 //   - subset: Subset to filter by.
-//     Allowed values: "General", "Location", "Purchasing", "Peripherals",
-//     "Hardware", "Certificates", "Software", "ExtensionAttributes",
-//     "GroupsAccounts", "iphones", "ConfigurationProfiles".
+//     Allowed values: "General", "Location", "Purchasing", "Peripherals", "Hardware", "Certificates",
+//     "Software", "ExtensionAttributes", "GroupsAccounts", "iphones", "ConfigurationProfiles".
 func (c *Client) GetComputerByIDSubset(ctx context.Context, id string, subset string) (*Computer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computer
@@ -262,9 +261,8 @@ func (c *Client) GetComputersBasic(ctx context.Context) (*ComputersBasic, error)
 // Required privileges: read:pro:computers.
 //
 // Parameters:
-//   - match: Name, mac address, etc. to filter by. Match uses the same format as the
-//     general search in Jamf Pro. For instance, admin* can be used to match
-//     computer names that begin with admin.
+//   - match: Name, mac address, etc. to filter by. Match uses the same format as the general search in Jamf Pro.
+//     For instance, admin* can be used to match computer names that begin with admin.
 func (c *Client) MatchComputers(ctx context.Context, match string) (*Computers, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computers

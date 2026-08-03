@@ -42,10 +42,10 @@ func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string
 //
 // Parameters:
 //   - deviceID: The platform deviceId.
-//   - filter: RSQL filter expression. Allowed fields: declarationIdentifier, active,
-//     validityState, declarationType, dateUpdated, channel.
-//   - sort: Sorting criteria in the format: property,(asc|desc). Default sort order is
-//     ascending. Multiple sort criteria are supported.
+//   - filter: RSQL filter expression. Allowed fields: declarationIdentifier, active, validityState,
+//     declarationType, dateUpdated, channel.
+//   - sort: Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort
+//     criteria are supported.
 func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceID string, filter string, sort []string) ([]FilteredResultDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {

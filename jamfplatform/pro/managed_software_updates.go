@@ -35,13 +35,11 @@ func (c *Client) ListAvailableOsUpdatesV1(ctx context.Context) (*AvailableOsUpda
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     planUuid:asc. Multiple sort criteria are supported and must be separated
-//     with a comma.
-//   - filter: Query in the RSQL format, allowing to filter Managed Software Updates
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: planUuid, device.deviceId,
-//     device.objectType, updateAction, versionType, specificVersion, maxDeferrals,
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is planUuid:asc. Multiple sort
+//     criteria are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Managed Software Updates collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query: planUuid,
+//     device.deviceId, device.objectType, updateAction, versionType, specificVersion, maxDeferrals,
 //     recipeId, forceInstallLocalDateTime, state.
 func (c *Client) ListManagedSoftwareUpdatePlansV1(ctx context.Context, sort []string, filter string) ([]ManagedSoftwareUpdatePlan, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -164,8 +162,7 @@ func (c *Client) CreateManagedSoftwareUpdateGroupPlanV1(ctx context.Context, req
 //
 // Parameters:
 //   - id: Managed Software Update Group Id.
-//   - groupType: Managed Software Update Group Type, Available options are "COMPUTER_GROUP"
-//     or "MOBILE_DEVICE_GROUP".
+//   - groupType: Managed Software Update Group Type, Available options are "COMPUTER_GROUP" or "MOBILE_DEVICE_GROUP".
 //     Allowed values: "COMPUTER_GROUP", "MOBILE_DEVICE_GROUP".
 func (c *Client) GetManagedSoftwareUpdateGroupPlansV1(ctx context.Context, id string, groupType string) (*ManagedSoftwareUpdatePlans, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -241,12 +238,10 @@ func (c *Client) GetManagedSoftwareUpdatePlanEventsV1(ctx context.Context, id st
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
-//   - filter: Query in the RSQL format, allowing to filter Managed Software Updates
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: osUpdatesStatusId,
-//     device.deviceId, device.objectType, downloaded, downloadPercentComplete,
-//     productKey, status, deferralsRemaining, maxDeferrals, nextScheduledInstall,
-//     created and updated.
+//   - filter: Query in the RSQL format, allowing to filter Managed Software Updates collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query:
+//     osUpdatesStatusId, device.deviceId, device.objectType, downloaded, downloadPercentComplete,
+//     productKey, status, deferralsRemaining, maxDeferrals, nextScheduledInstall, created and updated.
 func (c *Client) ListManagedSoftwareUpdateStatusesV1(ctx context.Context, filter string) (*ManagedSoftwareUpdateStatuses, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses

@@ -142,14 +142,12 @@ func (c *Client) RemovePatchSoftwareTitleFromDashboardV2(ctx context.Context, id
 //
 // Parameters:
 //   - id: Patch Software Title identifier.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     absoluteOrderId:asc. Multiple sort criteria are supported and must be
-//     separated with a comma.
-//   - filter: Query in the RSQL format, allowing to filter Patch Software Title Definition
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: id, version,
-//     minimumOperatingSystem, releaseDate, reboot, standalone and absoluteOrderId.
-//     This param can be combined with paging and sorting.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is absoluteOrderId:asc. Multiple
+//     sort criteria are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Patch Software Title Definition collection. Default
+//     filter is empty query - returning all results for the requested page. Fields allowed in the query:
+//     id, version, minimumOperatingSystem, releaseDate, reboot, standalone and absoluteOrderId. This param
+//     can be combined with paging and sorting.
 func (c *Client) ListPatchSoftwareTitleDefinitionsV2(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleDefinition, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleDefinition, bool, error) {
@@ -201,10 +199,9 @@ func (c *Client) GetPatchSoftwareTitleDependenciesV2(ctx context.Context, id str
 //
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
-//   - filter: Query in the RSQL format, allowing to filter Patch Report collection on
-//     version equality only. Default filter is empty query - returning all results
-//     for the requested page. Fields allowed in the query: version. Comparators
-//     allowed in the query: ==, != This param can be combined with paging and
+//   - filter: Query in the RSQL format, allowing to filter Patch Report collection on version equality only.
+//     Default filter is empty query - returning all results for the requested page. Fields allowed in the
+//     query: version. Comparators allowed in the query: ==, != This param can be combined with paging and
 //     sorting.
 //   - columnsToExport: List of column names to export.
 func (c *Client) ExportPatchSoftwareTitleReportV2(ctx context.Context, id string, filter string, columnsToExport []string) ([]byte, error) {
@@ -249,13 +246,11 @@ func (c *Client) ListPatchSoftwareTitleExtensionAttributesV2(ctx context.Context
 //
 // Parameters:
 //   - id: Patch Software Title Configuration Id.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     date:desc. Multiple sort criteria are supported and must be separated with a
-//     comma.
-//   - filter: Query in the RSQL format, allowing to filter history notes collection.
-//     Default filter is empty query - returning all results for the requested
-//     page. Fields allowed in the query: username, date, note, details. This param
-//     can be combined with paging and sorting. Example: filter=username!=admin and
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListPatchSoftwareTitleHistoryV2(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
@@ -308,15 +303,12 @@ func (c *Client) CreatePatchSoftwareTitleHistoryNoteV2(ctx context.Context, id s
 //
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     computerName:asc. Multiple sort criteria are supported and must be separated
-//     with a comma. Supported fields: computerName, deviceId, username,
-//     operatingSystemVersion, lastContactTime, buildingName, departmentName,
-//     siteName, version.
-//   - filter: Query in the RSQL format, allowing to filter Patch Report collection on
-//     version equality only. Default filter is empty query - returning all results
-//     for the requested page. Fields allowed in the query: version. Comparators
-//     allowed in the query: ==, != This param can be combined with paging and
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is computerName:asc. Multiple sort
+//     criteria are supported and must be separated with a comma. Supported fields: computerName, deviceId,
+//     username, operatingSystemVersion, lastContactTime, buildingName, departmentName, siteName, version.
+//   - filter: Query in the RSQL format, allowing to filter Patch Report collection on version equality only.
+//     Default filter is empty query - returning all results for the requested page. Fields allowed in the
+//     query: version. Comparators allowed in the query: ==, != This param can be combined with paging and
 //     sorting.
 func (c *Client) ListPatchSoftwareTitlePatchReportV2(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleReport, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")

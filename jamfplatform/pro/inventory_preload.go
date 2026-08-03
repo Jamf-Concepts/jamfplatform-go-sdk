@@ -122,24 +122,21 @@ func (c *Client) ListInventoryPreloadExtensionAttributeColumnsV2(ctx context.Con
 // Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 //
 // Parameters:
-//   - exportFields: Export fields parameter, used to change default order or ignore some of the
-//     response properties. Default is empty array, which means that all fields of
-//     the response entity will be serialized. Example: export-fields=id,username.
-//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the
-//     exported file. Default is empty array, which means that response properties
-//     names will be used. Number of the provided labels must match the number of
-//     export-fields Example: export-labels=identifier,name with matching:
+//   - exportFields: Export fields parameter, used to change default order or ignore some of the response properties.
+//     Default is empty array, which means that all fields of the response entity will be serialized.
+//     Example: export-fields=id,username.
+//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the exported file. Default is empty
+//     array, which means that response properties names will be used. Number of the provided labels must
+//     match the number of export-fields Example: export-labels=identifier,name with matching:
 //     export-fields=id,username.
-//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is
-//     `id:asc`. Multiple sort criteria are supported and must be separated with a
-//     comma. All inventory preload fields are supported, however fields added by
-//     extension attributes are not supported. If sorting by deviceType, use `0`
-//     for Computer and `1` for Mobile Device.
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `id:asc`. Multiple sort
+//     criteria are supported and must be separated with a comma. All inventory preload fields are
+//     supported, however fields added by extension attributes are not supported. If sorting by deviceType,
+//     use `0` for Computer and `1` for Mobile Device.
 //     Example: `sort=date:desc,name:asc`.
-//   - filter: Allowing to filter inventory preload records. Default search is empty query
-//   - returning all results for the requested page. All inventory preload fields
-//     are supported, however fields added by extension attributes are not
-//     supported. If filtering by deviceType, use `0` for Computer and `1` for
+//   - filter: Allowing to filter inventory preload records. Default search is empty query - returning all results
+//     for the requested page. All inventory preload fields are supported, however fields added by
+//     extension attributes are not supported. If filtering by deviceType, use `0` for Computer and `1` for
 //     Mobile Device.
 //     Query in the RSQL format, allowing `==`, `!=`, `>`, `<`, and `=in=`.
 //     Example: `filter=categoryName=="Category"`.
@@ -176,9 +173,8 @@ func (c *Client) ExportInventoryPreloadV2(ctx context.Context, request *ExportPa
 // Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     date:desc. Multiple sort criteria are supported and must be separated with a
-//     comma. Example: sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListInventoryPreloadHistoryV1(ctx context.Context, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -210,13 +206,11 @@ func (c *Client) ListInventoryPreloadHistoryV1(ctx context.Context, sort []strin
 // Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is
-//     `date:desc`. Multiple sort criteria are supported and must be separated with
-//     a comma.
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `date:desc`. Multiple sort
+//     criteria are supported and must be separated with a comma.
 //     Example: `sort=date:desc,name:asc`.
-//   - filter: Allows filtering inventory preload history records. Default search is empty
-//     query - returning all results for the requested page. All inventory preload
-//     history fields are supported.
+//   - filter: Allows filtering inventory preload history records. Default search is empty query - returning all
+//     results for the requested page. All inventory preload history fields are supported.
 //     Query in the RSQL format, allowing `==`, `!=`, `>`, `<`, and `=in=`.
 //     Example: `filter=username=="admin"`.
 func (c *Client) ListInventoryPreloadHistoryV2(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
@@ -281,16 +275,14 @@ func (c *Client) CreateInventoryPreloadHistoryNoteV2(ctx context.Context, reques
 // Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is
-//     `id:asc`. Multiple sort criteria are supported and must be separated with a
-//     comma. All inventory preload fields are supported, however fields added by
-//     extension attributes are not supported. If sorting by deviceType, use `0`
-//     for Computer and `1` for Mobile Device.
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `id:asc`. Multiple sort
+//     criteria are supported and must be separated with a comma. All inventory preload fields are
+//     supported, however fields added by extension attributes are not supported. If sorting by deviceType,
+//     use `0` for Computer and `1` for Mobile Device.
 //     Example: `sort=date:desc,name:asc`.
-//   - filter: Allowing to filter inventory preload records. Default search is empty query
-//   - returning all results for the requested page. All inventory preload fields
-//     are supported, however fields added by extension attributes are not
-//     supported. If filtering by deviceType, use `0` for Computer and `1` for
+//   - filter: Allowing to filter inventory preload records. Default search is empty query - returning all results
+//     for the requested page. All inventory preload fields are supported, however fields added by
+//     extension attributes are not supported. If filtering by deviceType, use `0` for Computer and `1` for
 //     Mobile Device.
 //     Query in the RSQL format, allowing `==`, `!=`, `>`, `<`, and `=in=`.
 //     Example: `filter=categoryName=="Category"`.

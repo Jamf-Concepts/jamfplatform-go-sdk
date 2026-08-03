@@ -57,72 +57,52 @@ func (c *Client) RemoveMdmProfileFromComputerV1(ctx context.Context, id string) 
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
-//   - section: section of computer details, if not specified, General section data is
-//     returned. Multiple section parameters are supported, e.g.
-//     section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS",
-//     "STORAGE", "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS",
-//     "SERVICES", "HARDWARE", "LOCAL_USER_ACCOUNTS", "CERTIFICATES",
-//     "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS",
+//     "SECURITY", "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
 //     "EXTENSION_ATTRIBUTES", "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
-//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is
-//     `general.name:asc`. Multiple sort criteria are supported and must be
-//     separated with a comma.
-//     Fields allowed in the sort: `general.name`, `udid`, `id`,
-//     `general.assetTag`, `general.jamfBinaryVersion`, `general.lastContactTime`,
-//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`,
-//     `general.reportDate`, `general.mdmCertificateExpiration`,
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
+//     sort criteria are supported and must be separated with a comma.
+//     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
+//     `general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`,
+//     `general.lastCloudBackupDate`, `general.reportDate`, `general.mdmCertificateExpiration`,
 //     `general.platform`, `general.lastLoggedInUsernameSelfService`,
-//     `general.lastLoggedInUsernameSelfServiceTimestamp`,
-//     `general.lastLoggedInUsernameBinary`,
-//     `general.lastLoggedInUsernameBinaryTimestamp`,
-//     `general.lastLoggedInUsernameMdm`,
-//     `general.lastLoggedInUsernameMdmTimestamp` `hardware.make`,
-//     `hardware.model`, `operatingSystem.build`,
-//     `operatingSystem.supplementalBuildVersion`,
-//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`,
-//     `operatingSystem.version`, `userAndLocation.realname`,
-//     `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
-//     Example: `sort=udid:desc,general.name:asc`.
-//   - filter: Query in the RSQL format, allowing to filter computer inventory collection.
-//     Default filter is empty query - returning all results for the requested
-//     page.
-//     Fields allowed in the query: `general.name`, `udid`, `id`,
-//     `general.assetTag`, `general.barcode1`, `general.barcode2`,
-//     `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
-//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`,
-//     `general.lastContactTime`, `general.lastEnrolledDate`,
-//     `general.lastCloudBackupDate`, `general.reportDate`,
-//     `general.lastReportedIp`, `general.lastReportedIpV4`,
-//     `general.lastReportedIpV6`, `general.managementId`,
-//     `general.remoteManagement.managed`, `general.mdmCapable.capable`,
-//     `general.mdmCertificateExpiration`, `general.platform`,
-//     `general.supervised`, `general.userApprovedMdm`,
-//     `general.declarativeDeviceManagementEnabled`,
-//     `general.lastLoggedInUsernameSelfService`,
-//     `general.lastLoggedInUsernameSelfServiceTimestamp`,
-//     `general.lastLoggedInUsernameBinary`,
-//     `general.lastLoggedInUsernameBinaryTimestamp`,
-//     `general.lastLoggedInUsernameMdm`,
-//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.bleCapable`,
-//     `hardware.macAddress`, `hardware.make`, `hardware.model`,
-//     `hardware.modelIdentifier`, `hardware.serialNumber`,
-//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`,
-//     `operatingSystem.activeDirectoryStatus`, `operatingSystem.fileVault2Status`,
+//     `general.lastLoggedInUsernameSelfServiceTimestamp`, `general.lastLoggedInUsernameBinary`,
+//     `general.lastLoggedInUsernameBinaryTimestamp`, `general.lastLoggedInUsernameMdm`,
+//     `general.lastLoggedInUsernameMdmTimestamp` `hardware.make`, `hardware.model`,
 //     `operatingSystem.build`, `operatingSystem.supplementalBuildVersion`,
-//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`,
-//     `operatingSystem.version`, `security.activationLockEnabled`,
+//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,
+//     `userAndLocation.realname`, `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
+//     Example: `sort=udid:desc,general.name:asc`.
+//   - filter: Query in the RSQL format, allowing to filter computer inventory collection. Default filter is empty
+//     query - returning all results for the requested page.
+//     Fields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`,
+//     `general.barcode2`, `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
+//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`, `general.lastContactTime`,
+//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`, `general.reportDate`,
+//     `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`,
+//     `general.managementId`, `general.remoteManagement.managed`, `general.mdmCapable.capable`,
+//     `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`,
+//     `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,
+//     `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,
+//     `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,
+//     `general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,
+//     `hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`,
+//     `hardware.modelIdentifier`, `hardware.serialNumber`,
+//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`,
+//     `operatingSystem.fileVault2Status`, `operatingSystem.build`,
+//     `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`,
+//     `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,
 //     `security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`,
-//     `userAndLocation.departmentId`, `userAndLocation.email`,
-//     `userAndLocation.realname`, `userAndLocation.phone`,
-//     `userAndLocation.position`,`userAndLocation.room`,
-//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`,
-//     `purchasing.appleCareId`, `purchasing.lifeExpectancy`,
-//     `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
+//     `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,
+//     `userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`,
+//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`, `purchasing.appleCareId`,
+//     `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
 //     `purchasing.warrantyDate`,.
-//     This param can be combined with paging and sorting. Example:
-//     `filter=general.name=="Orchard"`.
+//     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventory, bool, error) {
@@ -162,72 +142,52 @@ func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string,
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
-//   - section: section of computer details, if not specified, General section data is
-//     returned. Multiple section parameters are supported, e.g.
-//     section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS",
-//     "STORAGE", "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS",
-//     "SERVICES", "HARDWARE", "LOCAL_USER_ACCOUNTS", "CERTIFICATES",
-//     "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY", "OPERATING_SYSTEM",
-//     "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
+//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
 //     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
-//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is
-//     `general.name:asc`. Multiple sort criteria are supported and must be
-//     separated with a comma.
-//     Fields allowed in the sort: `general.name`, `udid`, `id`,
-//     `general.assetTag`, `general.jamfBinaryVersion`, `general.lastContactTime`,
-//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`,
-//     `general.reportDate`, `general.mdmCertificateExpiration`,
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
+//     sort criteria are supported and must be separated with a comma.
+//     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
+//     `general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`,
+//     `general.lastCloudBackupDate`, `general.reportDate`, `general.mdmCertificateExpiration`,
 //     `general.platform`, `general.lastLoggedInUsernameSelfService`,
-//     `general.lastLoggedInUsernameSelfServiceTimestamp`,
-//     `general.lastLoggedInUsernameBinary`,
-//     `general.lastLoggedInUsernameBinaryTimestamp`,
-//     `general.lastLoggedInUsernameMdm`,
-//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.make`,
-//     `hardware.model`, `operatingSystem.build`,
-//     `operatingSystem.supplementalBuildVersion`,
-//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`,
-//     `operatingSystem.version`, `userAndLocation.realname`,
-//     `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
-//     Example: `sort=udid:desc,general.name:asc`.
-//   - filter: Query in the RSQL format, allowing to filter computer inventory collection.
-//     Default filter is empty query - returning all results for the requested
-//     page.
-//     Fields allowed in the query: `general.name`, `udid`, `id`,
-//     `general.assetTag`, `general.barcode1`, `general.barcode2`,
-//     `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
-//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`,
-//     `general.lastContactTime`, `general.lastEnrolledDate`,
-//     `general.lastCloudBackupDate`, `general.reportDate`,
-//     `general.lastReportedIp`, `general.lastReportedIpV4`,
-//     `general.lastReportedIpV6`, `general.managementId`,
-//     `general.remoteManagement.managed`, `general.mdmCapable.capable`,
-//     `general.mdmCertificateExpiration`, `general.platform`,
-//     `general.supervised`, `general.userApprovedMdm`,
-//     `general.declarativeDeviceManagementEnabled`,
-//     `general.lastLoggedInUsernameSelfService`,
-//     `general.lastLoggedInUsernameSelfServiceTimestamp`,
-//     `general.lastLoggedInUsernameBinary`,
-//     `general.lastLoggedInUsernameBinaryTimestamp`,
-//     `general.lastLoggedInUsernameMdm`,
-//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.bleCapable`,
-//     `hardware.macAddress`, `hardware.make`, `hardware.model`,
-//     `hardware.modelIdentifier`, `hardware.serialNumber`,
-//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`,
-//     `operatingSystem.activeDirectoryStatus`, `operatingSystem.fileVault2Status`,
+//     `general.lastLoggedInUsernameSelfServiceTimestamp`, `general.lastLoggedInUsernameBinary`,
+//     `general.lastLoggedInUsernameBinaryTimestamp`, `general.lastLoggedInUsernameMdm`,
+//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.make`, `hardware.model`,
 //     `operatingSystem.build`, `operatingSystem.supplementalBuildVersion`,
-//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`,
-//     `operatingSystem.version`, `security.activationLockEnabled`,
+//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,
+//     `userAndLocation.realname`, `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
+//     Example: `sort=udid:desc,general.name:asc`.
+//   - filter: Query in the RSQL format, allowing to filter computer inventory collection. Default filter is empty
+//     query - returning all results for the requested page.
+//     Fields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`,
+//     `general.barcode2`, `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
+//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`, `general.lastContactTime`,
+//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`, `general.reportDate`,
+//     `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`,
+//     `general.managementId`, `general.remoteManagement.managed`, `general.mdmCapable.capable`,
+//     `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`,
+//     `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,
+//     `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,
+//     `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,
+//     `general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,
+//     `hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`,
+//     `hardware.modelIdentifier`, `hardware.serialNumber`,
+//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`,
+//     `operatingSystem.fileVault2Status`, `operatingSystem.build`,
+//     `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`,
+//     `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,
 //     `security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`,
-//     `userAndLocation.departmentId`, `userAndLocation.email`,
-//     `userAndLocation.realname`, `userAndLocation.phone`,
-//     `userAndLocation.position`,`userAndLocation.room`,
-//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`,
-//     `purchasing.appleCareId`, `purchasing.lifeExpectancy`,
-//     `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
+//     `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,
+//     `userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`,
+//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`, `purchasing.appleCareId`,
+//     `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
 //     `purchasing.warrantyDate`,.
-//     This param can be combined with paging and sorting. Example:
-//     `filter=general.name=="Orchard"`.
+//     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV2, bool, error) {
@@ -265,72 +225,52 @@ func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string,
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
-//   - section: section of computer details, if not specified, General section data is
-//     returned. Multiple section parameters are supported, e.g.
-//     section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS",
-//     "STORAGE", "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS",
-//     "SERVICES", "HARDWARE", "LOCAL_USER_ACCOUNTS", "CERTIFICATES",
-//     "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY", "OPERATING_SYSTEM",
-//     "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
+//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
 //     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
-//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is
-//     `general.name:asc`. Multiple sort criteria are supported and must be
-//     separated with a comma.
-//     Fields allowed in the sort: `general.name`, `udid`, `id`,
-//     `general.assetTag`, `general.jamfBinaryVersion`, `general.lastContactTime`,
-//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`,
-//     `general.reportDate`, `general.mdmCertificateExpiration`,
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
+//     sort criteria are supported and must be separated with a comma.
+//     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
+//     `general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`,
+//     `general.lastCloudBackupDate`, `general.reportDate`, `general.mdmCertificateExpiration`,
 //     `general.platform`, `general.lastLoggedInUsernameSelfService`,
-//     `general.lastLoggedInUsernameSelfServiceTimestamp`,
-//     `general.lastLoggedInUsernameBinary`,
-//     `general.lastLoggedInUsernameBinaryTimestamp`,
-//     `general.lastLoggedInUsernameMdm`,
-//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.make`,
-//     `hardware.model`, `operatingSystem.build`,
-//     `operatingSystem.supplementalBuildVersion`,
-//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`,
-//     `operatingSystem.version`, `userAndLocation.realname`,
-//     `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
-//     Example: `sort=udid:desc,general.name:asc`.
-//   - filter: Query in the RSQL format, allowing to filter computer inventory collection.
-//     Default filter is empty query - returning all results for the requested
-//     page.
-//     Fields allowed in the query: `general.name`, `udid`, `id`,
-//     `general.assetTag`, `general.barcode1`, `general.barcode2`,
-//     `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
-//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`,
-//     `general.lastContactTime`, `general.lastEnrolledDate`,
-//     `general.lastCloudBackupDate`, `general.reportDate`,
-//     `general.lastReportedIp`, `general.lastReportedIpV4`,
-//     `general.lastReportedIpV6`, `general.managementId`,
-//     `general.remoteManagement.managed`, `general.mdmCapable.capable`,
-//     `general.mdmCertificateExpiration`, `general.platform`,
-//     `general.supervised`, `general.userApprovedMdm`,
-//     `general.declarativeDeviceManagementEnabled`,
-//     `general.lastLoggedInUsernameSelfService`,
-//     `general.lastLoggedInUsernameSelfServiceTimestamp`,
-//     `general.lastLoggedInUsernameBinary`,
-//     `general.lastLoggedInUsernameBinaryTimestamp`,
-//     `general.lastLoggedInUsernameMdm`,
-//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.bleCapable`,
-//     `hardware.macAddress`, `hardware.make`, `hardware.model`,
-//     `hardware.modelIdentifier`, `hardware.serialNumber`,
-//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`,
-//     `operatingSystem.activeDirectoryStatus`, `operatingSystem.fileVault2Status`,
+//     `general.lastLoggedInUsernameSelfServiceTimestamp`, `general.lastLoggedInUsernameBinary`,
+//     `general.lastLoggedInUsernameBinaryTimestamp`, `general.lastLoggedInUsernameMdm`,
+//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.make`, `hardware.model`,
 //     `operatingSystem.build`, `operatingSystem.supplementalBuildVersion`,
-//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`,
-//     `operatingSystem.version`, `security.activationLockEnabled`,
+//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,
+//     `userAndLocation.realname`, `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
+//     Example: `sort=udid:desc,general.name:asc`.
+//   - filter: Query in the RSQL format, allowing to filter computer inventory collection. Default filter is empty
+//     query - returning all results for the requested page.
+//     Fields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`,
+//     `general.barcode2`, `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
+//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`, `general.lastContactTime`,
+//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`, `general.reportDate`,
+//     `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`,
+//     `general.managementId`, `general.remoteManagement.managed`, `general.mdmCapable.capable`,
+//     `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`,
+//     `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,
+//     `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,
+//     `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,
+//     `general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,
+//     `hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`,
+//     `hardware.modelIdentifier`, `hardware.serialNumber`,
+//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`,
+//     `operatingSystem.fileVault2Status`, `operatingSystem.build`,
+//     `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`,
+//     `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,
 //     `security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`,
-//     `userAndLocation.departmentId`, `userAndLocation.email`,
-//     `userAndLocation.realname`, `userAndLocation.phone`,
-//     `userAndLocation.position`,`userAndLocation.room`,
-//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`,
-//     `purchasing.appleCareId`, `purchasing.lifeExpectancy`,
-//     `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
+//     `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,
+//     `userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`,
+//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`, `purchasing.appleCareId`,
+//     `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
 //     `purchasing.warrantyDate`,.
-//     This param can be combined with paging and sorting. Example:
-//     `filter=general.name=="Orchard"`.
+//     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV3(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV3, bool, error) {
@@ -496,14 +436,12 @@ func (c *Client) ListComputerInventoryFileVaultsV3(ctx context.Context) ([]Compu
 //
 // Parameters:
 //   - id: instance id of computer record.
-//   - section: section of computer details, if not specified, General section data is
-//     returned. Multiple section parameters are supported, e.g.
-//     section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS",
-//     "STORAGE", "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS",
-//     "SERVICES", "HARDWARE", "LOCAL_USER_ACCOUNTS", "CERTIFICATES",
-//     "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=general&section=hardware.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS",
+//     "SECURITY", "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
 //     "EXTENSION_ATTRIBUTES", "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section []string) (*ComputerInventory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -530,14 +468,12 @@ func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section 
 //
 // Parameters:
 //   - id: instance id of computer record.
-//   - section: section of computer details, if not specified, General section data is
-//     returned. Multiple section parameters are supported, e.g.
-//     section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS",
-//     "STORAGE", "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS",
-//     "SERVICES", "HARDWARE", "LOCAL_USER_ACCOUNTS", "CERTIFICATES",
-//     "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY", "OPERATING_SYSTEM",
-//     "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=general&section=hardware.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
+//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
 //     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section []string) (*ComputerInventoryV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
@@ -562,14 +498,12 @@ func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section 
 //
 // Parameters:
 //   - id: instance id of computer record.
-//   - section: section of computer details, if not specified, General section data is
-//     returned. Multiple section parameters are supported, e.g.
-//     section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS",
-//     "STORAGE", "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS",
-//     "SERVICES", "HARDWARE", "LOCAL_USER_ACCOUNTS", "CERTIFICATES",
-//     "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY", "OPERATING_SYSTEM",
-//     "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=general&section=hardware.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
+//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
 //     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV3(ctx context.Context, id string, section []string) (*ComputerInventoryV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")

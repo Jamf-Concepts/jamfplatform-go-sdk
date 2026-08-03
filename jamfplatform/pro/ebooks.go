@@ -22,9 +22,8 @@ import (
 // Required privileges: read:pro:ebooks. Legacy Jamf Pro privilege name(s): Read eBooks.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListEbooksV1(ctx context.Context, sort []string) ([]Ebook, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Ebook, bool, error) {

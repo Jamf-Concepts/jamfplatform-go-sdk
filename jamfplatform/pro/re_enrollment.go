@@ -47,9 +47,8 @@ func (c *Client) UpdateReenrollmentSettingsV1(ctx context.Context, request *Reen
 // Required privileges: read:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Read Re-enrollment.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     date:desc. Multiple sort criteria are supported and must be separated with a
-//     comma. Example: sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListReenrollmentHistoryV1(ctx context.Context, sort string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -94,21 +93,18 @@ func (c *Client) CreateReenrollmentHistoryNoteV1(ctx context.Context, request *O
 // Required privileges: read:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Read Re-enrollment.
 //
 // Parameters:
-//   - exportFields: Export fields parameter, used to change default order or ignore some of the
-//     response properties. Default is empty array, which means that all fields of
-//     the response entity will be serialized. Example: export-fields=id,username.
-//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the
-//     exported file. Default is empty array, which means that response properties
-//     names will be used. Number of the provided labels must match the number of
-//     export-fields Example: export-labels=identifier,name with matching:
+//   - exportFields: Export fields parameter, used to change default order or ignore some of the response properties.
+//     Default is empty array, which means that all fields of the response entity will be serialized.
+//     Example: export-fields=id,username.
+//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the exported file. Default is empty
+//     array, which means that response properties names will be used. Number of the provided labels must
+//     match the number of export-fields Example: export-labels=identifier,name with matching:
 //     export-fields=id,username.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:desc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=id:desc,name:asc.
-//   - filter: Query in the RSQL format, allowing to filter history notes collection.
-//     Default filter is empty query - returning all results for the requested
-//     page. Fields allowed in the query: id, name. This param can be combined with
-//     paging and sorting. Example: name=="*script*".
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=id:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: id, name. This param
+//     can be combined with paging and sorting. Example: name=="*script*".
 func (c *Client) ExportReenrollmentHistoryV1(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte

@@ -99,8 +99,7 @@ func (c *Client) GetMobileDeviceHistoryByMacAddress(ctx context.Context, macAddr
 // Parameters:
 //   - id: ID to filter by.
 //   - subset: Subset to filter by.
-//     Allowed values: "General", "ManagementCommands", "UserLocation", "Audits",
-//     "Applications", "Ebooks".
+//     Allowed values: "General", "ManagementCommands", "UserLocation", "Audits", "Applications", "Ebooks".
 func (c *Client) GetMobileDeviceHistoryByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceHistory

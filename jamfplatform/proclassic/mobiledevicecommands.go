@@ -94,12 +94,11 @@ func (c *Client) GetMobileDeviceCommandByCommand(ctx context.Context, command st
 //
 // Parameters:
 //   - command: Command to send device.
-//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)",
-//     "EnableLostMode", "PasscodeLockGracePeriod (PasscodeLockGracePeriod
-//     Deprecated on 2025-06-26)", "PlayLostModeSound (PlayLostModeSound Deprecated
-//     on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on 2026-03-13)".
-//   - id_list: Mobile device ID values, multiple IDs may be separated by commas (e.g.
-//     /id/13,14,15).
+//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)", "EnableLostMode",
+//     "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)", "PlayLostModeSound
+//     (PlayLostModeSound Deprecated on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on
+//     2026-03-13)".
+//   - id_list: Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15).
 func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, command string, id_list string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(id_list))
@@ -116,10 +115,10 @@ func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, comma
 //
 // Parameters:
 //   - command: Command to send device.
-//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)",
-//     "EnableLostMode", "PasscodeLockGracePeriod (PasscodeLockGracePeriod
-//     Deprecated on 2025-06-26)", "PlayLostModeSound (PlayLostModeSound Deprecated
-//     on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on 2026-03-13)".
+//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)", "EnableLostMode",
+//     "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)", "PlayLostModeSound
+//     (PlayLostModeSound Deprecated on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on
+//     2026-03-13)".
 func (c *Client) CreateMobileDeviceCommandByCommand(ctx context.Context, command string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s", prefix, url.PathEscape(command))
@@ -136,13 +135,12 @@ func (c *Client) CreateMobileDeviceCommandByCommand(ctx context.Context, command
 //
 // Parameters:
 //   - command: Command to send device.
-//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)",
-//     "EnableLostMode", "PasscodeLockGracePeriod (PasscodeLockGracePeriod
-//     Deprecated on 2025-06-26)", "PlayLostModeSound (PlayLostModeSound Deprecated
-//     on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on 2026-03-13)".
+//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)", "EnableLostMode",
+//     "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)", "PlayLostModeSound
+//     (PlayLostModeSound Deprecated on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on
+//     2026-03-13)".
 //   - parameter: Path parameter parameter.
-//   - idList: Mobile device ID values, multiple IDs may be separated by commas (e.g.
-//     /id/13,14,15).
+//   - idList: Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15).
 func (c *Client) CreateMobileDeviceCommandWithParameterByIDList(ctx context.Context, command string, parameter string, idList string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(parameter), url.PathEscape(idList))
@@ -159,14 +157,13 @@ func (c *Client) CreateMobileDeviceCommandWithParameterByIDList(ctx context.Cont
 //
 // Parameters:
 //   - command: Command to send device.
-//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)",
-//     "EnableLostMode", "PasscodeLockGracePeriod (PasscodeLockGracePeriod
-//     Deprecated on 2025-06-26)", "PlayLostModeSound (PlayLostModeSound Deprecated
-//     on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on 2026-03-13)".
+//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)", "EnableLostMode",
+//     "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)", "PlayLostModeSound
+//     (PlayLostModeSound Deprecated on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on
+//     2026-03-13)".
 //   - parameter: Path parameter parameter.
 //   - version: Path parameter version.
-//   - idList: Mobile device ID values, multiple IDs may be separated by commas (e.g.
-//     /id/13,14,15).
+//   - idList: Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15).
 func (c *Client) CreateMobileDeviceCommandWithParameterVersionByIDList(ctx context.Context, command string, parameter string, version string, idList string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/%s/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(parameter), url.PathEscape(version), url.PathEscape(idList))

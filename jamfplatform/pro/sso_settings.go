@@ -72,13 +72,11 @@ func (c *Client) DisableSsoV3(ctx context.Context) error {
 // Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     date:desc. Multiple sort criteria are supported and must be separated with a
-//     comma. Example: sort=date:desc,name:asc.
-//   - filter: Query in the RSQL format, allowing to filter history notes collection.
-//     Default filter is empty query - returning all results for the requested
-//     page. Fields allowed in the query: username, date, note, details. This param
-//     can be combined with paging and sorting. Example: filter=username!=admin and
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListSsoHistoryV3(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")

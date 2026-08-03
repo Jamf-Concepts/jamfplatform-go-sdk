@@ -22,13 +22,12 @@ import (
 // Required privileges: read:pro:api-roles. Legacy Jamf Pro privilege name(s): Read API Roles.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Fields allowed in the query: id, displayName. Example:
-//     sort=displayName:desc.
-//   - filter: Query in the RSQL format, allowing to filter app titles collection. Default
-//     filter is empty query - returning all results for the requested page. Fields
-//     allowed in the query: id, displayName. Example: displayName=="*myRole*".
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Fields allowed in the query: id, displayName.
+//     Example: sort=displayName:desc.
+//   - filter: Query in the RSQL format, allowing to filter app titles collection. Default filter is empty query -
+//     returning all results for the requested page. Fields allowed in the query: id, displayName. Example:
+//     displayName=="*myRole*".
 func (c *Client) ListApiRolesV1(ctx context.Context, sort []string, filter string) ([]ApiRole, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ApiRole, bool, error) {

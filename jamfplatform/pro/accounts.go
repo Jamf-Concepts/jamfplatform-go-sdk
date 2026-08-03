@@ -22,21 +22,17 @@ import (
 // Required privileges: read:pro:accounts. Legacy Jamf Pro privilege name(s): Read Accounts.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     username:desc. Multiple sort criteria are supported and must be separated
-//     with a comma. Accepts fields: id, lastPasswordChange, failedLoginAttempts,
-//     username, realname, email, phone, ldapServerId, distinguishedName, siteId,
-//     privilegeLevel, changePasswordOnNextLogin, accountStatus. If any other field
-//     is passed it will be ignored in sorting operation and/or create
-//     unpredictable results.
-//   - filter: Query in the RSQL format to filter user accounts collection. An empty query
-//     returns all results for the requested page. Supported fields: id,
-//     lastPasswordChange, failedLoginAttempts, username, realname, email, phone,
-//     ldapServerId, distinguishedName, siteId, privilegeLevel,
-//     changePasswordOnNextLogin, accountStatus. Multiple conditions can be
-//     combined using logical operators. This parameter can be used with paging and
-//     sorting parameters. Example: username=="admin" and accountStatus==Enabled
-//     and failedLoginAttempts==0.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is username:desc. Multiple sort
+//     criteria are supported and must be separated with a comma. Accepts fields: id, lastPasswordChange,
+//     failedLoginAttempts, username, realname, email, phone, ldapServerId, distinguishedName, siteId,
+//     privilegeLevel, changePasswordOnNextLogin, accountStatus. If any other field is passed it will be
+//     ignored in sorting operation and/or create unpredictable results.
+//   - filter: Query in the RSQL format to filter user accounts collection. An empty query returns all results for
+//     the requested page. Supported fields: id, lastPasswordChange, failedLoginAttempts, username,
+//     realname, email, phone, ldapServerId, distinguishedName, siteId, privilegeLevel,
+//     changePasswordOnNextLogin, accountStatus. Multiple conditions can be combined using logical
+//     operators. This parameter can be used with paging and sorting parameters. Example: username=="admin"
+//     and accountStatus==Enabled and failedLoginAttempts==0.
 func (c *Client) ListAccountsV1(ctx context.Context, sort []string, filter string) ([]UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]UserAccount, bool, error) {

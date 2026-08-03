@@ -99,9 +99,8 @@ func (c *Client) RemoveFromComputerPrestageScopeV2(ctx context.Context, id strin
 // Required privileges: read:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria
-//     are supported and must be separated with a comma. Example:
-//     sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
+//     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListComputerPrestagesV3(ctx context.Context, sort []string) ([]GetComputerPrestageV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GetComputerPrestageV3, bool, error) {

@@ -23,13 +23,11 @@ import (
 // Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
 //
 // Parameters:
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is name:asc. If using multiple criteria,
-//     separate with commas. Allows sort for id and name.
-//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
-//     including ID, name, etc. Can be combined with paging and sorting. Fields
-//     allowed in the query: id, name Default filter is an empty query and returns
-//     all results from the requested page.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     name:asc. If using multiple criteria, separate with commas. Allows sort for id and name.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Fields allowed in the query: id, name Default filter is an empty
+//     query and returns all results from the requested page.
 func (c *Client) ListComputerExtensionAttributesV1(ctx context.Context, sort []string, filter string) ([]ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributes, bool, error) {
@@ -89,15 +87,13 @@ func (c *Client) DeleteMultipleComputerExtensionAttributesV1(ctx context.Context
 // Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
 //
 // Parameters:
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is templateName:asc. If using multiple
-//     criteria, separate with commas. Allows sort for templateName and
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     templateName:asc. If using multiple criteria, separate with commas. Allows sort for templateName and
 //     templateCategory.
-//   - filter: Filters results. Use RSQL format for queries. which allows filtering by
-//     multiple fields such as templateName, templateCategoryName. Can be combined
-//     with paging and sorting. Fields allowed in the query: templateName,
-//     templateCategoryName Default filter is an empty query and returns all
-//     results from the requested page.
+//   - filter: Filters results. Use RSQL format for queries. which allows filtering by multiple fields such as
+//     templateName, templateCategoryName. Can be combined with paging and sorting. Fields allowed in the
+//     query: templateName, templateCategoryName Default filter is an empty query and returns all results
+//     from the requested page.
 func (c *Client) ListComputerExtensionAttributeTemplatesV1(ctx context.Context, sort []string, filter string) ([]ComputerExtensionAttributeTemplates, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributeTemplates, bool, error) {
@@ -251,12 +247,11 @@ func (c *Client) DownloadComputerExtensionAttributeV1(ctx context.Context, id st
 //
 // Parameters:
 //   - id: Instance ID of Computer Extension Attribute history.
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is ID:asc. If using multiple criteria,
-//     separate with commas.
-//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
-//     including ID, name, etc. Can be combined with paging and sorting. Default
-//     filter is an empty query and returns all results from the requested page.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     ID:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Default filter is an empty query and returns all results from the
+//     requested page.
 func (c *Client) ListComputerExtensionAttributeHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

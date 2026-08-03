@@ -21,10 +21,9 @@ import (
 //
 // Parameters:
 //   - id: Tenant's benchmark ID.
-//   - sort: Sort order of result (e.g., 'ruleTitle:asc', 'passed:desc', 'failed:desc',
-//     'unknown:desc'). Supports chained sorting like 'ruleId,passed:desc'.
-//     Ascending order is default and in such a case doesn't require to be
-//     specified, such as 'ruleNumber,ruleTitle'.
+//   - sort: Sort order of result (e.g., 'ruleTitle:asc', 'passed:desc', 'failed:desc', 'unknown:desc'). Supports
+//     chained sorting like 'ruleId,passed:desc'. Ascending order is default and in such a case doesn't
+//     require to be specified, such as 'ruleNumber,ruleTitle'.
 //   - ruleSearch: string to search in rule title and rule id.
 func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort string, ruleSearch string) ([]RuleResult, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
@@ -60,9 +59,9 @@ func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort st
 //
 // Parameters:
 //   - id: Tenant's benchmark ID.
-//   - sort: Sort order of result (e.g., 'deviceName:asc', 'ruleResult:desc'). Supports
-//     chained sorting like 'deviceName,ruleResult:desc'. Ascending order is
-//     default and in such a case doesn't require to be specified.
+//   - sort: Sort order of result (e.g., 'deviceName:asc', 'ruleResult:desc'). Supports chained sorting like
+//     'deviceName,ruleResult:desc'. Ascending order is default and in such a case doesn't require to be
+//     specified.
 //   - deviceSearch: Search devices with matching device name or device ID.
 //   - ruleResult: Allowed values: "PASSED", "FAILED", "UNKNOWN".
 func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID string, sort string, deviceSearch string, ruleResult string) ([]DeviceRuleResult, error) {

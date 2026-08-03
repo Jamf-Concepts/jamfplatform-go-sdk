@@ -22,12 +22,11 @@ import (
 // Required privileges: read:pro:device-groups.
 //
 // Parameters:
-//   - sort: Fields to sort by and their orders. Fields allowed for sorting: `name`,
-//     `description`, `deviceType`, `groupType`.
-//   - filter: Filter query in RSQL format. Includes all results, by default. Fields
-//     allowed in the query: `name`, `description`, `deviceType`, `groupType`. This
-//     param can be combined with paging. Example: `name=="*Managed*" and
-//     deviceType=="MOBILE"`.
+//   - sort: Fields to sort by and their orders. Fields allowed for sorting: `name`, `description`, `deviceType`,
+//     `groupType`.
+//   - filter: Filter query in RSQL format. Includes all results, by default. Fields allowed in the query: `name`,
+//     `description`, `deviceType`, `groupType`. This param can be combined with paging. Example:
+//     `name=="*Managed*" and deviceType=="MOBILE"`.
 func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter string) ([]DeviceGroupListReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceGroupListReadRepresentationV1, bool, error) {

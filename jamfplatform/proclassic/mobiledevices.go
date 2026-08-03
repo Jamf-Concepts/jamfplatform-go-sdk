@@ -284,9 +284,9 @@ func (c *Client) ListMobileDevices(ctx context.Context) (*MobileDevices, error) 
 // Parameters:
 //   - id: ID to filter by.
 //   - subset: Subset to filter by.
-//     Allowed values: "General", "Location", "Purchasing", "Applications",
-//     "Security", "Network", "Certificates", "ConfigurationProfiles",
-//     "ProvisioningProfiles", "MobileDeviceGroups", "ExtensionAttributes".
+//     Allowed values: "General", "Location", "Purchasing", "Applications", "Security", "Network",
+//     "Certificates", "ConfigurationProfiles", "ProvisioningProfiles", "MobileDeviceGroups",
+//     "ExtensionAttributes".
 func (c *Client) GetMobileDeviceByIDSubset(ctx context.Context, id string, subset string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice
@@ -302,8 +302,7 @@ func (c *Client) GetMobileDeviceByIDSubset(ctx context.Context, id string, subse
 // Required privileges: read:pro:mobile-devices.
 //
 // Parameters:
-//   - match: Name, mac address, etc. to filter by. Match uses the same format as the
-//     general search in Jamf Pro.
+//   - match: Name, mac address, etc. to filter by. Match uses the same format as the general search in Jamf Pro.
 func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*MobileDevice, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDevice

@@ -67,8 +67,7 @@ func (c *Client) GetJCDSFileDownloadURLV1(ctx context.Context, fileName string) 
 // Required privileges: delete:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Delete Jamf Cloud Distribution Service Files.
 //
 // Parameters:
-//   - fileName: Name of the file that will be deleted from the Jamf Cloud Distribution
-//     Service.
+//   - fileName: Name of the file that will be deleted from the Jamf Cloud Distribution Service.
 func (c *Client) DeleteJCDSFileV1(ctx context.Context, fileName string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/jcds/files/%s", prefix, url.PathEscape(fileName))
@@ -85,10 +84,9 @@ func (c *Client) DeleteJCDSFileV1(ctx context.Context, fileName string) error {
 // Required privileges: read:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
 //
 // Parameters:
-//   - fileName: Name of the file to check the availability of in JCDS. If available, the
-//     inventory and status will be updated in Jamf Pro. If no file is specified,
-//     it will force an immediate inventory refresh at a rate-limit of once every
-//     15 seconds.
+//   - fileName: Name of the file to check the availability of in JCDS. If available, the inventory and status will
+//     be updated in Jamf Pro. If no file is specified, it will force an immediate inventory refresh at a
+//     rate-limit of once every 15 seconds.
 func (c *Client) RefreshJCDSInventoryV1(ctx context.Context, fileName string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/jcds/refresh-inventory"

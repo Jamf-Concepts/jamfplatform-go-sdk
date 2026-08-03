@@ -238,8 +238,7 @@ func (c *Client) UpdateMobileDeviceApplicationByBundleIDVersion(ctx context.Cont
 // Parameters:
 //   - id: ID to filter by.
 //   - subset: Subset to filter by.
-//     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP",
-//     "AppConfiguration".
+//     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP", "AppConfiguration".
 func (c *Client) GetMobileDeviceApplicationByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceApplication
@@ -257,8 +256,7 @@ func (c *Client) GetMobileDeviceApplicationByIDSubset(ctx context.Context, id st
 // Parameters:
 //   - name: Name to filter by.
 //   - subset: Subset to filter by.
-//     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP",
-//     "AppConfiguration".
+//     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP", "AppConfiguration".
 func (c *Client) GetMobileDeviceApplicationByNameSubset(ctx context.Context, name string, subset string) (*MobileDeviceApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceApplication

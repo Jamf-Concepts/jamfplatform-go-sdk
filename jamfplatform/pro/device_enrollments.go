@@ -23,9 +23,8 @@ import (
 // Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria
-//     are supported and must be separated with a comma. Example:
-//     sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
+//     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListDeviceEnrollmentsV1(ctx context.Context, sort []string) ([]DeviceEnrollmentInstance, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceEnrollmentInstance, bool, error) {
@@ -160,15 +159,12 @@ func (c *Client) DisownDeviceEnrollmentDevicesV1(ctx context.Context, id string,
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
-//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is
-//     descending. Multiple sort criteria are supported and must be entered on
-//     separate lines in Swagger UI. In the URI the 'sort' query param is
-//     duplicated for each sort criterion, e.g.,
-//     ...&sort=name%2Casc&sort=date%2Cdesc.
-//   - filter: Query in the RSQL format, allowing to filter history notes collection.
-//     Default search is empty query - returning all results for the requested
-//     page. Fields allowed in the query: username, date, note, details. This param
-//     can be combined with paging and sorting. Example: search=username!=admin and
+//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is duplicated for each sort criterion, e.g., ...&sort=name%2Casc&sort=date%2Cdesc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default search is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: search=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListDeviceEnrollmentHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")

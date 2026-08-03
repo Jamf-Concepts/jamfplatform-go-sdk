@@ -61,16 +61,14 @@ func (c *Client) UnregisterJamfProtectV1(ctx context.Context) error {
 //
 // Parameters:
 //   - id: the UUID of the Jamf Protect deployment.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is
-//     descending. Multiple sort criteria are supported and must be entered on
-//     separate lines in Swagger UI. In the URI the 'sort' query param is not
-//     duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc.
-//     Fields that can be sorted: status, updated.
-//   - filter: Query in the RSQL format, allowing to filter results. Default filter is
-//     empty query - returning all results for the requested page. Fields allowed
-//     in the query: status, updated, version This param can be combined with
-//     paging and sorting. Example: filter=username!=admin and details==*disabled*
-//     and date<2019-12-15.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is not duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc. Fields
+//     that can be sorted: status, updated.
+//   - filter: Query in the RSQL format, allowing to filter results. Default filter is empty query - returning all
+//     results for the requested page. Fields allowed in the query: status, updated, version This param can
+//     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
+//     date<2019-12-15.
 func (c *Client) ListJamfProtectDeploymentTasksV1(ctx context.Context, id string, sort []string, filter string) ([]DeploymentTask, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
@@ -120,16 +118,14 @@ func (c *Client) RetryJamfProtectDeploymentTasksV1(ctx context.Context, id strin
 // Required privileges: read:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Protect Settings.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is
-//     descending. Multiple sort criteria are supported and must be entered on
-//     separate lines in Swagger UI. In the URI the 'sort' query param is not
-//     duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc.
-//     Fields that can be sorted: status, updated.
-//   - filter: Query in the RSQL format, allowing to filter results. Default filter is
-//     empty query - returning all results for the requested page. Fields allowed
-//     in the query: status, updated, version This param can be combined with
-//     paging and sorting. Example: filter=username!=admin and details==*disabled*
-//     and date<2019-12-15.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is not duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc. Fields
+//     that can be sorted: status, updated.
+//   - filter: Query in the RSQL format, allowing to filter results. Default filter is empty query - returning all
+//     results for the requested page. Fields allowed in the query: status, updated, version This param can
+//     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
+//     date<2019-12-15.
 func (c *Client) ListJamfProtectHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -177,16 +173,14 @@ func (c *Client) CreateJamfProtectHistoryNoteV1(ctx context.Context, request *Ob
 // Required privileges: read:pro:jamf-protect-deployments. Legacy Jamf Pro privilege name(s): Read Jamf Protect Deployments.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is
-//     descending. Multiple sort criteria are supported and must be entered on
-//     separate lines in Swagger UI. In the URI the 'sort' query param is not
-//     duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc.
-//     Fields that can be sorted: status, updated.
-//   - filter: Query in the RSQL format, allowing to filter results. Default filter is
-//     empty query - returning all results for the requested page. Fields allowed
-//     in the query: status, updated, version This param can be combined with
-//     paging and sorting. Example: filter=username!=admin and details==*disabled*
-//     and date<2019-12-15.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is not duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc. Fields
+//     that can be sorted: status, updated.
+//   - filter: Query in the RSQL format, allowing to filter results. Default filter is empty query - returning all
+//     results for the requested page. Fields allowed in the query: status, updated, version This param can
+//     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
+//     date<2019-12-15.
 func (c *Client) ListJamfProtectPlansV1(ctx context.Context, sort []string, filter string) ([]JamfProtectPlan, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]JamfProtectPlan, bool, error) {

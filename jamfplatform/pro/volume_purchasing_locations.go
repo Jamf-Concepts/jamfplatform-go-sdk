@@ -22,14 +22,13 @@ import (
 // Required privileges: read:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//   - filter: Query in the RSQL format, allowing to filter Volume Purchasing Location
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: id, name, appleId, email,
-//     organizationName, tokenExpiration, countryCode, locationName,
-//     automaticallyPopulatePurchasedContent, sendNotificationWhenNoLongerAssigned,
-//     siteId and siteName. This param can be combined with paging and sorting.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Volume Purchasing Location collection. Default filter
+//     is empty query - returning all results for the requested page. Fields allowed in the query: id,
+//     name, appleId, email, organizationName, tokenExpiration, countryCode, locationName,
+//     automaticallyPopulatePurchasedContent, sendNotificationWhenNoLongerAssigned, siteId and siteName.
+//     This param can be combined with paging and sorting.
 func (c *Client) ListVolumePurchasingLocationsV1(ctx context.Context, sort []string, filter string) ([]VolumePurchasingLocationListView, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]VolumePurchasingLocationListView, bool, error) {
@@ -125,12 +124,11 @@ func (c *Client) UpdateVolumePurchasingLocationV1(ctx context.Context, id string
 //
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//   - filter: Query in the RSQL format, allowing to filter Volume Purchasing Content
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: name, licenseCountTotal,
-//     licenseCountInUse, licenseCountReported, contentType, and pricingParam. This
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Volume Purchasing Content collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query: name,
+//     licenseCountTotal, licenseCountInUse, licenseCountReported, contentType, and pricingParam. This
 //     param can be combined with paging and sorting.
 func (c *Client) ListVolumePurchasingLocationContentV1(ctx context.Context, id string, sort []string, filter string) ([]VolumePurchasingContent, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -167,13 +165,11 @@ func (c *Client) ListVolumePurchasingLocationContentV1(ctx context.Context, id s
 //
 // Parameters:
 //   - id: instance id of Volume Purchasing Location history record.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     date:desc. Multiple sort criteria are supported and must be separated with a
-//     comma.
-//   - filter: Query in the RSQL format, allowing to filter history notes collection.
-//     Default filter is empty query - returning all results for the requested
-//     page. Fields allowed in the query: username, date, note, details. This param
-//     can be combined with paging and sorting. Example: filter=username!=admin and
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListVolumePurchasingLocationHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")

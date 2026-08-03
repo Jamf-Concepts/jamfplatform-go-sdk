@@ -22,9 +22,8 @@ import (
 // Required privileges: read:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=id:desc,brandingName:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=id:desc,brandingName:asc.
 func (c *Client) ListIOSBrandingConfigurationsV1(ctx context.Context, sort []string) ([]IosBrandingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]IosBrandingConfiguration, bool, error) {

@@ -30,8 +30,7 @@ func (c *Client) DeleteCommandFlush(ctx context.Context, request *Commandflush) 
 //
 // Parameters:
 //   - idtype: Type of device to be flushed.
-//     Allowed values: "computers", "computergroups", "mobiledevices",
-//     "mobiledevicegroups".
+//     Allowed values: "computers", "computergroups", "mobiledevices", "mobiledevicegroups".
 //   - id: ID of device to be flushed.
 //   - status: Command status to be flushed.
 //     Allowed values: "Pending", "Failed", "Pending+Failed".

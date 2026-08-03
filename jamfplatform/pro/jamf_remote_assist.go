@@ -50,13 +50,12 @@ func (c *Client) GetJamfRemoteAssistSessionV1(ctx context.Context, id string) (*
 // Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     sessionId:desc. Multiple sort criteria are supported and must be separated
-//     with a comma. Example: sort=sessionId:desc,deviceId:asc.
-//   - filter: Query in the RSQL format, allowing to filter session history items
-//     collection. Default filter is empty query - returning all results for the
-//     requested page. Fields allowed in the query: sessionId, deviceId,
-//     sessionAdminId. This param can be combined with paging and sorting. Example:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is sessionId:desc. Multiple sort
+//     criteria are supported and must be separated with a comma. Example:
+//     sort=sessionId:desc,deviceId:asc.
+//   - filter: Query in the RSQL format, allowing to filter session history items collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query: sessionId,
+//     deviceId, sessionAdminId. This param can be combined with paging and sorting. Example:
 //     sessionAdminId=="*Andrzej*".
 func (c *Client) ListJamfRemoteAssistSessionsV2(ctx context.Context, sort []string, filter string) ([]SessionHistoryItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")

@@ -99,9 +99,8 @@ func (c *Client) GetComputerHistoryByMacAddress(ctx context.Context, macAddress 
 // Parameters:
 //   - id: Computer ID to filter by.
 //   - subset: Subset to filter by.
-//     Allowed values: "General", "ComputerUsageLogs", "Audits", "PolicyLogs",
-//     "CasperRemoteLogs", "ScreenSharingLogs", "CasperImagingLogs", "Commands",
-//     "UserLocation", "MacAppStoreApplications".
+//     Allowed values: "General", "ComputerUsageLogs", "Audits", "PolicyLogs", "CasperRemoteLogs",
+//     "ScreenSharingLogs", "CasperImagingLogs", "Commands", "UserLocation", "MacAppStoreApplications".
 func (c *Client) GetComputerHistoryByIDSubset(ctx context.Context, id string, subset string) (*ComputerHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerHistory

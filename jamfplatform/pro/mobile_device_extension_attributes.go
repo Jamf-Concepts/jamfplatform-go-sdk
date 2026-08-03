@@ -22,13 +22,11 @@ import (
 // Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
 //
 // Parameters:
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is name:asc. If using multiple criteria,
-//     separate with commas. Allows sort for id and name.
-//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
-//     including ID, name, etc. Can be combined with paging and sorting. Fields
-//     allowed in the query: id, name Default filter is an empty query and returns
-//     all results from the requested page.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     name:asc. If using multiple criteria, separate with commas. Allows sort for id and name.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Fields allowed in the query: id, name Default filter is an empty
+//     query and returns all results from the requested page.
 func (c *Client) ListMobileDeviceExtensionAttributesV1(ctx context.Context, sort []string, filter string) ([]MobileDeviceExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceExtensionAttributes, bool, error) {
@@ -140,12 +138,11 @@ func (c *Client) GetMobileDeviceExtensionAttributeDataDependencyV1(ctx context.C
 //
 // Parameters:
 //   - id: Instance ID of Mobile Device Extension Attribute.
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is ID:asc. If using multiple criteria,
-//     separate with commas.
-//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
-//     including ID, name, etc. Can be combined with paging and sorting. Default
-//     filter is an empty query and returns all results from the requested page.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     ID:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Default filter is an empty query and returns all results from the
+//     requested page.
 func (c *Client) ListMobileDeviceExtensionAttributeHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

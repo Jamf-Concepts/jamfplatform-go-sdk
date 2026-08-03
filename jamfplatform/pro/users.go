@@ -22,16 +22,13 @@ import (
 // Required privileges: read:pro:user. Legacy Jamf Pro privilege name(s): Read User.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property(:asc|desc). Default sort order is
-//     ascending. Multiple sort criteria are supported.
-//     Examples: - sort=username - sort=username:asc -
-//     sort=username:asc,realname:desc.
+//   - sort: Sorting criteria in the format: property(:asc|desc). Default sort order is ascending. Multiple sort
+//     criteria are supported.
+//     Examples: - sort=username - sort=username:asc - sort=username:asc,realname:desc.
 //   - filter: RSQL filter to limit results. Supports all user fields.
-//     Examples: - filter=username=="john*" - filter=realname=="John Smith" -
-//     filter=email=="*@jamf.com" - filter=position=="Manager";id!="1" -
-//     filter=id=in=(123,456,789).
-//   - platform: Optional. Return platform identifiers instead of internal identifiers when
-//     set to true.
+//     Examples: - filter=username=="john*" - filter=realname=="John Smith" - filter=email=="*@jamf.com" -
+//     filter=position=="Manager";id!="1" - filter=id=in=(123,456,789).
+//   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) ListUsersV1(ctx context.Context, sort []string, filter string, platform bool) ([]User, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]User, bool, error) {
@@ -92,8 +89,7 @@ func (c *Client) CreateUserV1(ctx context.Context, request *UserInventory, platf
 //
 // Parameters:
 //   - id: ID of the user to retrieve.
-//   - platform: Optional. Return platform identifiers instead of internal identifiers when
-//     set to true.
+//   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) GetUserV1(ctx context.Context, id string, platform bool) (*User, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result User

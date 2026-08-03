@@ -147,9 +147,8 @@ func (c *Client) GetLatestMobileDevicePrestageSyncV2(ctx context.Context, id str
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria
-//     are supported and must be separated with a comma. Example:
-//     sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
+//     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListMobileDevicePrestagesV2(ctx context.Context, sort []string) ([]GetMobileDevicePrestageV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GetMobileDevicePrestageV2, bool, error) {
@@ -181,9 +180,8 @@ func (c *Client) ListMobileDevicePrestagesV2(ctx context.Context, sort []string)
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria
-//     are supported and must be separated with a comma. Example:
-//     sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
+//     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListMobileDevicePrestagesV3(ctx context.Context, sort []string) ([]GetMobileDevicePrestageV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GetMobileDevicePrestageV3, bool, error) {
@@ -379,8 +377,7 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV3(ctx context.Context, id s
 // Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
 //
 // Parameters:
-//   - id: Identifier of the Mobile Device Prestage the attachment should be assigned
-//     to.
+//   - id: Identifier of the Mobile Device Prestage the attachment should be assigned to.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -405,8 +402,7 @@ func (c *Client) UploadMobileDevicePrestageAttachmentV2(ctx context.Context, id 
 // Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
 //
 // Parameters:
-//   - id: Identifier of the Mobile Device Prestage the attachment should be assigned
-//     to.
+//   - id: Identifier of the Mobile Device Prestage the attachment should be assigned to.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -466,11 +462,9 @@ func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV3(ctx context.Con
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
-//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is
-//     descending. Multiple sort criteria are supported and must be entered on
-//     separate lines in Swagger UI. In the URI the 'sort' query param is
-//     duplicated for each sort criterion, e.g.,
-//     ...&sort=name%2Casc&sort=date%2Cdesc.
+//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is duplicated for each sort criterion, e.g., ...&sort=name%2Casc&sort=date%2Cdesc.
 func (c *Client) ListMobileDevicePrestageHistoryV2(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -503,11 +497,9 @@ func (c *Client) ListMobileDevicePrestageHistoryV2(ctx context.Context, id strin
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
-//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is
-//     descending. Multiple sort criteria are supported and must be entered on
-//     separate lines in Swagger UI. In the URI the 'sort' query param is
-//     duplicated for each sort criterion, e.g.,
-//     ...&sort=name%2Casc&sort=date%2Cdesc.
+//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is duplicated for each sort criterion, e.g., ...&sort=name%2Casc&sort=date%2Cdesc.
 func (c *Client) ListMobileDevicePrestageHistoryV3(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

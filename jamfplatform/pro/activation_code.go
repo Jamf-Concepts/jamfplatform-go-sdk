@@ -33,15 +33,13 @@ func (c *Client) UpdateActivationCodeV1(ctx context.Context, request *Activation
 // Required privileges: read:pro:activation-code. Legacy Jamf Pro privilege name(s): Read Activation Code.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     date:desc. Fields allowed in the query: id, username, date, note, details
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=date:desc,note:asc.
-//   - filter: Query in the RSQL format, allowing to filter history notes collection.
-//     Default filter is empty query - returning all results for the requested
-//     page. Fields allowed in the query: id, username, date, note, details. This
-//     param can be combined with paging and sorting. Example:
-//     filter=username!=admin and details==*disabled* and date<2019-12-15.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Fields allowed in the
+//     query: id, username, date, note, details Multiple sort criteria are supported and must be separated
+//     with a comma. Example: sort=date:desc,note:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: id, username, date,
+//     note, details. This param can be combined with paging and sorting. Example: filter=username!=admin
+//     and details==*disabled* and date<2019-12-15.
 func (c *Client) ListActivationCodeHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

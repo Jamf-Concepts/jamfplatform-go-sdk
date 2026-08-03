@@ -47,13 +47,11 @@ func (c *Client) UpdateSmtpServerV2(ctx context.Context, request *SmtpServerV2) 
 // Required privileges: read:pro:smtp-server. Legacy Jamf Pro privilege name(s): Read SMTP Server.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=date:desc,username:asc.
-//   - filter: Query in the RSQL format, allowing to filter history notes collection.
-//     Default filter is empty query - returning all results for the requested
-//     page. Fields allowed in the query: username, date, note, details. This param
-//     can be combined with paging and sorting. Example: filter=username!=admin and
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,username:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListSmtpServerHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistoryV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")

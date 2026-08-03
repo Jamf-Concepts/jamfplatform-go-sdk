@@ -703,10 +703,14 @@ func privilegeComment(m GoMethod) string {
 	return line
 }
 
-// parameterDocWidth is the wrap width for parameter documentation text. The
-// rendered line prefix is "//     " (7 columns), keeping the widest emitted
-// godoc line inside 90.
-const parameterDocWidth = 76
+// parameterDocWidth is the wrap width for parameter documentation text; the
+// rendered line prefix is "//     " (7 columns), so emitted lines top out at
+// 107. Wider than an 80-column terminal on purpose: several Pro list
+// endpoints inline their whole sortable field set, and at 76 those blocks ran
+// to ~76 lines each. 100 costs ~17% fewer lines with nothing dropped.
+// Comments elsewhere in the generated tree are far longer still — 1711 lines
+// already exceed 100 columns — so this stays the narrowest prose we emit.
+const parameterDocWidth = 100
 
 // descriptionParagraphRe splits spec prose on blank lines so each paragraph
 // is wrapped as its own run of godoc lines.

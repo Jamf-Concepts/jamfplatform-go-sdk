@@ -24,10 +24,9 @@ import (
 //
 // Parameters:
 //   - sort: Sorting criteria in the format:
-//     `<field_name>[:sort_direction][,<secondary_sort_field_name>[:sort_direction]]*`.
-//     Default sort direction is `asc` (Ascending). Use `desc` for Descending
-//     ordering. Additional sort parameters are supported and determine order of
-//     results that have equivalent values for previous sort parameters.
+//     `<field_name>[:sort_direction][,<secondary_sort_field_name>[:sort_direction]]*`. Default sort
+//     direction is `asc` (Ascending). Use `desc` for Descending ordering. Additional sort parameters are
+//     supported and determine order of results that have equivalent values for previous sort parameters.
 //   - search: Search query to match against `name` and `description` properties.
 func (c *Client) ListBlueprints(ctx context.Context, sort []string, search string) ([]BlueprintOverview, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")

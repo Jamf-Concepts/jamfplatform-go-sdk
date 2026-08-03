@@ -21,8 +21,8 @@ import (
 // Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Remote Command to Install Package.
 //
 // Parameters:
-//   - verbose: Enables the 'verbose' response, which includes information about the
-//     commands queued as well as information about commands that failed to queue.
+//   - verbose: Enables the 'verbose' response, which includes information about the commands queued as well as
+//     information about commands that failed to queue.
 func (c *Client) DeployPackageV1(ctx context.Context, request *InstallPackage, verbose bool) (*VerbosePackageDeploymentResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result VerbosePackageDeploymentResponse
@@ -76,10 +76,10 @@ func (c *Client) SendMdmBlankPushV2(ctx context.Context, request *BlankPushReque
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
-//   - uuids: A list of the UUIDs of the commands being searched for. Limited to 40 UUIDs
-//     in length. Choose one of two parameters, but not both.
-//   - clientManagementID: The client management id used to search for a list of commands. Choose one
-//     of two parameters, but not both.
+//   - uuids: A list of the UUIDs of the commands being searched for. Limited to 40 UUIDs in length. Choose one of
+//     two parameters, but not both.
+//   - clientManagementID: The client management id used to search for a list of commands. Choose one of two parameters, but
+//     not both.
 func (c *Client) ListMdmCommandsV1(ctx context.Context, uuids []string, clientManagementID string) ([]MDMCommand, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []MDMCommand
@@ -106,14 +106,13 @@ func (c *Client) ListMdmCommandsV1(ctx context.Context, uuids []string, clientMa
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
-//   - sort: Default sort is dateSent:asc. Multiple sort criteria are supported and must
-//     be separated with a comma.
-//   - filter: Query in the RSQL format, allowing to filter, for a list of commands. All
-//     url must contain minimum one filter field. Fields allowed in the query:
-//     uuid, clientManagementId, command, status, clientType, dateSent, validAfter,
-//     dateCompleted, profileId, profileIdentifier, and active. This param can be
-//     combined with paging. Please note that any date filters must be used with
-//     gt, lt, ge, le Example:
+//   - sort: Default sort is dateSent:asc. Multiple sort criteria are supported and must be separated with a
+//     comma.
+//   - filter: Query in the RSQL format, allowing to filter, for a list of commands. All url must contain minimum
+//     one filter field. Fields allowed in the query: uuid, clientManagementId, command, status,
+//     clientType, dateSent, validAfter, dateCompleted, profileId, profileIdentifier, and active. This
+//     param can be combined with paging. Please note that any date filters must be used with gt, lt, ge,
+//     le Example:
 //     clientManagementId==fb511aae-c557-474f-a9c1-5dc845b90d0f;status==Pending;command==INSTALL_PROFILE;uuid==9e18f849-e689-4f2d-b616-a99d3da7db42;clientType==COMPUTER_USER;profileId==1;profileIdentifier==18cc61c2-01fc-11ed-b939-0242ac120002;dateCompleted=ge=2021-08-04T14:25:18.26Z;dateCompleted=le=2021-08-04T14:25:18.26Z;validAfter=ge=2021-08-05T14:25:18.26Z;active==true.
 func (c *Client) ListMdmCommandsV2(ctx context.Context, sort []string, filter string) ([]MDMCommand, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")

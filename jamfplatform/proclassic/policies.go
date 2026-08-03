@@ -176,9 +176,9 @@ func (c *Client) GetPolicyByCreatedBy(ctx context.Context, createdBy string) (*P
 // Parameters:
 //   - id: ID to filter by.
 //   - subset: Subset to filter by.
-//     Allowed values: "General", "Scope", "SelfService", "PackageConfiguration",
-//     "Scripts", "Printers", "DockItems", "AccountMaintenance", "Reboot",
-//     "Maintenance", "FilesProcesses", "UserInteraction", "DiskEncryption".
+//     Allowed values: "General", "Scope", "SelfService", "PackageConfiguration", "Scripts", "Printers",
+//     "DockItems", "AccountMaintenance", "Reboot", "Maintenance", "FilesProcesses", "UserInteraction",
+//     "DiskEncryption".
 func (c *Client) GetPolicyByIDSubset(ctx context.Context, id string, subset string) (*Policy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Policy

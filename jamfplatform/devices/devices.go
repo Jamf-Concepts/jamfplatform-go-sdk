@@ -22,16 +22,13 @@ import (
 // Required privileges: read:pro:devices.
 //
 // Parameters:
-//   - sort: Fields to sort by and their orders. Fields allowed in the query: `id`,
-//     `name`, `model`, `modelIdentifier`, `serialNumber`,
-//     `lastInventoryUpdateTime`, `lastCheckInTime`, `operatingSystemVersion`,
-//     `userId`, `enrollmentType`, `lastEnrollmentTime`.
-//   - filter: Filter query in RSQL format. Includes all results, by default. Fields
-//     allowed in the query: `id`, `name`, `model`, `modelIdentifier`,
-//     `serialNumber`, `lastInventoryUpdateTime`, `lastCheckInTime`,
-//     `operatingSystemVersion`, `enrollmentType`, `lastEnrollmentTime`. Dates are
-//     specified in ISO 8601 format. Example: `name=="*iPhone*" and
-//     lastInventoryUpdateTime>="2025-01-31T18:09:00.000Z"`.
+//   - sort: Fields to sort by and their orders. Fields allowed in the query: `id`, `name`, `model`,
+//     `modelIdentifier`, `serialNumber`, `lastInventoryUpdateTime`, `lastCheckInTime`,
+//     `operatingSystemVersion`, `userId`, `enrollmentType`, `lastEnrollmentTime`.
+//   - filter: Filter query in RSQL format. Includes all results, by default. Fields allowed in the query: `id`,
+//     `name`, `model`, `modelIdentifier`, `serialNumber`, `lastInventoryUpdateTime`, `lastCheckInTime`,
+//     `operatingSystemVersion`, `enrollmentType`, `lastEnrollmentTime`. Dates are specified in ISO 8601
+//     format. Example: `name=="*iPhone*" and lastInventoryUpdateTime>="2025-01-31T18:09:00.000Z"`.
 func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
@@ -112,11 +109,9 @@ func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 //
 // Parameters:
 //   - id: Path parameter id.
-//   - sort: Fields to sort by and their orders. Fields allowed in the query: `name`,
-//     `version`.
-//   - filter: Filter query in RSQL format. Includes all results, by default. Fields
-//     allowed in the query: `name`, `version`. Example: `name=="*Safari*" and
-//     version>="26.0.0"`.
+//   - sort: Fields to sort by and their orders. Fields allowed in the query: `name`, `version`.
+//   - filter: Filter query in RSQL format. Includes all results, by default. Fields allowed in the query: `name`,
+//     `version`. Example: `name=="*Safari*" and version>="26.0.0"`.
 func (c *Client) ListDeviceApplications(ctx context.Context, id string, sort []string, filter string) ([]DeviceInstalledApplicationReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceInstalledApplicationReadRepresentationV1, bool, error) {

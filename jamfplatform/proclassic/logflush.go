@@ -34,9 +34,8 @@ func (c *Client) DeleteLogFlush(ctx context.Context, request *Logflush) error {
 //   - log: At this time, only 'policy' logs are supported.
 //     Allowed values: "policy".
 //   - id: ID of policy whose log will be flushed.
-//   - interval: Supported values are a combination of [Zero, One, Two, Three, Six] and
-//     [Days, Weeks, Months, Years]. For example,
-//     JSSResource/logflush/policies/id/1/interval/Three+Months.
+//   - interval: Supported values are a combination of [Zero, One, Two, Three, Six] and [Days, Weeks, Months, Years].
+//     For example, JSSResource/logflush/policies/id/1/interval/Three+Months.
 func (c *Client) DeleteLogFlushByLogIDInterval(ctx context.Context, log string, id string, interval string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/logflush/%s/id/%s/interval/%s", prefix, url.PathEscape(log), url.PathEscape(id), url.PathEscape(interval))
@@ -54,9 +53,8 @@ func (c *Client) DeleteLogFlushByLogIDInterval(ctx context.Context, log string, 
 // Parameters:
 //   - log: At this time, only 'policy' logs are supported.
 //     Allowed values: "policy".
-//   - interval: Supported values are a combination of [Zero, One, Two, Three, Six] and
-//     [Days, Weeks, Months, Years]. For example,
-//     JSSResource/logflush/policies/interval/Three+Months.
+//   - interval: Supported values are a combination of [Zero, One, Two, Three, Six] and [Days, Weeks, Months, Years].
+//     For example, JSSResource/logflush/policies/interval/Three+Months.
 func (c *Client) DeleteLogFlushByLogInterval(ctx context.Context, log string, interval string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/logflush/%s/interval/%s", prefix, url.PathEscape(log), url.PathEscape(interval))

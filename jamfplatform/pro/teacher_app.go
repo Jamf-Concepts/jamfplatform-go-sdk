@@ -47,16 +47,14 @@ func (c *Client) UpdateTeacherAppSettingsV1(ctx context.Context, request *Teache
 // Required privileges: read:pro:teacher-app-settings. Legacy Jamf Pro privilege name(s): Read Teacher App Settings.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is
-//     descending. Multiple sort criteria are supported and must be entered on
-//     separate lines in Swagger UI. In the URI the 'sort' query param is not
-//     duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc.
-//     Fields that can be sorted: status, updated.
-//   - filter: Query in the RSQL format, allowing to filter results. Default filter is
-//     empty query - returning all results for the requested page. Fields allowed
-//     in the query: status, updated, version This param can be combined with
-//     paging and sorting. Example: filter=username!=admin and details==*disabled*
-//     and date<2019-12-15.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is not duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc. Fields
+//     that can be sorted: status, updated.
+//   - filter: Query in the RSQL format, allowing to filter results. Default filter is empty query - returning all
+//     results for the requested page. Fields allowed in the query: status, updated, version This param can
+//     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
+//     date<2019-12-15.
 func (c *Client) ListTeacherAppHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

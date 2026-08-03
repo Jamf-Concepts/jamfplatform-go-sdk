@@ -116,9 +116,8 @@ func (c *Client) GetComputerManagementByIDPatchFilter(ctx context.Context, id st
 // Parameters:
 //   - id: Computer ID value to filter by.
 //   - subset: Subset to filter by.
-//     Allowed values: "General", "Policies", "Ebooks", "MacAppStoreApps",
-//     "OSXConfigurationProfiles", "RestrictedSoftware", "SmartGroups",
-//     "StaticGroups", "PatchReportingSoftwareTitles".
+//     Allowed values: "General", "Policies", "Ebooks", "MacAppStoreApps", "OSXConfigurationProfiles",
+//     "RestrictedSoftware", "SmartGroups", "StaticGroups", "PatchReportingSoftwareTitles".
 func (c *Client) GetComputerManagementByIDSubset(ctx context.Context, id string, subset string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement
@@ -154,9 +153,8 @@ func (c *Client) GetComputerManagementByIDUsername(ctx context.Context, id strin
 //   - id: Computer ID to filter by.
 //   - username: Username to filter by.
 //   - subset: Subset to filter by.
-//     Allowed values: "General", "Policies", "Ebooks", "MacAppStoreApps",
-//     "OSXConfigurationProfiles", "RestrictedSoftware", "SmartGroups",
-//     "StaticGroups", "PatchReportingSoftwareTitles".
+//     Allowed values: "General", "Policies", "Ebooks", "MacAppStoreApps", "OSXConfigurationProfiles",
+//     "RestrictedSoftware", "SmartGroups", "StaticGroups", "PatchReportingSoftwareTitles".
 func (c *Client) GetComputerManagementByIDUsernameSubset(ctx context.Context, id string, username string, subset string) (*ComputerManagement, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerManagement

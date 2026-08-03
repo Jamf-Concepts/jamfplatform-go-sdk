@@ -300,9 +300,8 @@ func (c *Client) GetEnrollmentCustomizationTextPanelMarkdownV1(ctx context.Conte
 // Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria
-//     are supported and must be separated with a comma. Example:
-//     sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
+//     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListEnrollmentCustomizationsV2(ctx context.Context, sort []string) ([]EnrollmentCustomizationV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]EnrollmentCustomizationV2, bool, error) {
@@ -434,11 +433,9 @@ func (c *Client) DeleteEnrollmentCustomizationV2(ctx context.Context, id string)
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
-//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is
-//     descending. Multiple sort criteria are supported and must be entered on
-//     separate lines in Swagger UI. In the URI the 'sort' query param is
-//     duplicated for each sort criterion, e.g.,
-//     ...&sort=name%2Casc&sort=date%2Cdesc.
+//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is duplicated for each sort criterion, e.g., ...&sort=name%2Casc&sort=date%2Cdesc.
 func (c *Client) ListEnrollmentCustomizationHistoryV2(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

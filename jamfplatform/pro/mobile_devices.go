@@ -22,83 +22,62 @@ import (
 // Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 //
 // Parameters:
-//   - section: section of mobile device details, if not specified, General section data is
-//     returned. Multiple section parameters are supported, e.g.
-//     section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "HARDWARE", "USER_AND_LOCATION", "PURCHASING",
-//     "SECURITY", "APPLICATIONS", "EBOOKS", "NETWORK", "SERVICE_SUBSCRIPTIONS",
-//     "CERTIFICATES", "PROFILES", "USER_PROFILES", "PROVISIONING_PROFILES",
-//     "SHARED_USERS", "GROUPS", "EXTENSION_ATTRIBUTES".
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     displayName:asc. Multiple sort criteria are supported and must be separated
-//     with a comma.
-//     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`,
-//     `assetTag`, `availableSpaceMb`, `batteryLevel`, `batteryHealth`,
-//     `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,
-//     `lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`,
-//     `deviceLocatorServiceEnabled`, `devicePhoneNumber`,
+//   - section: section of mobile device details, if not specified, General section data is returned. Multiple
+//     section parameters are supported, e.g. section=GENERAL&section=HARDWARE.
+//     Allowed values: "GENERAL", "HARDWARE", "USER_AND_LOCATION", "PURCHASING", "SECURITY",
+//     "APPLICATIONS", "EBOOKS", "NETWORK", "SERVICE_SUBSCRIPTIONS", "CERTIFICATES", "PROFILES",
+//     "USER_PROFILES", "PROVISIONING_PROFILES", "SHARED_USERS", "GROUPS", "EXTENSION_ATTRIBUTES".
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is displayName:asc. Multiple sort
+//     criteria are supported and must be separated with a comma.
+//     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
+//     `availableSpaceMb`, `batteryLevel`, `batteryHealth`, `bluetoothLowEnergyCapable`,
+//     `bluetoothMacAddress`, `capacityMb`, `lostModeEnabledDate`, `declarativeDeviceManagementEnabled`,
+//     `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,
 //     `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
-//     `enrollmentSessionTokenValid`, `exchangeDeviceId`, `cloudBackupEnabled`,
-//     `osBuild`, `osSupplementalBuildVersion`, `osVersion`,
-//     `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`,
-//     `mobileDeviceId`, `managementId`, `languages`, `lastBackupDate`,
-//     `lastEnrolledDate`, `lastCloudBackupDate`, `lastInventoryUpdateDate`,
-//     `locales`, `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`,
-//     `managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`,
-//     `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`,
-//     `residentUsers`, `serialNumber`, `sharedIpad`, `supervised`, `tethered`,
-//     `timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,
-//     `deviceOwnershipType`, `building`, `department`, `emailAddress`, `fullName`,
-//     `userPhoneNumber`, `position`, `room`, `username`, `appleCareId`,
-//     `leaseExpirationDate`,`lifeExpectancyYears`, `poDate`, `poNumber`,
-//     `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`,
-//     `purchasingContact`, `vendor`, `warrantyExpirationDate`,
-//     `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,
-//     `fileEncryptionCapable`, `hardwareEncryptionSupported`, `jailbreakStatus`,
-//     `passcodeCompliant`, `passcodeCompliantWithProfile`,
-//     `passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`,
-//     `carrierSettingsVersion`, `cellularTechnology`, `currentCarrierNetwork`,
-//     `currentMobileCountryCode`, `currentMobileNetworkCode`,
-//     `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
-//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`,
-//     `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`,
-//     `lastLoggedInUsernameSelfService`,
+//     `enrollmentSessionTokenValid`, `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`,
+//     `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`, `ipAddress`,
+//     `itunesStoreAccountActive`, `mobileDeviceId`, `managementId`, `languages`, `lastBackupDate`,
+//     `lastEnrolledDate`, `lastCloudBackupDate`, `lastInventoryUpdateDate`, `locales`,
+//     `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`,
+//     `mdmProfileExpirationDate`, `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,
+//     `preferredVoiceNumber`, `quotaSize`, `residentUsers`, `serialNumber`, `sharedIpad`, `supervised`,
+//     `tethered`, `timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`, `deviceOwnershipType`,
+//     `building`, `department`, `emailAddress`, `fullName`, `userPhoneNumber`, `position`, `room`,
+//     `username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`, `poDate`, `poNumber`,
+//     `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`, `vendor`,
+//     `warrantyExpirationDate`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,
+//     `fileEncryptionCapable`, `hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`,
+//     `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`,
+//     `carrierSettingsVersion`, `cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`,
+//     `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
+//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`, `personalHotspotEnabled`,
+//     `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`,
 //     `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`,
 //     `lastLoggedInUsernameMdmTimestamp`.
 //     Example: `sort=displayName:desc,username:asc`.
-//   - filter: Query in the RSQL format, allowing to filter mobile device collection.
-//     Default filter is empty query - returning all results for the requested
-//     page.
-//     Fields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`,
-//     `assetTag`, `availableSpaceMb`, `batteryLevel`, `bluetoothLowEnergyCapable`,
-//     `bluetoothMacAddress`, `capacityMb`, `declarativeDeviceManagementEnabled`,
-//     `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,
-//     `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
-//     `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`,
-//     `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,
-//     `ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `managementId`,
-//     `languages`, `lastInventoryUpdateDate`, `locales`,
-//     `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`,
-//     `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,
-//     `preferredVoiceNumber`, `quotaSize`, `residentUsers`, `serialNumber`,
-//     `sharedIpad`, `supervised`, `tethered`, `timeZone`, `udid`,
-//     `usedSpacePercentage`, `wifiMacAddress`, `building`, `department`,
-//     `emailAddress`, `fullName`, `userPhoneNumber`, `position`, `room`,
-//     `username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,
-//     `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`,
-//     `purchasingContact`, `vendor`, `activationLockEnabled`,
-//     `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,
-//     `passcodeCompliant`, `passcodeCompliantWithProfile`,
-//     `passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`,
-//     `carrierSettingsVersion`, `currentCarrierNetwork`,
-//     `currentMobileCountryCode`, `currentMobileNetworkCode`,
-//     `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
-//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`,
-//     `personalHotspotEnabled`, `roaming`, `lastLoggedInUsernameSelfService`,
-//     `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`,
-//     `lastLoggedInUsernameMdmTimestamp`, `groupId`, `groupName`.
-//     This param can be combined with paging and sorting. Example:
-//     `filter=displayName=="iPad"`.
+//   - filter: Query in the RSQL format, allowing to filter mobile device collection. Default filter is empty query
+//   - returning all results for the requested page.
+//     Fields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
+//     `availableSpaceMb`, `batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`,
+//     `capacityMb`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,
+//     `devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
+//     `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`,
+//     `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`,
+//     `managementId`, `languages`, `lastInventoryUpdateDate`, `locales`,
+//     `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`, `model`,
+//     `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`,
+//     `residentUsers`, `serialNumber`, `sharedIpad`, `supervised`, `tethered`, `timeZone`, `udid`,
+//     `usedSpacePercentage`, `wifiMacAddress`, `building`, `department`, `emailAddress`, `fullName`,
+//     `userPhoneNumber`, `position`, `room`, `username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,
+//     `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`, `vendor`,
+//     `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,
+//     `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,
+//     `passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`, `currentMobileCountryCode`,
+//     `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
+//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`, `personalHotspotEnabled`, `roaming`,
+//     `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`,
+//     `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`, `groupId`, `groupName`.
+//     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string, sort []string, filter string) ([]MobileDeviceResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
@@ -136,9 +115,8 @@ func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string
 // Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListMobileDevicesV2(ctx context.Context, sort []string) ([]MobileDeviceV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceV2, bool, error) {
@@ -235,78 +213,58 @@ func (c *Client) EraseMobileDeviceV2(ctx context.Context, id string, request *Er
 //
 // Parameters:
 //   - id: instance id of mobile device record.
-//   - section: section of mobile device details, if not specified, Paired Devices section
-//     data is returned. Multiple section parameters are supported, e.g.
-//     section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "HARDWARE", "USER_AND_LOCATION", "PURCHASING",
-//     "SECURITY", "APPLICATIONS", "EBOOKS", "NETWORK", "SERVICE_SUBSCRIPTIONS",
-//     "CERTIFICATES", "PROFILES", "USER_PROFILES", "PROVISIONING_PROFILES",
-//     "SHARED_USERS", "GROUPS", "EXTENSION_ATTRIBUTES".
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     displayName:asc. Multiple sort criteria are supported and must be separated
-//     with a comma.
-//     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`,
-//     `assetTag`, `availableSpaceMb`, `batteryLevel`, `bluetoothLowEnergyCapable`,
-//     `bluetoothMacAddress`, `capacityMb`, `lostModeEnabledDate`,
-//     `declarativeDeviceManagementEnabled`, `deviceId`,
-//     `deviceLocatorServiceEnabled`, `devicePhoneNumber`,
-//     `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
-//     `enrollmentSessionTokenValid`, `osBuild`, `osSupplementalBuildVersion`,
-//     `osVersion`, `osRapidSecurityResponse`, `ipAddress`,
-//     `itunesStoreAccountActive`, `mobileDeviceId`, `languages`,
-//     `lastEnrolledDate`, `lastCloudBackupDate`, `lastInventoryUpdateDate`,
-//     `locales`, `lostModeEnabled`, `managed`, `mdmProfileExpirationDate`,
-//     `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,
-//     `preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`,
-//     `usedSpacePercentage`, `wifiMacAddress`, `deviceOwnershipType`, `building`,
-//     `department`, `emailAddress`, `fullName`, `userPhoneNumber`, `position`,
-//     `room`, `username`, `appleCareId`,
-//     `leaseExpirationDate`,`lifeExpectancyYears`, `poDate`, `poNumber`,
-//     `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`,
-//     `purchasingContact`, `vendor`, `warrantyExpirationDate`,
-//     `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,
-//     `fileEncryptionCapable`, `hardwareEncryptionSupported`, `jailbreakStatus`,
-//     `passcodeCompliant`, `passcodeCompliantWithProfile`,
-//     `passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`,
-//     `carrierSettingsVersion`, `cellularTechnology`, `currentCarrierNetwork`,
-//     `currentMobileCountryCode`, `currentMobileNetworkCode`,
-//     `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
-//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`,
-//     `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`,
-//     `lastLoggedInUsernameSelfService`,
+//   - section: section of mobile device details, if not specified, Paired Devices section data is returned.
+//     Multiple section parameters are supported, e.g. section=GENERAL&section=HARDWARE.
+//     Allowed values: "GENERAL", "HARDWARE", "USER_AND_LOCATION", "PURCHASING", "SECURITY",
+//     "APPLICATIONS", "EBOOKS", "NETWORK", "SERVICE_SUBSCRIPTIONS", "CERTIFICATES", "PROFILES",
+//     "USER_PROFILES", "PROVISIONING_PROFILES", "SHARED_USERS", "GROUPS", "EXTENSION_ATTRIBUTES".
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is displayName:asc. Multiple sort
+//     criteria are supported and must be separated with a comma.
+//     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
+//     `availableSpaceMb`, `batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`,
+//     `capacityMb`, `lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`,
+//     `deviceLocatorServiceEnabled`, `devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`,
+//     `displayName`, `doNotDisturbEnabled`, `enrollmentSessionTokenValid`, `osBuild`,
+//     `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`, `ipAddress`,
+//     `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastEnrolledDate`,
+//     `lastCloudBackupDate`, `lastInventoryUpdateDate`, `locales`, `lostModeEnabled`, `managed`,
+//     `mdmProfileExpirationDate`, `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,
+//     `preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`,
+//     `wifiMacAddress`, `deviceOwnershipType`, `building`, `department`, `emailAddress`, `fullName`,
+//     `userPhoneNumber`, `position`, `room`, `username`, `appleCareId`,
+//     `leaseExpirationDate`,`lifeExpectancyYears`, `poDate`, `poNumber`, `purchasePrice`,
+//     `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,
+//     `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,
+//     `hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`,
+//     `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`,
+//     `carrierSettingsVersion`, `cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`,
+//     `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
+//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`, `personalHotspotEnabled`,
+//     `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`,
 //     `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`,
 //     `lastLoggedInUsernameMdmTimestamp`.
 //     Example: `sort=displayName:desc,username:asc`.
-//   - filter: Query in the RSQL format, allowing to filter mobile device collection.
-//     Default filter is empty query - returning all results for the requested
-//     page.
-//     Fields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`,
-//     `assetTag`, `availableSpaceMb`, `batteryLevel`, `bluetoothLowEnergyCapable`,
-//     `bluetoothMacAddress`, `capacityMb`, `declarativeDeviceManagementEnabled`,
-//     `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,
-//     `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
-//     `osBuild`, `osSupplementalBuildVersion`, `osVersion`,
-//     `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`,
-//     `mobileDeviceId`, `languages`, `lastInventoryUpdateDate`, `locales`,
-//     `lostModeEnabled`, `managed`, `model`, `modelIdentifier`, `modelNumber`,
-//     `modemFirmwareVersion`, `preferredVoiceNumber`, `serialNumber`,
-//     `supervised`, `timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,
-//     `building`, `department`, `emailAddress`, `fullName`, `userPhoneNumber`,
-//     `position`, `room`, `username`, `appleCareId`, `lifeExpectancyYears`,
-//     `poNumber`, `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`,
-//     `purchasingContact`, `vendor`, `activationLockEnabled`,
-//     `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,
-//     `passcodeCompliant`, `passcodeCompliantWithProfile`,
-//     `passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`,
-//     `carrierSettingsVersion`, `currentCarrierNetwork`,
-//     `currentMobileCountryCode`, `currentMobileNetworkCode`,
-//     `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
-//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`,
-//     `personalHotspotEnabled`, `roaming`, `lastLoggedInUsernameSelfService`,
-//     `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`,
-//     `lastLoggedInUsernameMdmTimestamp`, `groupId`, `groupName`.
-//     This param can be combined with paging and sorting. Example:
-//     `filter=displayName=="iPad"`.
+//   - filter: Query in the RSQL format, allowing to filter mobile device collection. Default filter is empty query
+//   - returning all results for the requested page.
+//     Fields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
+//     `availableSpaceMb`, `batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`,
+//     `capacityMb`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,
+//     `devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
+//     `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`, `ipAddress`,
+//     `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastInventoryUpdateDate`, `locales`,
+//     `lostModeEnabled`, `managed`, `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,
+//     `preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`,
+//     `wifiMacAddress`, `building`, `department`, `emailAddress`, `fullName`, `userPhoneNumber`,
+//     `position`, `room`, `username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`, `purchasePrice`,
+//     `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`, `vendor`, `activationLockEnabled`,
+//     `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`, `passcodeCompliant`,
+//     `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`,
+//     `carrierSettingsVersion`, `currentCarrierNetwork`, `currentMobileCountryCode`,
+//     `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
+//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`, `personalHotspotEnabled`, `roaming`,
+//     `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`,
+//     `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`, `groupId`, `groupName`.
+//     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListMobileDevicePairedDevicesV2(ctx context.Context, id string, section []string, sort []string, filter string) ([]MobileDeviceResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {

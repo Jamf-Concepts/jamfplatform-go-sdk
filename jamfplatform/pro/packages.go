@@ -23,13 +23,11 @@ import (
 // Required privileges: read:pro:packages. Legacy Jamf Pro privilege name(s): Read Packages.
 //
 // Parameters:
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is ID:asc. If using multiple criteria,
-//     separate with commas.
-//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
-//     including ID, name, etc. Can be combined with paging and sorting. Fields
-//     allowed in the query: id, fileName, packageName, categoryId, info, notes,
-//     manifestFileName, cloudTransferStatus. Default filter is an empty query and
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     ID:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Fields allowed in the query: id, fileName, packageName,
+//     categoryId, info, notes, manifestFileName, cloudTransferStatus. Default filter is an empty query and
 //     returns all results from the requested page.
 func (c *Client) ListPackagesV1(ctx context.Context, sort []string, filter string) ([]Package, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
@@ -163,20 +161,18 @@ func (c *Client) DeleteMultiplePackagesV1(ctx context.Context, request *Ids) err
 // Required privileges: read:pro:packages. Legacy Jamf Pro privilege name(s): Read Packages.
 //
 // Parameters:
-//   - exportFields: Export fields parameter, used to change default order or ignore some of the
-//     response properties. Default is empty array, which means that all fields of
-//     the response entity will be serialized. Example: export-fields=id,username.
-//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the
-//     exported file. Default is empty array, which means that response properties
-//     names will be used. Number of the provided labels must match the number of
-//     export-fields Example: export-labels=identifier,name with matching:
+//   - exportFields: Export fields parameter, used to change default order or ignore some of the response properties.
+//     Default is empty array, which means that all fields of the response entity will be serialized.
+//     Example: export-fields=id,username.
+//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the exported file. Default is empty
+//     array, which means that response properties names will be used. Number of the provided labels must
+//     match the number of export-fields Example: export-labels=identifier,name with matching:
 //     export-fields=id,username.
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is ID:asc. If using multiple criteria,
-//     separate with commas.
-//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
-//     including ID, name, etc. Can be combined with paging and sorting. Default
-//     filter is an empty query and returns all results from the requested page.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     ID:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Default filter is an empty query and returns all results from the
+//     requested page.
 func (c *Client) ExportPackagesV1(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -209,12 +205,11 @@ func (c *Client) ExportPackagesV1(ctx context.Context, request *ExportParameters
 //
 // Parameters:
 //   - id: Instance ID of package history.
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is ID:asc. If using multiple criteria,
-//     separate with commas.
-//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
-//     including ID, name, etc. Can be combined with paging and sorting. Default
-//     filter is an empty query and returns all results from the requested page.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     ID:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Default filter is an empty query and returns all results from the
+//     requested page.
 func (c *Client) ListPackageHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -266,20 +261,18 @@ func (c *Client) CreatePackageHistoryNoteV1(ctx context.Context, id string, requ
 //
 // Parameters:
 //   - id: Instance ID of package history note.
-//   - exportFields: Export fields parameter, used to change default order or ignore some of the
-//     response properties. Default is empty array, which means that all fields of
-//     the response entity will be serialized. Example: export-fields=id,username.
-//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the
-//     exported file. Default is empty array, which means that response properties
-//     names will be used. Number of the provided labels must match the number of
-//     export-fields Example: export-labels=identifier,name with matching:
+//   - exportFields: Export fields parameter, used to change default order or ignore some of the response properties.
+//     Default is empty array, which means that all fields of the response entity will be serialized.
+//     Example: export-fields=id,username.
+//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the exported file. Default is empty
+//     array, which means that response properties names will be used. Number of the provided labels must
+//     match the number of export-fields Example: export-labels=identifier,name with matching:
 //     export-fields=id,username.
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is ID:asc. If using multiple criteria,
-//     separate with commas.
-//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
-//     including ID, name, etc. Can be combined with paging and sorting. Default
-//     filter is an empty query and returns all results from the requested page.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     ID:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Default filter is an empty query and returns all results from the
+//     requested page.
 func (c *Client) ExportPackageHistoryV1(ctx context.Context, id string, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte

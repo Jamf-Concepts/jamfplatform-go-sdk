@@ -22,13 +22,11 @@ import (
 // Required privileges: read:pro:api-integrations. Legacy Jamf Pro privilege name(s): Read API Integrations.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Fields allowed in the query: id, displayName. Example:
-//     sort=displayName:desc.
-//   - filter: Query in the RSQL format, allowing to filter app titles collection. Default
-//     filter is empty query - returning all results for the requested page. Fields
-//     allowed in the query: id, displayName. Example:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Fields allowed in the query: id, displayName.
+//     Example: sort=displayName:desc.
+//   - filter: Query in the RSQL format, allowing to filter app titles collection. Default filter is empty query -
+//     returning all results for the requested page. Fields allowed in the query: id, displayName. Example:
 //     displayName=="*IntegrationName*".
 func (c *Client) ListApiIntegrationsV1(ctx context.Context, sort []string, filter string) ([]ApiIntegrationResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")

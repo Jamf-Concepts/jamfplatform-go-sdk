@@ -33,8 +33,7 @@ func (c *Client) GetComputerCommandByUUID(ctx context.Context, uuid string) (*Co
 // Required privileges: create:pro:computer-commands.
 //
 // Parameters:
-//   - command: Command to send (EnableRemoteDesktop and DisableRemoteDesktop require macOS
-//     10.14.4).
+//   - command: Command to send (EnableRemoteDesktop and DisableRemoteDesktop require macOS 10.14.4).
 //     Allowed values: "EnableRemoteDesktop", "DisableRemoteDesktop".
 //   - id: Computer ID - supports comma separated values (e.g. id/8,10,55).
 func (c *Client) IssueComputerCommandByID(ctx context.Context, command string, id string, request *ComputerCommandPost) (*ComputerCommand, error) {
@@ -81,8 +80,8 @@ func (c *Client) ListComputerCommands(ctx context.Context) (*ComputerCommands, e
 // Required privileges: create:pro:computer-commands.
 //
 // Parameters:
-//   - command: Allowed values: "EnableRemoteDesktop (macOS 10.14.4 and later)",
-//     "DisableRemoteDesktop (macOS 10.14.4 and later)".
+//   - command: Allowed values: "EnableRemoteDesktop (macOS 10.14.4 and later)", "DisableRemoteDesktop (macOS
+//     10.14.4 and later)".
 func (c *Client) CreateComputerCommandByCommand(ctx context.Context, command string, request *ComputerCommandPost) (*ComputerCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerCommand

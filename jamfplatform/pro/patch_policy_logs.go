@@ -22,13 +22,11 @@ import (
 //
 // Parameters:
 //   - id: patch policy id.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     deviceName:asc. Multiple sort criteria are supported and must be separated
-//     with a comma.
-//   - filter: Query in the RSQL format, allowing to filter Patch Policy Logs collection.
-//     Default filter is empty query - returning all results for the requested
-//     page. Fields allowed in the query: deviceId, deviceName, statusCode,
-//     statusDate, attemptNumber, ignoredForPatchPolicyId. This param can be
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is deviceName:asc. Multiple sort
+//     criteria are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Patch Policy Logs collection. Default filter is empty
+//     query - returning all results for the requested page. Fields allowed in the query: deviceId,
+//     deviceName, statusCode, statusDate, attemptNumber, ignoredForPatchPolicyId. This param can be
 //     combined with paging and sorting.
 func (c *Client) ListPatchPolicyLogsV2(ctx context.Context, id string, sort []string, filter string) ([]PatchPolicyLogV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")

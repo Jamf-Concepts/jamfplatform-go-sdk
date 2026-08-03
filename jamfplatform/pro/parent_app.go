@@ -47,14 +47,12 @@ func (c *Client) UpdateParentAppSettingsV1(ctx context.Context, request *ParentA
 // Required privileges: read:pro:parent-app-settings. Legacy Jamf Pro privilege name(s): Read Parent App Settings.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
-//     date:desc. Multiple sort criteria are supported and must be separated with a
-//     comma. Example: sort=date:desc,name:asc.
-//   - filter: Query in the RSQL format, allowing to filter results. Default filter is
-//     empty query - returning all results for the requested page. Fields allowed
-//     in the query: status, updated, version This param can be combined with
-//     paging and sorting. Example: filter=username!=admin and details==*disabled*
-//     and date<2019-12-15.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter results. Default filter is empty query - returning all
+//     results for the requested page. Fields allowed in the query: status, updated, version This param can
+//     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
+//     date<2019-12-15.
 func (c *Client) ListParentAppHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

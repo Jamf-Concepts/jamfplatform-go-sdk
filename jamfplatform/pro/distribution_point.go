@@ -22,13 +22,11 @@ import (
 // Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
 //
 // Parameters:
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is id:asc. If using multiple criteria,
-//     separate with commas. Allows fields such as - name, serverName.
-//   - filter: Filters results. Use RSQL format for query. Allows fields such as - name,
-//     serverName, principal, fileSharingConnectionType, and httpsEnabled Can be
-//     combined with paging and sorting. Default filter is an empty query and
-//     returns all results from the requested page.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     id:asc. If using multiple criteria, separate with commas. Allows fields such as - name, serverName.
+//   - filter: Filters results. Use RSQL format for query. Allows fields such as - name, serverName, principal,
+//     fileSharingConnectionType, and httpsEnabled Can be combined with paging and sorting. Default filter
+//     is an empty query and returns all results from the requested page.
 func (c *Client) ListDistributionPointsV1(ctx context.Context, sort []string, filter string) ([]DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DistributionPoint, bool, error) {
@@ -154,12 +152,11 @@ func (c *Client) PatchDistributionPointV1(ctx context.Context, id string, reques
 //
 // Parameters:
 //   - id: Instance id of distribution point history.
-//   - sort: Sorts results by one or more criteria, following the format
-//     property:asc/desc. Default sort is id:asc. If using multiple criteria,
-//     separate with commas.
-//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
-//     including id, name, etc. Can be combined with paging and sorting. Default
-//     filter is an empty query and returns all results from the requested page.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     id:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including id, name, etc. Can be
+//     combined with paging and sorting. Default filter is an empty query and returns all results from the
+//     requested page.
 func (c *Client) ListDistributionPointHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

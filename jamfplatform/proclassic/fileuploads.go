@@ -18,9 +18,8 @@ import (
 //
 // Parameters:
 //   - resource: Resource to attach the file to.
-//     Allowed values: "computers", "mobiledevices", "enrollmentprofiles",
-//     "printers", "peripherals", "policies", "ebooks",
-//     "mobiledeviceapplicationsicon", "mobiledeviceapplicationsipa",
+//     Allowed values: "computers", "mobiledevices", "enrollmentprofiles", "printers", "peripherals",
+//     "policies", "ebooks", "mobiledeviceapplicationsicon", "mobiledeviceapplicationsipa",
 //     "diskencryptionconfigurations".
 //   - idType: Name is supported for all but the peripherals resource.
 //     Allowed values: "id", "name".

@@ -22,9 +22,8 @@ import (
 // Required privileges: read:pro:apple-configurator-enrollment. Legacy Jamf Pro privilege name(s): Read Apple Configurator Enrollment.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria
-//     are supported and must be separated with a comma. Example:
-//     sort=date:desc,name:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
+//     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListSupervisionIdentitiesV1(ctx context.Context, sort []string) ([]SupervisionIdentity, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SupervisionIdentity, bool, error) {

@@ -23,9 +23,8 @@ import (
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
-//     Multiple sort criteria are supported and must be separated with a comma.
-//     Example: sort=id:desc,brandingName:asc.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=id:desc,brandingName:asc.
 func (c *Client) ListMacOSBrandingConfigurationsV1(ctx context.Context, sort []string) ([]MacOsBrandingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MacOsBrandingConfiguration, bool, error) {
