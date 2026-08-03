@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -1332,6 +1333,31 @@ func TestAcceptance_ApplyVolumePurchasingLocationV1(t *testing.T) {
 
 // ---------- Prestage Apply (Computer + Mobile, shared DEP token) ----------
 
+// prestagePut500 reports whether err is the specific known prestage PUT defect:
+// HTTP 500 carrying an empty `errors` array while the write commits.
+//
+// Wire-probed 2026-07-31 against us.apigw.jamf.com, both endpoints:
+//
+//	PUT computer-prestages/{id}       500 {"httpStatus":500,"errors":[]}, displayName applied, versionLock 0 → 1
+//	PUT mobile-device-prestages/{id}  500 {"httpStatus":500,"errors":[]}, displayName applied, versionLock 1 → 2
+//
+// PI-1414 (Triaged, regression since 11.28) covers the computer endpoint;
+// PI-1529 covers the mobile endpoint.
+//
+// Deliberately narrow: it matches only 500 with an EMPTY error list, so a 500
+// that carries real detail, or any other status, still fails the test. Callers
+// must keep asserting the resulting state — tolerating the status is not the
+// same as tolerating a failed write.
+func prestagePut500(t *testing.T, err error, endpoint string) bool {
+	t.Helper()
+	apiErr := jamfplatform.AsAPIError(err)
+	if apiErr == nil || !apiErr.HasStatus(http.StatusInternalServerError) || len(apiErr.Details()) > 0 {
+		return false
+	}
+	t.Logf("tolerating known %s-prestage PUT 500 (write commits; PI-1414 computer / PI-1529 mobile): %v", endpoint, err)
+	return true
+}
+
 // TestAcceptance_ApplyPrestages exercises both ComputerPrestageV3 and
 // MobileDevicePrestageV3 Apply lifecycle sharing a single DEP token:
 //  1. Upload DEP token
@@ -1437,7 +1463,14 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		req.Mandatory = true // change something to force a real update
 		id2, created2, err := p.ApplyComputerPrestageV3(ctx, req)
 		if err != nil {
-			t.Fatalf("apply update: %v", err)
+			// PI-1414: PUT /api/v3/computer-prestages/{id} answers 500 with an
+			// empty error list on every request while committing the write. The
+			// state assertions below still run, so a real update failure is
+			// still caught — only the misleading status is tolerated.
+			if !prestagePut500(t, err, "computer") {
+				t.Fatalf("apply update: %v", err)
+			}
+			id2, created2 = id, false
 		}
 		if created2 {
 			t.Error("expected created = false on second apply")
@@ -1452,6 +1485,9 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		}
 		if got2.VersionLock <= got.VersionLock {
 			t.Errorf("versionLock did not advance: was %d, now %d", got.VersionLock, got2.VersionLock)
+		}
+		if !got2.Mandatory {
+			t.Error("update did not commit: mandatory is still false")
 		}
 		t.Logf("after update: versionLock=%d", got2.VersionLock)
 
@@ -1539,7 +1575,15 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		req.Mandatory = false // flip from true to force a real update
 		id2, created2, err := p.ApplyMobileDevicePrestageV3(ctx, req)
 		if err != nil {
-			t.Fatalf("apply update: %v", err)
+			// Same defect as PI-1414, on the mobile endpoint: PUT
+			// /api/v3/mobile-device-prestages/{id} answers 500 with an empty
+			// error list while committing the write (wire-probed 2026-07-31,
+			// versionLock 1 → 2 on a renaming PUT). Filed as PI-1529;
+			// PI-1414 names only computer-prestages.
+			if !prestagePut500(t, err, "mobile-device") {
+				t.Fatalf("apply update: %v", err)
+			}
+			id2, created2 = id, false
 		}
 		if created2 {
 			t.Error("expected created = false on second apply")
@@ -1554,6 +1598,9 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		}
 		if got2.VersionLock <= got.VersionLock {
 			t.Errorf("versionLock did not advance: was %d, now %d", got.VersionLock, got2.VersionLock)
+		}
+		if got2.Mandatory {
+			t.Error("update did not commit: mandatory is still true")
 		}
 		t.Logf("after update: versionLock=%d", got2.VersionLock)
 
