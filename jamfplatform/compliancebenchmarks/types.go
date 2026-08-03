@@ -9,16 +9,21 @@ import "time"
 
 // ApiError represents a api error.
 type ApiError struct {
-	Errors     []ApiErrorErrorsItem `json:"errors"`
-	HttpStatus int                  `json:"httpStatus"`
-	TraceID    string               `json:"traceId"`
+	Errors []ApiErrorErrorsItem `json:"errors"`
+	// HTTP status of the response.
+	HttpStatus int `json:"httpStatus"`
+	// Unique identifier for the request, useful for tracing and debugging.
+	TraceID string `json:"traceId"`
 }
 
 // ApiErrorErrorsItem represents a api error errors item.
 type ApiErrorErrorsItem struct {
-	Code        string `json:"code"`
+	// Error-specific code for troubleshooting.
+	Code string `json:"code"`
+	// A detailed error message.
 	Description string `json:"description"`
-	Field       string `json:"field"`
+	// The field that caused the error.
+	Field string `json:"field"`
 }
 
 // BaselineInfo represents a baseline info.
@@ -37,17 +42,24 @@ type BaselinesResponse struct {
 
 // BenchmarkRequestV2 represents a benchmark request v2.
 type BenchmarkRequestV2 struct {
-	Description        *string       `json:"description,omitempty"`
-	EnforcementMode    string        `json:"enforcementMode"`
-	Rules              []RuleRequest `json:"rules"`
-	SelectedOsVersions *[]OsVersion  `json:"selectedOsVersions,omitempty"`
-	SourceBaselineID   string        `json:"sourceBaselineId"`
-	Target             TargetV2      `json:"target"`
-	Title              string        `json:"title"`
+	// A detailed description of the benchmark.
+	Description *string `json:"description,omitempty"`
+	// The enforcement mode for this benchmark.
+	EnforcementMode string `json:"enforcementMode"`
+	// The rules that make up this benchmark.
+	Rules []RuleRequest `json:"rules"`
+	// The selected OS versions for this benchmark, default is all available baseline OS versions.
+	SelectedOsVersions *[]OsVersion `json:"selectedOsVersions,omitempty"`
+	// The identifier of the source baseline from which this benchmark is derived.
+	SourceBaselineID string   `json:"sourceBaselineId"`
+	Target           TargetV2 `json:"target"`
+	// A short, descriptive name for the benchmark.
+	Title string `json:"title"`
 }
 
 // BenchmarkResponseV2 represents a benchmark response v2.
 type BenchmarkResponseV2 struct {
+	// Available OS versions that this baseline supports.
 	AvailableOsVersions []OsVersion `json:"availableOsVersions"`
 	BaselineID          string      `json:"baselineId"`
 	BenchmarkID         string      `json:"benchmarkId"`
@@ -57,12 +69,13 @@ type BenchmarkResponseV2 struct {
 	EnforcementMode     string      `json:"enforcementMode"`
 	LastUpdatedAt       time.Time   `json:"lastUpdatedAt"`
 	Rules               []RuleInfo  `json:"rules"`
-	SelectedOsVersions  []OsVersion `json:"selectedOsVersions"`
-	Sources             []Source    `json:"sources"`
-	Target              *TargetV2   `json:"target,omitempty"`
-	TenantID            string      `json:"tenantId"`
-	Title               string      `json:"title"`
-	UpdateAvailable     bool        `json:"updateAvailable"`
+	// The user-selected OS versions with full metadata.
+	SelectedOsVersions []OsVersion `json:"selectedOsVersions"`
+	Sources            []Source    `json:"sources"`
+	Target             *TargetV2   `json:"target,omitempty"`
+	TenantID           string      `json:"tenantId"`
+	Title              string      `json:"title"`
+	UpdateAvailable    bool        `json:"updateAvailable"`
 }
 
 // BenchmarkRuleDevicesResponse Representation of devices for a benchmark rule. Used for drill-down view controller.
@@ -100,6 +113,7 @@ type CompliancePercentage struct {
 
 // DeviceRuleResult represents a device rule result.
 type DeviceRuleResult struct {
+	// Device Platform ID.
 	DeviceID   string          `json:"deviceId"`
 	DeviceName any             `json:"deviceName"`
 	State      RuleResultState `json:"state"`
@@ -141,8 +155,10 @@ type OsSpecificRuleInfo struct {
 
 // OsVersion represents a os version.
 type OsVersion struct {
-	OsType    string `json:"osType"`
-	OsVersion int    `json:"osVersion"`
+	// Operating system type.
+	OsType string `json:"osType"`
+	// Operating system version number.
+	OsVersion int `json:"osVersion"`
 }
 
 // RuleInfo represents a rule info.
@@ -183,9 +199,10 @@ type RuleResult struct {
 	PassPercentage  float32 `json:"passPercentage"`
 	Passed          int     `json:"passed"`
 	RuleID          string  `json:"ruleId"`
-	RuleNumber      string  `json:"ruleNumber"`
-	RuleTitle       string  `json:"ruleTitle"`
-	Unknown         int     `json:"unknown"`
+	// Rule number in the benchmark, if applicable. E.g. CIS numbers like '2.5.1.1'.
+	RuleNumber string `json:"ruleNumber"`
+	RuleTitle  string `json:"ruleTitle"`
+	Unknown    int    `json:"unknown"`
 }
 
 // Source represents a source.

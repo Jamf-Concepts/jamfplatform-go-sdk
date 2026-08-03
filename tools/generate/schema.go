@@ -1436,6 +1436,10 @@ func flattenAllOf(schema *openapi3.Schema) (map[string]*openapi3.SchemaRef, []st
 	return props, required
 }
 
+// fieldDocWidth is the wrap width for struct field documentation. Matches
+// parameterDocWidth; the rendered prefix is one tab plus "// ".
+const fieldDocWidth = 100
+
 // namedEnumTypes returns the Go type names of the string-enum schemas that
 // extractTypes will emit for this spec, keyed for lookup. Parameter docs use
 // it to point at the generated type instead of re-listing its values inline —
@@ -1590,10 +1594,19 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 			jsonTag += ",omitempty"
 		}
 
-		var fieldComment string
-		if !suppressWriteOnly && prop != nil && (prop.WriteOnly || prop.Format == "password") {
-			fieldComment = "Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update."
+		// Field godoc: the property's own description first, then the
+		// write-only note as trailing metadata. Continuation lines carry
+		// "\t// " because the struct template indents one level.
+		var fieldDoc []string
+		if prop != nil {
+			fieldDoc = docParagraphs(prop.Description, fieldDocWidth)
 		}
+		if !suppressWriteOnly && prop != nil && (prop.WriteOnly || prop.Format == "password") {
+			fieldDoc = append(fieldDoc, wrapCommentText(
+				"Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.",
+				fieldDocWidth)...)
+		}
+		fieldComment := strings.Join(fieldDoc, "\n\t// ")
 
 		// Strip ",omitempty" when the enclosing schema is listed in the
 		// per-spec EmitNullForOptional set. Lets callers emit explicit JSON

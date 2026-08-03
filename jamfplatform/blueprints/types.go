@@ -12,74 +12,95 @@ import (
 
 // AcceptCookies represents a accept cookies.
 type AcceptCookies struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Included *bool   `json:"Included,omitempty"`
-	Value    *string `json:"Value,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	// The policy Safari uses for managing cookies.
+	Value *string `json:"Value,omitempty"`
 }
 
 // AllowDisablingFraudWarning represents a allow disabling fraud warning.
 type AllowDisablingFraudWarning struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// If false, the system forces fraud warnings on in Safari.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // AllowHistoryClearing represents a allow history clearing.
 type AllowHistoryClearing struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// If false, the system disables clearing history in Safari.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // AllowJavaScript represents a allow java script.
 type AllowJavaScript struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// If false, the system disables JavaScript in Safari.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // AllowPopups represents a allow popups.
 type AllowPopups struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// If false, the system disables popups in Safari.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // AllowPrivateBrowsing represents a allow private browsing.
 type AllowPrivateBrowsing struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// If false, the system disables private browsing in Safari.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // AllowSummary represents a allow summary.
 type AllowSummary struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// If false, the system disables summarization of content in Safari.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // ApiError represents a api error.
 type ApiError struct {
-	Errors     *Error `json:"errors,omitempty"`
-	HttpStatus int    `json:"httpStatus"`
-	TraceID    string `json:"traceId"`
+	Errors *Error `json:"errors,omitempty"`
+	// HTTP status of the response.
+	HttpStatus int `json:"httpStatus"`
+	// Trace ID.
+	TraceID string `json:"traceId"`
 }
 
 // AudioAccessorySettingsComponent represents a audio accessory settings component.
 type AudioAccessorySettingsComponent struct {
+	// Audio accessory settings configuration.
+	// Configures audio accessory temporary pairing behavior.
 	Configuration AudioAccessorySettingsConfiguration `json:"configuration"`
 	Identifier    string                              `json:"identifier"`
 }
 
 // AudioAccessorySettingsConfiguration Audio accessory settings configuration. Configures audio accessory temporary pairing behavior.
 type AudioAccessorySettingsConfiguration struct {
+	// Temporary pairing configuration.
 	TemporaryPairing *TemporaryPairing `json:"TemporaryPairing,omitempty"`
 }
 
 // AutomaticAction represents a automatic action.
 type AutomaticAction struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool  `json:"Included,omitempty"`
 	Value    string `json:"Value"`
 }
@@ -93,14 +114,19 @@ type AutomaticActions struct {
 
 // BasicMode represents a basic mode.
 type BasicMode struct {
+	// Add the square root button to the basic calculator by replacing the +/- button.
 	AddSquareRoot bool `json:"AddSquareRoot"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 }
 
 // Beta represents a beta.
 type Beta struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool         `json:"Included,omitempty"`
 	Value    *BetaSettings `json:"Value,omitempty"`
 }
@@ -120,50 +146,74 @@ type BetaSettings struct {
 
 // BlueprintDetail represents a blueprint detail.
 type BlueprintDetail struct {
-	Created         time.Time        `json:"created"`
+	// Creation date.
+	Created time.Time `json:"created"`
+	// Blueprint deployment state.
 	DeploymentState *DeploymentState `json:"deploymentState,omitempty"`
-	Description     *string          `json:"description,omitempty"`
-	ID              string           `json:"id"`
-	Name            string           `json:"name"`
-	Scope           *BlueprintScope  `json:"scope,omitempty"`
-	Steps           []BlueprintStep  `json:"steps"`
-	Updated         time.Time        `json:"updated"`
+	// Description of the blueprint.
+	Description *string `json:"description,omitempty"`
+	// ID of the blueprint.
+	ID string `json:"id"`
+	// Name of the blueprint.
+	Name string `json:"name"`
+	// Device groups.
+	Scope *BlueprintScope `json:"scope,omitempty"`
+	// Array of blueprint steps.
+	Steps []BlueprintStep `json:"steps"`
+	// Last modification date.
+	Updated time.Time `json:"updated"`
 }
 
 // BlueprintOverview Array of result items.
 type BlueprintOverview struct {
-	Created         time.Time        `json:"created"`
+	// Creation date.
+	Created time.Time `json:"created"`
+	// Blueprint deployment state.
 	DeploymentState *DeploymentState `json:"deploymentState,omitempty"`
-	Description     *string          `json:"description,omitempty"`
-	ID              string           `json:"id"`
-	Name            string           `json:"name"`
-	Updated         time.Time        `json:"updated"`
+	// Description of the blueprint.
+	Description *string `json:"description,omitempty"`
+	// ID of the blueprint.
+	ID string `json:"id"`
+	// Name of the blueprint.
+	Name string `json:"name"`
+	// Last modification date.
+	Updated time.Time `json:"updated"`
 }
 
 // BlueprintScope Device groups.
 type BlueprintScope struct {
+	// Device groups.
 	DeviceGroups []string `json:"deviceGroups"`
 }
 
 // BlueprintStatusDetail represents a blueprint status detail.
 type BlueprintStatusDetail struct {
-	Failed    int `json:"failed"`
-	Pending   int `json:"pending"`
+	// Number of devices in failed state.
+	Failed int `json:"failed"`
+	// Number of devices in pending state.
+	Pending int `json:"pending"`
+	// Number of devices in successful state.
 	Succeeded int `json:"succeeded"`
 }
 
 // BlueprintStep Array of blueprint steps.
 type BlueprintStep struct {
-	ActivationPredicate *string     `json:"activationPredicate,omitempty"`
-	Components          []Component `json:"components"`
-	Name                *string     `json:"name,omitempty"`
+	// Declarative activation predicate.
+	ActivationPredicate *string `json:"activationPredicate,omitempty"`
+	// Array of components included in the step.
+	Components []Component `json:"components"`
+	// Name of the step.
+	Name *string `json:"name,omitempty"`
 }
 
 // BookmarkGroup represents a bookmark group.
 type BookmarkGroup struct {
-	Bookmarks       []BookmarkItem `json:"Bookmarks"`
-	GroupIdentifier string         `json:"GroupIdentifier"`
-	Title           string         `json:"Title"`
+	// A list of bookmarks.
+	Bookmarks []BookmarkItem `json:"Bookmarks"`
+	// A string that specifies the unique identifier for this group of managed bookmarks.
+	GroupIdentifier string `json:"GroupIdentifier"`
+	// The name of the bookmarks folder.
+	Title string `json:"Title"`
 }
 
 // BookmarkItem is a polymorphic response keyed by Type. Exactly one variant pointer is populated after unmarshaling.
@@ -218,9 +268,11 @@ type Calculator struct {
 
 // ChangeAtNextAuth represents a change at next auth.
 type ChangeAtNextAuth struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// Change at next auth.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // Component A blueprint component.
@@ -231,35 +283,110 @@ type Component struct {
 
 // ComponentDescription Array of result items.
 type ComponentDescription struct {
+	// Description of the component.
 	Description *string `json:"description,omitempty"`
-	Identifier  string  `json:"identifier"`
-	Meta        *Meta   `json:"meta,omitempty"`
-	Name        string  `json:"name"`
+	// Blueprint component identifier.
+	Identifier string `json:"identifier"`
+	// Meta object containing additional information about component.
+	Meta *Meta `json:"meta,omitempty"`
+	// Name of the component.
+	Name string `json:"name"`
 }
 
 // ConfigurationProfile Component for sending any Apple MDM configuration profile payload as a blueprint component.
 type ConfigurationProfile struct {
+	// Configuration wrapper for one or more Apple MDM profile payloads.
+	// ### Example — `com.apple.domains`.
+	// Using the payload defined in
+	// [com.apple.domains.yaml](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.domains.yaml),
+	// its `payloadkeys` are `EmailDomains`, `WebDomains`, `SafariPasswordAutoFillDomains`,
+	// `CrossSiteTrackingPreventionRelaxedDomains`, and `CrossSiteTrackingPreventionRelaxedApps` — all
+	// optional arrays of strings.
+	// ```json { "payloadDisplayName": "Managed Domains", "payloadContent": [ { "payloadType":
+	// "com.apple.domains", "EmailDomains": ["example.com", "private.example.com"], "WebDomains":
+	// ["*.example.com"], "SafariPasswordAutoFillDomains": ["login.example.com"] } ] } ```.
+	// ### Example — `com.apple.wifi.managed`.
+	// The same pattern works for any payload. For
+	// [com.apple.wifi.managed](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.wifi.managed.yaml),
+	// look up its `payloadkeys` and send:.
+	// ```json { "payloadDisplayName": "Corporate Wi-Fi", "payloadContent": [ { "payloadType":
+	// "com.apple.wifi.managed", "SSID_STR": "Corporate-WiFi", "EncryptionType": "WPA2", "AutoJoin": true,
+	// "IsHotspot": false } ] } ```.
+	// ### Combining multiple Apple payloads in one component.
+	// A single `com.jamf.ddm-configuration-profile` component can contain multiple Apple payloads in the
+	// `payloadContent` array:.
+	// ```json { "payloadDisplayName": "Network & Domains", "payloadContent": [ { "payloadType":
+	// "com.apple.domains", "WebDomains": ["*.corp.example.com"], "EmailDomains": ["corp.example.com"] }, {
+	// "payloadType": "com.apple.wifi.managed", "SSID_STR": "CorpNet", "EncryptionType": "WPA3" } ] } ```.
+	// You can also place multiple `com.jamf.ddm-configuration-profile` components in the same blueprint
+	// step alongside other component types.
 	Configuration ConfigurationProfileConfiguration `json:"configuration"`
-	Identifier    string                            `json:"identifier"`
+	// ## Using Apple MDM profile payloads as blueprint components.
+	// The API accepts **any** Apple MDM configuration profile payload as a blueprint component — not
+	// only the ones explicitly listed in this specification. Use the `com.jamf.ddm-configuration-profile`
+	// identifier with the pattern described here to send one or more Apple payloads.
+	// Apple publishes all payload definitions at
+	// [apple/device-management/mdm/profiles](https://github.com/apple/device-management/tree/release/mdm/profiles).
+	// ### Step 1 — Choose the Apple payload(s).
+	// Find the payload YAML in the Apple repository. The `payloadtype` field (e.g., `com.apple.domains`,
+	// `com.apple.wifi.managed`, `com.apple.applicationaccess`) identifies each payload.
+	// > **Unsupported payload types:** Blueprints with > `com.apple.font` or `com.apple.webClip.managed`
+	// payloads > cannot be created.
+	// ### Step 2 — Build the `configuration` object.
+	// The `configuration` has two mandatory fields:.
+	// | Field | Type | Description | |---|---|---| | `payloadDisplayName` | string | A human-readable name
+	// shown on the device (e.g., `"Managed Domains"`) | | `payloadContent` | array | An array of payload
+	// objects — each one represents a single Apple payload |.
+	// Each entry in `payloadContent` **must** contain:.
+	// | Field | Type | Description | |---|---|---| | `payloadType` | string | The Apple payload type
+	// identifier (e.g., `com.apple.domains`) |.
+	// In addition to `payloadType`, include the payload-specific keys from the `payloadkeys` section of
+	// the Apple payload YAML.
+	// ### Apple type → JSON type mapping.
+	// | Apple type | JSON value type | Example | |---|---|---| | `<string>` | string | `"example.com"` | |
+	// `<integer>` | number | `42` | | `<real>` | number | `3.14` | | `<boolean>` | boolean | `true` | |
+	// `<data>` | string (Base64-encoded) | `"SGVsbG8="` | | `<date>` | string (ISO 8601) |
+	// `"2026-01-15T00:00:00Z"` | | `<array>` | array | `["a", "b"]` | | `<dictionary>` | object | `{
+	// "key": "value" }` |.
+	// Only include the keys you want to configure. Keys marked `presence: optional` in the Apple YAML can
+	// be omitted; keys marked `presence: required` must be present.
+	// ### Reference.
+	// - Apple payload definitions: https://github.com/apple/device-management/tree/release/mdm/profiles -
+	// Apple Configuration Profile reference:
+	// https://developer.apple.com/documentation/devicemanagement/profile-specific-payload-keys.
+	Identifier string `json:"identifier"`
 }
 
 // ConfigurationProfileConfiguration Configuration wrapper for one or more Apple MDM profile payloads. ### Example — `com.apple.domains` Using the payload defined in [com.apple.domains.yaml](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.domains.yaml), its `payloadkeys` are `EmailDomains`, `WebDomains`, `SafariPasswordAutoFillDomains`, `CrossSiteTrackingPreventionRelaxedDomains`, and `CrossSiteTrackingPreventionRelaxedApps` — all optional arrays of strings. ```json { "payloadDisplayName": "Managed Domains", "payloadContent": [ { "payloadType": "com.apple.domains", "EmailDomains": ["example.com", "private.example.com"], "WebDomains": ["*.example.com"], "SafariPasswordAutoFillDomains": ["login.example.com"] } ] } ``` ### Example — `com.apple.wifi.managed` The same pattern works for any payload. For [com.apple.wifi.managed](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.wifi.managed.yaml), look up its `payloadkeys` and send: ```json { "payloadDisplayName": "Corporate Wi-Fi", "payloadContent": [ { "payloadType": "com.apple.wifi.managed", "SSID_STR": "Corporate-WiFi", "EncryptionType": "WPA2", "AutoJoin": true, "IsHotspot": false } ] } ``` ### Combining multiple Apple payloads in one component A single `com.jamf.ddm-configuration-profile` component can contain multiple Apple payloads in the `payloadContent` array: ```json { "payloadDisplayName": "Network & Domains", "payloadContent": [ { "payloadType": "com.apple.domains", "WebDomains": ["*.corp.example.com"], "EmailDomains": ["corp.example.com"] }, { "payloadType": "com.apple.wifi.managed", "SSID_STR": "CorpNet", "EncryptionType": "WPA3" } ] } ``` You can also place multiple `com.jamf.ddm-configuration-profile` components in the same blueprint step alongside other component types.
 type ConfigurationProfileConfiguration struct {
-	PayloadContent     []json.RawMessage `json:"payloadContent"`
-	PayloadDisplayName string            `json:"payloadDisplayName"`
+	// An array of Apple payload objects. Each entry represents a single Apple MDM payload and **must**
+	// include a `payloadType` field set to the Apple payload type identifier (e.g., `com.apple.domains`,
+	// `com.apple.wifi.managed`, `com.apple.applicationaccess`).
+	// In addition to `payloadType`, include any payload-specific keys from the `payloadkeys` section of
+	// the corresponding Apple payload YAML definition. Any additional properties beyond `payloadType` are
+	// accepted to accommodate any Apple payload schema.
+	PayloadContent []json.RawMessage `json:"payloadContent"`
+	// A human-readable name for this configuration profile, displayed on the device.
+	PayloadDisplayName string `json:"payloadDisplayName"`
 }
 
 // ConfigurationProfileContentItem A single Apple MDM payload entry. Must contain `payloadType` to identify the Apple payload, plus any payload-specific keys.
 type ConfigurationProfileContentItem struct {
+	// The Apple payload type identifier (e.g., `com.apple.domains`, `com.apple.wifi.managed`,
+	// `com.apple.applicationaccess`).
 	PayloadType string `json:"payloadType"`
 }
 
 // CreateBlueprintRequest represents a create blueprint request.
 type CreateBlueprintRequest struct {
-	Description *string         `json:"description,omitempty"`
-	Name        string          `json:"name"`
-	Scope       CreateScope     `json:"scope"`
-	Steps       []BlueprintStep `json:"steps"`
+	// Description of the blueprint.
+	Description *string `json:"description,omitempty"`
+	// Name of the blueprint.
+	Name string `json:"name"`
+	// Scope of the blueprint.
+	Scope CreateScope `json:"scope"`
+	// Array of blueprint steps.
+	Steps []BlueprintStep `json:"steps"`
 }
 
 // CreateResponse represents a create response.
@@ -270,35 +397,102 @@ type CreateResponse struct {
 
 // CreateScope Scope of the blueprint.
 type CreateScope struct {
+	// Device groups.
 	DeviceGroups []string `json:"deviceGroups"`
 }
 
 // CustomDeclaration A single Apple declarative device management declaration entry.
 type CustomDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
 	ChannelType DeclarationChannelType `json:"channelType"`
-	Kind        DeclarationKind        `json:"kind"`
-	Payload     map[string]any         `json:"payload"`
-	PayloadKey  int                    `json:"payloadKey"`
-	Type        string                 `json:"type"`
+	// The declaration group, determined by the Apple declaration type prefix: - `CONFIGURATION` — for
+	// `com.apple.configuration.*` types - `ASSET` — for `com.apple.asset.*` types.
+	Kind DeclarationKind `json:"kind"`
+	// A JSON object containing the declaration-specific keys from the Apple declaration schema. Include
+	// the `payloadkeys` fields from the corresponding Apple declaration YAML. Additional properties are
+	// accepted to accommodate any Apple declaration schema.
+	Payload map[string]any `json:"payload"`
+	// An integer that identifies this declaration within the `declarations` list of this request. Use this
+	// value to cross-reference declarations in other payload fields via the `$PAYLOAD_<payloadKey>`
+	// placeholder, which is substituted at deploy time with the generated declaration identifier. The
+	// value is local to the current request. It does not need to be globally unique or consistent across
+	// requests.
+	PayloadKey int `json:"payloadKey"`
+	// The Apple declarative device management declaration type identifier (e.g.,
+	// `com.apple.configuration.passcode.settings`, `com.apple.asset.useridentity`).
+	Type string `json:"type"`
 }
 
 // CustomDeclarationsComponent Blueprint component that delivers any Apple declarative device management declarations to managed devices.
 type CustomDeclarationsComponent struct {
+	// Configuration object containing one or more Apple declarative device management declarations.
+	// ### Example — single configuration declaration.
+	// ```json { "declarations": [ { "type": "com.apple.configuration.passcode.settings", "channelType":
+	// "SYSTEM", "kind": "CONFIGURATION", "payload": { "RequirePasscode": true, "MinimumLength": 8,
+	// "MaximumFailedAttempts": 10 }, "payloadKey": 1 } ] } ```.
+	// ### Example — configuration declaration referencing an asset.
+	// A configuration declaration can reference an asset declaration defined in the same `declarations`
+	// array using the `$PAYLOAD_<payloadKey>` placeholder. The `payloadKey` values are local to the
+	// declarations list in this request — they do not need to be globally unique or consistent across
+	// requests:.
+	// ```json { "declarations": [ { "type": "com.apple.asset.credential.userpassword", "channelType":
+	// "SYSTEM", "kind": "ASSET", "payload": { "Reference": { "DataURL":
+	// "https://example.com/asset-data/credential.json", "ContentType": "application/json" } },
+	// "payloadKey": 1 }, { "type": "com.apple.configuration.account.caldav", "channelType": "SYSTEM",
+	// "kind": "CONFIGURATION", "payload": { "HostName": "caldav.example.com", "VisibleName": "Work
+	// Calendar", "AuthenticationCredentialsAssetReference": "$PAYLOAD_1" }, "payloadKey": 2 } ] } ```.
 	Configuration CustomDeclarationsConfiguration `json:"configuration"`
-	Identifier    string                          `json:"identifier"`
+	// ## Use Apple declarative device management declarations as blueprint components.
+	// The API accepts any Apple declarative device management configuration or asset declaration as a
+	// blueprint component, not only the ones explicitly listed in this specification. Use the
+	// `com.jamf.ddm.custom-declarations` identifier with the pattern described here to send one or more
+	// Apple declarative device management declarations.
+	// Apple publishes all declaration definitions at
+	// [apple/device-management/declarative/declarations](https://github.com/apple/device-management/tree/release/declarative/declarations).
+	// ### Step 1 — Choose the Apple declaration type.
+	// Find the declaration YAML in the Apple repository. The `declarationtype` field (e.g.,
+	// `com.apple.configuration.passcode.settings`, `com.apple.asset.useridentity`) identifies each
+	// declaration.
+	// ### Step 2 — Set the `kind` field.
+	// The `kind` maps to the declaration group, derived from the Apple declaration type prefix:.
+	// | `kind` | Apple declaration type prefix | |---|---| | `CONFIGURATION` | `com.apple.configuration.`
+	// | | `ASSET` | `com.apple.asset.` |.
+	// ### Step 3 — Set the `channelType` field.
+	// | `channelType` | Description | |---|---| | `SYSTEM` | Applies the declaration to the system
+	// (device) channel | | `USER` | Applies the declaration to the user channel |.
+	// ### Step 4 — Build the `payload` object.
+	// The `payload` is a JSON object containing the declaration-specific keys from the `payloadkeys`
+	// section of the corresponding Apple declaration YAML.
+	// Only include the keys you want to configure. Keys marked `presence: optional` in the Apple YAML can
+	// be omitted; keys marked `presence: required` must be present.
+	// ### Step 5 — Use `payloadKey` for cross-declaration references.
+	// Each declaration in the array has an integer `payloadKey` that identifies it within the
+	// `declarations` list of this request. To reference another declaration's generated identifier in a
+	// payload field, use the placeholder `$PAYLOAD_<payloadKey>`. This placeholder is substituted at
+	// deploy time with the actual declaration identifier of the referenced declaration.
+	// The `payloadKey` value is local to the declarations in this request — it does not need to be
+	// globally unique or consistent across requests. This is useful when a configuration declaration must
+	// reference an asset declaration defined in the same component.
+	Identifier string `json:"identifier"`
 }
 
 // CustomDeclarationsConfiguration Configuration object containing one or more Apple declarative device management declarations. ### Example — single configuration declaration ```json { "declarations": [ { "type": "com.apple.configuration.passcode.settings", "channelType": "SYSTEM", "kind": "CONFIGURATION", "payload": { "RequirePasscode": true, "MinimumLength": 8, "MaximumFailedAttempts": 10 }, "payloadKey": 1 } ] } ``` ### Example — configuration declaration referencing an asset A configuration declaration can reference an asset declaration defined in the same `declarations` array using the `$PAYLOAD_<payloadKey>` placeholder. The `payloadKey` values are local to the declarations list in this request — they do not need to be globally unique or consistent across requests: ```json { "declarations": [ { "type": "com.apple.asset.credential.userpassword", "channelType": "SYSTEM", "kind": "ASSET", "payload": { "Reference": { "DataURL": "https://example.com/asset-data/credential.json", "ContentType": "application/json" } }, "payloadKey": 1 }, { "type": "com.apple.configuration.account.caldav", "channelType": "SYSTEM", "kind": "CONFIGURATION", "payload": { "HostName": "caldav.example.com", "VisibleName": "Work Calendar", "AuthenticationCredentialsAssetReference": "$PAYLOAD_1" }, "payloadKey": 2 } ] } ```.
 type CustomDeclarationsConfiguration struct {
+	// An array of Apple declarative device management declaration objects to include in this component.
 	Declarations []CustomDeclaration `json:"declarations"`
 }
 
 // CustomRegex represents a custom regex.
 type CustomRegex struct {
+	// Map of OS language ID to a localized description. Use the special `default` key for languages that
+	// the dictionary doesn't contain.
 	Description *map[string]string `json:"Description,omitempty"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Included *bool   `json:"Included,omitempty"`
-	Regex    *string `json:"Regex,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	// Regular expression.
+	Regex *string `json:"Regex,omitempty"`
 }
 
 // Deferrals represents a deferrals.
@@ -311,120 +505,221 @@ type Deferrals struct {
 
 // Deployment Information about last deployment job.
 type Deployment struct {
+	// Date when deployment job started.
 	Started time.Time `json:"started"`
-	State   string    `json:"state"`
+	// Deployment job state.
+	State string `json:"state"`
 }
 
 // DeploymentState Blueprint deployment state.
 type DeploymentState struct {
+	// Information about last deployment job.
 	LastDeployment *Deployment `json:"lastDeployment,omitempty"`
-	State          string      `json:"state"`
+	// Blueprint state.
+	State string `json:"state"`
 }
 
 // DetailsURL Optional URL with details about the enforced update.
 type DetailsURL struct {
-	Included *bool   `json:"Included,omitempty"`
-	Value    *string `json:"Value,omitempty"`
+	// Controls whether this setting should be used.
+	Included *bool `json:"Included,omitempty"`
+	// URL of a web page with the details about the enforced update.
+	Value *string `json:"Value,omitempty"`
 }
 
 // DiskManagementComponent represents a disk management component.
 type DiskManagementComponent struct {
+	// Disk management settings configuration.
+	// Configures restrictions for external and network storage access.
 	Configuration DiskManagementSettingsConfiguration `json:"configuration"`
 	Identifier    string                              `json:"identifier"`
 }
 
 // DiskManagementSettingsConfiguration Disk management settings configuration. Configures restrictions for external and network storage access.
 type DiskManagementSettingsConfiguration struct {
+	// Storage restrictions configuration.
 	Restrictions *Restrictions `json:"Restrictions,omitempty"`
-	Version      int           `json:"version"`
+	// Configuration version.
+	Version int `json:"version"`
 }
 
 // Error represents a error.
 type Error struct {
-	Code        string  `json:"code"`
-	Description string  `json:"description"`
-	Field       *string `json:"field,omitempty"`
-	ID          *string `json:"id,omitempty"`
+	// Error-specific code that can be used to identify localization string, etc.
+	Code string `json:"code"`
+	// A general description of error for troubleshooting/debugging. Generally this text should not be
+	// displayed to a user; instead refer to errorCode and it's localized text.
+	Description string `json:"description"`
+	// Name of the field that caused the error.
+	Field *string `json:"field,omitempty"`
+	// id of object with error.
+	ID *string `json:"id,omitempty"`
 }
 
 // FailedAttemptsResetInMinutes represents a failed attempts reset in minutes.
 type FailedAttemptsResetInMinutes struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *int  `json:"Value,omitempty"`
+	// Failed attempts reset in minutes.
+	Value *int `json:"Value,omitempty"`
 }
 
 // FolderBookmarkItem represents a folder bookmark item.
 type FolderBookmarkItem struct {
+	// An array of bookmarks for each bookmark in the folder.
 	Folder *[]URLBookmarkItem `json:"Folder,omitempty"`
-	Title  string             `json:"Title"`
-	Type   string             `json:"Type"`
+	// The title of the folder shown in Safari.
+	Title string `json:"Title"`
+	Type  string `json:"Type"`
 }
 
 // InputModes represents a input modes.
 type InputModes struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Included       *bool `json:"Included,omitempty"`
-	RPN            bool  `json:"RPN"`
-	UnitConversion bool  `json:"UnitConversion"`
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	// Configures whether RPN input is enabled.
+	RPN bool `json:"RPN"`
+	// Configures whether unit conversions are enabled.
+	UnitConversion bool `json:"UnitConversion"`
 }
 
 // ManagedAppAttributes Fine-grained app behavior settings. All fields are optional. **iOS 18.1+ note:** `Hideable` and `Lockable` require iOS 18.1 or later. When `Lockable` is `false`, `Hideable` is required and must also be `false`.
 type ManagedAppAttributes struct {
-	AssociatedDomains                      *[]string `json:"AssociatedDomains,omitempty"`
-	AssociatedDomainsEnableDirectDownloads *bool     `json:"AssociatedDomainsEnableDirectDownloads,omitempty"`
-	CellularSliceUUID                      *string   `json:"CellularSliceUUID,omitempty"`
-	DNSProxyUUID                           *string   `json:"DNSProxyUUID,omitempty"`
-	Hideable                               *bool     `json:"Hideable,omitempty"`
-	Lockable                               *bool     `json:"Lockable,omitempty"`
-	TapToPayScreenLock                     *bool     `json:"TapToPayScreenLock,omitempty"`
+	// Associated domains for the app.
+	AssociatedDomains *[]string `json:"AssociatedDomains,omitempty"`
+	// Enable direct downloads for the app's associated domains.
+	AssociatedDomainsEnableDirectDownloads *bool `json:"AssociatedDomainsEnableDirectDownloads,omitempty"`
+	// UUID of the network slice to use for the app's cellular connection.
+	CellularSliceUUID *string `json:"CellularSliceUUID,omitempty"`
+	// UUID of the DNS proxy configuration to apply to the app.
+	DNSProxyUUID *string `json:"DNSProxyUUID,omitempty"`
+	// Allow the user to hide the app from the home screen (requires iOS 18.1 or later). When `Lockable` is
+	// `false`, this must also be `false`.
+	Hideable *bool `json:"Hideable,omitempty"`
+	// Allow the user to lock the app behind Face ID or Touch ID (requires iOS 18.1 or later).
+	Lockable *bool `json:"Lockable,omitempty"`
+	// Require screen lock when the app uses Tap to Pay.
+	TapToPayScreenLock *bool `json:"TapToPayScreenLock,omitempty"`
 }
 
 // ManagedAppComponent Blueprint component that installs and manages volume purchasing apps on managed devices.
 type ManagedAppComponent struct {
+	// Configuration for one or more volume purchasing apps.
+	// ### Example — single required app.
+	// ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId":
+	// "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required",
+	// "AutomaticAppUpdates": "AlwaysOn" } ] } ```.
+	// ### Example — app with attributes (iOS 18.1+).
+	// ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId":
+	// "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required",
+	// "AllowDownloadsOverCellular": "AlwaysOff", "AutomaticAppUpdates": "AlwaysOn", "IncludeInBackup":
+	// true, "Attributes": { "Hideable": true, "Lockable": true, "AssociatedDomains": ["corp.example.com"],
+	// "AssociatedDomainsEnableDirectDownloads": false } } ] } ```.
+	// ### Example — multiple apps in one component.
+	// ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId":
+	// "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required" }, {
+	// "AssetId": "12345678-0000-0000-0000-000000000001", "AppAndBookTokenId":
+	// "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Word", "Install": "Optional",
+	// "AutomaticAppUpdates": "StoreSettings" } ] } ```.
 	Configuration ManagedAppConfiguration `json:"configuration"`
-	Identifier    string                  `json:"identifier"`
+	// ## Using volume purchasing apps as blueprint components.
+	// The `com.jamf.ddm.app-managed` component installs and manages Apple volume purchasing apps on
+	// devices. Each component contains one or more app configurations in the `apps` array.
+	// ### Prerequisites.
+	// Apps must be available in your Jamf organization's volume purchasing token. The `AssetId` and
+	// `AppAndBookTokenId` values come from your volume purchasing integration in Jamf — use the [List
+	// available blueprint components](../listComponents) endpoint (`GET /v1/blueprint-components`) to
+	// discover apps available to your organization and retrieve their identifiers.
+	// ### Required fields per app.
+	// | Field | Type | Description | |---|---|---| | `AssetId` | string | volume purchasing asset
+	// identifier for the app | | `AppAndBookTokenId` | string | Identifier of the volume purchasing token
+	// that licenses the app | | `AppId` | string | App bundle identifier (e.g., `com.microsoft.Excel`) |.
+	// ### Optional management fields.
+	// | Field | Type | Values | Description | |---|---|---|---| | `Install` | string | `Required`,
+	// `Optional` | Whether the app must be installed. Defaults to `Required`. | |
+	// `AllowDownloadsOverCellular` | string | `AlwaysOn`, `AlwaysOff`, `StoreSettings` | Controls cellular
+	// downloads. Defaults to `StoreSettings`. | | `AutomaticAppUpdates` | string | `AlwaysOn`,
+	// `AlwaysOff`, `StoreSettings` | Controls automatic updates. Defaults to `StoreSettings`. | |
+	// `IncludeInBackup` | boolean | `true`, `false` | Whether app data is included in device backups. | |
+	// `Attributes` | object | — | Fine-grained app behavior settings. See `Attributes` fields below. |.
+	// ### `Attributes` fields (all optional).
+	// | Field | Type | Description | |---|---|---| | `Hideable` | boolean | Allow the user to hide the app
+	// (requires iOS 18.1 or later). When `Lockable` is `false`, `Hideable` must also be `false`. | |
+	// `Lockable` | boolean | Allow the user to lock the app behind Face ID / Touch ID (requires iOS 18.1
+	// or later). | | `TapToPayScreenLock` | boolean | Require screen lock when Tap to Pay is used. | |
+	// `AssociatedDomains` | array of strings | Associated domains for the app (e.g., `["example.com"]`). |
+	// | `AssociatedDomainsEnableDirectDownloads` | boolean | Enable direct downloads for the associated
+	// domains. | | `CellularSliceUUID` | string (UUID) | Network slicing UUID for the app's cellular
+	// connection. | | `DNSProxyUUID` | string (UUID) | UUID of the DNS proxy configuration to apply to the
+	// app. |.
+	// > **Validation rule:** When `Lockable` is `false`, `Hideable` is required and must also be `false`.
+	Identifier string `json:"identifier"`
 }
 
 // ManagedAppConfiguration Configuration for one or more volume purchasing apps. ### Example — single required app ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required", "AutomaticAppUpdates": "AlwaysOn" } ] } ``` ### Example — app with attributes (iOS 18.1+) ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required", "AllowDownloadsOverCellular": "AlwaysOff", "AutomaticAppUpdates": "AlwaysOn", "IncludeInBackup": true, "Attributes": { "Hideable": true, "Lockable": true, "AssociatedDomains": ["corp.example.com"], "AssociatedDomainsEnableDirectDownloads": false } } ] } ``` ### Example — multiple apps in one component ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required" }, { "AssetId": "12345678-0000-0000-0000-000000000001", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Word", "Install": "Optional", "AutomaticAppUpdates": "StoreSettings" } ] } ```.
 type ManagedAppConfiguration struct {
+	// One or more volume purchasing app configurations to include in this component.
 	Apps []ManagedAppEntry `json:"apps"`
 }
 
 // ManagedAppEntry Configuration for a single volume purchasing app.
 type ManagedAppEntry struct {
-	AllowDownloadsOverCellular *string               `json:"AllowDownloadsOverCellular,omitempty"`
-	AppAndBookTokenID          string                `json:"AppAndBookTokenId"`
-	AppID                      string                `json:"AppId"`
-	AssetID                    string                `json:"AssetId"`
-	Attributes                 *ManagedAppAttributes `json:"Attributes,omitempty"`
-	AutomaticAppUpdates        *string               `json:"AutomaticAppUpdates,omitempty"`
-	IncludeInBackup            *bool                 `json:"IncludeInBackup,omitempty"`
-	Install                    *string               `json:"Install,omitempty"`
+	// Controls whether the app can be downloaded over a cellular connection.
+	AllowDownloadsOverCellular *string `json:"AllowDownloadsOverCellular,omitempty"`
+	// Identifier of the volume purchasing token that licenses this app.
+	AppAndBookTokenID string `json:"AppAndBookTokenId"`
+	// App bundle identifier.
+	AppID string `json:"AppId"`
+	// volume purchasing asset identifier for the app.
+	AssetID string `json:"AssetId"`
+	// Fine-grained app behavior settings. All fields are optional.
+	// **iOS 18.1+ note:** `Hideable` and `Lockable` require iOS 18.1 or later. When `Lockable` is `false`,
+	// `Hideable` is required and must also be `false`.
+	Attributes *ManagedAppAttributes `json:"Attributes,omitempty"`
+	// Controls whether the app updates automatically.
+	AutomaticAppUpdates *string `json:"AutomaticAppUpdates,omitempty"`
+	// Whether the app's data is included in device backups.
+	IncludeInBackup *bool `json:"IncludeInBackup,omitempty"`
+	// Whether the app must be installed on devices in scope.
+	Install *string `json:"Install,omitempty"`
 }
 
 // ManagedExtension represents a managed extension.
 type ManagedExtension struct {
-	AllowedDomains  *[]ManagedExtensionDomain `json:"AllowedDomains,omitempty"`
-	DeniedDomains   *[]ManagedExtensionDomain `json:"DeniedDomains,omitempty"`
-	PrivateBrowsing *string                   `json:"PrivateBrowsing,omitempty"`
-	State           *string                   `json:"State,omitempty"`
+	// Allowed domains.
+	AllowedDomains *[]ManagedExtensionDomain `json:"AllowedDomains,omitempty"`
+	// Denied domains.
+	DeniedDomains *[]ManagedExtensionDomain `json:"DeniedDomains,omitempty"`
+	// Private Browsing state.
+	PrivateBrowsing *string `json:"PrivateBrowsing,omitempty"`
+	// Extension state.
+	State *string `json:"State,omitempty"`
 }
 
 // ManagedExtensionDomain represents a managed extension domain.
 type ManagedExtensionDomain struct {
+	// Domain.
 	Domain string `json:"Domain"`
 }
 
 // MathNotesMode represents a math notes mode.
 type MathNotesMode struct {
+	// Controls whether the mode is enabled.
 	Enabled bool `json:"Enabled"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 }
 
 // MathSettingsComponent represents a math settings component.
 type MathSettingsComponent struct {
+	// Math settings configuration.
+	// Configures Calculator app modes and system-wide math behavior including keyboard suggestions and
+	// Math Notes.
 	Configuration MathSettingsConfiguration `json:"configuration"`
 	Identifier    string                    `json:"identifier"`
 }
@@ -437,63 +732,82 @@ type MathSettingsConfiguration struct {
 
 // MaximumFailedAttempts represents a maximum failed attempts.
 type MaximumFailedAttempts struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *int  `json:"Value,omitempty"`
+	// Maximum failed attempts.
+	Value *int `json:"Value,omitempty"`
 }
 
 // MaximumGracePeriodInMinutes represents a maximum grace period in minutes.
 type MaximumGracePeriodInMinutes struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *int  `json:"Value,omitempty"`
+	// Maximum grace period in minutes.
+	Value *int `json:"Value,omitempty"`
 }
 
 // MaximumInactivityInMinutes represents a maximum inactivity in minutes.
 type MaximumInactivityInMinutes struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *int  `json:"Value,omitempty"`
+	// Maximum inactivity in minutes.
+	Value *int `json:"Value,omitempty"`
 }
 
 // MaximumPasscodeAgeInDays represents a maximum passcode age in days.
 type MaximumPasscodeAgeInDays struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *int  `json:"Value,omitempty"`
+	// Maximum passcode age in days.
+	Value *int `json:"Value,omitempty"`
 }
 
 // Meta Meta object containing additional information about component.
 type Meta struct {
+	// Supported version of OS families.
 	SupportedOs map[string][]SupportedOs `json:"supportedOs"`
 }
 
 // MinimumComplexCharacters represents a minimum complex characters.
 type MinimumComplexCharacters struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *int  `json:"Value,omitempty"`
+	// Minimum complex characters.
+	Value *int `json:"Value,omitempty"`
 }
 
 // MinimumLength represents a minimum length.
 type MinimumLength struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *int  `json:"Value,omitempty"`
+	// Minimum length.
+	Value *int `json:"Value,omitempty"`
 }
 
 // NewTabStartPage represents a new tab start page.
 type NewTabStartPage struct {
+	// The composed identifier of the extension that provides the start page.
 	ExtensionIdentifier *string `json:"ExtensionIdentifier,omitempty"`
-	HomepageURL         *string `json:"HomepageURL,omitempty"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Included *bool   `json:"Included,omitempty"`
+	// The URL of the homepage which needs to start with https:// or http://.
+	HomepageURL *string `json:"HomepageURL,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	// Sets the start page type in Safari.
 	PageType *string `json:"PageType,omitempty"`
 }
 
 // OptionalPeriodInDays represents a optional period in days.
 type OptionalPeriodInDays struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 	Value    *int  `json:"Value,omitempty"`
 }
@@ -501,31 +815,41 @@ type OptionalPeriodInDays struct {
 // OptionallyEnabled represents a optionally enabled.
 type OptionallyEnabled struct {
 	Enabled bool `json:"Enabled"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 }
 
 // PagedResponseBlueprintOverview represents a paged response blueprint overview.
 type PagedResponseBlueprintOverview struct {
-	Results    []BlueprintOverview `json:"results"`
-	TotalCount int64               `json:"totalCount"`
+	// Array of result items.
+	Results []BlueprintOverview `json:"results"`
+	// Total number of items matching the filter.
+	TotalCount int64 `json:"totalCount"`
 }
 
 // PagedResponseComponentDescription represents a paged response component description.
 type PagedResponseComponentDescription struct {
-	Results    []ComponentDescription `json:"results"`
-	TotalCount int64                  `json:"totalCount"`
+	// Array of result items.
+	Results []ComponentDescription `json:"results"`
+	// Total number of items matching the filter.
+	TotalCount int64 `json:"totalCount"`
 }
 
 // PasscodeReuseLimit represents a passcode reuse limit.
 type PasscodeReuseLimit struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *int  `json:"Value,omitempty"`
+	// Passcode reuse limit.
+	Value *int `json:"Value,omitempty"`
 }
 
 // PasscodeSettingsComponent represents a passcode settings component.
 type PasscodeSettingsComponent struct {
+	// Passcode settings configuration.
+	// Configures device passcode requirements including complexity, length, and expiration.
 	Configuration PasscodeSettingsConfiguration `json:"configuration"`
 	Identifier    string                        `json:"identifier"`
 }
@@ -545,13 +869,17 @@ type PasscodeSettingsConfiguration struct {
 	RequireAlphanumericPasscode  *RequireAlphanumericPasscode  `json:"RequireAlphanumericPasscode,omitempty"`
 	RequireComplexPasscode       *RequireComplexPasscode       `json:"RequireComplexPasscode,omitempty"`
 	RequirePasscode              *RequirePasscode              `json:"RequirePasscode,omitempty"`
-	Version                      int                           `json:"version"`
+	// Configuration version.
+	Version int `json:"version"`
 }
 
 // ProgrammerMode represents a programmer mode.
 type ProgrammerMode struct {
+	// Controls whether the mode is enabled.
 	Enabled bool `json:"Enabled"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 }
 
@@ -563,51 +891,66 @@ type RapidSecurityResponse struct {
 
 // RecommendedCadence represents a recommended cadence.
 type RecommendedCadence struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool  `json:"Included,omitempty"`
 	Value    string `json:"Value"`
 }
 
 // RequireAlphanumericPasscode represents a require alphanumeric passcode.
 type RequireAlphanumericPasscode struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// Require alphanumeric passcode.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // RequireComplexPasscode represents a require complex passcode.
 type RequireComplexPasscode struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// Require complex passcode.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // RequirePasscode represents a require passcode.
 type RequirePasscode struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
-	Value    *bool `json:"Value,omitempty"`
+	// Require passcode.
+	Value *bool `json:"Value,omitempty"`
 }
 
 // Restrictions Storage restrictions configuration.
 type Restrictions struct {
+	// Storage access mode configuration.
 	ExternalStorage *StorageMode `json:"ExternalStorage,omitempty"`
-	NetworkStorage  *StorageMode `json:"NetworkStorage,omitempty"`
+	// Storage access mode configuration.
+	NetworkStorage *StorageMode `json:"NetworkStorage,omitempty"`
 }
 
 // SafariBookmarksComponent represents a safari bookmarks component.
 type SafariBookmarksComponent struct {
+	// Safari bookmarks configuration.
+	// Defines managed bookmark groups and folders that appear in Safari across managed devices.
 	Configuration SafariBookmarksConfiguration `json:"configuration"`
 	Identifier    string                       `json:"identifier"`
 }
 
 // SafariBookmarksConfiguration Safari bookmarks configuration. Defines managed bookmark groups and folders that appear in Safari across managed devices.
 type SafariBookmarksConfiguration struct {
+	// A dictionary that specifies a set of managed bookmarks.
 	ManagedBookmarks []BookmarkGroup `json:"ManagedBookmarks"`
 }
 
 // SafariExtensionsComponent represents a safari extensions component.
 type SafariExtensionsComponent struct {
+	// Safari extensions configuration.
+	// Manages Safari browser extensions including allowed/denied domains and private browsing settings.
 	Configuration SafariExtensionsConfiguration `json:"configuration"`
 	Identifier    string                        `json:"identifier"`
 }
@@ -619,6 +962,9 @@ type SafariExtensionsConfiguration struct {
 
 // SafariSettingsComponent represents a safari settings component.
 type SafariSettingsComponent struct {
+	// Safari settings configuration.
+	// Configures Safari browser behavior including cookies, JavaScript, popups, private browsing, and
+	// start page settings.
 	Configuration SafariSettingsConfiguration `json:"configuration"`
 	Identifier    string                      `json:"identifier"`
 }
@@ -637,13 +983,19 @@ type SafariSettingsConfiguration struct {
 
 // ScientificMode represents a scientific mode.
 type ScientificMode struct {
+	// Controls whether the mode is enabled.
 	Enabled bool `json:"Enabled"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 }
 
 // SoftwareUpdateSettingsComponent represents a software update settings component.
 type SoftwareUpdateSettingsComponent struct {
+	// Software update settings configuration.
+	// Configures OS update behavior including notifications, automatic actions, deferrals, and rapid
+	// security responses.
 	Configuration SoftwareUpdateSettingsConfiguration `json:"configuration"`
 	Identifier    string                              `json:"identifier"`
 }
@@ -661,13 +1013,17 @@ type SoftwareUpdateSettingsConfiguration struct {
 
 // StorageMode Storage access mode configuration.
 type StorageMode struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Included *bool  `json:"Included,omitempty"`
-	Value    string `json:"Value"`
+	// Controls whether this setting should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	// Controls whether the mode is enabled.
+	Value string `json:"Value"`
 }
 
 // SupportedOs Supported version of OS families.
 type SupportedOs struct {
+	// Version of the OS family.
 	Version string `json:"version"`
 }
 
@@ -714,89 +1070,121 @@ func (m SwUpdateAutomaticConfiguration) MarshalJSON() ([]byte, error) {
 
 // SwUpdateComponent represents a sw update component.
 type SwUpdateComponent struct {
+	// Software update enforcement configuration.
+	// Configures OS update enforcement using either manual (specific version by date) or automatic
+	// strategies.
 	Configuration SwUpdateConfiguration `json:"configuration"`
 	Identifier    string                `json:"identifier"`
 }
 
 // SwUpdateConfiguration Software update enforcement configuration. Configures OS update enforcement using either manual (specific version by date) or automatic strategies.
 type SwUpdateConfiguration struct {
+	// Type of software update enforcement strategy.
 	EnforcementType *string `json:"enforcementType,omitempty"`
 }
 
 // SwUpdateLatestConfiguration Automatic software update with LATEST strategy. Enforces the newest available OS version a specified number of days after release.
 type SwUpdateLatestConfiguration struct {
-	DeploymentTime   string      `json:"deploymentTime"`
-	DetailsURL       *DetailsURL `json:"detailsURL,omitempty"`
-	EnforceAfterDays int         `json:"enforceAfterDays"`
-	EnforcementType  string      `json:"enforcementType"`
-	Strategy         string      `json:"strategy"`
+	// The device local time (HH:MM) when the update should be installed.
+	DeploymentTime string `json:"deploymentTime"`
+	// Optional URL with details about the enforced update.
+	DetailsURL *DetailsURL `json:"detailsURL,omitempty"`
+	// The number of days after the OS update release.
+	EnforceAfterDays int    `json:"enforceAfterDays"`
+	EnforcementType  string `json:"enforcementType"`
+	Strategy         string `json:"strategy"`
 }
 
 // SwUpdateManualConfiguration Manual software update enforcement configuration. Enforces a specific OS version by a specific date/time.
 type SwUpdateManualConfiguration struct {
-	DetailsURL          *DetailsURL `json:"detailsURL,omitempty"`
-	EnforcementType     string      `json:"enforcementType"`
-	TargetLocalDateTime time.Time   `json:"targetLocalDateTime"`
-	TargetOSVersion     string      `json:"targetOSVersion"`
+	// Optional URL with details about the enforced update.
+	DetailsURL      *DetailsURL `json:"detailsURL,omitempty"`
+	EnforcementType string      `json:"enforcementType"`
+	// Local time of the device until which update must be performed.
+	TargetLocalDateTime time.Time `json:"targetLocalDateTime"`
+	// Target OS version in semantic versioning format.
+	TargetOSVersion string `json:"targetOSVersion"`
 }
 
 // SwUpdateSemanticConfiguration Automatic software update with SEMANTIC strategy. Applies semantic versioning rules to determine update enforcement timing.
 type SwUpdateSemanticConfiguration struct {
+	// Optional URL with details about the enforced update.
 	DetailsURL      *DetailsURL `json:"detailsURL,omitempty"`
 	EnforcementType string      `json:"enforcementType"`
-	Rules           UpdateRules `json:"rules"`
-	Strategy        string      `json:"strategy"`
+	// Rules for semantic update strategy.
+	Rules    UpdateRules `json:"rules"`
+	Strategy string      `json:"strategy"`
 }
 
 // SystemBehavior represents a system behavior.
 type SystemBehavior struct {
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
-	Included            *bool `json:"Included,omitempty"`
-	KeyboardSuggestions bool  `json:"KeyboardSuggestions"`
-	MathNotes           bool  `json:"MathNotes"`
+	// Controls whether this control should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Included *bool `json:"Included,omitempty"`
+	// Controls whether keyboard suggestions include math solutions.
+	KeyboardSuggestions bool `json:"KeyboardSuggestions"`
+	// Controls whether Math Notes is allowed in other apps such as Notes.
+	MathNotes bool `json:"MathNotes"`
 }
 
 // TemporaryPairing Temporary pairing configuration.
 type TemporaryPairing struct {
+	// Temporary pairing configuration details.
 	Configuration *TemporaryPairingConfig `json:"Configuration,omitempty"`
-	Disabled      *bool                   `json:"Disabled,omitempty"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.
+	// If true, temporary pairing of audio accessories is disabled.
+	Disabled *bool `json:"Disabled,omitempty"`
+	// Controls whether this setting should be used.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 }
 
 // TemporaryPairingConfig Temporary pairing configuration details.
 type TemporaryPairingConfig struct {
+	// Automatic unpairing time configuration.
 	UnpairingTime UnpairingTime `json:"UnpairingTime"`
 }
 
 // UnpairingTime Automatic unpairing time configuration.
 type UnpairingTime struct {
-	Hour   *int   `json:"Hour,omitempty"`
+	// Local time hour (24-hour clock) for automatic unpairing. Required when Policy is "Hour".
+	Hour *int `json:"Hour,omitempty"`
+	// A string that specifies the device's unpairing policy.
 	Policy string `json:"Policy"`
 }
 
 // UpdateBlueprintRequest represents a update blueprint request.
 type UpdateBlueprintRequest struct {
-	Description *string          `json:"description,omitempty"`
-	Name        *string          `json:"name,omitempty"`
-	Scope       *BlueprintScope  `json:"scope,omitempty"`
-	Steps       *[]BlueprintStep `json:"steps,omitempty"`
+	// Description of the blueprint.
+	Description *string `json:"description,omitempty"`
+	// Name of the blueprint.
+	Name *string `json:"name,omitempty"`
+	// Device groups.
+	Scope *BlueprintScope `json:"scope,omitempty"`
+	// Array of blueprint steps.
+	Steps *[]BlueprintStep `json:"steps,omitempty"`
 }
 
 // UpdateRule Configuration for a specific update type.
 type UpdateRule struct {
-	DeploymentTime   string `json:"deploymentTime"`
-	EnforceAfterDays int    `json:"enforceAfterDays"`
+	// The device local time (HH:MM) when the update should be installed.
+	DeploymentTime string `json:"deploymentTime"`
+	// The number of days after the OS update release.
+	EnforceAfterDays int `json:"enforceAfterDays"`
 }
 
 // UpdateRules Rules for semantic update strategy.
 type UpdateRules struct {
+	// Configuration for a specific update type.
 	Minor UpdateRule `json:"minor"`
 }
 
 // URLBookmarkItem represents a u r l bookmark item.
 type URLBookmarkItem struct {
+	// The title of the bookmark shown in Safari.
 	Title string `json:"Title"`
 	Type  string `json:"Type"`
-	URL   string `json:"URL"`
+	// The URL for the bookmark item.
+	URL string `json:"URL"`
 }

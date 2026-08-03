@@ -9,130 +9,207 @@ import "time"
 
 // ApiErrorRepresentation represents a api error representation.
 type ApiErrorRepresentation struct {
-	Errors     []ApiErrorRepresentationErrorsItem `json:"errors"`
-	HttpStatus int                                `json:"httpStatus"`
-	TraceID    string                             `json:"traceId"`
+	Errors []ApiErrorRepresentationErrorsItem `json:"errors"`
+	// HTTP status of the response.
+	HttpStatus int    `json:"httpStatus"`
+	TraceID    string `json:"traceId"`
 }
 
 // ApiErrorRepresentationErrorsItem represents a api error representation errors item.
 type ApiErrorRepresentationErrorsItem struct {
-	Code        string `json:"code"`
+	// Error-specific code that can be used to identify localization string, etc.
+	Code string `json:"code"`
+	// A general description of error for troubleshooting/debugging. Generally this text should not be
+	// displayed to a user; instead refer to errorCode and its localized text.
 	Description string `json:"description"`
-	Field       string `json:"field"`
-	ID          string `json:"id"`
+	// Name of the field that caused the error.
+	Field string `json:"field"`
+	// id of object with error. Optional.
+	ID string `json:"id"`
 }
 
 // DeviceHardwareReadRepresentationV1 represents a device hardware read representation v1.
 type DeviceHardwareReadRepresentationV1 struct {
-	BatteryHealth   string `json:"batteryHealth"`
-	MacAddress      string `json:"macAddress"`
-	Make            string `json:"make"`
-	Model           string `json:"model"`
+	// Battery health status of the device.
+	BatteryHealth string `json:"batteryHealth"`
+	// MAC address of the device.
+	MacAddress string `json:"macAddress"`
+	// Make of the device.
+	Make string `json:"make"`
+	// Model of the device.
+	Model string `json:"model"`
+	// Unique identifier of the device model.
 	ModelIdentifier string `json:"modelIdentifier"`
-	SerialNumber    string `json:"serialNumber"`
-	StorageCapacity int    `json:"storageCapacity"`
-	StorageUsed     int    `json:"storageUsed"`
-	UDID            string `json:"udid"`
+	// Serial number of the device.
+	SerialNumber string `json:"serialNumber"`
+	// Total storage capacity of the device, in megabytes.
+	StorageCapacity int `json:"storageCapacity"`
+	// Used storage space on the device, in megabytes.
+	StorageUsed int `json:"storageUsed"`
+	// Unique device identifier (UDID) of the device.
+	UDID string `json:"udid"`
 }
 
 // DeviceInstalledApplicationReadRepresentationV1 represents a device installed application read representation v1.
 type DeviceInstalledApplicationReadRepresentationV1 struct {
-	Name    string `json:"name"`
+	// The name of the installed application.
+	Name string `json:"name"`
+	// The version of the installed application.
 	Version string `json:"version"`
 }
 
 // DeviceListReadRepresentationV1 represents a device list read representation v1.
 type DeviceListReadRepresentationV1 struct {
-	EnrollmentType          string     `json:"enrollmentType"`
-	ID                      string     `json:"id"`
-	LastCheckInTime         *time.Time `json:"lastCheckInTime,omitempty"`
-	LastEnrollmentTime      *time.Time `json:"lastEnrollmentTime,omitempty"`
+	// The type of enrollment of a device.
+	EnrollmentType string `json:"enrollmentType"`
+	// The ID of the device, in UUID format.
+	ID string `json:"id"`
+	// The last time the device checked in, in ISO 8601 format, or `null` if the device is not a computer.
+	LastCheckInTime *time.Time `json:"lastCheckInTime,omitempty"`
+	// The last time the device was enrolled, in ISO 8601 format.
+	LastEnrollmentTime *time.Time `json:"lastEnrollmentTime,omitempty"`
+	// The last time the device inventory was updated, in ISO 8601 format.
 	LastInventoryUpdateTime *time.Time `json:"lastInventoryUpdateTime,omitempty"`
-	Model                   string     `json:"model"`
-	ModelIdentifier         string     `json:"modelIdentifier"`
-	Name                    string     `json:"name"`
-	OperatingSystemVersion  string     `json:"operatingSystemVersion"`
-	SerialNumber            string     `json:"serialNumber"`
-	UserID                  *string    `json:"userId,omitempty"`
+	// Model of the device.
+	Model string `json:"model"`
+	// Unique identifier of the device model.
+	ModelIdentifier string `json:"modelIdentifier"`
+	// Name of the device.
+	Name string `json:"name"`
+	// The operating system version of the device.
+	OperatingSystemVersion string `json:"operatingSystemVersion"`
+	// Serial number of the device.
+	SerialNumber string `json:"serialNumber"`
+	// The ID of the user associated with the device, in UUID format, if assigned; otherwise, null.
+	UserID *string `json:"userId,omitempty"`
 }
 
 // DeviceNetworkReadRepresentationV1 represents a device network read representation v1.
 type DeviceNetworkReadRepresentationV1 struct {
-	LastIPAddress           *string `json:"lastIpAddress,omitempty"`
+	// The last observed IP address of the device, in either IPv4 or IPv6 format.
+	LastIPAddress *string `json:"lastIpAddress,omitempty"`
+	// The last reported IPv4 address of the device, or null if not available or applicable.
 	LastReportedIPV4Address *string `json:"lastReportedIpV4Address,omitempty"`
+	// The last reported IPv6 address of the device, or null if not available or applicable.
 	LastReportedIPV6Address *string `json:"lastReportedIpV6Address,omitempty"`
 }
 
 // DeviceOperatingSystemReadRepresentationV1 represents a device operating system read representation v1.
 type DeviceOperatingSystemReadRepresentationV1 struct {
-	Build                    string  `json:"build"`
-	Name                     string  `json:"name"`
-	RapidSecurityResponse    *string `json:"rapidSecurityResponse,omitempty"`
+	// Build number of the operating system.
+	Build string `json:"build"`
+	// Name of the operating system.
+	Name string `json:"name"`
+	// Rapid security response version of the operating system, if applicable.
+	RapidSecurityResponse *string `json:"rapidSecurityResponse,omitempty"`
+	// Supplemental build version of the operating system, if applicable.
 	SupplementalBuildVersion *string `json:"supplementalBuildVersion,omitempty"`
-	Version                  string  `json:"version"`
+	// Version of the operating system.
+	Version string `json:"version"`
 }
 
 // DeviceReadRepresentationV1 represents a device read representation v1.
 type DeviceReadRepresentationV1 struct {
-	EnrollmentType          string                                     `json:"enrollmentType"`
-	Hardware                *DeviceHardwareReadRepresentationV1        `json:"hardware,omitempty"`
-	ID                      string                                     `json:"id"`
-	LastCheckInTime         *time.Time                                 `json:"lastCheckInTime,omitempty"`
-	LastEnrollmentTime      *time.Time                                 `json:"lastEnrollmentTime,omitempty"`
-	LastInventoryUpdateTime *time.Time                                 `json:"lastInventoryUpdateTime,omitempty"`
-	Managed                 bool                                       `json:"managed"`
-	MDMCapable              bool                                       `json:"mdmCapable"`
-	Name                    string                                     `json:"name"`
-	Network                 *DeviceNetworkReadRepresentationV1         `json:"network,omitempty"`
-	OperatingSystem         *DeviceOperatingSystemReadRepresentationV1 `json:"operatingSystem,omitempty"`
-	Security                *DeviceSecurityReadRepresentationV1        `json:"security,omitempty"`
-	Supervised              bool                                       `json:"supervised"`
-	UserID                  *string                                    `json:"userId,omitempty"`
+	// The type of enrollment of a device.
+	EnrollmentType string                              `json:"enrollmentType"`
+	Hardware       *DeviceHardwareReadRepresentationV1 `json:"hardware,omitempty"`
+	// The ID of the device, in UUID format.
+	ID string `json:"id"`
+	// The last time the device checked in, in ISO 8601 format, or `null` if the device is not a computer.
+	LastCheckInTime *time.Time `json:"lastCheckInTime,omitempty"`
+	// The last time the device was enrolled, in ISO 8601 format.
+	LastEnrollmentTime *time.Time `json:"lastEnrollmentTime,omitempty"`
+	// The last time the device inventory was updated, in ISO 8601 format.
+	LastInventoryUpdateTime *time.Time `json:"lastInventoryUpdateTime,omitempty"`
+	// Whether the device is managed.
+	Managed bool `json:"managed"`
+	// Whether the device is capable of communicating via MDM.
+	// Note: This field will be `false` for Jamf Pro versions prior to 11.27.0, regardless of the MDM
+	// capability of the device.
+	MDMCapable bool `json:"mdmCapable"`
+	// Name of the device.
+	Name            string                                     `json:"name"`
+	Network         *DeviceNetworkReadRepresentationV1         `json:"network,omitempty"`
+	OperatingSystem *DeviceOperatingSystemReadRepresentationV1 `json:"operatingSystem,omitempty"`
+	Security        *DeviceSecurityReadRepresentationV1        `json:"security,omitempty"`
+	// Whether the device is supervised.
+	Supervised bool `json:"supervised"`
+	// The ID of the user associated with the device, in UUID format, if assigned; otherwise, null.
+	UserID *string `json:"userId,omitempty"`
 }
 
 // DeviceSecurityReadRepresentationV1 represents a device security read representation v1.
 type DeviceSecurityReadRepresentationV1 struct {
+	// The status of the bootstrap token for the device.
 	BootstrapTokenEscrowedStatus string `json:"bootstrapTokenEscrowedStatus"`
-	HardwareEncryption           *bool  `json:"hardwareEncryption,omitempty"`
-	LostModeEnabled              *bool  `json:"lostModeEnabled,omitempty"`
-	PasscodeCompliant            *bool  `json:"passcodeCompliant,omitempty"`
-	PasscodePresent              *bool  `json:"passcodePresent,omitempty"`
+	// Whether hardware encryption is enabled on the device, or null if the device is a computer.
+	HardwareEncryption *bool `json:"hardwareEncryption,omitempty"`
+	// Whether Lost Mode is enabled on the device, or null if the device is a computer.
+	LostModeEnabled *bool `json:"lostModeEnabled,omitempty"`
+	// Whether the passcode on the device is compliant with the passcode policy, or null if the device is a
+	// computer.
+	PasscodeCompliant *bool `json:"passcodeCompliant,omitempty"`
+	// Whether a passcode is present on the device, or null if the device is a computer.
+	PasscodePresent *bool `json:"passcodePresent,omitempty"`
 }
 
 // DeviceUpdateRepresentationV1 represents a device update representation v1.
 type DeviceUpdateRepresentationV1 struct {
-	Name   *string `json:"name,omitempty"`
+	// Name of the device. If provided, must not be empty.
+	Name *string `json:"name,omitempty"`
+	// The ID of the user to associate with the device, in UUID format. Set to null to unassign the device
+	// from any user. Defaults to empty string (no change to current assignment).
 	UserID *string `json:"userId,omitempty"`
 }
 
 // PaginatedDeviceInstalledApplicationReadRepresentationV1 represents a paginated device installed application read representation v1.
 type PaginatedDeviceInstalledApplicationReadRepresentationV1 struct {
-	HasNext     bool                                             `json:"hasNext"`
-	HasPrevious bool                                             `json:"hasPrevious"`
-	Page        int                                              `json:"page"`
-	PageSize    int                                              `json:"pageSize"`
-	Results     []DeviceInstalledApplicationReadRepresentationV1 `json:"results"`
-	TotalCount  int                                              `json:"totalCount"`
-	TotalPages  int                                              `json:"totalPages"`
+	// Whether there is a next page.
+	HasNext bool `json:"hasNext"`
+	// Whether there is a previous page.
+	HasPrevious bool `json:"hasPrevious"`
+	// Current page number (0-based).
+	Page int `json:"page"`
+	// Number of items per page.
+	PageSize int `json:"pageSize"`
+	// List of installed applications for the specified device and page.
+	Results []DeviceInstalledApplicationReadRepresentationV1 `json:"results"`
+	// Total number of results across all pages.
+	TotalCount int `json:"totalCount"`
+	// Total number of pages.
+	TotalPages int `json:"totalPages"`
 }
 
 // PaginatedDeviceResponseRepresentation represents a paginated device response representation.
 type PaginatedDeviceResponseRepresentation struct {
-	HasNext     bool                             `json:"hasNext"`
-	HasPrevious bool                             `json:"hasPrevious"`
-	Page        int                              `json:"page"`
-	PageSize    int                              `json:"pageSize"`
-	Results     []DeviceListReadRepresentationV1 `json:"results"`
-	TotalCount  int                              `json:"totalCount"`
-	TotalPages  int                              `json:"totalPages"`
+	// Whether there is a next page.
+	HasNext bool `json:"hasNext"`
+	// Whether there is a previous page.
+	HasPrevious bool `json:"hasPrevious"`
+	// Current page number (0-based).
+	Page int `json:"page"`
+	// Number of items per page.
+	PageSize int `json:"pageSize"`
+	// List of devices for the specified page.
+	Results []DeviceListReadRepresentationV1 `json:"results"`
+	// Total number of results across all pages.
+	TotalCount int `json:"totalCount"`
+	// Total number of pages.
+	TotalPages int `json:"totalPages"`
 }
 
 // PaginatedResponseRepresentation represents a paginated response representation.
 type PaginatedResponseRepresentation struct {
-	HasNext     bool `json:"hasNext"`
+	// Whether there is a next page.
+	HasNext bool `json:"hasNext"`
+	// Whether there is a previous page.
 	HasPrevious bool `json:"hasPrevious"`
-	Page        int  `json:"page"`
-	PageSize    int  `json:"pageSize"`
-	TotalCount  int  `json:"totalCount"`
-	TotalPages  int  `json:"totalPages"`
+	// Current page number (0-based).
+	Page int `json:"page"`
+	// Number of items per page.
+	PageSize int `json:"pageSize"`
+	// Total number of results across all pages.
+	TotalCount int `json:"totalCount"`
+	// Total number of pages.
+	TotalPages int `json:"totalPages"`
 }

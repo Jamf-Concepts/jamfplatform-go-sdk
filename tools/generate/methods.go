@@ -713,10 +713,6 @@ func privilegeComment(m GoMethod) string {
 // already exceed 100 columns — so this stays the narrowest prose we emit.
 const parameterDocWidth = 100
 
-// descriptionParagraphRe splits spec prose on blank lines so each paragraph
-// is wrapped as its own run of godoc lines.
-var descriptionParagraphRe = regexp.MustCompile(`\n[ \t]*\n`)
-
 // defaultMethodComment is the leading godoc sentence used when the spec gives
 // an operation no summary but the generator still has metadata to append.
 // The undocumented-spec wording matches the pass in extractMethods so the two
@@ -807,17 +803,7 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 // value enums out of every call site's doc comment while still naming them
 // somewhere the compiler checks.
 func parameterDocLines(p *openapi3.Parameter, enumTypes map[string]bool) []string {
-	var out []string
-	// Paragraphs are wrapped separately. Collapsing the whole description in
-	// one pass fuses the last sentence of one paragraph into the first of the
-	// next — Jamf ends several of these field lists on a bare identifier with
-	// no terminating period, so the joint reads as one broken sentence.
-	for _, para := range descriptionParagraphRe.Split(stripSpecHTML(p.Description), -1) {
-		if strings.TrimSpace(para) == "" {
-			continue
-		}
-		out = append(out, wrapCommentText(cleanComment(para), parameterDocWidth)...)
-	}
+	out := docParagraphs(p.Description, parameterDocWidth)
 	if t := enumRefTypeName(p.Schema); t != "" && enumTypes[t] {
 		out = append(out, wrapCommentText("Allowed values: see the "+t+" constants.", parameterDocWidth)...)
 		return out

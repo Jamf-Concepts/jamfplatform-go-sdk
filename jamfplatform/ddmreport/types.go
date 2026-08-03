@@ -9,105 +9,158 @@ import "time"
 
 // ApiErrorDto represents a api error dto.
 type ApiErrorDto struct {
-	Errors     []ErrorDto `json:"errors"`
-	HttpStatus int        `json:"httpStatus"`
-	TraceID    string     `json:"traceId"`
+	Errors []ErrorDto `json:"errors"`
+	// HTTP status of the response.
+	HttpStatus int `json:"httpStatus"`
+	// Trace ID.
+	TraceID string `json:"traceId"`
 }
 
 // DeclarationReportClientDto represents a declaration report client dto.
 type DeclarationReportClientDto struct {
-	Active        bool                               `json:"active"`
-	Channel       string                             `json:"channel"`
-	DateUpdated   *time.Time                         `json:"dateUpdated,omitempty"`
-	DeviceID      string                             `json:"deviceId"`
-	Reasons       []StatusReportDeclarationReasonDto `json:"reasons"`
-	ServerToken   string                             `json:"serverToken"`
-	ValidityState string                             `json:"validityState"`
+	// The active state of the declaration.
+	Active bool `json:"active"`
+	// The platform channel.
+	Channel string `json:"channel"`
+	// The timestamp when this declaration status was last updated for the device.
+	DateUpdated *time.Time `json:"dateUpdated,omitempty"`
+	// The platform deviceId.
+	DeviceID string `json:"deviceId"`
+	// Reasons associated with the declaration, if any.
+	Reasons []StatusReportDeclarationReasonDto `json:"reasons"`
+	// The server token for the declaration.
+	ServerToken string `json:"serverToken"`
+	// The validity state of the declaration.
+	ValidityState string `json:"validityState"`
 }
 
 // DeclarationReportDto represents a declaration report dto.
 type DeclarationReportDto struct {
-	DeclarationIdentifier string                       `json:"declarationIdentifier"`
-	Results               []DeclarationReportClientDto `json:"results"`
-	TotalCount            int64                        `json:"totalCount"`
+	// The identifier of the declaration.
+	DeclarationIdentifier string `json:"declarationIdentifier"`
+	// The clients reporting the declaration.
+	Results []DeclarationReportClientDto `json:"results"`
+	// The total number of clients reporting the declaration.
+	TotalCount int64 `json:"totalCount"`
 }
 
 // DeviceChannelsDto represents a device channels dto.
 type DeviceChannelsDto struct {
+	// The channels associated with the device.
 	Channels []string `json:"channels"`
-	DeviceID string   `json:"deviceId"`
+	// The platform deviceId.
+	DeviceID string `json:"deviceId"`
 }
 
 // DeviceReportChannelDto represents a device report channel dto.
 type DeviceReportChannelDto struct {
-	Channel        string                       `json:"channel"`
-	Declarations   []StatusReportDeclarationDto `json:"declarations"`
-	LastReportTime time.Time                    `json:"lastReportTime"`
+	// The channel of the client from which the report is sent.
+	Channel string `json:"channel"`
+	// The declarations associated with the channel.
+	Declarations []StatusReportDeclarationDto `json:"declarations"`
+	// The last report received from the channel.
+	LastReportTime time.Time `json:"lastReportTime"`
 }
 
 // DeviceReportDto represents a device report dto.
 type DeviceReportDto struct {
+	// The channels associated with the device.
 	Channels []DeviceReportChannelDto `json:"channels"`
 }
 
 // ErrorDto represents a error dto.
 type ErrorDto struct {
-	Code        string  `json:"code"`
-	Description string  `json:"description"`
-	Field       string  `json:"field"`
-	ID          *string `json:"id"`
+	// Error-specific code that can be used to identify localization string, etc.
+	Code string `json:"code"`
+	// A general description of error for troubleshooting/debugging. Generally this text should not be
+	// displayed to a user; instead refer to errorCode and its localized text.
+	Description string `json:"description"`
+	// Name of the field that caused the error.
+	Field string `json:"field"`
+	// id of object with error.
+	ID *string `json:"id"`
 }
 
 // FilteredDeclarationReportDto represents a filtered declaration report dto.
 type FilteredDeclarationReportDto struct {
-	DeclarationIdentifier string              `json:"declarationIdentifier"`
-	Results               []FilteredResultDto `json:"results"`
-	TotalCount            int64               `json:"totalCount"`
+	// The declaration identifier.
+	DeclarationIdentifier string `json:"declarationIdentifier"`
+	// The devices associated with the declaration that meet the required filters.
+	Results []FilteredResultDto `json:"results"`
+	// The total number of devices reported for the declaration that meet the required filters.
+	TotalCount int64 `json:"totalCount"`
 }
 
 // FilteredDeviceReportDto represents a filtered device report dto.
 type FilteredDeviceReportDto struct {
-	DeviceID   string              `json:"deviceId"`
-	Results    []FilteredResultDto `json:"results"`
-	TotalCount int64               `json:"totalCount"`
+	// The platform deviceId.
+	DeviceID string `json:"deviceId"`
+	// The declarations associated with any channel on the device that meet the required filters.
+	Results []FilteredResultDto `json:"results"`
+	// The total number of declarations reported for the device that meet the required filters.
+	TotalCount int64 `json:"totalCount"`
 }
 
 // FilteredResultDto represents a filtered result dto.
 type FilteredResultDto struct {
-	Active                bool                               `json:"active"`
-	Channel               string                             `json:"channel"`
-	DateUpdated           *time.Time                         `json:"dateUpdated"`
-	DeclarationIdentifier string                             `json:"declarationIdentifier"`
-	DeviceID              string                             `json:"deviceId"`
-	LastReportTime        *time.Time                         `json:"lastReportTime"`
-	Reasons               []StatusReportDeclarationReasonDto `json:"reasons"`
-	ServerToken           string                             `json:"serverToken"`
-	Status                string                             `json:"status"`
-	Type                  string                             `json:"type"`
-	ValidityState         string                             `json:"validityState"`
+	// The active state of the declaration.
+	Active bool `json:"active"`
+	// The channel of the client from which the report is sent.
+	Channel string `json:"channel"`
+	// The timestamp when this declaration status was last updated for the device.
+	DateUpdated *time.Time `json:"dateUpdated"`
+	// The identifier of the declaration.
+	DeclarationIdentifier string `json:"declarationIdentifier"`
+	// The platform deviceId.
+	DeviceID string `json:"deviceId"`
+	// The timestamp of the device's last status report.
+	LastReportTime *time.Time `json:"lastReportTime"`
+	// Reasons associated with the declaration, if any.
+	Reasons []StatusReportDeclarationReasonDto `json:"reasons"`
+	// The server token for the declaration.
+	ServerToken string `json:"serverToken"`
+	// The installation status of the declaration.
+	Status string `json:"status"`
+	// The type of the declaration.
+	Type string `json:"type"`
+	// The validity state of the declaration.
+	ValidityState string `json:"validityState"`
 }
 
 // StatusReportDeclarationDto represents a status report declaration dto.
 type StatusReportDeclarationDto struct {
-	Active                bool                               `json:"active"`
-	DateUpdated           *time.Time                         `json:"dateUpdated"`
-	DeclarationIdentifier string                             `json:"declarationIdentifier"`
-	Reasons               []StatusReportDeclarationReasonDto `json:"reasons"`
-	ServerToken           string                             `json:"serverToken"`
-	Status                string                             `json:"status"`
-	Type                  string                             `json:"type"`
-	ValidityState         string                             `json:"validityState"`
+	// The active state of the declaration.
+	Active bool `json:"active"`
+	// The timestamp when this declaration status was last updated for the device.
+	DateUpdated *time.Time `json:"dateUpdated"`
+	// The identifier of the declaration.
+	DeclarationIdentifier string `json:"declarationIdentifier"`
+	// Reasons associated with the declaration, if any.
+	Reasons []StatusReportDeclarationReasonDto `json:"reasons"`
+	// The server token for the declaration.
+	ServerToken string `json:"serverToken"`
+	// The installation status of the declaration.
+	Status string `json:"status"`
+	// The type of the declaration.
+	Type string `json:"type"`
+	// The validity state of the declaration.
+	ValidityState string `json:"validityState"`
 }
 
 // StatusReportDeclarationReasonDetailDto represents a status report declaration reason detail dto.
 type StatusReportDeclarationReasonDetailDto struct {
+	// The description of the detail key.
 	Description string `json:"description"`
-	Key         string `json:"key"`
+	// The reason detail key.
+	Key string `json:"key"`
 }
 
 // StatusReportDeclarationReasonDto represents a status report declaration reason dto.
 type StatusReportDeclarationReasonDto struct {
-	Code        string                                   `json:"code"`
-	Description string                                   `json:"description"`
-	Details     []StatusReportDeclarationReasonDetailDto `json:"details"`
+	// The reason code.
+	Code string `json:"code"`
+	// The description of the reason.
+	Description string `json:"description"`
+	// Details associated with the reason, if any.
+	Details []StatusReportDeclarationReasonDetailDto `json:"details"`
 }

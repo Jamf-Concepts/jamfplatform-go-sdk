@@ -118,6 +118,30 @@ func stripSpecHTML(s string) string {
 	return specHTMLEntities.Replace(specHTMLTagRe.ReplaceAllString(s, " "))
 }
 
+// descriptionParagraphRe splits spec prose on blank lines so each paragraph
+// is wrapped as its own run of godoc lines.
+var descriptionParagraphRe = regexp.MustCompile(`\n[ \t]*\n`)
+
+// docParagraphs renders spec prose as wrapped godoc lines: HTML stripped,
+// entities decoded, and each blank-line-separated paragraph wrapped
+// independently. Wrapping the whole description in one pass would fuse the
+// last sentence of a paragraph into the first of the next — Jamf ends several
+// of its field lists on a bare identifier with no terminating period, so the
+// joint reads as one broken sentence.
+//
+// Returns nil for empty or whitespace-only input, letting callers treat "the
+// spec says nothing" as a distinct case from "the spec says something short".
+func docParagraphs(text string, width int) []string {
+	var out []string
+	for _, para := range descriptionParagraphRe.Split(stripSpecHTML(text), -1) {
+		if strings.TrimSpace(para) == "" {
+			continue
+		}
+		out = append(out, wrapCommentText(cleanComment(para), width)...)
+	}
+	return out
+}
+
 // wrapCommentText greedily wraps s to width columns without splitting a word.
 // Needed for parameter documentation: a single Jamf description can run to
 // thousands of characters (the Pro list endpoints inline every sortable field
