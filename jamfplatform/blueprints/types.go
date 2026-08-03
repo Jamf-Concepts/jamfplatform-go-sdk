@@ -301,26 +301,6 @@ type CustomRegex struct {
 	Regex    *string `json:"Regex,omitempty"`
 }
 
-// DeclarationChannelType represents a declaration channel type value.
-type DeclarationChannelType = string
-
-// DeclarationChannelType values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	DeclarationChannelTypeSystem DeclarationChannelType = "SYSTEM"
-	DeclarationChannelTypeUser   DeclarationChannelType = "USER"
-)
-
-// DeclarationKind represents a declaration kind value.
-type DeclarationKind = string
-
-// DeclarationKind values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	DeclarationKindConfiguration DeclarationKind = "CONFIGURATION"
-	DeclarationKindAsset         DeclarationKind = "ASSET"
-)
-
 // Deferrals represents a deferrals.
 type Deferrals struct {
 	CombinedPeriodInDays *OptionalPeriodInDays `json:"CombinedPeriodInDays,omitempty"`

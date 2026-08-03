@@ -81,41 +81,11 @@ type DeviceGroupUpdateRepresentationV1 struct {
 	Name        *string                                `json:"name,omitempty"`
 }
 
-// DeviceTypeV1 represents a device type v1 value.
-type DeviceTypeV1 = string
-
-// DeviceTypeV1 values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	DeviceTypeV1Computer DeviceTypeV1 = "COMPUTER"
-	DeviceTypeV1Mobile   DeviceTypeV1 = "MOBILE"
-)
-
-// GroupTypeV1 represents a group type v1 value.
-type GroupTypeV1 = string
-
-// GroupTypeV1 values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	GroupTypeV1Smart  GroupTypeV1 = "SMART"
-	GroupTypeV1Static GroupTypeV1 = "STATIC"
-)
-
 // HrefRepresentation represents a href representation.
 type HrefRepresentation struct {
 	Href string `json:"href"`
 	ID   string `json:"id"`
 }
-
-// JoinTypeV1 represents a join type v1 value.
-type JoinTypeV1 = string
-
-// JoinTypeV1 values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	JoinTypeV1And JoinTypeV1 = "AND"
-	JoinTypeV1Or  JoinTypeV1 = "OR"
-)
 
 // ListDeviceGroupMemberOfResponseRepresentation represents a list device group member of response representation.
 type ListDeviceGroupMemberOfResponseRepresentation struct {

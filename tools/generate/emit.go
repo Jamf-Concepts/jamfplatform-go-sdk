@@ -513,8 +513,12 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		return err
 	}
 
-	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
+	structTypes, enumTypeDecls := partitionEnumTypes(allTypes)
+	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: structTypes}
 	if err := emitTemplated(sourceTmpl, typesGF, filepath.Join(pkgDir, "types.go")); err != nil {
+		return err
+	}
+	if err := emitPkgEnums(pkgDir, cfg, goPkgName, pkgFormat, enumTypeDecls); err != nil {
 		return err
 	}
 
@@ -616,14 +620,53 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 		}
 	}
 
-	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
+	structTypes, enumTypeDecls := partitionEnumTypes(allTypes)
+	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: structTypes}
 	if err := emitTemplated(sourceTmpl, typesGF, filepath.Join(pkgDir, "types.go")); err != nil {
+		return err
+	}
+	if err := emitPkgEnums(pkgDir, cfg, goPkgName, pkgFormat, enumTypeDecls); err != nil {
 		return err
 	}
 	if err := emitTypesOnlyTest(pkgDir, goPkgName, allTypes); err != nil {
 		return err
 	}
 	return nil
+}
+
+// partitionEnumTypes splits emitted declarations into the structs and scalar
+// aliases that belong in types.go, and the string enums that get their own
+// file. Order within each partition is preserved so output stays stable.
+//
+// Enums are separated because the set is about to grow well past the handful
+// of spec-named ones: every property-level enum produces a type too, and those
+// have no struct to sit beside. One file for all of them beats scattering some
+// next to an alias and leaving the rest floating in types.go.
+func partitionEnumTypes(types []GoType) (structs, enums []GoType) {
+	for _, t := range types {
+		if len(t.EnumValues) > 0 {
+			enums = append(enums, t)
+			continue
+		}
+		structs = append(structs, t)
+	}
+	return structs, enums
+}
+
+// emitPkgEnums writes enums.go: every string-enum type in the package with its
+// constants. Writes nothing when the package has no enums, and removes a stale
+// file if a spec change drops the last one — a leftover enums.go would keep
+// declaring types no spec backs any more.
+func emitPkgEnums(pkgDir string, cfg Config, goPkgName, pkgFormat string, enums []GoType) error {
+	outPath := filepath.Join(pkgDir, "enums.go")
+	if len(enums) == 0 {
+		if err := os.Remove(outPath); err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("removing stale enums.go: %w", err)
+		}
+		return nil
+	}
+	gf := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: enums}
+	return emitTemplated(sourceTmpl, gf, outPath)
 }
 
 // emitTypesOnlyTest writes a types_test.go file with JSON round-trip tests

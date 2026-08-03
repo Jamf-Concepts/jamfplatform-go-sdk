@@ -188,17 +188,6 @@ type RuleResult struct {
 	Unknown         int     `json:"unknown"`
 }
 
-// RuleResultState represents a rule result state value.
-type RuleResultState = string
-
-// RuleResultState values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	RuleResultStatePassed  RuleResultState = "PASSED"
-	RuleResultStateFailed  RuleResultState = "FAILED"
-	RuleResultStateUnknown RuleResultState = "UNKNOWN"
-)
-
 // Source represents a source.
 type Source struct {
 	Branch   string `json:"branch"`
