@@ -377,6 +377,17 @@ func (t {{ .Name }}) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 {{- else }}
 // {{ .Comment }}
 type {{ .Name }} = string
+{{- if .EnumValues }}
+{{- $enumType := .Name }}
+
+// {{ .Name }} values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+{{- range .EnumValues }}
+	{{ .Name }} {{ $enumType }} = "{{ .Value }}"
+{{- end }}
+)
+{{- end }}
 {{- end }}
 {{ end }}
 {{- end }}

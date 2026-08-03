@@ -56,9 +56,23 @@ Each generated method carries a `// Parameters:` godoc list built from the spec'
 
 This is the only place a caller can learn what a `filter` or `sort` argument accepts: Jamf documents the RSQL-filterable and sortable field lists in the parameter description and nowhere else, so a bare `filter string` signature is unusable without the block. Same for Classic's `subset` path params, whose legal values (`General`, `Location`, `Purchasing`, …) are a path-param enum.
 
-Documentation only — parameter types stay exactly as config declares them. That is what makes it safe to quote enum values verbatim: Jamf's Classic enums include values unusable as Go identifiers (`Pending+Failed`, `EnableRemoteDesktop (macOS 10.14.4 and later)`) and one typo (`Hardwre`), all of which are still what the server accepts. Promoting any of these to typed constants needs a sanitiser first, and would change signatures — a separate decision, not something to bolt onto this pass.
+Parameter types stay exactly as config declares them — the block is documentation, never signature. That is what makes it safe to quote enum values verbatim: Jamf's Classic enums include values unusable as Go identifiers (`Pending+Failed`, `EnableRemoteDesktop (macOS 10.14.4 and later)`) and one typo (`Hardwre`), all of which are still what the server accepts. Where an enum *is* clean and named by the spec, it also gets constants — see below.
 
-Spec prose is wrapped at 76 columns, paragraph by paragraph (blank-line separated), with HTML tags (`</br>`, `<br/>`) stripped and entities decoded. Angle-bracket placeholders like `<field_name>` are deliberately preserved — the tag stripper matches an explicit HTML tag allowlist, not a generic `<...>` pattern. Long descriptions are never truncated: a half-printed RSQL field list is worse than none, since the caller can't tell whether their field was in the dropped tail.
+### Enum constants
+
+A named `type: string` schema with an `enum` is emitted as `type X = string` plus one typed constant per value (`enumConsts` in `schema.go`, rendered by the fieldless-type branch of the types template). 21 such types exist today, carrying 162 constants — 15 types in `pro`, 3 in `devicegroups`, 2 in `blueprints`, 1 in `compliancebenchmarks`.
+
+The alias is deliberately `=` (a type alias, not a defined type), so a constant typed `NotificationType` assigns to any existing `notificationType string` parameter with no cast. Promoting these to defined types would break every call site and is not worth it.
+
+Constant names are `<TypeName><TitleCasedValue>`: `NotificationTypeApnsCertRevoked = "APNS_CERT_REVOKED"`. Segment title-casing is deliberate over preserving all-caps runs — `APNS_CERT_REVOKED` is a wire-format artefact, not an acronym the spec is asserting. The wire value sits on the same line as the identifier, so no per-value godoc is emitted and the spec's own misspellings (`MII_UNATHORIZED_RESPONSE_NOTIFICATION`, `PATCH_EXTENTION_ATTRIBUTE`) stay greppable.
+
+Where a parameter's schema `$ref`s one of these types, its doc block says `Allowed values: see the NotificationType constants.` instead of listing them — godoc groups the constants under the type they're declared with. The check is against the set of schemas actually being emitted (`namedEnumTypes`), because an enum reachable *only* from a parameter is never emitted as a type; those keep their inline list. That is why `section` on the computer-inventory endpoints still lists its 22 values inline.
+
+Values that yield no Go identifier, and the second of any two values colliding on one identifier, are skipped with a log line rather than silently dropped — a missing constant reads as "the server doesn't accept this". No spec currently triggers either case.
+
+Inline **property** enums (151 distinct property names, 23 of which carry conflicting value sets across schemas — `type` alone has 14) are *not* generated. They need owner-qualified naming plus a collision resolver. Classic path-param enums are also excluded: their values include `Pending+Failed`, `EnableRemoteDesktop (macOS 10.14.4 and later)` and the typo `Hardwre`, which need a sanitiser before they can become identifiers.
+
+Spec prose is wrapped at 100 columns, paragraph by paragraph (blank-line separated), with HTML tags (`</br>`, `<br/>`) stripped and entities decoded. Angle-bracket placeholders like `<field_name>` are deliberately preserved — the tag stripper matches an explicit HTML tag allowlist, not a generic `<...>` pattern. Long descriptions are never truncated: a half-printed RSQL field list is worse than none, since the caller can't tell whether their field was in the dropped tail.
 
 ### Two-layer design
 

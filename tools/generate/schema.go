@@ -6,6 +6,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"maps"
 	"sort"
 	"strings"
@@ -1032,11 +1033,12 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 			continue
 		}
 
-		// Enum string → type alias
+		// Enum string → type alias plus a constant per value.
 		if schema.Type.Is("string") && len(schema.Enum) > 0 {
 			types = append(types, GoType{
-				Name:    name,
-				Comment: fmt.Sprintf("%s represents a %s value.", name, camelToWords(name)),
+				Name:       name,
+				Comment:    fmt.Sprintf("%s represents a %s value.", name, camelToWords(name)),
+				EnumValues: enumConsts(name, schema.Enum),
 			})
 			continue
 		}
@@ -1432,6 +1434,71 @@ func flattenAllOf(schema *openapi3.Schema) (map[string]*openapi3.SchemaRef, []st
 	}
 	sort.Strings(required)
 	return props, required
+}
+
+// namedEnumTypes returns the Go type names of the string-enum schemas that
+// extractTypes will emit for this spec, keyed for lookup. Parameter docs use
+// it to point at the generated type instead of re-listing its values inline —
+// the constants carry the same information, and godoc groups them under the
+// type they are declared with.
+//
+// Derived from the same referenced-schema set extractTypes consumes, so the
+// two cannot disagree about what exists. Enum schemas reached only from a
+// parameter are not emitted as types, which is exactly why the check is
+// needed: those keep their inline list.
+func namedEnumTypes(doc *openapi3.T, refs map[string]*schemaUsage) map[string]bool {
+	if doc.Components == nil || doc.Components.Schemas == nil {
+		return nil
+	}
+	out := make(map[string]bool)
+	for specName := range refs {
+		ref := doc.Components.Schemas[specName]
+		if ref == nil || ref.Value == nil {
+			continue
+		}
+		if ref.Value.Type.Is("string") && len(ref.Value.Enum) > 0 {
+			out[goTypeName(specName)] = true
+		}
+	}
+	return out
+}
+
+// enumConsts turns a named string-enum schema's values into typed constants.
+// Names are <TypeName><TitleCasedValue>; the wire value is what the constant
+// holds, so a value the spec spells oddly still reaches the server verbatim.
+// A godoc line is attached whenever the identifier does not read back as the
+// value it carries — the constant for "MII_UNATHORIZED_RESPONSE_NOTIFICATION"
+// should not hide the spec's misspelling from someone grepping for it.
+//
+// Constants are why these enums are worth generating at all: the alias is
+// `type X = string`, so a constant typed X assigns to any existing `string`
+// parameter with no cast and no signature change.
+//
+// Values that yield no identifier, and the second of any two values that
+// collide on one, are skipped with a log line. Silently dropping one would
+// read as "the server does not accept this".
+func enumConsts(typeName string, enum []any) []GoEnumConst {
+	out := make([]GoEnumConst, 0, len(enum))
+	seen := make(map[string]string, len(enum)) // const name → first wire value
+	for _, raw := range enum {
+		value, ok := raw.(string)
+		if !ok || value == "" {
+			continue
+		}
+		ident := enumConstIdent(value)
+		if ident == "" {
+			log.Printf("enum %s: skipping value %q — yields no Go identifier", typeName, value)
+			continue
+		}
+		constName := typeName + ident
+		if first, dup := seen[constName]; dup {
+			log.Printf("enum %s: skipping value %q — collides with %q on %s", typeName, value, first, constName)
+			continue
+		}
+		seen[constName] = value
+		out = append(out, GoEnumConst{Name: constName, Value: value})
+	}
+	return out
 }
 
 func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format string) GoType {

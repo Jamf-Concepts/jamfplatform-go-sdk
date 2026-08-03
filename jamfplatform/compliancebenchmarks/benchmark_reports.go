@@ -63,7 +63,7 @@ func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort st
 //     'deviceName,ruleResult:desc'. Ascending order is default and in such a case doesn't require to be
 //     specified.
 //   - deviceSearch: Search devices with matching device name or device ID.
-//   - ruleResult: Allowed values: "PASSED", "FAILED", "UNKNOWN".
+//   - ruleResult: Allowed values: see the RuleResultState constants.
 func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID string, sort string, deviceSearch string, ruleResult string) ([]DeviceRuleResult, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceRuleResult, bool, error) {

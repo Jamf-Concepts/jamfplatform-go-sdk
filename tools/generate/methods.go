@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path"
 	"regexp"
 	"slices"
 	"sort"
@@ -20,10 +21,10 @@ import (
 // Operations → Go methods
 // ---------------------------------------------------------------------------
 
-func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
+func extractMethods(doc *openapi3.T, spec SpecDef, enumTypes map[string]bool) ([]GoMethod, error) {
 	var methods []GoMethod
 	for _, opDef := range spec.Operations {
-		m, err := buildMethod(doc, spec, opDef)
+		m, err := buildMethod(doc, spec, opDef, enumTypes)
 		if err != nil {
 			return nil, fmt.Errorf("operation %s: %w", opDef.Op, err)
 		}
@@ -744,7 +745,7 @@ func defaultMethodComment(name string, spec SpecDef) string {
 // Params the spec doesn't describe are skipped, as are params declared in
 // config but absent from the spec (Classic operations that take undocumented
 // query keys). Returns "" when nothing is documentable.
-func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Operation) string {
+func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Operation, enumTypes map[string]bool) string {
 	specParams := make(map[string]*openapi3.Parameter)
 	collect := func(params openapi3.Parameters) {
 		for _, ref := range params {
@@ -781,7 +782,7 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 		if !ok {
 			continue
 		}
-		body := parameterDocLines(sp)
+		body := parameterDocLines(sp, enumTypes)
 		if len(body) == 0 {
 			continue
 		}
@@ -799,7 +800,13 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 // parameterDocLines returns the wrapped godoc lines for one spec parameter:
 // its description, then its allowed values when the schema constrains them.
 // Returns nil when the spec says nothing useful about it.
-func parameterDocLines(p *openapi3.Parameter) []string {
+//
+// When the constraint comes from a named schema the generator emits as a type
+// (enumTypes), the values are named rather than listed: the type carries a
+// constant per value, and godoc groups those under it. That keeps the 60-plus
+// value enums out of every call site's doc comment while still naming them
+// somewhere the compiler checks.
+func parameterDocLines(p *openapi3.Parameter, enumTypes map[string]bool) []string {
 	var out []string
 	// Paragraphs are wrapped separately. Collapsing the whole description in
 	// one pass fuses the last sentence of one paragraph into the first of the
@@ -811,10 +818,30 @@ func parameterDocLines(p *openapi3.Parameter) []string {
 		}
 		out = append(out, wrapCommentText(cleanComment(para), parameterDocWidth)...)
 	}
+	if t := enumRefTypeName(p.Schema); t != "" && enumTypes[t] {
+		out = append(out, wrapCommentText("Allowed values: see the "+t+" constants.", parameterDocWidth)...)
+		return out
+	}
 	if vals := parameterEnumValues(p.Schema); len(vals) > 0 {
 		out = append(out, wrapCommentText("Allowed values: "+strings.Join(vals, ", ")+".", parameterDocWidth)...)
 	}
 	return out
+}
+
+// enumRefTypeName returns the Go type name a parameter schema $refs, following
+// the item schema for repeatable params. Empty when the schema is inline —
+// an inline enum has no type to point at, so its values are listed instead.
+func enumRefTypeName(ref *openapi3.SchemaRef) string {
+	if ref == nil {
+		return ""
+	}
+	if ref.Ref != "" {
+		return goTypeName(path.Base(ref.Ref))
+	}
+	if ref.Value != nil && ref.Value.Items != nil && ref.Value.Items.Ref != "" {
+		return goTypeName(path.Base(ref.Value.Items.Ref))
+	}
+	return ""
 }
 
 // parameterEnumValues formats a parameter schema's enum for godoc. Repeatable
@@ -844,7 +871,7 @@ func parameterEnumValues(ref *openapi3.SchemaRef) []string {
 	return out
 }
 
-func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, error) {
+func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes map[string]bool) (GoMethod, error) {
 	httpMethod, specPath := opDef.parseOp()
 
 	pathItem := doc.Paths.Find(specPath)
@@ -930,7 +957,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 	// Parameter docs come last so the block sits below the summary and the
 	// privilege/deprecation lines, matching how godoc reads: prose, then
 	// metadata, then the per-argument list.
-	if pc := parameterComment(m, pathItem, op); pc != "" {
+	if pc := parameterComment(m, pathItem, op, enumTypes); pc != "" {
 		if m.Comment == "" {
 			m.Comment = defaultMethodComment(opDef.Name, spec)
 		}

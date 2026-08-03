@@ -82,8 +82,24 @@ type AccountPreferences struct {
 // AccountPreferencesSearchType represents a account preferences search type value.
 type AccountPreferencesSearchType = string
 
+// AccountPreferencesSearchType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountPreferencesSearchTypeExactMatch AccountPreferencesSearchType = "EXACT_MATCH"
+	AccountPreferencesSearchTypeStartsWith AccountPreferencesSearchType = "STARTS_WITH"
+	AccountPreferencesSearchTypeContains   AccountPreferencesSearchType = "CONTAINS"
+)
+
 // AccountPreferencesUserInterfaceDisplayTheme represents a account preferences user interface display theme value.
 type AccountPreferencesUserInterfaceDisplayTheme = string
+
+// AccountPreferencesUserInterfaceDisplayTheme values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountPreferencesUserInterfaceDisplayThemeMatchSystem AccountPreferencesUserInterfaceDisplayTheme = "MATCH_SYSTEM"
+	AccountPreferencesUserInterfaceDisplayThemeLight       AccountPreferencesUserInterfaceDisplayTheme = "LIGHT"
+	AccountPreferencesUserInterfaceDisplayThemeDark        AccountPreferencesUserInterfaceDisplayTheme = "DARK"
+)
 
 // AccountPreferencesV5 represents a account preferences v5.
 type AccountPreferencesV5 struct {
@@ -382,6 +398,13 @@ type ApnsPushEnableRequest struct {
 
 // AppAnalyticsSetting represents a app analytics setting value.
 type AppAnalyticsSetting = string
+
+// AppAnalyticsSetting values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppAnalyticsSettingEnableAppAnalytics  AppAnalyticsSetting = "ENABLE_APP_ANALYTICS"
+	AppAnalyticsSettingDisableAppAnalytics AppAnalyticsSetting = "DISABLE_APP_ANALYTICS"
+)
 
 // AppConfigReinstallCode represents a app config reinstall code.
 type AppConfigReinstallCode struct {
@@ -1757,6 +1780,22 @@ type ComputerPartitionEncryption struct {
 // ComputerPartitionFileVault2State represents a computer partition file vault2 state value.
 type ComputerPartitionFileVault2State = string
 
+// ComputerPartitionFileVault2State values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerPartitionFileVault2StateUnknown          ComputerPartitionFileVault2State = "UNKNOWN"
+	ComputerPartitionFileVault2StateUnencrypted      ComputerPartitionFileVault2State = "UNENCRYPTED"
+	ComputerPartitionFileVault2StateIneligible       ComputerPartitionFileVault2State = "INELIGIBLE"
+	ComputerPartitionFileVault2StateDecrypted        ComputerPartitionFileVault2State = "DECRYPTED"
+	ComputerPartitionFileVault2StateDecrypting       ComputerPartitionFileVault2State = "DECRYPTING"
+	ComputerPartitionFileVault2StateEncrypted        ComputerPartitionFileVault2State = "ENCRYPTED"
+	ComputerPartitionFileVault2StateEncrypting       ComputerPartitionFileVault2State = "ENCRYPTING"
+	ComputerPartitionFileVault2StateRestartNeeded    ComputerPartitionFileVault2State = "RESTART_NEEDED"
+	ComputerPartitionFileVault2StateOptimizing       ComputerPartitionFileVault2State = "OPTIMIZING"
+	ComputerPartitionFileVault2StateDecryptingPaused ComputerPartitionFileVault2State = "DECRYPTING_PAUSED"
+	ComputerPartitionFileVault2StateEncryptingPaused ComputerPartitionFileVault2State = "ENCRYPTING_PAUSED"
+)
+
 // ComputerPrestageSearchResultsV3 represents a computer prestage search results v3.
 type ComputerPrestageSearchResultsV3 struct {
 	Results    []GetComputerPrestageV3 `json:"results"`
@@ -2113,6 +2152,13 @@ type DashboardSetupTask struct {
 // DataRoamingSetting represents a data roaming setting value.
 type DataRoamingSetting = string
 
+// DataRoamingSetting values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DataRoamingSettingEnableDataRoaming  DataRoamingSetting = "ENABLE_DATA_ROAMING"
+	DataRoamingSettingDisableDataRoaming DataRoamingSetting = "DISABLE_DATA_ROAMING"
+)
+
 // DeclarativeManagementCommand represents a declarative management command.
 type DeclarativeManagementCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
@@ -2401,6 +2447,13 @@ type DeviceLockCommand struct {
 
 // DiagnosticSubmissionSetting represents a diagnostic submission setting value.
 type DiagnosticSubmissionSetting = string
+
+// DiagnosticSubmissionSetting values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DiagnosticSubmissionSettingEnableDiagnosticSubmission  DiagnosticSubmissionSetting = "ENABLE_DIAGNOSTIC_SUBMISSION"
+	DiagnosticSubmissionSettingDisableDiagnosticSubmission DiagnosticSubmissionSetting = "DISABLE_DIAGNOSTIC_SUBMISSION"
+)
 
 // DigiCertSetting DigiCert Trust Lifecycle Manager object to create, or update with a merge-patch strategy. Certificate data must be provided in full, or not at all for update with merge-patch strategy.
 type DigiCertSetting struct {
@@ -3920,6 +3973,19 @@ type Markdown struct {
 // MDMClientType represents a m d m client type value.
 type MDMClientType = string
 
+// MDMClientType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MDMClientTypeMobileDevice     MDMClientType = "MOBILE_DEVICE"
+	MDMClientTypeTv               MDMClientType = "TV"
+	MDMClientTypeVisionPro        MDMClientType = "VISION_PRO"
+	MDMClientTypeWatch            MDMClientType = "WATCH"
+	MDMClientTypeComputer         MDMClientType = "COMPUTER"
+	MDMClientTypeComputerUser     MDMClientType = "COMPUTER_USER"
+	MDMClientTypeMobileDeviceUser MDMClientType = "MOBILE_DEVICE_USER"
+	MDMClientTypeUnknown          MDMClientType = "UNKNOWN"
+)
+
 // MDMCommand represents a m d m command.
 type MDMCommand struct {
 	Client        *MDMCommandClient `json:"client,omitempty"`
@@ -3971,8 +4037,55 @@ type MDMCommandResults struct {
 // MDMCommandState represents a m d m command state value.
 type MDMCommandState = string
 
+// MDMCommandState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MDMCommandStatePending      MDMCommandState = "PENDING"
+	MDMCommandStateAcknowledged MDMCommandState = "ACKNOWLEDGED"
+	MDMCommandStateNotNow       MDMCommandState = "NOT_NOW"
+	MDMCommandStateError        MDMCommandState = "ERROR"
+)
+
 // MDMCommandType represents a m d m command type value.
 type MDMCommandType = string
+
+// MDMCommandType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MDMCommandTypeApplyRedemptionCode       MDMCommandType = "APPLY_REDEMPTION_CODE"
+	MDMCommandTypeCertificateList           MDMCommandType = "CERTIFICATE_LIST"
+	MDMCommandTypeClearPasscode             MDMCommandType = "CLEAR_PASSCODE"
+	MDMCommandTypeClearRestrictionsPassword MDMCommandType = "CLEAR_RESTRICTIONS_PASSWORD"
+	MDMCommandTypeDeclarativeManagement     MDMCommandType = "DECLARATIVE_MANAGEMENT"
+	MDMCommandTypeDeleteUser                MDMCommandType = "DELETE_USER"
+	MDMCommandTypeDeviceInformation         MDMCommandType = "DEVICE_INFORMATION"
+	MDMCommandTypeDeviceLocation            MDMCommandType = "DEVICE_LOCATION"
+	MDMCommandTypeDeviceLock                MDMCommandType = "DEVICE_LOCK"
+	MDMCommandTypeDisableLostMode           MDMCommandType = "DISABLE_LOST_MODE"
+	MDMCommandTypeDisableRemoteDesktop      MDMCommandType = "DISABLE_REMOTE_DESKTOP"
+	MDMCommandTypeEnableLostMode            MDMCommandType = "ENABLE_LOST_MODE"
+	MDMCommandTypeEnableRemoteDesktop       MDMCommandType = "ENABLE_REMOTE_DESKTOP"
+	MDMCommandTypeEraseDevice               MDMCommandType = "ERASE_DEVICE"
+	MDMCommandTypeInstalledApplicationList  MDMCommandType = "INSTALLED_APPLICATION_LIST"
+	MDMCommandTypeLogOutUser                MDMCommandType = "LOG_OUT_USER"
+	MDMCommandTypeManagedApplicationList    MDMCommandType = "MANAGED_APPLICATION_LIST"
+	MDMCommandTypeManagedMediaList          MDMCommandType = "MANAGED_MEDIA_LIST"
+	MDMCommandTypeRefreshCellularPlans      MDMCommandType = "REFRESH_CELLULAR_PLANS"
+	MDMCommandTypePlayLostModeSound         MDMCommandType = "PLAY_LOST_MODE_SOUND"
+	MDMCommandTypeProfileList               MDMCommandType = "PROFILE_LIST"
+	MDMCommandTypeProvisioningProfileList   MDMCommandType = "PROVISIONING_PROFILE_LIST"
+	MDMCommandTypeRestartDevice             MDMCommandType = "RESTART_DEVICE"
+	MDMCommandTypeRequestMirroring          MDMCommandType = "REQUEST_MIRRORING"
+	MDMCommandTypeSecurityInfo              MDMCommandType = "SECURITY_INFO"
+	MDMCommandTypeSettings                  MDMCommandType = "SETTINGS"
+	MDMCommandTypeSetAutoAdminPassword      MDMCommandType = "SET_AUTO_ADMIN_PASSWORD"
+	MDMCommandTypeSetRecoveryLock           MDMCommandType = "SET_RECOVERY_LOCK"
+	MDMCommandTypeShutDownDevice            MDMCommandType = "SHUT_DOWN_DEVICE"
+	MDMCommandTypeStopMirroring             MDMCommandType = "STOP_MIRRORING"
+	MDMCommandTypeUnlockUserAccount         MDMCommandType = "UNLOCK_USER_ACCOUNT"
+	MDMCommandTypeValidateApplications      MDMCommandType = "VALIDATE_APPLICATIONS"
+	MDMCommandTypeVerifyRecoveryLock        MDMCommandType = "VERIFY_RECOVERY_LOCK"
+)
 
 // MDMRenewalError represents a m d m renewal error.
 type MDMRenewalError struct {
@@ -3992,6 +4105,14 @@ type MDMRenewalErrorStrategiesResponse struct {
 // MDMRenewalErrorType represents a m d m renewal error type value.
 type MDMRenewalErrorType = string
 
+// MDMRenewalErrorType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MDMRenewalErrorTypeServerError  MDMRenewalErrorType = "SERVER_ERROR"
+	MDMRenewalErrorTypeCheckInError MDMRenewalErrorType = "CHECK_IN_ERROR"
+	MDMRenewalErrorTypeOther        MDMRenewalErrorType = "OTHER"
+)
+
 // MDMRenewalStrategy represents a m d m renewal strategy.
 type MDMRenewalStrategy struct {
 	ID                     string                 `json:"id"`
@@ -4004,6 +4125,17 @@ type MDMRenewalStrategy struct {
 
 // MDMRenewalStrategyType represents a m d m renewal strategy type value.
 type MDMRenewalStrategyType = string
+
+// MDMRenewalStrategyType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MDMRenewalStrategyTypeReturnNoCheckInInvitation                           MDMRenewalStrategyType = "RETURN_NO_CHECK_IN_INVITATION"
+	MDMRenewalStrategyTypeReturnCheckInInvitationFromMDMInvitationTable       MDMRenewalStrategyType = "RETURN_CHECK_IN_INVITATION_FROM_MDM_INVITATION_TABLE"
+	MDMRenewalStrategyTypeReturnCheckInInvitationFromEnrollmentUsageTable     MDMRenewalStrategyType = "RETURN_CHECK_IN_INVITATION_FROM_ENROLLMENT_USAGE_TABLE"
+	MDMRenewalStrategyTypeReturnCheckInInvitationFromMDMProfilePrototypeTable MDMRenewalStrategyType = "RETURN_CHECK_IN_INVITATION_FROM_MDM_PROFILE_PROTOTYPE_TABLE"
+	MDMRenewalStrategyTypeJssURLOverride                                      MDMRenewalStrategyType = "JSS_URL_OVERRIDE"
+	MDMRenewalStrategyTypePayloadIdentifier                                   MDMRenewalStrategyType = "PAYLOAD_IDENTIFIER"
+)
 
 // MembershipMappings Cloud Identity Provider user group membership mappings configuration.
 type MembershipMappings struct {
@@ -4919,6 +5051,76 @@ type NetworkV2 struct {
 // NotificationType represents a notification type value.
 type NotificationType = string
 
+// NotificationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	NotificationTypeApnsCertRevoked                                       NotificationType = "APNS_CERT_REVOKED"
+	NotificationTypeApnsConnectionFailure                                 NotificationType = "APNS_CONNECTION_FAILURE"
+	NotificationTypeAppleSchoolManagerTCNotSigned                         NotificationType = "APPLE_SCHOOL_MANAGER_T_C_NOT_SIGNED"
+	NotificationTypeBuiltInCaExpired                                      NotificationType = "BUILT_IN_CA_EXPIRED"
+	NotificationTypeBuiltInCaExpiring                                     NotificationType = "BUILT_IN_CA_EXPIRING"
+	NotificationTypeBuiltInCaRenewalFailed                                NotificationType = "BUILT_IN_CA_RENEWAL_FAILED"
+	NotificationTypeBuiltInCaRenewalSuccess                               NotificationType = "BUILT_IN_CA_RENEWAL_SUCCESS"
+	NotificationTypeCloudLdapCertExpired                                  NotificationType = "CLOUD_LDAP_CERT_EXPIRED"
+	NotificationTypeCloudLdapCertWillExpire                               NotificationType = "CLOUD_LDAP_CERT_WILL_EXPIRE"
+	NotificationTypeDepInstanceExpired                                    NotificationType = "DEP_INSTANCE_EXPIRED"
+	NotificationTypeDepInstanceWillExpire                                 NotificationType = "DEP_INSTANCE_WILL_EXPIRE"
+	NotificationTypeDeviceEnrollmentProgramTCNotSigned                    NotificationType = "DEVICE_ENROLLMENT_PROGRAM_T_C_NOT_SIGNED"
+	NotificationTypeExceededLicenseCount                                  NotificationType = "EXCEEDED_LICENSE_COUNT"
+	NotificationTypeFrequentInventoryCollectionPolicy                     NotificationType = "FREQUENT_INVENTORY_COLLECTION_POLICY"
+	NotificationTypeGsxCertExpired                                        NotificationType = "GSX_CERT_EXPIRED"
+	NotificationTypeGsxCertWillExpire                                     NotificationType = "GSX_CERT_WILL_EXPIRE"
+	NotificationTypeHclBindError                                          NotificationType = "HCL_BIND_ERROR"
+	NotificationTypeHclError                                              NotificationType = "HCL_ERROR"
+	NotificationTypeInsecureLdap                                          NotificationType = "INSECURE_LDAP"
+	NotificationTypeInvalidReferencesExtAttr                              NotificationType = "INVALID_REFERENCES_EXT_ATTR"
+	NotificationTypeInvalidReferencesPolicies                             NotificationType = "INVALID_REFERENCES_POLICIES"
+	NotificationTypeInvalidReferencesScripts                              NotificationType = "INVALID_REFERENCES_SCRIPTS"
+	NotificationTypeJamfConnectUpdate                                     NotificationType = "JAMF_CONNECT_UPDATE"
+	NotificationTypeJamfProtectUpdate                                     NotificationType = "JAMF_PROTECT_UPDATE"
+	NotificationTypeJimError                                              NotificationType = "JIM_ERROR"
+	NotificationTypeLdapConnectionCheckThroughJimFailed                   NotificationType = "LDAP_CONNECTION_CHECK_THROUGH_JIM_FAILED"
+	NotificationTypeLdapConnectionCheckThroughJimSuccessful               NotificationType = "LDAP_CONNECTION_CHECK_THROUGH_JIM_SUCCESSFUL"
+	NotificationTypeMDMExternalSigningCertificateExpired                  NotificationType = "MDM_EXTERNAL_SIGNING_CERTIFICATE_EXPIRED"
+	NotificationTypeMDMExternalSigningCertificateExpiring                 NotificationType = "MDM_EXTERNAL_SIGNING_CERTIFICATE_EXPIRING"
+	NotificationTypeMDMExternalSigningCertificateExpiringToday            NotificationType = "MDM_EXTERNAL_SIGNING_CERTIFICATE_EXPIRING_TODAY"
+	NotificationTypeMiiHeartbeatFailedNotification                        NotificationType = "MII_HEARTBEAT_FAILED_NOTIFICATION"
+	NotificationTypeMiiInventoryUploadFailedNotification                  NotificationType = "MII_INVENTORY_UPLOAD_FAILED_NOTIFICATION"
+	NotificationTypeMiiUnathorizedResponseNotification                    NotificationType = "MII_UNATHORIZED_RESPONSE_NOTIFICATION"
+	NotificationTypePatchExtentionAttribute                               NotificationType = "PATCH_EXTENTION_ATTRIBUTE"
+	NotificationTypePatchUpdate                                           NotificationType = "PATCH_UPDATE"
+	NotificationTypePolicyManagementAccountPayloadSecurityMultiple        NotificationType = "POLICY_MANAGEMENT_ACCOUNT_PAYLOAD_SECURITY_MULTIPLE"
+	NotificationTypePolicyManagementAccountPayloadSecuritySingle          NotificationType = "POLICY_MANAGEMENT_ACCOUNT_PAYLOAD_SECURITY_SINGLE"
+	NotificationTypePushCertExpired                                       NotificationType = "PUSH_CERT_EXPIRED"
+	NotificationTypePushCertWillExpire                                    NotificationType = "PUSH_CERT_WILL_EXPIRE"
+	NotificationTypePushProxyCertExpired                                  NotificationType = "PUSH_PROXY_CERT_EXPIRED"
+	NotificationTypeSsoCertExpired                                        NotificationType = "SSO_CERT_EXPIRED"
+	NotificationTypeSsoIdpCertExpired                                     NotificationType = "SSO_IDP_CERT_EXPIRED"
+	NotificationTypeSsoCertWillExpire                                     NotificationType = "SSO_CERT_WILL_EXPIRE"
+	NotificationTypeSsoIdpCertWillExpire                                  NotificationType = "SSO_IDP_CERT_WILL_EXPIRE"
+	NotificationTypeTomcatSslCertExpired                                  NotificationType = "TOMCAT_SSL_CERT_EXPIRED"
+	NotificationTypeTomcatSslCertWillExpire                               NotificationType = "TOMCAT_SSL_CERT_WILL_EXPIRE"
+	NotificationTypeUserInitiatedEnrollmentManagementAccountSecurityIssue NotificationType = "USER_INITIATED_ENROLLMENT_MANAGEMENT_ACCOUNT_SECURITY_ISSUE"
+	NotificationTypeUserMaidDuplicateError                                NotificationType = "USER_MAID_DUPLICATE_ERROR"
+	NotificationTypeUserMaidMismatchError                                 NotificationType = "USER_MAID_MISMATCH_ERROR"
+	NotificationTypeUserMaidRosterDuplicateError                          NotificationType = "USER_MAID_ROSTER_DUPLICATE_ERROR"
+	NotificationTypeVppAccountExpired                                     NotificationType = "VPP_ACCOUNT_EXPIRED"
+	NotificationTypeVppAccountWillExpire                                  NotificationType = "VPP_ACCOUNT_WILL_EXPIRE"
+	NotificationTypeVppTokenRevoked                                       NotificationType = "VPP_TOKEN_REVOKED"
+	NotificationTypeDeviceComplianceConnectionError                       NotificationType = "DEVICE_COMPLIANCE_CONNECTION_ERROR"
+	NotificationTypeConditionalAccessConnectionError                      NotificationType = "CONDITIONAL_ACCESS_CONNECTION_ERROR"
+	NotificationTypeAzureAdMigrationReportGenerated                       NotificationType = "AZURE_AD_MIGRATION_REPORT_GENERATED"
+	NotificationTypeBeyondCorpConnectionError                             NotificationType = "BEYOND_CORP_CONNECTION_ERROR"
+	NotificationTypeAppInstallersNewAppVersionAvailable                   NotificationType = "APP_INSTALLERS_NEW_APP_VERSION_AVAILABLE"
+	NotificationTypeAppInstallersNewAppVersionDeploymentStarted           NotificationType = "APP_INSTALLERS_NEW_APP_VERSION_DEPLOYMENT_STARTED"
+	NotificationTypeAppInstallersAppVersionRemoved                        NotificationType = "APP_INSTALLERS_APP_VERSION_REMOVED"
+	NotificationTypeAppInstallersAppTitleRemoved                          NotificationType = "APP_INSTALLERS_APP_TITLE_REMOVED"
+	NotificationTypeAppInstallersDeploymentInstallationFailed             NotificationType = "APP_INSTALLERS_DEPLOYMENT_INSTALLATION_FAILED"
+	NotificationTypeSamlResponseAssertionSigningRequired                  NotificationType = "SAML_RESPONSE_ASSERTION_SIGNING_REQUIRED"
+	NotificationTypeDirectoryCacheAwaitingSync                            NotificationType = "DIRECTORY_CACHE_AWAITING_SYNC"
+	NotificationTypePssoExternalURLUnavailable                            NotificationType = "PSSO_EXTERNAL_URL_UNAVAILABLE"
+)
+
 // NotificationV1 Jamf Pro notification used for important alerts.
 type NotificationV1 struct {
 	ID     string            `json:"id"`
@@ -5372,6 +5574,13 @@ type PatchSummaryVersion struct {
 
 // PersonalHotspotSetting represents a personal hotspot setting value.
 type PersonalHotspotSetting = string
+
+// PersonalHotspotSetting values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PersonalHotspotSettingEnablePersonalHotspot  PersonalHotspotSetting = "ENABLE_PERSONAL_HOTSPOT"
+	PersonalHotspotSettingDisablePersonalHotspot PersonalHotspotSetting = "DISABLE_PERSONAL_HOTSPOT"
+)
 
 // PlanConfigurationPost represents a plan configuration post.
 type PlanConfigurationPost struct {
@@ -6020,6 +6229,14 @@ type SelfServiceSettings struct {
 
 // ServiceDiscoveryVersion represents a service discovery version value.
 type ServiceDiscoveryVersion = string
+
+// ServiceDiscoveryVersion values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ServiceDiscoveryVersionNone    ServiceDiscoveryVersion = "none"
+	ServiceDiscoveryVersionMDMByod ServiceDiscoveryVersion = "mdm-byod"
+	ServiceDiscoveryVersionMDMAdde ServiceDiscoveryVersion = "mdm-adde"
+)
 
 // Session represents a session.
 type Session struct {
@@ -6821,6 +7038,13 @@ type VerifyRecoveryLockCommand struct {
 
 // VoiceRoamingSetting represents a voice roaming setting value.
 type VoiceRoamingSetting = string
+
+// VoiceRoamingSetting values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	VoiceRoamingSettingEnableVoiceRoaming  VoiceRoamingSetting = "ENABLE_VOICE_ROAMING"
+	VoiceRoamingSettingDisableVoiceRoaming VoiceRoamingSetting = "DISABLE_VOICE_ROAMING"
+)
 
 // VolumePurchasingContent represents a volume purchasing content.
 type VolumePurchasingContent struct {

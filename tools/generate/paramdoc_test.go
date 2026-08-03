@@ -90,7 +90,7 @@ func TestParameterComment(t *testing.T) {
 		param("ignored", "Not in the Go signature, must not appear"),
 	}}
 
-	got := parameterComment(m, pathItem, op)
+	got := parameterComment(m, pathItem, op, nil)
 	wantLines := []string{
 		"\n//\n// Parameters:",
 		"//   - id: ID to filter by.",
@@ -112,8 +112,75 @@ func TestParameterComment(t *testing.T) {
 	// single-line godoc.
 	bare := GoMethod{PathParams: []GoPathParam{{SpecName: "id", GoName: "id"}}}
 	bareItem := &openapi3.PathItem{Parameters: openapi3.Parameters{param("id", "")}}
-	if got := parameterComment(bare, bareItem, &openapi3.Operation{}); got != "" {
+	if got := parameterComment(bare, bareItem, &openapi3.Operation{}, nil); got != "" {
 		t.Errorf("undescribed param produced %q, want empty", got)
+	}
+}
+
+func TestParameterCommentNamesEmittedEnumTypes(t *testing.T) {
+	// A $ref'd enum schema that the generator emits as a type is named, not
+	// re-listed; the constants under that type carry the values.
+	refd := &openapi3.ParameterRef{Value: &openapi3.Parameter{
+		Name:        "notificationType",
+		Description: "type of the notification",
+		Schema: &openapi3.SchemaRef{
+			Ref:   "#/components/schemas/NotificationType",
+			Value: &openapi3.Schema{Enum: []any{"APNS_CERT_REVOKED", "GSX_CERT_EXPIRED"}},
+		},
+	}}
+	m := GoMethod{PathParams: []GoPathParam{{SpecName: "notificationType", GoName: "notificationType"}}}
+	op := &openapi3.Operation{Parameters: openapi3.Parameters{refd}}
+
+	got := parameterComment(m, nil, op, map[string]bool{"NotificationType": true})
+	if !strings.Contains(got, "Allowed values: see the NotificationType constants.") {
+		t.Errorf("expected a pointer to the emitted type, got:\n%s", got)
+	}
+	if strings.Contains(got, "APNS_CERT_REVOKED") {
+		t.Error("values were listed inline despite an emitted type existing")
+	}
+
+	// The same schema when NO type is emitted for it (enum reachable only from
+	// a parameter) must fall back to the inline list.
+	got = parameterComment(m, nil, op, nil)
+	if !strings.Contains(got, `"APNS_CERT_REVOKED", "GSX_CERT_EXPIRED"`) {
+		t.Errorf("expected an inline list with no emitted type, got:\n%s", got)
+	}
+}
+
+func TestEnumConstIdent(t *testing.T) {
+	cases := map[string]string{
+		"APNS_CERT_REVOKED":                   "ApnsCertRevoked",
+		"APPLE_SCHOOL_MANAGER_T_C_NOT_SIGNED": "AppleSchoolManagerTCNotSigned",
+		"mdm-byod":                            "MDMByod",
+		"General":                             "General",
+		"Pending+Failed":                      "PendingFailed",
+		// A leading digit is fine — the fragment is only ever a suffix.
+		"10.15": "1015",
+		// No alphanumerics at all → caller skips and logs.
+		"+/+": "",
+		"":    "",
+	}
+	for in, want := range cases {
+		if got := enumConstIdent(in); got != want {
+			t.Errorf("enumConstIdent(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestEnumConsts(t *testing.T) {
+	got := enumConsts("Subset", []any{"General", "Location", 42, ""})
+	if len(got) != 2 {
+		t.Fatalf("got %d consts, want 2 (non-string and empty values dropped): %+v", len(got), got)
+	}
+	if got[0].Name != "SubsetGeneral" || got[0].Value != "General" {
+		t.Errorf("first const = %+v", got[0])
+	}
+
+	// Two values colliding on one identifier: the first wins, the second is
+	// skipped rather than shadowing it.
+	coll := enumConsts("T", []any{"FOO_BAR", "foo.bar"})
+	if len(coll) != 1 || coll[0].Value != "FOO_BAR" {
+		t.Errorf("collision handling produced %+v", coll)
 	}
 }
 

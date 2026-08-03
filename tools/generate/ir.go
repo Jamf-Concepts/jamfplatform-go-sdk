@@ -7,10 +7,21 @@ package main
 // Intermediate representation
 // ---------------------------------------------------------------------------
 
+// GoEnumConst is one value of a named string-enum schema, emitted as a
+// typed constant alongside the schema's `type X = string` alias.
+// The declaration carries the wire value on the same line, so no per-value
+// godoc is emitted — a reader grepping for "MII_UNATHORIZED_RESPONSE_NOTIFICATION"
+// still finds it even though the identifier normalises the spec's misspelling.
+type GoEnumConst struct {
+	Name  string // Go identifier, e.g. NotificationTypeApnsCertRevoked
+	Value string // wire value, e.g. APNS_CERT_REVOKED
+}
+
 type GoType struct {
 	Name          string
 	Comment       string
 	Fields        []GoField
+	EnumValues    []GoEnumConst // populated for named string-enum schemas
 	IsRawJSON     bool
 	Discriminator *GoDiscriminator
 	XMLName       string // wire element name when format=xml and it differs from Go type name; emitted as XMLName xml.Name `xml:"..."` field

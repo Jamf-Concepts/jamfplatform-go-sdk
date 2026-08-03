@@ -302,14 +302,18 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 	}
 	hoistInlineObjects(doc, spec.Format)
 
-	methods, err := extractMethods(doc, spec)
+	// Only generate schemas that are actually referenced by the whitelisted operations
+	// and haven't already been emitted by a previous spec. Collected before the
+	// methods so their parameter docs can point at the enum types this set will
+	// produce; the pkg-level dedup below is applied after that read, since a
+	// type another spec already emitted is still present in the package.
+	referencedSchemas := collectReferencedSchemas(doc, spec)
+
+	methods, err := extractMethods(doc, spec, namedEnumTypes(doc, referencedSchemas))
 	if err != nil {
 		return err
 	}
 
-	// Only generate schemas that are actually referenced by the whitelisted operations
-	// and haven't already been emitted by a previous spec.
-	referencedSchemas := collectReferencedSchemas(doc, spec)
 	for name := range referencedSchemas {
 		if emittedTypes[name] {
 			delete(referencedSchemas, name)
@@ -453,13 +457,16 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
 		}
 		spec := ls.spec
-		methods, err := extractMethods(doc, spec)
+		// Collected before the methods so their parameter docs can point at the
+		// enum types this set will produce (see processSpec).
+		refs := collectReferencedSchemas(doc, spec)
+
+		methods, err := extractMethods(doc, spec, namedEnumTypes(doc, refs))
 		if err != nil {
 			return fmt.Errorf("spec %s: %w", spec.File, err)
 		}
 		allSpecs = append(allSpecs, specWithMethods{spec: spec, methods: methods, baseName: spec.baseName()})
 
-		refs := collectReferencedSchemas(doc, spec)
 		for name := range refs {
 			if pkgEmitted[name] {
 				delete(refs, name)

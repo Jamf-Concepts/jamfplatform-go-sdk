@@ -147,6 +147,46 @@ func wrapCommentText(s string, width int) []string {
 	return append(lines, cur.String())
 }
 
+// enumIdentSplitRe splits an enum wire value into word segments. Jamf's enum
+// values are SCREAMING_SNAKE in the Pro/Platform families, kebab in a few
+// (mdm-byod), and occasionally dotted or spaced in Classic.
+var enumIdentSplitRe = regexp.MustCompile(`[^A-Za-z0-9]+`)
+
+// enumConstIdent converts an enum wire value into the identifier fragment
+// appended to its type name: "APNS_CERT_REVOKED" → "ApnsCertRevoked",
+// "mdm-byod" → "MDMByod". Segments are title-cased and the shared acronym
+// fixups then run, so ID/URL/MDM land in their canonical spelling.
+//
+// A leading digit is fine — the fragment is only ever a suffix on the type
+// name, so "10.15" yields "1015" and the emitted constant is still valid.
+// Returns "" when the value holds no alphanumerics at all, leaving the caller
+// to skip it and say so rather than emit something that will not compile.
+func enumConstIdent(value string) string {
+	var b strings.Builder
+	for _, seg := range enumIdentSplitRe.Split(value, -1) {
+		if seg == "" {
+			continue
+		}
+		// An all-caps segment is a wire-format artefact, not an acronym the
+		// spec is asserting: lowercase the tail so SCREAMING_SNAKE reads as
+		// Go words. Mixed-case segments are left alone beyond the initial.
+		if seg == strings.ToUpper(seg) {
+			seg = strings.ToUpper(seg[:1]) + strings.ToLower(seg[1:])
+		} else {
+			seg = strings.ToUpper(seg[:1]) + seg[1:]
+		}
+		b.WriteString(seg)
+	}
+	s := b.String()
+	if s == "" {
+		return ""
+	}
+	for _, fix := range acronymFixups {
+		s = fix.re.ReplaceAllString(s, fix.repl)
+	}
+	return s
+}
+
 func lowerFirst(s string) string {
 	if s == "" {
 		return s
