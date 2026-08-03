@@ -86,6 +86,16 @@ Skipped, each deliberately: non-string enums (constants are typed to a `= string
 
 **The collision check must happen at registration, not when draining the collected enums.** Draining late still writes the field's `see the X constants` line, leaving it pointing at a type that carries no constants.
 
+#### Wire-verified behaviour (probed 2026-08-03)
+
+Verified against two live tenants. No generated enum was found to disagree with the server, so there is currently **no case for a `config.json` enum override**. What the probes did establish:
+
+- **Unrecognised enum values are silently dropped, not rejected.** Pro deserialises an unknown member to null and proceeds; only a *recognised* value reaches business-rule validation. A typo in a caller's string therefore changes behaviour with no error — which is the whole argument for the constants, and why the acceptance suite uses them (see `1c5e93b`, where an invalid value passed for exactly this reason).
+- **The server is an oracle for value sets.** An invalid value on a validated Pro field returns `possible values can be [ A, B, C ]`. Six fields (computer + mobile-device extension attributes × `dataType`, `inputType`, `inventoryDisplayType`) were confirmed byte-identical to what we emit.
+- **Classic validates neither `subset` nor `createdBy`.** Garbage returns 2xx with the full record. Those constants are documentation only, and Classic's Tomcat HTML errors never list valid values, so Classic has no oracle at all.
+- **Read and write representations can disagree on casing.** `ComputerGeneral.platform` (read) is a bare `string` in the spec and the server returns `"Mac"`; `ComputerGeneralCreate.platform` (write) declares `[WINDOWS, MAC, NONE]`. Both are faithfully generated — the read field gets no constants — but a consumer comparing a read value against `ComputerGeneralCreatePlatformMac` will never match, and echoing a read value back on write may be rejected. Do not assume a round-trip.
+- **`manageExistingData` carries an unencoded precondition.** Writable only on update, and only when `inputType` is `SCRIPT` with `enabled` false. The values `RETAIN`/`DELETE` are correct but rejected outside that state, including on every create.
+
 Spec prose is wrapped at 100 columns, paragraph by paragraph (blank-line separated), with HTML tags (`</br>`, `<br/>`) stripped and entities decoded. Angle-bracket placeholders like `<field_name>` are deliberately preserved — the tag stripper matches an explicit HTML tag allowlist, not a generic `<...>` pattern. Long descriptions are never truncated: a half-printed RSQL field list is worse than none, since the caller can't tell whether their field was in the dropped tail.
 
 ### Two-layer design
