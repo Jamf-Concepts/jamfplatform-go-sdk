@@ -558,11 +558,22 @@ func TestAcceptance_ResolveComputerExtensionAttributeV1_Lifecycle(t *testing.T) 
 	_, err := c.ResolveComputerExtensionAttributeV1IDByName(ctx, name)
 	requireNotFoundErr(t, "pre-create", err)
 
+	// manageExistingData is deliberately omitted. The server rejects it on
+	// create ("This field should be blank for first time CEA creation") and on
+	// any update whose inputType is not SCRIPT with enabled=false — a
+	// precondition the spec does not encode. This test previously sent
+	// "DELETE_EXISTING_DATA", which is not one of the two accepted values and
+	// only passed because the server silently drops enum members it does not
+	// recognise; the spec's own values would have produced a 400 here. Verified
+	// on the wire 2026-08-03: RETAIN and DELETE round-trip once inputType is
+	// SCRIPT and enabled is false.
 	newCEA := func(n string) *pro.ComputerExtensionAttributes {
 		return &pro.ComputerExtensionAttributes{
-			Name: n, Enabled: ptr(true), DataType: "STRING", InputType: "TEXT",
-			InventoryDisplayType: "GENERAL", ManageExistingData: ptr("DELETE_EXISTING_DATA"),
-			PopupMenuChoices: &[]string{},
+			Name: n, Enabled: ptr(true),
+			DataType:             pro.ComputerExtensionAttributesDataTypeString,
+			InputType:            pro.ComputerExtensionAttributesInputTypeText,
+			InventoryDisplayType: pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
+			PopupMenuChoices:     &[]string{},
 		}
 	}
 	resp, err := c.CreateComputerExtensionAttributeV1(ctx, newCEA(name))
