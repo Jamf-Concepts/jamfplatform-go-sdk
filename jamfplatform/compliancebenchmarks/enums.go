@@ -15,3 +15,78 @@ const (
 	RuleResultStateFailed  RuleResultState = "FAILED"
 	RuleResultStateUnknown RuleResultState = "UNKNOWN"
 )
+
+// BenchmarkRequestV2EnforcementMode is the set of values accepted by BenchmarkRequestV2.EnforcementMode.
+type BenchmarkRequestV2EnforcementMode = string
+
+// BenchmarkRequestV2EnforcementMode values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	BenchmarkRequestV2EnforcementModeMonitor           BenchmarkRequestV2EnforcementMode = "MONITOR"
+	BenchmarkRequestV2EnforcementModeMonitorAndEnforce BenchmarkRequestV2EnforcementMode = "MONITOR_AND_ENFORCE"
+)
+
+// BenchmarkResponseV2EnforcementMode is the set of values accepted by BenchmarkResponseV2.EnforcementMode.
+type BenchmarkResponseV2EnforcementMode = string
+
+// BenchmarkResponseV2EnforcementMode values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	BenchmarkResponseV2EnforcementModeMonitor           BenchmarkResponseV2EnforcementMode = "MONITOR"
+	BenchmarkResponseV2EnforcementModeMonitorAndEnforce BenchmarkResponseV2EnforcementMode = "MONITOR_AND_ENFORCE"
+)
+
+// BenchmarkV2SyncState is the set of values accepted by BenchmarkV2.SyncState.
+type BenchmarkV2SyncState = string
+
+// BenchmarkV2SyncState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	BenchmarkV2SyncStateSynced       BenchmarkV2SyncState = "SYNCED"
+	BenchmarkV2SyncStatePending      BenchmarkV2SyncState = "PENDING"
+	BenchmarkV2SyncStateFailed       BenchmarkV2SyncState = "FAILED"
+	BenchmarkV2SyncStateDeleting     BenchmarkV2SyncState = "DELETING"
+	BenchmarkV2SyncStateDeleteFailed BenchmarkV2SyncState = "DELETE_FAILED"
+)
+
+// OrganizationDefinedValueType is the set of values accepted by OrganizationDefinedValue.Type.
+type OrganizationDefinedValueType = string
+
+// OrganizationDefinedValueType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	OrganizationDefinedValueTypeInteger OrganizationDefinedValueType = "INTEGER"
+	OrganizationDefinedValueTypeString  OrganizationDefinedValueType = "STRING"
+	OrganizationDefinedValueTypeEnum    OrganizationDefinedValueType = "ENUM"
+	OrganizationDefinedValueTypeRegex   OrganizationDefinedValueType = "REGEX"
+)
+
+// OsInfoManagementType is the set of values accepted by OsInfo.ManagementType.
+type OsInfoManagementType = string
+
+// OsInfoManagementType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	OsInfoManagementTypeManaged OsInfoManagementType = "MANAGED"
+	OsInfoManagementTypeByod    OsInfoManagementType = "BYOD"
+)
+
+// OsInfoOsType is the set of values accepted by OsInfo.OsType.
+type OsInfoOsType = string
+
+// OsInfoOsType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	OsInfoOsTypeMacOs OsInfoOsType = "MAC_OS"
+	OsInfoOsTypeIos   OsInfoOsType = "IOS"
+)
+
+// OsVersionOsType is the set of values accepted by OsVersion.OsType.
+type OsVersionOsType = string
+
+// OsVersionOsType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	OsVersionOsTypeMacOs OsVersionOsType = "MAC_OS"
+	OsVersionOsTypeIos   OsVersionOsType = "IOS"
+)

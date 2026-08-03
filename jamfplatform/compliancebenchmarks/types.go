@@ -45,6 +45,7 @@ type BenchmarkRequestV2 struct {
 	// A detailed description of the benchmark.
 	Description *string `json:"description,omitempty"`
 	// The enforcement mode for this benchmark.
+	// Allowed values: see the BenchmarkRequestV2EnforcementMode constants.
 	EnforcementMode string `json:"enforcementMode"`
 	// The rules that make up this benchmark.
 	Rules []RuleRequest `json:"rules"`
@@ -66,9 +67,10 @@ type BenchmarkResponseV2 struct {
 	CanSwitchToEnforce  bool        `json:"canSwitchToEnforce"`
 	Deleted             bool        `json:"deleted"`
 	Description         string      `json:"description"`
-	EnforcementMode     string      `json:"enforcementMode"`
-	LastUpdatedAt       time.Time   `json:"lastUpdatedAt"`
-	Rules               []RuleInfo  `json:"rules"`
+	// Allowed values: see the BenchmarkResponseV2EnforcementMode constants.
+	EnforcementMode string     `json:"enforcementMode"`
+	LastUpdatedAt   time.Time  `json:"lastUpdatedAt"`
+	Rules           []RuleInfo `json:"rules"`
 	// The user-selected OS versions with full metadata.
 	SelectedOsVersions []OsVersion `json:"selectedOsVersions"`
 	Sources            []Source    `json:"sources"`
@@ -92,9 +94,10 @@ type BenchmarkRulesStatsResponse struct {
 
 // BenchmarkV2 represents a benchmark v2.
 type BenchmarkV2 struct {
-	Description     string    `json:"description"`
-	ID              string    `json:"id"`
-	Modified        bool      `json:"modified"`
+	Description string `json:"description"`
+	ID          string `json:"id"`
+	Modified    bool   `json:"modified"`
+	// Allowed values: see the BenchmarkV2SyncState constants.
 	SyncState       string    `json:"syncState"`
 	Target          *TargetV2 `json:"target,omitempty"`
 	Title           string    `json:"title"`
@@ -132,18 +135,21 @@ type ODVRequest struct {
 
 // OrganizationDefinedValue represents a organization defined value.
 type OrganizationDefinedValue struct {
-	Hint        string                 `json:"hint"`
-	Placeholder string                 `json:"placeholder"`
-	Type        string                 `json:"type"`
-	Validation  *ValidationConstraints `json:"validation,omitempty"`
-	Value       string                 `json:"value"`
+	Hint        string `json:"hint"`
+	Placeholder string `json:"placeholder"`
+	// Allowed values: see the OrganizationDefinedValueType constants.
+	Type       string                 `json:"type"`
+	Validation *ValidationConstraints `json:"validation,omitempty"`
+	Value      string                 `json:"value"`
 }
 
 // OsInfo represents a os info.
 type OsInfo struct {
+	// Allowed values: see the OsInfoManagementType constants.
 	ManagementType string `json:"managementType"`
-	OsType         string `json:"osType"`
-	OsVersion      int    `json:"osVersion"`
+	// Allowed values: see the OsInfoOsType constants.
+	OsType    string `json:"osType"`
+	OsVersion int    `json:"osVersion"`
 }
 
 // OsSpecificRuleInfo represents a os specific rule info.
@@ -156,6 +162,7 @@ type OsSpecificRuleInfo struct {
 // OsVersion represents a os version.
 type OsVersion struct {
 	// Operating system type.
+	// Allowed values: see the OsVersionOsType constants.
 	OsType string `json:"osType"`
 	// Operating system version number.
 	OsVersion int `json:"osVersion"`

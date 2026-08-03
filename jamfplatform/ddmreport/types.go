@@ -31,6 +31,7 @@ type DeclarationReportClientDto struct {
 	// The server token for the declaration.
 	ServerToken string `json:"serverToken"`
 	// The validity state of the declaration.
+	// Allowed values: see the DeclarationReportClientDtoValidityState constants.
 	ValidityState string `json:"validityState"`
 }
 
@@ -120,10 +121,13 @@ type FilteredResultDto struct {
 	// The server token for the declaration.
 	ServerToken string `json:"serverToken"`
 	// The installation status of the declaration.
+	// Allowed values: see the FilteredResultDtoStatus constants.
 	Status string `json:"status"`
 	// The type of the declaration.
+	// Allowed values: see the FilteredResultDtoType constants.
 	Type string `json:"type"`
 	// The validity state of the declaration.
+	// Allowed values: see the FilteredResultDtoValidityState constants.
 	ValidityState string `json:"validityState"`
 }
 
@@ -140,10 +144,13 @@ type StatusReportDeclarationDto struct {
 	// The server token for the declaration.
 	ServerToken string `json:"serverToken"`
 	// The installation status of the declaration.
+	// Allowed values: see the StatusReportDeclarationDtoStatus constants.
 	Status string `json:"status"`
 	// The type of the declaration.
+	// Allowed values: see the StatusReportDeclarationDtoType constants.
 	Type string `json:"type"`
 	// The validity state of the declaration.
+	// Allowed values: see the StatusReportDeclarationDtoValidityState constants.
 	ValidityState string `json:"validityState"`
 }
 

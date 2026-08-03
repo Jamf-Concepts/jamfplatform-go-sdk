@@ -16,6 +16,7 @@ type AcceptCookies struct {
 	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 	// The policy Safari uses for managing cookies.
+	// Allowed values: see the AcceptCookiesValue constants.
 	Value *string `json:"Value,omitempty"`
 }
 
@@ -101,8 +102,9 @@ type AutomaticAction struct {
 	// Controls whether this control should be used.
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
 	// can supply a value on update.
-	Included *bool  `json:"Included,omitempty"`
-	Value    string `json:"Value"`
+	Included *bool `json:"Included,omitempty"`
+	// Allowed values: see the AutomaticActionValue constants.
+	Value string `json:"Value"`
 }
 
 // AutomaticActions represents a automatic actions.
@@ -139,9 +141,10 @@ type BetaProgram struct {
 
 // BetaSettings represents a beta settings.
 type BetaSettings struct {
-	OfferPrograms     *[]BetaProgram `json:"OfferPrograms,omitempty"`
-	ProgramEnrollment string         `json:"ProgramEnrollment"`
-	RequireProgram    *BetaProgram   `json:"RequireProgram,omitempty"`
+	OfferPrograms *[]BetaProgram `json:"OfferPrograms,omitempty"`
+	// Allowed values: see the BetaSettingsProgramEnrollment constants.
+	ProgramEnrollment string       `json:"ProgramEnrollment"`
+	RequireProgram    *BetaProgram `json:"RequireProgram,omitempty"`
 }
 
 // BlueprintDetail represents a blueprint detail.
@@ -516,6 +519,7 @@ type DeploymentState struct {
 	// Information about last deployment job.
 	LastDeployment *Deployment `json:"lastDeployment,omitempty"`
 	// Blueprint state.
+	// Allowed values: see the DeploymentStateState constants.
 	State string `json:"state"`
 }
 
@@ -668,6 +672,7 @@ type ManagedAppConfiguration struct {
 // ManagedAppEntry Configuration for a single volume purchasing app.
 type ManagedAppEntry struct {
 	// Controls whether the app can be downloaded over a cellular connection.
+	// Allowed values: see the ManagedAppEntryAllowDownloadsOverCellular constants.
 	AllowDownloadsOverCellular *string `json:"AllowDownloadsOverCellular,omitempty"`
 	// Identifier of the volume purchasing token that licenses this app.
 	AppAndBookTokenID string `json:"AppAndBookTokenId"`
@@ -680,10 +685,12 @@ type ManagedAppEntry struct {
 	// `Hideable` is required and must also be `false`.
 	Attributes *ManagedAppAttributes `json:"Attributes,omitempty"`
 	// Controls whether the app updates automatically.
+	// Allowed values: see the ManagedAppEntryAutomaticAppUpdates constants.
 	AutomaticAppUpdates *string `json:"AutomaticAppUpdates,omitempty"`
 	// Whether the app's data is included in device backups.
 	IncludeInBackup *bool `json:"IncludeInBackup,omitempty"`
 	// Whether the app must be installed on devices in scope.
+	// Allowed values: see the ManagedAppEntryInstall constants.
 	Install *string `json:"Install,omitempty"`
 }
 
@@ -694,8 +701,10 @@ type ManagedExtension struct {
 	// Denied domains.
 	DeniedDomains *[]ManagedExtensionDomain `json:"DeniedDomains,omitempty"`
 	// Private Browsing state.
+	// Allowed values: see the ManagedExtensionPrivateBrowsing constants.
 	PrivateBrowsing *string `json:"PrivateBrowsing,omitempty"`
 	// Extension state.
+	// Allowed values: see the ManagedExtensionState constants.
 	State *string `json:"State,omitempty"`
 }
 
@@ -800,6 +809,7 @@ type NewTabStartPage struct {
 	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 	// Sets the start page type in Safari.
+	// Allowed values: see the NewTabStartPagePageType constants.
 	PageType *string `json:"PageType,omitempty"`
 }
 
@@ -894,8 +904,9 @@ type RecommendedCadence struct {
 	// Controls whether this control should be used.
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
 	// can supply a value on update.
-	Included *bool  `json:"Included,omitempty"`
-	Value    string `json:"Value"`
+	Included *bool `json:"Included,omitempty"`
+	// Allowed values: see the RecommendedCadenceValue constants.
+	Value string `json:"Value"`
 }
 
 // RequireAlphanumericPasscode represents a require alphanumeric passcode.
@@ -1018,6 +1029,7 @@ type StorageMode struct {
 	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
 	// Controls whether the mode is enabled.
+	// Allowed values: see the StorageModeValue constants.
 	Value string `json:"Value"`
 }
 
@@ -1151,6 +1163,7 @@ type UnpairingTime struct {
 	// Local time hour (24-hour clock) for automatic unpairing. Required when Policy is "Hour".
 	Hour *int `json:"Hour,omitempty"`
 	// A string that specifies the device's unpairing policy.
+	// Allowed values: see the UnpairingTimePolicy constants.
 	Policy string `json:"Policy"`
 }
 

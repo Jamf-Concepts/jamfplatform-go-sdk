@@ -9,11 +9,13 @@ import "encoding/xml"
 
 // Account represents a account.
 type Account struct {
-	XMLName             xml.Name
-	AccessLevel         *string            `xml:"access_level,omitempty"`
-	DirectoryUser       *bool              `xml:"directory_user,omitempty"`
-	Email               *string            `xml:"email,omitempty"`
-	EmailAddress        *string            `xml:"email_address,omitempty"`
+	XMLName xml.Name
+	// Allowed values: see the AccountAccessLevel constants.
+	AccessLevel   *string `xml:"access_level,omitempty"`
+	DirectoryUser *bool   `xml:"directory_user,omitempty"`
+	Email         *string `xml:"email,omitempty"`
+	EmailAddress  *string `xml:"email_address,omitempty"`
+	// Allowed values: see the AccountEnabled constants.
 	Enabled             *string            `xml:"enabled,omitempty"`
 	ForcePasswordChange *bool              `xml:"force_password_change,omitempty"`
 	FullName            *string            `xml:"full_name,omitempty"`
@@ -24,11 +26,12 @@ type Account struct {
 	Name *string `xml:"name,omitempty"`
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
 	// can supply a value on update.
-	Password       *string            `xml:"password,omitempty"`
-	PasswordSha256 *string            `xml:"password_sha256,omitempty"`
-	PrivilegeSet   *string            `xml:"privilege_set,omitempty"`
-	Privileges     *AccountPrivileges `xml:"privileges,omitempty"`
-	Site           *SiteObject        `xml:"site,omitempty"`
+	Password       *string `xml:"password,omitempty"`
+	PasswordSha256 *string `xml:"password_sha256,omitempty"`
+	// Allowed values: see the AccountPrivilegeSet constants.
+	PrivilegeSet *string            `xml:"privilege_set,omitempty"`
+	Privileges   *AccountPrivileges `xml:"privileges,omitempty"`
+	Site         *SiteObject        `xml:"site,omitempty"`
 }
 
 // MarshalXML forces the Account root element name to the wire value
@@ -1372,7 +1375,8 @@ func (t ClassMeetingTimes) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 
 // ClassMeetingTimesMeetingTime represents a class meeting times meeting time.
 type ClassMeetingTimesMeetingTime struct {
-	XMLName   xml.Name
+	XMLName xml.Name
+	// Allowed values: see the ClassMeetingTimesMeetingTimeDays constants.
 	Days      *string `xml:"days,omitempty"`
 	EndTime   *int    `xml:"end_time,omitempty"`
 	StartTime *int    `xml:"start_time,omitempty"`
@@ -1904,7 +1908,8 @@ type Commandflush struct {
 	XMLName       xml.Name
 	ID            *int                       `xml:"id,omitempty"`
 	MobileDevices *CommandflushMobileDevices `xml:"mobile_devices,omitempty"`
-	Status        *string                    `xml:"status,omitempty"`
+	// Allowed values: see the CommandflushStatus constants.
+	Status *string `xml:"status,omitempty"`
 }
 
 // MarshalXML forces the Commandflush root element name to the wire value
@@ -2334,12 +2339,13 @@ type ComputerHardware struct {
 	ProcessorSpeedMhz           *string                                `xml:"processor_speed_mhz,omitempty"`
 	ProcessorType               *string                                `xml:"processor_type,omitempty"`
 	ServicePack                 *string                                `xml:"service_pack,omitempty"`
-	SipStatus                   *string                                `xml:"sip_status,omitempty"`
-	SmcVersion                  *string                                `xml:"smc_version,omitempty"`
-	Storage                     *ComputerHardwareStorage               `xml:"storage,omitempty"`
-	TotalRam                    *int                                   `xml:"total_ram,omitempty"`
-	TotalRamMb                  *int                                   `xml:"total_ram_mb,omitempty"`
-	XprotectVersion             *string                                `xml:"xprotect_version,omitempty"`
+	// Allowed values: see the ComputerHardwareSipStatus constants.
+	SipStatus       *string                  `xml:"sip_status,omitempty"`
+	SmcVersion      *string                  `xml:"smc_version,omitempty"`
+	Storage         *ComputerHardwareStorage `xml:"storage,omitempty"`
+	TotalRam        *int                     `xml:"total_ram,omitempty"`
+	TotalRamMb      *int                     `xml:"total_ram_mb,omitempty"`
+	XprotectVersion *string                  `xml:"xprotect_version,omitempty"`
 }
 
 // MarshalXML forces the ComputerHardware root element name to the wire value
@@ -3399,7 +3405,8 @@ func (t ComputerCommandsItemComputerCommandComputersComputerItem) MarshalXML(e *
 
 // ComputerExtensionAttribute represents a computer extension attribute.
 type ComputerExtensionAttribute struct {
-	XMLName  xml.Name
+	XMLName xml.Name
+	// Allowed values: see the ComputerExtensionAttributeDataType constants.
 	DataType *string `xml:"data_type,omitempty"`
 	// Description of the extension attribute.
 	Description *string `xml:"description,omitempty"`
@@ -3408,6 +3415,7 @@ type ComputerExtensionAttribute struct {
 	ID        *int                                 `xml:"id,omitempty"`
 	InputType *ComputerExtensionAttributeInputType `xml:"input_type,omitempty"`
 	// Category in which to display the extension attribute in Jamf Pro.
+	// Allowed values: see the ComputerExtensionAttributeInventoryDisplay constants.
 	InventoryDisplay *string `xml:"inventory_display,omitempty"`
 	// Extension attribute name.
 	Name *string `xml:"name,omitempty"`
@@ -3433,7 +3441,8 @@ type ComputerExtensionAttributeInputType struct {
 	Platform     *string                                          `xml:"platform,omitempty"`
 	PopupChoices *ComputerExtensionAttributeInputTypePopupChoices `xml:"popup_choices,omitempty"`
 	Script       *string                                          `xml:"script,omitempty"`
-	Type         *string                                          `xml:"type,omitempty"`
+	// Allowed values: see the ComputerExtensionAttributeInputTypeType constants.
+	Type *string `xml:"type,omitempty"`
 }
 
 // MarshalXML forces the ComputerExtensionAttributeInputType root element name to the wire value
@@ -3803,8 +3812,9 @@ type ComputerHardwareSoftwareReportsFontReport struct {
 	DateTimeUtc   *string `xml:"date_time_utc,omitempty"`
 	Name          *string `xml:"name,omitempty"`
 	Path          *string `xml:"path,omitempty"`
-	Type          *string `xml:"type,omitempty"`
-	Version       *string `xml:"version,omitempty"`
+	// Allowed values: see the ComputerHardwareSoftwareReportsFontReportType constants.
+	Type    *string `xml:"type,omitempty"`
+	Version *string `xml:"version,omitempty"`
 }
 
 // MarshalXML forces the ComputerHardwareSoftwareReportsFontReport root element name to the wire value
@@ -3863,8 +3873,9 @@ type ComputerHardwareSoftwareReportsPluginReport struct {
 	DateTimeUtc   *string `xml:"date_time_utc,omitempty"`
 	Name          *string `xml:"name,omitempty"`
 	Path          *string `xml:"path,omitempty"`
-	Type          *string `xml:"type,omitempty"`
-	Version       *string `xml:"version,omitempty"`
+	// Allowed values: see the ComputerHardwareSoftwareReportsPluginReportType constants.
+	Type    *string `xml:"type,omitempty"`
+	Version *string `xml:"version,omitempty"`
 }
 
 // MarshalXML forces the ComputerHardwareSoftwareReportsPluginReport root element name to the wire value
@@ -3888,8 +3899,9 @@ type ComputerHardwareSoftwareReportsSoftwareReport struct {
 	DateTimeUtc   *string `xml:"date_time_utc,omitempty"`
 	Name          *string `xml:"name,omitempty"`
 	Path          *string `xml:"path,omitempty"`
-	Type          *string `xml:"type,omitempty"`
-	Version       *string `xml:"version,omitempty"`
+	// Allowed values: see the ComputerHardwareSoftwareReportsSoftwareReportType constants.
+	Type    *string `xml:"type,omitempty"`
+	Version *string `xml:"version,omitempty"`
 }
 
 // MarshalXML forces the ComputerHardwareSoftwareReportsSoftwareReport root element name to the wire value
@@ -4621,8 +4633,9 @@ func (t ComputerInventoryCollectionApplications) MarshalXML(e *xml.Encoder, star
 
 // ComputerInventoryCollectionApplicationsApplicationItem represents a computer inventory collection applications application item.
 type ComputerInventoryCollectionApplicationsApplicationItem struct {
-	XMLName  xml.Name
-	Path     *string `xml:"path,omitempty"`
+	XMLName xml.Name
+	Path    *string `xml:"path,omitempty"`
+	// Allowed values: see the ComputerInventoryCollectionApplicationsApplicationItemPlatform constants.
 	Platform *string `xml:"platform,omitempty"`
 }
 
@@ -4660,8 +4673,9 @@ func (t ComputerInventoryCollectionFonts) MarshalXML(e *xml.Encoder, start xml.S
 
 // ComputerInventoryCollectionFontsFontItem represents a computer inventory collection fonts font item.
 type ComputerInventoryCollectionFontsFontItem struct {
-	XMLName  xml.Name
-	Path     *string `xml:"path,omitempty"`
+	XMLName xml.Name
+	Path    *string `xml:"path,omitempty"`
+	// Allowed values: see the ComputerInventoryCollectionFontsFontItemPlatform constants.
 	Platform *string `xml:"platform,omitempty"`
 }
 
@@ -4699,8 +4713,9 @@ func (t ComputerInventoryCollectionPlugins) MarshalXML(e *xml.Encoder, start xml
 
 // ComputerInventoryCollectionPluginsPluginItem represents a computer inventory collection plugins plugin item.
 type ComputerInventoryCollectionPluginsPluginItem struct {
-	XMLName  xml.Name
-	Path     *string `xml:"path,omitempty"`
+	XMLName xml.Name
+	Path    *string `xml:"path,omitempty"`
+	// Allowed values: see the ComputerInventoryCollectionPluginsPluginItemPlatform constants.
 	Platform *string `xml:"platform,omitempty"`
 }
 
@@ -5370,12 +5385,13 @@ type ComputerPostHardware struct {
 	ProcessorSpeedMhz           *string                                `xml:"processor_speed_mhz,omitempty"`
 	ProcessorType               *string                                `xml:"processor_type,omitempty"`
 	ServicePack                 *string                                `xml:"service_pack,omitempty"`
-	SipStatus                   *string                                `xml:"sip_status,omitempty"`
-	SmcVersion                  *string                                `xml:"smc_version,omitempty"`
-	Storage                     *ComputerHardwareStorage               `xml:"storage,omitempty"`
-	TotalRam                    *int                                   `xml:"total_ram,omitempty"`
-	TotalRamMb                  *int                                   `xml:"total_ram_mb,omitempty"`
-	XprotectVersion             *string                                `xml:"xprotect_version,omitempty"`
+	// Allowed values: see the ComputerPostHardwareSipStatus constants.
+	SipStatus       *string                  `xml:"sip_status,omitempty"`
+	SmcVersion      *string                  `xml:"smc_version,omitempty"`
+	Storage         *ComputerHardwareStorage `xml:"storage,omitempty"`
+	TotalRam        *int                     `xml:"total_ram,omitempty"`
+	TotalRamMb      *int                     `xml:"total_ram_mb,omitempty"`
+	XprotectVersion *string                  `xml:"xprotect_version,omitempty"`
 }
 
 // MarshalXML forces the ComputerPostHardware root element name to the wire value
@@ -5678,7 +5694,8 @@ func (t ComputersBasicComputer) MarshalXML(e *xml.Encoder, start xml.StartElemen
 
 // Criterion represents a criterion.
 type Criterion struct {
-	XMLName      xml.Name
+	XMLName xml.Name
+	// Allowed values: see the CriterionAndOr constants.
 	AndOr        *string `xml:"and_or,omitempty"`
 	ClosingParen *bool   `xml:"closing_paren,omitempty"`
 	// Name of the criteria.
@@ -5972,11 +5989,13 @@ func (t DirectoryBindingsItem) MarshalXML(e *xml.Encoder, start xml.StartElement
 
 // DiskEncryptionConfiguration represents a disk encryption configuration.
 type DiskEncryptionConfiguration struct {
-	XMLName                  xml.Name
+	XMLName xml.Name
+	// Allowed values: see the DiskEncryptionConfigurationFileVaultEnabledUsers constants.
 	FileVaultEnabledUsers    *string                                              `xml:"file_vault_enabled_users,omitempty"`
 	ID                       *int                                                 `xml:"id,omitempty"`
 	InstitutionalRecoveryKey *DiskEncryptionConfigurationInstitutionalRecoveryKey `xml:"institutional_recovery_key,omitempty"`
-	KeyType                  *string                                              `xml:"key_type,omitempty"`
+	// Allowed values: see the DiskEncryptionConfigurationKeyType constants.
+	KeyType *string `xml:"key_type,omitempty"`
 	// Name of the disk encryption configuration.
 	Name *string `xml:"name,omitempty"`
 }
@@ -6060,7 +6079,8 @@ func (t DiskEncryptionConfigurationsItem) MarshalXML(e *xml.Encoder, start xml.S
 
 // DistributionPoint represents a distribution point.
 type DistributionPoint struct {
-	XMLName        xml.Name
+	XMLName xml.Name
+	// Allowed values: see the DistributionPointConnectionType constants.
 	ConnectionType *string `xml:"connection_type,omitempty"`
 	// Path to the share.
 	Context              *string `xml:"context,omitempty"`
@@ -6086,7 +6106,8 @@ type DistributionPoint struct {
 	NoAuthenticationRequired *bool   `xml:"no_authentication_required,omitempty"`
 	Password                 *string `xml:"password,omitempty"`
 	Port                     *int    `xml:"port,omitempty"`
-	Protocol                 *string `xml:"protocol,omitempty"`
+	// Allowed values: see the DistributionPointProtocol constants.
+	Protocol *string `xml:"protocol,omitempty"`
 	// Password for the read only account.
 	ReadOnlyPassword       *string `xml:"read_only_password,omitempty"`
 	ReadOnlyPasswordSha256 *string `xml:"read_only_password_sha256,omitempty"`
@@ -6122,7 +6143,8 @@ func (t DistributionPoint) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 
 // DistributionPointPost represents a distribution point post.
 type DistributionPointPost struct {
-	XMLName        xml.Name
+	XMLName xml.Name
+	// Allowed values: see the DistributionPointPostConnectionType constants.
 	ConnectionType *string `xml:"connection_type,omitempty"`
 	// Path to the share.
 	Context              *string `xml:"context,omitempty"`
@@ -6148,7 +6170,8 @@ type DistributionPointPost struct {
 	NoAuthenticationRequired *bool   `xml:"no_authentication_required,omitempty"`
 	Password                 *string `xml:"password,omitempty"`
 	Port                     *int    `xml:"port,omitempty"`
-	Protocol                 *string `xml:"protocol,omitempty"`
+	// Allowed values: see the DistributionPointPostProtocol constants.
+	Protocol *string `xml:"protocol,omitempty"`
 	// Password for the read only account.
 	ReadOnlyPassword       *string `xml:"read_only_password,omitempty"`
 	ReadOnlyPasswordSha256 *string `xml:"read_only_password_sha256,omitempty"`
@@ -6231,6 +6254,7 @@ type DockItem struct {
 	// Name of the dock item.
 	Name *string `xml:"name,omitempty"`
 	Path *string `xml:"path,omitempty"`
+	// Allowed values: see the DockItemType constants.
 	Type *string `xml:"type,omitempty"`
 }
 
@@ -6316,10 +6340,12 @@ type EbookGeneral struct {
 	Author          *string         `xml:"author,omitempty"`
 	Category        *CategoryObject `xml:"category,omitempty"`
 	DeployAsManaged *bool           `xml:"deploy_as_managed,omitempty"`
-	DeploymentType  *string         `xml:"deployment_type,omitempty"`
-	FileType        *string         `xml:"file_type,omitempty"`
-	Free            *bool           `xml:"free,omitempty"`
-	ID              *int            `xml:"id,omitempty"`
+	// Allowed values: see the EbookGeneralDeploymentType constants.
+	DeploymentType *string `xml:"deployment_type,omitempty"`
+	// Allowed values: see the EbookGeneralFileType constants.
+	FileType *string `xml:"file_type,omitempty"`
+	Free     *bool   `xml:"free,omitempty"`
+	ID       *int    `xml:"id,omitempty"`
 	// Name of the ebook.
 	Name            *string                      `xml:"name,omitempty"`
 	SelfServiceIcon *EbookGeneralSelfServiceIcon `xml:"self_service_icon,omitempty"`
@@ -7135,10 +7161,12 @@ type EbookPostGeneral struct {
 	Author          *string         `xml:"author,omitempty"`
 	Category        *CategoryObject `xml:"category,omitempty"`
 	DeployAsManaged *bool           `xml:"deploy_as_managed,omitempty"`
-	DeploymentType  *string         `xml:"deployment_type,omitempty"`
-	FileType        *string         `xml:"file_type,omitempty"`
-	Free            *bool           `xml:"free,omitempty"`
-	ID              *int            `xml:"id,omitempty"`
+	// Allowed values: see the EbookPostGeneralDeploymentType constants.
+	DeploymentType *string `xml:"deployment_type,omitempty"`
+	// Allowed values: see the EbookPostGeneralFileType constants.
+	FileType *string `xml:"file_type,omitempty"`
+	Free     *bool   `xml:"free,omitempty"`
+	ID       *int    `xml:"id,omitempty"`
 	// Name of the ebook.
 	Name            *string                      `xml:"name,omitempty"`
 	SelfServiceIcon *EbookGeneralSelfServiceIcon `xml:"self_service_icon,omitempty"`
@@ -7266,13 +7294,15 @@ func (t EbooksItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 // Group represents a group.
 type Group struct {
-	XMLName     xml.Name
+	XMLName xml.Name
+	// Allowed values: see the GroupAccessLevel constants.
 	AccessLevel *string          `xml:"access_level,omitempty"`
 	ID          *int             `xml:"id,omitempty"`
 	LdapServer  *GroupLdapServer `xml:"ldap_server,omitempty"`
 	Members     *GroupMembers    `xml:"members,omitempty"`
 	// Group name.
-	Name         *string          `xml:"name,omitempty"`
+	Name *string `xml:"name,omitempty"`
+	// Allowed values: see the GroupPrivilegeSet constants.
 	PrivilegeSet *string          `xml:"privilege_set,omitempty"`
 	Privileges   *GroupPrivileges `xml:"privileges,omitempty"`
 	Site         *Site            `xml:"site,omitempty"`
@@ -7492,11 +7522,12 @@ func (t GroupPrivilegesRecon) MarshalXML(e *xml.Encoder, start xml.StartElement)
 // GsxConnection represents a gsx connection.
 type GsxConnection struct {
 	XMLName       xml.Name
-	AccountNumber *int    `xml:"account_number,omitempty"`
-	Enabled       *bool   `xml:"enabled,omitempty"`
-	Region        *string `xml:"region,omitempty"`
-	URI           *string `xml:"uri,omitempty"`
-	Username      *string `xml:"username,omitempty"`
+	AccountNumber *int  `xml:"account_number,omitempty"`
+	Enabled       *bool `xml:"enabled,omitempty"`
+	// Allowed values: see the GsxConnectionRegion constants.
+	Region   *string `xml:"region,omitempty"`
+	URI      *string `xml:"uri,omitempty"`
+	Username *string `xml:"username,omitempty"`
 }
 
 // MarshalXML forces the GsxConnection root element name to the wire value
@@ -7640,9 +7671,10 @@ type HealthcareListenerRule struct {
 	AdtMessage      *string `xml:"adt_message,omitempty"`
 	AdtMessageField *string `xml:"adt_message_field,omitempty"`
 	// -1 represents the location field 'Room'; any other number is a mobile device extension attribute ID.
-	DeviceInventoryField     *int                                      `xml:"device_inventory_field,omitempty"`
-	HclID                    *int                                      `xml:"hcl_id,omitempty"`
-	ID                       *int                                      `xml:"id,omitempty"`
+	DeviceInventoryField *int `xml:"device_inventory_field,omitempty"`
+	HclID                *int `xml:"hcl_id,omitempty"`
+	ID                   *int `xml:"id,omitempty"`
+	// Allowed values: see the HealthcareListenerRuleMDMCommand constants.
 	MDMCommand               *string                                   `xml:"mdm_command,omitempty"`
 	MDMCommandAdditionalData *string                                   `xml:"mdm_command_additional_data,omitempty"`
 	Name                     *string                                   `xml:"name,omitempty"`
@@ -7650,7 +7682,8 @@ type HealthcareListenerRule struct {
 	NotificationEnabled      *bool                                     `xml:"notification_enabled,omitempty"`
 	NotificationThreshold    *int                                      `xml:"notification_threshold,omitempty"`
 	NotifyUnsupportedEnabled *bool                                     `xml:"notify_unsupported_enabled,omitempty"`
-	OperatingSystem          *string                                   `xml:"operating_system,omitempty"`
+	// Allowed values: see the HealthcareListenerRuleOperatingSystem constants.
+	OperatingSystem *string `xml:"operating_system,omitempty"`
 }
 
 // MarshalXML forces the HealthcareListenerRule root element name to the wire value
@@ -8021,10 +8054,11 @@ func (t LdapServer) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 // LdapServerConnection represents a ldap server connection.
 type LdapServerConnection struct {
-	XMLName            xml.Name
-	Account            *LdapServerConnectionAccount `xml:"account,omitempty"`
-	AuthenticationType *string                      `xml:"authentication_type,omitempty"`
-	CertificatesUsed   *string                      `xml:"certificates_used,omitempty"`
+	XMLName xml.Name
+	Account *LdapServerConnectionAccount `xml:"account,omitempty"`
+	// Allowed values: see the LdapServerConnectionAuthenticationType constants.
+	AuthenticationType *string `xml:"authentication_type,omitempty"`
+	CertificatesUsed   *string `xml:"certificates_used,omitempty"`
 	// Hostname or IP address of the server.
 	Hostname     *string `xml:"hostname,omitempty"`
 	ID           *int    `xml:"id,omitempty"`
@@ -8033,14 +8067,16 @@ type LdapServerConnection struct {
 	// Name of the LDAP server.
 	Name *string `xml:"name,omitempty"`
 	// Timeout in seconds.
-	OpenCloseTimeout *int    `xml:"open_close_timeout,omitempty"`
-	Port             *int    `xml:"port,omitempty"`
+	OpenCloseTimeout *int `xml:"open_close_timeout,omitempty"`
+	Port             *int `xml:"port,omitempty"`
+	// Allowed values: see the LdapServerConnectionReferralResponse constants.
 	ReferralResponse *string `xml:"referral_response,omitempty"`
 	// Timeout in seconds.
-	SearchTimeout *int    `xml:"search_timeout,omitempty"`
-	ServerType    *string `xml:"server_type,omitempty"`
-	UseSsl        *bool   `xml:"use_ssl,omitempty"`
-	UseWildcards  *bool   `xml:"use_wildcards,omitempty"`
+	SearchTimeout *int `xml:"search_timeout,omitempty"`
+	// Allowed values: see the LdapServerConnectionServerType constants.
+	ServerType   *string `xml:"server_type,omitempty"`
+	UseSsl       *bool   `xml:"use_ssl,omitempty"`
+	UseWildcards *bool   `xml:"use_wildcards,omitempty"`
 }
 
 // MarshalXML forces the LdapServerConnection root element name to the wire value
@@ -8101,14 +8137,17 @@ func (t LdapServerMappingsForUsers) MarshalXML(e *xml.Encoder, start xml.StartEl
 
 // LdapServerMappingsForUsersUserGroupMappings represents a ldap server mappings for users user group mappings.
 type LdapServerMappingsForUsersUserGroupMappings struct {
-	XMLName                  xml.Name
-	MapGroupID               *string `xml:"map_group_id,omitempty"`
-	MapGroupName             *string `xml:"map_group_name,omitempty"`
-	MapGroupUUID             *string `xml:"map_group_uuid,omitempty"`
+	XMLName      xml.Name
+	MapGroupID   *string `xml:"map_group_id,omitempty"`
+	MapGroupName *string `xml:"map_group_name,omitempty"`
+	MapGroupUUID *string `xml:"map_group_uuid,omitempty"`
+	// Allowed values: see the LdapServerMappingsForUsersUserGroupMappingsMapObjectClassToAnyOrAll
+	// constants.
 	MapObjectClassToAnyOrAll *string `xml:"map_object_class_to_any_or_all,omitempty"`
 	ObjectClasses            *string `xml:"object_classes,omitempty"`
 	SearchBase               *string `xml:"search_base,omitempty"`
-	SearchScope              *string `xml:"search_scope,omitempty"`
+	// Allowed values: see the LdapServerMappingsForUsersUserGroupMappingsSearchScope constants.
+	SearchScope *string `xml:"search_scope,omitempty"`
 }
 
 // MarshalXML forces the LdapServerMappingsForUsersUserGroupMappings root element name to the wire value
@@ -8131,18 +8170,23 @@ type LdapServerMappingsForUsersUserGroupMembershipMappings struct {
 	GroupID                                          *string `xml:"group_id,omitempty"`
 	GroupMembershipEnabledWhenUserMembershipSelected *bool   `xml:"group_membership_enabled_when_user_membership_selected,omitempty"`
 	MapGroupMembershipToUserField                    *string `xml:"map_group_membership_to_user_field,omitempty"`
-	MapObjectClassToAnyOrAll                         *string `xml:"map_object_class_to_any_or_all,omitempty"`
-	MapUserMembershipToGroupField                    *string `xml:"map_user_membership_to_group_field"`
-	MapUserMembershipUseDn                           *bool   `xml:"map_user_membership_use_dn,omitempty"`
-	MembershipScopingOptimization                    *bool   `xml:"membership_scoping_optimization,omitempty"`
-	ObjectClasses                                    *string `xml:"object_classes,omitempty"`
-	RecursiveLookups                                 *bool   `xml:"recursive_lookups,omitempty"`
-	SearchBase                                       *string `xml:"search_base,omitempty"`
-	SearchScope                                      *string `xml:"search_scope,omitempty"`
-	UseDn                                            *bool   `xml:"use_dn,omitempty"`
-	UserGroupMembershipStoredIn                      *string `xml:"user_group_membership_stored_in,omitempty"`
-	UserGroupMembershipUseLdapCompare                *bool   `xml:"user_group_membership_use_ldap_compare,omitempty"`
-	Username                                         *string `xml:"username,omitempty"`
+	// Allowed values: see the
+	// LdapServerMappingsForUsersUserGroupMembershipMappingsMapObjectClassToAnyOrAll constants.
+	MapObjectClassToAnyOrAll      *string `xml:"map_object_class_to_any_or_all,omitempty"`
+	MapUserMembershipToGroupField *string `xml:"map_user_membership_to_group_field"`
+	MapUserMembershipUseDn        *bool   `xml:"map_user_membership_use_dn,omitempty"`
+	MembershipScopingOptimization *bool   `xml:"membership_scoping_optimization,omitempty"`
+	ObjectClasses                 *string `xml:"object_classes,omitempty"`
+	RecursiveLookups              *bool   `xml:"recursive_lookups,omitempty"`
+	SearchBase                    *string `xml:"search_base,omitempty"`
+	// Allowed values: see the LdapServerMappingsForUsersUserGroupMembershipMappingsSearchScope constants.
+	SearchScope *string `xml:"search_scope,omitempty"`
+	UseDn       *bool   `xml:"use_dn,omitempty"`
+	// Allowed values: see the
+	// LdapServerMappingsForUsersUserGroupMembershipMappingsUserGroupMembershipStoredIn constants.
+	UserGroupMembershipStoredIn       *string `xml:"user_group_membership_stored_in,omitempty"`
+	UserGroupMembershipUseLdapCompare *bool   `xml:"user_group_membership_use_ldap_compare,omitempty"`
+	Username                          *string `xml:"username,omitempty"`
 }
 
 // MarshalXML forces the LdapServerMappingsForUsersUserGroupMembershipMappings root element name to the wire value
@@ -8160,11 +8204,12 @@ func (t LdapServerMappingsForUsersUserGroupMembershipMappings) MarshalXML(e *xml
 
 // LdapServerMappingsForUsersUserMappings represents a ldap server mappings for users user mappings.
 type LdapServerMappingsForUsersUserMappings struct {
-	XMLName                  xml.Name
-	AppendToEmailResults     *string `xml:"append_to_email_results,omitempty"`
-	MapBuilding              *string `xml:"map_building,omitempty"`
-	MapDepartment            *string `xml:"map_department,omitempty"`
-	MapEmailAddress          *string `xml:"map_email_address,omitempty"`
+	XMLName              xml.Name
+	AppendToEmailResults *string `xml:"append_to_email_results,omitempty"`
+	MapBuilding          *string `xml:"map_building,omitempty"`
+	MapDepartment        *string `xml:"map_department,omitempty"`
+	MapEmailAddress      *string `xml:"map_email_address,omitempty"`
+	// Allowed values: see the LdapServerMappingsForUsersUserMappingsMapObjectClassToAnyOrAll constants.
 	MapObjectClassToAnyOrAll *string `xml:"map_object_class_to_any_or_all,omitempty"`
 	MapPhone                 *string `xml:"map_phone,omitempty"`
 	MapPosition              *string `xml:"map_position,omitempty"`
@@ -8175,7 +8220,8 @@ type LdapServerMappingsForUsersUserMappings struct {
 	MapUsername              *string `xml:"map_username,omitempty"`
 	ObjectClasses            *string `xml:"object_classes,omitempty"`
 	SearchBase               *string `xml:"search_base,omitempty"`
-	SearchScope              *string `xml:"search_scope,omitempty"`
+	// Allowed values: see the LdapServerMappingsForUsersUserMappingsSearchScope constants.
+	SearchScope *string `xml:"search_scope,omitempty"`
 }
 
 // MarshalXML forces the LdapServerMappingsForUsersUserMappings root element name to the wire value
@@ -8214,10 +8260,11 @@ func (t LdapServerPost) MarshalXML(e *xml.Encoder, start xml.StartElement) error
 
 // LdapServerPostConnection represents a ldap server post connection.
 type LdapServerPostConnection struct {
-	XMLName            xml.Name
-	Account            *LdapServerConnectionAccount `xml:"account,omitempty"`
-	AuthenticationType *string                      `xml:"authentication_type,omitempty"`
-	CertificatesUsed   *string                      `xml:"certificates_used,omitempty"`
+	XMLName xml.Name
+	Account *LdapServerConnectionAccount `xml:"account,omitempty"`
+	// Allowed values: see the LdapServerPostConnectionAuthenticationType constants.
+	AuthenticationType *string `xml:"authentication_type,omitempty"`
+	CertificatesUsed   *string `xml:"certificates_used,omitempty"`
 	// Hostname or IP address of the server.
 	Hostname     *string `xml:"hostname,omitempty"`
 	ID           *int    `xml:"id,omitempty"`
@@ -8226,14 +8273,16 @@ type LdapServerPostConnection struct {
 	// Name of the LDAP server.
 	Name *string `xml:"name,omitempty"`
 	// Timeout in seconds.
-	OpenCloseTimeout *int    `xml:"open_close_timeout,omitempty"`
-	Port             *int    `xml:"port,omitempty"`
+	OpenCloseTimeout *int `xml:"open_close_timeout,omitempty"`
+	Port             *int `xml:"port,omitempty"`
+	// Allowed values: see the LdapServerPostConnectionReferralResponse constants.
 	ReferralResponse *string `xml:"referral_response,omitempty"`
 	// Timeout in seconds.
-	SearchTimeout *int    `xml:"search_timeout,omitempty"`
-	ServerType    *string `xml:"server_type,omitempty"`
-	UseSsl        *bool   `xml:"use_ssl,omitempty"`
-	UseWildcards  *bool   `xml:"use_wildcards,omitempty"`
+	SearchTimeout *int `xml:"search_timeout,omitempty"`
+	// Allowed values: see the LdapServerPostConnectionServerType constants.
+	ServerType   *string `xml:"server_type,omitempty"`
+	UseSsl       *bool   `xml:"use_ssl,omitempty"`
+	UseWildcards *bool   `xml:"use_wildcards,omitempty"`
 }
 
 // MarshalXML forces the LdapServerPostConnection root element name to the wire value
@@ -8446,17 +8495,18 @@ func (t LicensedSoftwareLicenses) MarshalXML(e *xml.Encoder, start xml.StartElem
 
 // LicensedSoftwareLicensesLicenseItem represents a licensed software licenses license item.
 type LicensedSoftwareLicensesLicenseItem struct {
-	XMLName          xml.Name
-	ID               *int                                            `xml:"id,omitempty"`
-	Attachments      *LicensedSoftwareLicensesLicenseItemAttachments `xml:"attachments,omitempty"`
-	LicenseCount     *int                                            `xml:"license_count,omitempty"`
-	LicenseType      *string                                         `xml:"license_type,omitempty"`
-	Notes            *string                                         `xml:"notes,omitempty"`
-	OrganizationName *string                                         `xml:"organization_name,omitempty"`
-	Purchasing       *LicensedSoftwareLicensesLicenseItemPurchasing  `xml:"purchasing,omitempty"`
-	RegisteredTo     *string                                         `xml:"registered_to,omitempty"`
-	SerialNumber1    *string                                         `xml:"serial_number_1,omitempty"`
-	SerialNumber2    *string                                         `xml:"serial_number_2,omitempty"`
+	XMLName      xml.Name
+	ID           *int                                            `xml:"id,omitempty"`
+	Attachments  *LicensedSoftwareLicensesLicenseItemAttachments `xml:"attachments,omitempty"`
+	LicenseCount *int                                            `xml:"license_count,omitempty"`
+	// Allowed values: see the LicensedSoftwareLicensesLicenseItemLicenseType constants.
+	LicenseType      *string                                        `xml:"license_type,omitempty"`
+	Notes            *string                                        `xml:"notes,omitempty"`
+	OrganizationName *string                                        `xml:"organization_name,omitempty"`
+	Purchasing       *LicensedSoftwareLicensesLicenseItemPurchasing `xml:"purchasing,omitempty"`
+	RegisteredTo     *string                                        `xml:"registered_to,omitempty"`
+	SerialNumber1    *string                                        `xml:"serial_number_1,omitempty"`
+	SerialNumber2    *string                                        `xml:"serial_number_2,omitempty"`
 }
 
 // MarshalXML forces the LicensedSoftwareLicensesLicenseItem root element name to the wire value
@@ -8623,7 +8673,8 @@ func (t LicensedSoftwareAllItemLicensedSoftware) MarshalXML(e *xml.Encoder, star
 
 // LicensedSoftwareDefintion represents a licensed software defintion.
 type LicensedSoftwareDefintion struct {
-	XMLName     xml.Name
+	XMLName xml.Name
+	// Allowed values: see the LicensedSoftwareDefintionCompareType constants.
 	CompareType *string `xml:"compare_type,omitempty"`
 	Name        *string `xml:"name,omitempty"`
 	Version     *string `xml:"version,omitempty"`
@@ -8675,9 +8726,10 @@ type Logflush struct {
 	XMLName   xml.Name
 	ID        *int               `xml:"id,omitempty"`
 	Computers *LogflushComputers `xml:"computers,omitempty"`
-	Interval  *string            `xml:"interval,omitempty"`
-	Log       *string            `xml:"log,omitempty"`
-	LogID     *int               `xml:"log_id,omitempty"`
+	// Allowed values: see the LogflushInterval constants.
+	Interval *string `xml:"interval,omitempty"`
+	Log      *string `xml:"log,omitempty"`
+	LogID    *int    `xml:"log_id,omitempty"`
 }
 
 // MarshalXML forces the Logflush root element name to the wire value
@@ -9859,12 +9911,13 @@ func (t MobileDeviceApplicationAppConfiguration) MarshalXML(e *xml.Encoder, star
 
 // MobileDeviceApplicationGeneral represents a mobile device application general.
 type MobileDeviceApplicationGeneral struct {
-	XMLName                          xml.Name
-	AllowUserToDelete                *bool                               `xml:"allow_user_to_delete,omitempty"`
-	BundleID                         *string                             `xml:"bundle_id,omitempty"`
-	Category                         *CategoryObject                     `xml:"category,omitempty"`
-	DeployAsManagedApp               *bool                               `xml:"deploy_as_managed_app,omitempty"`
-	DeployAutomatically              *bool                               `xml:"deploy_automatically,omitempty"`
+	XMLName             xml.Name
+	AllowUserToDelete   *bool           `xml:"allow_user_to_delete,omitempty"`
+	BundleID            *string         `xml:"bundle_id,omitempty"`
+	Category            *CategoryObject `xml:"category,omitempty"`
+	DeployAsManagedApp  *bool           `xml:"deploy_as_managed_app,omitempty"`
+	DeployAutomatically *bool           `xml:"deploy_automatically,omitempty"`
+	// Allowed values: see the MobileDeviceApplicationGeneralDeploymentType constants.
 	DeploymentType                   *string                             `xml:"deployment_type,omitempty"`
 	Description                      *string                             `xml:"description,omitempty"`
 	DisplayName                      *string                             `xml:"display_name,omitempty"`
@@ -10910,12 +10963,14 @@ func (t MobileDeviceConfigurationProfile) MarshalXML(e *xml.Encoder, start xml.S
 
 // MobileDeviceConfigurationProfileGeneral represents a mobile device configuration profile general.
 type MobileDeviceConfigurationProfileGeneral struct {
-	XMLName          xml.Name
-	Category         *CategoryObject `xml:"category,omitempty"`
-	DeploymentMethod *string         `xml:"deployment_method,omitempty"`
-	Description      *string         `xml:"description,omitempty"`
-	ID               *int            `xml:"id,omitempty"`
+	XMLName  xml.Name
+	Category *CategoryObject `xml:"category,omitempty"`
+	// Allowed values: see the MobileDeviceConfigurationProfileGeneralDeploymentMethod constants.
+	DeploymentMethod *string `xml:"deployment_method,omitempty"`
+	Description      *string `xml:"description,omitempty"`
+	ID               *int    `xml:"id,omitempty"`
 	// Level of the configuration profile.
+	// Allowed values: see the MobileDeviceConfigurationProfileGeneralLevel constants.
 	Level *string `xml:"level,omitempty"`
 	// Name of the configuration profile.
 	Name                                 *string          `xml:"name,omitempty"`
@@ -11832,13 +11887,15 @@ func (t MobileDeviceEnrollmentProfilesItemMobileDeviceEnrollmentProfile) Marshal
 
 // MobileDeviceExtensionAttribute represents a mobile device extension attribute.
 type MobileDeviceExtensionAttribute struct {
-	XMLName          xml.Name
-	DataType         *string                                  `xml:"data_type,omitempty"`
-	Description      *string                                  `xml:"description,omitempty"`
-	ID               *int                                     `xml:"id,omitempty"`
-	InputType        *MobileDeviceExtensionAttributeInputType `xml:"input_type,omitempty"`
-	InventoryDisplay *string                                  `xml:"inventory_display,omitempty"`
-	Name             *string                                  `xml:"name,omitempty"`
+	XMLName xml.Name
+	// Allowed values: see the MobileDeviceExtensionAttributeDataType constants.
+	DataType    *string                                  `xml:"data_type,omitempty"`
+	Description *string                                  `xml:"description,omitempty"`
+	ID          *int                                     `xml:"id,omitempty"`
+	InputType   *MobileDeviceExtensionAttributeInputType `xml:"input_type,omitempty"`
+	// Allowed values: see the MobileDeviceExtensionAttributeInventoryDisplay constants.
+	InventoryDisplay *string `xml:"inventory_display,omitempty"`
+	Name             *string `xml:"name,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceExtensionAttribute root element name to the wire value
@@ -11859,7 +11916,8 @@ type MobileDeviceExtensionAttributeInputType struct {
 	XMLName      xml.Name
 	ID           *int                                                 `xml:"id,omitempty"`
 	PopupChoices *MobileDeviceExtensionAttributeInputTypePopupChoices `xml:"popup_choices,omitempty"`
-	Type         *string                                              `xml:"type,omitempty"`
+	// Allowed values: see the MobileDeviceExtensionAttributeInputTypeType constants.
+	Type *string `xml:"type,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceExtensionAttributeInputType root element name to the wire value
@@ -12647,8 +12705,9 @@ func (t MobileDeviceHistoryUserLocationLocationItem) MarshalXML(e *xml.Encoder, 
 
 // MobileDeviceHistoryApp represents a mobile device history app.
 type MobileDeviceHistoryApp struct {
-	BundleSize       *string `xml:"bundle_size,omitempty"`
-	DynamicSize      *string `xml:"dynamic_size,omitempty"`
+	BundleSize  *string `xml:"bundle_size,omitempty"`
+	DynamicSize *string `xml:"dynamic_size,omitempty"`
+	// Allowed values: see the MobileDeviceHistoryAppManagementStatus constants.
 	ManagementStatus *string `xml:"management_status,omitempty"`
 	Name             *string `xml:"name,omitempty"`
 	Version          *string `xml:"version,omitempty"`
@@ -13540,12 +13599,14 @@ func (t OsXConfigurationProfile) MarshalXML(e *xml.Encoder, start xml.StartEleme
 
 // OsXConfigurationProfileGeneral represents a os x configuration profile general.
 type OsXConfigurationProfileGeneral struct {
-	XMLName            xml.Name
-	Category           *CategoryObject `xml:"category,omitempty"`
-	Description        *string         `xml:"description,omitempty"`
-	DistributionMethod *string         `xml:"distribution_method,omitempty"`
-	ID                 *int            `xml:"id,omitempty"`
-	Level              *string         `xml:"level,omitempty"`
+	XMLName     xml.Name
+	Category    *CategoryObject `xml:"category,omitempty"`
+	Description *string         `xml:"description,omitempty"`
+	// Allowed values: see the OsXConfigurationProfileGeneralDistributionMethod constants.
+	DistributionMethod *string `xml:"distribution_method,omitempty"`
+	ID                 *int    `xml:"id,omitempty"`
+	// Allowed values: see the OsXConfigurationProfileGeneralLevel constants.
+	Level *string `xml:"level,omitempty"`
 	// Name of the configuration profile.
 	Name             *string          `xml:"name,omitempty"`
 	Payloads         *PayloadsXMLText `xml:"payloads,omitempty"`
@@ -14302,12 +14363,13 @@ type Package struct {
 	Info                       *string `xml:"info,omitempty"`
 	InstallIfReportedAvailable *bool   `xml:"install_if_reported_available,omitempty"`
 	// Name of the package.
-	Name              *string `xml:"name,omitempty"`
-	Notes             *string `xml:"notes,omitempty"`
-	OsRequirements    *string `xml:"os_requirements,omitempty"`
-	Priority          *int    `xml:"priority,omitempty"`
-	RebootRequired    *bool   `xml:"reboot_required,omitempty"`
-	ReinstallOption   *string `xml:"reinstall_option,omitempty"`
+	Name            *string `xml:"name,omitempty"`
+	Notes           *string `xml:"notes,omitempty"`
+	OsRequirements  *string `xml:"os_requirements,omitempty"`
+	Priority        *int    `xml:"priority,omitempty"`
+	RebootRequired  *bool   `xml:"reboot_required,omitempty"`
+	ReinstallOption *string `xml:"reinstall_option,omitempty"`
+	// Allowed values: see the PackageRequiredProcessor constants.
 	RequiredProcessor *string `xml:"required_processor,omitempty"`
 	SendNotification  *bool   `xml:"send_notification,omitempty"`
 	SwitchWithPackage *string `xml:"switch_with_package,omitempty"`
@@ -14689,8 +14751,9 @@ func (t PatchPolicy) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 // PatchPolicyGeneral represents a patch policy general.
 type PatchPolicyGeneral struct {
-	XMLName            xml.Name
-	AllowDowngrade     *bool                       `xml:"allow_downgrade,omitempty"`
+	XMLName        xml.Name
+	AllowDowngrade *bool `xml:"allow_downgrade,omitempty"`
+	// Allowed values: see the PatchPolicyGeneralDistributionMethod constants.
 	DistributionMethod *string                     `xml:"distribution_method,omitempty"`
 	Enabled            *bool                       `xml:"enabled,omitempty"`
 	ID                 *int                        `xml:"id,omitempty"`
@@ -15169,12 +15232,13 @@ func (t PatchPolicyUserInteractionGracePeriod) MarshalXML(e *xml.Encoder, start 
 // PatchPolicyUserInteractionNotifications represents a patch policy user interaction notifications.
 type PatchPolicyUserInteractionNotifications struct {
 	XMLName             xml.Name
-	ID                  *int                                              `xml:"id,omitempty"`
-	NotificationEnabled *bool                                             `xml:"notification_enabled,omitempty"`
-	NotificationMessage *string                                           `xml:"notification_message,omitempty"`
-	NotificationSubject *string                                           `xml:"notification_subject,omitempty"`
-	NotificationType    *string                                           `xml:"notification_type,omitempty"`
-	Reminders           *PatchPolicyUserInteractionNotificationsReminders `xml:"reminders,omitempty"`
+	ID                  *int    `xml:"id,omitempty"`
+	NotificationEnabled *bool   `xml:"notification_enabled,omitempty"`
+	NotificationMessage *string `xml:"notification_message,omitempty"`
+	NotificationSubject *string `xml:"notification_subject,omitempty"`
+	// Allowed values: see the PatchPolicyUserInteractionNotificationsNotificationType constants.
+	NotificationType *string                                           `xml:"notification_type,omitempty"`
+	Reminders        *PatchPolicyUserInteractionNotificationsReminders `xml:"reminders,omitempty"`
 }
 
 // MarshalXML forces the PatchPolicyUserInteractionNotifications root element name to the wire value
@@ -15721,7 +15785,8 @@ type PeripheralTypeFieldsFieldItem struct {
 	Choices *[]PeripheralTypeFieldsFieldItemChoicesItem `xml:"choices,omitempty"`
 	Name    *string                                     `xml:"name,omitempty"`
 	Order   *int                                        `xml:"order,omitempty"`
-	Type    *string                                     `xml:"type,omitempty"`
+	// Allowed values: see the PeripheralTypeFieldsFieldItemType constants.
+	Type *string `xml:"type,omitempty"`
 }
 
 // MarshalXML forces the PeripheralTypeFieldsFieldItem root element name to the wire value
@@ -15966,7 +16031,8 @@ func (t PolicyAccountMaintenanceAccounts) MarshalXML(e *xml.Encoder, start xml.S
 
 // PolicyAccountMaintenanceAccountsAccountItem represents a policy account maintenance accounts account item.
 type PolicyAccountMaintenanceAccountsAccountItem struct {
-	XMLName                xml.Name
+	XMLName xml.Name
+	// Allowed values: see the PolicyAccountMaintenanceAccountsAccountItemAction constants.
 	Action                 *string `xml:"action,omitempty"`
 	Admin                  *bool   `xml:"admin,omitempty"`
 	ArchiveHomeDirectory   *bool   `xml:"archive_home_directory,omitempty"`
@@ -16017,7 +16083,8 @@ func (t PolicyAccountMaintenanceDirectoryBindings) MarshalXML(e *xml.Encoder, st
 
 // PolicyAccountMaintenanceManagementAccount represents a policy account maintenance management account.
 type PolicyAccountMaintenanceManagementAccount struct {
-	XMLName         xml.Name
+	XMLName xml.Name
+	// Allowed values: see the PolicyAccountMaintenanceManagementAccountAction constants.
 	Action          *string `xml:"action,omitempty"`
 	ManagedPassword *string `xml:"managed_password,omitempty"`
 	// Only necessary when utilizing the random action.
@@ -16039,7 +16106,8 @@ func (t PolicyAccountMaintenanceManagementAccount) MarshalXML(e *xml.Encoder, st
 
 // PolicyAccountMaintenanceOpenFirmwareEfiPassword represents a policy account maintenance open firmware efi password.
 type PolicyAccountMaintenanceOpenFirmwareEfiPassword struct {
-	XMLName          xml.Name
+	XMLName xml.Name
+	// Allowed values: see the PolicyAccountMaintenanceOpenFirmwareEfiPasswordOfMode constants.
 	OfMode           *string `xml:"of_mode,omitempty"`
 	OfPassword       *string `xml:"of_password,omitempty"`
 	OfPasswordSha256 *string `xml:"of_password_sha256,omitempty"`
@@ -16060,13 +16128,15 @@ func (t PolicyAccountMaintenanceOpenFirmwareEfiPassword) MarshalXML(e *xml.Encod
 
 // PolicyDiskEncryption represents a policy disk encryption.
 type PolicyDiskEncryption struct {
-	XMLName                       xml.Name
+	XMLName xml.Name
+	// Allowed values: see the PolicyDiskEncryptionAction constants.
 	Action                        *string `xml:"action,omitempty"`
 	AuthRestart                   *bool   `xml:"auth_restart,omitempty"`
 	DiskEncryptionConfigurationID *int    `xml:"disk_encryption_configuration_id,omitempty"`
 	// disk encryption ID to utilize for remediating institutional recovery key types.
-	RemediateDiskEncryptionConfigurationID *int    `xml:"remediate_disk_encryption_configuration_id,omitempty"`
-	RemediateKeyType                       *string `xml:"remediate_key_type,omitempty"`
+	RemediateDiskEncryptionConfigurationID *int `xml:"remediate_disk_encryption_configuration_id,omitempty"`
+	// Allowed values: see the PolicyDiskEncryptionRemediateKeyType constants.
+	RemediateKeyType *string `xml:"remediate_key_type,omitempty"`
 }
 
 // MarshalXML forces the PolicyDiskEncryption root element name to the wire value
@@ -16105,9 +16175,10 @@ func (t PolicyDockItems) MarshalXML(e *xml.Encoder, start xml.StartElement) erro
 // PolicyDockItemsDockItemItem represents a policy dock items dock item item.
 type PolicyDockItemsDockItemItem struct {
 	XMLName xml.Name
-	Action  *string `xml:"action,omitempty"`
-	ID      *int    `xml:"id,omitempty"`
-	Name    *string `xml:"name,omitempty"`
+	// Allowed values: see the PolicyDockItemsDockItemItemAction constants.
+	Action *string `xml:"action,omitempty"`
+	ID     *int    `xml:"id,omitempty"`
+	Name   *string `xml:"name,omitempty"`
 }
 
 // MarshalXML forces the PolicyDockItemsDockItemItem root element name to the wire value
@@ -16151,31 +16222,34 @@ func (t PolicyFilesProcesses) MarshalXML(e *xml.Encoder, start xml.StartElement)
 
 // PolicyGeneral represents a policy general.
 type PolicyGeneral struct {
-	XMLName                    xml.Name
-	Category                   *CategoryObject                       `xml:"category,omitempty"`
-	DateTimeLimitations        *PolicyGeneralDateTimeLimitations     `xml:"date_time_limitations,omitempty"`
-	Enabled                    *bool                                 `xml:"enabled,omitempty"`
-	Frequency                  *string                               `xml:"frequency,omitempty"`
-	ID                         *int                                  `xml:"id,omitempty"`
-	LocationUserOnly           *bool                                 `xml:"location_user_only,omitempty"`
-	Name                       *string                               `xml:"name,omitempty"`
-	NetworkLimitations         *PolicyGeneralNetworkLimitations      `xml:"network_limitations,omitempty"`
-	NetworkRequirements        *string                               `xml:"network_requirements,omitempty"`
-	NotifyOnEachFailedRetry    *bool                                 `xml:"notify_on_each_failed_retry,omitempty"`
-	Offline                    *bool                                 `xml:"offline,omitempty"`
-	OverrideDefaultSettings    *PolicyGeneralOverrideDefaultSettings `xml:"override_default_settings,omitempty"`
-	RetryAttempts              *int                                  `xml:"retry_attempts,omitempty"`
-	RetryEvent                 *string                               `xml:"retry_event,omitempty"`
-	Site                       *SiteObject                           `xml:"site,omitempty"`
-	TargetDrive                *string                               `xml:"target_drive,omitempty"`
-	Trigger                    *string                               `xml:"trigger,omitempty"`
-	TriggerCheckin             *bool                                 `xml:"trigger_checkin,omitempty"`
-	TriggerEnrollmentComplete  *bool                                 `xml:"trigger_enrollment_complete,omitempty"`
-	TriggerLogin               *bool                                 `xml:"trigger_login,omitempty"`
-	TriggerLogout              *bool                                 `xml:"trigger_logout,omitempty"`
-	TriggerNetworkStateChanged *bool                                 `xml:"trigger_network_state_changed,omitempty"`
-	TriggerOther               *string                               `xml:"trigger_other,omitempty"`
-	TriggerStartup             *bool                                 `xml:"trigger_startup,omitempty"`
+	XMLName             xml.Name
+	Category            *CategoryObject                   `xml:"category,omitempty"`
+	DateTimeLimitations *PolicyGeneralDateTimeLimitations `xml:"date_time_limitations,omitempty"`
+	Enabled             *bool                             `xml:"enabled,omitempty"`
+	// Allowed values: see the PolicyGeneralFrequency constants.
+	Frequency          *string                          `xml:"frequency,omitempty"`
+	ID                 *int                             `xml:"id,omitempty"`
+	LocationUserOnly   *bool                            `xml:"location_user_only,omitempty"`
+	Name               *string                          `xml:"name,omitempty"`
+	NetworkLimitations *PolicyGeneralNetworkLimitations `xml:"network_limitations,omitempty"`
+	// Allowed values: see the PolicyGeneralNetworkRequirements constants.
+	NetworkRequirements     *string                               `xml:"network_requirements,omitempty"`
+	NotifyOnEachFailedRetry *bool                                 `xml:"notify_on_each_failed_retry,omitempty"`
+	Offline                 *bool                                 `xml:"offline,omitempty"`
+	OverrideDefaultSettings *PolicyGeneralOverrideDefaultSettings `xml:"override_default_settings,omitempty"`
+	RetryAttempts           *int                                  `xml:"retry_attempts,omitempty"`
+	// Allowed values: see the PolicyGeneralRetryEvent constants.
+	RetryEvent                 *string     `xml:"retry_event,omitempty"`
+	Site                       *SiteObject `xml:"site,omitempty"`
+	TargetDrive                *string     `xml:"target_drive,omitempty"`
+	Trigger                    *string     `xml:"trigger,omitempty"`
+	TriggerCheckin             *bool       `xml:"trigger_checkin,omitempty"`
+	TriggerEnrollmentComplete  *bool       `xml:"trigger_enrollment_complete,omitempty"`
+	TriggerLogin               *bool       `xml:"trigger_login,omitempty"`
+	TriggerLogout              *bool       `xml:"trigger_logout,omitempty"`
+	TriggerNetworkStateChanged *bool       `xml:"trigger_network_state_changed,omitempty"`
+	TriggerOther               *string     `xml:"trigger_other,omitempty"`
+	TriggerStartup             *bool       `xml:"trigger_startup,omitempty"`
 }
 
 // MarshalXML forces the PolicyGeneral root element name to the wire value
@@ -16222,7 +16296,8 @@ func (t PolicyGeneralDateTimeLimitations) MarshalXML(e *xml.Encoder, start xml.S
 // PolicyGeneralDateTimeLimitationsNoExecuteOn represents a policy general date time limitations no execute on.
 type PolicyGeneralDateTimeLimitationsNoExecuteOn struct {
 	XMLName xml.Name
-	Day     *[]string `xml:"day,omitempty"`
+	// Allowed values: see the PolicyGeneralDateTimeLimitationsNoExecuteOnDay constants.
+	Day *[]string `xml:"day,omitempty"`
 }
 
 // MarshalXML forces the PolicyGeneralDateTimeLimitationsNoExecuteOn root element name to the wire value
@@ -16240,9 +16315,10 @@ func (t PolicyGeneralDateTimeLimitationsNoExecuteOn) MarshalXML(e *xml.Encoder, 
 
 // PolicyGeneralNetworkLimitations represents a policy general network limitations.
 type PolicyGeneralNetworkLimitations struct {
-	XMLName                  xml.Name
-	ID                       *int                                            `xml:"id,omitempty"`
-	AnyIPAddress             *bool                                           `xml:"any_ip_address,omitempty"`
+	XMLName      xml.Name
+	ID           *int  `xml:"id,omitempty"`
+	AnyIPAddress *bool `xml:"any_ip_address,omitempty"`
+	// Allowed values: see the PolicyGeneralNetworkLimitationsMinimumNetworkConnection constants.
 	MinimumNetworkConnection *string                                         `xml:"minimum_network_connection,omitempty"`
 	NetworkSegments          *PolicyGeneralNetworkLimitationsNetworkSegments `xml:"network_segments,omitempty"`
 }
@@ -16372,7 +16448,8 @@ func (t PolicyPackageConfigurationPackages) MarshalXML(e *xml.Encoder, start xml
 
 // PolicyPackageConfigurationPackagesPackageItem represents a policy package configuration packages package item.
 type PolicyPackageConfigurationPackagesPackageItem struct {
-	XMLName       xml.Name
+	XMLName xml.Name
+	// Allowed values: see the PolicyPackageConfigurationPackagesPackageItemAction constants.
 	Action        *string `xml:"action,omitempty"`
 	Feu           *bool   `xml:"feu,omitempty"`
 	Fut           *bool   `xml:"fut,omitempty"`
@@ -16417,7 +16494,8 @@ func (t PolicyPrinters) MarshalXML(e *xml.Encoder, start xml.StartElement) error
 
 // PolicyPrintersPrinterItem represents a policy printers printer item.
 type PolicyPrintersPrinterItem struct {
-	XMLName     xml.Name
+	XMLName xml.Name
+	// Allowed values: see the PolicyPrintersPrinterItemAction constants.
 	Action      *string `xml:"action,omitempty"`
 	ID          *int    `xml:"id,omitempty"`
 	MakeDefault *bool   `xml:"make_default,omitempty"`
@@ -17082,7 +17160,8 @@ type PolicyScriptsScriptItem struct {
 	Parameter7  *string `xml:"parameter7,omitempty"`
 	Parameter8  *string `xml:"parameter8,omitempty"`
 	Parameter9  *string `xml:"parameter9,omitempty"`
-	Priority    *string `xml:"priority,omitempty"`
+	// Allowed values: see the PolicyScriptsScriptItemPriority constants.
+	Priority *string `xml:"priority,omitempty"`
 }
 
 // MarshalXML forces the PolicyScriptsScriptItem root element name to the wire value
@@ -17272,13 +17351,15 @@ func (t PolicyPostAccountMaintenance) MarshalXML(e *xml.Encoder, start xml.Start
 
 // PolicyPostDiskEncryption represents a policy post disk encryption.
 type PolicyPostDiskEncryption struct {
-	XMLName                       xml.Name
+	XMLName xml.Name
+	// Allowed values: see the PolicyPostDiskEncryptionAction constants.
 	Action                        *string `xml:"action,omitempty"`
 	AuthRestart                   *bool   `xml:"auth_restart,omitempty"`
 	DiskEncryptionConfigurationID *int    `xml:"disk_encryption_configuration_id,omitempty"`
 	// disk encryption ID to utilize for remediating institutional recovery key types.
-	RemediateDiskEncryptionConfigurationID *int    `xml:"remediate_disk_encryption_configuration_id,omitempty"`
-	RemediateKeyType                       *string `xml:"remediate_key_type,omitempty"`
+	RemediateDiskEncryptionConfigurationID *int `xml:"remediate_disk_encryption_configuration_id,omitempty"`
+	// Allowed values: see the PolicyPostDiskEncryptionRemediateKeyType constants.
+	RemediateKeyType *string `xml:"remediate_key_type,omitempty"`
 }
 
 // MarshalXML forces the PolicyPostDiskEncryption root element name to the wire value
@@ -17317,9 +17398,10 @@ func (t PolicyPostDockItems) MarshalXML(e *xml.Encoder, start xml.StartElement) 
 // PolicyPostDockItemsDockItemItem represents a policy post dock items dock item item.
 type PolicyPostDockItemsDockItemItem struct {
 	XMLName xml.Name
-	Action  *string `xml:"action,omitempty"`
-	ID      *int    `xml:"id,omitempty"`
-	Name    *string `xml:"name,omitempty"`
+	// Allowed values: see the PolicyPostDockItemsDockItemItemAction constants.
+	Action *string `xml:"action,omitempty"`
+	ID     *int    `xml:"id,omitempty"`
+	Name   *string `xml:"name,omitempty"`
 }
 
 // MarshalXML forces the PolicyPostDockItemsDockItemItem root element name to the wire value
@@ -17363,31 +17445,34 @@ func (t PolicyPostFilesProcesses) MarshalXML(e *xml.Encoder, start xml.StartElem
 
 // PolicyPostGeneral represents a policy post general.
 type PolicyPostGeneral struct {
-	XMLName                    xml.Name
-	Category                   *CategoryObject                       `xml:"category,omitempty"`
-	DateTimeLimitations        *PolicyGeneralDateTimeLimitations     `xml:"date_time_limitations,omitempty"`
-	Enabled                    *bool                                 `xml:"enabled,omitempty"`
-	Frequency                  *string                               `xml:"frequency,omitempty"`
-	ID                         *int                                  `xml:"id,omitempty"`
-	LocationUserOnly           *bool                                 `xml:"location_user_only,omitempty"`
-	Name                       *string                               `xml:"name,omitempty"`
-	NetworkLimitations         *PolicyGeneralNetworkLimitations      `xml:"network_limitations,omitempty"`
-	NetworkRequirements        *string                               `xml:"network_requirements,omitempty"`
-	NotifyOnEachFailedRetry    *bool                                 `xml:"notify_on_each_failed_retry,omitempty"`
-	Offline                    *bool                                 `xml:"offline,omitempty"`
-	OverrideDefaultSettings    *PolicyGeneralOverrideDefaultSettings `xml:"override_default_settings,omitempty"`
-	RetryAttempts              *int                                  `xml:"retry_attempts,omitempty"`
-	RetryEvent                 *string                               `xml:"retry_event,omitempty"`
-	Site                       *SiteObject                           `xml:"site,omitempty"`
-	TargetDrive                *string                               `xml:"target_drive,omitempty"`
-	Trigger                    *string                               `xml:"trigger,omitempty"`
-	TriggerCheckin             *bool                                 `xml:"trigger_checkin,omitempty"`
-	TriggerEnrollmentComplete  *bool                                 `xml:"trigger_enrollment_complete,omitempty"`
-	TriggerLogin               *bool                                 `xml:"trigger_login,omitempty"`
-	TriggerLogout              *bool                                 `xml:"trigger_logout,omitempty"`
-	TriggerNetworkStateChanged *bool                                 `xml:"trigger_network_state_changed,omitempty"`
-	TriggerOther               *string                               `xml:"trigger_other,omitempty"`
-	TriggerStartup             *bool                                 `xml:"trigger_startup,omitempty"`
+	XMLName             xml.Name
+	Category            *CategoryObject                   `xml:"category,omitempty"`
+	DateTimeLimitations *PolicyGeneralDateTimeLimitations `xml:"date_time_limitations,omitempty"`
+	Enabled             *bool                             `xml:"enabled,omitempty"`
+	// Allowed values: see the PolicyPostGeneralFrequency constants.
+	Frequency          *string                          `xml:"frequency,omitempty"`
+	ID                 *int                             `xml:"id,omitempty"`
+	LocationUserOnly   *bool                            `xml:"location_user_only,omitempty"`
+	Name               *string                          `xml:"name,omitempty"`
+	NetworkLimitations *PolicyGeneralNetworkLimitations `xml:"network_limitations,omitempty"`
+	// Allowed values: see the PolicyPostGeneralNetworkRequirements constants.
+	NetworkRequirements     *string                               `xml:"network_requirements,omitempty"`
+	NotifyOnEachFailedRetry *bool                                 `xml:"notify_on_each_failed_retry,omitempty"`
+	Offline                 *bool                                 `xml:"offline,omitempty"`
+	OverrideDefaultSettings *PolicyGeneralOverrideDefaultSettings `xml:"override_default_settings,omitempty"`
+	RetryAttempts           *int                                  `xml:"retry_attempts,omitempty"`
+	// Allowed values: see the PolicyPostGeneralRetryEvent constants.
+	RetryEvent                 *string     `xml:"retry_event,omitempty"`
+	Site                       *SiteObject `xml:"site,omitempty"`
+	TargetDrive                *string     `xml:"target_drive,omitempty"`
+	Trigger                    *string     `xml:"trigger,omitempty"`
+	TriggerCheckin             *bool       `xml:"trigger_checkin,omitempty"`
+	TriggerEnrollmentComplete  *bool       `xml:"trigger_enrollment_complete,omitempty"`
+	TriggerLogin               *bool       `xml:"trigger_login,omitempty"`
+	TriggerLogout              *bool       `xml:"trigger_logout,omitempty"`
+	TriggerNetworkStateChanged *bool       `xml:"trigger_network_state_changed,omitempty"`
+	TriggerOther               *string     `xml:"trigger_other,omitempty"`
+	TriggerStartup             *bool       `xml:"trigger_startup,omitempty"`
 }
 
 // MarshalXML forces the PolicyPostGeneral root element name to the wire value
@@ -18132,7 +18217,8 @@ type SavedSearchesItemSavedSearch struct {
 	XMLName xml.Name
 	ID      *int    `xml:"id,omitempty"`
 	Name    *string `xml:"name,omitempty"`
-	Type    *string `xml:"type,omitempty"`
+	// Allowed values: see the SavedSearchesItemSavedSearchType constants.
+	Type *string `xml:"type,omitempty"`
 }
 
 // MarshalXML forces the SavedSearchesItemSavedSearch root element name to the wire value
@@ -18156,13 +18242,14 @@ type Script struct {
 	ID       *int    `xml:"id,omitempty"`
 	Info     *string `xml:"info,omitempty"`
 	// Name of the script.
-	Name                  *string           `xml:"name,omitempty"`
-	Notes                 *string           `xml:"notes,omitempty"`
-	OsRequirements        *string           `xml:"os_requirements,omitempty"`
-	Parameters            *ScriptParameters `xml:"parameters,omitempty"`
-	Priority              *string           `xml:"priority,omitempty"`
-	ScriptContents        *string           `xml:"script_contents,omitempty"`
-	ScriptContentsEncoded *string           `xml:"script_contents_encoded,omitempty"`
+	Name           *string           `xml:"name,omitempty"`
+	Notes          *string           `xml:"notes,omitempty"`
+	OsRequirements *string           `xml:"os_requirements,omitempty"`
+	Parameters     *ScriptParameters `xml:"parameters,omitempty"`
+	// Allowed values: see the ScriptPriority constants.
+	Priority              *string `xml:"priority,omitempty"`
+	ScriptContents        *string `xml:"script_contents,omitempty"`
+	ScriptContentsEncoded *string `xml:"script_contents_encoded,omitempty"`
 }
 
 // MarshalXML forces the Script root element name to the wire value
@@ -18633,8 +18720,9 @@ type UserExtensionAttributes2ExtensionAttributeItem struct {
 	XMLName xml.Name
 	ID      *int    `xml:"id,omitempty"`
 	Name    *string `xml:"name,omitempty"`
-	Type    *string `xml:"type,omitempty"`
-	Value   *string `xml:"value,omitempty"`
+	// Allowed values: see the UserExtensionAttributes2ExtensionAttributeItemType constants.
+	Type  *string `xml:"type,omitempty"`
+	Value *string `xml:"value,omitempty"`
 }
 
 // MarshalXML forces the UserExtensionAttributes2ExtensionAttributeItem root element name to the wire value
@@ -18795,7 +18883,8 @@ func (t UserSites) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 // UserExtensionAttribute represents a user extension attribute.
 type UserExtensionAttribute struct {
-	XMLName     xml.Name
+	XMLName xml.Name
+	// Allowed values: see the UserExtensionAttributeDataType constants.
 	DataType    *string                          `xml:"data_type,omitempty"`
 	Description *string                          `xml:"description,omitempty"`
 	ID          *int                             `xml:"id,omitempty"`
@@ -18822,7 +18911,8 @@ type UserExtensionAttributeInputType struct {
 	XMLName      xml.Name
 	ID           *int                                         `xml:"id,omitempty"`
 	PopupChoices *UserExtensionAttributeInputTypePopupChoices `xml:"popup_choices,omitempty"`
-	Type         *string                                      `xml:"type,omitempty"`
+	// Allowed values: see the UserExtensionAttributeInputTypeType constants.
+	Type *string `xml:"type,omitempty"`
 }
 
 // MarshalXML forces the UserExtensionAttributeInputType root element name to the wire value
@@ -19107,8 +19197,9 @@ type UserPostExtensionAttributesExtensionAttributeItem struct {
 	XMLName xml.Name
 	ID      *int    `xml:"id,omitempty"`
 	Name    *string `xml:"name,omitempty"`
-	Type    *string `xml:"type,omitempty"`
-	Value   *string `xml:"value,omitempty"`
+	// Allowed values: see the UserPostExtensionAttributesExtensionAttributeItemType constants.
+	Type  *string `xml:"type,omitempty"`
+	Value *string `xml:"value,omitempty"`
 }
 
 // MarshalXML forces the UserPostExtensionAttributesExtensionAttributeItem root element name to the wire value
@@ -19934,17 +20025,18 @@ func (t VppInvitation) MarshalXML(e *xml.Encoder, start xml.StartElement) error 
 
 // VppInvitationGeneral represents a vpp invitation general.
 type VppInvitationGeneral struct {
-	XMLName                  xml.Name
-	ID                       *int                            `xml:"id,omitempty"`
-	Name                     *string                         `xml:"name,omitempty"`
-	VppAccount               *VppInvitationGeneralVppAccount `xml:"vpp_account,omitempty"`
-	DistributionMethod       *string                         `xml:"distribution_method,omitempty"`
-	SenderName               *string                         `xml:"sender_name,omitempty"`
-	SenderEmailAddress       *string                         `xml:"sender_email_address,omitempty"`
-	Subject                  *string                         `xml:"subject,omitempty"`
-	Message                  *string                         `xml:"message,omitempty"`
-	RequireLogin             *bool                           `xml:"require_login,omitempty"`
-	AutoRegisterManagedUsers *bool                           `xml:"auto_register_managed_users,omitempty"`
+	XMLName    xml.Name
+	ID         *int                            `xml:"id,omitempty"`
+	Name       *string                         `xml:"name,omitempty"`
+	VppAccount *VppInvitationGeneralVppAccount `xml:"vpp_account,omitempty"`
+	// Allowed values: see the VppInvitationGeneralDistributionMethod constants.
+	DistributionMethod       *string `xml:"distribution_method,omitempty"`
+	SenderName               *string `xml:"sender_name,omitempty"`
+	SenderEmailAddress       *string `xml:"sender_email_address,omitempty"`
+	Subject                  *string `xml:"subject,omitempty"`
+	Message                  *string `xml:"message,omitempty"`
+	RequireLogin             *bool   `xml:"require_login,omitempty"`
+	AutoRegisterManagedUsers *bool   `xml:"auto_register_managed_users,omitempty"`
 }
 
 // MarshalXML forces the VppInvitationGeneral root element name to the wire value
@@ -20266,20 +20358,23 @@ func (t VppInvitationsItem) MarshalXML(e *xml.Encoder, start xml.StartElement) e
 
 // Webhook represents a webhook.
 type Webhook struct {
-	XMLName            xml.Name
+	XMLName xml.Name
+	// Allowed values: see the WebhookAuthenticationType constants.
 	AuthenticationType *string `xml:"authentication_type,omitempty"`
 	// Number of seconds to attempt to connect to the webhooks host server.
-	ConnectionTimeout                 *int                  `xml:"connection_timeout,omitempty"`
+	ConnectionTimeout *int `xml:"connection_timeout,omitempty"`
+	// Allowed values: see the WebhookContentType constants.
 	ContentType                       *string               `xml:"content_type,omitempty"`
 	DisplayFields                     *WebhookDisplayFields `xml:"display_fields,omitempty"`
 	EnableDisplayFieldsForGroupObject *bool                 `xml:"enable_display_fields_for_group_object,omitempty"`
 	Enabled                           *bool                 `xml:"enabled,omitempty"`
-	Event                             *string               `xml:"event,omitempty"`
-	HashAlgorithm                     *string               `xml:"hash_algorithm,omitempty"`
-	Header                            *string               `xml:"header,omitempty"`
-	ID                                *int                  `xml:"id,omitempty"`
-	Name                              *string               `xml:"name,omitempty"`
-	Password                          *string               `xml:"password,omitempty"`
+	// Allowed values: see the WebhookEvent constants.
+	Event         *string `xml:"event,omitempty"`
+	HashAlgorithm *string `xml:"hash_algorithm,omitempty"`
+	Header        *string `xml:"header,omitempty"`
+	ID            *int    `xml:"id,omitempty"`
+	Name          *string `xml:"name,omitempty"`
+	Password      *string `xml:"password,omitempty"`
 	// Number of seconds to wait for a response from the webhooks host server after sending a request.
 	ReadTimeout  *int    `xml:"read_timeout,omitempty"`
 	SmartGroupID *int    `xml:"smart_group_id,omitempty"`

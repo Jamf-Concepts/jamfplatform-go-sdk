@@ -273,3 +273,2400 @@ const (
 	VoiceRoamingSettingEnableVoiceRoaming  VoiceRoamingSetting = "ENABLE_VOICE_ROAMING"
 	VoiceRoamingSettingDisableVoiceRoaming VoiceRoamingSetting = "DISABLE_VOICE_ROAMING"
 )
+
+// AccountAccessLevel is the set of values accepted by Account.AccessLevel.
+type AccountAccessLevel = string
+
+// AccountAccessLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountAccessLevelFullAccess       AccountAccessLevel = "FullAccess"
+	AccountAccessLevelSiteAccess       AccountAccessLevel = "SiteAccess"
+	AccountAccessLevelGroupBasedAccess AccountAccessLevel = "GroupBasedAccess"
+)
+
+// AccountGroupV1AccessLevel is the set of values accepted by AccountGroupV1.AccessLevel.
+type AccountGroupV1AccessLevel = string
+
+// AccountGroupV1AccessLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountGroupV1AccessLevelFullAccess       AccountGroupV1AccessLevel = "FullAccess"
+	AccountGroupV1AccessLevelSiteAccess       AccountGroupV1AccessLevel = "SiteAccess"
+	AccountGroupV1AccessLevelGroupBasedAccess AccountGroupV1AccessLevel = "GroupBasedAccess"
+)
+
+// AccountGroupV1PrivilegeLevel is the set of values accepted by AccountGroupV1.PrivilegeLevel.
+type AccountGroupV1PrivilegeLevel = string
+
+// AccountGroupV1PrivilegeLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountGroupV1PrivilegeLevelAdministrator AccountGroupV1PrivilegeLevel = "ADMINISTRATOR"
+	AccountGroupV1PrivilegeLevelAuditor       AccountGroupV1PrivilegeLevel = "AUDITOR"
+	AccountGroupV1PrivilegeLevelEnrollment    AccountGroupV1PrivilegeLevel = "ENROLLMENT"
+	AccountGroupV1PrivilegeLevelCustom        AccountGroupV1PrivilegeLevel = "CUSTOM"
+)
+
+// AccountPreferencesV5Language is the set of values accepted by AccountPreferencesV5.Language.
+type AccountPreferencesV5Language = string
+
+// AccountPreferencesV5Language values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountPreferencesV5LanguageEn     AccountPreferencesV5Language = "en"
+	AccountPreferencesV5LanguageDe     AccountPreferencesV5Language = "de"
+	AccountPreferencesV5LanguageFr     AccountPreferencesV5Language = "fr"
+	AccountPreferencesV5LanguageEs     AccountPreferencesV5Language = "es"
+	AccountPreferencesV5LanguageJa     AccountPreferencesV5Language = "ja"
+	AccountPreferencesV5LanguageZhHant AccountPreferencesV5Language = "zh-hant"
+)
+
+// AccountPreferencesV6Language is the set of values accepted by AccountPreferencesV6.Language.
+type AccountPreferencesV6Language = string
+
+// AccountPreferencesV6Language values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountPreferencesV6LanguageEn     AccountPreferencesV6Language = "en"
+	AccountPreferencesV6LanguageDe     AccountPreferencesV6Language = "de"
+	AccountPreferencesV6LanguageFr     AccountPreferencesV6Language = "fr"
+	AccountPreferencesV6LanguageEs     AccountPreferencesV6Language = "es"
+	AccountPreferencesV6LanguageJa     AccountPreferencesV6Language = "ja"
+	AccountPreferencesV6LanguageZhHant AccountPreferencesV6Language = "zh-hant"
+)
+
+// AccountPrivilegeSet is the set of values accepted by Account.PrivilegeSet.
+type AccountPrivilegeSet = string
+
+// AccountPrivilegeSet values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountPrivilegeSetAdministrator AccountPrivilegeSet = "ADMINISTRATOR"
+	AccountPrivilegeSetAuditor       AccountPrivilegeSet = "AUDITOR"
+	AccountPrivilegeSetEnrollment    AccountPrivilegeSet = "ENROLLMENT"
+	AccountPrivilegeSetCustom        AccountPrivilegeSet = "CUSTOM"
+)
+
+// AccountSettingsRequestUserAccountType is the set of values accepted by AccountSettingsRequest.UserAccountType.
+type AccountSettingsRequestUserAccountType = string
+
+// AccountSettingsRequestUserAccountType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountSettingsRequestUserAccountTypeAdministrator AccountSettingsRequestUserAccountType = "ADMINISTRATOR"
+	AccountSettingsRequestUserAccountTypeStandard      AccountSettingsRequestUserAccountType = "STANDARD"
+	AccountSettingsRequestUserAccountTypeSkip          AccountSettingsRequestUserAccountType = "SKIP"
+)
+
+// AccountSettingsResponseUserAccountType is the set of values accepted by AccountSettingsResponse.UserAccountType.
+type AccountSettingsResponseUserAccountType = string
+
+// AccountSettingsResponseUserAccountType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AccountSettingsResponseUserAccountTypeAdministrator AccountSettingsResponseUserAccountType = "ADMINISTRATOR"
+	AccountSettingsResponseUserAccountTypeStandard      AccountSettingsResponseUserAccountType = "STANDARD"
+	AccountSettingsResponseUserAccountTypeSkip          AccountSettingsResponseUserAccountType = "SKIP"
+)
+
+// AdcsDependencyConfigProfileType is the set of values accepted by AdcsDependency.ConfigProfileType.
+type AdcsDependencyConfigProfileType = string
+
+// AdcsDependencyConfigProfileType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AdcsDependencyConfigProfileTypeOsxConfigurationProfile AdcsDependencyConfigProfileType = "OSX_CONFIGURATION_PROFILE"
+	AdcsDependencyConfigProfileTypeIosConfigurationProfile AdcsDependencyConfigProfileType = "IOS_CONFIGURATION_PROFILE"
+)
+
+// ApiIntegrationResponseAppType is the set of values accepted by ApiIntegrationResponse.AppType.
+type ApiIntegrationResponseAppType = string
+
+// ApiIntegrationResponseAppType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ApiIntegrationResponseAppTypeClientCredentials ApiIntegrationResponseAppType = "CLIENT_CREDENTIALS"
+	ApiIntegrationResponseAppTypeNativeAppOauth    ApiIntegrationResponseAppType = "NATIVE_APP_OAUTH"
+	ApiIntegrationResponseAppTypeNone              ApiIntegrationResponseAppType = "NONE"
+)
+
+// ApnsClientPushStatusDeviceType is the set of values accepted by ApnsClientPushStatus.DeviceType.
+type ApnsClientPushStatusDeviceType = string
+
+// ApnsClientPushStatusDeviceType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ApnsClientPushStatusDeviceTypeMobileDevice     ApnsClientPushStatusDeviceType = "MOBILE_DEVICE"
+	ApnsClientPushStatusDeviceTypeMobileDeviceUser ApnsClientPushStatusDeviceType = "MOBILE_DEVICE_USER"
+	ApnsClientPushStatusDeviceTypeComputer         ApnsClientPushStatusDeviceType = "COMPUTER"
+	ApnsClientPushStatusDeviceTypeComputerUser     ApnsClientPushStatusDeviceType = "COMPUTER_USER"
+	ApnsClientPushStatusDeviceTypeTv               ApnsClientPushStatusDeviceType = "TV"
+	ApnsClientPushStatusDeviceTypeWatch            ApnsClientPushStatusDeviceType = "WATCH"
+	ApnsClientPushStatusDeviceTypeVisionPro        ApnsClientPushStatusDeviceType = "VISION_PRO"
+	ApnsClientPushStatusDeviceTypeUnknown          ApnsClientPushStatusDeviceType = "UNKNOWN"
+)
+
+// ApnsPushEnableRequestStatus is the set of values accepted by ApnsPushEnableRequest.Status.
+type ApnsPushEnableRequestStatus = string
+
+// ApnsPushEnableRequestStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ApnsPushEnableRequestStatusQueued    ApnsPushEnableRequestStatus = "QUEUED"
+	ApnsPushEnableRequestStatusStarted   ApnsPushEnableRequestStatus = "STARTED"
+	ApnsPushEnableRequestStatusCompleted ApnsPushEnableRequestStatus = "COMPLETED"
+)
+
+// AzureServerConfigurationRequestType is the set of values accepted by AzureServerConfigurationRequest.Type.
+type AzureServerConfigurationRequestType = string
+
+// AzureServerConfigurationRequestType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AzureServerConfigurationRequestTypePublic  AzureServerConfigurationRequestType = "PUBLIC"
+	AzureServerConfigurationRequestTypeGccHigh AzureServerConfigurationRequestType = "GCC_HIGH"
+)
+
+// AzureServerConfigurationType is the set of values accepted by AzureServerConfiguration.Type.
+type AzureServerConfigurationType = string
+
+// AzureServerConfigurationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AzureServerConfigurationTypePublic  AzureServerConfigurationType = "PUBLIC"
+	AzureServerConfigurationTypeGccHigh AzureServerConfigurationType = "GCC_HIGH"
+)
+
+// CloudDistributionPointCdnType is the set of values accepted by CloudDistributionPoint.CdnType.
+type CloudDistributionPointCdnType = string
+
+// CloudDistributionPointCdnType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CloudDistributionPointCdnTypeNone                CloudDistributionPointCdnType = "NONE"
+	CloudDistributionPointCdnTypeJamfCloud           CloudDistributionPointCdnType = "JAMF_CLOUD"
+	CloudDistributionPointCdnTypeRackspaceCloudFiles CloudDistributionPointCdnType = "RACKSPACE_CLOUD_FILES"
+	CloudDistributionPointCdnTypeAmazonS3            CloudDistributionPointCdnType = "AMAZON_S3"
+	CloudDistributionPointCdnTypeAkamai              CloudDistributionPointCdnType = "AKAMAI"
+)
+
+// CloudDistributionPointInventoryFileInfoStatus is the set of values accepted by CloudDistributionPointInventoryFileInfo.Status.
+type CloudDistributionPointInventoryFileInfoStatus = string
+
+// CloudDistributionPointInventoryFileInfoStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CloudDistributionPointInventoryFileInfoStatusReady   CloudDistributionPointInventoryFileInfoStatus = "READY"
+	CloudDistributionPointInventoryFileInfoStatusPending CloudDistributionPointInventoryFileInfoStatus = "PENDING"
+	CloudDistributionPointInventoryFileInfoStatusError   CloudDistributionPointInventoryFileInfoStatus = "ERROR"
+)
+
+// CloudDistributionPointInventoryFileInfoType is the set of values accepted by CloudDistributionPointInventoryFileInfo.Type.
+type CloudDistributionPointInventoryFileInfoType = string
+
+// CloudDistributionPointInventoryFileInfoType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CloudDistributionPointInventoryFileInfoTypeNone            CloudDistributionPointInventoryFileInfoType = "NONE"
+	CloudDistributionPointInventoryFileInfoTypePackage         CloudDistributionPointInventoryFileInfoType = "PACKAGE"
+	CloudDistributionPointInventoryFileInfoTypeEbook           CloudDistributionPointInventoryFileInfoType = "EBOOK"
+	CloudDistributionPointInventoryFileInfoTypeMobileDeviceApp CloudDistributionPointInventoryFileInfoType = "MOBILE_DEVICE_APP"
+	CloudDistributionPointInventoryFileInfoTypeScript          CloudDistributionPointInventoryFileInfoType = "SCRIPT"
+)
+
+// CloudIDPCommonProviderName is the set of values accepted by CloudIDPCommon.ProviderName.
+type CloudIDPCommonProviderName = string
+
+// CloudIDPCommonProviderName values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CloudIDPCommonProviderNameGoogle CloudIDPCommonProviderName = "GOOGLE"
+	CloudIDPCommonProviderNameAzure  CloudIDPCommonProviderName = "AZURE"
+)
+
+// CloudIDPCommonRequestProviderName is the set of values accepted by CloudIDPCommonRequest.ProviderName.
+type CloudIDPCommonRequestProviderName = string
+
+// CloudIDPCommonRequestProviderName values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CloudIDPCommonRequestProviderNameGoogle CloudIDPCommonRequestProviderName = "GOOGLE"
+	CloudIDPCommonRequestProviderNameAzure  CloudIDPCommonRequestProviderName = "AZURE"
+)
+
+// CloudIDPCommonResponseProviderName is the set of values accepted by CloudIDPCommonResponse.ProviderName.
+type CloudIDPCommonResponseProviderName = string
+
+// CloudIDPCommonResponseProviderName values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CloudIDPCommonResponseProviderNameGoogle CloudIDPCommonResponseProviderName = "GOOGLE"
+	CloudIDPCommonResponseProviderNameAzure  CloudIDPCommonResponseProviderName = "AZURE"
+)
+
+// CloudLdapServerRequestConnectionType is the set of values accepted by CloudLdapServerRequest.ConnectionType.
+type CloudLdapServerRequestConnectionType = string
+
+// CloudLdapServerRequestConnectionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CloudLdapServerRequestConnectionTypeLdaps    CloudLdapServerRequestConnectionType = "LDAPS"
+	CloudLdapServerRequestConnectionTypeStartTls CloudLdapServerRequestConnectionType = "START_TLS"
+)
+
+// CloudLdapServerResponseConnectionType is the set of values accepted by CloudLdapServerResponse.ConnectionType.
+type CloudLdapServerResponseConnectionType = string
+
+// CloudLdapServerResponseConnectionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CloudLdapServerResponseConnectionTypeLdaps    CloudLdapServerResponseConnectionType = "LDAPS"
+	CloudLdapServerResponseConnectionTypeStartTls CloudLdapServerResponseConnectionType = "START_TLS"
+)
+
+// CloudLdapServerUpdateConnectionType is the set of values accepted by CloudLdapServerUpdate.ConnectionType.
+type CloudLdapServerUpdateConnectionType = string
+
+// CloudLdapServerUpdateConnectionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CloudLdapServerUpdateConnectionTypeLdaps    CloudLdapServerUpdateConnectionType = "LDAPS"
+	CloudLdapServerUpdateConnectionTypeStartTls CloudLdapServerUpdateConnectionType = "START_TLS"
+)
+
+// ComputerCertificateCertificateStatus is the set of values accepted by ComputerCertificate.CertificateStatus.
+type ComputerCertificateCertificateStatus = string
+
+// ComputerCertificateCertificateStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerCertificateCertificateStatusExpiring      ComputerCertificateCertificateStatus = "EXPIRING"
+	ComputerCertificateCertificateStatusExpired       ComputerCertificateCertificateStatus = "EXPIRED"
+	ComputerCertificateCertificateStatusRevoked       ComputerCertificateCertificateStatus = "REVOKED"
+	ComputerCertificateCertificateStatusPendingRevoke ComputerCertificateCertificateStatus = "PENDING_REVOKE"
+	ComputerCertificateCertificateStatusIssued        ComputerCertificateCertificateStatus = "ISSUED"
+)
+
+// ComputerCertificateLifecycleStatus is the set of values accepted by ComputerCertificate.LifecycleStatus.
+type ComputerCertificateLifecycleStatus = string
+
+// ComputerCertificateLifecycleStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerCertificateLifecycleStatusActive   ComputerCertificateLifecycleStatus = "ACTIVE"
+	ComputerCertificateLifecycleStatusInactive ComputerCertificateLifecycleStatus = "INACTIVE"
+)
+
+// ComputerContentCachingRegistrationStatus is the set of values accepted by ComputerContentCaching.RegistrationStatus.
+type ComputerContentCachingRegistrationStatus = string
+
+// ComputerContentCachingRegistrationStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerContentCachingRegistrationStatusContentCachingFailed    ComputerContentCachingRegistrationStatus = "CONTENT_CACHING_FAILED"
+	ComputerContentCachingRegistrationStatusContentCachingPending   ComputerContentCachingRegistrationStatus = "CONTENT_CACHING_PENDING"
+	ComputerContentCachingRegistrationStatusContentCachingSucceeded ComputerContentCachingRegistrationStatus = "CONTENT_CACHING_SUCCEEDED"
+)
+
+// ComputerContentCachingTetheratorStatus is the set of values accepted by ComputerContentCaching.TetheratorStatus.
+type ComputerContentCachingTetheratorStatus = string
+
+// ComputerContentCachingTetheratorStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerContentCachingTetheratorStatusContentCachingUnknown  ComputerContentCachingTetheratorStatus = "CONTENT_CACHING_UNKNOWN"
+	ComputerContentCachingTetheratorStatusContentCachingDisabled ComputerContentCachingTetheratorStatus = "CONTENT_CACHING_DISABLED"
+	ComputerContentCachingTetheratorStatusContentCachingEnabled  ComputerContentCachingTetheratorStatus = "CONTENT_CACHING_ENABLED"
+)
+
+// ComputerDiskEncryptionIndividualRecoveryKeyValidityStatus is the set of values accepted by ComputerDiskEncryption.IndividualRecoveryKeyValidityStatus.
+type ComputerDiskEncryptionIndividualRecoveryKeyValidityStatus = string
+
+// ComputerDiskEncryptionIndividualRecoveryKeyValidityStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerDiskEncryptionIndividualRecoveryKeyValidityStatusValid         ComputerDiskEncryptionIndividualRecoveryKeyValidityStatus = "VALID"
+	ComputerDiskEncryptionIndividualRecoveryKeyValidityStatusInvalid       ComputerDiskEncryptionIndividualRecoveryKeyValidityStatus = "INVALID"
+	ComputerDiskEncryptionIndividualRecoveryKeyValidityStatusUnknown       ComputerDiskEncryptionIndividualRecoveryKeyValidityStatus = "UNKNOWN"
+	ComputerDiskEncryptionIndividualRecoveryKeyValidityStatusNotApplicable ComputerDiskEncryptionIndividualRecoveryKeyValidityStatus = "NOT_APPLICABLE"
+)
+
+// ComputerExtensionAttributeDataType is the set of values accepted by ComputerExtensionAttribute.DataType.
+type ComputerExtensionAttributeDataType = string
+
+// ComputerExtensionAttributeDataType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerExtensionAttributeDataTypeString   ComputerExtensionAttributeDataType = "STRING"
+	ComputerExtensionAttributeDataTypeInteger  ComputerExtensionAttributeDataType = "INTEGER"
+	ComputerExtensionAttributeDataTypeDateTime ComputerExtensionAttributeDataType = "DATE_TIME"
+)
+
+// ComputerExtensionAttributeInputType is the set of values accepted by ComputerExtensionAttribute.InputType.
+type ComputerExtensionAttributeInputType = string
+
+// ComputerExtensionAttributeInputType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerExtensionAttributeInputTypeText   ComputerExtensionAttributeInputType = "TEXT"
+	ComputerExtensionAttributeInputTypePopup  ComputerExtensionAttributeInputType = "POPUP"
+	ComputerExtensionAttributeInputTypeScript ComputerExtensionAttributeInputType = "SCRIPT"
+	ComputerExtensionAttributeInputTypeLdap   ComputerExtensionAttributeInputType = "LDAP"
+)
+
+// ComputerExtensionAttributesDataType is the set of values accepted by ComputerExtensionAttributes.DataType.
+type ComputerExtensionAttributesDataType = string
+
+// ComputerExtensionAttributesDataType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerExtensionAttributesDataTypeInteger ComputerExtensionAttributesDataType = "INTEGER"
+	ComputerExtensionAttributesDataTypeString  ComputerExtensionAttributesDataType = "STRING"
+	ComputerExtensionAttributesDataTypeDate    ComputerExtensionAttributesDataType = "DATE"
+)
+
+// ComputerExtensionAttributesInputType is the set of values accepted by ComputerExtensionAttributes.InputType.
+type ComputerExtensionAttributesInputType = string
+
+// ComputerExtensionAttributesInputType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerExtensionAttributesInputTypeScript                           ComputerExtensionAttributesInputType = "SCRIPT"
+	ComputerExtensionAttributesInputTypeText                             ComputerExtensionAttributesInputType = "TEXT"
+	ComputerExtensionAttributesInputTypePopup                            ComputerExtensionAttributesInputType = "POPUP"
+	ComputerExtensionAttributesInputTypeDirectoryServiceAttributeMapping ComputerExtensionAttributesInputType = "DIRECTORY_SERVICE_ATTRIBUTE_MAPPING"
+)
+
+// ComputerExtensionAttributesInventoryDisplayType is the set of values accepted by ComputerExtensionAttributes.InventoryDisplayType.
+type ComputerExtensionAttributesInventoryDisplayType = string
+
+// ComputerExtensionAttributesInventoryDisplayType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerExtensionAttributesInventoryDisplayTypeGeneral             ComputerExtensionAttributesInventoryDisplayType = "GENERAL"
+	ComputerExtensionAttributesInventoryDisplayTypeHardware            ComputerExtensionAttributesInventoryDisplayType = "HARDWARE"
+	ComputerExtensionAttributesInventoryDisplayTypeOperatingSystem     ComputerExtensionAttributesInventoryDisplayType = "OPERATING_SYSTEM"
+	ComputerExtensionAttributesInventoryDisplayTypeUserAndLocation     ComputerExtensionAttributesInventoryDisplayType = "USER_AND_LOCATION"
+	ComputerExtensionAttributesInventoryDisplayTypePurchasing          ComputerExtensionAttributesInventoryDisplayType = "PURCHASING"
+	ComputerExtensionAttributesInventoryDisplayTypeExtensionAttributes ComputerExtensionAttributesInventoryDisplayType = "EXTENSION_ATTRIBUTES"
+)
+
+// ComputerExtensionAttributesManageExistingData is the set of values accepted by ComputerExtensionAttributes.ManageExistingData.
+type ComputerExtensionAttributesManageExistingData = string
+
+// ComputerExtensionAttributesManageExistingData values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerExtensionAttributesManageExistingDataRetain ComputerExtensionAttributesManageExistingData = "RETAIN"
+	ComputerExtensionAttributesManageExistingDataDelete ComputerExtensionAttributesManageExistingData = "DELETE"
+)
+
+// ComputerGeneralCreatePlatform is the set of values accepted by ComputerGeneralCreate.Platform.
+type ComputerGeneralCreatePlatform = string
+
+// ComputerGeneralCreatePlatform values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerGeneralCreatePlatformWindows ComputerGeneralCreatePlatform = "WINDOWS"
+	ComputerGeneralCreatePlatformMac     ComputerGeneralCreatePlatform = "MAC"
+	ComputerGeneralCreatePlatformNone    ComputerGeneralCreatePlatform = "NONE"
+)
+
+// ComputerHardwareBatteryHealth is the set of values accepted by ComputerHardware.BatteryHealth.
+type ComputerHardwareBatteryHealth = string
+
+// ComputerHardwareBatteryHealth values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerHardwareBatteryHealthNonGenuine         ComputerHardwareBatteryHealth = "NON_GENUINE"
+	ComputerHardwareBatteryHealthNormal             ComputerHardwareBatteryHealth = "NORMAL"
+	ComputerHardwareBatteryHealthServiceRecommended ComputerHardwareBatteryHealth = "SERVICE_RECOMMENDED"
+	ComputerHardwareBatteryHealthUnknown            ComputerHardwareBatteryHealth = "UNKNOWN"
+	ComputerHardwareBatteryHealthUnsupported        ComputerHardwareBatteryHealth = "UNSUPPORTED"
+)
+
+// ComputerHardwareCreateBatteryHealth is the set of values accepted by ComputerHardwareCreate.BatteryHealth.
+type ComputerHardwareCreateBatteryHealth = string
+
+// ComputerHardwareCreateBatteryHealth values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerHardwareCreateBatteryHealthNonGenuine         ComputerHardwareCreateBatteryHealth = "NON_GENUINE"
+	ComputerHardwareCreateBatteryHealthNormal             ComputerHardwareCreateBatteryHealth = "NORMAL"
+	ComputerHardwareCreateBatteryHealthServiceRecommended ComputerHardwareCreateBatteryHealth = "SERVICE_RECOMMENDED"
+	ComputerHardwareCreateBatteryHealthUnknown            ComputerHardwareCreateBatteryHealth = "UNKNOWN"
+	ComputerHardwareCreateBatteryHealthUnsupported        ComputerHardwareCreateBatteryHealth = "UNSUPPORTED"
+)
+
+// ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatus is the set of values accepted by ComputerInventoryFileVault.IndividualRecoveryKeyValidityStatus.
+type ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatus = string
+
+// ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatusValid         ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatus = "VALID"
+	ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatusInvalid       ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatus = "INVALID"
+	ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatusUnknown       ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatus = "UNKNOWN"
+	ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatusNotApplicable ComputerInventoryFileVaultIndividualRecoveryKeyValidityStatus = "NOT_APPLICABLE"
+)
+
+// ComputerLocalUserAccountAzureActiveDirectoryID is the set of values accepted by ComputerLocalUserAccount.AzureActiveDirectoryID.
+type ComputerLocalUserAccountAzureActiveDirectoryID = string
+
+// ComputerLocalUserAccountAzureActiveDirectoryID values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerLocalUserAccountAzureActiveDirectoryIDActivated    ComputerLocalUserAccountAzureActiveDirectoryID = "ACTIVATED"
+	ComputerLocalUserAccountAzureActiveDirectoryIDDeactivated  ComputerLocalUserAccountAzureActiveDirectoryID = "DEACTIVATED"
+	ComputerLocalUserAccountAzureActiveDirectoryIDUnresponsive ComputerLocalUserAccountAzureActiveDirectoryID = "UNRESPONSIVE"
+	ComputerLocalUserAccountAzureActiveDirectoryIDUnknown      ComputerLocalUserAccountAzureActiveDirectoryID = "UNKNOWN"
+)
+
+// ComputerLocalUserAccountCreateUserAccountType is the set of values accepted by ComputerLocalUserAccountCreate.UserAccountType.
+type ComputerLocalUserAccountCreateUserAccountType = string
+
+// ComputerLocalUserAccountCreateUserAccountType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerLocalUserAccountCreateUserAccountTypeLocal   ComputerLocalUserAccountCreateUserAccountType = "LOCAL"
+	ComputerLocalUserAccountCreateUserAccountTypeMobile  ComputerLocalUserAccountCreateUserAccountType = "MOBILE"
+	ComputerLocalUserAccountCreateUserAccountTypeUnknown ComputerLocalUserAccountCreateUserAccountType = "UNKNOWN"
+)
+
+// ComputerLocalUserAccountUserAccountType is the set of values accepted by ComputerLocalUserAccount.UserAccountType.
+type ComputerLocalUserAccountUserAccountType = string
+
+// ComputerLocalUserAccountUserAccountType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerLocalUserAccountUserAccountTypeLocal   ComputerLocalUserAccountUserAccountType = "LOCAL"
+	ComputerLocalUserAccountUserAccountTypeMobile  ComputerLocalUserAccountUserAccountType = "MOBILE"
+	ComputerLocalUserAccountUserAccountTypeUnknown ComputerLocalUserAccountUserAccountType = "UNKNOWN"
+)
+
+// ComputerOperatingSystemFileVault2Status is the set of values accepted by ComputerOperatingSystem.FileVault2Status.
+type ComputerOperatingSystemFileVault2Status = string
+
+// ComputerOperatingSystemFileVault2Status values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerOperatingSystemFileVault2StatusNotApplicable ComputerOperatingSystemFileVault2Status = "NOT_APPLICABLE"
+	ComputerOperatingSystemFileVault2StatusNotEncrypted  ComputerOperatingSystemFileVault2Status = "NOT_ENCRYPTED"
+	ComputerOperatingSystemFileVault2StatusBootEncrypted ComputerOperatingSystemFileVault2Status = "BOOT_ENCRYPTED"
+	ComputerOperatingSystemFileVault2StatusSomeEncrypted ComputerOperatingSystemFileVault2Status = "SOME_ENCRYPTED"
+	ComputerOperatingSystemFileVault2StatusAllEncrypted  ComputerOperatingSystemFileVault2Status = "ALL_ENCRYPTED"
+)
+
+// ComputerPartitionCreatePartitionType is the set of values accepted by ComputerPartitionCreate.PartitionType.
+type ComputerPartitionCreatePartitionType = string
+
+// ComputerPartitionCreatePartitionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerPartitionCreatePartitionTypeBoot     ComputerPartitionCreatePartitionType = "BOOT"
+	ComputerPartitionCreatePartitionTypeRecovery ComputerPartitionCreatePartitionType = "RECOVERY"
+	ComputerPartitionCreatePartitionTypeOther    ComputerPartitionCreatePartitionType = "OTHER"
+)
+
+// ComputerPartitionPartitionType is the set of values accepted by ComputerPartition.PartitionType.
+type ComputerPartitionPartitionType = string
+
+// ComputerPartitionPartitionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerPartitionPartitionTypeBoot     ComputerPartitionPartitionType = "BOOT"
+	ComputerPartitionPartitionTypeRecovery ComputerPartitionPartitionType = "RECOVERY"
+	ComputerPartitionPartitionTypeOther    ComputerPartitionPartitionType = "OTHER"
+)
+
+// ComputerPrestageV3PrestageMinimumOsTargetVersionType is the set of values accepted by ComputerPrestageV3.PrestageMinimumOsTargetVersionType.
+type ComputerPrestageV3PrestageMinimumOsTargetVersionType = string
+
+// ComputerPrestageV3PrestageMinimumOsTargetVersionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerPrestageV3PrestageMinimumOsTargetVersionTypeNoEnforcement               ComputerPrestageV3PrestageMinimumOsTargetVersionType = "NO_ENFORCEMENT"
+	ComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestVersion      ComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_VERSION"
+	ComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestMajorVersion ComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	ComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestMinorVersion ComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	ComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsSpecificVersion    ComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// ComputerPrestageV3RecoveryLockPasswordType is the set of values accepted by ComputerPrestageV3.RecoveryLockPasswordType.
+type ComputerPrestageV3RecoveryLockPasswordType = string
+
+// ComputerPrestageV3RecoveryLockPasswordType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerPrestageV3RecoveryLockPasswordTypeManual ComputerPrestageV3RecoveryLockPasswordType = "MANUAL"
+	ComputerPrestageV3RecoveryLockPasswordTypeRandom ComputerPrestageV3RecoveryLockPasswordType = "RANDOM"
+)
+
+// ComputerSecurityAttestationStatus is the set of values accepted by ComputerSecurity.AttestationStatus.
+type ComputerSecurityAttestationStatus = string
+
+// ComputerSecurityAttestationStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecurityAttestationStatusPending                     ComputerSecurityAttestationStatus = "PENDING"
+	ComputerSecurityAttestationStatusSuccess                     ComputerSecurityAttestationStatus = "SUCCESS"
+	ComputerSecurityAttestationStatusCertificateInvalid          ComputerSecurityAttestationStatus = "CERTIFICATE_INVALID"
+	ComputerSecurityAttestationStatusDevicePropertiesMismatch    ComputerSecurityAttestationStatus = "DEVICE_PROPERTIES_MISMATCH"
+	ComputerSecurityAttestationStatusMdaUnsupportedDueToHardware ComputerSecurityAttestationStatus = "MDA_UNSUPPORTED_DUE_TO_HARDWARE"
+	ComputerSecurityAttestationStatusMdaUnsupportedDueToSoftware ComputerSecurityAttestationStatus = "MDA_UNSUPPORTED_DUE_TO_SOFTWARE"
+)
+
+// ComputerSecurityBootstrapTokenEscrowedStatus is the set of values accepted by ComputerSecurity.BootstrapTokenEscrowedStatus.
+type ComputerSecurityBootstrapTokenEscrowedStatus = string
+
+// ComputerSecurityBootstrapTokenEscrowedStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecurityBootstrapTokenEscrowedStatusEscrowed     ComputerSecurityBootstrapTokenEscrowedStatus = "ESCROWED"
+	ComputerSecurityBootstrapTokenEscrowedStatusNotEscrowed  ComputerSecurityBootstrapTokenEscrowedStatus = "NOT_ESCROWED"
+	ComputerSecurityBootstrapTokenEscrowedStatusNotSupported ComputerSecurityBootstrapTokenEscrowedStatus = "NOT_SUPPORTED"
+)
+
+// ComputerSecurityCreateExternalBootLevel is the set of values accepted by ComputerSecurityCreate.ExternalBootLevel.
+type ComputerSecurityCreateExternalBootLevel = string
+
+// ComputerSecurityCreateExternalBootLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecurityCreateExternalBootLevelAllowBootingFromExternalMedia    ComputerSecurityCreateExternalBootLevel = "ALLOW_BOOTING_FROM_EXTERNAL_MEDIA"
+	ComputerSecurityCreateExternalBootLevelDisallowBootingFromExternalMedia ComputerSecurityCreateExternalBootLevel = "DISALLOW_BOOTING_FROM_EXTERNAL_MEDIA"
+	ComputerSecurityCreateExternalBootLevelNotSupported                     ComputerSecurityCreateExternalBootLevel = "NOT_SUPPORTED"
+	ComputerSecurityCreateExternalBootLevelUnknown                          ComputerSecurityCreateExternalBootLevel = "UNKNOWN"
+)
+
+// ComputerSecurityCreateGatekeeperStatus is the set of values accepted by ComputerSecurityCreate.GatekeeperStatus.
+type ComputerSecurityCreateGatekeeperStatus = string
+
+// ComputerSecurityCreateGatekeeperStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecurityCreateGatekeeperStatusNotCollected                    ComputerSecurityCreateGatekeeperStatus = "NOT_COLLECTED"
+	ComputerSecurityCreateGatekeeperStatusDisabled                        ComputerSecurityCreateGatekeeperStatus = "DISABLED"
+	ComputerSecurityCreateGatekeeperStatusAppStoreAndIdentifiedDevelopers ComputerSecurityCreateGatekeeperStatus = "APP_STORE_AND_IDENTIFIED_DEVELOPERS"
+	ComputerSecurityCreateGatekeeperStatusAppStore                        ComputerSecurityCreateGatekeeperStatus = "APP_STORE"
+)
+
+// ComputerSecurityCreateSecureBootLevel is the set of values accepted by ComputerSecurityCreate.SecureBootLevel.
+type ComputerSecurityCreateSecureBootLevel = string
+
+// ComputerSecurityCreateSecureBootLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecurityCreateSecureBootLevelNoSecurity     ComputerSecurityCreateSecureBootLevel = "NO_SECURITY"
+	ComputerSecurityCreateSecureBootLevelMediumSecurity ComputerSecurityCreateSecureBootLevel = "MEDIUM_SECURITY"
+	ComputerSecurityCreateSecureBootLevelFullSecurity   ComputerSecurityCreateSecureBootLevel = "FULL_SECURITY"
+	ComputerSecurityCreateSecureBootLevelNotSupported   ComputerSecurityCreateSecureBootLevel = "NOT_SUPPORTED"
+	ComputerSecurityCreateSecureBootLevelUnknown        ComputerSecurityCreateSecureBootLevel = "UNKNOWN"
+)
+
+// ComputerSecurityCreateSipStatus is the set of values accepted by ComputerSecurityCreate.SipStatus.
+type ComputerSecurityCreateSipStatus = string
+
+// ComputerSecurityCreateSipStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecurityCreateSipStatusNotCollected ComputerSecurityCreateSipStatus = "NOT_COLLECTED"
+	ComputerSecurityCreateSipStatusNotAvailable ComputerSecurityCreateSipStatus = "NOT_AVAILABLE"
+	ComputerSecurityCreateSipStatusDisabled     ComputerSecurityCreateSipStatus = "DISABLED"
+	ComputerSecurityCreateSipStatusEnabled      ComputerSecurityCreateSipStatus = "ENABLED"
+)
+
+// ComputerSecurityExternalBootLevel is the set of values accepted by ComputerSecurity.ExternalBootLevel.
+type ComputerSecurityExternalBootLevel = string
+
+// ComputerSecurityExternalBootLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecurityExternalBootLevelAllowBootingFromExternalMedia    ComputerSecurityExternalBootLevel = "ALLOW_BOOTING_FROM_EXTERNAL_MEDIA"
+	ComputerSecurityExternalBootLevelDisallowBootingFromExternalMedia ComputerSecurityExternalBootLevel = "DISALLOW_BOOTING_FROM_EXTERNAL_MEDIA"
+	ComputerSecurityExternalBootLevelNotSupported                     ComputerSecurityExternalBootLevel = "NOT_SUPPORTED"
+	ComputerSecurityExternalBootLevelUnknown                          ComputerSecurityExternalBootLevel = "UNKNOWN"
+)
+
+// ComputerSecurityGatekeeperStatus is the set of values accepted by ComputerSecurity.GatekeeperStatus.
+type ComputerSecurityGatekeeperStatus = string
+
+// ComputerSecurityGatekeeperStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecurityGatekeeperStatusNotCollected                    ComputerSecurityGatekeeperStatus = "NOT_COLLECTED"
+	ComputerSecurityGatekeeperStatusDisabled                        ComputerSecurityGatekeeperStatus = "DISABLED"
+	ComputerSecurityGatekeeperStatusAppStoreAndIdentifiedDevelopers ComputerSecurityGatekeeperStatus = "APP_STORE_AND_IDENTIFIED_DEVELOPERS"
+	ComputerSecurityGatekeeperStatusAppStore                        ComputerSecurityGatekeeperStatus = "APP_STORE"
+)
+
+// ComputerSecuritySecureBootLevel is the set of values accepted by ComputerSecurity.SecureBootLevel.
+type ComputerSecuritySecureBootLevel = string
+
+// ComputerSecuritySecureBootLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecuritySecureBootLevelNoSecurity     ComputerSecuritySecureBootLevel = "NO_SECURITY"
+	ComputerSecuritySecureBootLevelMediumSecurity ComputerSecuritySecureBootLevel = "MEDIUM_SECURITY"
+	ComputerSecuritySecureBootLevelFullSecurity   ComputerSecuritySecureBootLevel = "FULL_SECURITY"
+	ComputerSecuritySecureBootLevelNotSupported   ComputerSecuritySecureBootLevel = "NOT_SUPPORTED"
+	ComputerSecuritySecureBootLevelUnknown        ComputerSecuritySecureBootLevel = "UNKNOWN"
+)
+
+// ComputerSecuritySipStatus is the set of values accepted by ComputerSecurity.SipStatus.
+type ComputerSecuritySipStatus = string
+
+// ComputerSecuritySipStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSecuritySipStatusNotCollected ComputerSecuritySipStatus = "NOT_COLLECTED"
+	ComputerSecuritySipStatusNotAvailable ComputerSecuritySipStatus = "NOT_AVAILABLE"
+	ComputerSecuritySipStatusDisabled     ComputerSecuritySipStatus = "DISABLED"
+	ComputerSecuritySipStatusEnabled      ComputerSecuritySipStatus = "ENABLED"
+)
+
+// ComputerSmartGroupCriteriaV2AndOr is the set of values accepted by ComputerSmartGroupCriteriaV2.AndOr.
+type ComputerSmartGroupCriteriaV2AndOr = string
+
+// ComputerSmartGroupCriteriaV2AndOr values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSmartGroupCriteriaV2AndOrAnd ComputerSmartGroupCriteriaV2AndOr = "and"
+	ComputerSmartGroupCriteriaV2AndOrOr  ComputerSmartGroupCriteriaV2AndOr = "or"
+)
+
+// CreatePathScope is the set of values accepted by CreatePath.Scope.
+type CreatePathScope = string
+
+// CreatePathScope values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CreatePathScopeApp    CreatePathScope = "APP"
+	CreatePathScopeFont   CreatePathScope = "FONT"
+	CreatePathScopePlugin CreatePathScope = "PLUGIN"
+)
+
+// DashboardItemMetricsItemTag is the set of values accepted by DashboardItemMetricsItem.Tag.
+type DashboardItemMetricsItemTag = string
+
+// DashboardItemMetricsItemTag values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DashboardItemMetricsItemTagCompleted        DashboardItemMetricsItemTag = "Completed"
+	DashboardItemMetricsItemTagRemaining        DashboardItemMetricsItemTag = "Remaining"
+	DashboardItemMetricsItemTagSiteLicense      DashboardItemMetricsItemTag = "Site License"
+	DashboardItemMetricsItemTagNoLicenses       DashboardItemMetricsItemTag = "No Licenses"
+	DashboardItemMetricsItemTagOver             DashboardItemMetricsItemTag = "Over"
+	DashboardItemMetricsItemTagFailed           DashboardItemMetricsItemTag = "Failed"
+	DashboardItemMetricsItemTagRetrying         DashboardItemMetricsItemTag = "Retrying"
+	DashboardItemMetricsItemTagRetryingDisabled DashboardItemMetricsItemTag = "Retrying-disabled"
+	DashboardItemMetricsItemTagPending          DashboardItemMetricsItemTag = "Pending"
+	DashboardItemMetricsItemTagExpiring         DashboardItemMetricsItemTag = "Expiring"
+	DashboardItemMetricsItemTagActive           DashboardItemMetricsItemTag = "Active"
+	DashboardItemMetricsItemTagInactive         DashboardItemMetricsItemTag = "Inactive"
+	DashboardItemMetricsItemTagComputers        DashboardItemMetricsItemTag = "Computers"
+	DashboardItemMetricsItemTagDevices          DashboardItemMetricsItemTag = "Devices"
+	DashboardItemMetricsItemTagUsers            DashboardItemMetricsItemTag = "Users"
+	DashboardItemMetricsItemTagInUse            DashboardItemMetricsItemTag = "In Use"
+	DashboardItemMetricsItemTagNA               DashboardItemMetricsItemTag = "N/A"
+	DashboardItemMetricsItemTagLatestVersion    DashboardItemMetricsItemTag = "Latest Version"
+	DashboardItemMetricsItemTagOtherVersions    DashboardItemMetricsItemTag = "Other Versions"
+)
+
+// DashboardObjectObjectType is the set of values accepted by DashboardObject.ObjectType.
+type DashboardObjectObjectType = string
+
+// DashboardObjectObjectType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DashboardObjectObjectTypeTypeIosConfigurationProfile         DashboardObjectObjectType = "TYPE_IOS_CONFIGURATION_PROFILE"
+	DashboardObjectObjectTypeTypeMacosConfigurationProfile       DashboardObjectObjectType = "TYPE_MACOS_CONFIGURATION_PROFILE"
+	DashboardObjectObjectTypeTypeUserGroup                       DashboardObjectObjectType = "TYPE_USER_GROUP"
+	DashboardObjectObjectTypeTypeLicensedSoftware                DashboardObjectObjectType = "TYPE_LICENSED_SOFTWARE"
+	DashboardObjectObjectTypeTypePatchSoftwareTitleConfiguration DashboardObjectObjectType = "TYPE_PATCH_SOFTWARE_TITLE_CONFIGURATION"
+	DashboardObjectObjectTypeTypePatchPolicy                     DashboardObjectObjectType = "TYPE_PATCH_POLICY"
+	DashboardObjectObjectTypeTypePolicy                          DashboardObjectObjectType = "TYPE_POLICY"
+	DashboardObjectObjectTypeTypeComputerGroup                   DashboardObjectObjectType = "TYPE_COMPUTER_GROUP"
+	DashboardObjectObjectTypeTypeMobileDeviceGroup               DashboardObjectObjectType = "TYPE_MOBILE_DEVICE_GROUP"
+	DashboardObjectObjectTypeTypeDigicertPkiManagerSettings      DashboardObjectObjectType = "TYPE_DIGICERT_PKI_MANAGER_SETTINGS"
+)
+
+// DashboardSetupFeatureOptionsFeature is the set of values accepted by DashboardSetupFeatureOptions.Feature.
+type DashboardSetupFeatureOptionsFeature = string
+
+// DashboardSetupFeatureOptionsFeature values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DashboardSetupFeatureOptionsFeatureTypeIosConfigurationProfile         DashboardSetupFeatureOptionsFeature = "TYPE_IOS_CONFIGURATION_PROFILE"
+	DashboardSetupFeatureOptionsFeatureTypeMacosConfigurationProfile       DashboardSetupFeatureOptionsFeature = "TYPE_MACOS_CONFIGURATION_PROFILE"
+	DashboardSetupFeatureOptionsFeatureTypeUserGroup                       DashboardSetupFeatureOptionsFeature = "TYPE_USER_GROUP"
+	DashboardSetupFeatureOptionsFeatureTypeLicensedSoftware                DashboardSetupFeatureOptionsFeature = "TYPE_LICENSED_SOFTWARE"
+	DashboardSetupFeatureOptionsFeatureTypePatchSoftwareTitleConfiguration DashboardSetupFeatureOptionsFeature = "TYPE_PATCH_SOFTWARE_TITLE_CONFIGURATION"
+	DashboardSetupFeatureOptionsFeatureTypePatchPolicy                     DashboardSetupFeatureOptionsFeature = "TYPE_PATCH_POLICY"
+	DashboardSetupFeatureOptionsFeatureTypePolicy                          DashboardSetupFeatureOptionsFeature = "TYPE_POLICY"
+	DashboardSetupFeatureOptionsFeatureTypeComputerGroup                   DashboardSetupFeatureOptionsFeature = "TYPE_COMPUTER_GROUP"
+	DashboardSetupFeatureOptionsFeatureTypeMobileDeviceGroup               DashboardSetupFeatureOptionsFeature = "TYPE_MOBILE_DEVICE_GROUP"
+	DashboardSetupFeatureOptionsFeatureTypeDigicertPkiManagerSettings      DashboardSetupFeatureOptionsFeature = "TYPE_DIGICERT_PKI_MANAGER_SETTINGS"
+)
+
+// DashboardSetupSetupTaskOptionsSetupTask is the set of values accepted by DashboardSetupSetupTaskOptions.SetupTask.
+type DashboardSetupSetupTaskOptionsSetupTask = string
+
+// DashboardSetupSetupTaskOptionsSetupTask values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DashboardSetupSetupTaskOptionsSetupTaskTypeLdapServerSetupTask               DashboardSetupSetupTaskOptionsSetupTask = "TYPE_LDAP_SERVER_SETUP_TASK"
+	DashboardSetupSetupTaskOptionsSetupTaskTypePushNotificationSettingsSetupTask DashboardSetupSetupTaskOptionsSetupTask = "TYPE_PUSH_NOTIFICATION_SETTINGS_SETUP_TASK"
+	DashboardSetupSetupTaskOptionsSetupTaskTypeSmtpServerSetupTask               DashboardSetupSetupTaskOptionsSetupTask = "TYPE_SMTP_SERVER_SETUP_TASK"
+	DashboardSetupSetupTaskOptionsSetupTaskTypeSslSetupTask                      DashboardSetupSetupTaskOptionsSetupTask = "TYPE_SSL_SETUP_TASK"
+)
+
+// DeploymentTaskStatus is the set of values accepted by DeploymentTask.Status.
+type DeploymentTaskStatus = string
+
+// DeploymentTaskStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DeploymentTaskStatusCommandQueued   DeploymentTaskStatus = "COMMAND_QUEUED"
+	DeploymentTaskStatusNoCommand       DeploymentTaskStatus = "NO_COMMAND"
+	DeploymentTaskStatusPendingManifest DeploymentTaskStatus = "PENDING_MANIFEST"
+	DeploymentTaskStatusComplete        DeploymentTaskStatus = "COMPLETE"
+	DeploymentTaskStatusGaveUp          DeploymentTaskStatus = "GAVE_UP"
+	DeploymentTaskStatusUnknown         DeploymentTaskStatus = "UNKNOWN"
+)
+
+// DetailsV2BatteryHealth is the set of values accepted by DetailsV2.BatteryHealth.
+type DetailsV2BatteryHealth = string
+
+// DetailsV2BatteryHealth values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DetailsV2BatteryHealthNonGenuine         DetailsV2BatteryHealth = "NON_GENUINE"
+	DetailsV2BatteryHealthNormal             DetailsV2BatteryHealth = "NORMAL"
+	DetailsV2BatteryHealthServiceRecommended DetailsV2BatteryHealth = "SERVICE_RECOMMENDED"
+	DetailsV2BatteryHealthUnknown            DetailsV2BatteryHealth = "UNKNOWN"
+	DetailsV2BatteryHealthUnsupported        DetailsV2BatteryHealth = "UNSUPPORTED"
+)
+
+// DeviceComplianceInformationComplianceState is the set of values accepted by DeviceComplianceInformation.ComplianceState.
+type DeviceComplianceInformationComplianceState = string
+
+// DeviceComplianceInformationComplianceState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DeviceComplianceInformationComplianceStateUnknown      DeviceComplianceInformationComplianceState = "UNKNOWN"
+	DeviceComplianceInformationComplianceStateNonCompliant DeviceComplianceInformationComplianceState = "NON_COMPLIANT"
+	DeviceComplianceInformationComplianceStateCompliant    DeviceComplianceInformationComplianceState = "COMPLIANT"
+)
+
+// DeviceEnrollmentDeviceProfileStatus is the set of values accepted by DeviceEnrollmentDevice.ProfileStatus.
+type DeviceEnrollmentDeviceProfileStatus = string
+
+// DeviceEnrollmentDeviceProfileStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DeviceEnrollmentDeviceProfileStatusEmpty    DeviceEnrollmentDeviceProfileStatus = "EMPTY"
+	DeviceEnrollmentDeviceProfileStatusAssigned DeviceEnrollmentDeviceProfileStatus = "ASSIGNED"
+	DeviceEnrollmentDeviceProfileStatusPushed   DeviceEnrollmentDeviceProfileStatus = "PUSHED"
+	DeviceEnrollmentDeviceProfileStatusRemoved  DeviceEnrollmentDeviceProfileStatus = "REMOVED"
+)
+
+// DigicertDependencyConfigProfileType is the set of values accepted by DigicertDependency.ConfigProfileType.
+type DigicertDependencyConfigProfileType = string
+
+// DigicertDependencyConfigProfileType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DigicertDependencyConfigProfileTypeOsxConfigurationProfile DigicertDependencyConfigProfileType = "OSX_CONFIGURATION_PROFILE"
+	DigicertDependencyConfigProfileTypeIosConfigurationProfile DigicertDependencyConfigProfileType = "IOS_CONFIGURATION_PROFILE"
+)
+
+// DistributionPointFileSharingConnectionType is the set of values accepted by DistributionPoint.FileSharingConnectionType.
+type DistributionPointFileSharingConnectionType = string
+
+// DistributionPointFileSharingConnectionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DistributionPointFileSharingConnectionTypeAfp  DistributionPointFileSharingConnectionType = "AFP"
+	DistributionPointFileSharingConnectionTypeSmb  DistributionPointFileSharingConnectionType = "SMB"
+	DistributionPointFileSharingConnectionTypeNone DistributionPointFileSharingConnectionType = "NONE"
+)
+
+// DistributionPointHttpsSecurityType is the set of values accepted by DistributionPoint.HttpsSecurityType.
+type DistributionPointHttpsSecurityType = string
+
+// DistributionPointHttpsSecurityType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DistributionPointHttpsSecurityTypeUsernamePassword DistributionPointHttpsSecurityType = "USERNAME_PASSWORD"
+	DistributionPointHttpsSecurityTypeNone             DistributionPointHttpsSecurityType = "NONE"
+)
+
+// DockItemType is the set of values accepted by DockItem.Type.
+type DockItemType = string
+
+// DockItemType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DockItemTypeApp    DockItemType = "APP"
+	DockItemTypeFile   DockItemType = "FILE"
+	DockItemTypeFolder DockItemType = "FOLDER"
+)
+
+// DssDeclarationGroup is the set of values accepted by DssDeclaration.Group.
+type DssDeclarationGroup = string
+
+// DssDeclarationGroup values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DssDeclarationGroupActivation    DssDeclarationGroup = "ACTIVATION"
+	DssDeclarationGroupAsset         DssDeclarationGroup = "ASSET"
+	DssDeclarationGroupConfiguration DssDeclarationGroup = "CONFIGURATION"
+	DssDeclarationGroupManagement    DssDeclarationGroup = "MANAGEMENT"
+)
+
+// EbookKind is the set of values accepted by Ebook.Kind.
+type EbookKind = string
+
+// EbookKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	EbookKindUnknown EbookKind = "UNKNOWN"
+	EbookKindPdf     EbookKind = "PDF"
+	EbookKindEpub    EbookKind = "EPUB"
+	EbookKindIbooks  EbookKind = "IBOOKS"
+)
+
+// EnrollmentSettingsV4FlushMDMCommandsOnReenroll is the set of values accepted by EnrollmentSettingsV4.FlushMDMCommandsOnReenroll.
+type EnrollmentSettingsV4FlushMDMCommandsOnReenroll = string
+
+// EnrollmentSettingsV4FlushMDMCommandsOnReenroll values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	EnrollmentSettingsV4FlushMDMCommandsOnReenrollDeleteNothing                      EnrollmentSettingsV4FlushMDMCommandsOnReenroll = "DELETE_NOTHING"
+	EnrollmentSettingsV4FlushMDMCommandsOnReenrollDeleteErrors                       EnrollmentSettingsV4FlushMDMCommandsOnReenroll = "DELETE_ERRORS"
+	EnrollmentSettingsV4FlushMDMCommandsOnReenrollDeleteEverythingExceptAcknowledged EnrollmentSettingsV4FlushMDMCommandsOnReenroll = "DELETE_EVERYTHING_EXCEPT_ACKNOWLEDGED"
+	EnrollmentSettingsV4FlushMDMCommandsOnReenrollDeleteEverything                   EnrollmentSettingsV4FlushMDMCommandsOnReenroll = "DELETE_EVERYTHING"
+)
+
+// EraseDeviceCommandObliterationBehavior is the set of values accepted by EraseDeviceCommand.ObliterationBehavior.
+type EraseDeviceCommandObliterationBehavior = string
+
+// EraseDeviceCommandObliterationBehavior values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	EraseDeviceCommandObliterationBehaviorDefault               EraseDeviceCommandObliterationBehavior = "Default"
+	EraseDeviceCommandObliterationBehaviorDoNotObliterate       EraseDeviceCommandObliterationBehavior = "DoNotObliterate"
+	EraseDeviceCommandObliterationBehaviorObliterateWithWarning EraseDeviceCommandObliterationBehavior = "ObliterateWithWarning"
+	EraseDeviceCommandObliterationBehaviorAlways                EraseDeviceCommandObliterationBehavior = "Always"
+)
+
+// ExtensionAttributeV2Type is the set of values accepted by ExtensionAttributeV2.Type.
+type ExtensionAttributeV2Type = string
+
+// ExtensionAttributeV2Type values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ExtensionAttributeV2TypeString  ExtensionAttributeV2Type = "STRING"
+	ExtensionAttributeV2TypeInteger ExtensionAttributeV2Type = "INTEGER"
+	ExtensionAttributeV2TypeDate    ExtensionAttributeV2Type = "DATE"
+)
+
+// ExtensionAttributesDataType is the set of values accepted by ExtensionAttributes.DataType.
+type ExtensionAttributesDataType = string
+
+// ExtensionAttributesDataType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ExtensionAttributesDataTypeInteger ExtensionAttributesDataType = "INTEGER"
+	ExtensionAttributesDataTypeString  ExtensionAttributesDataType = "STRING"
+	ExtensionAttributesDataTypeDate    ExtensionAttributesDataType = "DATE"
+)
+
+// FileTransferItemFileTransferType is the set of values accepted by FileTransferItem.FileTransferType.
+type FileTransferItemFileTransferType = string
+
+// FileTransferItemFileTransferType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	FileTransferItemFileTransferTypeDownload FileTransferItemFileTransferType = "DOWNLOAD"
+	FileTransferItemFileTransferTypeUpload   FileTransferItemFileTransferType = "UPLOAD"
+)
+
+// GetComputerPrestageV3PrestageMinimumOsTargetVersionType is the set of values accepted by GetComputerPrestageV3.PrestageMinimumOsTargetVersionType.
+type GetComputerPrestageV3PrestageMinimumOsTargetVersionType = string
+
+// GetComputerPrestageV3PrestageMinimumOsTargetVersionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GetComputerPrestageV3PrestageMinimumOsTargetVersionTypeNoEnforcement               GetComputerPrestageV3PrestageMinimumOsTargetVersionType = "NO_ENFORCEMENT"
+	GetComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestVersion      GetComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_VERSION"
+	GetComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestMajorVersion GetComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	GetComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestMinorVersion GetComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	GetComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsSpecificVersion    GetComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// GetComputerPrestageV3RecoveryLockPasswordType is the set of values accepted by GetComputerPrestageV3.RecoveryLockPasswordType.
+type GetComputerPrestageV3RecoveryLockPasswordType = string
+
+// GetComputerPrestageV3RecoveryLockPasswordType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GetComputerPrestageV3RecoveryLockPasswordTypeManual GetComputerPrestageV3RecoveryLockPasswordType = "MANUAL"
+	GetComputerPrestageV3RecoveryLockPasswordTypeRandom GetComputerPrestageV3RecoveryLockPasswordType = "RANDOM"
+)
+
+// GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos is the set of values accepted by GetMobileDevicePrestageV2.PrestageMinimumOsTargetVersionTypeIos.
+type GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = string
+
+// GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosNoEnforcement               GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "NO_ENFORCEMENT"
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestVersion      GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_VERSION"
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMajorVersion GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMinorVersion GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsSpecificVersion    GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad is the set of values accepted by GetMobileDevicePrestageV2.PrestageMinimumOsTargetVersionTypeIpad.
+type GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = string
+
+// GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadNoEnforcement               GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "NO_ENFORCEMENT"
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestVersion      GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_VERSION"
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMajorVersion GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMinorVersion GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsSpecificVersion    GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos is the set of values accepted by GetMobileDevicePrestageV3.PrestageMinimumOsTargetVersionTypeIos.
+type GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = string
+
+// GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosNoEnforcement               GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "NO_ENFORCEMENT"
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestVersion      GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_VERSION"
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMajorVersion GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMinorVersion GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsSpecificVersion    GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad is the set of values accepted by GetMobileDevicePrestageV3.PrestageMinimumOsTargetVersionTypeIpad.
+type GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = string
+
+// GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadNoEnforcement               GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "NO_ENFORCEMENT"
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestVersion      GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_VERSION"
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMajorVersion GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMinorVersion GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsSpecificVersion    GetMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// GroupDtoV1GroupType is the set of values accepted by GroupDtoV1.GroupType.
+type GroupDtoV1GroupType = string
+
+// GroupDtoV1GroupType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GroupDtoV1GroupTypeMobile   GroupDtoV1GroupType = "MOBILE"
+	GroupDtoV1GroupTypeComputer GroupDtoV1GroupType = "COMPUTER"
+)
+
+// GroupMappingsObjectClassLimitation is the set of values accepted by GroupMappings.ObjectClassLimitation.
+type GroupMappingsObjectClassLimitation = string
+
+// GroupMappingsObjectClassLimitation values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GroupMappingsObjectClassLimitationAnyObjectClasses GroupMappingsObjectClassLimitation = "ANY_OBJECT_CLASSES"
+	GroupMappingsObjectClassLimitationAllObjectClasses GroupMappingsObjectClassLimitation = "ALL_OBJECT_CLASSES"
+)
+
+// GroupMappingsSearchScope is the set of values accepted by GroupMappings.SearchScope.
+type GroupMappingsSearchScope = string
+
+// GroupMappingsSearchScope values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GroupMappingsSearchScopeAllSubtrees    GroupMappingsSearchScope = "ALL_SUBTREES"
+	GroupMappingsSearchScopeFirstLevelOnly GroupMappingsSearchScope = "FIRST_LEVEL_ONLY"
+)
+
+// GroupWithCriteriaDtoV1GroupType is the set of values accepted by GroupWithCriteriaDtoV1.GroupType.
+type GroupWithCriteriaDtoV1GroupType = string
+
+// GroupWithCriteriaDtoV1GroupType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GroupWithCriteriaDtoV1GroupTypeMobile   GroupWithCriteriaDtoV1GroupType = "MOBILE"
+	GroupWithCriteriaDtoV1GroupTypeComputer GroupWithCriteriaDtoV1GroupType = "COMPUTER"
+)
+
+// InstalledApplicationListCommandItems is the set of values accepted by InstalledApplicationListCommand.Items.
+type InstalledApplicationListCommandItems = string
+
+// InstalledApplicationListCommandItems values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	InstalledApplicationListCommandItemsAdHocCodeSigned           InstalledApplicationListCommandItems = "AdHocCodeSigned"
+	InstalledApplicationListCommandItemsAppStoreVendable          InstalledApplicationListCommandItems = "AppStoreVendable"
+	InstalledApplicationListCommandItemsBetaApp                   InstalledApplicationListCommandItems = "BetaApp"
+	InstalledApplicationListCommandItemsBundleSize                InstalledApplicationListCommandItems = "BundleSize"
+	InstalledApplicationListCommandItemsDeviceBasedVpp            InstalledApplicationListCommandItems = "DeviceBasedVpp"
+	InstalledApplicationListCommandItemsDistributorIdentifier     InstalledApplicationListCommandItems = "DistributorIdentifier"
+	InstalledApplicationListCommandItemsDynamicSize               InstalledApplicationListCommandItems = "DynamicSize"
+	InstalledApplicationListCommandItemsExternalVersionIdentifier InstalledApplicationListCommandItems = "ExternalVersionIdentifier"
+	InstalledApplicationListCommandItemsHasUpdateAvailable        InstalledApplicationListCommandItems = "HasUpdateAvailable"
+	InstalledApplicationListCommandItemsIdentifier                InstalledApplicationListCommandItems = "Identifier"
+	InstalledApplicationListCommandItemsInstalling                InstalledApplicationListCommandItems = "Installing"
+	InstalledApplicationListCommandItemsAppClip                   InstalledApplicationListCommandItems = "AppClip"
+	InstalledApplicationListCommandItemsValidated                 InstalledApplicationListCommandItems = "Validated"
+	InstalledApplicationListCommandItemsName                      InstalledApplicationListCommandItems = "Name"
+	InstalledApplicationListCommandItemsShortVersion              InstalledApplicationListCommandItems = "ShortVersion"
+	InstalledApplicationListCommandItemsVersion                   InstalledApplicationListCommandItems = "Version"
+)
+
+// InventoryListMobileDeviceBatteryHealth is the set of values accepted by InventoryListMobileDevice.BatteryHealth.
+type InventoryListMobileDeviceBatteryHealth = string
+
+// InventoryListMobileDeviceBatteryHealth values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	InventoryListMobileDeviceBatteryHealthNonGenuine         InventoryListMobileDeviceBatteryHealth = "NON_GENUINE"
+	InventoryListMobileDeviceBatteryHealthNormal             InventoryListMobileDeviceBatteryHealth = "NORMAL"
+	InventoryListMobileDeviceBatteryHealthServiceRecommended InventoryListMobileDeviceBatteryHealth = "SERVICE_RECOMMENDED"
+	InventoryListMobileDeviceBatteryHealthUnknown            InventoryListMobileDeviceBatteryHealth = "UNKNOWN"
+	InventoryListMobileDeviceBatteryHealthUnsupported        InventoryListMobileDeviceBatteryHealth = "UNSUPPORTED"
+)
+
+// InventoryPreloadRecordV2DeviceType is the set of values accepted by InventoryPreloadRecordV2.DeviceType.
+type InventoryPreloadRecordV2DeviceType = string
+
+// InventoryPreloadRecordV2DeviceType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	InventoryPreloadRecordV2DeviceTypeComputer     InventoryPreloadRecordV2DeviceType = "Computer"
+	InventoryPreloadRecordV2DeviceTypeMobileDevice InventoryPreloadRecordV2DeviceType = "Mobile Device"
+	InventoryPreloadRecordV2DeviceTypeUnknown      InventoryPreloadRecordV2DeviceType = "Unknown"
+)
+
+// LinkedConnectProfileAutoDeploymentType is the set of values accepted by LinkedConnectProfile.AutoDeploymentType.
+type LinkedConnectProfileAutoDeploymentType = string
+
+// LinkedConnectProfileAutoDeploymentType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	LinkedConnectProfileAutoDeploymentTypePatchUpdates            LinkedConnectProfileAutoDeploymentType = "PATCH_UPDATES"
+	LinkedConnectProfileAutoDeploymentTypeMinorAndPatchUpdates    LinkedConnectProfileAutoDeploymentType = "MINOR_AND_PATCH_UPDATES"
+	LinkedConnectProfileAutoDeploymentTypeInitialInstallationOnly LinkedConnectProfileAutoDeploymentType = "INITIAL_INSTALLATION_ONLY"
+	LinkedConnectProfileAutoDeploymentTypeNone                    LinkedConnectProfileAutoDeploymentType = "NONE"
+)
+
+// ManagedSoftwareUpdatePlanToggleStatusExitState is the set of values accepted by ManagedSoftwareUpdatePlanToggleStatus.ExitState.
+type ManagedSoftwareUpdatePlanToggleStatusExitState = string
+
+// ManagedSoftwareUpdatePlanToggleStatusExitState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedSoftwareUpdatePlanToggleStatusExitStateUnknown   ManagedSoftwareUpdatePlanToggleStatusExitState = "UNKNOWN"
+	ManagedSoftwareUpdatePlanToggleStatusExitStateExecuting ManagedSoftwareUpdatePlanToggleStatusExitState = "EXECUTING"
+	ManagedSoftwareUpdatePlanToggleStatusExitStateCompleted ManagedSoftwareUpdatePlanToggleStatusExitState = "COMPLETED"
+	ManagedSoftwareUpdatePlanToggleStatusExitStateNoop      ManagedSoftwareUpdatePlanToggleStatusExitState = "NOOP"
+	ManagedSoftwareUpdatePlanToggleStatusExitStateFailed    ManagedSoftwareUpdatePlanToggleStatusExitState = "FAILED"
+	ManagedSoftwareUpdatePlanToggleStatusExitStateStopped   ManagedSoftwareUpdatePlanToggleStatusExitState = "STOPPED"
+)
+
+// ManagedSoftwareUpdatePlanToggleStatusState is the set of values accepted by ManagedSoftwareUpdatePlanToggleStatus.State.
+type ManagedSoftwareUpdatePlanToggleStatusState = string
+
+// ManagedSoftwareUpdatePlanToggleStatusState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedSoftwareUpdatePlanToggleStatusStateNotRunning ManagedSoftwareUpdatePlanToggleStatusState = "NOT_RUNNING"
+	ManagedSoftwareUpdatePlanToggleStatusStateRunning    ManagedSoftwareUpdatePlanToggleStatusState = "RUNNING"
+	ManagedSoftwareUpdatePlanToggleStatusStateNeverRan   ManagedSoftwareUpdatePlanToggleStatusState = "NEVER_RAN"
+)
+
+// ManagedSoftwareUpdatePlanUpdateAction is the set of values accepted by ManagedSoftwareUpdatePlan.UpdateAction.
+type ManagedSoftwareUpdatePlanUpdateAction = string
+
+// ManagedSoftwareUpdatePlanUpdateAction values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedSoftwareUpdatePlanUpdateActionDownloadOnly                 ManagedSoftwareUpdatePlanUpdateAction = "DOWNLOAD_ONLY"
+	ManagedSoftwareUpdatePlanUpdateActionDownloadInstall              ManagedSoftwareUpdatePlanUpdateAction = "DOWNLOAD_INSTALL"
+	ManagedSoftwareUpdatePlanUpdateActionDownloadInstallAllowDeferral ManagedSoftwareUpdatePlanUpdateAction = "DOWNLOAD_INSTALL_ALLOW_DEFERRAL"
+	ManagedSoftwareUpdatePlanUpdateActionDownloadInstallRestart       ManagedSoftwareUpdatePlanUpdateAction = "DOWNLOAD_INSTALL_RESTART"
+	ManagedSoftwareUpdatePlanUpdateActionDownloadInstallSchedule      ManagedSoftwareUpdatePlanUpdateAction = "DOWNLOAD_INSTALL_SCHEDULE"
+	ManagedSoftwareUpdatePlanUpdateActionUnknown                      ManagedSoftwareUpdatePlanUpdateAction = "UNKNOWN"
+)
+
+// ManagedSoftwareUpdatePlanVersionType is the set of values accepted by ManagedSoftwareUpdatePlan.VersionType.
+type ManagedSoftwareUpdatePlanVersionType = string
+
+// ManagedSoftwareUpdatePlanVersionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedSoftwareUpdatePlanVersionTypeLatestMajor     ManagedSoftwareUpdatePlanVersionType = "LATEST_MAJOR"
+	ManagedSoftwareUpdatePlanVersionTypeLatestMinor     ManagedSoftwareUpdatePlanVersionType = "LATEST_MINOR"
+	ManagedSoftwareUpdatePlanVersionTypeLatestAny       ManagedSoftwareUpdatePlanVersionType = "LATEST_ANY"
+	ManagedSoftwareUpdatePlanVersionTypeSpecificVersion ManagedSoftwareUpdatePlanVersionType = "SPECIFIC_VERSION"
+	ManagedSoftwareUpdatePlanVersionTypeCustomVersion   ManagedSoftwareUpdatePlanVersionType = "CUSTOM_VERSION"
+	ManagedSoftwareUpdatePlanVersionTypeUnknown         ManagedSoftwareUpdatePlanVersionType = "UNKNOWN"
+)
+
+// ManagedSoftwareUpdateStatusDeviceObjectType is the set of values accepted by ManagedSoftwareUpdateStatusDevice.ObjectType.
+type ManagedSoftwareUpdateStatusDeviceObjectType = string
+
+// ManagedSoftwareUpdateStatusDeviceObjectType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedSoftwareUpdateStatusDeviceObjectTypeComputer     ManagedSoftwareUpdateStatusDeviceObjectType = "COMPUTER"
+	ManagedSoftwareUpdateStatusDeviceObjectTypeMobileDevice ManagedSoftwareUpdateStatusDeviceObjectType = "MOBILE_DEVICE"
+	ManagedSoftwareUpdateStatusDeviceObjectTypeAppleTv      ManagedSoftwareUpdateStatusDeviceObjectType = "APPLE_TV"
+)
+
+// ManagedSoftwareUpdateStatusStatus is the set of values accepted by ManagedSoftwareUpdateStatus.Status.
+type ManagedSoftwareUpdateStatusStatus = string
+
+// ManagedSoftwareUpdateStatusStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedSoftwareUpdateStatusStatusDownloading                 ManagedSoftwareUpdateStatusStatus = "DOWNLOADING"
+	ManagedSoftwareUpdateStatusStatusIdle                        ManagedSoftwareUpdateStatusStatus = "IDLE"
+	ManagedSoftwareUpdateStatusStatusInstalling                  ManagedSoftwareUpdateStatusStatus = "INSTALLING"
+	ManagedSoftwareUpdateStatusStatusInstalled                   ManagedSoftwareUpdateStatusStatus = "INSTALLED"
+	ManagedSoftwareUpdateStatusStatusError                       ManagedSoftwareUpdateStatusStatus = "ERROR"
+	ManagedSoftwareUpdateStatusStatusDownloadFailed              ManagedSoftwareUpdateStatusStatus = "DOWNLOAD_FAILED"
+	ManagedSoftwareUpdateStatusStatusDownloadRequiresComputer    ManagedSoftwareUpdateStatusStatus = "DOWNLOAD_REQUIRES_COMPUTER"
+	ManagedSoftwareUpdateStatusStatusDownloadInsufficientSpace   ManagedSoftwareUpdateStatusStatus = "DOWNLOAD_INSUFFICIENT_SPACE"
+	ManagedSoftwareUpdateStatusStatusDownloadInsufficientPower   ManagedSoftwareUpdateStatusStatus = "DOWNLOAD_INSUFFICIENT_POWER"
+	ManagedSoftwareUpdateStatusStatusDownloadInsufficientNetwork ManagedSoftwareUpdateStatusStatus = "DOWNLOAD_INSUFFICIENT_NETWORK"
+	ManagedSoftwareUpdateStatusStatusInstallInsufficientSpace    ManagedSoftwareUpdateStatusStatus = "INSTALL_INSUFFICIENT_SPACE"
+	ManagedSoftwareUpdateStatusStatusInstallInsufficientPower    ManagedSoftwareUpdateStatusStatus = "INSTALL_INSUFFICIENT_POWER"
+	ManagedSoftwareUpdateStatusStatusInstallPhoneCallInProgress  ManagedSoftwareUpdateStatusStatus = "INSTALL_PHONE_CALL_IN_PROGRESS"
+	ManagedSoftwareUpdateStatusStatusInstallFailed               ManagedSoftwareUpdateStatusStatus = "INSTALL_FAILED"
+	ManagedSoftwareUpdateStatusStatusUnknown                     ManagedSoftwareUpdateStatusStatus = "UNKNOWN"
+)
+
+// MobileDeviceCertificateV2CertificateStatus is the set of values accepted by MobileDeviceCertificateV2.CertificateStatus.
+type MobileDeviceCertificateV2CertificateStatus = string
+
+// MobileDeviceCertificateV2CertificateStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceCertificateV2CertificateStatusExpiring      MobileDeviceCertificateV2CertificateStatus = "EXPIRING"
+	MobileDeviceCertificateV2CertificateStatusExpired       MobileDeviceCertificateV2CertificateStatus = "EXPIRED"
+	MobileDeviceCertificateV2CertificateStatusRevoked       MobileDeviceCertificateV2CertificateStatus = "REVOKED"
+	MobileDeviceCertificateV2CertificateStatusPendingRevoke MobileDeviceCertificateV2CertificateStatus = "PENDING_REVOKE"
+	MobileDeviceCertificateV2CertificateStatusIssued        MobileDeviceCertificateV2CertificateStatus = "ISSUED"
+)
+
+// MobileDeviceCertificateV2LifecycleStatus is the set of values accepted by MobileDeviceCertificateV2.LifecycleStatus.
+type MobileDeviceCertificateV2LifecycleStatus = string
+
+// MobileDeviceCertificateV2LifecycleStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceCertificateV2LifecycleStatusActive   MobileDeviceCertificateV2LifecycleStatus = "ACTIVE"
+	MobileDeviceCertificateV2LifecycleStatusInactive MobileDeviceCertificateV2LifecycleStatus = "INACTIVE"
+)
+
+// MobileDeviceDetailsGetV2Type is the set of values accepted by MobileDeviceDetailsGetV2.Type.
+type MobileDeviceDetailsGetV2Type = string
+
+// MobileDeviceDetailsGetV2Type values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceDetailsGetV2TypeIos      MobileDeviceDetailsGetV2Type = "ios"
+	MobileDeviceDetailsGetV2TypeTvos     MobileDeviceDetailsGetV2Type = "tvos"
+	MobileDeviceDetailsGetV2TypeWatchos  MobileDeviceDetailsGetV2Type = "watchos"
+	MobileDeviceDetailsGetV2TypeVisionos MobileDeviceDetailsGetV2Type = "visionos"
+	MobileDeviceDetailsGetV2TypeUnknown  MobileDeviceDetailsGetV2Type = "unknown"
+)
+
+// MobileDeviceDetailsV2Type is the set of values accepted by MobileDeviceDetailsV2.Type.
+type MobileDeviceDetailsV2Type = string
+
+// MobileDeviceDetailsV2Type values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceDetailsV2TypeIos      MobileDeviceDetailsV2Type = "ios"
+	MobileDeviceDetailsV2TypeTvos     MobileDeviceDetailsV2Type = "tvos"
+	MobileDeviceDetailsV2TypeWatchos  MobileDeviceDetailsV2Type = "watchos"
+	MobileDeviceDetailsV2TypeVisionos MobileDeviceDetailsV2Type = "visionos"
+	MobileDeviceDetailsV2TypeUnknown  MobileDeviceDetailsV2Type = "unknown"
+)
+
+// MobileDeviceExtensionAttributeType is the set of values accepted by MobileDeviceExtensionAttribute.Type.
+type MobileDeviceExtensionAttributeType = string
+
+// MobileDeviceExtensionAttributeType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceExtensionAttributeTypeString  MobileDeviceExtensionAttributeType = "STRING"
+	MobileDeviceExtensionAttributeTypeInteger MobileDeviceExtensionAttributeType = "INTEGER"
+	MobileDeviceExtensionAttributeTypeDate    MobileDeviceExtensionAttributeType = "DATE"
+)
+
+// MobileDeviceExtensionAttributesDataType is the set of values accepted by MobileDeviceExtensionAttributes.DataType.
+type MobileDeviceExtensionAttributesDataType = string
+
+// MobileDeviceExtensionAttributesDataType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceExtensionAttributesDataTypeInteger MobileDeviceExtensionAttributesDataType = "INTEGER"
+	MobileDeviceExtensionAttributesDataTypeString  MobileDeviceExtensionAttributesDataType = "STRING"
+	MobileDeviceExtensionAttributesDataTypeDate    MobileDeviceExtensionAttributesDataType = "DATE"
+)
+
+// MobileDeviceExtensionAttributesInputType is the set of values accepted by MobileDeviceExtensionAttributes.InputType.
+type MobileDeviceExtensionAttributesInputType = string
+
+// MobileDeviceExtensionAttributesInputType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceExtensionAttributesInputTypeText                             MobileDeviceExtensionAttributesInputType = "TEXT"
+	MobileDeviceExtensionAttributesInputTypePopup                            MobileDeviceExtensionAttributesInputType = "POPUP"
+	MobileDeviceExtensionAttributesInputTypeDirectoryServiceAttributeMapping MobileDeviceExtensionAttributesInputType = "DIRECTORY_SERVICE_ATTRIBUTE_MAPPING"
+)
+
+// MobileDeviceExtensionAttributesInventoryDisplayType is the set of values accepted by MobileDeviceExtensionAttributes.InventoryDisplayType.
+type MobileDeviceExtensionAttributesInventoryDisplayType = string
+
+// MobileDeviceExtensionAttributesInventoryDisplayType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral             MobileDeviceExtensionAttributesInventoryDisplayType = "GENERAL"
+	MobileDeviceExtensionAttributesInventoryDisplayTypeHardware            MobileDeviceExtensionAttributesInventoryDisplayType = "HARDWARE"
+	MobileDeviceExtensionAttributesInventoryDisplayTypeUserAndLocation     MobileDeviceExtensionAttributesInventoryDisplayType = "USER_AND_LOCATION"
+	MobileDeviceExtensionAttributesInventoryDisplayTypePurchasing          MobileDeviceExtensionAttributesInventoryDisplayType = "PURCHASING"
+	MobileDeviceExtensionAttributesInventoryDisplayTypeExtensionAttributes MobileDeviceExtensionAttributesInventoryDisplayType = "EXTENSION_ATTRIBUTES"
+)
+
+// MobileDeviceGeneralDeviceOwnershipType is the set of values accepted by MobileDeviceGeneral.DeviceOwnershipType.
+type MobileDeviceGeneralDeviceOwnershipType = string
+
+// MobileDeviceGeneralDeviceOwnershipType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceGeneralDeviceOwnershipTypeInstitutional                 MobileDeviceGeneralDeviceOwnershipType = "Institutional"
+	MobileDeviceGeneralDeviceOwnershipTypeUserEnrollment                MobileDeviceGeneralDeviceOwnershipType = "UserEnrollment"
+	MobileDeviceGeneralDeviceOwnershipTypeAccountDrivenUserEnrollment   MobileDeviceGeneralDeviceOwnershipType = "AccountDrivenUserEnrollment"
+	MobileDeviceGeneralDeviceOwnershipTypeAccountDrivenDeviceEnrollment MobileDeviceGeneralDeviceOwnershipType = "AccountDrivenDeviceEnrollment"
+)
+
+// MobileDeviceHardwareBatteryHealth is the set of values accepted by MobileDeviceHardware.BatteryHealth.
+type MobileDeviceHardwareBatteryHealth = string
+
+// MobileDeviceHardwareBatteryHealth values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceHardwareBatteryHealthNonGenuine         MobileDeviceHardwareBatteryHealth = "NON_GENUINE"
+	MobileDeviceHardwareBatteryHealthNormal             MobileDeviceHardwareBatteryHealth = "NORMAL"
+	MobileDeviceHardwareBatteryHealthServiceRecommended MobileDeviceHardwareBatteryHealth = "SERVICE_RECOMMENDED"
+	MobileDeviceHardwareBatteryHealthUnknown            MobileDeviceHardwareBatteryHealth = "UNKNOWN"
+	MobileDeviceHardwareBatteryHealthUnsupported        MobileDeviceHardwareBatteryHealth = "UNSUPPORTED"
+)
+
+// MobileDeviceIosGeneralDeviceOwnershipType is the set of values accepted by MobileDeviceIosGeneral.DeviceOwnershipType.
+type MobileDeviceIosGeneralDeviceOwnershipType = string
+
+// MobileDeviceIosGeneralDeviceOwnershipType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceIosGeneralDeviceOwnershipTypeInstitutional                 MobileDeviceIosGeneralDeviceOwnershipType = "Institutional"
+	MobileDeviceIosGeneralDeviceOwnershipTypeUserEnrollment                MobileDeviceIosGeneralDeviceOwnershipType = "UserEnrollment"
+	MobileDeviceIosGeneralDeviceOwnershipTypeAccountDrivenUserEnrollment   MobileDeviceIosGeneralDeviceOwnershipType = "AccountDrivenUserEnrollment"
+	MobileDeviceIosGeneralDeviceOwnershipTypeAccountDrivenDeviceEnrollment MobileDeviceIosGeneralDeviceOwnershipType = "AccountDrivenDeviceEnrollment"
+)
+
+// MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos is the set of values accepted by MobileDevicePrestageV2.PrestageMinimumOsTargetVersionTypeIos.
+type MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = string
+
+// MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosNoEnforcement               MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "NO_ENFORCEMENT"
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestVersion      MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_VERSION"
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMajorVersion MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMinorVersion MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsSpecificVersion    MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad is the set of values accepted by MobileDevicePrestageV2.PrestageMinimumOsTargetVersionTypeIpad.
+type MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = string
+
+// MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadNoEnforcement               MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "NO_ENFORCEMENT"
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestVersion      MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_VERSION"
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMajorVersion MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMinorVersion MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsSpecificVersion    MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos is the set of values accepted by MobileDevicePrestageV3.PrestageMinimumOsTargetVersionTypeIos.
+type MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = string
+
+// MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosNoEnforcement               MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "NO_ENFORCEMENT"
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestVersion      MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_VERSION"
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMajorVersion MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMinorVersion MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsSpecificVersion    MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad is the set of values accepted by MobileDevicePrestageV3.PrestageMinimumOsTargetVersionTypeIpad.
+type MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = string
+
+// MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadNoEnforcement               MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "NO_ENFORCEMENT"
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestVersion      MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_VERSION"
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMajorVersion MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMinorVersion MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsSpecificVersion    MobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// MobileDeviceSecurityAttestationStatus is the set of values accepted by MobileDeviceSecurity.AttestationStatus.
+type MobileDeviceSecurityAttestationStatus = string
+
+// MobileDeviceSecurityAttestationStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceSecurityAttestationStatusPending                     MobileDeviceSecurityAttestationStatus = "PENDING"
+	MobileDeviceSecurityAttestationStatusSuccess                     MobileDeviceSecurityAttestationStatus = "SUCCESS"
+	MobileDeviceSecurityAttestationStatusCertificateInvalid          MobileDeviceSecurityAttestationStatus = "CERTIFICATE_INVALID"
+	MobileDeviceSecurityAttestationStatusDevicePropertiesMismatch    MobileDeviceSecurityAttestationStatus = "DEVICE_PROPERTIES_MISMATCH"
+	MobileDeviceSecurityAttestationStatusMdaUnsupportedDueToHardware MobileDeviceSecurityAttestationStatus = "MDA_UNSUPPORTED_DUE_TO_HARDWARE"
+	MobileDeviceSecurityAttestationStatusMdaUnsupportedDueToSoftware MobileDeviceSecurityAttestationStatus = "MDA_UNSUPPORTED_DUE_TO_SOFTWARE"
+)
+
+// MobileDeviceSecurityBootstrapTokenEscrowed is the set of values accepted by MobileDeviceSecurity.BootstrapTokenEscrowed.
+type MobileDeviceSecurityBootstrapTokenEscrowed = string
+
+// MobileDeviceSecurityBootstrapTokenEscrowed values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceSecurityBootstrapTokenEscrowedEscrowed     MobileDeviceSecurityBootstrapTokenEscrowed = "ESCROWED"
+	MobileDeviceSecurityBootstrapTokenEscrowedNotEscrowed  MobileDeviceSecurityBootstrapTokenEscrowed = "NOT_ESCROWED"
+	MobileDeviceSecurityBootstrapTokenEscrowedNotSupported MobileDeviceSecurityBootstrapTokenEscrowed = "NOT_SUPPORTED"
+)
+
+// MobileDeviceSmartGroupCriteriaV2AndOr is the set of values accepted by MobileDeviceSmartGroupCriteriaV2.AndOr.
+type MobileDeviceSmartGroupCriteriaV2AndOr = string
+
+// MobileDeviceSmartGroupCriteriaV2AndOr values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceSmartGroupCriteriaV2AndOrAnd MobileDeviceSmartGroupCriteriaV2AndOr = "and"
+	MobileDeviceSmartGroupCriteriaV2AndOrOr  MobileDeviceSmartGroupCriteriaV2AndOr = "or"
+)
+
+// MobileDeviceTvOsGeneralDeviceOwnershipType is the set of values accepted by MobileDeviceTvOsGeneral.DeviceOwnershipType.
+type MobileDeviceTvOsGeneralDeviceOwnershipType = string
+
+// MobileDeviceTvOsGeneralDeviceOwnershipType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceTvOsGeneralDeviceOwnershipTypeInstitutional                 MobileDeviceTvOsGeneralDeviceOwnershipType = "Institutional"
+	MobileDeviceTvOsGeneralDeviceOwnershipTypeUserEnrollment                MobileDeviceTvOsGeneralDeviceOwnershipType = "UserEnrollment"
+	MobileDeviceTvOsGeneralDeviceOwnershipTypeAccountDrivenUserEnrollment   MobileDeviceTvOsGeneralDeviceOwnershipType = "AccountDrivenUserEnrollment"
+	MobileDeviceTvOsGeneralDeviceOwnershipTypeAccountDrivenDeviceEnrollment MobileDeviceTvOsGeneralDeviceOwnershipType = "AccountDrivenDeviceEnrollment"
+)
+
+// MobileDeviceV2Type is the set of values accepted by MobileDeviceV2.Type.
+type MobileDeviceV2Type = string
+
+// MobileDeviceV2Type values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceV2TypeIos      MobileDeviceV2Type = "ios"
+	MobileDeviceV2TypeTvos     MobileDeviceV2Type = "tvos"
+	MobileDeviceV2TypeWatchos  MobileDeviceV2Type = "watchos"
+	MobileDeviceV2TypeVisionos MobileDeviceV2Type = "visionos"
+	MobileDeviceV2TypeUnknown  MobileDeviceV2Type = "unknown"
+)
+
+// MobileDeviceVisionOsGeneralDeviceOwnershipType is the set of values accepted by MobileDeviceVisionOsGeneral.DeviceOwnershipType.
+type MobileDeviceVisionOsGeneralDeviceOwnershipType = string
+
+// MobileDeviceVisionOsGeneralDeviceOwnershipType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceVisionOsGeneralDeviceOwnershipTypeInstitutional                 MobileDeviceVisionOsGeneralDeviceOwnershipType = "Institutional"
+	MobileDeviceVisionOsGeneralDeviceOwnershipTypeUserEnrollment                MobileDeviceVisionOsGeneralDeviceOwnershipType = "UserEnrollment"
+	MobileDeviceVisionOsGeneralDeviceOwnershipTypeAccountDrivenUserEnrollment   MobileDeviceVisionOsGeneralDeviceOwnershipType = "AccountDrivenUserEnrollment"
+	MobileDeviceVisionOsGeneralDeviceOwnershipTypeAccountDrivenDeviceEnrollment MobileDeviceVisionOsGeneralDeviceOwnershipType = "AccountDrivenDeviceEnrollment"
+)
+
+// MobileDeviceWatchOsGeneralDeviceOwnershipType is the set of values accepted by MobileDeviceWatchOsGeneral.DeviceOwnershipType.
+type MobileDeviceWatchOsGeneralDeviceOwnershipType = string
+
+// MobileDeviceWatchOsGeneralDeviceOwnershipType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceWatchOsGeneralDeviceOwnershipTypeInstitutional                 MobileDeviceWatchOsGeneralDeviceOwnershipType = "Institutional"
+	MobileDeviceWatchOsGeneralDeviceOwnershipTypeUserEnrollment                MobileDeviceWatchOsGeneralDeviceOwnershipType = "UserEnrollment"
+	MobileDeviceWatchOsGeneralDeviceOwnershipTypeAccountDrivenUserEnrollment   MobileDeviceWatchOsGeneralDeviceOwnershipType = "AccountDrivenUserEnrollment"
+	MobileDeviceWatchOsGeneralDeviceOwnershipTypeAccountDrivenDeviceEnrollment MobileDeviceWatchOsGeneralDeviceOwnershipType = "AccountDrivenDeviceEnrollment"
+)
+
+// OidcSettingsUserMapping is the set of values accepted by OidcSettings.UserMapping.
+type OidcSettingsUserMapping = string
+
+// OidcSettingsUserMapping values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	OidcSettingsUserMappingUsername OidcSettingsUserMapping = "USERNAME"
+	OidcSettingsUserMappingEmail    OidcSettingsUserMapping = "EMAIL"
+)
+
+// OidcSettingsUsernameAttributeClaimMapping is the set of values accepted by OidcSettings.UsernameAttributeClaimMapping.
+type OidcSettingsUsernameAttributeClaimMapping = string
+
+// OidcSettingsUsernameAttributeClaimMapping values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	OidcSettingsUsernameAttributeClaimMappingUsername OidcSettingsUsernameAttributeClaimMapping = "USERNAME"
+	OidcSettingsUsernameAttributeClaimMappingEmail    OidcSettingsUsernameAttributeClaimMapping = "EMAIL"
+)
+
+// OnboardingItemSelfServiceEntityType is the set of values accepted by OnboardingItem.SelfServiceEntityType.
+type OnboardingItemSelfServiceEntityType = string
+
+// OnboardingItemSelfServiceEntityType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	OnboardingItemSelfServiceEntityTypeOsXPolicy        OnboardingItemSelfServiceEntityType = "OS_X_POLICY"
+	OnboardingItemSelfServiceEntityTypeOsXConfigProfile OnboardingItemSelfServiceEntityType = "OS_X_CONFIG_PROFILE"
+	OnboardingItemSelfServiceEntityTypeOsXMacApp        OnboardingItemSelfServiceEntityType = "OS_X_MAC_APP"
+	OnboardingItemSelfServiceEntityTypeOsXAppInstaller  OnboardingItemSelfServiceEntityType = "OS_X_APP_INSTALLER"
+	OnboardingItemSelfServiceEntityTypeOsXEbook         OnboardingItemSelfServiceEntityType = "OS_X_EBOOK"
+	OnboardingItemSelfServiceEntityTypeOsXPatchPolicy   OnboardingItemSelfServiceEntityType = "OS_X_PATCH_POLICY"
+	OnboardingItemSelfServiceEntityTypeUnknown          OnboardingItemSelfServiceEntityType = "UNKNOWN"
+)
+
+// PackageManifestHashType is the set of values accepted by PackageManifest.HashType.
+type PackageManifestHashType = string
+
+// PackageManifestHashType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PackageManifestHashTypeMd5    PackageManifestHashType = "MD5"
+	PackageManifestHashTypeSha256 PackageManifestHashType = "SHA256"
+)
+
+// PatchPolicyLogV2StatusEnum is the set of values accepted by PatchPolicyLogV2.StatusEnum.
+type PatchPolicyLogV2StatusEnum = string
+
+// PatchPolicyLogV2StatusEnum values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PatchPolicyLogV2StatusEnumUnknown   PatchPolicyLogV2StatusEnum = "UNKNOWN"
+	PatchPolicyLogV2StatusEnumPending   PatchPolicyLogV2StatusEnum = "PENDING"
+	PatchPolicyLogV2StatusEnumCompleted PatchPolicyLogV2StatusEnum = "COMPLETED"
+	PatchPolicyLogV2StatusEnumFailed    PatchPolicyLogV2StatusEnum = "FAILED"
+)
+
+// PlanConfigurationPostUpdateAction is the set of values accepted by PlanConfigurationPost.UpdateAction.
+type PlanConfigurationPostUpdateAction = string
+
+// PlanConfigurationPostUpdateAction values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PlanConfigurationPostUpdateActionDownloadOnly                 PlanConfigurationPostUpdateAction = "DOWNLOAD_ONLY"
+	PlanConfigurationPostUpdateActionDownloadInstall              PlanConfigurationPostUpdateAction = "DOWNLOAD_INSTALL"
+	PlanConfigurationPostUpdateActionDownloadInstallAllowDeferral PlanConfigurationPostUpdateAction = "DOWNLOAD_INSTALL_ALLOW_DEFERRAL"
+	PlanConfigurationPostUpdateActionDownloadInstallRestart       PlanConfigurationPostUpdateAction = "DOWNLOAD_INSTALL_RESTART"
+	PlanConfigurationPostUpdateActionDownloadInstallSchedule      PlanConfigurationPostUpdateAction = "DOWNLOAD_INSTALL_SCHEDULE"
+	PlanConfigurationPostUpdateActionUnknown                      PlanConfigurationPostUpdateAction = "UNKNOWN"
+)
+
+// PlanConfigurationPostVersionType is the set of values accepted by PlanConfigurationPost.VersionType.
+type PlanConfigurationPostVersionType = string
+
+// PlanConfigurationPostVersionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PlanConfigurationPostVersionTypeLatestMajor     PlanConfigurationPostVersionType = "LATEST_MAJOR"
+	PlanConfigurationPostVersionTypeLatestMinor     PlanConfigurationPostVersionType = "LATEST_MINOR"
+	PlanConfigurationPostVersionTypeLatestAny       PlanConfigurationPostVersionType = "LATEST_ANY"
+	PlanConfigurationPostVersionTypeSpecificVersion PlanConfigurationPostVersionType = "SPECIFIC_VERSION"
+	PlanConfigurationPostVersionTypeCustomVersion   PlanConfigurationPostVersionType = "CUSTOM_VERSION"
+	PlanConfigurationPostVersionTypeUnknown         PlanConfigurationPostVersionType = "UNKNOWN"
+)
+
+// PlanDeviceObjectType is the set of values accepted by PlanDevice.ObjectType.
+type PlanDeviceObjectType = string
+
+// PlanDeviceObjectType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PlanDeviceObjectTypeComputer     PlanDeviceObjectType = "COMPUTER"
+	PlanDeviceObjectTypeMobileDevice PlanDeviceObjectType = "MOBILE_DEVICE"
+	PlanDeviceObjectTypeAppleTv      PlanDeviceObjectType = "APPLE_TV"
+)
+
+// PlanDevicePostObjectType is the set of values accepted by PlanDevicePost.ObjectType.
+type PlanDevicePostObjectType = string
+
+// PlanDevicePostObjectType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PlanDevicePostObjectTypeComputer     PlanDevicePostObjectType = "COMPUTER"
+	PlanDevicePostObjectTypeMobileDevice PlanDevicePostObjectType = "MOBILE_DEVICE"
+	PlanDevicePostObjectTypeAppleTv      PlanDevicePostObjectType = "APPLE_TV"
+)
+
+// PlanGroupPostObjectType is the set of values accepted by PlanGroupPost.ObjectType.
+type PlanGroupPostObjectType = string
+
+// PlanGroupPostObjectType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PlanGroupPostObjectTypeComputerGroup     PlanGroupPostObjectType = "COMPUTER_GROUP"
+	PlanGroupPostObjectTypeMobileDeviceGroup PlanGroupPostObjectType = "MOBILE_DEVICE_GROUP"
+)
+
+// PlanStatusErrorReasons is the set of values accepted by PlanStatus.ErrorReasons.
+type PlanStatusErrorReasons = string
+
+// PlanStatusErrorReasons values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PlanStatusErrorReasonsAppleSiliconNoEscrowKey                                                  PlanStatusErrorReasons = "APPLE_SILICON_NO_ESCROW_KEY"
+	PlanStatusErrorReasonsNotSupervised                                                            PlanStatusErrorReasons = "NOT_SUPERVISED"
+	PlanStatusErrorReasonsNotManaged                                                               PlanStatusErrorReasons = "NOT_MANAGED"
+	PlanStatusErrorReasonsNoDiskSpace                                                              PlanStatusErrorReasons = "NO_DISK_SPACE"
+	PlanStatusErrorReasonsNoUpdatesAvailable                                                       PlanStatusErrorReasons = "NO_UPDATES_AVAILABLE"
+	PlanStatusErrorReasonsSpecificVersionUnavailable                                               PlanStatusErrorReasons = "SPECIFIC_VERSION_UNAVAILABLE"
+	PlanStatusErrorReasonsSpecificVersionUnavailableForDeviceModel                                 PlanStatusErrorReasons = "SPECIFIC_VERSION_UNAVAILABLE_FOR_DEVICE_MODEL"
+	PlanStatusErrorReasonsActionNotSupportedForDeviceType                                          PlanStatusErrorReasons = "ACTION_NOT_SUPPORTED_FOR_DEVICE_TYPE"
+	PlanStatusErrorReasonsDeclarativeDeviceManagementSoftwareUpdatesNotSupportedForDeviceOsVersion PlanStatusErrorReasons = "DECLARATIVE_DEVICE_MANAGEMENT_SOFTWARE_UPDATES_NOT_SUPPORTED_FOR_DEVICE_OS_VERSION"
+	PlanStatusErrorReasonsDeclarativeDeviceManagementSoftwareUpdatesNotSupportedForDeviceType      PlanStatusErrorReasons = "DECLARATIVE_DEVICE_MANAGEMENT_SOFTWARE_UPDATES_NOT_SUPPORTED_FOR_DEVICE_TYPE"
+	PlanStatusErrorReasonsPlanNotFound                                                             PlanStatusErrorReasons = "PLAN_NOT_FOUND"
+	PlanStatusErrorReasonsAppleSoftwareLookupServiceError                                          PlanStatusErrorReasons = "APPLE_SOFTWARE_LOOKUP_SERVICE_ERROR"
+	PlanStatusErrorReasonsExistingPlanForDeviceInProgress                                          PlanStatusErrorReasons = "EXISTING_PLAN_FOR_DEVICE_IN_PROGRESS"
+	PlanStatusErrorReasonsDowngradeNotSupported                                                    PlanStatusErrorReasons = "DOWNGRADE_NOT_SUPPORTED"
+	PlanStatusErrorReasonsDeclarativeServiceError                                                  PlanStatusErrorReasons = "DECLARATIVE_SERVICE_ERROR"
+	PlanStatusErrorReasonsUnableToFindUpdatesAndOutOfRetries                                       PlanStatusErrorReasons = "UNABLE_TO_FIND_UPDATES_AND_OUT_OF_RETRIES"
+	PlanStatusErrorReasonsDataIntegrityViolationException                                          PlanStatusErrorReasons = "DATA_INTEGRITY_VIOLATION_EXCEPTION"
+	PlanStatusErrorReasonsIllegalArgumentException                                                 PlanStatusErrorReasons = "ILLEGAL_ARGUMENT_EXCEPTION"
+	PlanStatusErrorReasonsMDMException                                                             PlanStatusErrorReasons = "MDM_EXCEPTION"
+	PlanStatusErrorReasonsInstallReasonUnknown                                                     PlanStatusErrorReasons = "INSTALL_REASON_UNKNOWN"
+	PlanStatusErrorReasonsAcceptPlanFailure                                                        PlanStatusErrorReasons = "ACCEPT_PLAN_FAILURE"
+	PlanStatusErrorReasonsSchedulePlanFailure                                                      PlanStatusErrorReasons = "SCHEDULE_PLAN_FAILURE"
+	PlanStatusErrorReasonsRejectPlanFailure                                                        PlanStatusErrorReasons = "REJECT_PLAN_FAILURE"
+	PlanStatusErrorReasonsStartPlanFailure                                                         PlanStatusErrorReasons = "START_PLAN_FAILURE"
+	PlanStatusErrorReasonsQueueScheduledOsUpdateScanFailure                                        PlanStatusErrorReasons = "QUEUE_SCHEDULED_OS_UPDATE_SCAN_FAILURE"
+	PlanStatusErrorReasonsScanWaitFinishedFailure                                                  PlanStatusErrorReasons = "SCAN_WAIT_FINISHED_FAILURE"
+	PlanStatusErrorReasonsQueueAvailableOsUpdateCommandFailure                                     PlanStatusErrorReasons = "QUEUE_AVAILABLE_OS_UPDATE_COMMAND_FAILURE"
+	PlanStatusErrorReasonsMDMClientException                                                       PlanStatusErrorReasons = "MDM_CLIENT_EXCEPTION"
+	PlanStatusErrorReasonsQueueScheduleOsUpdateFailure                                             PlanStatusErrorReasons = "QUEUE_SCHEDULE_OS_UPDATE_FAILURE"
+	PlanStatusErrorReasonsQueueOsUpdateStatusCommandFailure                                        PlanStatusErrorReasons = "QUEUE_OS_UPDATE_STATUS_COMMAND_FAILURE"
+	PlanStatusErrorReasonsStillInProgressFailure                                                   PlanStatusErrorReasons = "STILL_IN_PROGRESS_FAILURE"
+	PlanStatusErrorReasonsWaitToCollectOsUpdateStatusFailure                                       PlanStatusErrorReasons = "WAIT_TO_COLLECT_OS_UPDATE_STATUS_FAILURE"
+	PlanStatusErrorReasonsIsDownloadedAndNeedsInstallFailure                                       PlanStatusErrorReasons = "IS_DOWNLOADED_AND_NEEDS_INSTALL_FAILURE"
+	PlanStatusErrorReasonsIsInstalledFailure                                                       PlanStatusErrorReasons = "IS_INSTALLED_FAILURE"
+	PlanStatusErrorReasonsIsDownloadOnlyAndDownloadedFailure                                       PlanStatusErrorReasons = "IS_DOWNLOAD_ONLY_AND_DOWNLOADED_FAILURE"
+	PlanStatusErrorReasonsVerifyInstallationFailure                                                PlanStatusErrorReasons = "VERIFY_INSTALLATION_FAILURE"
+	PlanStatusErrorReasonsIsMacOsUpdateFailure                                                     PlanStatusErrorReasons = "IS_MAC_OS_UPDATE_FAILURE"
+	PlanStatusErrorReasonsIsLatestFailure                                                          PlanStatusErrorReasons = "IS_LATEST_FAILURE"
+	PlanStatusErrorReasonsIsSpecificVersionFailure                                                 PlanStatusErrorReasons = "IS_SPECIFIC_VERSION_FAILURE"
+	PlanStatusErrorReasonsHandleCommandQueueFailure                                                PlanStatusErrorReasons = "HANDLE_COMMAND_QUEUE_FAILURE"
+	PlanStatusErrorReasonsInvalidConfigurationDeclaration                                          PlanStatusErrorReasons = "INVALID_CONFIGURATION_DECLARATION"
+	PlanStatusErrorReasonsDeclarativeDeviceManagementStatusResponseFailureReasonReceived           PlanStatusErrorReasons = "DECLARATIVE_DEVICE_MANAGEMENT_STATUS_RESPONSE_FAILURE_REASON_RECEIVED"
+	PlanStatusErrorReasonsNoDeviceStatusByGracePeriod                                              PlanStatusErrorReasons = "NO_DEVICE_STATUS_BY_GRACE_PERIOD"
+	PlanStatusErrorReasonsUnknown                                                                  PlanStatusErrorReasons = "UNKNOWN"
+)
+
+// PlanStatusState is the set of values accepted by PlanStatus.State.
+type PlanStatusState = string
+
+// PlanStatusState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PlanStatusStateInit                                      PlanStatusState = "Init"
+	PlanStatusStatePendingPlanValidation                     PlanStatusState = "PendingPlanValidation"
+	PlanStatusStateAcceptingPlan                             PlanStatusState = "AcceptingPlan"
+	PlanStatusStateRejectingPlan                             PlanStatusState = "RejectingPlan"
+	PlanStatusStateProcessingPlanType                        PlanStatusState = "ProcessingPlanType"
+	PlanStatusStateProcessingPlanTypeMDM                     PlanStatusState = "ProcessingPlanTypeMdm"
+	PlanStatusStateStartingPlan                              PlanStatusState = "StartingPlan"
+	PlanStatusStatePlanFailed                                PlanStatusState = "PlanFailed"
+	PlanStatusStateSchedulingScanForOSUpdates                PlanStatusState = "SchedulingScanForOSUpdates"
+	PlanStatusStateProcessingScheduleOSUpdateScanResponse    PlanStatusState = "ProcessingScheduleOSUpdateScanResponse"
+	PlanStatusStateWaitingForScheduledOSUpdateScanToComplete PlanStatusState = "WaitingForScheduledOSUpdateScanToComplete"
+	PlanStatusStateCollectingAvailableOSUpdates              PlanStatusState = "CollectingAvailableOSUpdates"
+	PlanStatusStateProcessingAvailableOSUpdatesResponse      PlanStatusState = "ProcessingAvailableOSUpdatesResponse"
+	PlanStatusStateProcessingSchedulingType                  PlanStatusState = "ProcessingSchedulingType"
+	PlanStatusStateSchedulingDDM                             PlanStatusState = "SchedulingDDM"
+	PlanStatusStateDDMPlanScheduled                          PlanStatusState = "DDMPlanScheduled"
+	PlanStatusStateWaitingToStartDDMUpdate                   PlanStatusState = "WaitingToStartDDMUpdate"
+	PlanStatusStateProcessingDDMStatusResponse               PlanStatusState = "ProcessingDDMStatusResponse"
+	PlanStatusStateCollectingDDMStatus                       PlanStatusState = "CollectingDDMStatus"
+	PlanStatusStateSchedulingMDM                             PlanStatusState = "SchedulingMDM"
+	PlanStatusStateMDMPlanScheduled                          PlanStatusState = "MDMPlanScheduled"
+	PlanStatusStateSchedulingOSUpdate                        PlanStatusState = "SchedulingOSUpdate"
+	PlanStatusStateProcessingScheduleOSUpdateResponse        PlanStatusState = "ProcessingScheduleOSUpdateResponse"
+	PlanStatusStateCollectingOSUpdateStatus                  PlanStatusState = "CollectingOSUpdateStatus"
+	PlanStatusStateProcessingOSUpdateStatusResponse          PlanStatusState = "ProcessingOSUpdateStatusResponse"
+	PlanStatusStateWaitingToCollectOSUpdateStatus            PlanStatusState = "WaitingToCollectOSUpdateStatus"
+	PlanStatusStateVerifyingInstallation                     PlanStatusState = "VerifyingInstallation"
+	PlanStatusStateProcessingInstallationVerification        PlanStatusState = "ProcessingInstallationVerification"
+	PlanStatusStatePlanCompleted                             PlanStatusState = "PlanCompleted"
+	PlanStatusStatePlanCanceled                              PlanStatusState = "PlanCanceled"
+	PlanStatusStatePlanException                             PlanStatusState = "PlanException"
+	PlanStatusStateUnknown                                   PlanStatusState = "Unknown"
+)
+
+// PostComputerPrestageV3PrestageMinimumOsTargetVersionType is the set of values accepted by PostComputerPrestageV3.PrestageMinimumOsTargetVersionType.
+type PostComputerPrestageV3PrestageMinimumOsTargetVersionType = string
+
+// PostComputerPrestageV3PrestageMinimumOsTargetVersionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PostComputerPrestageV3PrestageMinimumOsTargetVersionTypeNoEnforcement               PostComputerPrestageV3PrestageMinimumOsTargetVersionType = "NO_ENFORCEMENT"
+	PostComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestVersion      PostComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_VERSION"
+	PostComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestMajorVersion PostComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	PostComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestMinorVersion PostComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	PostComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsSpecificVersion    PostComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// PostComputerPrestageV3RecoveryLockPasswordType is the set of values accepted by PostComputerPrestageV3.RecoveryLockPasswordType.
+type PostComputerPrestageV3RecoveryLockPasswordType = string
+
+// PostComputerPrestageV3RecoveryLockPasswordType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PostComputerPrestageV3RecoveryLockPasswordTypeManual PostComputerPrestageV3RecoveryLockPasswordType = "MANUAL"
+	PostComputerPrestageV3RecoveryLockPasswordTypeRandom PostComputerPrestageV3RecoveryLockPasswordType = "RANDOM"
+)
+
+// ProtectSettingsResponseSyncStatus is the set of values accepted by ProtectSettingsResponse.SyncStatus.
+type ProtectSettingsResponseSyncStatus = string
+
+// ProtectSettingsResponseSyncStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ProtectSettingsResponseSyncStatusInProgress ProtectSettingsResponseSyncStatus = "IN_PROGRESS"
+	ProtectSettingsResponseSyncStatusCompleted  ProtectSettingsResponseSyncStatus = "COMPLETED"
+	ProtectSettingsResponseSyncStatusError      ProtectSettingsResponseSyncStatus = "ERROR"
+	ProtectSettingsResponseSyncStatusUnknown    ProtectSettingsResponseSyncStatus = "UNKNOWN"
+)
+
+// PutComputerPrestageV3PrestageMinimumOsTargetVersionType is the set of values accepted by PutComputerPrestageV3.PrestageMinimumOsTargetVersionType.
+type PutComputerPrestageV3PrestageMinimumOsTargetVersionType = string
+
+// PutComputerPrestageV3PrestageMinimumOsTargetVersionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PutComputerPrestageV3PrestageMinimumOsTargetVersionTypeNoEnforcement               PutComputerPrestageV3PrestageMinimumOsTargetVersionType = "NO_ENFORCEMENT"
+	PutComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestVersion      PutComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_VERSION"
+	PutComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestMajorVersion PutComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	PutComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsLatestMinorVersion PutComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	PutComputerPrestageV3PrestageMinimumOsTargetVersionTypeMinimumOsSpecificVersion    PutComputerPrestageV3PrestageMinimumOsTargetVersionType = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// PutComputerPrestageV3RecoveryLockPasswordType is the set of values accepted by PutComputerPrestageV3.RecoveryLockPasswordType.
+type PutComputerPrestageV3RecoveryLockPasswordType = string
+
+// PutComputerPrestageV3RecoveryLockPasswordType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PutComputerPrestageV3RecoveryLockPasswordTypeManual PutComputerPrestageV3RecoveryLockPasswordType = "MANUAL"
+	PutComputerPrestageV3RecoveryLockPasswordTypeRandom PutComputerPrestageV3RecoveryLockPasswordType = "RANDOM"
+)
+
+// PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos is the set of values accepted by PutMobileDevicePrestageV2.PrestageMinimumOsTargetVersionTypeIos.
+type PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = string
+
+// PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosNoEnforcement               PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "NO_ENFORCEMENT"
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestVersion      PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_VERSION"
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMajorVersion PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMinorVersion PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIosMinimumOsSpecificVersion    PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad is the set of values accepted by PutMobileDevicePrestageV2.PrestageMinimumOsTargetVersionTypeIpad.
+type PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = string
+
+// PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadNoEnforcement               PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "NO_ENFORCEMENT"
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestVersion      PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_VERSION"
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMajorVersion PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMinorVersion PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpadMinimumOsSpecificVersion    PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos is the set of values accepted by PutMobileDevicePrestageV3.PrestageMinimumOsTargetVersionTypeIos.
+type PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = string
+
+// PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosNoEnforcement               PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "NO_ENFORCEMENT"
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestVersion      PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_VERSION"
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMajorVersion PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsLatestMinorVersion PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIosMinimumOsSpecificVersion    PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIos = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad is the set of values accepted by PutMobileDevicePrestageV3.PrestageMinimumOsTargetVersionTypeIpad.
+type PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = string
+
+// PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadNoEnforcement               PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "NO_ENFORCEMENT"
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestVersion      PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_VERSION"
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMajorVersion PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MAJOR_VERSION"
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsLatestMinorVersion PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_LATEST_MINOR_VERSION"
+	PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpadMinimumOsSpecificVersion    PutMobileDevicePrestageV3PrestageMinimumOsTargetVersionTypeIpad = "MINIMUM_OS_SPECIFIC_VERSION"
+)
+
+// ReenrollmentFlushMDMQueue is the set of values accepted by Reenrollment.FlushMDMQueue.
+type ReenrollmentFlushMDMQueue = string
+
+// ReenrollmentFlushMDMQueue values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ReenrollmentFlushMDMQueueDeleteNothing                      ReenrollmentFlushMDMQueue = "DELETE_NOTHING"
+	ReenrollmentFlushMDMQueueDeleteErrors                       ReenrollmentFlushMDMQueue = "DELETE_ERRORS"
+	ReenrollmentFlushMDMQueueDeleteEverythingExceptAcknowledged ReenrollmentFlushMDMQueue = "DELETE_EVERYTHING_EXCEPT_ACKNOWLEDGED"
+	ReenrollmentFlushMDMQueueDeleteEverything                   ReenrollmentFlushMDMQueue = "DELETE_EVERYTHING"
+)
+
+// SamlSettingsIdpProviderType is the set of values accepted by SamlSettings.IdpProviderType.
+type SamlSettingsIdpProviderType = string
+
+// SamlSettingsIdpProviderType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SamlSettingsIdpProviderTypeAdfs       SamlSettingsIdpProviderType = "ADFS"
+	SamlSettingsIdpProviderTypeOkta       SamlSettingsIdpProviderType = "OKTA"
+	SamlSettingsIdpProviderTypeGoogle     SamlSettingsIdpProviderType = "GOOGLE"
+	SamlSettingsIdpProviderTypeShibboleth SamlSettingsIdpProviderType = "SHIBBOLETH"
+	SamlSettingsIdpProviderTypeOnelogin   SamlSettingsIdpProviderType = "ONELOGIN"
+	SamlSettingsIdpProviderTypePing       SamlSettingsIdpProviderType = "PING"
+	SamlSettingsIdpProviderTypeCentrify   SamlSettingsIdpProviderType = "CENTRIFY"
+	SamlSettingsIdpProviderTypeAzure      SamlSettingsIdpProviderType = "AZURE"
+	SamlSettingsIdpProviderTypeOther      SamlSettingsIdpProviderType = "OTHER"
+)
+
+// SamlSettingsMetadataSource is the set of values accepted by SamlSettings.MetadataSource.
+type SamlSettingsMetadataSource = string
+
+// SamlSettingsMetadataSource values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SamlSettingsMetadataSourceURL     SamlSettingsMetadataSource = "URL"
+	SamlSettingsMetadataSourceFile    SamlSettingsMetadataSource = "FILE"
+	SamlSettingsMetadataSourceUnknown SamlSettingsMetadataSource = "UNKNOWN"
+)
+
+// SamlSettingsUserMapping is the set of values accepted by SamlSettings.UserMapping.
+type SamlSettingsUserMapping = string
+
+// SamlSettingsUserMapping values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SamlSettingsUserMappingUsername SamlSettingsUserMapping = "USERNAME"
+	SamlSettingsUserMappingEmail    SamlSettingsUserMapping = "EMAIL"
+)
+
+// ScriptPriority is the set of values accepted by Script.Priority.
+type ScriptPriority = string
+
+// ScriptPriority values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ScriptPriorityBefore   ScriptPriority = "BEFORE"
+	ScriptPriorityAfter    ScriptPriority = "AFTER"
+	ScriptPriorityAtReboot ScriptPriority = "AT_REBOOT"
+)
+
+// SecurityV2AttestationStatus is the set of values accepted by SecurityV2.AttestationStatus.
+type SecurityV2AttestationStatus = string
+
+// SecurityV2AttestationStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SecurityV2AttestationStatusPending                     SecurityV2AttestationStatus = "PENDING"
+	SecurityV2AttestationStatusSuccess                     SecurityV2AttestationStatus = "SUCCESS"
+	SecurityV2AttestationStatusCertificateInvalid          SecurityV2AttestationStatus = "CERTIFICATE_INVALID"
+	SecurityV2AttestationStatusDevicePropertiesMismatch    SecurityV2AttestationStatus = "DEVICE_PROPERTIES_MISMATCH"
+	SecurityV2AttestationStatusMdaUnsupportedDueToHardware SecurityV2AttestationStatus = "MDA_UNSUPPORTED_DUE_TO_HARDWARE"
+	SecurityV2AttestationStatusMdaUnsupportedDueToSoftware SecurityV2AttestationStatus = "MDA_UNSUPPORTED_DUE_TO_SOFTWARE"
+)
+
+// SecurityV2BootstrapTokenEscrowed is the set of values accepted by SecurityV2.BootstrapTokenEscrowed.
+type SecurityV2BootstrapTokenEscrowed = string
+
+// SecurityV2BootstrapTokenEscrowed values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SecurityV2BootstrapTokenEscrowedEscrowed     SecurityV2BootstrapTokenEscrowed = "ESCROWED"
+	SecurityV2BootstrapTokenEscrowedNotEscrowed  SecurityV2BootstrapTokenEscrowed = "NOT_ESCROWED"
+	SecurityV2BootstrapTokenEscrowedNotSupported SecurityV2BootstrapTokenEscrowed = "NOT_SUPPORTED"
+)
+
+// SelfServiceInteractionSettingsDefaultLandingPage is the set of values accepted by SelfServiceInteractionSettings.DefaultLandingPage.
+type SelfServiceInteractionSettingsDefaultLandingPage = string
+
+// SelfServiceInteractionSettingsDefaultLandingPage values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SelfServiceInteractionSettingsDefaultLandingPageHome          SelfServiceInteractionSettingsDefaultLandingPage = "HOME"
+	SelfServiceInteractionSettingsDefaultLandingPageBrowse        SelfServiceInteractionSettingsDefaultLandingPage = "BROWSE"
+	SelfServiceInteractionSettingsDefaultLandingPageHistory       SelfServiceInteractionSettingsDefaultLandingPage = "HISTORY"
+	SelfServiceInteractionSettingsDefaultLandingPageNotifications SelfServiceInteractionSettingsDefaultLandingPage = "NOTIFICATIONS"
+)
+
+// SelfServiceLoginSettingsAuthType is the set of values accepted by SelfServiceLoginSettings.AuthType.
+type SelfServiceLoginSettingsAuthType = string
+
+// SelfServiceLoginSettingsAuthType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SelfServiceLoginSettingsAuthTypeBasic SelfServiceLoginSettingsAuthType = "Basic"
+	SelfServiceLoginSettingsAuthTypeSaml  SelfServiceLoginSettingsAuthType = "Saml"
+)
+
+// SelfServiceLoginSettingsUserLoginLevel is the set of values accepted by SelfServiceLoginSettings.UserLoginLevel.
+type SelfServiceLoginSettingsUserLoginLevel = string
+
+// SelfServiceLoginSettingsUserLoginLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SelfServiceLoginSettingsUserLoginLevelNotRequired SelfServiceLoginSettingsUserLoginLevel = "NotRequired"
+	SelfServiceLoginSettingsUserLoginLevelAnonymous   SelfServiceLoginSettingsUserLoginLevel = "Anonymous"
+	SelfServiceLoginSettingsUserLoginLevelRequired    SelfServiceLoginSettingsUserLoginLevel = "Required"
+)
+
+// SessionHistoryItemSessionType is the set of values accepted by SessionHistoryItem.SessionType.
+type SessionHistoryItemSessionType = string
+
+// SessionHistoryItemSessionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SessionHistoryItemSessionTypeAttended   SessionHistoryItemSessionType = "ATTENDED"
+	SessionHistoryItemSessionTypeUnattended SessionHistoryItemSessionType = "UNATTENDED"
+)
+
+// SessionHistoryItemStatusType is the set of values accepted by SessionHistoryItem.StatusType.
+type SessionHistoryItemStatusType = string
+
+// SessionHistoryItemStatusType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SessionHistoryItemStatusTypeStarted  SessionHistoryItemStatusType = "STARTED"
+	SessionHistoryItemStatusTypeFinished SessionHistoryItemStatusType = "FINISHED"
+	SessionHistoryItemStatusTypeError    SessionHistoryItemStatusType = "ERROR"
+)
+
+// SessionHistoryItemWithDetailsSessionType is the set of values accepted by SessionHistoryItemWithDetails.SessionType.
+type SessionHistoryItemWithDetailsSessionType = string
+
+// SessionHistoryItemWithDetailsSessionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SessionHistoryItemWithDetailsSessionTypeAttended   SessionHistoryItemWithDetailsSessionType = "ATTENDED"
+	SessionHistoryItemWithDetailsSessionTypeUnattended SessionHistoryItemWithDetailsSessionType = "UNATTENDED"
+)
+
+// SessionHistoryItemWithDetailsStatusType is the set of values accepted by SessionHistoryItemWithDetails.StatusType.
+type SessionHistoryItemWithDetailsStatusType = string
+
+// SessionHistoryItemWithDetailsStatusType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SessionHistoryItemWithDetailsStatusTypeStarted  SessionHistoryItemWithDetailsStatusType = "STARTED"
+	SessionHistoryItemWithDetailsStatusTypeFinished SessionHistoryItemWithDetailsStatusType = "FINISHED"
+	SessionHistoryItemWithDetailsStatusTypeError    SessionHistoryItemWithDetailsStatusType = "ERROR"
+)
+
+// SiteObjectObjectType is the set of values accepted by SiteObject.ObjectType.
+type SiteObjectObjectType = string
+
+// SiteObjectObjectType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SiteObjectObjectTypeComputer                        SiteObjectObjectType = "Computer"
+	SiteObjectObjectTypePeripheral                      SiteObjectObjectType = "Peripheral"
+	SiteObjectObjectTypeLicensedSoftware                SiteObjectObjectType = "Licensed Software"
+	SiteObjectObjectTypeLicensedSoftwareTemplate        SiteObjectObjectType = "Licensed Software Template"
+	SiteObjectObjectTypePolicy                          SiteObjectObjectType = "Policy"
+	SiteObjectObjectTypeMacOSConfigurationProfile       SiteObjectObjectType = "macOS Configuration Profile"
+	SiteObjectObjectTypeRestrictedSoftware              SiteObjectObjectType = "Restricted Software"
+	SiteObjectObjectTypeManagedPreferenceProfile        SiteObjectObjectType = "Managed Preference Profile"
+	SiteObjectObjectTypeComputerGroup                   SiteObjectObjectType = "Computer Group"
+	SiteObjectObjectTypeMobileDevice                    SiteObjectObjectType = "Mobile Device"
+	SiteObjectObjectTypeAppleTv                         SiteObjectObjectType = "Apple TV"
+	SiteObjectObjectTypeUserGroup                       SiteObjectObjectType = "User Group"
+	SiteObjectObjectTypeIOSConfigurationProfile         SiteObjectObjectType = "iOS Configuration Profile"
+	SiteObjectObjectTypeMobileDeviceApp                 SiteObjectObjectType = "Mobile Device App"
+	SiteObjectObjectTypeEBook                           SiteObjectObjectType = "E-book"
+	SiteObjectObjectTypeMobileDeviceGroup               SiteObjectObjectType = "Mobile Device Group"
+	SiteObjectObjectTypeClassroom                       SiteObjectObjectType = "Classroom"
+	SiteObjectObjectTypeAdvancedComputerSearch          SiteObjectObjectType = "Advanced Computer Search"
+	SiteObjectObjectTypeAdvancedMobileSearch            SiteObjectObjectType = "Advanced Mobile Search"
+	SiteObjectObjectTypeAdvancedUserSearch              SiteObjectObjectType = "Advanced User Search"
+	SiteObjectObjectTypeAdvancedUserContentSearch       SiteObjectObjectType = "Advanced User Content Search"
+	SiteObjectObjectTypeComputerInvitation              SiteObjectObjectType = "Computer Invitation"
+	SiteObjectObjectTypeMobileDeviceInvitation          SiteObjectObjectType = "Mobile Device Invitation"
+	SiteObjectObjectTypeMobileDeviceEnrollmentProfile   SiteObjectObjectType = "Mobile Device Enrollment Profile"
+	SiteObjectObjectTypeDeviceEnrollmentProgramInstance SiteObjectObjectType = "Device Enrollment Program Instance"
+	SiteObjectObjectTypeMobileDevicePrestage            SiteObjectObjectType = "Mobile Device Prestage"
+	SiteObjectObjectTypeComputerDepPrestage             SiteObjectObjectType = "Computer DEP Prestage"
+	SiteObjectObjectTypeEnrollmentCustomization         SiteObjectObjectType = "Enrollment Customization"
+	SiteObjectObjectTypeVppLocation                     SiteObjectObjectType = "VPP Location"
+	SiteObjectObjectTypeVppSubscription                 SiteObjectObjectType = "VPP Subscription"
+	SiteObjectObjectTypeVppInvitation                   SiteObjectObjectType = "VPP Invitation"
+	SiteObjectObjectTypeVppAssignment                   SiteObjectObjectType = "VPP Assignment"
+	SiteObjectObjectTypeUser                            SiteObjectObjectType = "User"
+	SiteObjectObjectTypeNetworkIntegration              SiteObjectObjectType = "Network Integration"
+	SiteObjectObjectTypeMacApp                          SiteObjectObjectType = "Mac App"
+	SiteObjectObjectTypeAppInstaller                    SiteObjectObjectType = "App Installer"
+	SiteObjectObjectTypeSelfServicePlugin               SiteObjectObjectType = "Self Service Plugin"
+	SiteObjectObjectTypeSoftwareTitle                   SiteObjectObjectType = "Software Title"
+	SiteObjectObjectTypePatchSoftwareTitleSummary       SiteObjectObjectType = "Patch Software Title Summary"
+	SiteObjectObjectTypePatchPolicy                     SiteObjectObjectType = "Patch Policy"
+	SiteObjectObjectTypePatchSoftwareTitleConfiguration SiteObjectObjectType = "Patch Software Title Configuration"
+	SiteObjectObjectTypeChangePassword                  SiteObjectObjectType = "Change Password"
+	SiteObjectObjectTypeMobileDeviceInventory           SiteObjectObjectType = "Mobile Device Inventory"
+	SiteObjectObjectTypeComputerInventory               SiteObjectObjectType = "Computer Inventory"
+	SiteObjectObjectTypeChangeManagement                SiteObjectObjectType = "Change Management"
+	SiteObjectObjectTypeLicensedSoftwareLicense         SiteObjectObjectType = "Licensed Software License"
+	SiteObjectObjectTypeUnknown                         SiteObjectObjectType = "Unknown"
+)
+
+// SlasaAcceptanceSlasaAcceptanceStatus is the set of values accepted by SlasaAcceptance.SlasaAcceptanceStatus.
+type SlasaAcceptanceSlasaAcceptanceStatus = string
+
+// SlasaAcceptanceSlasaAcceptanceStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SlasaAcceptanceSlasaAcceptanceStatusAccepted    SlasaAcceptanceSlasaAcceptanceStatus = "ACCEPTED"
+	SlasaAcceptanceSlasaAcceptanceStatusNotAccepted SlasaAcceptanceSlasaAcceptanceStatus = "NOT_ACCEPTED"
+)
+
+// SmtpConnectionSettingsEncryptionType is the set of values accepted by SmtpConnectionSettings.EncryptionType.
+type SmtpConnectionSettingsEncryptionType = string
+
+// SmtpConnectionSettingsEncryptionType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SmtpConnectionSettingsEncryptionTypeNone  SmtpConnectionSettingsEncryptionType = "NONE"
+	SmtpConnectionSettingsEncryptionTypeSsl   SmtpConnectionSettingsEncryptionType = "SSL"
+	SmtpConnectionSettingsEncryptionTypeTls12 SmtpConnectionSettingsEncryptionType = "TLS_1_2"
+	SmtpConnectionSettingsEncryptionTypeTls11 SmtpConnectionSettingsEncryptionType = "TLS_1_1"
+	SmtpConnectionSettingsEncryptionTypeTls1  SmtpConnectionSettingsEncryptionType = "TLS_1"
+	SmtpConnectionSettingsEncryptionTypeTls13 SmtpConnectionSettingsEncryptionType = "TLS_1_3"
+)
+
+// SmtpGoogleMailAuthenticationStatus is the set of values accepted by SmtpGoogleMailAuthentication.Status.
+type SmtpGoogleMailAuthenticationStatus = string
+
+// SmtpGoogleMailAuthenticationStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SmtpGoogleMailAuthenticationStatusFailed          SmtpGoogleMailAuthenticationStatus = "FAILED"
+	SmtpGoogleMailAuthenticationStatusUnauthenticated SmtpGoogleMailAuthenticationStatus = "UNAUTHENTICATED"
+	SmtpGoogleMailAuthenticationStatusAuthenticated   SmtpGoogleMailAuthenticationStatus = "AUTHENTICATED"
+)
+
+// SmtpServerV2AuthenticationType is the set of values accepted by SmtpServerV2.AuthenticationType.
+type SmtpServerV2AuthenticationType = string
+
+// SmtpServerV2AuthenticationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SmtpServerV2AuthenticationTypeNone       SmtpServerV2AuthenticationType = "NONE"
+	SmtpServerV2AuthenticationTypeBasic      SmtpServerV2AuthenticationType = "BASIC"
+	SmtpServerV2AuthenticationTypeGraphApi   SmtpServerV2AuthenticationType = "GRAPH_API"
+	SmtpServerV2AuthenticationTypeGoogleMail SmtpServerV2AuthenticationType = "GOOGLE_MAIL"
+)
+
+// SoftwareUpdateSettingsRecommendationCadence is the set of values accepted by SoftwareUpdateSettings.RecommendationCadence.
+type SoftwareUpdateSettingsRecommendationCadence = string
+
+// SoftwareUpdateSettingsRecommendationCadence values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SoftwareUpdateSettingsRecommendationCadenceAllowAllUpdates             SoftwareUpdateSettingsRecommendationCadence = "ALLOW_ALL_UPDATES"
+	SoftwareUpdateSettingsRecommendationCadenceOnlyAllowLeastCurrentUpdate SoftwareUpdateSettingsRecommendationCadence = "ONLY_ALLOW_LEAST_CURRENT_UPDATE"
+	SoftwareUpdateSettingsRecommendationCadenceOnlyAllowMostCurrentUpdate  SoftwareUpdateSettingsRecommendationCadence = "ONLY_ALLOW_MOST_CURRENT_UPDATE"
+)
+
+// SsoKeystoreCertParseResponseKeystoreSetupType is the set of values accepted by SsoKeystoreCertParseResponse.KeystoreSetupType.
+type SsoKeystoreCertParseResponseKeystoreSetupType = string
+
+// SsoKeystoreCertParseResponseKeystoreSetupType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SsoKeystoreCertParseResponseKeystoreSetupTypeNone      SsoKeystoreCertParseResponseKeystoreSetupType = "NONE"
+	SsoKeystoreCertParseResponseKeystoreSetupTypeUploaded  SsoKeystoreCertParseResponseKeystoreSetupType = "UPLOADED"
+	SsoKeystoreCertParseResponseKeystoreSetupTypeGenerated SsoKeystoreCertParseResponseKeystoreSetupType = "GENERATED"
+)
+
+// SsoKeystoreCertParseResponseType is the set of values accepted by SsoKeystoreCertParseResponse.Type.
+type SsoKeystoreCertParseResponseType = string
+
+// SsoKeystoreCertParseResponseType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SsoKeystoreCertParseResponseTypePkcs12 SsoKeystoreCertParseResponseType = "PKCS12"
+	SsoKeystoreCertParseResponseTypeJks    SsoKeystoreCertParseResponseType = "JKS"
+	SsoKeystoreCertParseResponseTypeNone   SsoKeystoreCertParseResponseType = "NONE"
+)
+
+// SsoKeystoreKeystoreSetupType is the set of values accepted by SsoKeystore.KeystoreSetupType.
+type SsoKeystoreKeystoreSetupType = string
+
+// SsoKeystoreKeystoreSetupType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SsoKeystoreKeystoreSetupTypeNone      SsoKeystoreKeystoreSetupType = "NONE"
+	SsoKeystoreKeystoreSetupTypeUploaded  SsoKeystoreKeystoreSetupType = "UPLOADED"
+	SsoKeystoreKeystoreSetupTypeGenerated SsoKeystoreKeystoreSetupType = "GENERATED"
+)
+
+// SsoKeystoreResponseKeystoreSetupType is the set of values accepted by SsoKeystoreResponse.KeystoreSetupType.
+type SsoKeystoreResponseKeystoreSetupType = string
+
+// SsoKeystoreResponseKeystoreSetupType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SsoKeystoreResponseKeystoreSetupTypeNone      SsoKeystoreResponseKeystoreSetupType = "NONE"
+	SsoKeystoreResponseKeystoreSetupTypeUploaded  SsoKeystoreResponseKeystoreSetupType = "UPLOADED"
+	SsoKeystoreResponseKeystoreSetupTypeGenerated SsoKeystoreResponseKeystoreSetupType = "GENERATED"
+)
+
+// SsoKeystoreResponseType is the set of values accepted by SsoKeystoreResponse.Type.
+type SsoKeystoreResponseType = string
+
+// SsoKeystoreResponseType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SsoKeystoreResponseTypePkcs12 SsoKeystoreResponseType = "PKCS12"
+	SsoKeystoreResponseTypeJks    SsoKeystoreResponseType = "JKS"
+	SsoKeystoreResponseTypeNone   SsoKeystoreResponseType = "NONE"
+)
+
+// SsoKeystoreType is the set of values accepted by SsoKeystore.Type.
+type SsoKeystoreType = string
+
+// SsoKeystoreType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SsoKeystoreTypePkcs12 SsoKeystoreType = "PKCS12"
+	SsoKeystoreTypeJks    SsoKeystoreType = "JKS"
+	SsoKeystoreTypeNone   SsoKeystoreType = "NONE"
+)
+
+// SsoSettingsV3ConfigurationType is the set of values accepted by SsoSettingsV3.ConfigurationType.
+type SsoSettingsV3ConfigurationType = string
+
+// SsoSettingsV3ConfigurationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SsoSettingsV3ConfigurationTypeSaml         SsoSettingsV3ConfigurationType = "SAML"
+	SsoSettingsV3ConfigurationTypeOidc         SsoSettingsV3ConfigurationType = "OIDC"
+	SsoSettingsV3ConfigurationTypeOidcWithSaml SsoSettingsV3ConfigurationType = "OIDC_WITH_SAML"
+)
+
+// StartupStatusErrorCode is the set of values accepted by StartupStatus.ErrorCode.
+type StartupStatusErrorCode = string
+
+// StartupStatusErrorCode values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	StartupStatusErrorCodeCacheConfigurationError         StartupStatusErrorCode = "CACHE_CONFIGURATION_ERROR"
+	StartupStatusErrorCodeSecondaryNodeStartupError       StartupStatusErrorCode = "SECONDARY_NODE_STARTUP_ERROR"
+	StartupStatusErrorCodeMoreThanOneClusterSettingsError StartupStatusErrorCode = "MORE_THAN_ONE_CLUSTER_SETTINGS_ERROR"
+	StartupStatusErrorCodePrimaryNodeNotSetError          StartupStatusErrorCode = "PRIMARY_NODE_NOT_SET_ERROR"
+	StartupStatusErrorCodeDatabaseError                   StartupStatusErrorCode = "DATABASE_ERROR"
+	StartupStatusErrorCodeDatabasePasswordMissing         StartupStatusErrorCode = "DATABASE_PASSWORD_MISSING"
+	StartupStatusErrorCodeEhcacheError                    StartupStatusErrorCode = "EHCACHE_ERROR"
+	StartupStatusErrorCodeFlagInitializationFailed        StartupStatusErrorCode = "FLAG_INITIALIZATION_FAILED"
+	StartupStatusErrorCodeMemcachedError                  StartupStatusErrorCode = "MEMCACHED_ERROR"
+	StartupStatusErrorCodeDatabaseMyisamError             StartupStatusErrorCode = "DATABASE_MYISAM_ERROR"
+	StartupStatusErrorCodeOldVersionError                 StartupStatusErrorCode = "OLD_VERSION_ERROR"
+)
+
+// StartupStatusStepCode is the set of values accepted by StartupStatus.StepCode.
+type StartupStatusStepCode = string
+
+// StartupStatusStepCode values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	StartupStatusStepCodeServerInitStart                           StartupStatusStepCode = "SERVER_INIT_START"
+	StartupStatusStepCodeServerInitAnalyzingWebapp                 StartupStatusStepCode = "SERVER_INIT_ANALYZING_WEBAPP"
+	StartupStatusStepCodeServerInitPopulatingNavigation            StartupStatusStepCode = "SERVER_INIT_POPULATING_NAVIGATION"
+	StartupStatusStepCodeServerInitPopulatingObjects               StartupStatusStepCode = "SERVER_INIT_POPULATING_OBJECTS"
+	StartupStatusStepCodeServerInitInitializingObj                 StartupStatusStepCode = "SERVER_INIT_INITIALIZING_OBJ"
+	StartupStatusStepCodeServerInitVerifyingCache                  StartupStatusStepCode = "SERVER_INIT_VERIFYING_CACHE"
+	StartupStatusStepCodeServerInitInitializingChangeManagement    StartupStatusStepCode = "SERVER_INIT_INITIALIZING_CHANGE_MANAGEMENT"
+	StartupStatusStepCodeServerInitInitializingCommunicationSystem StartupStatusStepCode = "SERVER_INIT_INITIALIZING_COMMUNICATION_SYSTEM"
+	StartupStatusStepCodeServerInitInitializingMDMQueueMonitor     StartupStatusStepCode = "SERVER_INIT_INITIALIZING_MDM_QUEUE_MONITOR"
+	StartupStatusStepCodeServerInitCalculatingSmartGroups          StartupStatusStepCode = "SERVER_INIT_CALCULATING_SMART_GROUPS"
+	StartupStatusStepCodeServerInitDbSchemaCompare                 StartupStatusStepCode = "SERVER_INIT_DB_SCHEMA_COMPARE"
+	StartupStatusStepCodeServerInitDbTableCheckForRename           StartupStatusStepCode = "SERVER_INIT_DB_TABLE_CHECK_FOR_RENAME"
+	StartupStatusStepCodeServerInitDbTableAlter                    StartupStatusStepCode = "SERVER_INIT_DB_TABLE_ALTER"
+	StartupStatusStepCodeServerInitDbTableAnalyzing                StartupStatusStepCode = "SERVER_INIT_DB_TABLE_ANALYZING"
+	StartupStatusStepCodeServerInitDbTableCreate                   StartupStatusStepCode = "SERVER_INIT_DB_TABLE_CREATE"
+	StartupStatusStepCodeServerInitDbTableDrop                     StartupStatusStepCode = "SERVER_INIT_DB_TABLE_DROP"
+	StartupStatusStepCodeServerInitDbTableRename                   StartupStatusStepCode = "SERVER_INIT_DB_TABLE_RENAME"
+	StartupStatusStepCodeServerInitDbColumnRename                  StartupStatusStepCode = "SERVER_INIT_DB_COLUMN_RENAME"
+	StartupStatusStepCodeServerInitDbColumnEncodingChangeStep1     StartupStatusStepCode = "SERVER_INIT_DB_COLUMN_ENCODING_CHANGE_STEP_1"
+	StartupStatusStepCodeServerInitDbColumnEncodingChangeStep2     StartupStatusStepCode = "SERVER_INIT_DB_COLUMN_ENCODING_CHANGE_STEP_2"
+	StartupStatusStepCodeServerInitDbColumnEncodingChangeStep3     StartupStatusStepCode = "SERVER_INIT_DB_COLUMN_ENCODING_CHANGE_STEP_3"
+	StartupStatusStepCodeServerInitDbUpgradeCheck                  StartupStatusStepCode = "SERVER_INIT_DB_UPGRADE_CHECK"
+	StartupStatusStepCodeServerInitDbUpgradeComplete               StartupStatusStepCode = "SERVER_INIT_DB_UPGRADE_COMPLETE"
+	StartupStatusStepCodeServerInitSsGenerateNotifications         StartupStatusStepCode = "SERVER_INIT_SS_GENERATE_NOTIFICATIONS"
+	StartupStatusStepCodeServerInitSsGenerateNotificationsStatus   StartupStatusStepCode = "SERVER_INIT_SS_GENERATE_NOTIFICATIONS_STATUS"
+	StartupStatusStepCodeServerInitSsGenerateNotificationsFinalize StartupStatusStepCode = "SERVER_INIT_SS_GENERATE_NOTIFICATIONS_FINALIZE"
+	StartupStatusStepCodeServerInitPkiMigrationDone                StartupStatusStepCode = "SERVER_INIT_PKI_MIGRATION_DONE"
+	StartupStatusStepCodeServerInitPkiMigrationStatus              StartupStatusStepCode = "SERVER_INIT_PKI_MIGRATION_STATUS"
+	StartupStatusStepCodeServerInitMemcachedEndpointsCheck         StartupStatusStepCode = "SERVER_INIT_MEMCACHED_ENDPOINTS_CHECK"
+	StartupStatusStepCodeServerInitCacheFlushing                   StartupStatusStepCode = "SERVER_INIT_CACHE_FLUSHING"
+	StartupStatusStepCodeServerInitComplete                        StartupStatusStepCode = "SERVER_INIT_COMPLETE"
+)
+
+// TimeZoneRegion is the set of values accepted by TimeZone.Region.
+type TimeZoneRegion = string
+
+// TimeZoneRegion values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	TimeZoneRegionAfrica    TimeZoneRegion = "Africa"
+	TimeZoneRegionAmerica   TimeZoneRegion = "America"
+	TimeZoneRegionAsia      TimeZoneRegion = "Asia"
+	TimeZoneRegionAtlantic  TimeZoneRegion = "Atlantic"
+	TimeZoneRegionAustralia TimeZoneRegion = "Australia"
+	TimeZoneRegionEurope    TimeZoneRegion = "Europe"
+	TimeZoneRegionIndian    TimeZoneRegion = "Indian"
+	TimeZoneRegionPacific   TimeZoneRegion = "Pacific"
+	TimeZoneRegionNone      TimeZoneRegion = "None"
+)
+
+// UnifiedSmartGroupCriteriaV2AndOr is the set of values accepted by UnifiedSmartGroupCriteriaV2.AndOr.
+type UnifiedSmartGroupCriteriaV2AndOr = string
+
+// UnifiedSmartGroupCriteriaV2AndOr values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	UnifiedSmartGroupCriteriaV2AndOrAnd UnifiedSmartGroupCriteriaV2AndOr = "and"
+	UnifiedSmartGroupCriteriaV2AndOrOr  UnifiedSmartGroupCriteriaV2AndOr = "or"
+)
+
+// UserAccountAccessLevel is the set of values accepted by UserAccount.AccessLevel.
+type UserAccountAccessLevel = string
+
+// UserAccountAccessLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	UserAccountAccessLevelFullAccess       UserAccountAccessLevel = "FullAccess"
+	UserAccountAccessLevelSiteAccess       UserAccountAccessLevel = "SiteAccess"
+	UserAccountAccessLevelGroupBasedAccess UserAccountAccessLevel = "GroupBasedAccess"
+)
+
+// UserAccountAccountStatus is the set of values accepted by UserAccount.AccountStatus.
+type UserAccountAccountStatus = string
+
+// UserAccountAccountStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	UserAccountAccountStatusEnabled  UserAccountAccountStatus = "Enabled"
+	UserAccountAccountStatusDisabled UserAccountAccountStatus = "Disabled"
+)
+
+// UserAccountAccountType is the set of values accepted by UserAccount.AccountType.
+type UserAccountAccountType = string
+
+// UserAccountAccountType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	UserAccountAccountTypeDefault   UserAccountAccountType = "DEFAULT"
+	UserAccountAccountTypeFederated UserAccountAccountType = "FEDERATED"
+)
+
+// UserAccountPrivilegeLevel is the set of values accepted by UserAccount.PrivilegeLevel.
+type UserAccountPrivilegeLevel = string
+
+// UserAccountPrivilegeLevel values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	UserAccountPrivilegeLevelAdministrator UserAccountPrivilegeLevel = "ADMINISTRATOR"
+	UserAccountPrivilegeLevelAuditor       UserAccountPrivilegeLevel = "AUDITOR"
+	UserAccountPrivilegeLevelEnrollment    UserAccountPrivilegeLevel = "ENROLLMENT"
+	UserAccountPrivilegeLevelCustom        UserAccountPrivilegeLevel = "CUSTOM"
+)
+
+// UserMappingsObjectClassLimitation is the set of values accepted by UserMappings.ObjectClassLimitation.
+type UserMappingsObjectClassLimitation = string
+
+// UserMappingsObjectClassLimitation values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	UserMappingsObjectClassLimitationAnyObjectClasses UserMappingsObjectClassLimitation = "ANY_OBJECT_CLASSES"
+	UserMappingsObjectClassLimitationAllObjectClasses UserMappingsObjectClassLimitation = "ALL_OBJECT_CLASSES"
+)
+
+// UserMappingsSearchScope is the set of values accepted by UserMappings.SearchScope.
+type UserMappingsSearchScope = string
+
+// UserMappingsSearchScope values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	UserMappingsSearchScopeAllSubtrees    UserMappingsSearchScope = "ALL_SUBTREES"
+	UserMappingsSearchScopeFirstLevelOnly UserMappingsSearchScope = "FIRST_LEVEL_ONLY"
+)
+
+// VolumePurchasingContentContentType is the set of values accepted by VolumePurchasingContent.ContentType.
+type VolumePurchasingContentContentType = string
+
+// VolumePurchasingContentContentType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	VolumePurchasingContentContentTypeIosApp  VolumePurchasingContentContentType = "IOS_APP"
+	VolumePurchasingContentContentTypeMacApp  VolumePurchasingContentContentType = "MAC_APP"
+	VolumePurchasingContentContentTypeBook    VolumePurchasingContentContentType = "BOOK"
+	VolumePurchasingContentContentTypeUnknown VolumePurchasingContentContentType = "UNKNOWN"
+)
+
+// VolumePurchasingContentDeviceTypes is the set of values accepted by VolumePurchasingContent.DeviceTypes.
+type VolumePurchasingContentDeviceTypes = string
+
+// VolumePurchasingContentDeviceTypes values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	VolumePurchasingContentDeviceTypesIos   VolumePurchasingContentDeviceTypes = "IOS"
+	VolumePurchasingContentDeviceTypesMacos VolumePurchasingContentDeviceTypes = "MACOS"
+	VolumePurchasingContentDeviceTypesTvos  VolumePurchasingContentDeviceTypes = "TVOS"
+)
+
+// VolumePurchasingContentPricingParam is the set of values accepted by VolumePurchasingContent.PricingParam.
+type VolumePurchasingContentPricingParam = string
+
+// VolumePurchasingContentPricingParam values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	VolumePurchasingContentPricingParamStdq    VolumePurchasingContentPricingParam = "STDQ"
+	VolumePurchasingContentPricingParamPlus    VolumePurchasingContentPricingParam = "PLUS"
+	VolumePurchasingContentPricingParamUnknown VolumePurchasingContentPricingParam = "Unknown"
+)
+
+// VolumePurchasingSubscriptionBaseTriggers is the set of values accepted by VolumePurchasingSubscriptionBase.Triggers.
+type VolumePurchasingSubscriptionBaseTriggers = string
+
+// VolumePurchasingSubscriptionBaseTriggers values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	VolumePurchasingSubscriptionBaseTriggersNoMoreLicenses      VolumePurchasingSubscriptionBaseTriggers = "NO_MORE_LICENSES"
+	VolumePurchasingSubscriptionBaseTriggersRemovedFromAppStore VolumePurchasingSubscriptionBaseTriggers = "REMOVED_FROM_APP_STORE"
+)
+
+// VolumePurchasingSubscriptionTriggers is the set of values accepted by VolumePurchasingSubscription.Triggers.
+type VolumePurchasingSubscriptionTriggers = string
+
+// VolumePurchasingSubscriptionTriggers values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	VolumePurchasingSubscriptionTriggersNoMoreLicenses      VolumePurchasingSubscriptionTriggers = "NO_MORE_LICENSES"
+	VolumePurchasingSubscriptionTriggersRemovedFromAppStore VolumePurchasingSubscriptionTriggers = "REMOVED_FROM_APP_STORE"
+)
+
+// AppInstallerDeploymentCreateDeploymentType is the set of values accepted by AppInstallerDeploymentCreate.DeploymentType.
+type AppInstallerDeploymentCreateDeploymentType = string
+
+// AppInstallerDeploymentCreateDeploymentType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppInstallerDeploymentCreateDeploymentTypeInstallAutomatically AppInstallerDeploymentCreateDeploymentType = "INSTALL_AUTOMATICALLY"
+	AppInstallerDeploymentCreateDeploymentTypeSelfService          AppInstallerDeploymentCreateDeploymentType = "SELF_SERVICE"
+)
+
+// AppInstallerDeploymentCreateUpdateBehavior is the set of values accepted by AppInstallerDeploymentCreate.UpdateBehavior.
+type AppInstallerDeploymentCreateUpdateBehavior = string
+
+// AppInstallerDeploymentCreateUpdateBehavior values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppInstallerDeploymentCreateUpdateBehaviorAutomatic AppInstallerDeploymentCreateUpdateBehavior = "AUTOMATIC"
+	AppInstallerDeploymentCreateUpdateBehaviorManual    AppInstallerDeploymentCreateUpdateBehavior = "MANUAL"
+)
+
+// AppInstallerDeploymentDeploymentType is the set of values accepted by AppInstallerDeployment.DeploymentType.
+type AppInstallerDeploymentDeploymentType = string
+
+// AppInstallerDeploymentDeploymentType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppInstallerDeploymentDeploymentTypeInstallAutomatically AppInstallerDeploymentDeploymentType = "INSTALL_AUTOMATICALLY"
+	AppInstallerDeploymentDeploymentTypeSelfService          AppInstallerDeploymentDeploymentType = "SELF_SERVICE"
+)
+
+// AppInstallerDeploymentListEntryDeploymentType is the set of values accepted by AppInstallerDeploymentListEntry.DeploymentType.
+type AppInstallerDeploymentListEntryDeploymentType = string
+
+// AppInstallerDeploymentListEntryDeploymentType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppInstallerDeploymentListEntryDeploymentTypeInstallAutomatically AppInstallerDeploymentListEntryDeploymentType = "INSTALL_AUTOMATICALLY"
+	AppInstallerDeploymentListEntryDeploymentTypeSelfService          AppInstallerDeploymentListEntryDeploymentType = "SELF_SERVICE"
+)
+
+// AppInstallerDeploymentListEntryUpdateBehavior is the set of values accepted by AppInstallerDeploymentListEntry.UpdateBehavior.
+type AppInstallerDeploymentListEntryUpdateBehavior = string
+
+// AppInstallerDeploymentListEntryUpdateBehavior values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppInstallerDeploymentListEntryUpdateBehaviorAutomatic AppInstallerDeploymentListEntryUpdateBehavior = "AUTOMATIC"
+	AppInstallerDeploymentListEntryUpdateBehaviorManual    AppInstallerDeploymentListEntryUpdateBehavior = "MANUAL"
+)
+
+// AppInstallerDeploymentUpdateBehavior is the set of values accepted by AppInstallerDeployment.UpdateBehavior.
+type AppInstallerDeploymentUpdateBehavior = string
+
+// AppInstallerDeploymentUpdateBehavior values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppInstallerDeploymentUpdateBehaviorAutomatic AppInstallerDeploymentUpdateBehavior = "AUTOMATIC"
+	AppInstallerDeploymentUpdateBehaviorManual    AppInstallerDeploymentUpdateBehavior = "MANUAL"
+)
+
+// AppInstallerDeploymentProcessControlsDaysOfWeek is the set of values accepted by AppInstallerDeploymentProcessControls.DaysOfWeek.
+type AppInstallerDeploymentProcessControlsDaysOfWeek = string
+
+// AppInstallerDeploymentProcessControlsDaysOfWeek values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppInstallerDeploymentProcessControlsDaysOfWeekMonday    AppInstallerDeploymentProcessControlsDaysOfWeek = "MONDAY"
+	AppInstallerDeploymentProcessControlsDaysOfWeekTuesday   AppInstallerDeploymentProcessControlsDaysOfWeek = "TUESDAY"
+	AppInstallerDeploymentProcessControlsDaysOfWeekWednesday AppInstallerDeploymentProcessControlsDaysOfWeek = "WEDNESDAY"
+	AppInstallerDeploymentProcessControlsDaysOfWeekThursday  AppInstallerDeploymentProcessControlsDaysOfWeek = "THURSDAY"
+	AppInstallerDeploymentProcessControlsDaysOfWeekFriday    AppInstallerDeploymentProcessControlsDaysOfWeek = "FRIDAY"
+	AppInstallerDeploymentProcessControlsDaysOfWeekSaturday  AppInstallerDeploymentProcessControlsDaysOfWeek = "SATURDAY"
+	AppInstallerDeploymentProcessControlsDaysOfWeekSunday    AppInstallerDeploymentProcessControlsDaysOfWeek = "SUNDAY"
+)

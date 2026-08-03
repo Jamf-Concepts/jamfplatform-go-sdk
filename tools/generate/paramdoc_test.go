@@ -167,6 +167,60 @@ func TestEnumConstIdent(t *testing.T) {
 	}
 }
 
+func TestRegisterPropertyEnum(t *testing.T) {
+	strEnum := func(vals ...any) *openapi3.SchemaRef {
+		return &openapi3.SchemaRef{Value: &openapi3.Schema{
+			Type: &openapi3.Types{"string"}, Enum: vals,
+		}}
+	}
+
+	currentPropertyEnums = map[string]GoType{}
+	currentSpecTypeNames = map[string]bool{"AccountAccessLevel": true}
+	t.Cleanup(func() { currentPropertyEnums, currentSpecTypeNames = nil, nil })
+
+	// Happy path: <Owner><Property>, registered and referenced.
+	if got := registerPropertyEnum("Policy", "trigger", strEnum("EVENT", "USER_INITIATED")); got != "PolicyTrigger" {
+		t.Errorf("got %q, want PolicyTrigger", got)
+	}
+	reg, ok := currentPropertyEnums["PolicyTrigger"]
+	if !ok || len(reg.EnumValues) != 2 {
+		t.Fatalf("PolicyTrigger not registered correctly: %+v", reg)
+	}
+
+	// A name the spec already declares must be abandoned, not referenced —
+	// otherwise the field points at a type carrying no constants.
+	if got := registerPropertyEnum("Account", "accessLevel", strEnum("FullAccess", "SiteAccess")); got != "" {
+		t.Errorf("collision returned %q, want empty", got)
+	}
+	if _, dup := currentPropertyEnums["AccountAccessLevel"]; dup {
+		t.Error("collision was registered anyway")
+	}
+
+	// Skips: $ref (field type already names it), non-string, single value.
+	cases := map[string]*openapi3.SchemaRef{
+		"ref":         {Ref: "#/components/schemas/NotificationType", Value: &openapi3.Schema{Enum: []any{"A", "B"}}},
+		"non-string":  {Value: &openapi3.Schema{Type: &openapi3.Types{"integer"}, Enum: []any{1, 2}}},
+		"single":      strEnum("ONLY"),
+		"no enum":     strEnum(),
+		"nil":         nil,
+		"item is ref": {Value: &openapi3.Schema{Items: &openapi3.SchemaRef{Ref: "#/components/schemas/X", Value: &openapi3.Schema{Enum: []any{"A", "B"}}}}},
+	}
+	for label, ref := range cases {
+		if got := registerPropertyEnum("Owner", label, ref); got != "" {
+			t.Errorf("%s: got %q, want empty", label, got)
+		}
+	}
+
+	// A repeatable property carries the constraint on its inline item schema.
+	items := &openapi3.SchemaRef{Value: &openapi3.Schema{
+		Type:  &openapi3.Types{"array"},
+		Items: strEnum("MAC", "IOS"),
+	}}
+	if got := registerPropertyEnum("Device", "platforms", items); got != "DevicePlatforms" {
+		t.Errorf("item enum: got %q, want DevicePlatforms", got)
+	}
+}
+
 func TestEnumConsts(t *testing.T) {
 	got := enumConsts("Subset", []any{"General", "Location", 42, ""})
 	if len(got) != 2 {

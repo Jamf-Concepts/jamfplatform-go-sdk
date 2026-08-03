@@ -24,3 +24,145 @@ const (
 	DeclarationKindConfiguration DeclarationKind = "CONFIGURATION"
 	DeclarationKindAsset         DeclarationKind = "ASSET"
 )
+
+// AcceptCookiesValue is the set of values accepted by AcceptCookies.Value.
+type AcceptCookiesValue = string
+
+// AcceptCookiesValue values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AcceptCookiesValueNever           AcceptCookiesValue = "Never"
+	AcceptCookiesValueCurrentWebsite  AcceptCookiesValue = "CurrentWebsite"
+	AcceptCookiesValueVisitedWebsites AcceptCookiesValue = "VisitedWebsites"
+	AcceptCookiesValueAlways          AcceptCookiesValue = "Always"
+)
+
+// AutomaticActionValue is the set of values accepted by AutomaticAction.Value.
+type AutomaticActionValue = string
+
+// AutomaticActionValue values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AutomaticActionValueAllowed   AutomaticActionValue = "Allowed"
+	AutomaticActionValueAlwaysOn  AutomaticActionValue = "AlwaysOn"
+	AutomaticActionValueAlwaysOff AutomaticActionValue = "AlwaysOff"
+)
+
+// BetaSettingsProgramEnrollment is the set of values accepted by BetaSettings.ProgramEnrollment.
+type BetaSettingsProgramEnrollment = string
+
+// BetaSettingsProgramEnrollment values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	BetaSettingsProgramEnrollmentAllowed   BetaSettingsProgramEnrollment = "Allowed"
+	BetaSettingsProgramEnrollmentAlwaysOn  BetaSettingsProgramEnrollment = "AlwaysOn"
+	BetaSettingsProgramEnrollmentAlwaysOff BetaSettingsProgramEnrollment = "AlwaysOff"
+)
+
+// DeploymentStateState is the set of values accepted by DeploymentState.State.
+type DeploymentStateState = string
+
+// DeploymentStateState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DeploymentStateStateNotDeployed DeploymentStateState = "NOT_DEPLOYED"
+	DeploymentStateStateDeployed    DeploymentStateState = "DEPLOYED"
+	DeploymentStateStateOutOfDate   DeploymentStateState = "OUT_OF_DATE"
+)
+
+// ManagedAppEntryAllowDownloadsOverCellular is the set of values accepted by ManagedAppEntry.AllowDownloadsOverCellular.
+type ManagedAppEntryAllowDownloadsOverCellular = string
+
+// ManagedAppEntryAllowDownloadsOverCellular values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedAppEntryAllowDownloadsOverCellularAlwaysOn      ManagedAppEntryAllowDownloadsOverCellular = "AlwaysOn"
+	ManagedAppEntryAllowDownloadsOverCellularAlwaysOff     ManagedAppEntryAllowDownloadsOverCellular = "AlwaysOff"
+	ManagedAppEntryAllowDownloadsOverCellularStoreSettings ManagedAppEntryAllowDownloadsOverCellular = "StoreSettings"
+)
+
+// ManagedAppEntryAutomaticAppUpdates is the set of values accepted by ManagedAppEntry.AutomaticAppUpdates.
+type ManagedAppEntryAutomaticAppUpdates = string
+
+// ManagedAppEntryAutomaticAppUpdates values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedAppEntryAutomaticAppUpdatesAlwaysOn      ManagedAppEntryAutomaticAppUpdates = "AlwaysOn"
+	ManagedAppEntryAutomaticAppUpdatesAlwaysOff     ManagedAppEntryAutomaticAppUpdates = "AlwaysOff"
+	ManagedAppEntryAutomaticAppUpdatesStoreSettings ManagedAppEntryAutomaticAppUpdates = "StoreSettings"
+)
+
+// ManagedAppEntryInstall is the set of values accepted by ManagedAppEntry.Install.
+type ManagedAppEntryInstall = string
+
+// ManagedAppEntryInstall values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedAppEntryInstallRequired ManagedAppEntryInstall = "Required"
+	ManagedAppEntryInstallOptional ManagedAppEntryInstall = "Optional"
+)
+
+// ManagedExtensionPrivateBrowsing is the set of values accepted by ManagedExtension.PrivateBrowsing.
+type ManagedExtensionPrivateBrowsing = string
+
+// ManagedExtensionPrivateBrowsing values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedExtensionPrivateBrowsingAllowed   ManagedExtensionPrivateBrowsing = "Allowed"
+	ManagedExtensionPrivateBrowsingAlwaysOn  ManagedExtensionPrivateBrowsing = "AlwaysOn"
+	ManagedExtensionPrivateBrowsingAlwaysOff ManagedExtensionPrivateBrowsing = "AlwaysOff"
+)
+
+// ManagedExtensionState is the set of values accepted by ManagedExtension.State.
+type ManagedExtensionState = string
+
+// ManagedExtensionState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedExtensionStateAllowed   ManagedExtensionState = "Allowed"
+	ManagedExtensionStateAlwaysOn  ManagedExtensionState = "AlwaysOn"
+	ManagedExtensionStateAlwaysOff ManagedExtensionState = "AlwaysOff"
+)
+
+// NewTabStartPagePageType is the set of values accepted by NewTabStartPage.PageType.
+type NewTabStartPagePageType = string
+
+// NewTabStartPagePageType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	NewTabStartPagePageTypeStart     NewTabStartPagePageType = "Start"
+	NewTabStartPagePageTypeHome      NewTabStartPagePageType = "Home"
+	NewTabStartPagePageTypeExtension NewTabStartPagePageType = "Extension"
+)
+
+// RecommendedCadenceValue is the set of values accepted by RecommendedCadence.Value.
+type RecommendedCadenceValue = string
+
+// RecommendedCadenceValue values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	RecommendedCadenceValueAll    RecommendedCadenceValue = "All"
+	RecommendedCadenceValueOldest RecommendedCadenceValue = "Oldest"
+	RecommendedCadenceValueNewest RecommendedCadenceValue = "Newest"
+)
+
+// StorageModeValue is the set of values accepted by StorageMode.Value.
+type StorageModeValue = string
+
+// StorageModeValue values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	StorageModeValueAllowed    StorageModeValue = "Allowed"
+	StorageModeValueDisallowed StorageModeValue = "Disallowed"
+	StorageModeValueReadOnly   StorageModeValue = "ReadOnly"
+)
+
+// UnpairingTimePolicy is the set of values accepted by UnpairingTime.Policy.
+type UnpairingTimePolicy = string
+
+// UnpairingTimePolicy values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	UnpairingTimePolicyNone UnpairingTimePolicy = "None"
+	UnpairingTimePolicyHour UnpairingTimePolicy = "Hour"
+)

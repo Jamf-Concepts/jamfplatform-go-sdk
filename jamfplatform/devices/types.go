@@ -31,6 +31,7 @@ type ApiErrorRepresentationErrorsItem struct {
 // DeviceHardwareReadRepresentationV1 represents a device hardware read representation v1.
 type DeviceHardwareReadRepresentationV1 struct {
 	// Battery health status of the device.
+	// Allowed values: see the DeviceHardwareReadRepresentationV1BatteryHealth constants.
 	BatteryHealth string `json:"batteryHealth"`
 	// MAC address of the device.
 	MacAddress string `json:"macAddress"`
@@ -141,6 +142,7 @@ type DeviceReadRepresentationV1 struct {
 // DeviceSecurityReadRepresentationV1 represents a device security read representation v1.
 type DeviceSecurityReadRepresentationV1 struct {
 	// The status of the bootstrap token for the device.
+	// Allowed values: see the DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatus constants.
 	BootstrapTokenEscrowedStatus string `json:"bootstrapTokenEscrowedStatus"`
 	// Whether hardware encryption is enabled on the device, or null if the device is a computer.
 	HardwareEncryption *bool `json:"hardwareEncryption,omitempty"`
