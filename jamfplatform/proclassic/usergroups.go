@@ -18,6 +18,9 @@ import (
 // GetUserGroupByID finds user groups by ID.
 //
 // Required privileges: read:pro:user-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetUserGroupByID(ctx context.Context, id string) (*UserGroup, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result UserGroup
@@ -31,6 +34,9 @@ func (c *Client) GetUserGroupByID(ctx context.Context, id string) (*UserGroup, e
 // CreateUserGroupByID creates user groups by ID.
 //
 // Required privileges: create:pro:user-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateUserGroupByID(ctx context.Context, id string, request *UserGroup) (*UserGroup, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result UserGroup
@@ -44,6 +50,9 @@ func (c *Client) CreateUserGroupByID(ctx context.Context, id string, request *Us
 // UpdateUserGroupByID updates user groups by ID.
 //
 // Required privileges: update:pro:user-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateUserGroupByID(ctx context.Context, id string, request *UserGroup) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateUserGroupByID(ctx context.Context, id string, request *Us
 // DeleteUserGroupByID deletes user groups by ID.
 //
 // Required privileges: delete:pro:user-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteUserGroupByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteUserGroupByID(ctx context.Context, id string) error {
 // GetUserGroupByName finds user groups by name.
 //
 // Required privileges: read:pro:user-groups.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetUserGroupByName(ctx context.Context, name string) (*UserGroup, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result UserGroup
@@ -81,6 +96,9 @@ func (c *Client) GetUserGroupByName(ctx context.Context, name string) (*UserGrou
 // UpdateUserGroupByName updates user groups by name.
 //
 // Required privileges: update:pro:user-groups.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateUserGroupByName(ctx context.Context, name string, request *UserGroup) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateUserGroupByName(ctx context.Context, name string, request
 // DeleteUserGroupByName deletes user groups by name.
 //
 // Required privileges: delete:pro:user-groups.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteUserGroupByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,9 @@ func (c *Client) ListUserGroups(ctx context.Context) (*UserGroups, error) {
 // CreateUserGroupByName creates user groups by ID.
 //
 // Required privileges: create:pro:user-groups.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateUserGroupByName(ctx context.Context, name string, request *UserGroup) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))

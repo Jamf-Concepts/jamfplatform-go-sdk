@@ -44,6 +44,9 @@ func (c *Client) CreateAdvancedUserContentSearchV1(ctx context.Context, request 
 // GetAdvancedUserContentSearchV1 get Specified Advanced User Content Search object.
 //
 // Required privileges: read:pro:advanced-user-content-searches. Legacy Jamf Pro privilege name(s): Read Advanced User Content Searches.
+//
+// Parameters:
+//   - id: id of target Advanced User Content Search.
 func (c *Client) GetAdvancedUserContentSearchV1(ctx context.Context, id string) (*AdvancedUserContentSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AdvancedUserContentSearch
@@ -57,6 +60,9 @@ func (c *Client) GetAdvancedUserContentSearchV1(ctx context.Context, id string) 
 // UpdateAdvancedUserContentSearchV1 get Specified Advanced User Content Search object.
 //
 // Required privileges: update:pro:advanced-user-content-searches. Legacy Jamf Pro privilege name(s): Update Advanced User Content Searches.
+//
+// Parameters:
+//   - id: id of target Advanced User Content Search.
 func (c *Client) UpdateAdvancedUserContentSearchV1(ctx context.Context, id string, request *AdvancedUserContentSearch) (*AdvancedUserContentSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AdvancedUserContentSearch
@@ -70,6 +76,9 @@ func (c *Client) UpdateAdvancedUserContentSearchV1(ctx context.Context, id strin
 // DeleteAdvancedUserContentSearchV1 remove specified Advanced User Content Search object.
 //
 // Required privileges: delete:pro:advanced-user-content-searches. Legacy Jamf Pro privilege name(s): Delete Advanced User Content Searches.
+//
+// Parameters:
+//   - id: instance id of Advanced User Content Search record.
 func (c *Client) DeleteAdvancedUserContentSearchV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/advanced-user-content-searches/%s", prefix, url.PathEscape(id))

@@ -20,6 +20,11 @@ import (
 // ListCloudIdpV1 get information about all Cloud Identity Providers configurations.
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
+//     Multiple sort criteria are supported and must be separated with a comma.
+//     Example: sort=date:desc,name:asc.
 func (c *Client) ListCloudIdpV1(ctx context.Context, sort []string) ([]CloudIDPCommonResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]CloudIDPCommonResponse, bool, error) {
@@ -49,6 +54,23 @@ func (c *Client) ListCloudIdpV1(ctx context.Context, sort []string) ([]CloudIDPC
 // ExportCloudIdpV1 export Cloud Identity Providers collection.
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+//
+// Parameters:
+//   - exportFields: Export fields parameter, used to change default order or ignore some of the
+//     response properties. Default is empty array, which means that all fields of
+//     the response entity will be serialized. Example: export-fields=id,username.
+//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the
+//     exported file. Default is empty array, which means that response properties
+//     names will be used. Number of the provided labels must match the number of
+//     export-fields Example: export-labels=identifier,name with matching:
+//     export-fields=id,username.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:desc.
+//     Multiple sort criteria are supported and must be seperated with a comma.
+//     Example: sort=id:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection.
+//     Default filter is empty query - returning all results for the requested
+//     page. Fields allowed in the query: id, name. This param can be combined with
+//     paging and sorting. Example: name=="*department*".
 func (c *Client) ExportCloudIdpV1(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -78,6 +100,9 @@ func (c *Client) ExportCloudIdpV1(ctx context.Context, request *ExportParameters
 // GetCloudIdpV1 get Cloud Identity Provider configuration with given ID.
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+//
+// Parameters:
+//   - id: Cloud Identity Provider identifier.
 func (c *Client) GetCloudIdpV1(ctx context.Context, id string) (*CloudIDPCommon, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result CloudIDPCommon
@@ -91,6 +116,17 @@ func (c *Client) GetCloudIdpV1(ctx context.Context, id string) (*CloudIDPCommon,
 // ListCloudIdpHistoryV1 get Cloud Identity Provider history.
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+//
+// Parameters:
+//   - id: Cloud Identity Provider identifier.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
+//     date:desc. Multiple sort criteria are supported and must be separated with a
+//     comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection.
+//     Default filter is empty query - returning all results for the requested
+//     page. Fields allowed in the query: username, date, note, details. This param
+//     can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
 func (c *Client) ListCloudIdpHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -123,6 +159,9 @@ func (c *Client) ListCloudIdpHistoryV1(ctx context.Context, id string, sort []st
 // CreateCloudIdpHistoryNoteV1 add Cloud Identity Provider history note.
 //
 // Required privileges: update:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
+//
+// Parameters:
+//   - id: Cloud Identity Provider identifier.
 func (c *Client) CreateCloudIdpHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory
@@ -136,6 +175,9 @@ func (c *Client) CreateCloudIdpHistoryNoteV1(ctx context.Context, id string, req
 // TestCloudIdpGroupV1 get group test search.
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+//
+// Parameters:
+//   - id: Cloud Identity Provider identifier.
 func (c *Client) TestCloudIdpGroupV1(ctx context.Context, id string, request *GroupTestSearchRequest) (*GroupTestSearchResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GroupTestSearchResponse
@@ -149,6 +191,9 @@ func (c *Client) TestCloudIdpGroupV1(ctx context.Context, id string, request *Gr
 // TestCloudIdpUserV1 get user test search.
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+//
+// Parameters:
+//   - id: Cloud Identity Provider identifier.
 func (c *Client) TestCloudIdpUserV1(ctx context.Context, id string, request *UserTestSearchRequest) (*UserTestSearchResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserTestSearchResponse
@@ -162,6 +207,9 @@ func (c *Client) TestCloudIdpUserV1(ctx context.Context, id string, request *Use
 // TestCloudIdpUserMembershipV1 get membership test search.
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+//
+// Parameters:
+//   - id: Cloud Identity Provider identifier.
 func (c *Client) TestCloudIdpUserMembershipV1(ctx context.Context, id string, request *MembershipTestSearchRequest) (*MembershipTestSearchResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result MembershipTestSearchResponse

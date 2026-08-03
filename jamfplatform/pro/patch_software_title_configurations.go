@@ -46,6 +46,9 @@ func (c *Client) CreatePatchSoftwareTitleConfigurationV2(ctx context.Context, re
 // GetPatchSoftwareTitleConfigurationV2 retrieve Patch Software Title Configurations with the supplied id.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
 func (c *Client) GetPatchSoftwareTitleConfigurationV2(ctx context.Context, id string) (*PatchSoftwareTitleConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PatchSoftwareTitleConfiguration
@@ -59,6 +62,9 @@ func (c *Client) GetPatchSoftwareTitleConfigurationV2(ctx context.Context, id st
 // DeletePatchSoftwareTitleConfigurationV2 delete Patch Software Title Configurations with the supplied id.
 //
 // Required privileges: delete:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Delete Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
 func (c *Client) DeletePatchSoftwareTitleConfigurationV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
@@ -71,6 +77,9 @@ func (c *Client) DeletePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 // UpdatePatchSoftwareTitleConfigurationV2 update Patch Software Title Configurations.
 //
 // Required privileges: update:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
 func (c *Client) UpdatePatchSoftwareTitleConfigurationV2(ctx context.Context, id string, request *PatchSoftwareTitleConfigurationPatch) (*PatchSoftwareTitleConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PatchSoftwareTitleConfiguration
@@ -84,6 +93,9 @@ func (c *Client) UpdatePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 // GetPatchSoftwareTitleDashboardStatusV2 return whether or not the requested software title configuration is on the dashboard.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: software title configuration id.
 func (c *Client) GetPatchSoftwareTitleDashboardStatusV2(ctx context.Context, id string) (*SoftwareTitleConfigurationOnDashboard, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SoftwareTitleConfigurationOnDashboard
@@ -97,6 +109,9 @@ func (c *Client) GetPatchSoftwareTitleDashboardStatusV2(ctx context.Context, id 
 // AddPatchSoftwareTitleToDashboardV2 add a software title configuration to the dashboard.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: software title configuration id.
 func (c *Client) AddPatchSoftwareTitleToDashboardV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
@@ -109,6 +124,9 @@ func (c *Client) AddPatchSoftwareTitleToDashboardV2(ctx context.Context, id stri
 // RemovePatchSoftwareTitleFromDashboardV2 remove a software title configuration from the dashboard.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: software title configuration id.
 func (c *Client) RemovePatchSoftwareTitleFromDashboardV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
@@ -121,6 +139,17 @@ func (c *Client) RemovePatchSoftwareTitleFromDashboardV2(ctx context.Context, id
 // ListPatchSoftwareTitleDefinitionsV2 retrieve Patch Software Title Definitions with the supplied id.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title identifier.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
+//     absoluteOrderId:asc. Multiple sort criteria are supported and must be
+//     separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Patch Software Title Definition
+//     collection. Default filter is empty query - returning all results for the
+//     requested page. Fields allowed in the query: id, version,
+//     minimumOperatingSystem, releaseDate, reboot, standalone and absoluteOrderId.
+//     This param can be combined with paging and sorting.
 func (c *Client) ListPatchSoftwareTitleDefinitionsV2(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleDefinition, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleDefinition, bool, error) {
@@ -153,6 +182,9 @@ func (c *Client) ListPatchSoftwareTitleDefinitionsV2(ctx context.Context, id str
 // GetPatchSoftwareTitleDependenciesV2 retrieve list of Patch Software Title Configuration Dependencies.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configuration Id.
 func (c *Client) GetPatchSoftwareTitleDependenciesV2(ctx context.Context, id string) (*PatchSoftwareTitleConfigurationDependencies, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PatchSoftwareTitleConfigurationDependencies
@@ -166,6 +198,15 @@ func (c *Client) GetPatchSoftwareTitleDependenciesV2(ctx context.Context, id str
 // ExportPatchSoftwareTitleReportV2 export Patch Reporting Data.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
+//   - filter: Query in the RSQL format, allowing to filter Patch Report collection on
+//     version equality only. Default filter is empty query - returning all results
+//     for the requested page. Fields allowed in the query: version. Comparators
+//     allowed in the query: ==, != This param can be combined with paging and
+//     sorting.
+//   - columnsToExport: List of column names to export.
 func (c *Client) ExportPatchSoftwareTitleReportV2(ctx context.Context, id string, filter string, columnsToExport []string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []byte
@@ -189,6 +230,9 @@ func (c *Client) ExportPatchSoftwareTitleReportV2(ctx context.Context, id string
 // ListPatchSoftwareTitleExtensionAttributesV2 retrieve Software Title Extension Attributes with the supplied id.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title identifier.
 func (c *Client) ListPatchSoftwareTitleExtensionAttributesV2(ctx context.Context, id string) ([]PatchSoftwareTitleExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []PatchSoftwareTitleExtensionAttributes
@@ -202,6 +246,17 @@ func (c *Client) ListPatchSoftwareTitleExtensionAttributesV2(ctx context.Context
 // ListPatchSoftwareTitleHistoryV2 get specified Patch Software Title Configuration history object.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configuration Id.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
+//     date:desc. Multiple sort criteria are supported and must be separated with a
+//     comma.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection.
+//     Default filter is empty query - returning all results for the requested
+//     page. Fields allowed in the query: username, date, note, details. This param
+//     can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
 func (c *Client) ListPatchSoftwareTitleHistoryV2(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -234,6 +289,9 @@ func (c *Client) ListPatchSoftwareTitleHistoryV2(ctx context.Context, id string,
 // CreatePatchSoftwareTitleHistoryNoteV2 add Patch Software Title Configuration history object notes.
 //
 // Required privileges: update:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configuration Id.
 func (c *Client) CreatePatchSoftwareTitleHistoryNoteV2(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -247,6 +305,19 @@ func (c *Client) CreatePatchSoftwareTitleHistoryNoteV2(ctx context.Context, id s
 // ListPatchSoftwareTitlePatchReportV2 retrieve Patch Software Title Configuration Patch Report.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
+//     computerName:asc. Multiple sort criteria are supported and must be separated
+//     with a comma. Supported fields: computerName, deviceId, username,
+//     operatingSystemVersion, lastContactTime, buildingName, departmentName,
+//     siteName, version.
+//   - filter: Query in the RSQL format, allowing to filter Patch Report collection on
+//     version equality only. Default filter is empty query - returning all results
+//     for the requested page. Fields allowed in the query: version. Comparators
+//     allowed in the query: ==, != This param can be combined with paging and
+//     sorting.
 func (c *Client) ListPatchSoftwareTitlePatchReportV2(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleReport, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleReport, bool, error) {
@@ -279,6 +350,9 @@ func (c *Client) ListPatchSoftwareTitlePatchReportV2(ctx context.Context, id str
 // GetPatchSoftwareTitlePatchSummaryV2 return Active Patch Summary.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch id.
 func (c *Client) GetPatchSoftwareTitlePatchSummaryV2(ctx context.Context, id string) (*PatchSummary, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PatchSummary
@@ -292,6 +366,9 @@ func (c *Client) GetPatchSoftwareTitlePatchSummaryV2(ctx context.Context, id str
 // ListPatchSoftwareTitlePatchSummaryVersionsV2 returns patch versions.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch id.
 func (c *Client) ListPatchSoftwareTitlePatchSummaryVersionsV2(ctx context.Context, id string) ([]PatchSummaryVersion, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []PatchSummaryVersion

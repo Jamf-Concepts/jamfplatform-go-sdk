@@ -18,6 +18,9 @@ import (
 // GetClassByID finds classes by ID.
 //
 // Required privileges: read:pro:classes.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetClassByID(ctx context.Context, id string) (*Class, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Class
@@ -31,6 +34,9 @@ func (c *Client) GetClassByID(ctx context.Context, id string) (*Class, error) {
 // CreateClassByID creates a new class by ID.
 //
 // Required privileges: create:pro:classes.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateClassByID(ctx context.Context, id string, request *ClassPost) (*Class, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Class
@@ -44,6 +50,9 @@ func (c *Client) CreateClassByID(ctx context.Context, id string, request *ClassP
 // UpdateClassByID updates an existing class by ID.
 //
 // Required privileges: update:pro:classes.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateClassByID(ctx context.Context, id string, request *ClassPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateClassByID(ctx context.Context, id string, request *ClassP
 // DeleteClassByID deletes a class by ID.
 //
 // Required privileges: delete:pro:classes.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteClassByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteClassByID(ctx context.Context, id string) error {
 // GetClassByName finds classes by name.
 //
 // Required privileges: read:pro:classes.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetClassByName(ctx context.Context, name string) (*Class, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Class
@@ -81,6 +96,9 @@ func (c *Client) GetClassByName(ctx context.Context, name string) (*Class, error
 // UpdateClassByName updates an existing class by name.
 //
 // Required privileges: update:pro:classes.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateClassByName(ctx context.Context, name string, request *ClassPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateClassByName(ctx context.Context, name string, request *Cl
 // DeleteClassByName deletes a class by name.
 //
 // Required privileges: delete:pro:classes.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteClassByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,9 @@ func (c *Client) ListClasses(ctx context.Context) (*Classes, error) {
 // CreateClassByName creates a new class by ID.
 //
 // Required privileges: create:pro:classes.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateClassByName(ctx context.Context, name string, request *ClassPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))

@@ -57,6 +57,9 @@ func (c *Client) ReorderAppRequestFormInputFieldsV1(ctx context.Context, request
 // GetAppRequestFormInputFieldV1 get specified Form Input Field object.
 //
 // Required privileges: read:pro:app-request-settings. Legacy Jamf Pro privilege name(s): Read App Request Settings.
+//
+// Parameters:
+//   - id: Instance id of form input field record.
 func (c *Client) GetAppRequestFormInputFieldV1(ctx context.Context, id string) (*AppRequestFormInputField, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AppRequestFormInputField
@@ -70,6 +73,9 @@ func (c *Client) GetAppRequestFormInputFieldV1(ctx context.Context, id string) (
 // UpdateAppRequestFormInputFieldV1 update specified Form Input Field object.
 //
 // Required privileges: update:pro:app-request-settings. Legacy Jamf Pro privilege name(s): Update App Request Settings.
+//
+// Parameters:
+//   - id: Instance id of form input field record.
 func (c *Client) UpdateAppRequestFormInputFieldV1(ctx context.Context, id string, request *AppRequestFormInputField) (*AppRequestFormInputField, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AppRequestFormInputField
@@ -83,6 +89,9 @@ func (c *Client) UpdateAppRequestFormInputFieldV1(ctx context.Context, id string
 // DeleteAppRequestFormInputFieldV1 remove specified Form Input Field record.
 //
 // Required privileges: update:pro:app-request-settings. Legacy Jamf Pro privilege name(s): Update App Request Settings.
+//
+// Parameters:
+//   - id: Instance id of form input field record.
 func (c *Client) DeleteAppRequestFormInputFieldV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/app-request/form-input-fields/%s", prefix, url.PathEscape(id))

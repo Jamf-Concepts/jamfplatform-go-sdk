@@ -17,6 +17,9 @@ import (
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetPatchSoftwareTitleByID(ctx context.Context, id string) (*PatchSoftwareTitle, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchSoftwareTitle
@@ -32,6 +35,9 @@ func (c *Client) GetPatchSoftwareTitleByID(ctx context.Context, id string) (*Pat
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: create:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreatePatchSoftwareTitleByID(ctx context.Context, id string, request *PatchSoftwareTitle) (*PatchSoftwareTitle, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchSoftwareTitle
@@ -47,6 +53,9 @@ func (c *Client) CreatePatchSoftwareTitleByID(ctx context.Context, id string, re
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: update:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: ID value to update by.
 func (c *Client) UpdatePatchSoftwareTitleByID(ctx context.Context, id string, request *PatchSoftwareTitle) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchsoftwaretitles/id/%s", prefix, url.PathEscape(id))
@@ -61,6 +70,9 @@ func (c *Client) UpdatePatchSoftwareTitleByID(ctx context.Context, id string, re
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: delete:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: ID value to update by.
 func (c *Client) DeletePatchSoftwareTitleByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchsoftwaretitles/id/%s", prefix, url.PathEscape(id))

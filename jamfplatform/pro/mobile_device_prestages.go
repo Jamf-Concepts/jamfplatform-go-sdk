@@ -47,6 +47,9 @@ func (c *Client) ListAllMobileDevicePrestageSyncsV2(ctx context.Context) ([]Pres
 // GetMobileDevicePrestageScopeV2 get Device Scope for a specific Mobile Device Prestage.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) GetMobileDevicePrestageScopeV2(ctx context.Context, id string) (*PrestageScopeResponseV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
@@ -60,6 +63,9 @@ func (c *Client) GetMobileDevicePrestageScopeV2(ctx context.Context, id string) 
 // ReplaceMobileDevicePrestageScopeV2 replace Device Scope for a specific Mobile Device Prestage.
 //
 // Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) ReplaceMobileDevicePrestageScopeV2(ctx context.Context, id string, request *PrestageScopeUpdate) (*PrestageScopeResponseV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
@@ -73,6 +79,9 @@ func (c *Client) ReplaceMobileDevicePrestageScopeV2(ctx context.Context, id stri
 // AddToMobileDevicePrestageScopeV2 add Device Scope for a specific Mobile Device Prestage.
 //
 // Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) AddToMobileDevicePrestageScopeV2(ctx context.Context, id string, request *PrestageScopeUpdate) (*PrestageScopeResponseV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
@@ -86,6 +95,9 @@ func (c *Client) AddToMobileDevicePrestageScopeV2(ctx context.Context, id string
 // RemoveFromMobileDevicePrestageScopeV2 remove Device Scope for a specific Mobile Device Prestage.
 //
 // Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) RemoveFromMobileDevicePrestageScopeV2(ctx context.Context, id string, request *PrestageScopeUpdate) (*PrestageScopeResponseV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
@@ -99,6 +111,9 @@ func (c *Client) RemoveFromMobileDevicePrestageScopeV2(ctx context.Context, id s
 // ListMobileDevicePrestageSyncsV2 get all prestage sync states for a single prestage.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) ListMobileDevicePrestageSyncsV2(ctx context.Context, id string) ([]PrestageSyncStatusV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []PrestageSyncStatusV2
@@ -112,6 +127,9 @@ func (c *Client) ListMobileDevicePrestageSyncsV2(ctx context.Context, id string)
 // GetLatestMobileDevicePrestageSyncV2 get the latest Sync State for a single Prestage.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) GetLatestMobileDevicePrestageSyncV2(ctx context.Context, id string) (*PrestageSyncStatusV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result PrestageSyncStatusV2
@@ -127,6 +145,11 @@ func (c *Client) GetLatestMobileDevicePrestageSyncV2(ctx context.Context, id str
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example:
+//     sort=date:desc,name:asc.
 func (c *Client) ListMobileDevicePrestagesV2(ctx context.Context, sort []string) ([]GetMobileDevicePrestageV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GetMobileDevicePrestageV2, bool, error) {
@@ -156,6 +179,11 @@ func (c *Client) ListMobileDevicePrestagesV2(ctx context.Context, sort []string)
 // ListMobileDevicePrestagesV3 get sorted and paged Mobile Device Prestages.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example:
+//     sort=date:desc,name:asc.
 func (c *Client) ListMobileDevicePrestagesV3(ctx context.Context, sort []string) ([]GetMobileDevicePrestageV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GetMobileDevicePrestageV3, bool, error) {
@@ -215,6 +243,9 @@ func (c *Client) CreateMobileDevicePrestageV3(ctx context.Context, request *Mobi
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) GetMobileDevicePrestageV2(ctx context.Context, id string) (*GetMobileDevicePrestageV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result GetMobileDevicePrestageV2
@@ -228,6 +259,9 @@ func (c *Client) GetMobileDevicePrestageV2(ctx context.Context, id string) (*Get
 // GetMobileDevicePrestageV3 retrieve a Mobile Device Prestage with the supplied id.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) GetMobileDevicePrestageV3(ctx context.Context, id string) (*GetMobileDevicePrestageV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result GetMobileDevicePrestageV3
@@ -243,6 +277,9 @@ func (c *Client) GetMobileDevicePrestageV3(ctx context.Context, id string) (*Get
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) UpdateMobileDevicePrestageV2(ctx context.Context, id string, request *PutMobileDevicePrestageV2) (*GetMobileDevicePrestageV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result GetMobileDevicePrestageV2
@@ -256,6 +293,9 @@ func (c *Client) UpdateMobileDevicePrestageV2(ctx context.Context, id string, re
 // UpdateMobileDevicePrestageV3 update a Mobile Device Prestage.
 //
 // Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) UpdateMobileDevicePrestageV3(ctx context.Context, id string, request *PutMobileDevicePrestageV3) (*GetMobileDevicePrestageV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result GetMobileDevicePrestageV3
@@ -271,6 +311,9 @@ func (c *Client) UpdateMobileDevicePrestageV3(ctx context.Context, id string, re
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: delete:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) DeleteMobileDevicePrestageV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
@@ -283,6 +326,9 @@ func (c *Client) DeleteMobileDevicePrestageV2(ctx context.Context, id string) er
 // DeleteMobileDevicePrestageV3 delete a Mobile Device Prestage with the supplied id.
 //
 // Required privileges: delete:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) DeleteMobileDevicePrestageV3(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
@@ -297,6 +343,9 @@ func (c *Client) DeleteMobileDevicePrestageV3(ctx context.Context, id string) er
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) ListMobileDevicePrestageAttachmentsV2(ctx context.Context, id string) ([]FileAttachmentV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []FileAttachmentV2
@@ -310,6 +359,9 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV2(ctx context.Context, id s
 // ListMobileDevicePrestageAttachmentsV3 get attachments for a Mobile Device Prestage.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) ListMobileDevicePrestageAttachmentsV3(ctx context.Context, id string) ([]FileAttachmentV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result []FileAttachmentV3
@@ -325,6 +377,10 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV3(ctx context.Context, id s
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Identifier of the Mobile Device Prestage the attachment should be assigned
+//     to.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -347,6 +403,10 @@ func (c *Client) UploadMobileDevicePrestageAttachmentV2(ctx context.Context, id 
 // UploadMobileDevicePrestageAttachmentV3 add an attachment to a Mobile Device Prestage.
 //
 // Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Identifier of the Mobile Device Prestage the attachment should be assigned
+//     to.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -371,6 +431,9 @@ func (c *Client) UploadMobileDevicePrestageAttachmentV3(ctx context.Context, id 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: delete:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV2(ctx context.Context, id string, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments/delete-multiple", prefix, url.PathEscape(id))
@@ -383,6 +446,9 @@ func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV2(ctx context.Con
 // DeleteMultipleMobileDevicePrestageAttachmentsV3 remove an attachment for a Mobile Device Prestage.
 //
 // Required privileges: delete:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV3(ctx context.Context, id string, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments/delete-multiple", prefix, url.PathEscape(id))
@@ -397,6 +463,14 @@ func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV3(ctx context.Con
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
+//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is
+//     descending. Multiple sort criteria are supported and must be entered on
+//     separate lines in Swagger UI. In the URI the 'sort' query param is
+//     duplicated for each sort criterion, e.g.,
+//     ...&sort=name%2Casc&sort=date%2Cdesc.
 func (c *Client) ListMobileDevicePrestageHistoryV2(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -426,6 +500,14 @@ func (c *Client) ListMobileDevicePrestageHistoryV2(ctx context.Context, id strin
 // ListMobileDevicePrestageHistoryV3 get sorted and paged Mobile Device Prestage history objects.
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
+//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is
+//     descending. Multiple sort criteria are supported and must be entered on
+//     separate lines in Swagger UI. In the URI the 'sort' query param is
+//     duplicated for each sort criterion, e.g.,
+//     ...&sort=name%2Casc&sort=date%2Cdesc.
 func (c *Client) ListMobileDevicePrestageHistoryV3(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -457,6 +539,9 @@ func (c *Client) ListMobileDevicePrestageHistoryV3(ctx context.Context, id strin
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) CreateMobileDevicePrestageHistoryNoteV2(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result HrefResponse
@@ -470,6 +555,9 @@ func (c *Client) CreateMobileDevicePrestageHistoryNoteV2(ctx context.Context, id
 // CreateMobileDevicePrestageHistoryNoteV3 add Mobile Device Prestage history object notes.
 //
 // Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+//
+// Parameters:
+//   - id: Mobile Device Prestage identifier.
 func (c *Client) CreateMobileDevicePrestageHistoryNoteV3(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result HrefResponse

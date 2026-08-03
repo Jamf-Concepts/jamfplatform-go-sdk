@@ -18,6 +18,9 @@ import (
 // GetAdvancedUserSearchByID finds user searches by ID.
 //
 // Required privileges: read:pro:advanced-user-searches.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetAdvancedUserSearchByID(ctx context.Context, id string) (*AdvancedUserSearch, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedUserSearch
@@ -31,6 +34,9 @@ func (c *Client) GetAdvancedUserSearchByID(ctx context.Context, id string) (*Adv
 // CreateAdvancedUserSearchByID creates a new advanced user search by ID.
 //
 // Required privileges: create:pro:advanced-user-searches.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateAdvancedUserSearchByID(ctx context.Context, id string, request *AdvancedUserSearch) (*AdvancedUserSearch, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedUserSearch
@@ -44,6 +50,9 @@ func (c *Client) CreateAdvancedUserSearchByID(ctx context.Context, id string, re
 // UpdateAdvancedUserSearchByID updates an existing advanced user search by ID.
 //
 // Required privileges: update:pro:advanced-user-searches.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateAdvancedUserSearchByID(ctx context.Context, id string, request *AdvancedUserSearch) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedusersearches/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateAdvancedUserSearchByID(ctx context.Context, id string, re
 // DeleteAdvancedUserSearchByID deletes a user search by ID.
 //
 // Required privileges: delete:pro:advanced-user-searches.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteAdvancedUserSearchByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedusersearches/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteAdvancedUserSearchByID(ctx context.Context, id string) er
 // GetAdvancedUserSearchByName finds user searches by name.
 //
 // Required privileges: read:pro:advanced-user-searches.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetAdvancedUserSearchByName(ctx context.Context, name string) (*AdvancedUserSearch, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result AdvancedUserSearch
@@ -81,6 +96,9 @@ func (c *Client) GetAdvancedUserSearchByName(ctx context.Context, name string) (
 // DeleteAdvancedUserSearchByName deletes a user search by Name.
 //
 // Required privileges: delete:pro:advanced-user-searches.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) DeleteAdvancedUserSearchByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedusersearches/name/%s", prefix, url.PathEscape(name))
@@ -106,6 +124,9 @@ func (c *Client) ListAdvancedUserSearches(ctx context.Context) (*AdvancedUserSea
 // UpdateAdvancedUserSearchByName updates an existing advanced user search by name.
 //
 // Required privileges: update:pro:advanced-user-searches.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) UpdateAdvancedUserSearchByName(ctx context.Context, name string, request *AdvancedUserSearch) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedusersearches/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,9 @@ func (c *Client) UpdateAdvancedUserSearchByName(ctx context.Context, name string
 // CreateAdvancedUserSearchByName creates a new advanced user search by ID.
 //
 // Required privileges: create:pro:advanced-user-searches.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateAdvancedUserSearchByName(ctx context.Context, name string, request *AdvancedUserSearch) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedusersearches/name/%s", prefix, url.PathEscape(name))

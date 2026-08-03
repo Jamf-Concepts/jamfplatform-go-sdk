@@ -29,6 +29,14 @@ func (c *Client) DeleteLogFlush(ctx context.Context, request *Logflush) error {
 //
 // Required privileges: delete:pro:policies, execute:pro:flush-policy-logs.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - log: At this time, only 'policy' logs are supported.
+//     Allowed values: "policy".
+//   - id: ID of policy whose log will be flushed.
+//   - interval: Supported values are a combination of [Zero, One, Two, Three, Six] and
+//     [Days, Weeks, Months, Years]. For example,
+//     JSSResource/logflush/policies/id/1/interval/Three+Months.
 func (c *Client) DeleteLogFlushByLogIDInterval(ctx context.Context, log string, id string, interval string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/logflush/%s/id/%s/interval/%s", prefix, url.PathEscape(log), url.PathEscape(id), url.PathEscape(interval))
@@ -42,6 +50,13 @@ func (c *Client) DeleteLogFlushByLogIDInterval(ctx context.Context, log string, 
 //
 // Required privileges: delete:pro:policies, execute:pro:flush-policy-logs.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - log: At this time, only 'policy' logs are supported.
+//     Allowed values: "policy".
+//   - interval: Supported values are a combination of [Zero, One, Two, Three, Six] and
+//     [Days, Weeks, Months, Years]. For example,
+//     JSSResource/logflush/policies/interval/Three+Months.
 func (c *Client) DeleteLogFlushByLogInterval(ctx context.Context, log string, interval string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/logflush/%s/interval/%s", prefix, url.PathEscape(log), url.PathEscape(interval))

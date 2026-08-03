@@ -50,6 +50,16 @@ When Jamf publishes a new endpoint version, run `python3 tools/scripts/backfill_
 
 Endpoints marked `deprecated: true` in the spec are always emitted; the generator adds a `// Deprecated:` godoc line that includes the `x-deprecation-date` value (normalised to `YYYY-MM-DD`) so consumers see the removal window. There is no `skipDeprecated` knob — deprecation is opt-out by retaining the entry in config, opt-in (i.e. removed) by deleting it once Jamf drops the path.
 
+### Parameter documentation
+
+Each generated method carries a `// Parameters:` godoc list built from the spec's parameter objects (`parameterComment` in `methods.go`): the description, then `Allowed values:` when the schema declares an enum. Ordering follows the Go signature — path params, then the config-declared query params. Params the spec doesn't describe are skipped, as are params declared in `config.json` but absent from the spec.
+
+This is the only place a caller can learn what a `filter` or `sort` argument accepts: Jamf documents the RSQL-filterable and sortable field lists in the parameter description and nowhere else, so a bare `filter string` signature is unusable without the block. Same for Classic's `subset` path params, whose legal values (`General`, `Location`, `Purchasing`, …) are a path-param enum.
+
+Documentation only — parameter types stay exactly as config declares them. That is what makes it safe to quote enum values verbatim: Jamf's Classic enums include values unusable as Go identifiers (`Pending+Failed`, `EnableRemoteDesktop (macOS 10.14.4 and later)`) and one typo (`Hardwre`), all of which are still what the server accepts. Promoting any of these to typed constants needs a sanitiser first, and would change signatures — a separate decision, not something to bolt onto this pass.
+
+Spec prose is wrapped at 76 columns, paragraph by paragraph (blank-line separated), with HTML tags (`</br>`, `<br/>`) stripped and entities decoded. Angle-bracket placeholders like `<field_name>` are deliberately preserved — the tag stripper matches an explicit HTML tag allowlist, not a generic `<...>` pattern. Long descriptions are never truncated: a half-printed RSQL field list is worse than none, since the caller can't tell whether their field was in the dropped tail.
+
 ### Two-layer design
 
 - **`jamfplatform/`** — Exported package. Generated types, methods, and the handwritten `Client` with `tenantPrefix` helper. Methods call `c.transport.Do`/`DoExpect`/`DoWithContentType`.

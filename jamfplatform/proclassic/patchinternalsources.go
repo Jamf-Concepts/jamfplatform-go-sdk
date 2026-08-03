@@ -16,6 +16,9 @@ import (
 // GetPatchInternalSourceByID finds a patch internal source by ID.
 //
 // Required privileges: read:pro:patch-internal-source.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetPatchInternalSourceByID(ctx context.Context, id string) (*PatchInternalSource, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchInternalSource
@@ -29,6 +32,9 @@ func (c *Client) GetPatchInternalSourceByID(ctx context.Context, id string) (*Pa
 // GetPatchInternalSourceByName finds the first patch internal source with the name provided.
 //
 // Required privileges: read:pro:patch-internal-source.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetPatchInternalSourceByName(ctx context.Context, name string) (*PatchInternalSource, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchInternalSource

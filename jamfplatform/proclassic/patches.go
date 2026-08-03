@@ -17,6 +17,9 @@ import (
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetPatchByID(ctx context.Context, id string) (*SoftwareTitle, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SoftwareTitle
@@ -47,6 +50,9 @@ func (c *Client) CreatePatchByID(ctx context.Context, id string, request *Softwa
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: update:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: ID value to update by.
 func (c *Client) UpdatePatchByID(ctx context.Context, id string, request *SoftwareTitle) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
@@ -61,6 +67,9 @@ func (c *Client) UpdatePatchByID(ctx context.Context, id string, request *Softwa
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: delete:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeletePatchByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
@@ -90,6 +99,9 @@ func (c *Client) ListPatches(ctx context.Context) (*PatchManagementSoftwareTitle
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetPatchByName(ctx context.Context, name string) (*SoftwareTitle, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SoftwareTitle
@@ -105,6 +117,10 @@ func (c *Client) GetPatchByName(ctx context.Context, name string) (*SoftwareTitl
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: ID to filter by.
+//   - version: Version number to filter by.
 func (c *Client) GetPatchComputersByIDVersion(ctx context.Context, id string, version string) (*Computers, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computers

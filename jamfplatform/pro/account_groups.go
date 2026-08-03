@@ -20,6 +20,16 @@ import (
 // ListAccountGroupsV1 get account groups.
 //
 // Required privileges: read:pro:account-groups. Legacy Jamf Pro privilege name(s): Read Account Groups.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc.
+//     Multiple sort criteria are supported and must be separated with a comma.
+//     Accepts fields: id, name, siteId, ldapServerId.
+//   - filter: Query in the RSQL format to filter account groups collection. An empty query
+//     returns all results for the requested page. Supported fields: id, name,
+//     siteId, ldapServerId. Multiple conditions can be combined using logical
+//     operators. This parameter can be used with paging and sorting parameters.
+//     Example: name=="Admins" and siteId==-1.
 func (c *Client) ListAccountGroupsV1(ctx context.Context, sort []string, filter string) ([]AccountGroupV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]AccountGroupV1, bool, error) {
@@ -52,6 +62,9 @@ func (c *Client) ListAccountGroupsV1(ctx context.Context, sort []string, filter 
 // GetAccountGroupV1 gets the account group.
 //
 // Required privileges: read:pro:account-groups. Legacy Jamf Pro privilege name(s): Read Account Groups.
+//
+// Parameters:
+//   - id: id of target account group.
 func (c *Client) GetAccountGroupV1(ctx context.Context, id string) (*AccountGroupV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AccountGroupV1

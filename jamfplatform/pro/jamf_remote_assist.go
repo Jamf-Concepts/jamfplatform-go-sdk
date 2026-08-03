@@ -32,6 +32,9 @@ func (c *Client) ListJamfRemoteAssistSessionsV1(ctx context.Context) ([]SessionH
 // GetJamfRemoteAssistSessionV1 gets single session history item.
 //
 // Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
+//
+// Parameters:
+//   - id: instance id of session.
 func (c *Client) GetJamfRemoteAssistSessionV1(ctx context.Context, id string) (*SessionHistoryItemWithDetails, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SessionHistoryItemWithDetails
@@ -45,6 +48,16 @@ func (c *Client) GetJamfRemoteAssistSessionV1(ctx context.Context, id string) (*
 // ListJamfRemoteAssistSessionsV2 gets session history items.
 //
 // Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
+//     sessionId:desc. Multiple sort criteria are supported and must be separated
+//     with a comma. Example: sort=sessionId:desc,deviceId:asc.
+//   - filter: Query in the RSQL format, allowing to filter session history items
+//     collection. Default filter is empty query - returning all results for the
+//     requested page. Fields allowed in the query: sessionId, deviceId,
+//     sessionAdminId. This param can be combined with paging and sorting. Example:
+//     sessionAdminId=="*Andrzej*".
 func (c *Client) ListJamfRemoteAssistSessionsV2(ctx context.Context, sort []string, filter string) ([]SessionHistoryItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SessionHistoryItem, bool, error) {
@@ -90,6 +103,9 @@ func (c *Client) ExportJamfRemoteAssistSessionsV2(ctx context.Context, request *
 // GetJamfRemoteAssistSessionV2 gets single session history item.
 //
 // Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
+//
+// Parameters:
+//   - id: instance id of session.
 func (c *Client) GetJamfRemoteAssistSessionV2(ctx context.Context, id string) (*SessionHistoryItemWithDetails, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result SessionHistoryItemWithDetails

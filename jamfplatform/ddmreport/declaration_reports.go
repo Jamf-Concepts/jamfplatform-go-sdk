@@ -22,6 +22,11 @@ import (
 //
 // Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - declarationIdentifier: The declarationIdentifier present on a status report.
+//   - sort: Sorting criteria in the format: property,(asc|desc). Default sort order is
+//     ascending. Multiple sort criteria are supported.
 func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationIdentifier string, sort []string) ([]DeclarationReportClientDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeclarationReportClientDto, bool, error) {
@@ -52,6 +57,13 @@ func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationId
 //
 // Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - declarationIdentifier: The declarationIdentifier present on a status report.
+//   - filter: RSQL filter expression. Allowed fields: deviceId, channel, lastReportTime,
+//     active, validityState, declarationType, dateUpdated.
+//   - sort: Sorting criteria in the format: property,(asc|desc). Default sort order is
+//     ascending. Multiple sort criteria are supported.
 func (c *Client) ListDeclarationReportClientsFiltered(ctx context.Context, declarationIdentifier string, filter string, sort []string) ([]FilteredResultDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {

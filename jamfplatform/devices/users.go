@@ -19,6 +19,19 @@ import (
 // ListDevicesForUser get devices for a user.
 //
 // Required privileges: read:pro:devices.
+//
+// Parameters:
+//   - userID: Path parameter id.
+//   - sort: Fields to sort by and their orders. Fields allowed in the query: `id`,
+//     `name`, `model`, `modelIdentifier`, `serialNumber`,
+//     `lastInventoryUpdateTime`, `lastCheckInTime`, `operatingSystemVersion`,
+//     `userId`, `enrollmentType`, `lastEnrollmentTime`.
+//   - filter: Filter query in RSQL format. Includes all results, by default. Fields
+//     allowed in the query: `id`, `name`, `model`, `modelIdentifier`,
+//     `serialNumber`, `lastInventoryUpdateTime`, `lastCheckInTime`,
+//     `operatingSystemVersion`, `enrollmentType`, `lastEnrollmentTime`. Dates are
+//     specified in ISO 8601 format. Example: `name=="*iPhone*" and
+//     lastInventoryUpdateTime>="2025-01-31T18:09:00.000Z"`.
 func (c *Client) ListDevicesForUser(ctx context.Context, userID string, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {

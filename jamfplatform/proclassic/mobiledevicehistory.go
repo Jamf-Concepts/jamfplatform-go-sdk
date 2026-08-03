@@ -15,6 +15,9 @@ import (
 // GetMobileDeviceHistoryByID finds mobile device history by ID.
 //
 // Required privileges: read:pro:mobile-devices.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceHistoryByID(ctx context.Context, id string) (*MobileDeviceHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceHistory
@@ -28,6 +31,9 @@ func (c *Client) GetMobileDeviceHistoryByID(ctx context.Context, id string) (*Mo
 // GetMobileDeviceHistoryByName finds mobile device history by name.
 //
 // Required privileges: read:pro:mobile-devices.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetMobileDeviceHistoryByName(ctx context.Context, name string) (*MobileDeviceHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceHistory
@@ -41,6 +47,9 @@ func (c *Client) GetMobileDeviceHistoryByName(ctx context.Context, name string) 
 // GetMobileDeviceHistoryByUDID finds mobile device history by UDID.
 //
 // Required privileges: read:pro:mobile-devices.
+//
+// Parameters:
+//   - udid: UDID to filter by.
 func (c *Client) GetMobileDeviceHistoryByUDID(ctx context.Context, udid string) (*MobileDeviceHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceHistory
@@ -54,6 +63,9 @@ func (c *Client) GetMobileDeviceHistoryByUDID(ctx context.Context, udid string) 
 // GetMobileDeviceHistoryBySerialNumber finds mobile device history by serial number.
 //
 // Required privileges: read:pro:mobile-devices.
+//
+// Parameters:
+//   - serialNumber: Serial number to filter by.
 func (c *Client) GetMobileDeviceHistoryBySerialNumber(ctx context.Context, serialNumber string) (*MobileDeviceHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceHistory
@@ -67,6 +79,9 @@ func (c *Client) GetMobileDeviceHistoryBySerialNumber(ctx context.Context, seria
 // GetMobileDeviceHistoryByMacAddress finds mobile device history by wifi mac address.
 //
 // Required privileges: read:pro:mobile-devices.
+//
+// Parameters:
+//   - macAddress: Mac address to filter by.
 func (c *Client) GetMobileDeviceHistoryByMacAddress(ctx context.Context, macAddress string) (*MobileDeviceHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceHistory
@@ -80,6 +95,12 @@ func (c *Client) GetMobileDeviceHistoryByMacAddress(ctx context.Context, macAddr
 // GetMobileDeviceHistoryByIDSubset finds a subset of data for a mobile device history.
 //
 // Required privileges: read:pro:mobile-devices.
+//
+// Parameters:
+//   - id: ID to filter by.
+//   - subset: Subset to filter by.
+//     Allowed values: "General", "ManagementCommands", "UserLocation", "Audits",
+//     "Applications", "Ebooks".
 func (c *Client) GetMobileDeviceHistoryByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceHistory, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceHistory

@@ -99,6 +99,54 @@ func cleanComment(s string) string {
 	return s
 }
 
+// specHTMLTagRe matches the inline HTML fragments Jamf embeds in spec prose
+// (<br/>, </br>, <p>, <li>, …). Godoc has no HTML, so the tags are dropped.
+// The alternation is an explicit tag allowlist rather than a generic <...>
+// pattern because some descriptions use angle brackets as placeholder syntax
+// ("sort in the format <field_name>:asc") and those must survive.
+var specHTMLTagRe = regexp.MustCompile(`(?i)</?(br|p|div|span|ul|ol|li|b|i|em|strong|code|pre|a|table|tr|td|th)\b[^>]*>`)
+
+// specHTMLEntities decodes the handful of entities Jamf's spec prose uses.
+var specHTMLEntities = strings.NewReplacer(
+	"&amp;", "&", "&lt;", "<", "&gt;", ">", "&quot;", `"`, "&#39;", "'", "&nbsp;", " ",
+)
+
+// stripSpecHTML renders spec prose as plain text for godoc: known tags become
+// a space (so "a</br>b" doesn't fuse into "ab") and entities are decoded.
+// Whitespace normalisation is left to cleanComment.
+func stripSpecHTML(s string) string {
+	return specHTMLEntities.Replace(specHTMLTagRe.ReplaceAllString(s, " "))
+}
+
+// wrapCommentText greedily wraps s to width columns without splitting a word.
+// Needed for parameter documentation: a single Jamf description can run to
+// thousands of characters (the Pro list endpoints inline every sortable field
+// name), and cleanComment collapses it to one unreadable line.
+func wrapCommentText(s string, width int) []string {
+	words := strings.Fields(s)
+	if len(words) == 0 {
+		return nil
+	}
+	var (
+		lines []string
+		cur   strings.Builder
+	)
+	for _, w := range words {
+		switch {
+		case cur.Len() == 0:
+			cur.WriteString(w)
+		case cur.Len()+1+len(w) <= width:
+			cur.WriteByte(' ')
+			cur.WriteString(w)
+		default:
+			lines = append(lines, cur.String())
+			cur.Reset()
+			cur.WriteString(w)
+		}
+	}
+	return append(lines, cur.String())
+}
+
 func lowerFirst(s string) string {
 	if s == "" {
 		return s

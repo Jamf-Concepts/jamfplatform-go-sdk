@@ -15,6 +15,9 @@ import (
 // ListJamfPackagesV1 get the packages for a given Jamf application.
 //
 // Required privileges: read:pro:jamf-packages-action. Legacy Jamf Pro privilege name(s): Jamf Packages Action.
+//
+// Parameters:
+//   - application: The Jamf Application key. The only supported values are protect and connect.
 func (c *Client) ListJamfPackagesV1(ctx context.Context, application string) ([]JamfPackageResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []JamfPackageResponse
@@ -35,6 +38,9 @@ func (c *Client) ListJamfPackagesV1(ctx context.Context, application string) ([]
 // GetJamfPackageV2 get the packages for a given Jamf application.
 //
 // Required privileges: read:pro:jamf-packages-action. Legacy Jamf Pro privilege name(s): Jamf Packages Action.
+//
+// Parameters:
+//   - application: The Jamf Application key. The only supported values are protect and connect.
 func (c *Client) GetJamfPackageV2(ctx context.Context, application string) (*JamfApplicationResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result JamfApplicationResponse

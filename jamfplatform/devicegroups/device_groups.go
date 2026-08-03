@@ -20,6 +20,14 @@ import (
 // ListDeviceGroups get all device groups.
 //
 // Required privileges: read:pro:device-groups.
+//
+// Parameters:
+//   - sort: Fields to sort by and their orders. Fields allowed for sorting: `name`,
+//     `description`, `deviceType`, `groupType`.
+//   - filter: Filter query in RSQL format. Includes all results, by default. Fields
+//     allowed in the query: `name`, `description`, `deviceType`, `groupType`. This
+//     param can be combined with paging. Example: `name=="*Managed*" and
+//     deviceType=="MOBILE"`.
 func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter string) ([]DeviceGroupListReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceGroupListReadRepresentationV1, bool, error) {
@@ -64,6 +72,9 @@ func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCrea
 // GetDeviceGroup get a device group by ID.
 //
 // Required privileges: read:pro:device-groups.
+//
+// Parameters:
+//   - id: Path parameter id.
 func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	var result DeviceGroupReadRepresentationV1
@@ -77,6 +88,9 @@ func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupRea
 // UpdateDeviceGroup update a device group.
 //
 // Required privileges: update:pro:device-groups.
+//
+// Parameters:
+//   - id: Path parameter id.
 func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *DeviceGroupUpdateRepresentationV1) error {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
@@ -89,6 +103,9 @@ func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *Devi
 // DeleteDeviceGroup delete a device group.
 //
 // Required privileges: delete:pro:device-groups.
+//
+// Parameters:
+//   - id: Path parameter id.
 func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
@@ -101,6 +118,9 @@ func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
 // ListDeviceGroupMembers get group members.
 //
 // Required privileges: read:pro:device-groups.
+//
+// Parameters:
+//   - id: Path parameter id.
 func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]string, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))
@@ -118,6 +138,9 @@ func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]strin
 // UpdateDeviceGroupMembers update device group members.
 //
 // Required privileges: update:pro:device-groups.
+//
+// Parameters:
+//   - id: Path parameter id.
 func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, request *DeviceGroupMemberPatchRepresentationV1) error {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))

@@ -21,6 +21,14 @@ import (
 //
 // Required privileges: read:pro:blueprints, read:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format:
+//     `<field_name>[:sort_direction][,<secondary_sort_field_name>[:sort_direction]]*`.
+//     Default sort direction is `asc` (Ascending). Use `desc` for Descending
+//     ordering. Additional sort parameters are supported and determine order of
+//     results that have equivalent values for previous sort parameters.
+//   - search: Search query to match against `name` and `description` properties.
 func (c *Client) ListBlueprints(ctx context.Context, sort []string, search string) ([]BlueprintOverview, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]BlueprintOverview, bool, error) {
@@ -67,6 +75,9 @@ func (c *Client) CreateBlueprint(ctx context.Context, request *CreateBlueprintRe
 //
 // Required privileges: read:pro:blueprints, read:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - blueprintID: Blueprint ID.
 func (c *Client) GetBlueprint(ctx context.Context, blueprintID string) (*BlueprintDetail, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	var result BlueprintDetail
@@ -81,6 +92,9 @@ func (c *Client) GetBlueprint(ctx context.Context, blueprintID string) (*Bluepri
 //
 // Required privileges: update:pro:blueprints, update:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - blueprintID: Blueprint ID.
 func (c *Client) UpdateBlueprint(ctx context.Context, blueprintID string, request *UpdateBlueprintRequest) error {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(blueprintID))
@@ -94,6 +108,9 @@ func (c *Client) UpdateBlueprint(ctx context.Context, blueprintID string, reques
 //
 // Required privileges: delete:pro:blueprints, delete:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - blueprintID: Blueprint ID.
 func (c *Client) DeleteBlueprint(ctx context.Context, blueprintID string) error {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(blueprintID))
@@ -107,6 +124,9 @@ func (c *Client) DeleteBlueprint(ctx context.Context, blueprintID string) error 
 //
 // Required privileges: deploy:pro:blueprints, deploy:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - blueprintID: Blueprint ID.
 func (c *Client) DeployBlueprint(ctx context.Context, blueprintID string) error {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s/deploy", prefix, url.PathEscape(blueprintID))
@@ -120,6 +140,9 @@ func (c *Client) DeployBlueprint(ctx context.Context, blueprintID string) error 
 //
 // Required privileges: deploy:pro:blueprints, deploy:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - blueprintID: Blueprint ID.
 func (c *Client) UndeployBlueprint(ctx context.Context, blueprintID string) error {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s/undeploy", prefix, url.PathEscape(blueprintID))
@@ -133,6 +156,9 @@ func (c *Client) UndeployBlueprint(ctx context.Context, blueprintID string) erro
 //
 // Required privileges: read:pro:blueprints, read:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - blueprintID: Blueprint ID.
 func (c *Client) GetBlueprintReport(ctx context.Context, blueprintID string) (*BlueprintStatusDetail, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	var result BlueprintStatusDetail
@@ -173,6 +199,9 @@ func (c *Client) ListBlueprintComponents(ctx context.Context) ([]ComponentDescri
 //
 // Required privileges: read:pro:blueprints, read:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - identifier: Identifier of the component.
 func (c *Client) GetBlueprintComponent(ctx context.Context, identifier string) (*ComponentDescription, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
 	var result ComponentDescription

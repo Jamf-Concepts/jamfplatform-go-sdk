@@ -15,6 +15,9 @@ import (
 // GetComputerInvitationByID finds computer invitations by id.
 //
 // Required privileges: read:pro:computer-enrollment-invitations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetComputerInvitationByID(ctx context.Context, id string) (*ComputerInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerInvitation
@@ -28,6 +31,9 @@ func (c *Client) GetComputerInvitationByID(ctx context.Context, id string) (*Com
 // CreateComputerInvitationByID creates a new computer invitation by id.
 //
 // Required privileges: create:pro:computer-enrollment-invitations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateComputerInvitationByID(ctx context.Context, id string, request *ComputerInvitation) (*ComputerInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerInvitation
@@ -41,6 +47,9 @@ func (c *Client) CreateComputerInvitationByID(ctx context.Context, id string, re
 // DeleteComputerInvitationByID deletes a computer invitation by id.
 //
 // Required privileges: delete:pro:computer-enrollment-invitations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteComputerInvitationByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerinvitations/id/%s", prefix, url.PathEscape(id))
@@ -66,6 +75,9 @@ func (c *Client) ListComputerInvitations(ctx context.Context) (*ComputerInvitati
 // DeleteComputerInvitationByInvitation deletes a computer invitation by invitation.
 //
 // Required privileges: delete:pro:computer-enrollment-invitations.
+//
+// Parameters:
+//   - invitation: Invitation value to filter by.
 func (c *Client) DeleteComputerInvitationByInvitation(ctx context.Context, invitation string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerinvitations/invitation/%s", prefix, url.PathEscape(invitation))
@@ -78,6 +90,9 @@ func (c *Client) DeleteComputerInvitationByInvitation(ctx context.Context, invit
 // GetComputerInvitationByInvitation finds computer invitations by invitation.
 //
 // Required privileges: read:pro:computer-enrollment-invitations.
+//
+// Parameters:
+//   - invitation: Invitation value to filter by.
 func (c *Client) GetComputerInvitationByInvitation(ctx context.Context, invitation string) (*ComputerInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerInvitation
@@ -91,6 +106,9 @@ func (c *Client) GetComputerInvitationByInvitation(ctx context.Context, invitati
 // CreateComputerInvitationByInvitation creates a new computer invitation by invitation.
 //
 // Required privileges: create:pro:computer-enrollment-invitations.
+//
+// Parameters:
+//   - invitation: Invitation value to filter by.
 func (c *Client) CreateComputerInvitationByInvitation(ctx context.Context, invitation string, request *ComputerInvitation) (*ComputerInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerInvitation
@@ -104,6 +122,9 @@ func (c *Client) CreateComputerInvitationByInvitation(ctx context.Context, invit
 // GetComputerInvitationByName finds computer invitations by invitation.
 //
 // Required privileges: read:pro:computer-enrollment-invitations.
+//
+// Parameters:
+//   - name: Invitation value to filter by.
 func (c *Client) GetComputerInvitationByName(ctx context.Context, name string) (*ComputerInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerInvitation
@@ -117,6 +138,9 @@ func (c *Client) GetComputerInvitationByName(ctx context.Context, name string) (
 // CreateComputerInvitationByName creates a new computer invitation by invitation.
 //
 // Required privileges: create:pro:computer-enrollment-invitations.
+//
+// Parameters:
+//   - name: Invitation value to filter by.
 func (c *Client) CreateComputerInvitationByName(ctx context.Context, name string, request *ComputerInvitation) (*ComputerInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerInvitation
@@ -130,6 +154,9 @@ func (c *Client) CreateComputerInvitationByName(ctx context.Context, name string
 // DeleteComputerInvitationByName deletes a computer invitation by invitation.
 //
 // Required privileges: delete:pro:computer-enrollment-invitations.
+//
+// Parameters:
+//   - name: Invitation value to filter by.
 func (c *Client) DeleteComputerInvitationByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerinvitations/name/%s", prefix, url.PathEscape(name))

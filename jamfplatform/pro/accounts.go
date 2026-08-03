@@ -20,6 +20,23 @@ import (
 // ListAccountsV1 get user accounts.
 //
 // Required privileges: read:pro:accounts. Legacy Jamf Pro privilege name(s): Read Accounts.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
+//     username:desc. Multiple sort criteria are supported and must be separated
+//     with a comma. Accepts fields: id, lastPasswordChange, failedLoginAttempts,
+//     username, realname, email, phone, ldapServerId, distinguishedName, siteId,
+//     privilegeLevel, changePasswordOnNextLogin, accountStatus. If any other field
+//     is passed it will be ignored in sorting operation and/or create
+//     unpredictable results.
+//   - filter: Query in the RSQL format to filter user accounts collection. An empty query
+//     returns all results for the requested page. Supported fields: id,
+//     lastPasswordChange, failedLoginAttempts, username, realname, email, phone,
+//     ldapServerId, distinguishedName, siteId, privilegeLevel,
+//     changePasswordOnNextLogin, accountStatus. Multiple conditions can be
+//     combined using logical operators. This parameter can be used with paging and
+//     sorting parameters. Example: username=="admin" and accountStatus==Enabled
+//     and failedLoginAttempts==0.
 func (c *Client) ListAccountsV1(ctx context.Context, sort []string, filter string) ([]UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]UserAccount, bool, error) {
@@ -65,6 +82,9 @@ func (c *Client) CreateAccountV1(ctx context.Context, request *UserAccount) (*Us
 // GetAccountV1 gets the user account.
 //
 // Required privileges: read:pro:accounts. Legacy Jamf Pro privilege name(s): Read Accounts.
+//
+// Parameters:
+//   - id: id of target account.
 func (c *Client) GetAccountV1(ctx context.Context, id string) (*UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserAccount
@@ -78,6 +98,9 @@ func (c *Client) GetAccountV1(ctx context.Context, id string) (*UserAccount, err
 // DeleteAccountV1 deletes the user account.
 //
 // Required privileges: delete:pro:accounts. Legacy Jamf Pro privilege name(s): Delete Accounts.
+//
+// Parameters:
+//   - id: id of target account.
 func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/accounts/%s", prefix, url.PathEscape(id))
@@ -90,6 +113,9 @@ func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
 // UpdateAccountV1 updates the user account.
 //
 // Required privileges: update:pro:accounts. Legacy Jamf Pro privilege name(s): Update Accounts.
+//
+// Parameters:
+//   - id: id of target account.
 func (c *Client) UpdateAccountV1(ctx context.Context, id string, request *UserAccount) (*UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result UserAccount

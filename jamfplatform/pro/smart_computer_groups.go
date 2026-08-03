@@ -15,6 +15,9 @@ import (
 // RecalculateSmartComputerGroupV1 recalculate the smart group for the given id.
 //
 // Required privileges: update:pro:computer-groups. Legacy Jamf Pro privilege name(s): Update Smart Computer Groups.
+//
+// Parameters:
+//   - id: instance id of smart group.
 func (c *Client) RecalculateSmartComputerGroupV1(ctx context.Context, id string) (*RecalculationResults, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result RecalculationResults
@@ -28,6 +31,9 @@ func (c *Client) RecalculateSmartComputerGroupV1(ctx context.Context, id string)
 // RecalculateComputerSmartGroupsV1 recalculate a smart group for the given id.
 //
 // Required privileges: update:pro:computer-groups. Legacy Jamf Pro privilege name(s): Update Smart Computer Groups.
+//
+// Parameters:
+//   - id: id of computer.
 func (c *Client) RecalculateComputerSmartGroupsV1(ctx context.Context, id string) (*RecalculationResults, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result RecalculationResults

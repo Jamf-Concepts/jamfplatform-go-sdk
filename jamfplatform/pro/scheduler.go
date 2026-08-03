@@ -29,6 +29,16 @@ func (c *Client) GetSchedulerJobsV1(ctx context.Context) (*SchedulerJobs, error)
 // GetSchedulerJobTriggersV1 retrieve all triggers for a Jamf Pro Scheduler job.
 //
 // Required privileges: none (callable by any authenticated API client).
+//
+// Parameters:
+//   - jobKey: Jamf Pro Scheduler Job Key.
+//   - sort: Sorts results by one or more criteria, following the format
+//     property:asc/desc. Default sort is nextFireTime:asc. If using multiple
+//     criteria, separate with commas.
+//   - filter: Query in the RSQL format, allowing to filter the Jamf Pro Scheduler triggers
+//     collection. Default filter is empty query - returning all results for the
+//     requested page. Fields allowed in the query: triggerKey, previousFireTime,
+//     nextFireTime.
 func (c *Client) GetSchedulerJobTriggersV1(ctx context.Context, jobKey string, sort []string, filter string) (*SchedulerJob, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SchedulerJob

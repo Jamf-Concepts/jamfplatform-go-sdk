@@ -20,6 +20,18 @@ import (
 // ListUsersV1 retrieve users with pagination and filtering.
 //
 // Required privileges: read:pro:user. Legacy Jamf Pro privilege name(s): Read User.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property(:asc|desc). Default sort order is
+//     ascending. Multiple sort criteria are supported.
+//     Examples: - sort=username - sort=username:asc -
+//     sort=username:asc,realname:desc.
+//   - filter: RSQL filter to limit results. Supports all user fields.
+//     Examples: - filter=username=="john*" - filter=realname=="John Smith" -
+//     filter=email=="*@jamf.com" - filter=position=="Manager";id!="1" -
+//     filter=id=in=(123,456,789).
+//   - platform: Optional. Return platform identifiers instead of internal identifiers when
+//     set to true.
 func (c *Client) ListUsersV1(ctx context.Context, sort []string, filter string, platform bool) ([]User, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]User, bool, error) {
@@ -54,6 +66,9 @@ func (c *Client) ListUsersV1(ctx context.Context, sort []string, filter string, 
 // CreateUserV1 create a new user in inventory.
 //
 // Required privileges: create:pro:user. Legacy Jamf Pro privilege name(s): Create User.
+//
+// Parameters:
+//   - platform: Internal platform request indicator.
 func (c *Client) CreateUserV1(ctx context.Context, request *UserInventory, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result HrefResponse
@@ -74,6 +89,11 @@ func (c *Client) CreateUserV1(ctx context.Context, request *UserInventory, platf
 // GetUserV1 retrieve a user by ID.
 //
 // Required privileges: read:pro:user. Legacy Jamf Pro privilege name(s): Read User.
+//
+// Parameters:
+//   - id: ID of the user to retrieve.
+//   - platform: Optional. Return platform identifiers instead of internal identifiers when
+//     set to true.
 func (c *Client) GetUserV1(ctx context.Context, id string, platform bool) (*User, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result User
@@ -94,6 +114,9 @@ func (c *Client) GetUserV1(ctx context.Context, id string, platform bool) (*User
 // UpdateUserV1 update a user in inventory.
 //
 // Required privileges: update:pro:user. Legacy Jamf Pro privilege name(s): Update User.
+//
+// Parameters:
+//   - id: ID of the user to update.
 func (c *Client) UpdateUserV1(ctx context.Context, id string, request *UserInventory) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/users/%s", prefix, url.PathEscape(id))
@@ -106,6 +129,9 @@ func (c *Client) UpdateUserV1(ctx context.Context, id string, request *UserInven
 // DeleteUserV1 delete a user from inventory.
 //
 // Required privileges: delete:pro:user. Legacy Jamf Pro privilege name(s): Delete User.
+//
+// Parameters:
+//   - id: ID of the user to delete.
 func (c *Client) DeleteUserV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/users/%s", prefix, url.PathEscape(id))

@@ -20,6 +20,15 @@ import (
 // ListApiRolesV1 get the current Jamf API Roles.
 //
 // Required privileges: read:pro:api-roles. Legacy Jamf Pro privilege name(s): Read API Roles.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc.
+//     Multiple sort criteria are supported and must be separated with a comma.
+//     Fields allowed in the query: id, displayName. Example:
+//     sort=displayName:desc.
+//   - filter: Query in the RSQL format, allowing to filter app titles collection. Default
+//     filter is empty query - returning all results for the requested page. Fields
+//     allowed in the query: id, displayName. Example: displayName=="*myRole*".
 func (c *Client) ListApiRolesV1(ctx context.Context, sort []string, filter string) ([]ApiRole, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ApiRole, bool, error) {
@@ -65,6 +74,9 @@ func (c *Client) CreateApiRoleV1(ctx context.Context, request *ApiRoleRequest) (
 // GetApiRoleV1 get the specific Jamf API Role.
 //
 // Required privileges: read:pro:api-roles. Legacy Jamf Pro privilege name(s): Read API Roles.
+//
+// Parameters:
+//   - id: instance id of API role.
 func (c *Client) GetApiRoleV1(ctx context.Context, id string) (*ApiRole, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ApiRole
@@ -78,6 +90,9 @@ func (c *Client) GetApiRoleV1(ctx context.Context, id string) (*ApiRole, error) 
 // UpdateApiRoleV1 update API Integrations Role.
 //
 // Required privileges: update:pro:api-roles. Legacy Jamf Pro privilege name(s): Update API Roles.
+//
+// Parameters:
+//   - id: instance id of API role.
 func (c *Client) UpdateApiRoleV1(ctx context.Context, id string, request *ApiRoleRequest) (*ApiRole, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ApiRole
@@ -91,6 +106,9 @@ func (c *Client) UpdateApiRoleV1(ctx context.Context, id string, request *ApiRol
 // DeleteApiRoleV1 delete API Integrations Role.
 //
 // Required privileges: delete:pro:api-roles. Legacy Jamf Pro privilege name(s): Delete API Roles.
+//
+// Parameters:
+//   - id: instance id of API role.
 func (c *Client) DeleteApiRoleV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/api-roles/%s", prefix, url.PathEscape(id))

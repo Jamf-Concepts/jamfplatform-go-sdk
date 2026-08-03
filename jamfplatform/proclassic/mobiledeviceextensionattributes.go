@@ -18,6 +18,9 @@ import (
 // GetMobileDeviceExtensionAttributeByID finds mobile device extension attributes by ID.
 //
 // Required privileges: read:pro:mobile-device-extension-attributes.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceExtensionAttributeByID(ctx context.Context, id string) (*MobileDeviceExtensionAttribute, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceExtensionAttribute
@@ -31,6 +34,9 @@ func (c *Client) GetMobileDeviceExtensionAttributeByID(ctx context.Context, id s
 // CreateMobileDeviceExtensionAttributeByID creates a new mobile device extension attribute by ID.
 //
 // Required privileges: create:pro:mobile-device-extension-attributes.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceExtensionAttributeByID(ctx context.Context, id string, request *MobileDeviceExtensionAttribute) (*MobileDeviceExtensionAttribute, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceExtensionAttribute
@@ -44,6 +50,9 @@ func (c *Client) CreateMobileDeviceExtensionAttributeByID(ctx context.Context, i
 // UpdateMobileDeviceExtensionAttributeByID updates an existing mobile device extension attribute by ID.
 //
 // Required privileges: update:pro:mobile-device-extension-attributes.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateMobileDeviceExtensionAttributeByID(ctx context.Context, id string, request *MobileDeviceExtensionAttribute) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateMobileDeviceExtensionAttributeByID(ctx context.Context, i
 // DeleteMobileDeviceExtensionAttributeByID deletes a mobile device extension attribute by ID.
 //
 // Required privileges: delete:pro:mobile-device-extension-attributes.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceExtensionAttributeByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteMobileDeviceExtensionAttributeByID(ctx context.Context, i
 // GetMobileDeviceExtensionAttributeByName finds mobiledeviceextensionattributes by name.
 //
 // Required privileges: read:pro:mobile-device-extension-attributes.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetMobileDeviceExtensionAttributeByName(ctx context.Context, name string) (*MobileDeviceExtensionAttribute, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceExtensionAttribute
@@ -81,6 +96,9 @@ func (c *Client) GetMobileDeviceExtensionAttributeByName(ctx context.Context, na
 // UpdateMobileDeviceExtensionAttributeByName updates an existing mobile device extension attribute by name.
 //
 // Required privileges: update:pro:mobile-device-extension-attributes.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceExtensionAttributeByName(ctx context.Context, name string, request *MobileDeviceExtensionAttribute) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateMobileDeviceExtensionAttributeByName(ctx context.Context,
 // DeleteMobileDeviceExtensionAttributeByName deletes a mobile device extension attribute by name.
 //
 // Required privileges: delete:pro:mobile-device-extension-attributes.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceExtensionAttributeByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,9 @@ func (c *Client) ListMobileDeviceExtensionAttributes(ctx context.Context) (*Mobi
 // CreateMobileDeviceExtensionAttributeByName creates a new mobile device extension attribute by ID.
 //
 // Required privileges: create:pro:mobile-device-extension-attributes.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateMobileDeviceExtensionAttributeByName(ctx context.Context, name string, request *MobileDeviceExtensionAttribute) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))

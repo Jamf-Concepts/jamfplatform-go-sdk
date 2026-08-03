@@ -15,6 +15,9 @@ import (
 // GetPatchPolicyByID finds a patch policy by ID.
 //
 // Required privileges: read:pro:patch-policies.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetPatchPolicyByID(ctx context.Context, id string) (*PatchPolicy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchPolicy
@@ -28,6 +31,9 @@ func (c *Client) GetPatchPolicyByID(ctx context.Context, id string) (*PatchPolic
 // CreatePatchPolicyBySoftwareTitleConfigID create a new patch policy associated with a patch software title configuration ID.
 //
 // Required privileges: create:pro:patch-policies.
+//
+// Parameters:
+//   - softwareTitleConfigID: Patch software title config ID value to filter by.
 func (c *Client) CreatePatchPolicyBySoftwareTitleConfigID(ctx context.Context, softwareTitleConfigID string, request *PatchPolicy) (*PatchPolicy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchPolicy
@@ -41,6 +47,9 @@ func (c *Client) CreatePatchPolicyBySoftwareTitleConfigID(ctx context.Context, s
 // UpdatePatchPolicyByID updates an existing patch policy by ID.
 //
 // Required privileges: update:pro:patch-policies.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdatePatchPolicyByID(ctx context.Context, id string, request *PatchPolicy) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchpolicies/id/%s", prefix, url.PathEscape(id))
@@ -53,6 +62,9 @@ func (c *Client) UpdatePatchPolicyByID(ctx context.Context, id string, request *
 // DeletePatchPolicyByID deletes a patch policy by ID.
 //
 // Required privileges: delete:pro:patch-policies.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeletePatchPolicyByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchpolicies/id/%s", prefix, url.PathEscape(id))
@@ -67,6 +79,9 @@ func (c *Client) DeletePatchPolicyByID(ctx context.Context, id string) error {
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-policies.
+//
+// Parameters:
+//   - softwareTitleConfigID: Patch software title config ID value to filter by.
 func (c *Client) ListPatchPoliciesBySoftwareTitleConfigID(ctx context.Context, softwareTitleConfigID string) (*PatchPolicy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchPolicy
@@ -95,6 +110,11 @@ func (c *Client) ListPatchPolicies(ctx context.Context) (*PatchPolicies, error) 
 // GetPatchPolicyByIDSubset display subsets of information for a patch policy.
 //
 // Required privileges: read:pro:patch-policies.
+//
+// Parameters:
+//   - id: ID to filter by.
+//   - subset: Subset to filter by.
+//     Allowed values: "General", "Scope", "UserInteraction".
 func (c *Client) GetPatchPolicyByIDSubset(ctx context.Context, id string, subset string) (*PatchPolicy, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchPolicy

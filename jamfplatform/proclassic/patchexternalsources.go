@@ -18,6 +18,9 @@ import (
 // GetPatchExternalSourceByID finds a patch external source by ID.
 //
 // Required privileges: read:pro:patch-external-source.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetPatchExternalSourceByID(ctx context.Context, id string) (*PatchExternalSource, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchExternalSource
@@ -31,6 +34,9 @@ func (c *Client) GetPatchExternalSourceByID(ctx context.Context, id string) (*Pa
 // CreatePatchExternalSourceByID create a new patch external source by ID.
 //
 // Required privileges: create:pro:patch-external-source.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreatePatchExternalSourceByID(ctx context.Context, id string, request *PatchExternalSource) (*PatchExternalSource, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchExternalSource
@@ -44,6 +50,9 @@ func (c *Client) CreatePatchExternalSourceByID(ctx context.Context, id string, r
 // UpdatePatchExternalSourceByID updates a patch external source by ID.
 //
 // Required privileges: update:pro:patch-external-source.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdatePatchExternalSourceByID(ctx context.Context, id string, request *PatchExternalSource) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchexternalsources/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdatePatchExternalSourceByID(ctx context.Context, id string, r
 // DeletePatchExternalSourceByID deletes a patch external source by ID.
 //
 // Required privileges: delete:pro:patch-external-source.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeletePatchExternalSourceByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchexternalsources/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeletePatchExternalSourceByID(ctx context.Context, id string) e
 // GetPatchExternalSourceByName finds the first patch external source with the name provided.
 //
 // Required privileges: read:pro:patch-external-source.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetPatchExternalSourceByName(ctx context.Context, name string) (*PatchExternalSource, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchExternalSource
@@ -94,6 +109,9 @@ func (c *Client) ListPatchExternalSources(ctx context.Context) (*PatchExternalSo
 // CreatePatchExternalSourceByName create a new patch external source by name.
 //
 // Required privileges: create:pro:patch-external-source.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) CreatePatchExternalSourceByName(ctx context.Context, name string, request *PatchExternalSource) (*PatchExternalSource, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchExternalSource
@@ -107,6 +125,9 @@ func (c *Client) CreatePatchExternalSourceByName(ctx context.Context, name strin
 // UpdatePatchExternalSourceByName updates a patch external source by name.
 //
 // Required privileges: update:pro:patch-external-source.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) UpdatePatchExternalSourceByName(ctx context.Context, name string, request *PatchExternalSource) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))
@@ -119,6 +140,9 @@ func (c *Client) UpdatePatchExternalSourceByName(ctx context.Context, name strin
 // DeletePatchExternalSourceByName deletes a patch external source by ID.
 //
 // Required privileges: delete:pro:patch-external-source.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) DeletePatchExternalSourceByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))

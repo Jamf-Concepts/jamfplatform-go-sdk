@@ -17,6 +17,9 @@ import (
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetComputerByID(ctx context.Context, id string) (*Computer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computer
@@ -32,6 +35,9 @@ func (c *Client) GetComputerByID(ctx context.Context, id string) (*Computer, err
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetComputerByName(ctx context.Context, name string) (*Computer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computer
@@ -47,6 +53,9 @@ func (c *Client) GetComputerByName(ctx context.Context, name string) (*Computer,
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - serialNumber: Serial number to filter by.
 func (c *Client) GetComputerBySerialNumber(ctx context.Context, serialNumber string) (*Computer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computer
@@ -61,6 +70,9 @@ func (c *Client) GetComputerBySerialNumber(ctx context.Context, serialNumber str
 //
 // Required privileges: create:pro:computers, create:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateComputerByID(ctx context.Context, id string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
@@ -76,6 +88,9 @@ func (c *Client) CreateComputerByID(ctx context.Context, id string, request *Com
 //
 // Required privileges: update:pro:computers, update:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateComputerByID(ctx context.Context, id string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
@@ -91,6 +106,9 @@ func (c *Client) UpdateComputerByID(ctx context.Context, id string, request *Com
 //
 // Required privileges: update:pro:computers, update:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateComputerByName(ctx context.Context, name string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/name/%s", prefix, url.PathEscape(name))
@@ -103,6 +121,9 @@ func (c *Client) UpdateComputerByName(ctx context.Context, name string, request 
 // DeleteComputerByID deletes a computer by ID.
 //
 // Required privileges: delete:pro:computers.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteComputerByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
@@ -117,6 +138,9 @@ func (c *Client) DeleteComputerByID(ctx context.Context, id string) error {
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: delete:pro:computers.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteComputerByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/name/%s", prefix, url.PathEscape(name))
@@ -131,6 +155,9 @@ func (c *Client) DeleteComputerByName(ctx context.Context, name string) error {
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: delete:pro:computers.
+//
+// Parameters:
+//   - serialNumber: Serial number value to filter by.
 func (c *Client) DeleteComputerBySerialNumber(ctx context.Context, serialNumber string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/serialnumber/%s", prefix, url.PathEscape(serialNumber))
@@ -160,6 +187,13 @@ func (c *Client) ListComputers(ctx context.Context) (*Computers, error) {
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - id: ID to filter by.
+//   - subset: Subset to filter by.
+//     Allowed values: "General", "Location", "Purchasing", "Peripherals",
+//     "Hardware", "Certificates", "Software", "ExtensionAttributes",
+//     "GroupsAccounts", "iphones", "ConfigurationProfiles".
 func (c *Client) GetComputerByIDSubset(ctx context.Context, id string, subset string) (*Computer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computer
@@ -175,6 +209,9 @@ func (c *Client) GetComputerByIDSubset(ctx context.Context, id string, subset st
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - macaddress: Mac address to filter by.
 func (c *Client) GetComputerByMacAddress(ctx context.Context, macaddress string) (*Computer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computer
@@ -190,6 +227,9 @@ func (c *Client) GetComputerByMacAddress(ctx context.Context, macaddress string)
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - udid: UDID to filter by.
 func (c *Client) GetComputerByUDID(ctx context.Context, udid string) (*Computer, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computer
@@ -220,6 +260,11 @@ func (c *Client) GetComputersBasic(ctx context.Context) (*ComputersBasic, error)
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - match: Name, mac address, etc. to filter by. Match uses the same format as the
+//     general search in Jamf Pro. For instance, admin* can be used to match
+//     computer names that begin with admin.
 func (c *Client) MatchComputers(ctx context.Context, match string) (*Computers, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computers
@@ -235,6 +280,9 @@ func (c *Client) MatchComputers(ctx context.Context, match string) (*Computers, 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - matchName: Name to filter by.
 func (c *Client) MatchComputersByName(ctx context.Context, matchName string) (*Computers, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Computers
@@ -249,6 +297,9 @@ func (c *Client) MatchComputersByName(ctx context.Context, matchName string) (*C
 //
 // Required privileges: create:pro:computers, create:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateComputerByName(ctx context.Context, name string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/name/%s", prefix, url.PathEscape(name))
@@ -262,6 +313,9 @@ func (c *Client) CreateComputerByName(ctx context.Context, name string, request 
 //
 // Required privileges: create:pro:computers, create:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - serialNumber: ID value to filter by.
 func (c *Client) CreateComputerBySerialNumber(ctx context.Context, serialNumber string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/serialnumber/%s", prefix, url.PathEscape(serialNumber))
@@ -275,6 +329,9 @@ func (c *Client) CreateComputerBySerialNumber(ctx context.Context, serialNumber 
 //
 // Required privileges: create:pro:computers, create:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - macaddress: ID value to filter by.
 func (c *Client) CreateComputerByMacAddress(ctx context.Context, macaddress string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
@@ -288,6 +345,9 @@ func (c *Client) CreateComputerByMacAddress(ctx context.Context, macaddress stri
 //
 // Required privileges: create:pro:computers, create:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - udid: ID value to filter by.
 func (c *Client) CreateComputerByUDID(ctx context.Context, udid string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
@@ -303,6 +363,9 @@ func (c *Client) CreateComputerByUDID(ctx context.Context, udid string, request 
 //
 // Required privileges: update:pro:computers, update:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - serialNumber: Serial number value to filter by.
 func (c *Client) UpdateComputerBySerialNumber(ctx context.Context, serialNumber string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/serialnumber/%s", prefix, url.PathEscape(serialNumber))
@@ -318,6 +381,9 @@ func (c *Client) UpdateComputerBySerialNumber(ctx context.Context, serialNumber 
 //
 // Required privileges: update:pro:computers, update:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - macaddress: MAC address value to filter by.
 func (c *Client) UpdateComputerByMacAddress(ctx context.Context, macaddress string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
@@ -333,6 +399,9 @@ func (c *Client) UpdateComputerByMacAddress(ctx context.Context, macaddress stri
 //
 // Required privileges: update:pro:computers, update:pro:users.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - udid: UDID value to filter by.
 func (c *Client) UpdateComputerByUDID(ctx context.Context, udid string, request *ComputerPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
@@ -347,6 +416,9 @@ func (c *Client) UpdateComputerByUDID(ctx context.Context, udid string, request 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: delete:pro:computers.
+//
+// Parameters:
+//   - macaddress: MAC address value to filter by.
 func (c *Client) DeleteComputerByMacAddress(ctx context.Context, macaddress string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
@@ -361,6 +433,9 @@ func (c *Client) DeleteComputerByMacAddress(ctx context.Context, macaddress stri
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: delete:pro:computers.
+//
+// Parameters:
+//   - udid: UDID value to filter by.
 func (c *Client) DeleteComputerByUDID(ctx context.Context, udid string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))

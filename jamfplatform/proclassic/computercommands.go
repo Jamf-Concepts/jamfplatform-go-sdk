@@ -15,6 +15,9 @@ import (
 // GetComputerCommandByUUID finds a computer command by UUID.
 //
 // Required privileges: read:pro:computer-commands.
+//
+// Parameters:
+//   - uuid: UUID to filter by.
 func (c *Client) GetComputerCommandByUUID(ctx context.Context, uuid string) (*ComputerCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerCommand
@@ -28,6 +31,12 @@ func (c *Client) GetComputerCommandByUUID(ctx context.Context, uuid string) (*Co
 // IssueComputerCommandByID creates a new computer command using command name and device IDs.
 //
 // Required privileges: create:pro:computer-commands.
+//
+// Parameters:
+//   - command: Command to send (EnableRemoteDesktop and DisableRemoteDesktop require macOS
+//     10.14.4).
+//     Allowed values: "EnableRemoteDesktop", "DisableRemoteDesktop".
+//   - id: Computer ID - supports comma separated values (e.g. id/8,10,55).
 func (c *Client) IssueComputerCommandByID(ctx context.Context, command string, id string, request *ComputerCommandPost) (*ComputerCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerCommand
@@ -41,6 +50,9 @@ func (c *Client) IssueComputerCommandByID(ctx context.Context, command string, i
 // GetComputerCommandByName finds all computer commands by name.
 //
 // Required privileges: read:pro:computer-commands.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetComputerCommandByName(ctx context.Context, name string) (*ComputerCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerCommand
@@ -67,6 +79,10 @@ func (c *Client) ListComputerCommands(ctx context.Context) (*ComputerCommands, e
 // CreateComputerCommandByCommand creates a new computer command using command name.
 //
 // Required privileges: create:pro:computer-commands.
+//
+// Parameters:
+//   - command: Allowed values: "EnableRemoteDesktop (macOS 10.14.4 and later)",
+//     "DisableRemoteDesktop (macOS 10.14.4 and later)".
 func (c *Client) CreateComputerCommandByCommand(ctx context.Context, command string, request *ComputerCommandPost) (*ComputerCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerCommand
@@ -80,6 +96,9 @@ func (c *Client) CreateComputerCommandByCommand(ctx context.Context, command str
 // GetComputerCommandsByCommand finds all computer commands by name.
 //
 // Required privileges: read:pro:computer-commands.
+//
+// Parameters:
+//   - command: Name to filter by.
 func (c *Client) GetComputerCommandsByCommand(ctx context.Context, command string) (*ComputerCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerCommand
@@ -93,6 +112,9 @@ func (c *Client) GetComputerCommandsByCommand(ctx context.Context, command strin
 // GetComputerCommandsByStatus finds a computer command by UUID.
 //
 // Required privileges: read:pro:computer-commands.
+//
+// Parameters:
+//   - uuid: UUID to filter by.
 func (c *Client) GetComputerCommandsByStatus(ctx context.Context, uuid string) (*ComputerCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerCommand

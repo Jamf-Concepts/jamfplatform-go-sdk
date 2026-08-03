@@ -16,6 +16,9 @@ import (
 //
 // Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups, read:pro:computers, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Computers, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: Device Platform ID.
 func (c *Client) GetDeviceGroupsForDeviceV1(ctx context.Context, id string) ([]DeviceGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []DeviceGroup

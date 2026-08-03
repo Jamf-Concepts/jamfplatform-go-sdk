@@ -45,6 +45,16 @@ func (c *Client) UpdateDeviceCommunicationSettingsV1(ctx context.Context, reques
 // ListDeviceCommunicationSettingsHistoryV1 get Device Communication settings history.
 //
 // Required privileges: read:pro:automatically-renew-mdm-profile-settings. Legacy Jamf Pro privilege name(s): Read Automatically Renew MDM Profile Settings.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is
+//     date:desc. Multiple sort criteria are supported and must be separated with a
+//     comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection.
+//     Default filter is empty query - returning all results for the requested
+//     page. Fields allowed in the query: username, date, note, details. This param
+//     can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
 func (c *Client) ListDeviceCommunicationSettingsHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

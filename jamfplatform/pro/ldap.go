@@ -15,6 +15,9 @@ import (
 // SearchLdapGroupsPreview retrieve the configured access groups that contain the text in the search param.
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+//
+// Parameters:
+//   - q: Will perform a "contains" search on the names of access groups.
 func (c *Client) SearchLdapGroupsPreview(ctx context.Context, q string) (*LdapGroupSearchResults, error) {
 	prefix := c.transport.TenantPrefix("pro", "")
 	var result LdapGroupSearchResults
@@ -48,6 +51,9 @@ func (c *Client) ListLdapServersPreview(ctx context.Context) ([]LdapServer, erro
 // SearchLdapGroupsV1 retrieve the configured access groups that contain the text in the search param.
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+//
+// Parameters:
+//   - q: Will perform a "contains" search on the names of access groups.
 func (c *Client) SearchLdapGroupsV1(ctx context.Context, q string) (*LdapGroupSearchResults, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result LdapGroupSearchResults

@@ -47,6 +47,9 @@ func (c *Client) InitiateJCDSUploadV1(ctx context.Context) (*Credentials, error)
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-08-28) and may be removed in a future release.
 //
 // Required privileges: read:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
+//
+// Parameters:
+//   - fileName: Name of the file stored in the Jamf Cloud Distribution Service.
 func (c *Client) GetJCDSFileDownloadURLV1(ctx context.Context, fileName string) (*DownloadURL, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DownloadURL
@@ -62,6 +65,10 @@ func (c *Client) GetJCDSFileDownloadURLV1(ctx context.Context, fileName string) 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-08-28) and may be removed in a future release.
 //
 // Required privileges: delete:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Delete Jamf Cloud Distribution Service Files.
+//
+// Parameters:
+//   - fileName: Name of the file that will be deleted from the Jamf Cloud Distribution
+//     Service.
 func (c *Client) DeleteJCDSFileV1(ctx context.Context, fileName string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/jcds/files/%s", prefix, url.PathEscape(fileName))
@@ -76,6 +83,12 @@ func (c *Client) DeleteJCDSFileV1(ctx context.Context, fileName string) error {
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-08-28) and may be removed in a future release.
 //
 // Required privileges: read:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
+//
+// Parameters:
+//   - fileName: Name of the file to check the availability of in JCDS. If available, the
+//     inventory and status will be updated in Jamf Pro. If no file is specified,
+//     it will force an immediate inventory refresh at a rate-limit of once every
+//     15 seconds.
 func (c *Client) RefreshJCDSInventoryV1(ctx context.Context, fileName string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/jcds/refresh-inventory"

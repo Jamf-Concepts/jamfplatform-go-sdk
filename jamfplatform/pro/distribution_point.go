@@ -20,6 +20,15 @@ import (
 // ListDistributionPointsV1 finds all Distribution Points.
 //
 // Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
+//
+// Parameters:
+//   - sort: Sorts results by one or more criteria, following the format
+//     property:asc/desc. Default sort is id:asc. If using multiple criteria,
+//     separate with commas. Allows fields such as - name, serverName.
+//   - filter: Filters results. Use RSQL format for query. Allows fields such as - name,
+//     serverName, principal, fileSharingConnectionType, and httpsEnabled Can be
+//     combined with paging and sorting. Default filter is an empty query and
+//     returns all results from the requested page.
 func (c *Client) ListDistributionPointsV1(ctx context.Context, sort []string, filter string) ([]DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DistributionPoint, bool, error) {
@@ -77,6 +86,9 @@ func (c *Client) DeleteMultipleDistributionPointsV1(ctx context.Context, request
 // GetDistributionPointV1 get specified distribution point.
 //
 // Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
+//
+// Parameters:
+//   - id: instance id of distribution point.
 func (c *Client) GetDistributionPointV1(ctx context.Context, id string) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DistributionPoint
@@ -91,6 +103,9 @@ func (c *Client) GetDistributionPointV1(ctx context.Context, id string) (*Distri
 //
 // Required privileges: read:pro:distribution-points, update:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points, Update Distribution Points.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: Instance id of distribution point.
 func (c *Client) UpdateDistributionPointV1(ctx context.Context, id string, request *DistributionPoint) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DistributionPoint
@@ -104,6 +119,9 @@ func (c *Client) UpdateDistributionPointV1(ctx context.Context, id string, reque
 // DeleteDistributionPointV1 remove specified distribution point.
 //
 // Required privileges: delete:pro:distribution-points. Legacy Jamf Pro privilege name(s): Delete Distribution Points.
+//
+// Parameters:
+//   - id: Instance id of distribution point.
 func (c *Client) DeleteDistributionPointV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/distribution-points/%s", prefix, url.PathEscape(id))
@@ -117,6 +135,9 @@ func (c *Client) DeleteDistributionPointV1(ctx context.Context, id string) error
 //
 // Required privileges: read:pro:distribution-points, update:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points, Update Distribution Points.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: Instance id of distribution point.
 func (c *Client) PatchDistributionPointV1(ctx context.Context, id string, request *DistributionPoint) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DistributionPoint
@@ -130,6 +151,15 @@ func (c *Client) PatchDistributionPointV1(ctx context.Context, id string, reques
 // ListDistributionPointHistoryV1 get specified distribution point History object.
 //
 // Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
+//
+// Parameters:
+//   - id: Instance id of distribution point history.
+//   - sort: Sorts results by one or more criteria, following the format
+//     property:asc/desc. Default sort is id:asc. If using multiple criteria,
+//     separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields,
+//     including id, name, etc. Can be combined with paging and sorting. Default
+//     filter is an empty query and returns all results from the requested page.
 func (c *Client) ListDistributionPointHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -162,6 +192,9 @@ func (c *Client) ListDistributionPointHistoryV1(ctx context.Context, id string, 
 // CreateDistributionPointHistoryNoteV1 add specified distribution point History object notes.
 //
 // Required privileges: update:pro:distribution-points. Legacy Jamf Pro privilege name(s): Update Distribution Points.
+//
+// Parameters:
+//   - id: Instance id of distribution point history.
 func (c *Client) CreateDistributionPointHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory

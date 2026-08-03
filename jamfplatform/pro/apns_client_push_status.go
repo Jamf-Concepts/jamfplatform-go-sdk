@@ -20,6 +20,17 @@ import (
 //
 // Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property(,asc|desc). Default sort order is
+//     ascending. Multiple sort criteria are supported. Sortable fields:
+//     pushDisabledTime, deviceType, managementId.
+//   - filter: Query in the RSQL format, allowing to filter results. Fields allowed in the
+//     query: deviceType, disabledAt, managementId. This param can be combined with
+//     paging and sorting.
+//     Example: filter=deviceType=="MOBILE_DEVICE" Example:
+//     filter=disabledAt>2024-11-01T00:00:00Z Example:
+//     filter=deviceType=="COMPUTER";disabledAt>2024-01-01T00:00:00Z.
 func (c *Client) ListApnsClientPushStatusesV1(ctx context.Context, sort []string, filter string) ([]ApnsClientPushStatus, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ApnsClientPushStatus, bool, error) {
