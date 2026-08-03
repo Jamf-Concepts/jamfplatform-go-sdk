@@ -196,22 +196,62 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 // and leading/trailing whitespace inside string values is trimmed.
 // Byte-identical round-trips are impossible by design; consumers must
 // compare payloads structurally, never byte-wise.
+//
+// Line breaks inside string values are their own wire law (wire-verified
+// 2026-08-03, Jamf Pro 11.30.2, both profile endpoints; rendering confirmed
+// on macOS 26.6):
+//
+//   - Literal LF and TAB are DELETED outright — not collapsed to a space,
+//     so the words either side merge — for every payload type the server
+//     stores verbatim and for every slot outside the PayloadContent array
+//     (e.g. the top-level ConsentText dictionary). MCX custom settings,
+//     com.apple.notificationsettings and com.apple.systempolicy.control
+//     keep them.
+//   - CR survives everywhere, which is why this type preserves CR
+//     references rather than decoding them, and why Jamf Pro's own UI emits
+//     `&#13;` for login-window banner line breaks.
+//   - U+2028, U+2029 and U+0085 also survive every slot untouched and
+//     render as line breaks, so they need no special handling here.
+//
+// Astral-plane characters (non-BMP, e.g. emoji) are a separate server
+// defect no client can work around: verbatim slots store two U+FFFD
+// replacement characters in their place, and an MCX payload drops its
+// entire mcx_preference_settings dictionary — taking untouched sibling keys
+// with it. macOS itself handles them correctly, so consumers should surface
+// this as a server-side failure rather than retry.
 type PayloadsXMLText string
 
 // minimizePlistSourceEscaping decodes every character/entity reference in
-// plist XML source EXCEPT those encoding `&` and `<` — i.e.
-// `&quot;`/`&#34;` become literal `"`, `&#xA;` a literal
-// newline, `&gt;` a literal `>`, and so on. The parsed document is
-// unchanged (both representations decode to identical values), but the
-// representation matters on the wire: the server stores verbatim-category
-// payload fragments with zero decodes, so every avoidable entity in the
-// source surfaces as literal text in stored values. Serialisers built on
-// encoding/xml (howett.net/plist — used by consumers that re-serialise
-// payloads before sending, e.g. UUID injection) escape `"` `'` and
-// value newlines/tabs numerically, which corrupted TCC CodeRequirement
-// strings on update until normalised here. `&amp;`/`&lt;` (and their
-// numeric forms) must stay escaped — decoding them would make the plist
-// source invalid XML.
+// plist XML source EXCEPT those encoding `&`, `<` and carriage
+// return — i.e. `&quot;`/`&#34;` become literal `"`,
+// `&#xA;` a literal newline, `&gt;` a literal `>`, and so on.
+// The parsed document is unchanged (both representations decode to identical
+// values), but the representation matters on the wire: the server stores
+// verbatim-category payload fragments with zero decodes, so every avoidable
+// entity in the source surfaces as literal text in stored values.
+// Serialisers built on encoding/xml (howett.net/plist — used by consumers
+// that re-serialise payloads before sending, e.g. UUID injection) escape
+// `"` `'` and value newlines/tabs numerically, which corrupted TCC
+// CodeRequirement strings on update until normalised here.
+//
+// Three classes must survive undecoded:
+//
+//   - `&amp;`/`&lt;` (and their numeric forms): decoding them would
+//     make the plist source invalid XML.
+//   - Carriage-return references (`&#13;`, `&#xD;`, zero-padded and
+//     case variants): CR is the ONLY whitespace character Jamf Pro stores
+//     inside string values — literal LF and TAB are deleted outright — and
+//     XML 1.0 §2.11 line-end normalisation converts a literal CR to LF in
+//     transit, so a reference is the only way to transmit one. Decoding
+//     these turned a Jamf-authored multi-line value (its own UI emits
+//     `&#13;` for banner line breaks) into content the server then
+//     destroyed. Wire-verified 2026-08-03 against Jamf Pro 11.30.2 on both
+//     osxconfigurationprofiles and mobiledeviceconfigurationprofiles;
+//     rendering confirmed on macOS 26.6.
+//
+// A literal CR byte in the source is deliberately NOT re-encoded: per XML
+// 1.0 §2.11 it already means LF, so promoting it to a CR reference would
+// change the value.
 func minimizePlistSourceEscaping(s string) string {
 	var b strings.Builder
 	for i := 0; i < len(s); {
@@ -245,12 +285,74 @@ func minimizePlistSourceEscaping(s string) string {
 				r = rune(n)
 			}
 		}
-		if r < 0 || r == '&' || r == '<' {
+		if r < 0 || r == '&' || r == '<' || r == '\r' {
 			b.WriteString(s[i : i+semi+1])
 		} else {
 			b.WriteRune(r)
 		}
 		i += semi + 1
+	}
+	return b.String()
+}
+
+// crRefLen reports the byte length of a carriage-return character reference
+// at the start of s — `&#13;`, `&#xD;` and their zero-padded and
+// case variants — or 0 when s does not start with one. Named references are
+// not considered: XML 1.0 predefines none for CR.
+func crRefLen(s string) int {
+	if !strings.HasPrefix(s, "&#") {
+		return 0
+	}
+	semi := strings.IndexByte(s, ';')
+	if semi < 0 || semi > 12 {
+		return 0
+	}
+	ref := s[2:semi]
+	if ref == "" {
+		return 0
+	}
+	var (
+		n   int64
+		err error
+	)
+	if ref[0] == 'x' || ref[0] == 'X' {
+		n, err = strconv.ParseInt(ref[1:], 16, 32)
+	} else {
+		n, err = strconv.ParseInt(ref, 10, 32)
+	}
+	if err != nil || n != int64('\r') {
+		return 0
+	}
+	return semi + 1
+}
+
+// escapeAmpPreservingCRRefs escapes every `&` once so the server's
+// single entity-decode restores the minimal source — except the `&` that
+// opens a carriage-return reference, which is emitted bare so the decode
+// yields an actual CR.
+//
+// Escaping those too stores the reference as literal text (the PI-827 extra
+// entity layer), so a device would display `&#13;` instead of breaking
+// the line. Leaving the reference bare is safe against the server's
+// bare-`&`/`<` rejection because it decodes to CR, not to `&`
+// — wire-verified 2026-08-03, Jamf Pro 11.30.2. Preserving other numeric
+// references is NOT safe and must not be generalised: `&#38;` decodes to
+// a bare `&` and the server rejects the write with 409.
+func escapeAmpPreservingCRRefs(s string) string {
+	var b strings.Builder
+	for i := 0; i < len(s); {
+		if s[i] != '&' {
+			b.WriteByte(s[i])
+			i++
+			continue
+		}
+		if n := crRefLen(s[i:]); n > 0 {
+			b.WriteString(s[i : i+n])
+			i += n
+			continue
+		}
+		b.WriteString("&amp;")
+		i++
 	}
 	return b.String()
 }
@@ -289,7 +391,8 @@ func stripPayloadCDATASections(s string) string {
 // sections rewritten as escaped character data, source escaping minimised
 // (see minimizePlistSourceEscaping — avoidable entities become literal
 // text in verbatim-stored values otherwise), any `]]>` entity-guarded,
-// and every `&` escaped once. The innerxml field is used because
+// and every `&` escaped once apart from carriage-return references (see
+// escapeAmpPreservingCRRefs). The innerxml field is used because
 // xml.Encoder has no raw-CDATA API. Ordering is load-bearing: CDATA
 // sections must be rewritten before minimising (their content is literal
 // text whose references must NOT be decoded), and the `]]>` guard must
@@ -301,7 +404,7 @@ func (p PayloadsXMLText) MarshalXML(e *xml.Encoder, start xml.StartElement) erro
 	}
 	s = minimizePlistSourceEscaping(s)
 	s = strings.ReplaceAll(s, "]]>", "]]&gt;")
-	s = strings.ReplaceAll(s, "&", "&amp;")
+	s = escapeAmpPreservingCRRefs(s)
 	return e.EncodeElement(struct {
 		S string `xml:",innerxml"`
 	}{S: "<![CDATA[" + s + "]]>"}, start)
