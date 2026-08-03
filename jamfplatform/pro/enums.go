@@ -206,10 +206,11 @@ type MDMCommandState = string
 // MDMCommandState values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	MDMCommandStatePending      MDMCommandState = "PENDING"
-	MDMCommandStateAcknowledged MDMCommandState = "ACKNOWLEDGED"
-	MDMCommandStateNotNow       MDMCommandState = "NOT_NOW"
-	MDMCommandStateError        MDMCommandState = "ERROR"
+	MDMCommandStatePending            MDMCommandState = "PENDING"
+	MDMCommandStateAcknowledged       MDMCommandState = "ACKNOWLEDGED"
+	MDMCommandStateNotNow             MDMCommandState = "NOT_NOW"
+	MDMCommandStateError              MDMCommandState = "ERROR"
+	MDMCommandStateCommandFormatError MDMCommandState = "COMMAND_FORMAT_ERROR"
 )
 
 // MDMCommandStateValues returns every value the Jamf API accepts for MDMCommandState,
@@ -224,6 +225,7 @@ func MDMCommandStateValues() []MDMCommandState {
 		MDMCommandStateAcknowledged,
 		MDMCommandStateNotNow,
 		MDMCommandStateError,
+		MDMCommandStateCommandFormatError,
 	}
 }
 
@@ -233,39 +235,41 @@ type MDMCommandType = string
 // MDMCommandType values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	MDMCommandTypeApplyRedemptionCode       MDMCommandType = "APPLY_REDEMPTION_CODE"
-	MDMCommandTypeCertificateList           MDMCommandType = "CERTIFICATE_LIST"
-	MDMCommandTypeClearPasscode             MDMCommandType = "CLEAR_PASSCODE"
-	MDMCommandTypeClearRestrictionsPassword MDMCommandType = "CLEAR_RESTRICTIONS_PASSWORD"
-	MDMCommandTypeDeclarativeManagement     MDMCommandType = "DECLARATIVE_MANAGEMENT"
-	MDMCommandTypeDeleteUser                MDMCommandType = "DELETE_USER"
-	MDMCommandTypeDeviceInformation         MDMCommandType = "DEVICE_INFORMATION"
-	MDMCommandTypeDeviceLocation            MDMCommandType = "DEVICE_LOCATION"
-	MDMCommandTypeDeviceLock                MDMCommandType = "DEVICE_LOCK"
-	MDMCommandTypeDisableLostMode           MDMCommandType = "DISABLE_LOST_MODE"
-	MDMCommandTypeDisableRemoteDesktop      MDMCommandType = "DISABLE_REMOTE_DESKTOP"
-	MDMCommandTypeEnableLostMode            MDMCommandType = "ENABLE_LOST_MODE"
-	MDMCommandTypeEnableRemoteDesktop       MDMCommandType = "ENABLE_REMOTE_DESKTOP"
-	MDMCommandTypeEraseDevice               MDMCommandType = "ERASE_DEVICE"
-	MDMCommandTypeInstalledApplicationList  MDMCommandType = "INSTALLED_APPLICATION_LIST"
-	MDMCommandTypeLogOutUser                MDMCommandType = "LOG_OUT_USER"
-	MDMCommandTypeManagedApplicationList    MDMCommandType = "MANAGED_APPLICATION_LIST"
-	MDMCommandTypeManagedMediaList          MDMCommandType = "MANAGED_MEDIA_LIST"
-	MDMCommandTypeRefreshCellularPlans      MDMCommandType = "REFRESH_CELLULAR_PLANS"
-	MDMCommandTypePlayLostModeSound         MDMCommandType = "PLAY_LOST_MODE_SOUND"
-	MDMCommandTypeProfileList               MDMCommandType = "PROFILE_LIST"
-	MDMCommandTypeProvisioningProfileList   MDMCommandType = "PROVISIONING_PROFILE_LIST"
-	MDMCommandTypeRestartDevice             MDMCommandType = "RESTART_DEVICE"
-	MDMCommandTypeRequestMirroring          MDMCommandType = "REQUEST_MIRRORING"
-	MDMCommandTypeSecurityInfo              MDMCommandType = "SECURITY_INFO"
-	MDMCommandTypeSettings                  MDMCommandType = "SETTINGS"
-	MDMCommandTypeSetAutoAdminPassword      MDMCommandType = "SET_AUTO_ADMIN_PASSWORD"
-	MDMCommandTypeSetRecoveryLock           MDMCommandType = "SET_RECOVERY_LOCK"
-	MDMCommandTypeShutDownDevice            MDMCommandType = "SHUT_DOWN_DEVICE"
-	MDMCommandTypeStopMirroring             MDMCommandType = "STOP_MIRRORING"
-	MDMCommandTypeUnlockUserAccount         MDMCommandType = "UNLOCK_USER_ACCOUNT"
-	MDMCommandTypeValidateApplications      MDMCommandType = "VALIDATE_APPLICATIONS"
-	MDMCommandTypeVerifyRecoveryLock        MDMCommandType = "VERIFY_RECOVERY_LOCK"
+	MDMCommandTypeApplyRedemptionCode          MDMCommandType = "APPLY_REDEMPTION_CODE"
+	MDMCommandTypeCancelEnhancedLogCollection  MDMCommandType = "CANCEL_ENHANCED_LOG_COLLECTION"
+	MDMCommandTypeCertificateList              MDMCommandType = "CERTIFICATE_LIST"
+	MDMCommandTypeClearPasscode                MDMCommandType = "CLEAR_PASSCODE"
+	MDMCommandTypeClearRestrictionsPassword    MDMCommandType = "CLEAR_RESTRICTIONS_PASSWORD"
+	MDMCommandTypeDeclarativeManagement        MDMCommandType = "DECLARATIVE_MANAGEMENT"
+	MDMCommandTypeDeleteUser                   MDMCommandType = "DELETE_USER"
+	MDMCommandTypeDeviceInformation            MDMCommandType = "DEVICE_INFORMATION"
+	MDMCommandTypeDeviceLocation               MDMCommandType = "DEVICE_LOCATION"
+	MDMCommandTypeDeviceLock                   MDMCommandType = "DEVICE_LOCK"
+	MDMCommandTypeDisableLostMode              MDMCommandType = "DISABLE_LOST_MODE"
+	MDMCommandTypeDisableRemoteDesktop         MDMCommandType = "DISABLE_REMOTE_DESKTOP"
+	MDMCommandTypeEnableLostMode               MDMCommandType = "ENABLE_LOST_MODE"
+	MDMCommandTypeEnableRemoteDesktop          MDMCommandType = "ENABLE_REMOTE_DESKTOP"
+	MDMCommandTypeEraseDevice                  MDMCommandType = "ERASE_DEVICE"
+	MDMCommandTypeInstalledApplicationList     MDMCommandType = "INSTALLED_APPLICATION_LIST"
+	MDMCommandTypeLogOutUser                   MDMCommandType = "LOG_OUT_USER"
+	MDMCommandTypeManagedApplicationList       MDMCommandType = "MANAGED_APPLICATION_LIST"
+	MDMCommandTypeManagedMediaList             MDMCommandType = "MANAGED_MEDIA_LIST"
+	MDMCommandTypeRefreshCellularPlans         MDMCommandType = "REFRESH_CELLULAR_PLANS"
+	MDMCommandTypePlayLostModeSound            MDMCommandType = "PLAY_LOST_MODE_SOUND"
+	MDMCommandTypeProfileList                  MDMCommandType = "PROFILE_LIST"
+	MDMCommandTypeProvisioningProfileList      MDMCommandType = "PROVISIONING_PROFILE_LIST"
+	MDMCommandTypeRestartDevice                MDMCommandType = "RESTART_DEVICE"
+	MDMCommandTypeRequestMirroring             MDMCommandType = "REQUEST_MIRRORING"
+	MDMCommandTypeSecurityInfo                 MDMCommandType = "SECURITY_INFO"
+	MDMCommandTypeSettings                     MDMCommandType = "SETTINGS"
+	MDMCommandTypeSetAutoAdminPassword         MDMCommandType = "SET_AUTO_ADMIN_PASSWORD"
+	MDMCommandTypeSetRecoveryLock              MDMCommandType = "SET_RECOVERY_LOCK"
+	MDMCommandTypeShutDownDevice               MDMCommandType = "SHUT_DOWN_DEVICE"
+	MDMCommandTypeStopMirroring                MDMCommandType = "STOP_MIRRORING"
+	MDMCommandTypeTriggerEnhancedLogCollection MDMCommandType = "TRIGGER_ENHANCED_LOG_COLLECTION"
+	MDMCommandTypeUnlockUserAccount            MDMCommandType = "UNLOCK_USER_ACCOUNT"
+	MDMCommandTypeValidateApplications         MDMCommandType = "VALIDATE_APPLICATIONS"
+	MDMCommandTypeVerifyRecoveryLock           MDMCommandType = "VERIFY_RECOVERY_LOCK"
 )
 
 // MDMCommandTypeValues returns every value the Jamf API accepts for MDMCommandType,
@@ -277,6 +281,7 @@ const (
 func MDMCommandTypeValues() []MDMCommandType {
 	return []MDMCommandType{
 		MDMCommandTypeApplyRedemptionCode,
+		MDMCommandTypeCancelEnhancedLogCollection,
 		MDMCommandTypeCertificateList,
 		MDMCommandTypeClearPasscode,
 		MDMCommandTypeClearRestrictionsPassword,
@@ -306,6 +311,7 @@ func MDMCommandTypeValues() []MDMCommandType {
 		MDMCommandTypeSetRecoveryLock,
 		MDMCommandTypeShutDownDevice,
 		MDMCommandTypeStopMirroring,
+		MDMCommandTypeTriggerEnhancedLogCollection,
 		MDMCommandTypeUnlockUserAccount,
 		MDMCommandTypeValidateApplications,
 		MDMCommandTypeVerifyRecoveryLock,

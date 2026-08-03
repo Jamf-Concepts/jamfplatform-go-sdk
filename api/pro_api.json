@@ -2257,6 +2257,16 @@
         },
         "type": "object"
       },
+      "CancelEnhancedLogCollectionCommand": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MdmCommandBase"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
       "CategoriesSearchResults": {
         "properties": {
           "results": {
@@ -12124,6 +12134,11 @@
             "format": "date-time",
             "type": "string"
           },
+          "lastContactDate": {
+            "example": "2022-10-17T11:48:56.307Z",
+            "format": "date-time",
+            "type": "string"
+          },
           "lastEnrolledDate": {
             "example": "2022-10-17T11:48:56.307Z",
             "format": "date-time",
@@ -14020,6 +14035,7 @@
             "discriminator": {
               "mapping": {
                 "APPLY_REDEMPTION_CODE": "#/components/schemas/ApplyRedemptionCodeCommand",
+                "CANCEL_ENHANCED_LOG_COLLECTION": "#/components/schemas/CancelEnhancedLogCollectionCommand",
                 "CERTIFICATE_LIST": "#/components/schemas/CertificateListCommand",
                 "CLEAR_PASSCODE": "#/components/schemas/ClearPasscodeCommand",
                 "CLEAR_RESTRICTIONS_PASSWORD": "#/components/schemas/ClearRestrictionsPasswordCommand",
@@ -14049,6 +14065,7 @@
                 "SET_RECOVERY_LOCK": "#/components/schemas/SetRecoveryLockCommand",
                 "SHUT_DOWN_DEVICE": "#/components/schemas/ShutDownDeviceCommand",
                 "STOP_MIRRORING": "#/components/schemas/StopMirroringCommand",
+                "TRIGGER_ENHANCED_LOG_COLLECTION": "#/components/schemas/TriggerEnhancedLogCollectionCommand",
                 "UNLOCK_USER_ACCOUNT": "#/components/schemas/UnlockUserAccountCommand",
                 "VALIDATE_APPLICATIONS": "#/components/schemas/ValidateApplicationsCommand",
                 "VERIFY_RECOVERY_LOCK": "#/components/schemas/VerifyRecoveryLockCommand"
@@ -14064,6 +14081,9 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ApplyRedemptionCodeCommand"
+              },
+              {
+                "$ref": "#/components/schemas/CancelEnhancedLogCollectionCommand"
               },
               {
                 "$ref": "#/components/schemas/CertificateListCommand"
@@ -14153,6 +14173,9 @@
                 "$ref": "#/components/schemas/StopMirroringCommand"
               },
               {
+                "$ref": "#/components/schemas/TriggerEnhancedLogCollectionCommand"
+              },
+              {
                 "$ref": "#/components/schemas/UnlockUserAccountCommand"
               },
               {
@@ -14186,7 +14209,8 @@
           "PENDING",
           "ACKNOWLEDGED",
           "NOT_NOW",
-          "ERROR"
+          "ERROR",
+          "COMMAND_FORMAT_ERROR"
         ],
         "example": "PENDING",
         "type": "string"
@@ -14194,6 +14218,7 @@
       "MdmCommandType": {
         "enum": [
           "APPLY_REDEMPTION_CODE",
+          "CANCEL_ENHANCED_LOG_COLLECTION",
           "CERTIFICATE_LIST",
           "CLEAR_PASSCODE",
           "CLEAR_RESTRICTIONS_PASSWORD",
@@ -14223,6 +14248,7 @@
           "SET_RECOVERY_LOCK",
           "SHUT_DOWN_DEVICE",
           "STOP_MIRRORING",
+          "TRIGGER_ENHANCED_LOG_COLLECTION",
           "UNLOCK_USER_ACCOUNT",
           "VALIDATE_APPLICATIONS",
           "VERIFY_RECOVERY_LOCK"
@@ -14617,6 +14643,11 @@
             "example": "10.0.0.1",
             "type": "string"
           },
+          "lastContactTimestamp": {
+            "example": "2018-10-15T16:39:56Z",
+            "format": "date-time",
+            "type": "string"
+          },
           "lastEnrollmentTimestamp": {
             "example": "2018-10-15T16:39:56.307Z",
             "format": "date-time",
@@ -14926,6 +14957,12 @@
           },
           "ipAddress": {
             "example": "10.0.0.1",
+            "type": "string"
+          },
+          "lastContactDate": {
+            "description": "The date and time of the most recent device contact via MDM or DDM channels.",
+            "example": "2022-10-17T11:48:56.307Z",
+            "format": "date-time",
             "type": "string"
           },
           "lastEnrolledDate": {
@@ -16966,6 +17003,12 @@
                 },
                 "idpType": {
                   "example": "GENERIC_OIDC",
+                  "type": "string"
+                },
+                "logoUrl": {
+                  "description": "Customer-provided icon served by jamf account URL for this connection. Null when no custom icon is configured (Jamf ID connections always return null).\n",
+                  "example": "https://acme.example.com/sso-logo.png",
+                  "nullable": true,
                   "type": "string"
                 },
                 "redirectUrl": {
@@ -21758,6 +21801,27 @@
         },
         "type": "object"
       },
+      "TriggerEnhancedLogCollectionCommand": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MdmCommandBase"
+          },
+          {
+            "properties": {
+              "appleCareToken": {
+                "description": "The AppleCare token the device uses for authenticating the enhanced log collection session.",
+                "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "appleCareToken"
+            ],
+            "type": "object"
+          }
+        ]
+      },
       "TvOsDetails": {
         "description": "will be populated if the type is appleTv.",
         "properties": {
@@ -23088,7 +23152,7 @@
     "description": "Comprehensive Jamf Pro management API for enterprise device management, configuration, and automation.",
     "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
     "title": "Jamf Pro API",
-    "version": "11.29.0"
+    "version": "11.30.0"
   },
   "openapi": "3.0.1",
   "paths": {
@@ -30549,6 +30613,7 @@
     },
     "/v1/tenant/{tenantId}/computer-inventory/{id}/erase": {
       "post": {
+        "deprecated": true,
         "description": "Erase a computer\n\n**Required Permissions:** `execute:pro:computer-commands`",
         "parameters": [
           {
@@ -30615,6 +30680,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "execute:pro:computer-commands"
         ],
@@ -30625,6 +30691,7 @@
     },
     "/v1/tenant/{tenantId}/computer-inventory/{id}/remove-mdm-profile": {
       "post": {
+        "deprecated": true,
         "description": "Remove a computer's MDM profile\n\n**Required Permissions:** `execute:pro:computer-commands`",
         "parameters": [
           {
@@ -30678,6 +30745,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "execute:pro:computer-commands"
         ],
@@ -39310,15 +39378,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/tenantId"
-          },
-          {
-            "description": "Path parameter id",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -39354,15 +39413,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/tenantId"
-          },
-          {
-            "description": "Path parameter id",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -60580,7 +60630,7 @@
             "$ref": "#/components/parameters/page-size"
           },
           {
-            "description": "Sorting criteria in the format: property:asc/desc. Default sort\nis displayName:asc. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `batteryHealth`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,\n`devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`enrollmentSessionTokenValid`, `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`,\n`osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`,\n`mobileDeviceId`, `managementId`, `languages`, `lastBackupDate`, `lastEnrolledDate`, `lastCloudBackupDate`,\n`lastInventoryUpdateDate`, `locales`, `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`,\n`managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`,\n`modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`, `residentUsers`,\n`serialNumber`, `sharedIpad`, `supervised`, `tethered`,\n`timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,\n`deviceOwnershipType`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`,\n`poDate`, `poNumber`, `purchasePrice`, `purchasedOrLeased`,\n`purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,\n`activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,\n`hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`, `passcodeCompliantWithProfile`,\n`passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`, `carrierSettingsVersion`,\n`cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`, `currentMobileNetworkCode`,\n`dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,\n`homeMobileNetworkCode`, `iccid`, `imei`, `imei2`,\n`meid`, `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`\n\nExample: `sort=displayName:desc,username:asc`\n",
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort\nis displayName:asc. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `batteryHealth`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,\n`devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`enrollmentSessionTokenValid`, `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`,\n`osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`,\n`mobileDeviceId`, `managementId`, `languages`, `lastBackupDate`, `lastContactDate`, `lastEnrolledDate`, `lastCloudBackupDate`,\n`lastInventoryUpdateDate`, `locales`, `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`,\n`managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`,\n`modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`, `residentUsers`,\n`serialNumber`, `sharedIpad`, `supervised`, `tethered`,\n`timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,\n`deviceOwnershipType`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`,\n`poDate`, `poNumber`, `purchasePrice`, `purchasedOrLeased`,\n`purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,\n`activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,\n`hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`, `passcodeCompliantWithProfile`,\n`passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`, `carrierSettingsVersion`,\n`cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`, `currentMobileNetworkCode`,\n`dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,\n`homeMobileNetworkCode`, `iccid`, `imei`, `imei2`,\n`meid`, `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`\n\nExample: `sort=displayName:desc,username:asc`\n",
             "explode": true,
             "in": "query",
             "name": "sort",
@@ -60596,7 +60646,7 @@
             "style": "form"
           },
           {
-            "description": "Query in the RSQL format, allowing to filter mobile device collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,\n`diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`, `exchangeDeviceId`,\n`cloudBackupEnabled`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `managementId`, `languages`, `lastInventoryUpdateDate`, `locales`,\n`locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`, `model`,\n`modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`,\n`residentUsers`, `serialNumber`, `sharedIpad`, `supervised`,\n`tethered`, `timeZone`, `udid`, `usedSpacePercentage`,\n`wifiMacAddress`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,\n`purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`,\n`vendor`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,\n`fileEncryptionCapable`, `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,\n`passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`,\n`currentMobileCountryCode`, `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`,\n`network`, `homeMobileCountryCode`, `homeMobileNetworkCode`, `iccid`,\n`imei`, `imei2`, `meid`, `personalHotspotEnabled`,\n`roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`,\n`groupId`, `groupName`\n\nThis param can be combined with paging and sorting.\nExample: `filter=displayName==\"iPad\"`\n",
+            "description": "Query in the RSQL format, allowing to filter mobile device collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,\n`diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`, `exchangeDeviceId`,\n`cloudBackupEnabled`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `managementId`, `languages`, `lastContactDate`, `lastInventoryUpdateDate`, `locales`,\n`locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`, `model`,\n`modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`,\n`residentUsers`, `serialNumber`, `sharedIpad`, `supervised`,\n`tethered`, `timeZone`, `udid`, `usedSpacePercentage`,\n`wifiMacAddress`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,\n`purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`,\n`vendor`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,\n`fileEncryptionCapable`, `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,\n`passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`,\n`currentMobileCountryCode`, `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`,\n`network`, `homeMobileCountryCode`, `homeMobileNetworkCode`, `iccid`,\n`imei`, `imei2`, `meid`, `personalHotspotEnabled`,\n`roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`,\n`groupId`, `groupName`\n\nThis param can be combined with paging and sorting.\nExample: `filter=displayName==\"iPad\"`\n",
             "explode": true,
             "in": "query",
             "name": "filter",
@@ -60962,7 +61012,7 @@
             "$ref": "#/components/parameters/page-size"
           },
           {
-            "description": "Sorting criteria in the format: property:asc/desc. Default sort\nis displayName:asc. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,\n`devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`enrollmentSessionTokenValid`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastEnrolledDate`, `lastCloudBackupDate`,\n`lastInventoryUpdateDate`, `locales`, `lostModeEnabled`,\n`managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,\n`preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,\n`deviceOwnershipType`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`,\n`poDate`, `poNumber`, `purchasePrice`, `purchasedOrLeased`,\n`purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,\n`activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,\n`hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`, `passcodeCompliantWithProfile`,\n`passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`, `carrierSettingsVersion`,\n`cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`, `currentMobileNetworkCode`,\n`dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,\n`homeMobileNetworkCode`, `iccid`, `imei`, `imei2`,\n`meid`, `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`\n\nExample: `sort=displayName:desc,username:asc`\n",
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort\nis displayName:asc. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,\n`devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`enrollmentSessionTokenValid`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastContactDate`, `lastEnrolledDate`, `lastCloudBackupDate`,\n`lastInventoryUpdateDate`, `locales`, `lostModeEnabled`,\n`managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,\n`preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,\n`deviceOwnershipType`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`,\n`poDate`, `poNumber`, `purchasePrice`, `purchasedOrLeased`,\n`purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,\n`activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,\n`hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`, `passcodeCompliantWithProfile`,\n`passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`, `carrierSettingsVersion`,\n`cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`, `currentMobileNetworkCode`,\n`dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,\n`homeMobileNetworkCode`, `iccid`, `imei`, `imei2`,\n`meid`, `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`\n\nExample: `sort=displayName:desc,username:asc`\n",
             "explode": true,
             "in": "query",
             "name": "sort",
@@ -60978,7 +61028,7 @@
             "style": "form"
           },
           {
-            "description": "Query in the RSQL format, allowing to filter mobile device collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,\n`diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastInventoryUpdateDate`, `locales`,\n`lostModeEnabled`, `managed`, `model`,\n`modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`,\n`wifiMacAddress`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,\n`purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`,\n`vendor`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,\n`fileEncryptionCapable`, `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,\n`passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`,\n`currentMobileCountryCode`, `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`,\n`network`, `homeMobileCountryCode`, `homeMobileNetworkCode`, `iccid`,\n`imei`, `imei2`, `meid`, `personalHotspotEnabled`,\n`roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`,\n`groupId`, `groupName`\n\nThis param can be combined with paging and sorting.\nExample: `filter=displayName==\"iPad\"`\n",
+            "description": "Query in the RSQL format, allowing to filter mobile device collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,\n`diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastContactDate`, `lastInventoryUpdateDate`, `locales`,\n`lostModeEnabled`, `managed`, `model`,\n`modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`,\n`wifiMacAddress`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,\n`purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`,\n`vendor`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,\n`fileEncryptionCapable`, `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,\n`passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`,\n`currentMobileCountryCode`, `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`,\n`network`, `homeMobileCountryCode`, `homeMobileNetworkCode`, `iccid`,\n`imei`, `imei2`, `meid`, `personalHotspotEnabled`,\n`roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`,\n`groupId`, `groupName`\n\nThis param can be combined with paging and sorting.\nExample: `filter=displayName==\"iPad\"`\n",
             "explode": true,
             "in": "query",
             "name": "filter",
@@ -61874,6 +61924,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations": {
       "get": {
+        "deprecated": true,
         "description": "Retrieves patch software title configurations\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -61905,6 +61956,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -61913,6 +61965,7 @@
         ]
       },
       "post": {
+        "deprecated": true,
         "description": "Creates Patch Software Title Configurations using sToken\n\n**Required Permissions:** `create:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -61962,6 +62015,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "create:pro:patch-management-software-titles"
         ],
@@ -61972,6 +62026,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}": {
       "delete": {
+        "deprecated": true,
         "description": "Deletes Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `delete:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62014,6 +62069,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "delete:pro:patch-management-software-titles"
         ],
@@ -62022,6 +62078,7 @@
         ]
       },
       "get": {
+        "deprecated": true,
         "description": "Retrieves Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62071,6 +62128,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62079,6 +62137,7 @@
         ]
       },
       "patch": {
+        "deprecated": true,
         "description": "Updates Patch Software Title Configurations\n\n**Required Permissions:** `update:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62159,6 +62218,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:patch-management-software-titles"
         ],
@@ -62169,6 +62229,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard": {
       "delete": {
+        "deprecated": true,
         "description": "Removes a software title configuration from the dashboard.\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62201,6 +62262,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62209,6 +62271,7 @@
         ]
       },
       "get": {
+        "deprecated": true,
         "description": "Returns whether or not the requested software title configuration is on the dashboard\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62258,6 +62321,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62266,6 +62330,7 @@
         ]
       },
       "post": {
+        "deprecated": true,
         "description": "Adds asoftware title configuration to the dashboard.\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62299,6 +62364,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62309,6 +62375,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/definitions": {
       "get": {
+        "deprecated": true,
         "description": "Retrieves patch software title definitions with the supplied id\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62391,6 +62458,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62401,6 +62469,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dependencies": {
       "get": {
+        "deprecated": true,
         "description": "Retrieve list of Patch Software Title Configuration Dependencies\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62440,6 +62509,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62450,6 +62520,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/export-report": {
       "get": {
+        "deprecated": true,
         "description": "Export Patch Reporting Data\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62581,6 +62652,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62591,6 +62663,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/extension-attributes": {
       "get": {
+        "deprecated": true,
         "description": "Retrieves software title extension attributes with the supplied id\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62643,6 +62716,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62653,6 +62727,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/history": {
       "get": {
+        "deprecated": true,
         "description": "Gets specified Patch Software Title Configuration history object\n\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62735,6 +62810,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62743,6 +62819,7 @@
         ]
       },
       "post": {
+        "deprecated": true,
         "description": "Adds Patch Software Title Configuration history object notes\n\n**Required Permissions:** `update:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62823,6 +62900,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:patch-management-software-titles"
         ],
@@ -62833,6 +62911,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-report": {
       "get": {
+        "deprecated": true,
         "description": "Retrieve Patch Software Title Configuration Patch Report\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62925,6 +63004,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62935,6 +63015,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary": {
       "get": {
+        "deprecated": true,
         "description": "Returns active patch summary.\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62994,6 +63075,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -63004,6 +63086,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary/versions": {
       "get": {
+        "deprecated": true,
         "description": "Returns patch versions\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -63066,6 +63149,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -64852,6 +64936,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory": {
       "get": {
+        "deprecated": true,
         "description": "Return paginated Computer Inventory records\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
@@ -64932,6 +65017,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computers"
         ],
@@ -64940,6 +65026,7 @@
         ]
       },
       "post": {
+        "deprecated": true,
         "description": "Creates Computer Inventory record\n\n**Required Permissions:** `create:pro:computers`",
         "parameters": [
           {
@@ -64978,6 +65065,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "create:pro:computers"
         ],
@@ -64988,6 +65076,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory-detail/{id}": {
       "get": {
+        "deprecated": true,
         "description": "Return all sections of a computer\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
@@ -65037,6 +65126,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computers"
         ],
@@ -65045,6 +65135,7 @@
         ]
       },
       "patch": {
+        "deprecated": true,
         "description": "Update specific fields on a computer, then return the updated computer object.\n\n**Required Permissions:** `update:pro:computers`",
         "parameters": [
           {
@@ -65097,6 +65188,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:computers"
         ],
@@ -65107,6 +65199,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/filevault": {
       "get": {
+        "deprecated": true,
         "description": "Return paginated FileVault information for all computers\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
         "parameters": [
           {
@@ -65141,6 +65234,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:disk-encryption-recovery-key"
         ],
@@ -65151,6 +65245,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}": {
       "delete": {
+        "deprecated": true,
         "description": "Remove specified Computer record\n\n**Required Permissions:** `delete:pro:computers`",
         "parameters": [
           {
@@ -65193,6 +65288,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "delete:pro:computers"
         ],
@@ -65201,6 +65297,7 @@
         ]
       },
       "get": {
+        "deprecated": true,
         "description": "Return General section of a Computer\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
@@ -65269,6 +65366,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computers"
         ],
@@ -65279,6 +65377,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/attachments": {
       "post": {
+        "deprecated": true,
         "description": "Upload attachment and assign to computer\n\n**Required Permissions:** `update:pro:computers`",
         "parameters": [
           {
@@ -65348,6 +65447,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:computers"
         ],
@@ -65358,6 +65458,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}": {
       "delete": {
+        "deprecated": true,
         "description": "Remove attachment\n\n**Required Permissions:** `update:pro:computers`",
         "parameters": [
           {
@@ -65411,6 +65512,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:computers"
         ],
@@ -65419,6 +65521,7 @@
         ]
       },
       "get": {
+        "deprecated": true,
         "description": "Download attachment file\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
@@ -65481,6 +65584,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computers"
         ],
@@ -65491,6 +65595,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/filevault": {
       "get": {
+        "deprecated": true,
         "description": "Return FileVault information for a specific computer\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
         "parameters": [
           {
@@ -65540,6 +65645,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:disk-encryption-recovery-key"
         ],
@@ -65550,6 +65656,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin": {
       "get": {
+        "deprecated": true,
         "description": "Return a computer's Device Lock PIN\n\n**Required Permissions:** `read:pro:computer-device-lock-pin`",
         "parameters": [
           {
@@ -65599,6 +65706,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computer-device-lock-pin"
         ],
@@ -65609,6 +65717,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password": {
       "get": {
+        "deprecated": true,
         "description": "Return a Computers Recovery Lock Password\n\n**Required Permissions:** `read:pro:recovery-lock`",
         "parameters": [
           {
@@ -65658,6 +65767,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:recovery-lock"
         ],

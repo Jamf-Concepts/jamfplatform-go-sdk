@@ -681,6 +681,11 @@ type BuildingSearchResults struct {
 	TotalCount int        `json:"totalCount"`
 }
 
+// CancelEnhancedLogCollectionCommand represents a cancel enhanced log collection command.
+type CancelEnhancedLogCollectionCommand struct {
+	CommandType MDMCommandType `json:"commandType"`
+}
+
 // CategoriesSearchResults represents a categories search results.
 type CategoriesSearchResults struct {
 	Results    []Category `json:"results"`
@@ -3962,6 +3967,7 @@ type InventoryListMobileDevice struct {
 	Languages                                   string                    `json:"languages"`
 	LastBackupDate                              *time.Time                `json:"lastBackupDate,omitempty"`
 	LastCloudBackupDate                         *time.Time                `json:"lastCloudBackupDate,omitempty"`
+	LastContactDate                             *time.Time                `json:"lastContactDate,omitempty"`
 	LastEnrolledDate                            *time.Time                `json:"lastEnrolledDate,omitempty"`
 	LastInventoryUpdateDate                     *time.Time                `json:"lastInventoryUpdateDate,omitempty"`
 	LastLoggedInUsernameMDM                     *string                   `json:"lastLoggedInUsernameMdm,omitempty"`
@@ -4732,6 +4738,7 @@ type MobileDeviceDetailsGetV2 struct {
 	// will be populated if the type is ios or visionos.
 	Ios                           *DetailsV2  `json:"ios,omitempty"`
 	IPAddress                     string      `json:"ipAddress"`
+	LastContactTimestamp          *time.Time  `json:"lastContactTimestamp,omitempty"`
 	LastEnrollmentTimestamp       *time.Time  `json:"lastEnrollmentTimestamp,omitempty"`
 	LastInventoryUpdateTimestamp  *time.Time  `json:"lastInventoryUpdateTimestamp,omitempty"`
 	Location                      *LocationV2 `json:"location,omitempty"`
@@ -4780,6 +4787,7 @@ type MobileDeviceDetailsV2 struct {
 	// will be populated if the type is ios or visionos.
 	Ios                           *DetailsV2  `json:"ios,omitempty"`
 	IPAddress                     string      `json:"ipAddress"`
+	LastContactTimestamp          *time.Time  `json:"lastContactTimestamp,omitempty"`
 	LastEnrollmentTimestamp       *time.Time  `json:"lastEnrollmentTimestamp,omitempty"`
 	LastInventoryUpdateTimestamp  *time.Time  `json:"lastInventoryUpdateTimestamp,omitempty"`
 	Location                      *LocationV2 `json:"location,omitempty"`
@@ -4892,28 +4900,30 @@ type MobileDeviceGeneral struct {
 	// The enrollment method used for the device. **Note:** The `PersonalDeviceProfile` enrollment method
 	// was removed as of 11.25.
 	// Allowed values: see the MobileDeviceGeneralDeviceOwnershipType constants.
-	DeviceOwnershipType                      string                           `json:"deviceOwnershipType"`
-	DisplayName                              string                           `json:"displayName"`
-	EnrollmentMethodPrestage                 *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
-	EnrollmentSessionTokenValid              bool                             `json:"enrollmentSessionTokenValid"`
-	ExtensionAttributes                      []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
-	IPAddress                                string                           `json:"ipAddress"`
-	LastEnrolledDate                         *time.Time                       `json:"lastEnrolledDate,omitempty"`
-	LastInventoryUpdateDate                  *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
-	LastLoggedInUsernameMDM                  *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
-	LastLoggedInUsernameMDMTimestamp         *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
-	LastLoggedInUsernameSelfService          *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
-	LastLoggedInUsernameSelfServiceTimestamp *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
-	Managed                                  bool                             `json:"managed"`
-	ManagementID                             string                           `json:"managementId"`
-	MDMProfileExpirationDate                 *time.Time                       `json:"mdmProfileExpirationDate,omitempty"`
-	OsBuild                                  string                           `json:"osBuild"`
-	OsRapidSecurityResponse                  string                           `json:"osRapidSecurityResponse"`
-	OsSupplementalBuildVersion               string                           `json:"osSupplementalBuildVersion"`
-	OsVersion                                string                           `json:"osVersion"`
-	SiteID                                   string                           `json:"siteId"`
-	SoftwareUpdateDeviceID                   string                           `json:"softwareUpdateDeviceId"`
-	Supervised                               bool                             `json:"supervised"`
+	DeviceOwnershipType         string                           `json:"deviceOwnershipType"`
+	DisplayName                 string                           `json:"displayName"`
+	EnrollmentMethodPrestage    *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
+	EnrollmentSessionTokenValid bool                             `json:"enrollmentSessionTokenValid"`
+	ExtensionAttributes         []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
+	IPAddress                   string                           `json:"ipAddress"`
+	// The date and time of the most recent device contact via MDM or DDM channels.
+	LastContactDate                          *time.Time `json:"lastContactDate,omitempty"`
+	LastEnrolledDate                         *time.Time `json:"lastEnrolledDate,omitempty"`
+	LastInventoryUpdateDate                  *time.Time `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                  *string    `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
+	LastLoggedInUsernameSelfService          *string    `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp *time.Time `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	Managed                                  bool       `json:"managed"`
+	ManagementID                             string     `json:"managementId"`
+	MDMProfileExpirationDate                 *time.Time `json:"mdmProfileExpirationDate,omitempty"`
+	OsBuild                                  string     `json:"osBuild"`
+	OsRapidSecurityResponse                  string     `json:"osRapidSecurityResponse"`
+	OsSupplementalBuildVersion               string     `json:"osSupplementalBuildVersion"`
+	OsVersion                                string     `json:"osVersion"`
+	SiteID                                   string     `json:"siteId"`
+	SoftwareUpdateDeviceID                   string     `json:"softwareUpdateDeviceId"`
+	Supervised                               bool       `json:"supervised"`
 	// IANA time zone database name.
 	TimeZone string `json:"timeZone"`
 	UDID     string `json:"udid"`
@@ -4989,43 +4999,45 @@ type MobileDeviceIosGeneral struct {
 	// The enrollment method used for the device. **Note:** The `PersonalDeviceProfile` enrollment method
 	// was removed as of 11.25.
 	// Allowed values: see the MobileDeviceIosGeneralDeviceOwnershipType constants.
-	DeviceOwnershipType                         string                           `json:"deviceOwnershipType"`
-	DiagnosticAndUsageReportingEnabled          bool                             `json:"diagnosticAndUsageReportingEnabled"`
-	DisplayName                                 string                           `json:"displayName"`
-	DoNotDisturbEnabled                         bool                             `json:"doNotDisturbEnabled"`
-	EnrollmentMethodPrestage                    *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
-	EnrollmentSessionTokenValid                 bool                             `json:"enrollmentSessionTokenValid"`
-	ExchangeDeviceID                            string                           `json:"exchangeDeviceId"`
-	ExtensionAttributes                         []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
-	IPAddress                                   string                           `json:"ipAddress"`
-	ItunesStoreAccountActive                    bool                             `json:"itunesStoreAccountActive"`
-	LastBackupDate                              *time.Time                       `json:"lastBackupDate,omitempty"`
-	LastCloudBackupDate                         *time.Time                       `json:"lastCloudBackupDate,omitempty"`
-	LastEnrolledDate                            *time.Time                       `json:"lastEnrolledDate,omitempty"`
-	LastInventoryUpdateDate                     *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
-	LastLoggedInUsernameMDM                     *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
-	LastLoggedInUsernameMDMTimestamp            *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
-	LastLoggedInUsernameSelfService             *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
-	LastLoggedInUsernameSelfServiceTimestamp    *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
-	LocationServicesForSelfServiceMobileEnabled bool                             `json:"locationServicesForSelfServiceMobileEnabled"`
-	Managed                                     bool                             `json:"managed"`
-	ManagementID                                string                           `json:"managementId"`
-	MaximumSharediPadUsersStored                int                              `json:"maximumSharediPadUsersStored"`
-	MDMProfileExpirationDate                    *time.Time                       `json:"mdmProfileExpirationDate,omitempty"`
-	OsBuild                                     string                           `json:"osBuild"`
-	OsRapidSecurityResponse                     string                           `json:"osRapidSecurityResponse"`
-	OsSupplementalBuildVersion                  string                           `json:"osSupplementalBuildVersion"`
-	OsVersion                                   string                           `json:"osVersion"`
-	QuotaSize                                   int                              `json:"quotaSize"`
-	ResidentUsers                               int                              `json:"residentUsers"`
-	SharedIpad                                  bool                             `json:"sharedIpad"`
-	SiteID                                      string                           `json:"siteId"`
-	SoftwareUpdateDeviceID                      string                           `json:"softwareUpdateDeviceId"`
-	Supervised                                  bool                             `json:"supervised"`
-	SyncedToComputer                            int                              `json:"syncedToComputer"`
-	TemporarySessionOnly                        bool                             `json:"temporarySessionOnly"`
-	TemporarySessionTimeout                     int                              `json:"temporarySessionTimeout"`
-	Tethered                                    bool                             `json:"tethered"`
+	DeviceOwnershipType                string                           `json:"deviceOwnershipType"`
+	DiagnosticAndUsageReportingEnabled bool                             `json:"diagnosticAndUsageReportingEnabled"`
+	DisplayName                        string                           `json:"displayName"`
+	DoNotDisturbEnabled                bool                             `json:"doNotDisturbEnabled"`
+	EnrollmentMethodPrestage           *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
+	EnrollmentSessionTokenValid        bool                             `json:"enrollmentSessionTokenValid"`
+	ExchangeDeviceID                   string                           `json:"exchangeDeviceId"`
+	ExtensionAttributes                []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
+	IPAddress                          string                           `json:"ipAddress"`
+	ItunesStoreAccountActive           bool                             `json:"itunesStoreAccountActive"`
+	LastBackupDate                     *time.Time                       `json:"lastBackupDate,omitempty"`
+	LastCloudBackupDate                *time.Time                       `json:"lastCloudBackupDate,omitempty"`
+	// The date and time of the most recent device contact via MDM or DDM channels.
+	LastContactDate                             *time.Time `json:"lastContactDate,omitempty"`
+	LastEnrolledDate                            *time.Time `json:"lastEnrolledDate,omitempty"`
+	LastInventoryUpdateDate                     *time.Time `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                     *string    `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp            *time.Time `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
+	LastLoggedInUsernameSelfService             *string    `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp    *time.Time `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	LocationServicesForSelfServiceMobileEnabled bool       `json:"locationServicesForSelfServiceMobileEnabled"`
+	Managed                                     bool       `json:"managed"`
+	ManagementID                                string     `json:"managementId"`
+	MaximumSharediPadUsersStored                int        `json:"maximumSharediPadUsersStored"`
+	MDMProfileExpirationDate                    *time.Time `json:"mdmProfileExpirationDate,omitempty"`
+	OsBuild                                     string     `json:"osBuild"`
+	OsRapidSecurityResponse                     string     `json:"osRapidSecurityResponse"`
+	OsSupplementalBuildVersion                  string     `json:"osSupplementalBuildVersion"`
+	OsVersion                                   string     `json:"osVersion"`
+	QuotaSize                                   int        `json:"quotaSize"`
+	ResidentUsers                               int        `json:"residentUsers"`
+	SharedIpad                                  bool       `json:"sharedIpad"`
+	SiteID                                      string     `json:"siteId"`
+	SoftwareUpdateDeviceID                      string     `json:"softwareUpdateDeviceId"`
+	Supervised                                  bool       `json:"supervised"`
+	SyncedToComputer                            int        `json:"syncedToComputer"`
+	TemporarySessionOnly                        bool       `json:"temporarySessionOnly"`
+	TemporarySessionTimeout                     int        `json:"temporarySessionTimeout"`
+	Tethered                                    bool       `json:"tethered"`
 	// IANA time zone database name.
 	TimeZone           string `json:"timeZone"`
 	UDID               string `json:"udid"`
@@ -5433,30 +5445,32 @@ type MobileDeviceTvOsGeneral struct {
 	// The enrollment method used for the device. **Note:** The `PersonalDeviceProfile` enrollment method
 	// was removed as of 11.25.
 	// Allowed values: see the MobileDeviceTvOsGeneralDeviceOwnershipType constants.
-	DeviceOwnershipType                      string                           `json:"deviceOwnershipType"`
-	DisplayName                              string                           `json:"displayName"`
-	EnrollmentMethodPrestage                 *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
-	EnrollmentSessionTokenValid              bool                             `json:"enrollmentSessionTokenValid"`
-	ExtensionAttributes                      []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
-	IPAddress                                string                           `json:"ipAddress"`
-	Languages                                string                           `json:"languages"`
-	LastEnrolledDate                         *time.Time                       `json:"lastEnrolledDate,omitempty"`
-	LastInventoryUpdateDate                  *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
-	LastLoggedInUsernameMDM                  *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
-	LastLoggedInUsernameMDMTimestamp         *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
-	LastLoggedInUsernameSelfService          *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
-	LastLoggedInUsernameSelfServiceTimestamp *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
-	Locales                                  string                           `json:"locales"`
-	Managed                                  bool                             `json:"managed"`
-	ManagementID                             string                           `json:"managementId"`
-	MDMProfileExpirationDate                 *time.Time                       `json:"mdmProfileExpirationDate,omitempty"`
-	OsBuild                                  string                           `json:"osBuild"`
-	OsRapidSecurityResponse                  string                           `json:"osRapidSecurityResponse"`
-	OsSupplementalBuildVersion               string                           `json:"osSupplementalBuildVersion"`
-	OsVersion                                string                           `json:"osVersion"`
-	SiteID                                   string                           `json:"siteId"`
-	SoftwareUpdateDeviceID                   string                           `json:"softwareUpdateDeviceId"`
-	Supervised                               bool                             `json:"supervised"`
+	DeviceOwnershipType         string                           `json:"deviceOwnershipType"`
+	DisplayName                 string                           `json:"displayName"`
+	EnrollmentMethodPrestage    *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
+	EnrollmentSessionTokenValid bool                             `json:"enrollmentSessionTokenValid"`
+	ExtensionAttributes         []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
+	IPAddress                   string                           `json:"ipAddress"`
+	Languages                   string                           `json:"languages"`
+	// The date and time of the most recent device contact via MDM or DDM channels.
+	LastContactDate                          *time.Time `json:"lastContactDate,omitempty"`
+	LastEnrolledDate                         *time.Time `json:"lastEnrolledDate,omitempty"`
+	LastInventoryUpdateDate                  *time.Time `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                  *string    `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
+	LastLoggedInUsernameSelfService          *string    `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp *time.Time `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	Locales                                  string     `json:"locales"`
+	Managed                                  bool       `json:"managed"`
+	ManagementID                             string     `json:"managementId"`
+	MDMProfileExpirationDate                 *time.Time `json:"mdmProfileExpirationDate,omitempty"`
+	OsBuild                                  string     `json:"osBuild"`
+	OsRapidSecurityResponse                  string     `json:"osRapidSecurityResponse"`
+	OsSupplementalBuildVersion               string     `json:"osSupplementalBuildVersion"`
+	OsVersion                                string     `json:"osVersion"`
+	SiteID                                   string     `json:"siteId"`
+	SoftwareUpdateDeviceID                   string     `json:"softwareUpdateDeviceId"`
+	Supervised                               bool       `json:"supervised"`
 	// IANA time zone database name.
 	TimeZone string `json:"timeZone"`
 	UDID     string `json:"udid"`
@@ -5532,32 +5546,34 @@ type MobileDeviceVisionOsGeneral struct {
 	// The enrollment method used for the device. **Note:** The `PersonalDeviceProfile` enrollment method
 	// was removed as of 11.25.
 	// Allowed values: see the MobileDeviceVisionOsGeneralDeviceOwnershipType constants.
-	DeviceOwnershipType                      string                           `json:"deviceOwnershipType"`
-	DiagnosticAndUsageReportingEnabled       bool                             `json:"diagnosticAndUsageReportingEnabled"`
-	DisplayName                              string                           `json:"displayName"`
-	DoNotDisturbEnabled                      bool                             `json:"doNotDisturbEnabled"`
-	EnrollmentMethodPrestage                 *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
-	EnrollmentSessionTokenValid              bool                             `json:"enrollmentSessionTokenValid"`
-	ExtensionAttributes                      []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
-	IPAddress                                string                           `json:"ipAddress"`
-	ItunesStoreAccountActive                 bool                             `json:"itunesStoreAccountActive"`
-	LastCloudBackupDate                      *time.Time                       `json:"lastCloudBackupDate,omitempty"`
-	LastEnrolledDate                         *time.Time                       `json:"lastEnrolledDate,omitempty"`
-	LastInventoryUpdateDate                  *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
-	LastLoggedInUsernameMDM                  *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
-	LastLoggedInUsernameMDMTimestamp         *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
-	LastLoggedInUsernameSelfService          *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
-	LastLoggedInUsernameSelfServiceTimestamp *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
-	Managed                                  bool                             `json:"managed"`
-	ManagementID                             string                           `json:"managementId"`
-	MDMProfileExpirationDate                 *time.Time                       `json:"mdmProfileExpirationDate,omitempty"`
-	OsBuild                                  string                           `json:"osBuild"`
-	OsRapidSecurityResponse                  string                           `json:"osRapidSecurityResponse"`
-	OsSupplementalBuildVersion               string                           `json:"osSupplementalBuildVersion"`
-	OsVersion                                string                           `json:"osVersion"`
-	SiteID                                   string                           `json:"siteId"`
-	SoftwareUpdateDeviceID                   string                           `json:"softwareUpdateDeviceId"`
-	Supervised                               bool                             `json:"supervised"`
+	DeviceOwnershipType                string                           `json:"deviceOwnershipType"`
+	DiagnosticAndUsageReportingEnabled bool                             `json:"diagnosticAndUsageReportingEnabled"`
+	DisplayName                        string                           `json:"displayName"`
+	DoNotDisturbEnabled                bool                             `json:"doNotDisturbEnabled"`
+	EnrollmentMethodPrestage           *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
+	EnrollmentSessionTokenValid        bool                             `json:"enrollmentSessionTokenValid"`
+	ExtensionAttributes                []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
+	IPAddress                          string                           `json:"ipAddress"`
+	ItunesStoreAccountActive           bool                             `json:"itunesStoreAccountActive"`
+	LastCloudBackupDate                *time.Time                       `json:"lastCloudBackupDate,omitempty"`
+	// The date and time of the most recent device contact via MDM or DDM channels.
+	LastContactDate                          *time.Time `json:"lastContactDate,omitempty"`
+	LastEnrolledDate                         *time.Time `json:"lastEnrolledDate,omitempty"`
+	LastInventoryUpdateDate                  *time.Time `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                  *string    `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
+	LastLoggedInUsernameSelfService          *string    `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp *time.Time `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	Managed                                  bool       `json:"managed"`
+	ManagementID                             string     `json:"managementId"`
+	MDMProfileExpirationDate                 *time.Time `json:"mdmProfileExpirationDate,omitempty"`
+	OsBuild                                  string     `json:"osBuild"`
+	OsRapidSecurityResponse                  string     `json:"osRapidSecurityResponse"`
+	OsSupplementalBuildVersion               string     `json:"osSupplementalBuildVersion"`
+	OsVersion                                string     `json:"osVersion"`
+	SiteID                                   string     `json:"siteId"`
+	SoftwareUpdateDeviceID                   string     `json:"softwareUpdateDeviceId"`
+	Supervised                               bool       `json:"supervised"`
 	// IANA time zone database name.
 	TimeZone string `json:"timeZone"`
 	UDID     string `json:"udid"`
@@ -5593,32 +5609,34 @@ type MobileDeviceWatchOsGeneral struct {
 	// The enrollment method used for the device. **Note:** The `PersonalDeviceProfile` enrollment method
 	// was removed as of 11.25.
 	// Allowed values: see the MobileDeviceWatchOsGeneralDeviceOwnershipType constants.
-	DeviceOwnershipType                      string                           `json:"deviceOwnershipType"`
-	DiagnosticAndUsageReportingEnabled       bool                             `json:"diagnosticAndUsageReportingEnabled"`
-	DisplayName                              string                           `json:"displayName"`
-	DoNotDisturbEnabled                      bool                             `json:"doNotDisturbEnabled"`
-	EnrollmentMethodPrestage                 *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
-	EnrollmentSessionTokenValid              bool                             `json:"enrollmentSessionTokenValid"`
-	ExtensionAttributes                      []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
-	IPAddress                                string                           `json:"ipAddress"`
-	ItunesStoreAccountActive                 bool                             `json:"itunesStoreAccountActive"`
-	LastCloudBackupDate                      *time.Time                       `json:"lastCloudBackupDate,omitempty"`
-	LastEnrolledDate                         *time.Time                       `json:"lastEnrolledDate,omitempty"`
-	LastInventoryUpdateDate                  *time.Time                       `json:"lastInventoryUpdateDate,omitempty"`
-	LastLoggedInUsernameMDM                  *string                          `json:"lastLoggedInUsernameMdm,omitempty"`
-	LastLoggedInUsernameMDMTimestamp         *time.Time                       `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
-	LastLoggedInUsernameSelfService          *string                          `json:"lastLoggedInUsernameSelfService,omitempty"`
-	LastLoggedInUsernameSelfServiceTimestamp *time.Time                       `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
-	Managed                                  bool                             `json:"managed"`
-	ManagementID                             string                           `json:"managementId"`
-	MDMProfileExpirationDate                 *time.Time                       `json:"mdmProfileExpirationDate,omitempty"`
-	OsBuild                                  string                           `json:"osBuild"`
-	OsRapidSecurityResponse                  string                           `json:"osRapidSecurityResponse"`
-	OsSupplementalBuildVersion               string                           `json:"osSupplementalBuildVersion"`
-	OsVersion                                string                           `json:"osVersion"`
-	SiteID                                   string                           `json:"siteId"`
-	SoftwareUpdateDeviceID                   string                           `json:"softwareUpdateDeviceId"`
-	Supervised                               bool                             `json:"supervised"`
+	DeviceOwnershipType                string                           `json:"deviceOwnershipType"`
+	DiagnosticAndUsageReportingEnabled bool                             `json:"diagnosticAndUsageReportingEnabled"`
+	DisplayName                        string                           `json:"displayName"`
+	DoNotDisturbEnabled                bool                             `json:"doNotDisturbEnabled"`
+	EnrollmentMethodPrestage           *EnrollmentMethodPrestage        `json:"enrollmentMethodPrestage,omitempty"`
+	EnrollmentSessionTokenValid        bool                             `json:"enrollmentSessionTokenValid"`
+	ExtensionAttributes                []MobileDeviceExtensionAttribute `json:"extensionAttributes"`
+	IPAddress                          string                           `json:"ipAddress"`
+	ItunesStoreAccountActive           bool                             `json:"itunesStoreAccountActive"`
+	LastCloudBackupDate                *time.Time                       `json:"lastCloudBackupDate,omitempty"`
+	// The date and time of the most recent device contact via MDM or DDM channels.
+	LastContactDate                          *time.Time `json:"lastContactDate,omitempty"`
+	LastEnrolledDate                         *time.Time `json:"lastEnrolledDate,omitempty"`
+	LastInventoryUpdateDate                  *time.Time `json:"lastInventoryUpdateDate,omitempty"`
+	LastLoggedInUsernameMDM                  *string    `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
+	LastLoggedInUsernameSelfService          *string    `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp *time.Time `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	Managed                                  bool       `json:"managed"`
+	ManagementID                             string     `json:"managementId"`
+	MDMProfileExpirationDate                 *time.Time `json:"mdmProfileExpirationDate,omitempty"`
+	OsBuild                                  string     `json:"osBuild"`
+	OsRapidSecurityResponse                  string     `json:"osRapidSecurityResponse"`
+	OsSupplementalBuildVersion               string     `json:"osSupplementalBuildVersion"`
+	OsVersion                                string     `json:"osVersion"`
+	SiteID                                   string     `json:"siteId"`
+	SoftwareUpdateDeviceID                   string     `json:"softwareUpdateDeviceId"`
+	Supervised                               bool       `json:"supervised"`
 	// IANA time zone database name.
 	TimeZone string `json:"timeZone"`
 	UDID     string `json:"udid"`
@@ -5743,9 +5761,12 @@ type OidcLoginDispatchResponseV2 struct {
 
 // OidcLoginDispatchResponseV2IdpRedirectsItem represents a oidc login dispatch response v2 idp redirects item.
 type OidcLoginDispatchResponseV2IdpRedirectsItem struct {
-	IdpName     string `json:"idpName"`
-	IdpType     string `json:"idpType"`
-	RedirectURL string `json:"redirectUrl"`
+	IdpName string `json:"idpName"`
+	IdpType string `json:"idpType"`
+	// Customer-provided icon served by jamf account URL for this connection. Null when no custom icon is
+	// configured (Jamf ID connections always return null).
+	LogoURL     *string `json:"logoUrl,omitempty"`
+	RedirectURL string  `json:"redirectUrl"`
 }
 
 // OidcPublicFeaturesResponse represents a oidc public features response.
@@ -7505,6 +7526,13 @@ type TimeZone struct {
 	// Allowed values: see the TimeZoneRegion constants.
 	Region string `json:"region"`
 	ZoneID string `json:"zoneId"`
+}
+
+// TriggerEnhancedLogCollectionCommand represents a trigger enhanced log collection command.
+type TriggerEnhancedLogCollectionCommand struct {
+	// The AppleCare token the device uses for authenticating the enhanced log collection session.
+	AppleCareToken string         `json:"appleCareToken"`
+	CommandType    MDMCommandType `json:"commandType"`
 }
 
 // TvOsDetails will be populated if the type is appleTv.
