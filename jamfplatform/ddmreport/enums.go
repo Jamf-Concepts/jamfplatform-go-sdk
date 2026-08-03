@@ -16,6 +16,20 @@ const (
 	DeclarationReportClientDtoValidityStateUnknown DeclarationReportClientDtoValidityState = "UNKNOWN"
 )
 
+// DeclarationReportClientDtoValidityStateValues returns every value the Jamf API accepts for DeclarationReportClientDtoValidityState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeclarationReportClientDtoValidityStateValues() []DeclarationReportClientDtoValidityState {
+	return []DeclarationReportClientDtoValidityState{
+		DeclarationReportClientDtoValidityStateValid,
+		DeclarationReportClientDtoValidityStateInvalid,
+		DeclarationReportClientDtoValidityStateUnknown,
+	}
+}
+
 // FilteredResultDtoStatus is the set of values accepted by FilteredResultDto.Status.
 type FilteredResultDtoStatus = string
 
@@ -28,6 +42,22 @@ const (
 	FilteredResultDtoStatusUnsuccessful FilteredResultDtoStatus = "UNSUCCESSFUL"
 	FilteredResultDtoStatusUnknown      FilteredResultDtoStatus = "UNKNOWN"
 )
+
+// FilteredResultDtoStatusValues returns every value the Jamf API accepts for FilteredResultDtoStatus,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func FilteredResultDtoStatusValues() []FilteredResultDtoStatus {
+	return []FilteredResultDtoStatus{
+		FilteredResultDtoStatusPending,
+		FilteredResultDtoStatusSuccessful,
+		FilteredResultDtoStatusAwaitingSync,
+		FilteredResultDtoStatusUnsuccessful,
+		FilteredResultDtoStatusUnknown,
+	}
+}
 
 // FilteredResultDtoType is the set of values accepted by FilteredResultDto.Type.
 type FilteredResultDtoType = string
@@ -42,6 +72,22 @@ const (
 	FilteredResultDtoTypeUnknown       FilteredResultDtoType = "UNKNOWN"
 )
 
+// FilteredResultDtoTypeValues returns every value the Jamf API accepts for FilteredResultDtoType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func FilteredResultDtoTypeValues() []FilteredResultDtoType {
+	return []FilteredResultDtoType{
+		FilteredResultDtoTypeAsset,
+		FilteredResultDtoTypeManagement,
+		FilteredResultDtoTypeConfiguration,
+		FilteredResultDtoTypeActivation,
+		FilteredResultDtoTypeUnknown,
+	}
+}
+
 // FilteredResultDtoValidityState is the set of values accepted by FilteredResultDto.ValidityState.
 type FilteredResultDtoValidityState = string
 
@@ -52,6 +98,20 @@ const (
 	FilteredResultDtoValidityStateInvalid FilteredResultDtoValidityState = "INVALID"
 	FilteredResultDtoValidityStateUnknown FilteredResultDtoValidityState = "UNKNOWN"
 )
+
+// FilteredResultDtoValidityStateValues returns every value the Jamf API accepts for FilteredResultDtoValidityState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func FilteredResultDtoValidityStateValues() []FilteredResultDtoValidityState {
+	return []FilteredResultDtoValidityState{
+		FilteredResultDtoValidityStateValid,
+		FilteredResultDtoValidityStateInvalid,
+		FilteredResultDtoValidityStateUnknown,
+	}
+}
 
 // StatusReportDeclarationDtoStatus is the set of values accepted by StatusReportDeclarationDto.Status.
 type StatusReportDeclarationDtoStatus = string
@@ -66,6 +126,22 @@ const (
 	StatusReportDeclarationDtoStatusUnknown      StatusReportDeclarationDtoStatus = "UNKNOWN"
 )
 
+// StatusReportDeclarationDtoStatusValues returns every value the Jamf API accepts for StatusReportDeclarationDtoStatus,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func StatusReportDeclarationDtoStatusValues() []StatusReportDeclarationDtoStatus {
+	return []StatusReportDeclarationDtoStatus{
+		StatusReportDeclarationDtoStatusPending,
+		StatusReportDeclarationDtoStatusSuccessful,
+		StatusReportDeclarationDtoStatusAwaitingSync,
+		StatusReportDeclarationDtoStatusUnsuccessful,
+		StatusReportDeclarationDtoStatusUnknown,
+	}
+}
+
 // StatusReportDeclarationDtoType is the set of values accepted by StatusReportDeclarationDto.Type.
 type StatusReportDeclarationDtoType = string
 
@@ -79,6 +155,22 @@ const (
 	StatusReportDeclarationDtoTypeUnknown       StatusReportDeclarationDtoType = "UNKNOWN"
 )
 
+// StatusReportDeclarationDtoTypeValues returns every value the Jamf API accepts for StatusReportDeclarationDtoType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func StatusReportDeclarationDtoTypeValues() []StatusReportDeclarationDtoType {
+	return []StatusReportDeclarationDtoType{
+		StatusReportDeclarationDtoTypeAsset,
+		StatusReportDeclarationDtoTypeManagement,
+		StatusReportDeclarationDtoTypeConfiguration,
+		StatusReportDeclarationDtoTypeActivation,
+		StatusReportDeclarationDtoTypeUnknown,
+	}
+}
+
 // StatusReportDeclarationDtoValidityState is the set of values accepted by StatusReportDeclarationDto.ValidityState.
 type StatusReportDeclarationDtoValidityState = string
 
@@ -89,3 +181,17 @@ const (
 	StatusReportDeclarationDtoValidityStateInvalid StatusReportDeclarationDtoValidityState = "INVALID"
 	StatusReportDeclarationDtoValidityStateUnknown StatusReportDeclarationDtoValidityState = "UNKNOWN"
 )
+
+// StatusReportDeclarationDtoValidityStateValues returns every value the Jamf API accepts for StatusReportDeclarationDtoValidityState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func StatusReportDeclarationDtoValidityStateValues() []StatusReportDeclarationDtoValidityState {
+	return []StatusReportDeclarationDtoValidityState{
+		StatusReportDeclarationDtoValidityStateValid,
+		StatusReportDeclarationDtoValidityStateInvalid,
+		StatusReportDeclarationDtoValidityStateUnknown,
+	}
+}

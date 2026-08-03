@@ -387,6 +387,20 @@ const (
 	{{ .Name }} {{ $enumType }} = "{{ .Value }}"
 {{- end }}
 )
+
+// {{ .Name }}Values returns every value the Jamf API accepts for {{ .Name }},
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func {{ .Name }}Values() []{{ $enumType }} {
+	return []{{ $enumType }}{
+{{- range .EnumValues }}
+		{{ .Name }},
+{{- end }}
+	}
+}
 {{- end }}
 {{- end }}
 {{ end }}

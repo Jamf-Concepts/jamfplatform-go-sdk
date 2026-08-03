@@ -15,6 +15,19 @@ const (
 	DeviceTypeV1Mobile   DeviceTypeV1 = "MOBILE"
 )
 
+// DeviceTypeV1Values returns every value the Jamf API accepts for DeviceTypeV1,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeviceTypeV1Values() []DeviceTypeV1 {
+	return []DeviceTypeV1{
+		DeviceTypeV1Computer,
+		DeviceTypeV1Mobile,
+	}
+}
+
 // GroupTypeV1 represents a group type v1 value.
 type GroupTypeV1 = string
 
@@ -25,6 +38,19 @@ const (
 	GroupTypeV1Static GroupTypeV1 = "STATIC"
 )
 
+// GroupTypeV1Values returns every value the Jamf API accepts for GroupTypeV1,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func GroupTypeV1Values() []GroupTypeV1 {
+	return []GroupTypeV1{
+		GroupTypeV1Smart,
+		GroupTypeV1Static,
+	}
+}
+
 // JoinTypeV1 represents a join type v1 value.
 type JoinTypeV1 = string
 
@@ -34,3 +60,16 @@ const (
 	JoinTypeV1And JoinTypeV1 = "AND"
 	JoinTypeV1Or  JoinTypeV1 = "OR"
 )
+
+// JoinTypeV1Values returns every value the Jamf API accepts for JoinTypeV1,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func JoinTypeV1Values() []JoinTypeV1 {
+	return []JoinTypeV1{
+		JoinTypeV1And,
+		JoinTypeV1Or,
+	}
+}

@@ -18,6 +18,22 @@ const (
 	DeviceHardwareReadRepresentationV1BatteryHealthUnsupported        DeviceHardwareReadRepresentationV1BatteryHealth = "UNSUPPORTED"
 )
 
+// DeviceHardwareReadRepresentationV1BatteryHealthValues returns every value the Jamf API accepts for DeviceHardwareReadRepresentationV1BatteryHealth,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeviceHardwareReadRepresentationV1BatteryHealthValues() []DeviceHardwareReadRepresentationV1BatteryHealth {
+	return []DeviceHardwareReadRepresentationV1BatteryHealth{
+		DeviceHardwareReadRepresentationV1BatteryHealthNonGenuine,
+		DeviceHardwareReadRepresentationV1BatteryHealthNormal,
+		DeviceHardwareReadRepresentationV1BatteryHealthServiceRecommended,
+		DeviceHardwareReadRepresentationV1BatteryHealthUnknown,
+		DeviceHardwareReadRepresentationV1BatteryHealthUnsupported,
+	}
+}
+
 // DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatus is the set of values accepted by DeviceSecurityReadRepresentationV1.BootstrapTokenEscrowedStatus.
 type DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatus = string
 
@@ -28,3 +44,17 @@ const (
 	DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatusEscrowed     DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatus = "ESCROWED"
 	DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatusNotEscrowed  DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatus = "NOT_ESCROWED"
 )
+
+// DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatusValues returns every value the Jamf API accepts for DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatus,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatusValues() []DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatus {
+	return []DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatus{
+		DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatusNotSupported,
+		DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatusEscrowed,
+		DeviceSecurityReadRepresentationV1BootstrapTokenEscrowedStatusNotEscrowed,
+	}
+}

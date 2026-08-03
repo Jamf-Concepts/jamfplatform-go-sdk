@@ -15,6 +15,19 @@ const (
 	DeclarationChannelTypeUser   DeclarationChannelType = "USER"
 )
 
+// DeclarationChannelTypeValues returns every value the Jamf API accepts for DeclarationChannelType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeclarationChannelTypeValues() []DeclarationChannelType {
+	return []DeclarationChannelType{
+		DeclarationChannelTypeSystem,
+		DeclarationChannelTypeUser,
+	}
+}
+
 // DeclarationKind represents a declaration kind value.
 type DeclarationKind = string
 
@@ -24,6 +37,19 @@ const (
 	DeclarationKindConfiguration DeclarationKind = "CONFIGURATION"
 	DeclarationKindAsset         DeclarationKind = "ASSET"
 )
+
+// DeclarationKindValues returns every value the Jamf API accepts for DeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeclarationKindValues() []DeclarationKind {
+	return []DeclarationKind{
+		DeclarationKindConfiguration,
+		DeclarationKindAsset,
+	}
+}
 
 // AcceptCookiesValue is the set of values accepted by AcceptCookies.Value.
 type AcceptCookiesValue = string
@@ -37,6 +63,21 @@ const (
 	AcceptCookiesValueAlways          AcceptCookiesValue = "Always"
 )
 
+// AcceptCookiesValueValues returns every value the Jamf API accepts for AcceptCookiesValue,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AcceptCookiesValueValues() []AcceptCookiesValue {
+	return []AcceptCookiesValue{
+		AcceptCookiesValueNever,
+		AcceptCookiesValueCurrentWebsite,
+		AcceptCookiesValueVisitedWebsites,
+		AcceptCookiesValueAlways,
+	}
+}
+
 // AutomaticActionValue is the set of values accepted by AutomaticAction.Value.
 type AutomaticActionValue = string
 
@@ -47,6 +88,20 @@ const (
 	AutomaticActionValueAlwaysOn  AutomaticActionValue = "AlwaysOn"
 	AutomaticActionValueAlwaysOff AutomaticActionValue = "AlwaysOff"
 )
+
+// AutomaticActionValueValues returns every value the Jamf API accepts for AutomaticActionValue,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AutomaticActionValueValues() []AutomaticActionValue {
+	return []AutomaticActionValue{
+		AutomaticActionValueAllowed,
+		AutomaticActionValueAlwaysOn,
+		AutomaticActionValueAlwaysOff,
+	}
+}
 
 // BetaSettingsProgramEnrollment is the set of values accepted by BetaSettings.ProgramEnrollment.
 type BetaSettingsProgramEnrollment = string
@@ -59,6 +114,20 @@ const (
 	BetaSettingsProgramEnrollmentAlwaysOff BetaSettingsProgramEnrollment = "AlwaysOff"
 )
 
+// BetaSettingsProgramEnrollmentValues returns every value the Jamf API accepts for BetaSettingsProgramEnrollment,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func BetaSettingsProgramEnrollmentValues() []BetaSettingsProgramEnrollment {
+	return []BetaSettingsProgramEnrollment{
+		BetaSettingsProgramEnrollmentAllowed,
+		BetaSettingsProgramEnrollmentAlwaysOn,
+		BetaSettingsProgramEnrollmentAlwaysOff,
+	}
+}
+
 // DeploymentStateState is the set of values accepted by DeploymentState.State.
 type DeploymentStateState = string
 
@@ -69,6 +138,20 @@ const (
 	DeploymentStateStateDeployed    DeploymentStateState = "DEPLOYED"
 	DeploymentStateStateOutOfDate   DeploymentStateState = "OUT_OF_DATE"
 )
+
+// DeploymentStateStateValues returns every value the Jamf API accepts for DeploymentStateState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeploymentStateStateValues() []DeploymentStateState {
+	return []DeploymentStateState{
+		DeploymentStateStateNotDeployed,
+		DeploymentStateStateDeployed,
+		DeploymentStateStateOutOfDate,
+	}
+}
 
 // ManagedAppEntryAllowDownloadsOverCellular is the set of values accepted by ManagedAppEntry.AllowDownloadsOverCellular.
 type ManagedAppEntryAllowDownloadsOverCellular = string
@@ -81,6 +164,20 @@ const (
 	ManagedAppEntryAllowDownloadsOverCellularStoreSettings ManagedAppEntryAllowDownloadsOverCellular = "StoreSettings"
 )
 
+// ManagedAppEntryAllowDownloadsOverCellularValues returns every value the Jamf API accepts for ManagedAppEntryAllowDownloadsOverCellular,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedAppEntryAllowDownloadsOverCellularValues() []ManagedAppEntryAllowDownloadsOverCellular {
+	return []ManagedAppEntryAllowDownloadsOverCellular{
+		ManagedAppEntryAllowDownloadsOverCellularAlwaysOn,
+		ManagedAppEntryAllowDownloadsOverCellularAlwaysOff,
+		ManagedAppEntryAllowDownloadsOverCellularStoreSettings,
+	}
+}
+
 // ManagedAppEntryAutomaticAppUpdates is the set of values accepted by ManagedAppEntry.AutomaticAppUpdates.
 type ManagedAppEntryAutomaticAppUpdates = string
 
@@ -92,6 +189,20 @@ const (
 	ManagedAppEntryAutomaticAppUpdatesStoreSettings ManagedAppEntryAutomaticAppUpdates = "StoreSettings"
 )
 
+// ManagedAppEntryAutomaticAppUpdatesValues returns every value the Jamf API accepts for ManagedAppEntryAutomaticAppUpdates,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedAppEntryAutomaticAppUpdatesValues() []ManagedAppEntryAutomaticAppUpdates {
+	return []ManagedAppEntryAutomaticAppUpdates{
+		ManagedAppEntryAutomaticAppUpdatesAlwaysOn,
+		ManagedAppEntryAutomaticAppUpdatesAlwaysOff,
+		ManagedAppEntryAutomaticAppUpdatesStoreSettings,
+	}
+}
+
 // ManagedAppEntryInstall is the set of values accepted by ManagedAppEntry.Install.
 type ManagedAppEntryInstall = string
 
@@ -101,6 +212,19 @@ const (
 	ManagedAppEntryInstallRequired ManagedAppEntryInstall = "Required"
 	ManagedAppEntryInstallOptional ManagedAppEntryInstall = "Optional"
 )
+
+// ManagedAppEntryInstallValues returns every value the Jamf API accepts for ManagedAppEntryInstall,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedAppEntryInstallValues() []ManagedAppEntryInstall {
+	return []ManagedAppEntryInstall{
+		ManagedAppEntryInstallRequired,
+		ManagedAppEntryInstallOptional,
+	}
+}
 
 // ManagedExtensionPrivateBrowsing is the set of values accepted by ManagedExtension.PrivateBrowsing.
 type ManagedExtensionPrivateBrowsing = string
@@ -113,6 +237,20 @@ const (
 	ManagedExtensionPrivateBrowsingAlwaysOff ManagedExtensionPrivateBrowsing = "AlwaysOff"
 )
 
+// ManagedExtensionPrivateBrowsingValues returns every value the Jamf API accepts for ManagedExtensionPrivateBrowsing,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedExtensionPrivateBrowsingValues() []ManagedExtensionPrivateBrowsing {
+	return []ManagedExtensionPrivateBrowsing{
+		ManagedExtensionPrivateBrowsingAllowed,
+		ManagedExtensionPrivateBrowsingAlwaysOn,
+		ManagedExtensionPrivateBrowsingAlwaysOff,
+	}
+}
+
 // ManagedExtensionState is the set of values accepted by ManagedExtension.State.
 type ManagedExtensionState = string
 
@@ -123,6 +261,20 @@ const (
 	ManagedExtensionStateAlwaysOn  ManagedExtensionState = "AlwaysOn"
 	ManagedExtensionStateAlwaysOff ManagedExtensionState = "AlwaysOff"
 )
+
+// ManagedExtensionStateValues returns every value the Jamf API accepts for ManagedExtensionState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedExtensionStateValues() []ManagedExtensionState {
+	return []ManagedExtensionState{
+		ManagedExtensionStateAllowed,
+		ManagedExtensionStateAlwaysOn,
+		ManagedExtensionStateAlwaysOff,
+	}
+}
 
 // NewTabStartPagePageType is the set of values accepted by NewTabStartPage.PageType.
 type NewTabStartPagePageType = string
@@ -135,6 +287,20 @@ const (
 	NewTabStartPagePageTypeExtension NewTabStartPagePageType = "Extension"
 )
 
+// NewTabStartPagePageTypeValues returns every value the Jamf API accepts for NewTabStartPagePageType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func NewTabStartPagePageTypeValues() []NewTabStartPagePageType {
+	return []NewTabStartPagePageType{
+		NewTabStartPagePageTypeStart,
+		NewTabStartPagePageTypeHome,
+		NewTabStartPagePageTypeExtension,
+	}
+}
+
 // RecommendedCadenceValue is the set of values accepted by RecommendedCadence.Value.
 type RecommendedCadenceValue = string
 
@@ -145,6 +311,20 @@ const (
 	RecommendedCadenceValueOldest RecommendedCadenceValue = "Oldest"
 	RecommendedCadenceValueNewest RecommendedCadenceValue = "Newest"
 )
+
+// RecommendedCadenceValueValues returns every value the Jamf API accepts for RecommendedCadenceValue,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func RecommendedCadenceValueValues() []RecommendedCadenceValue {
+	return []RecommendedCadenceValue{
+		RecommendedCadenceValueAll,
+		RecommendedCadenceValueOldest,
+		RecommendedCadenceValueNewest,
+	}
+}
 
 // StorageModeValue is the set of values accepted by StorageMode.Value.
 type StorageModeValue = string
@@ -157,6 +337,20 @@ const (
 	StorageModeValueReadOnly   StorageModeValue = "ReadOnly"
 )
 
+// StorageModeValueValues returns every value the Jamf API accepts for StorageModeValue,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func StorageModeValueValues() []StorageModeValue {
+	return []StorageModeValue{
+		StorageModeValueAllowed,
+		StorageModeValueDisallowed,
+		StorageModeValueReadOnly,
+	}
+}
+
 // UnpairingTimePolicy is the set of values accepted by UnpairingTime.Policy.
 type UnpairingTimePolicy = string
 
@@ -166,3 +360,16 @@ const (
 	UnpairingTimePolicyNone UnpairingTimePolicy = "None"
 	UnpairingTimePolicyHour UnpairingTimePolicy = "Hour"
 )
+
+// UnpairingTimePolicyValues returns every value the Jamf API accepts for UnpairingTimePolicy,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func UnpairingTimePolicyValues() []UnpairingTimePolicy {
+	return []UnpairingTimePolicy{
+		UnpairingTimePolicyNone,
+		UnpairingTimePolicyHour,
+	}
+}

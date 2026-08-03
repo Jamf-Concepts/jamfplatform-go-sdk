@@ -16,6 +16,20 @@ const (
 	RuleResultStateUnknown RuleResultState = "UNKNOWN"
 )
 
+// RuleResultStateValues returns every value the Jamf API accepts for RuleResultState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func RuleResultStateValues() []RuleResultState {
+	return []RuleResultState{
+		RuleResultStatePassed,
+		RuleResultStateFailed,
+		RuleResultStateUnknown,
+	}
+}
+
 // BenchmarkRequestV2EnforcementMode is the set of values accepted by BenchmarkRequestV2.EnforcementMode.
 type BenchmarkRequestV2EnforcementMode = string
 
@@ -26,6 +40,19 @@ const (
 	BenchmarkRequestV2EnforcementModeMonitorAndEnforce BenchmarkRequestV2EnforcementMode = "MONITOR_AND_ENFORCE"
 )
 
+// BenchmarkRequestV2EnforcementModeValues returns every value the Jamf API accepts for BenchmarkRequestV2EnforcementMode,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func BenchmarkRequestV2EnforcementModeValues() []BenchmarkRequestV2EnforcementMode {
+	return []BenchmarkRequestV2EnforcementMode{
+		BenchmarkRequestV2EnforcementModeMonitor,
+		BenchmarkRequestV2EnforcementModeMonitorAndEnforce,
+	}
+}
+
 // BenchmarkResponseV2EnforcementMode is the set of values accepted by BenchmarkResponseV2.EnforcementMode.
 type BenchmarkResponseV2EnforcementMode = string
 
@@ -35,6 +62,19 @@ const (
 	BenchmarkResponseV2EnforcementModeMonitor           BenchmarkResponseV2EnforcementMode = "MONITOR"
 	BenchmarkResponseV2EnforcementModeMonitorAndEnforce BenchmarkResponseV2EnforcementMode = "MONITOR_AND_ENFORCE"
 )
+
+// BenchmarkResponseV2EnforcementModeValues returns every value the Jamf API accepts for BenchmarkResponseV2EnforcementMode,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func BenchmarkResponseV2EnforcementModeValues() []BenchmarkResponseV2EnforcementMode {
+	return []BenchmarkResponseV2EnforcementMode{
+		BenchmarkResponseV2EnforcementModeMonitor,
+		BenchmarkResponseV2EnforcementModeMonitorAndEnforce,
+	}
+}
 
 // BenchmarkV2SyncState is the set of values accepted by BenchmarkV2.SyncState.
 type BenchmarkV2SyncState = string
@@ -49,6 +89,22 @@ const (
 	BenchmarkV2SyncStateDeleteFailed BenchmarkV2SyncState = "DELETE_FAILED"
 )
 
+// BenchmarkV2SyncStateValues returns every value the Jamf API accepts for BenchmarkV2SyncState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func BenchmarkV2SyncStateValues() []BenchmarkV2SyncState {
+	return []BenchmarkV2SyncState{
+		BenchmarkV2SyncStateSynced,
+		BenchmarkV2SyncStatePending,
+		BenchmarkV2SyncStateFailed,
+		BenchmarkV2SyncStateDeleting,
+		BenchmarkV2SyncStateDeleteFailed,
+	}
+}
+
 // OrganizationDefinedValueType is the set of values accepted by OrganizationDefinedValue.Type.
 type OrganizationDefinedValueType = string
 
@@ -61,6 +117,21 @@ const (
 	OrganizationDefinedValueTypeRegex   OrganizationDefinedValueType = "REGEX"
 )
 
+// OrganizationDefinedValueTypeValues returns every value the Jamf API accepts for OrganizationDefinedValueType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func OrganizationDefinedValueTypeValues() []OrganizationDefinedValueType {
+	return []OrganizationDefinedValueType{
+		OrganizationDefinedValueTypeInteger,
+		OrganizationDefinedValueTypeString,
+		OrganizationDefinedValueTypeEnum,
+		OrganizationDefinedValueTypeRegex,
+	}
+}
+
 // OsInfoManagementType is the set of values accepted by OsInfo.ManagementType.
 type OsInfoManagementType = string
 
@@ -70,6 +141,19 @@ const (
 	OsInfoManagementTypeManaged OsInfoManagementType = "MANAGED"
 	OsInfoManagementTypeByod    OsInfoManagementType = "BYOD"
 )
+
+// OsInfoManagementTypeValues returns every value the Jamf API accepts for OsInfoManagementType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func OsInfoManagementTypeValues() []OsInfoManagementType {
+	return []OsInfoManagementType{
+		OsInfoManagementTypeManaged,
+		OsInfoManagementTypeByod,
+	}
+}
 
 // OsInfoOsType is the set of values accepted by OsInfo.OsType.
 type OsInfoOsType = string
@@ -81,6 +165,19 @@ const (
 	OsInfoOsTypeIos   OsInfoOsType = "IOS"
 )
 
+// OsInfoOsTypeValues returns every value the Jamf API accepts for OsInfoOsType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func OsInfoOsTypeValues() []OsInfoOsType {
+	return []OsInfoOsType{
+		OsInfoOsTypeMacOs,
+		OsInfoOsTypeIos,
+	}
+}
+
 // OsVersionOsType is the set of values accepted by OsVersion.OsType.
 type OsVersionOsType = string
 
@@ -90,3 +187,16 @@ const (
 	OsVersionOsTypeMacOs OsVersionOsType = "MAC_OS"
 	OsVersionOsTypeIos   OsVersionOsType = "IOS"
 )
+
+// OsVersionOsTypeValues returns every value the Jamf API accepts for OsVersionOsType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func OsVersionOsTypeValues() []OsVersionOsType {
+	return []OsVersionOsType{
+		OsVersionOsTypeMacOs,
+		OsVersionOsTypeIos,
+	}
+}

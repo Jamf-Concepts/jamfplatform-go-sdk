@@ -1522,7 +1522,9 @@ func registerPropertyEnum(ownerType, pname string, propRef *openapi3.SchemaRef) 
 	}
 
 	typeName := ownerType + exportedGoName(pname)
-	if currentSpecTypeNames[typeName] {
+	// The Values accessor shares the type's namespace, so both spellings have
+	// to be free before the type can be declared.
+	if currentSpecTypeNames[typeName] || currentSpecTypeNames[typeName+"Values"] {
 		log.Printf("property enum %s.%s: skipping — %s is already declared by a spec schema",
 			ownerType, exportedGoName(pname), typeName)
 		return ""
