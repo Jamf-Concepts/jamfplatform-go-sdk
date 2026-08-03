@@ -56,7 +56,7 @@ func createLightweightBenchmark(t *testing.T, c *jamfplatform.Client, title stri
 		SourceBaselineID: baseline.BaselineID,
 		Rules:            []compliancebenchmarks.RuleRequest{rr},
 		Target:           compliancebenchmarks.TargetV2{DeviceGroups: []string{groupID}},
-		EnforcementMode:  "MONITOR",
+		EnforcementMode:  compliancebenchmarks.BenchmarkRequestV2EnforcementModeMonitor,
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -164,7 +164,7 @@ func TestAcceptance_ResolveBenchmark_Ambiguous(t *testing.T) {
 		SourceBaselineID: baseline.BaselineID,
 		Rules:            []compliancebenchmarks.RuleRequest{rr},
 		Target:           compliancebenchmarks.TargetV2{DeviceGroups: []string{groupID}},
-		EnforcementMode:  "MONITOR",
+		EnforcementMode:  compliancebenchmarks.BenchmarkRequestV2EnforcementModeMonitor,
 	})
 	if err != nil {
 		var apiErr *jamfplatform.APIResponseError

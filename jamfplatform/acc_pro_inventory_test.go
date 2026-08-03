@@ -379,7 +379,7 @@ func TestAcceptance_Pro_Inventory_PreloadRecordCRUDV2(t *testing.T) {
 
 	created, err := p.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{
 		SerialNumber: serial,
-		DeviceType:   "Computer",
+		DeviceType:   pro.InventoryPreloadRecordV2DeviceTypeComputer,
 		Department:   &dept,
 	})
 	if err != nil {

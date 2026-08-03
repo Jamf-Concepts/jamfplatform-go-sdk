@@ -464,7 +464,7 @@ func TestAcceptance_Pro_Core_DockItemCRUDV1(t *testing.T) {
 	name := "sdk-acc-dockitem-" + runSuffix()
 	created, err := p.CreateDockItemV1(ctx, &pro.DockItem{
 		Name: name,
-		Type: "APP",
+		Type: pro.DockItemTypeApp,
 		Path: "file:///Applications/Safari.app/",
 	})
 	if err != nil {

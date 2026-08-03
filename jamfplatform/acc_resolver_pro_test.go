@@ -639,8 +639,8 @@ func TestAcceptance_ResolveMobileDeviceExtensionAttributeV1_Lifecycle(t *testing
 
 	newMDEA := func(n string) *pro.MobileDeviceExtensionAttributes {
 		return &pro.MobileDeviceExtensionAttributes{
-			Name: n, DataType: "STRING", InputType: "TEXT",
-			InventoryDisplayType: "GENERAL", PopupMenuChoices: &[]string{},
+			Name: n, DataType: pro.MobileDeviceExtensionAttributesDataTypeString, InputType: pro.MobileDeviceExtensionAttributesInputTypeText,
+			InventoryDisplayType: pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral, PopupMenuChoices: &[]string{},
 		}
 	}
 	resp, err := c.CreateMobileDeviceExtensionAttributeV1(ctx, newMDEA(name))
@@ -1081,7 +1081,7 @@ func TestAcceptance_ResolveDistributionPointV1_Lifecycle(t *testing.T) {
 
 	newDP := func(n string) *pro.DistributionPoint {
 		return &pro.DistributionPoint{
-			Name: n, FileSharingConnectionType: "SMB", ServerName: "localhost",
+			Name: n, FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb, ServerName: "localhost",
 			ShareName: strPtr("share"), ReadWriteUsername: strPtr("rw"), ReadWritePassword: strPtr("rw"),
 			ReadOnlyUsername: strPtr("ro"), ReadOnlyPassword: strPtr("ro"),
 		}
@@ -1631,7 +1631,7 @@ func TestAcceptance_ResolveInventoryPreloadRecordV2_Lifecycle(t *testing.T) {
 	t.Log("step 1: not-found ✓")
 
 	// Step 2: Create
-	resp, err := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: "Computer"})
+	resp, err := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: pro.InventoryPreloadRecordV2DeviceTypeComputer})
 	if err != nil {
 		t.Fatalf("CreateInventoryPreloadRecordV2: %v", err)
 	}
@@ -1661,7 +1661,7 @@ func TestAcceptance_ResolveInventoryPreloadRecordV2_Lifecycle(t *testing.T) {
 
 	// Step 5: Attempt duplicate — inventory preload keyed by serial, so duplicate should be rejected
 	id2, dupCreated := tryCreateDuplicate(t, "inventory preload record", func() (string, error) {
-		r, e := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: "Computer"})
+		r, e := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: pro.InventoryPreloadRecordV2DeviceTypeComputer})
 		if e != nil {
 			return "", e
 		}

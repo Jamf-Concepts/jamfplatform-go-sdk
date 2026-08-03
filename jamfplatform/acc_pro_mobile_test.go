@@ -159,9 +159,9 @@ func TestAcceptance_Pro_Mobile_MDEACRUD(t *testing.T) {
 	created, err := p.CreateMobileDeviceExtensionAttributeV1(ctx, &pro.MobileDeviceExtensionAttributes{
 		Name:                 name,
 		Description:          ptr("SDK acceptance test fixture"),
-		InputType:            "TEXT",
-		InventoryDisplayType: "GENERAL",
-		DataType:             "STRING",
+		InputType:            pro.MobileDeviceExtensionAttributesInputTypeText,
+		InventoryDisplayType: pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
+		DataType:             pro.MobileDeviceExtensionAttributesDataTypeString,
 		PopupMenuChoices:     &[]string{},
 	})
 	if err != nil {
