@@ -62,7 +62,7 @@ func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) 
 // Required privileges: read:pro:devices.
 //
 // Parameters:
-//   - id: Path parameter id.
+//   - id: The ID of the device, in UUID format.
 func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	var result DeviceReadRepresentationV1
@@ -78,7 +78,7 @@ func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresent
 // Required privileges: update:pro:devices.
 //
 // Parameters:
-//   - id: Path parameter id.
+//   - id: The ID of the device, in UUID format.
 func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpdateRepresentationV1) error {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
@@ -93,7 +93,7 @@ func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpd
 // Required privileges: delete:pro:devices.
 //
 // Parameters:
-//   - id: Path parameter id.
+//   - id: The ID of the device, in UUID format.
 func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
@@ -108,7 +108,7 @@ func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 // Required privileges: read:pro:devices.
 //
 // Parameters:
-//   - id: Path parameter id.
+//   - id: The ID of the device, in UUID format.
 //   - sort: Fields to sort by and their orders. Fields allowed in the query: `name`, `version`.
 //   - filter: Filter query in RSQL format. Includes all results, by default. Fields allowed in the query: `name`,
 //     `version`. Example: `name=="*Safari*" and version>="26.0.0"`.

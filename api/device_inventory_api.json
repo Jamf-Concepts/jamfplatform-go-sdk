@@ -639,15 +639,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/tenantId"
-          },
-          {
-            "description": "Path parameter id",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -694,15 +685,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/tenantId"
-          },
-          {
-            "description": "Path parameter id",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -751,15 +733,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/tenantId"
-          },
-          {
-            "description": "Path parameter id",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "requestBody": {
@@ -826,15 +799,6 @@
               "default": "",
               "type": "string"
             }
-          },
-          {
-            "description": "Path parameter id",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -891,15 +855,6 @@
             "name": "filter",
             "schema": {
               "default": "",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Path parameter id",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
               "type": "string"
             }
           }

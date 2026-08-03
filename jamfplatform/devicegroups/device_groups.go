@@ -73,7 +73,7 @@ func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCrea
 // Required privileges: read:pro:device-groups.
 //
 // Parameters:
-//   - id: Path parameter id.
+//   - id: The ID of the device group, in UUID format.
 func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	var result DeviceGroupReadRepresentationV1
@@ -89,7 +89,7 @@ func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupRea
 // Required privileges: update:pro:device-groups.
 //
 // Parameters:
-//   - id: Path parameter id.
+//   - id: The ID of the device group, in UUID format.
 func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *DeviceGroupUpdateRepresentationV1) error {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
@@ -104,7 +104,7 @@ func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *Devi
 // Required privileges: delete:pro:device-groups.
 //
 // Parameters:
-//   - id: Path parameter id.
+//   - id: The ID of the device group, in UUID format.
 func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
@@ -119,7 +119,7 @@ func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
 // Required privileges: read:pro:device-groups.
 //
 // Parameters:
-//   - id: Path parameter id.
+//   - id: The ID of the device group, in UUID format.
 func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]string, error) {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))
@@ -139,7 +139,7 @@ func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]strin
 // Required privileges: update:pro:device-groups.
 //
 // Parameters:
-//   - id: Path parameter id.
+//   - id: The ID of the device group, in UUID format.
 func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, request *DeviceGroupMemberPatchRepresentationV1) error {
 	prefix := c.transport.TenantPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))

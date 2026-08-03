@@ -21,7 +21,7 @@ import (
 // Required privileges: read:pro:devices.
 //
 // Parameters:
-//   - userID: Path parameter id.
+//   - userID: The ID of the user, in UUID format.
 //   - sort: Fields to sort by and their orders. Fields allowed in the query: `id`, `name`, `model`,
 //     `modelIdentifier`, `serialNumber`, `lastInventoryUpdateTime`, `lastCheckInTime`,
 //     `operatingSystemVersion`, `userId`, `enrollmentType`, `lastEnrollmentTime`.
