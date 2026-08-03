@@ -395,3 +395,33 @@ echo sdk-acc-upload-value</script>
 		t.Logf("UploadComputerExtensionAttributeV1 succeeded but returned no id; body: %+v", resp)
 	}
 }
+
+// TestAcceptance_Pro_Computer_ListPreviewComputers covers the computers preview
+// list, which had no acceptance test, and checks the lastContactDate field it
+// gained in Jamf Pro 11.30.
+//
+// The field is logged rather than asserted: a computer that has never checked in
+// returns it empty, so requiring a value would tie the test to tenant state.
+// What is verified is that it decodes — the server sends lastContactDate as a
+// string here, not the RFC 3339 timestamp the mobile equivalents use, so a
+// mistyped field would fail the call above rather than reach this loop.
+func TestAcceptance_Pro_Computer_ListPreviewComputers(t *testing.T) {
+	c := accClient(t)
+
+	computers, err := pro.New(c).ListPreviewComputers(context.Background(), nil)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListPreviewComputers: %v", err)
+	}
+	t.Logf("Found %d computers (preview)", len(computers))
+
+	withContact := 0
+	for _, comp := range computers {
+		if comp.LastContactDate != "" {
+			withContact++
+		}
+	}
+	if len(computers) > 0 {
+		t.Logf("lastContactDate populated on %d/%d computers (field added in 11.30)", withContact, len(computers))
+	}
+}
