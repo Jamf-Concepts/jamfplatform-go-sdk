@@ -160,7 +160,7 @@ func readMember(files map[string]*zip.File, name string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rc.Close()
+	defer func() { _ = rc.Close() }()
 	return io.ReadAll(rc)
 }
 
@@ -275,7 +275,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("opening archive: %v", err)
 	}
-	defer zr.Close()
+	defer func() { _ = zr.Close() }()
 
 	files := make(map[string]*zip.File, len(zr.File))
 	names := make([]string, 0, len(zr.File))
