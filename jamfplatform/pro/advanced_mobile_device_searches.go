@@ -82,6 +82,9 @@ func (c *Client) ListAdvancedMobileDeviceSearchChoicesV1(ctx context.Context, cr
 // GetAdvancedMobileDeviceSearchV1 get specified Advanced Search object.
 //
 // Required privileges: read:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Read Advanced Mobile Device Searches.
+//
+// Parameters:
+//   - id: id of target Advanced Search.
 func (c *Client) GetAdvancedMobileDeviceSearchV1(ctx context.Context, id string) (*AdvancedSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AdvancedSearch
@@ -95,6 +98,9 @@ func (c *Client) GetAdvancedMobileDeviceSearchV1(ctx context.Context, id string)
 // UpdateAdvancedMobileDeviceSearchV1 get specified Advanced Search object.
 //
 // Required privileges: update:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Update Advanced Mobile Device Searches.
+//
+// Parameters:
+//   - id: id of target Advanced Search.
 func (c *Client) UpdateAdvancedMobileDeviceSearchV1(ctx context.Context, id string, request *AdvancedSearch) (*AdvancedSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result AdvancedSearch
@@ -108,6 +114,9 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchV1(ctx context.Context, id stri
 // DeleteAdvancedMobileDeviceSearchV1 remove specified Advanced Search object.
 //
 // Required privileges: delete:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Delete Advanced Mobile Device Searches.
+//
+// Parameters:
+//   - id: instance id of advanced search record.
 func (c *Client) DeleteAdvancedMobileDeviceSearchV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/advanced-mobile-device-searches/%s", prefix, url.PathEscape(id))

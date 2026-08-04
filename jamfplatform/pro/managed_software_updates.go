@@ -33,6 +33,14 @@ func (c *Client) ListAvailableOsUpdatesV1(ctx context.Context) (*AvailableOsUpda
 //
 // Required privileges: read:pro:managed-software-updates, read:pro:computers, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is planUuid:asc. Multiple sort
+//     criteria are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Managed Software Updates collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query: planUuid,
+//     device.deviceId, device.objectType, updateAction, versionType, specificVersion, maxDeferrals,
+//     recipeId, forceInstallLocalDateTime, state.
 func (c *Client) ListManagedSoftwareUpdatePlansV1(ctx context.Context, sort []string, filter string) ([]ManagedSoftwareUpdatePlan, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ManagedSoftwareUpdatePlan, bool, error) {
@@ -151,6 +159,11 @@ func (c *Client) CreateManagedSoftwareUpdateGroupPlanV1(ctx context.Context, req
 //
 // Required privileges: read:pro:managed-software-updates, read:pro:computers, read:pro:computer-groups, read:pro:mobile-devices, read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Smart Computer Groups, Read Static Computer Groups, Read Mobile Devices, Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: Managed Software Update Group Id.
+//   - groupType: Managed Software Update Group Type, Available options are "COMPUTER_GROUP" or "MOBILE_DEVICE_GROUP".
+//     Allowed values: "COMPUTER_GROUP", "MOBILE_DEVICE_GROUP".
 func (c *Client) GetManagedSoftwareUpdateGroupPlansV1(ctx context.Context, id string, groupType string) (*ManagedSoftwareUpdatePlans, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlans
@@ -172,6 +185,9 @@ func (c *Client) GetManagedSoftwareUpdateGroupPlansV1(ctx context.Context, id st
 //
 // Required privileges: read:pro:managed-software-updates, read:pro:computers, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: Managed Software Update Plan Uuid.
 func (c *Client) GetManagedSoftwareUpdatePlanV1(ctx context.Context, id string) (*ManagedSoftwareUpdatePlan, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlan
@@ -186,6 +202,9 @@ func (c *Client) GetManagedSoftwareUpdatePlanV1(ctx context.Context, id string) 
 //
 // Required privileges: read:pro:managed-software-updates, read:pro:computers, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: Managed Software Update Plan Uuid.
 func (c *Client) GetManagedSoftwareUpdatePlanDeclarationsV1(ctx context.Context, id string) (*DssDeclarations, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DssDeclarations
@@ -200,6 +219,9 @@ func (c *Client) GetManagedSoftwareUpdatePlanDeclarationsV1(ctx context.Context,
 //
 // Required privileges: read:pro:managed-software-updates, read:pro:computers, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: Managed Software Update Plan Uuid.
 func (c *Client) GetManagedSoftwareUpdatePlanEventsV1(ctx context.Context, id string) (*ManagedSoftwareUpdatePlanEventStore, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlanEventStore
@@ -214,6 +236,12 @@ func (c *Client) GetManagedSoftwareUpdatePlanEventsV1(ctx context.Context, id st
 //
 // Required privileges: read:pro:computers, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Computers, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - filter: Query in the RSQL format, allowing to filter Managed Software Updates collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query:
+//     osUpdatesStatusId, device.deviceId, device.objectType, downloaded, downloadPercentComplete,
+//     productKey, status, deferralsRemaining, maxDeferrals, nextScheduledInstall, created and updated.
 func (c *Client) ListManagedSoftwareUpdateStatusesV1(ctx context.Context, filter string) (*ManagedSoftwareUpdateStatuses, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses
@@ -235,6 +263,9 @@ func (c *Client) ListManagedSoftwareUpdateStatusesV1(ctx context.Context, filter
 //
 // Required privileges: read:pro:computers, read:pro:computer-groups. Legacy Jamf Pro privilege name(s): Read Computers, Read Smart Computer Groups, Read Static Computer Groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: Computer Group identifier.
 func (c *Client) GetManagedSoftwareUpdateStatusesForComputerGroupV1(ctx context.Context, id string) (*ManagedSoftwareUpdateStatuses, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses
@@ -248,6 +279,9 @@ func (c *Client) GetManagedSoftwareUpdateStatusesForComputerGroupV1(ctx context.
 // GetManagedSoftwareUpdateStatusesForComputerV1 retrieve Managed Software Update Statuses for Computers.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: Computer identifier.
 func (c *Client) GetManagedSoftwareUpdateStatusesForComputerV1(ctx context.Context, id string) (*ManagedSoftwareUpdateStatuses, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses
@@ -262,6 +296,9 @@ func (c *Client) GetManagedSoftwareUpdateStatusesForComputerV1(ctx context.Conte
 //
 // Required privileges: read:pro:mobile-devices, read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: Mobile Device Group identifier.
 func (c *Client) GetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1(ctx context.Context, id string) (*ManagedSoftwareUpdateStatuses, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses
@@ -275,6 +312,9 @@ func (c *Client) GetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1(ctx cont
 // GetManagedSoftwareUpdateStatusesForMobileDeviceV1 retrieve Managed Software Update Statuses for Mobile Devices.
 //
 // Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
+//
+// Parameters:
+//   - id: Mobile Device identifier.
 func (c *Client) GetManagedSoftwareUpdateStatusesForMobileDeviceV1(ctx context.Context, id string) (*ManagedSoftwareUpdateStatuses, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses

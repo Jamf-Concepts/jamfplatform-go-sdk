@@ -16,6 +16,13 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go test -v -cover -count=1 -timeout=120s ./...
+      # Separate module: the root run never reaches the generator's own unit
+      # tests (config validation, parameter doc rendering, enum naming).
+      - run: cd tools/generate && go test -count=1 -timeout=120s ./...
+      # acctargets lives in the tools module, which the root run also misses.
+      # Scoped to the subpackage rather than ./... because tools/tools.go is a
+      # build-tagged blank import of copywrite that typecheck rejects by design.
+      - run: cd tools && go test -count=1 -timeout=120s ./acctargets/...
 
   vet:
     name: Vet
@@ -30,12 +37,31 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # One entry per Go module. The generator is its own module, so the
+        # root-only run never descended into it and its findings went
+        # unreported. tools/ is entered only at tools/acctargets: linting the
+        # module root would pull in tools/tools.go, a build-tagged blank import
+        # of copywrite (a main package) that typecheck rejects by design and
+        # which exists solely to pin the dependency.
+        include:
+          - module: "."
+            path: "./..."
+          - module: "tools/generate"
+            path: "./..."
+          - module: "tools"
+            path: "./acctargets/..."
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version-file: ${{ matrix.module }}/go.mod
       - uses: golangci/golangci-lint-action@v9
+        with:
+          working-directory: ${{ matrix.module }}
+          args: ${{ matrix.path }}
 
   generate:
     name: Generated Code
@@ -60,6 +86,10 @@ jobs:
       - run: git diff --exit-code go.mod go.sum
       - run: cd tools && go mod tidy
       - run: git diff --exit-code tools/go.mod tools/go.sum
+      # tools/generate is where dependabot lands most of its bumps
+      # (kin-openapi, x/tools), so drift here is the likeliest to go unnoticed.
+      - run: cd tools/generate && go mod tidy
+      - run: git diff --exit-code tools/generate/go.mod tools/generate/go.sum
 
   copyright:
     name: Copyright Headers

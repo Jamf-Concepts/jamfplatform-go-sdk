@@ -315,9 +315,9 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 	id, created, err := p.ApplyComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                          name,
 		Enabled:                       &boolTrue,
-		DataType:                      "STRING",
-		InputType:                     "TEXT",
-		InventoryDisplayType:          "GENERAL",
+		DataType:                      pro.ComputerExtensionAttributesDataTypeString,
+		InputType:                     pro.ComputerExtensionAttributesInputTypeText,
+		InventoryDisplayType:          pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
 		Description:                   strPtr("SDK acceptance test"),
 		LdapAttributeMapping:          &emptyStr,
 		LdapExtensionAttributeAllowed: &boolFalse,
@@ -334,9 +334,9 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 	id2, created2, err := p.ApplyComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                          name,
 		Enabled:                       &boolTrue,
-		DataType:                      "STRING",
-		InputType:                     "TEXT",
-		InventoryDisplayType:          "GENERAL",
+		DataType:                      pro.ComputerExtensionAttributesDataTypeString,
+		InputType:                     pro.ComputerExtensionAttributesInputTypeText,
+		InventoryDisplayType:          pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
 		Description:                   strPtr("SDK acceptance test updated"),
 		LdapAttributeMapping:          &emptyStr,
 		LdapExtensionAttributeAllowed: &boolFalse,
@@ -372,9 +372,9 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 	id, created, err := p.ApplyMobileDeviceExtensionAttributeV1(ctx, &pro.MobileDeviceExtensionAttributes{
 		Name:                          name,
-		DataType:                      "STRING",
-		InputType:                     "TEXT",
-		InventoryDisplayType:          "GENERAL",
+		DataType:                      pro.MobileDeviceExtensionAttributesDataTypeString,
+		InputType:                     pro.MobileDeviceExtensionAttributesInputTypeText,
+		InventoryDisplayType:          pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
 		Description:                   ptr("SDK acceptance test"),
 		LdapAttributeMapping:          ptr(""),
 		LdapExtensionAttributeAllowed: ptr(false),
@@ -390,9 +390,9 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 	id2, created2, err := p.ApplyMobileDeviceExtensionAttributeV1(ctx, &pro.MobileDeviceExtensionAttributes{
 		Name:                          name,
-		DataType:                      "STRING",
-		InputType:                     "TEXT",
-		InventoryDisplayType:          "GENERAL",
+		DataType:                      pro.MobileDeviceExtensionAttributesDataTypeString,
+		InputType:                     pro.MobileDeviceExtensionAttributesInputTypeText,
+		InventoryDisplayType:          pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
 		Description:                   ptr("SDK acceptance test updated"),
 		LdapAttributeMapping:          ptr(""),
 		LdapExtensionAttributeAllowed: ptr(false),
@@ -612,7 +612,7 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 	principal := true
 	id, created, err := p.ApplyDistributionPointV1(ctx, &pro.DistributionPoint{
 		Name:                      name,
-		FileSharingConnectionType: "SMB",
+		FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb,
 		ServerName:                "test-server.example.com",
 		ShareName:                 strPtr("share"),
 		ReadOnlyUsername:          strPtr("rouser"),
@@ -630,7 +630,7 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 
 	id2, created2, err := p.ApplyDistributionPointV1(ctx, &pro.DistributionPoint{
 		Name:                      name,
-		FileSharingConnectionType: "SMB",
+		FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb,
 		ServerName:                "test-server-updated.example.com",
 		ShareName:                 strPtr("share"),
 		ReadOnlyUsername:          strPtr("rouser"),
@@ -1008,8 +1008,8 @@ func TestAcceptance_ApplyAppInstallerDeploymentV1(t *testing.T) {
 	req := &pro.AppInstallerDeploymentCreate{
 		Name:           name,
 		AppTitleID:     titleID,
-		DeploymentType: "INSTALL_AUTOMATICALLY",
-		UpdateBehavior: "AUTOMATIC",
+		DeploymentType: pro.AppInstallerDeploymentCreateDeploymentTypeInstallAutomatically,
+		UpdateBehavior: pro.AppInstallerDeploymentCreateUpdateBehaviorAutomatic,
 	}
 
 	id, created, err := p.ApplyAppInstallerDeploymentV1(ctx, req)
@@ -1416,11 +1416,11 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 			RequireAuthentication:              false,
 			EnableRecoveryLock:                 &falseVal,
 			RotateRecoveryLockPassword:         &falseVal,
-			RecoveryLockPasswordType:           ptr("MANUAL"),
+			RecoveryLockPasswordType:           ptr(pro.PostComputerPrestageV3RecoveryLockPasswordTypeManual),
 			EnrollmentSiteID:                   "-1",
 			CustomPackageDistributionPointID:   "-1",
 			EnrollmentCustomizationID:          &zeroStr,
-			PrestageMinimumOsTargetVersionType: ptr("NO_ENFORCEMENT"),
+			PrestageMinimumOsTargetVersionType: ptr(pro.PostComputerPrestageV3PrestageMinimumOsTargetVersionTypeNoEnforcement),
 			SkipSetupItems:                     &map[string]bool{},
 			AnchorCertificates:                 &[]string{},
 			CustomPackageIds:                   []string{},

@@ -50,6 +50,54 @@ When Jamf publishes a new endpoint version, run `python3 tools/scripts/backfill_
 
 Endpoints marked `deprecated: true` in the spec are always emitted; the generator adds a `// Deprecated:` godoc line that includes the `x-deprecation-date` value (normalised to `YYYY-MM-DD`) so consumers see the removal window. There is no `skipDeprecated` knob — deprecation is opt-out by retaining the entry in config, opt-in (i.e. removed) by deleting it once Jamf drops the path.
 
+### Parameter documentation
+
+Each generated method carries a `// Parameters:` godoc list built from the spec's parameter objects (`parameterComment` in `methods.go`): the description, then `Allowed values:` when the schema declares an enum. Ordering follows the Go signature — path params, then the config-declared query params. Params the spec doesn't describe are skipped, as are params declared in `config.json` but absent from the spec.
+
+This is the only place a caller can learn what a `filter` or `sort` argument accepts: Jamf documents the RSQL-filterable and sortable field lists in the parameter description and nowhere else, so a bare `filter string` signature is unusable without the block. Same for Classic's `subset` path params, whose legal values (`General`, `Location`, `Purchasing`, …) are a path-param enum.
+
+Parameter types stay exactly as config declares them — the block is documentation, never signature. That is what makes it safe to quote enum values verbatim, including ones no Go identifier can spell (`EnableRemoteDesktop (macOS 10.14.4 and later)`) and the spec's typo `Hardwre`, all of which are still what the server accepts. Enums the generator *can* name get constants too — see below.
+
+Struct fields are documented the same way, from each property's `description` (1198 fields, 1726 doc lines), with the write-only note appended as trailing metadata. Both share `docParagraphs` in `util.go`.
+
+### Enum constants
+
+Every string enum in a spec becomes a Go type plus one constant per value, in a per-package `enums.go` (never `types.go` — see `partitionEnumTypes`). 331 types carrying 1430 constants: 204 in `pro`, 92 in `proclassic`, 15 in `blueprints`, 8 in `compliancebenchmarks`, 7 in `ddmreport`, 3 in `devicegroups`, 2 in `devices`.
+
+Two sources feed it:
+
+- **Spec-named enum schemas** keep their own name (`NotificationType`). These are emitted by the fieldless-type branch of the schema walker via `enumConsts`.
+- **Inline property enums** are synthesised as `<Owner><Property>` by `registerPropertyEnum` (`PolicyTrigger`, `AccountGroupV1AccessLevel`). Nothing shorter is safe — `type` alone carries 14 distinct value sets across 18 schemas. Identical value sets under different owners are duplicated rather than folded into a shared type: folding means inventing a name, and that name then churns whenever Jamf changes one owner's values but not the other's.
+
+The alias is deliberately `=` (a type alias, not a defined type), so a constant typed `NotificationType` assigns to any existing `notificationType string` parameter with no cast. Promoting these to defined types, or retyping the struct fields that carry them (`State DeploymentState` instead of `State string`), would churn the whole tree and entangle with the pointer/three-state design. Field types are left alone.
+
+Constant names are `<TypeName><TitleCasedValue>`: `NotificationTypeApnsCertRevoked = "APNS_CERT_REVOKED"`. Title-casing each segment is deliberate over preserving all-caps runs — `APNS_CERT_REVOKED` is a wire-format artefact, not an acronym the spec is asserting. The wire value sits on the same line as the identifier, so no per-value godoc is emitted and the spec's own misspellings (`MII_UNATHORIZED_RESPONSE_NOTIFICATION`, `PATCH_EXTENTION_ATTRIBUTE`) stay greppable.
+
+Classic is where this pays off most: its values are prose, not identifiers — `Full Access`, `Text Field`, `Pop-up Menu`, `Current or Next User`, `Pending+Failed`. Callers had no way to guess the exact spacing and casing. The title-caser handles them with no special sanitiser because it splits on non-alphanumerics.
+
+Each type also gets `<Type>Values() []<Type>` returning every value in spec order — for `stringvalidator.OneOf(pro.PolicyTriggerValues()...)` in the Terraform provider, and anything else that enumerates rather than names. A function, not a var: a var would let one consumer mutate the set for the whole process. It cannot be a method — Go forbids methods on an alias to a predeclared type, and that alias is what keeps constants assignable to plain `string`.
+
+Fields and parameters point at the type instead of re-listing values (`Allowed values: see the NotificationType constants.`), since godoc groups constants under their declared type. 309 such references. Two cases keep an inline list instead:
+
+- A parameter whose enum schema is never emitted as a type (reachable only from that parameter) — which is why `section` on the computer-inventory endpoints still lists all 22 values.
+- A `$ref`'d property, where the field's own type already names the enum.
+
+Skipped, each deliberately: non-string enums (constants are typed to a `= string` alias), single-value sets, values yielding no Go identifier, the second of any two values colliding on one identifier, and any synthesised name the spec already uses — checked for both `<Owner><Property>` and `<Owner><Property>Values`, since the accessor shares the namespace. Every skip logs. `Deployment.State` is the only one firing today (`DeploymentState` is a struct); its values remain reachable as `DeploymentStateState`.
+
+**The collision check must happen at registration, not when draining the collected enums.** Draining late still writes the field's `see the X constants` line, leaving it pointing at a type that carries no constants.
+
+#### Wire-verified behaviour (probed 2026-08-03)
+
+Verified against two live tenants. No generated enum was found to disagree with the server, so there is currently **no case for a `config.json` enum override**. What the probes did establish:
+
+- **Unrecognised enum values are silently dropped, not rejected.** Pro deserialises an unknown member to null and proceeds; only a *recognised* value reaches business-rule validation. A typo in a caller's string therefore changes behaviour with no error — which is the whole argument for the constants, and why the acceptance suite uses them (see `1c5e93b`, where an invalid value passed for exactly this reason).
+- **The server is an oracle for value sets.** An invalid value on a validated Pro field returns `possible values can be [ A, B, C ]`. Six fields (computer + mobile-device extension attributes × `dataType`, `inputType`, `inventoryDisplayType`) were confirmed byte-identical to what we emit.
+- **Classic validates neither `subset` nor `createdBy`.** Garbage returns 2xx with the full record. Those constants are documentation only, and Classic's Tomcat HTML errors never list valid values, so Classic has no oracle at all.
+- **Read and write representations can disagree on casing.** `ComputerGeneral.platform` (read) is a bare `string` in the spec and the server returns `"Mac"`; `ComputerGeneralCreate.platform` (write) declares `[WINDOWS, MAC, NONE]`. Both are faithfully generated — the read field gets no constants — but a consumer comparing a read value against `ComputerGeneralCreatePlatformMac` will never match, and echoing a read value back on write may be rejected. Do not assume a round-trip.
+- **`manageExistingData` carries an unencoded precondition.** Writable only on update, and only when `inputType` is `SCRIPT` with `enabled` false. The values `RETAIN`/`DELETE` are correct but rejected outside that state, including on every create.
+
+Spec prose is wrapped at 100 columns, paragraph by paragraph (blank-line separated), with HTML tags (`</br>`, `<br/>`) stripped and entities decoded. Angle-bracket placeholders like `<field_name>` are deliberately preserved — the tag stripper matches an explicit HTML tag allowlist, not a generic `<...>` pattern. Long descriptions are never truncated: a half-printed RSQL field list is worse than none, since the caller can't tell whether their field was in the dropped tail.
+
 ### Two-layer design
 
 - **`jamfplatform/`** — Exported package. Generated types, methods, and the handwritten `Client` with `tenantPrefix` helper. Methods call `c.transport.Do`/`DoExpect`/`DoWithContentType`.

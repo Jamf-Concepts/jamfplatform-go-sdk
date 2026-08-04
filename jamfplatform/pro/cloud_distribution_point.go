@@ -70,6 +70,12 @@ func (c *Client) UpdateCloudDistributionPointV1(ctx context.Context, request *Cl
 // FailCloudDistributionPointUploadV1 marks a specific file upload as failed for the currently configured cloud distribution point.
 //
 // Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
+//
+// Parameters:
+//   - id: The identifier of the inventory file to be marked as failed. The type and ID will make a unique
+//     identifier for the file.
+//   - fileName: Name of the file to mark failure for.
+//   - uploadType: Type of file to mark failure for. Possible values are PACKAGE, EBOOK, MOBILE_DEVICE_APP.
 func (c *Client) FailCloudDistributionPointUploadV1(ctx context.Context, id string, fileName string, uploadType string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/cloud-distribution-point/fail-upload/%s", prefix, url.PathEscape(id))
@@ -92,6 +98,14 @@ func (c *Client) FailCloudDistributionPointUploadV1(ctx context.Context, id stri
 // ListCloudDistributionPointFilesV1 get the cloud distribution point Inventory files details.
 //
 // Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
+//
+// Parameters:
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     id:asc. If using multiple criteria, separate with commas. Allows sort for id, fileName, inventoryId
+//     and type etc.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including fileName and type Can
+//     be combined with paging and sorting. Fields allowed in the query: fileName, inventoryId and type
+//     Default filter is an empty query and returns all results from the requested page.
 func (c *Client) ListCloudDistributionPointFilesV1(ctx context.Context, sort []string, filter string) ([]CloudDistributionPointInventoryFileInfo, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]CloudDistributionPointInventoryFileInfo, bool, error) {
@@ -124,6 +138,13 @@ func (c *Client) ListCloudDistributionPointFilesV1(ctx context.Context, sort []s
 // ListCloudDistributionPointHistoryV1 get cloud distribution point history details.
 //
 // Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
+//
+// Parameters:
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     ID:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Default filter is an empty query and returns all results from the
+//     requested page.
 func (c *Client) ListCloudDistributionPointHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -169,6 +190,11 @@ func (c *Client) CreateCloudDistributionPointHistoryNoteV1(ctx context.Context, 
 // RefreshCloudDistributionPointInventoryV1 updates inventory data for the currently configured cloud distribution point.
 //
 // Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
+//
+// Parameters:
+//   - fileName: Name of the file to check the availability of. If available, the inventory and status will be
+//     updated in Jamf Pro. If no file is specified, it will force an immediate inventory refresh at a
+//     rate-limit of once every 15 seconds.
 func (c *Client) RefreshCloudDistributionPointInventoryV1(ctx context.Context, fileName string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := prefix + "/cloud-distribution-point/refresh-inventory"

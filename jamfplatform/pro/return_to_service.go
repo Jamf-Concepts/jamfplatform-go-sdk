@@ -44,6 +44,9 @@ func (c *Client) CreateReturnToServiceConfigurationV1(ctx context.Context, reque
 // GetReturnToServiceConfigurationV1 retrieve a Return to Service Configuration with the supplied id.
 //
 // Required privileges: read:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): View Return To Service Configurations.
+//
+// Parameters:
+//   - id: Return to Service Configuration identifier.
 func (c *Client) GetReturnToServiceConfigurationV1(ctx context.Context, id string) (*ReturnToServiceConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ReturnToServiceConfiguration
@@ -57,6 +60,9 @@ func (c *Client) GetReturnToServiceConfigurationV1(ctx context.Context, id strin
 // UpdateReturnToServiceConfigurationV1 update a Return to Service Configuration.
 //
 // Required privileges: update:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): Edit Return To Service Configurations.
+//
+// Parameters:
+//   - id: Return to Service Configuration identifier.
 func (c *Client) UpdateReturnToServiceConfigurationV1(ctx context.Context, id string, request *ReturnToServiceConfigurationRequest) (*ReturnToServiceConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ReturnToServiceConfiguration
@@ -70,6 +76,9 @@ func (c *Client) UpdateReturnToServiceConfigurationV1(ctx context.Context, id st
 // DeleteReturnToServiceConfigurationV1 delete a Return To Service Configuration with the supplied id.
 //
 // Required privileges: delete:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): Delete Return To Service Configurations.
+//
+// Parameters:
+//   - id: Return To Service Configurations identifier.
 func (c *Client) DeleteReturnToServiceConfigurationV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/return-to-service/%s", prefix, url.PathEscape(id))

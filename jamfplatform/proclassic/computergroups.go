@@ -18,6 +18,9 @@ import (
 // GetComputerGroupByID finds computer groups by ID.
 //
 // Required privileges: read:pro:computer-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetComputerGroupByID(ctx context.Context, id string) (*ComputerGroup, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerGroup
@@ -31,6 +34,9 @@ func (c *Client) GetComputerGroupByID(ctx context.Context, id string) (*Computer
 // CreateComputerGroupByID creates a new computer group by ID.
 //
 // Required privileges: create:pro:computer-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateComputerGroupByID(ctx context.Context, id string, request *ComputerGroupPost) (*ComputerGroup, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerGroup
@@ -44,6 +50,9 @@ func (c *Client) CreateComputerGroupByID(ctx context.Context, id string, request
 // UpdateComputerGroupByID updates an existing computer group by ID.
 //
 // Required privileges: update:pro:computer-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateComputerGroupByID(ctx context.Context, id string, request *ComputerGroupPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateComputerGroupByID(ctx context.Context, id string, request
 // DeleteComputerGroupByID deletes a computer group by ID.
 //
 // Required privileges: delete:pro:computer-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteComputerGroupByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteComputerGroupByID(ctx context.Context, id string) error {
 // GetComputerGroupByName finds computer groups by name.
 //
 // Required privileges: read:pro:computer-groups.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetComputerGroupByName(ctx context.Context, name string) (*ComputerGroup, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result ComputerGroup
@@ -81,6 +96,9 @@ func (c *Client) GetComputerGroupByName(ctx context.Context, name string) (*Comp
 // UpdateComputerGroupByName updates an existing computer group by name.
 //
 // Required privileges: update:pro:computer-groups.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateComputerGroupByName(ctx context.Context, name string, request *ComputerGroupPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateComputerGroupByName(ctx context.Context, name string, req
 // DeleteComputerGroupByName deletes a computer group by name.
 //
 // Required privileges: delete:pro:computer-groups.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteComputerGroupByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,9 @@ func (c *Client) ListComputerGroups(ctx context.Context) (*ComputerGroups, error
 // CreateComputerGroupByName creates a new computer group by ID.
 //
 // Required privileges: create:pro:computer-groups.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateComputerGroupByName(ctx context.Context, name string, request *ComputerGroupPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))

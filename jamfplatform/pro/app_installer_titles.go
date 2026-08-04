@@ -48,6 +48,9 @@ func (c *Client) ListAppInstallerTitlesV1(ctx context.Context) ([]AppInstallerTi
 //
 // Required privileges: read:pro:mac-applications. Legacy Jamf Pro privilege name(s): Read Mac Applications.
 //
+// Parameters:
+//   - id: ID of the App Installer title.
+//
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) GetAppInstallerTitleV1(ctx context.Context, id string) (*AppInstallerTitle, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")

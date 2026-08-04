@@ -15,6 +15,9 @@ import (
 // ListDeviceEnrollmentDevicesV1 retrieve a list of Devices assigned to the supplied id.
 //
 // Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
+//
+// Parameters:
+//   - id: Device Enrollment Instance identifier.
 func (c *Client) ListDeviceEnrollmentDevicesV1(ctx context.Context, id string) (*DeviceEnrollmentDeviceSearchResults, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DeviceEnrollmentDeviceSearchResults

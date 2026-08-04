@@ -15,6 +15,9 @@ import (
 // GetHealthcareListenerRuleByID finds Healthcare Listener rules by ID.
 //
 // Required privileges: read:pro:infrastructure-managers.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetHealthcareListenerRuleByID(ctx context.Context, id string) (*HealthcareListenerRule, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result HealthcareListenerRule
@@ -28,6 +31,9 @@ func (c *Client) GetHealthcareListenerRuleByID(ctx context.Context, id string) (
 // CreateHealthcareListenerRuleByID creates a new Healthcare Listener rule.
 //
 // Required privileges: create:pro:infrastructure-managers.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateHealthcareListenerRuleByID(ctx context.Context, id string, request *HealthcareListenerRule) (*HealthcareListenerRule, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result HealthcareListenerRule
@@ -41,6 +47,9 @@ func (c *Client) CreateHealthcareListenerRuleByID(ctx context.Context, id string
 // UpdateHealthcareListenerRuleByID updates an existing Healthcare Listener rule by ID.
 //
 // Required privileges: update:pro:infrastructure-managers.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateHealthcareListenerRuleByID(ctx context.Context, id string, request *HealthcareListenerRule) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/healthcarelistenerrule/id/%s", prefix, url.PathEscape(id))

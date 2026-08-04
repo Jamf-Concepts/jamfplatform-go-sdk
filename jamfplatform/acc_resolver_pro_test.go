@@ -558,11 +558,22 @@ func TestAcceptance_ResolveComputerExtensionAttributeV1_Lifecycle(t *testing.T) 
 	_, err := c.ResolveComputerExtensionAttributeV1IDByName(ctx, name)
 	requireNotFoundErr(t, "pre-create", err)
 
+	// manageExistingData is deliberately omitted. The server rejects it on
+	// create ("This field should be blank for first time CEA creation") and on
+	// any update whose inputType is not SCRIPT with enabled=false — a
+	// precondition the spec does not encode. This test previously sent
+	// "DELETE_EXISTING_DATA", which is not one of the two accepted values and
+	// only passed because the server silently drops enum members it does not
+	// recognise; the spec's own values would have produced a 400 here. Verified
+	// on the wire 2026-08-03: RETAIN and DELETE round-trip once inputType is
+	// SCRIPT and enabled is false.
 	newCEA := func(n string) *pro.ComputerExtensionAttributes {
 		return &pro.ComputerExtensionAttributes{
-			Name: n, Enabled: ptr(true), DataType: "STRING", InputType: "TEXT",
-			InventoryDisplayType: "GENERAL", ManageExistingData: ptr("DELETE_EXISTING_DATA"),
-			PopupMenuChoices: &[]string{},
+			Name: n, Enabled: ptr(true),
+			DataType:             pro.ComputerExtensionAttributesDataTypeString,
+			InputType:            pro.ComputerExtensionAttributesInputTypeText,
+			InventoryDisplayType: pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
+			PopupMenuChoices:     &[]string{},
 		}
 	}
 	resp, err := c.CreateComputerExtensionAttributeV1(ctx, newCEA(name))
@@ -628,8 +639,8 @@ func TestAcceptance_ResolveMobileDeviceExtensionAttributeV1_Lifecycle(t *testing
 
 	newMDEA := func(n string) *pro.MobileDeviceExtensionAttributes {
 		return &pro.MobileDeviceExtensionAttributes{
-			Name: n, DataType: "STRING", InputType: "TEXT",
-			InventoryDisplayType: "GENERAL", PopupMenuChoices: &[]string{},
+			Name: n, DataType: pro.MobileDeviceExtensionAttributesDataTypeString, InputType: pro.MobileDeviceExtensionAttributesInputTypeText,
+			InventoryDisplayType: pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral, PopupMenuChoices: &[]string{},
 		}
 	}
 	resp, err := c.CreateMobileDeviceExtensionAttributeV1(ctx, newMDEA(name))
@@ -1070,7 +1081,7 @@ func TestAcceptance_ResolveDistributionPointV1_Lifecycle(t *testing.T) {
 
 	newDP := func(n string) *pro.DistributionPoint {
 		return &pro.DistributionPoint{
-			Name: n, FileSharingConnectionType: "SMB", ServerName: "localhost",
+			Name: n, FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb, ServerName: "localhost",
 			ShareName: strPtr("share"), ReadWriteUsername: strPtr("rw"), ReadWritePassword: strPtr("rw"),
 			ReadOnlyUsername: strPtr("ro"), ReadOnlyPassword: strPtr("ro"),
 		}
@@ -1620,7 +1631,7 @@ func TestAcceptance_ResolveInventoryPreloadRecordV2_Lifecycle(t *testing.T) {
 	t.Log("step 1: not-found ✓")
 
 	// Step 2: Create
-	resp, err := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: "Computer"})
+	resp, err := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: pro.InventoryPreloadRecordV2DeviceTypeComputer})
 	if err != nil {
 		t.Fatalf("CreateInventoryPreloadRecordV2: %v", err)
 	}
@@ -1650,7 +1661,7 @@ func TestAcceptance_ResolveInventoryPreloadRecordV2_Lifecycle(t *testing.T) {
 
 	// Step 5: Attempt duplicate — inventory preload keyed by serial, so duplicate should be rejected
 	id2, dupCreated := tryCreateDuplicate(t, "inventory preload record", func() (string, error) {
-		r, e := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: "Computer"})
+		r, e := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: pro.InventoryPreloadRecordV2DeviceTypeComputer})
 		if e != nil {
 			return "", e
 		}

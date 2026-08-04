@@ -20,6 +20,15 @@ import (
 // ListDevices get all devices.
 //
 // Required privileges: read:pro:devices.
+//
+// Parameters:
+//   - sort: Fields to sort by and their orders. Fields allowed in the query: `id`, `name`, `model`,
+//     `modelIdentifier`, `serialNumber`, `lastInventoryUpdateTime`, `lastCheckInTime`,
+//     `operatingSystemVersion`, `userId`, `enrollmentType`, `lastEnrollmentTime`.
+//   - filter: Filter query in RSQL format. Includes all results, by default. Fields allowed in the query: `id`,
+//     `name`, `model`, `modelIdentifier`, `serialNumber`, `lastInventoryUpdateTime`, `lastCheckInTime`,
+//     `operatingSystemVersion`, `enrollmentType`, `lastEnrollmentTime`. Dates are specified in ISO 8601
+//     format. Example: `name=="*iPhone*" and lastInventoryUpdateTime>="2025-01-31T18:09:00.000Z"`.
 func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
@@ -51,6 +60,9 @@ func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) 
 // GetDevice get a device by ID.
 //
 // Required privileges: read:pro:devices.
+//
+// Parameters:
+//   - id: Path parameter id.
 func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	var result DeviceReadRepresentationV1
@@ -64,6 +76,9 @@ func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresent
 // UpdateDevice update a device.
 //
 // Required privileges: update:pro:devices.
+//
+// Parameters:
+//   - id: Path parameter id.
 func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpdateRepresentationV1) error {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
@@ -76,6 +91,9 @@ func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpd
 // DeleteDevice delete a device.
 //
 // Required privileges: delete:pro:devices.
+//
+// Parameters:
+//   - id: Path parameter id.
 func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
@@ -88,6 +106,12 @@ func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 // ListDeviceApplications get installed applications for a device.
 //
 // Required privileges: read:pro:devices.
+//
+// Parameters:
+//   - id: Path parameter id.
+//   - sort: Fields to sort by and their orders. Fields allowed in the query: `name`, `version`.
+//   - filter: Filter query in RSQL format. Includes all results, by default. Fields allowed in the query: `name`,
+//     `version`. Example: `name=="*Safari*" and version>="26.0.0"`.
 func (c *Client) ListDeviceApplications(ctx context.Context, id string, sort []string, filter string) ([]DeviceInstalledApplicationReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceInstalledApplicationReadRepresentationV1, bool, error) {

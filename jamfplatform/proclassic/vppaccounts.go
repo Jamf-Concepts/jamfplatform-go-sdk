@@ -15,6 +15,9 @@ import (
 // GetVPPAccountByID finds VPP Account by ID.
 //
 // Required privileges: read:pro:volume-purchasing-locations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetVPPAccountByID(ctx context.Context, id string) (*VppAccount, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result VppAccount
@@ -28,6 +31,9 @@ func (c *Client) GetVPPAccountByID(ctx context.Context, id string) (*VppAccount,
 // CreateVPPAccountByID creates a new VPP account by ID.
 //
 // Required privileges: create:pro:volume-purchasing-locations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateVPPAccountByID(ctx context.Context, id string, request *VppAccount) (*VppAccount, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result VppAccount
@@ -41,6 +47,9 @@ func (c *Client) CreateVPPAccountByID(ctx context.Context, id string, request *V
 // UpdateVPPAccountByID updates a VPP account by ID.
 //
 // Required privileges: update:pro:volume-purchasing-locations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateVPPAccountByID(ctx context.Context, id string, request *VppAccount) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppaccounts/id/%s", prefix, url.PathEscape(id))
@@ -53,6 +62,9 @@ func (c *Client) UpdateVPPAccountByID(ctx context.Context, id string, request *V
 // DeleteVPPAccountByID deletes a VPP account by ID.
 //
 // Required privileges: delete:pro:volume-purchasing-locations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteVPPAccountByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppaccounts/id/%s", prefix, url.PathEscape(id))

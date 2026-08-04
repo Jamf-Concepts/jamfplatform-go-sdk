@@ -61,6 +61,14 @@ func (c *Client) PatchGSXConnectionV1(ctx context.Context, request *GsxConnectio
 // ListGSXConnectionHistoryV1 get specified GSX Connection History object.
 //
 // Required privileges: read:pro:gsx-connection. Legacy Jamf Pro privilege name(s): Read GSX Connection.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
 func (c *Client) ListGSXConnectionHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistoryV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistoryV1, bool, error) {

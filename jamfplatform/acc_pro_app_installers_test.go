@@ -229,8 +229,8 @@ func TestAcceptance_Pro_AppInstallerDeploymentsRandomSweep(t *testing.T) {
 		dep, err := p.CreateAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeploymentCreate{
 			Name:           name,
 			AppTitleID:     title.ID,
-			DeploymentType: "SELF_SERVICE",
-			UpdateBehavior: "AUTOMATIC",
+			DeploymentType: pro.AppInstallerDeploymentCreateDeploymentTypeSelfService,
+			UpdateBehavior: pro.AppInstallerDeploymentCreateUpdateBehaviorAutomatic,
 			CategoryID:     ptrStr("-1"),
 			SiteID:         ptrStr("-1"),
 			SmartGroupID:   &groupID,
@@ -386,8 +386,8 @@ func createDeployment(t *testing.T, p *pro.Client, titleID, smartGroupID, name s
 	ref, err := p.CreateAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeploymentCreate{
 		Name:           name,
 		AppTitleID:     titleID,
-		DeploymentType: "SELF_SERVICE",
-		UpdateBehavior: "AUTOMATIC",
+		DeploymentType: pro.AppInstallerDeploymentCreateDeploymentTypeSelfService,
+		UpdateBehavior: pro.AppInstallerDeploymentCreateUpdateBehaviorAutomatic,
 		CategoryID:     ptrStr("-1"),
 		SiteID:         ptrStr("-1"),
 		SmartGroupID:   &smartGroupID,

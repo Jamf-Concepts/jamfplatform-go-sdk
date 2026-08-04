@@ -20,6 +20,13 @@ import (
 // ListMobileDeviceExtensionAttributesV1 retrieve Mobile Device Extension Attributes.
 //
 // Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+//
+// Parameters:
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     name:asc. If using multiple criteria, separate with commas. Allows sort for id and name.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Fields allowed in the query: id, name Default filter is an empty
+//     query and returns all results from the requested page.
 func (c *Client) ListMobileDeviceExtensionAttributesV1(ctx context.Context, sort []string, filter string) ([]MobileDeviceExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceExtensionAttributes, bool, error) {
@@ -65,6 +72,9 @@ func (c *Client) CreateMobileDeviceExtensionAttributeV1(ctx context.Context, req
 // GetMobileDeviceExtensionAttributeV1 get specified Mobile Device Extension Attribute object.
 //
 // Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+//
+// Parameters:
+//   - id: Unique ID of Mobile Device Extension Attribute.
 func (c *Client) GetMobileDeviceExtensionAttributeV1(ctx context.Context, id string) (*MobileDeviceExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result MobileDeviceExtensionAttributes
@@ -78,6 +88,9 @@ func (c *Client) GetMobileDeviceExtensionAttributeV1(ctx context.Context, id str
 // UpdateMobileDeviceExtensionAttributeV1 update specified Mobile Device Extension Attribute object.
 //
 // Required privileges: update:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Update Mobile Device Extension Attributes.
+//
+// Parameters:
+//   - id: Unique ID of Mobile Device Extension Attribute.
 func (c *Client) UpdateMobileDeviceExtensionAttributeV1(ctx context.Context, id string, request *MobileDeviceExtensionAttributes) (*MobileDeviceExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result MobileDeviceExtensionAttributes
@@ -91,6 +104,9 @@ func (c *Client) UpdateMobileDeviceExtensionAttributeV1(ctx context.Context, id 
 // DeleteMobileDeviceExtensionAttributeV1 delete a Mobile Device Extension Attribute by ID.
 //
 // Required privileges: delete:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Delete Mobile Device Extension Attributes.
+//
+// Parameters:
+//   - id: Unique ID of Mobile Device Extension Attribute.
 func (c *Client) DeleteMobileDeviceExtensionAttributeV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-extension-attributes/%s", prefix, url.PathEscape(id))
@@ -103,6 +119,9 @@ func (c *Client) DeleteMobileDeviceExtensionAttributeV1(ctx context.Context, id 
 // GetMobileDeviceExtensionAttributeDataDependencyV1 get smart group dependent object for a specified mobile device extension attribute.
 //
 // Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+//
+// Parameters:
+//   - id: Unique ID of mobile device extension attribute.
 func (c *Client) GetMobileDeviceExtensionAttributeDataDependencyV1(ctx context.Context, id string) (*DependencyObjectResults, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DependencyObjectResults
@@ -116,6 +135,14 @@ func (c *Client) GetMobileDeviceExtensionAttributeDataDependencyV1(ctx context.C
 // ListMobileDeviceExtensionAttributeHistoryV1 get specified Mobile Device Extension Attribute History object.
 //
 // Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+//
+// Parameters:
+//   - id: Instance ID of Mobile Device Extension Attribute.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     ID:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Default filter is an empty query and returns all results from the
+//     requested page.
 func (c *Client) ListMobileDeviceExtensionAttributeHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -148,6 +175,9 @@ func (c *Client) ListMobileDeviceExtensionAttributeHistoryV1(ctx context.Context
 // CreateMobileDeviceExtensionAttributeHistoryNoteV1 add specified Mobile Device Extension Attribute history object notes.
 //
 // Required privileges: update:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Update Mobile Device Extension Attributes.
+//
+// Parameters:
+//   - id: Instance ID of Mobile Device Extension Attribute.
 func (c *Client) CreateMobileDeviceExtensionAttributeHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory
@@ -161,6 +191,9 @@ func (c *Client) CreateMobileDeviceExtensionAttributeHistoryNoteV1(ctx context.C
 // ListDeviceExtensionAttributesPreview get Mobile Device Extension Attribute values placed in select paramter.
 //
 // Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+//
+// Parameters:
+//   - selectAttr: Acceptable values currently include: * name.
 func (c *Client) ListDeviceExtensionAttributesPreview(ctx context.Context, selectAttr string) (*MobileDeviceExtensionAttributeResults, error) {
 	prefix := c.transport.TenantPrefix("pro", "")
 	var result MobileDeviceExtensionAttributeResults

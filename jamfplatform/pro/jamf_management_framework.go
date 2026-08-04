@@ -16,6 +16,9 @@ import (
 //
 // Required privileges: read:pro:computer-check-in, execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Remote Command to Install Package, Read Computer Check-In.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: instance id of computer.
 func (c *Client) RedeployJamfManagementFrameworkV1(ctx context.Context, id string) (*RedeployJamfManagementFrameworkResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result RedeployJamfManagementFrameworkResponse

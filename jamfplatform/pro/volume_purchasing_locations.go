@@ -20,6 +20,15 @@ import (
 // ListVolumePurchasingLocationsV1 retrieve Volume Purchasing Locations.
 //
 // Required privileges: read:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Volume Purchasing Location collection. Default filter
+//     is empty query - returning all results for the requested page. Fields allowed in the query: id,
+//     name, appleId, email, organizationName, tokenExpiration, countryCode, locationName,
+//     automaticallyPopulatePurchasedContent, sendNotificationWhenNoLongerAssigned, siteId and siteName.
+//     This param can be combined with paging and sorting.
 func (c *Client) ListVolumePurchasingLocationsV1(ctx context.Context, sort []string, filter string) ([]VolumePurchasingLocationListView, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]VolumePurchasingLocationListView, bool, error) {
@@ -65,6 +74,9 @@ func (c *Client) CreateVolumePurchasingLocationV1(ctx context.Context, request *
 // GetVolumePurchasingLocationV1 retrieve a Volume Purchasing Location with the supplied id.
 //
 // Required privileges: read:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
+//
+// Parameters:
+//   - id: Volume Purchasing Location identifier.
 func (c *Client) GetVolumePurchasingLocationV1(ctx context.Context, id string) (*VolumePurchasingLocation, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result VolumePurchasingLocation
@@ -78,6 +90,9 @@ func (c *Client) GetVolumePurchasingLocationV1(ctx context.Context, id string) (
 // DeleteVolumePurchasingLocationV1 delete a Volume Purchasing Location with the supplied id.
 //
 // Required privileges: delete:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Delete Volume Purchasing Locations.
+//
+// Parameters:
+//   - id: Volume Purchasing Location identifier.
 func (c *Client) DeleteVolumePurchasingLocationV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/volume-purchasing-locations/%s", prefix, url.PathEscape(id))
@@ -90,6 +105,9 @@ func (c *Client) DeleteVolumePurchasingLocationV1(ctx context.Context, id string
 // UpdateVolumePurchasingLocationV1 update a Volume Purchasing Location.
 //
 // Required privileges: update:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
+//
+// Parameters:
+//   - id: Volume Purchasing Location identifier.
 func (c *Client) UpdateVolumePurchasingLocationV1(ctx context.Context, id string, request *VolumePurchasingLocationPatch) (*VolumePurchasingLocation, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result VolumePurchasingLocation
@@ -103,6 +121,15 @@ func (c *Client) UpdateVolumePurchasingLocationV1(ctx context.Context, id string
 // ListVolumePurchasingLocationContentV1 retrieve the Volume Purchasing Content for the Volume Purchasing Location with the supplied id.
 //
 // Required privileges: read:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
+//
+// Parameters:
+//   - id: Volume Purchasing Location identifier.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Volume Purchasing Content collection. Default filter is
+//     empty query - returning all results for the requested page. Fields allowed in the query: name,
+//     licenseCountTotal, licenseCountInUse, licenseCountReported, contentType, and pricingParam. This
+//     param can be combined with paging and sorting.
 func (c *Client) ListVolumePurchasingLocationContentV1(ctx context.Context, id string, sort []string, filter string) ([]VolumePurchasingContent, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]VolumePurchasingContent, bool, error) {
@@ -135,6 +162,15 @@ func (c *Client) ListVolumePurchasingLocationContentV1(ctx context.Context, id s
 // ListVolumePurchasingLocationHistoryV1 get specified Volume Purchasing Location history object.
 //
 // Required privileges: read:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
+//
+// Parameters:
+//   - id: instance id of Volume Purchasing Location history record.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
 func (c *Client) ListVolumePurchasingLocationHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -167,6 +203,9 @@ func (c *Client) ListVolumePurchasingLocationHistoryV1(ctx context.Context, id s
 // CreateVolumePurchasingLocationHistoryNoteV1 add specified Volume Purchasing Location history object notes.
 //
 // Required privileges: update:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
+//
+// Parameters:
+//   - id: instance id of Volume Purchasing Location history record.
 func (c *Client) CreateVolumePurchasingLocationHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory
@@ -180,6 +219,9 @@ func (c *Client) CreateVolumePurchasingLocationHistoryNoteV1(ctx context.Context
 // ReclaimVolumePurchasingLocationLicensesV1 reclaim a Volume Purchasing Location with the supplied id.
 //
 // Required privileges: update:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
+//
+// Parameters:
+//   - id: Volume Purchasing Location identifier.
 func (c *Client) ReclaimVolumePurchasingLocationLicensesV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/volume-purchasing-locations/%s/reclaim", prefix, url.PathEscape(id))
@@ -192,6 +234,9 @@ func (c *Client) ReclaimVolumePurchasingLocationLicensesV1(ctx context.Context, 
 // RevokeVolumePurchasingLocationLicensesV1 revoke licenses for a Volume Purchasing Location with the supplied id.
 //
 // Required privileges: update:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
+//
+// Parameters:
+//   - id: Volume Purchasing Location identifier.
 func (c *Client) RevokeVolumePurchasingLocationLicensesV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/volume-purchasing-locations/%s/revoke-licenses", prefix, url.PathEscape(id))

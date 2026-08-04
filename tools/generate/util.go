@@ -99,6 +99,118 @@ func cleanComment(s string) string {
 	return s
 }
 
+// specHTMLTagRe matches the inline HTML fragments Jamf embeds in spec prose
+// (<br/>, </br>, <p>, <li>, …). Godoc has no HTML, so the tags are dropped.
+// The alternation is an explicit tag allowlist rather than a generic <...>
+// pattern because some descriptions use angle brackets as placeholder syntax
+// ("sort in the format <field_name>:asc") and those must survive.
+var specHTMLTagRe = regexp.MustCompile(`(?i)</?(br|p|div|span|ul|ol|li|b|i|em|strong|code|pre|a|table|tr|td|th)\b[^>]*>`)
+
+// specHTMLEntities decodes the handful of entities Jamf's spec prose uses.
+var specHTMLEntities = strings.NewReplacer(
+	"&amp;", "&", "&lt;", "<", "&gt;", ">", "&quot;", `"`, "&#39;", "'", "&nbsp;", " ",
+)
+
+// stripSpecHTML renders spec prose as plain text for godoc: known tags become
+// a space (so "a</br>b" doesn't fuse into "ab") and entities are decoded.
+// Whitespace normalisation is left to cleanComment.
+func stripSpecHTML(s string) string {
+	return specHTMLEntities.Replace(specHTMLTagRe.ReplaceAllString(s, " "))
+}
+
+// descriptionParagraphRe splits spec prose on blank lines so each paragraph
+// is wrapped as its own run of godoc lines.
+var descriptionParagraphRe = regexp.MustCompile(`\n[ \t]*\n`)
+
+// docParagraphs renders spec prose as wrapped godoc lines: HTML stripped,
+// entities decoded, and each blank-line-separated paragraph wrapped
+// independently. Wrapping the whole description in one pass would fuse the
+// last sentence of a paragraph into the first of the next — Jamf ends several
+// of its field lists on a bare identifier with no terminating period, so the
+// joint reads as one broken sentence.
+//
+// Returns nil for empty or whitespace-only input, letting callers treat "the
+// spec says nothing" as a distinct case from "the spec says something short".
+func docParagraphs(text string, width int) []string {
+	var out []string
+	for _, para := range descriptionParagraphRe.Split(stripSpecHTML(text), -1) {
+		if strings.TrimSpace(para) == "" {
+			continue
+		}
+		out = append(out, wrapCommentText(cleanComment(para), width)...)
+	}
+	return out
+}
+
+// wrapCommentText greedily wraps s to width columns without splitting a word.
+// Needed for parameter documentation: a single Jamf description can run to
+// thousands of characters (the Pro list endpoints inline every sortable field
+// name), and cleanComment collapses it to one unreadable line.
+func wrapCommentText(s string, width int) []string {
+	words := strings.Fields(s)
+	if len(words) == 0 {
+		return nil
+	}
+	var (
+		lines []string
+		cur   strings.Builder
+	)
+	for _, w := range words {
+		switch {
+		case cur.Len() == 0:
+			cur.WriteString(w)
+		case cur.Len()+1+len(w) <= width:
+			cur.WriteByte(' ')
+			cur.WriteString(w)
+		default:
+			lines = append(lines, cur.String())
+			cur.Reset()
+			cur.WriteString(w)
+		}
+	}
+	return append(lines, cur.String())
+}
+
+// enumIdentSplitRe splits an enum wire value into word segments. Jamf's enum
+// values are SCREAMING_SNAKE in the Pro/Platform families, kebab in a few
+// (mdm-byod), and occasionally dotted or spaced in Classic.
+var enumIdentSplitRe = regexp.MustCompile(`[^A-Za-z0-9]+`)
+
+// enumConstIdent converts an enum wire value into the identifier fragment
+// appended to its type name: "APNS_CERT_REVOKED" → "ApnsCertRevoked",
+// "mdm-byod" → "MDMByod". Segments are title-cased and the shared acronym
+// fixups then run, so ID/URL/MDM land in their canonical spelling.
+//
+// A leading digit is fine — the fragment is only ever a suffix on the type
+// name, so "10.15" yields "1015" and the emitted constant is still valid.
+// Returns "" when the value holds no alphanumerics at all, leaving the caller
+// to skip it and say so rather than emit something that will not compile.
+func enumConstIdent(value string) string {
+	var b strings.Builder
+	for _, seg := range enumIdentSplitRe.Split(value, -1) {
+		if seg == "" {
+			continue
+		}
+		// An all-caps segment is a wire-format artefact, not an acronym the
+		// spec is asserting: lowercase the tail so SCREAMING_SNAKE reads as
+		// Go words. Mixed-case segments are left alone beyond the initial.
+		if seg == strings.ToUpper(seg) {
+			seg = strings.ToUpper(seg[:1]) + strings.ToLower(seg[1:])
+		} else {
+			seg = strings.ToUpper(seg[:1]) + seg[1:]
+		}
+		b.WriteString(seg)
+	}
+	s := b.String()
+	if s == "" {
+		return ""
+	}
+	for _, fix := range acronymFixups {
+		s = fix.re.ReplaceAllString(s, fix.repl)
+	}
+	return s
+}
+
 func lowerFirst(s string) string {
 	if s == "" {
 		return s

@@ -18,6 +18,9 @@ import (
 // GetDirectoryBindingByID finds directory bindings by ID.
 //
 // Required privileges: read:pro:directory-bindings.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetDirectoryBindingByID(ctx context.Context, id string) (*DirectoryBinding, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DirectoryBinding
@@ -31,6 +34,9 @@ func (c *Client) GetDirectoryBindingByID(ctx context.Context, id string) (*Direc
 // CreateDirectoryBindingByID creates a new directory binding by ID.
 //
 // Required privileges: create:pro:directory-bindings.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateDirectoryBindingByID(ctx context.Context, id string, request *DirectoryBinding) (*DirectoryBinding, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DirectoryBinding
@@ -44,6 +50,9 @@ func (c *Client) CreateDirectoryBindingByID(ctx context.Context, id string, requ
 // UpdateDirectoryBindingByID updates an existing directory binding by ID.
 //
 // Required privileges: update:pro:directory-bindings.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateDirectoryBindingByID(ctx context.Context, id string, request *DirectoryBinding) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateDirectoryBindingByID(ctx context.Context, id string, requ
 // DeleteDirectoryBindingByID deletes a directory binding by ID.
 //
 // Required privileges: delete:pro:directory-bindings.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteDirectoryBindingByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteDirectoryBindingByID(ctx context.Context, id string) erro
 // GetDirectoryBindingByName finds directory bindings by name.
 //
 // Required privileges: read:pro:directory-bindings.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetDirectoryBindingByName(ctx context.Context, name string) (*DirectoryBinding, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DirectoryBinding
@@ -81,6 +96,9 @@ func (c *Client) GetDirectoryBindingByName(ctx context.Context, name string) (*D
 // UpdateDirectoryBindingByName updates an existing directory binding by name.
 //
 // Required privileges: update:pro:directory-bindings.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateDirectoryBindingByName(ctx context.Context, name string, request *DirectoryBinding) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateDirectoryBindingByName(ctx context.Context, name string, 
 // DeleteDirectoryBindingByName deletes a directory binding by name.
 //
 // Required privileges: delete:pro:directory-bindings.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteDirectoryBindingByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,9 @@ func (c *Client) ListDirectoryBindings(ctx context.Context) (*DirectoryBindings,
 // CreateDirectoryBindingByName creates a new directory binding by ID.
 //
 // Required privileges: create:pro:directory-bindings.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateDirectoryBindingByName(ctx context.Context, name string, request *DirectoryBinding) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))

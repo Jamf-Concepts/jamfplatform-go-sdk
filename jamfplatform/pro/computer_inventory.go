@@ -21,6 +21,9 @@ import (
 // EraseComputerV1 erase a computer.
 //
 // Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Remote Wipe Command.
+//
+// Parameters:
+//   - id: Id of the computer to erase.
 func (c *Client) EraseComputerV1(ctx context.Context, id string, request *EraseDeviceComputerRequest) (*EraseDeviceComputerResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result EraseDeviceComputerResponse
@@ -34,6 +37,9 @@ func (c *Client) EraseComputerV1(ctx context.Context, id string, request *EraseD
 // RemoveMdmProfileFromComputerV1 remove a computer's MDM profile.
 //
 // Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Unmanage Command.
+//
+// Parameters:
+//   - id: Id of the computer to remove the MDM profile from.
 func (c *Client) RemoveMdmProfileFromComputerV1(ctx context.Context, id string) (*RemoveComputerMDMProfileResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result RemoveComputerMDMProfileResponse
@@ -49,6 +55,54 @@ func (c *Client) RemoveMdmProfileFromComputerV1(ctx context.Context, id string) 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS",
+//     "SECURITY", "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
+//     "EXTENSION_ATTRIBUTES", "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
+//     sort criteria are supported and must be separated with a comma.
+//     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
+//     `general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`,
+//     `general.lastCloudBackupDate`, `general.reportDate`, `general.mdmCertificateExpiration`,
+//     `general.platform`, `general.lastLoggedInUsernameSelfService`,
+//     `general.lastLoggedInUsernameSelfServiceTimestamp`, `general.lastLoggedInUsernameBinary`,
+//     `general.lastLoggedInUsernameBinaryTimestamp`, `general.lastLoggedInUsernameMdm`,
+//     `general.lastLoggedInUsernameMdmTimestamp` `hardware.make`, `hardware.model`,
+//     `operatingSystem.build`, `operatingSystem.supplementalBuildVersion`,
+//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,
+//     `userAndLocation.realname`, `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
+//     Example: `sort=udid:desc,general.name:asc`.
+//   - filter: Query in the RSQL format, allowing to filter computer inventory collection. Default filter is empty
+//     query - returning all results for the requested page.
+//     Fields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`,
+//     `general.barcode2`, `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
+//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`, `general.lastContactTime`,
+//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`, `general.reportDate`,
+//     `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`,
+//     `general.managementId`, `general.remoteManagement.managed`, `general.mdmCapable.capable`,
+//     `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`,
+//     `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,
+//     `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,
+//     `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,
+//     `general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,
+//     `hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`,
+//     `hardware.modelIdentifier`, `hardware.serialNumber`,
+//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`,
+//     `operatingSystem.fileVault2Status`, `operatingSystem.build`,
+//     `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`,
+//     `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,
+//     `security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`,
+//     `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,
+//     `userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`,
+//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`, `purchasing.appleCareId`,
+//     `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
+//     `purchasing.warrantyDate`,.
+//     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventory, bool, error) {
@@ -86,6 +140,54 @@ func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string,
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
+//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
+//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
+//     sort criteria are supported and must be separated with a comma.
+//     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
+//     `general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`,
+//     `general.lastCloudBackupDate`, `general.reportDate`, `general.mdmCertificateExpiration`,
+//     `general.platform`, `general.lastLoggedInUsernameSelfService`,
+//     `general.lastLoggedInUsernameSelfServiceTimestamp`, `general.lastLoggedInUsernameBinary`,
+//     `general.lastLoggedInUsernameBinaryTimestamp`, `general.lastLoggedInUsernameMdm`,
+//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.make`, `hardware.model`,
+//     `operatingSystem.build`, `operatingSystem.supplementalBuildVersion`,
+//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,
+//     `userAndLocation.realname`, `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
+//     Example: `sort=udid:desc,general.name:asc`.
+//   - filter: Query in the RSQL format, allowing to filter computer inventory collection. Default filter is empty
+//     query - returning all results for the requested page.
+//     Fields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`,
+//     `general.barcode2`, `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
+//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`, `general.lastContactTime`,
+//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`, `general.reportDate`,
+//     `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`,
+//     `general.managementId`, `general.remoteManagement.managed`, `general.mdmCapable.capable`,
+//     `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`,
+//     `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,
+//     `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,
+//     `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,
+//     `general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,
+//     `hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`,
+//     `hardware.modelIdentifier`, `hardware.serialNumber`,
+//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`,
+//     `operatingSystem.fileVault2Status`, `operatingSystem.build`,
+//     `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`,
+//     `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,
+//     `security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`,
+//     `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,
+//     `userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`,
+//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`, `purchasing.appleCareId`,
+//     `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
+//     `purchasing.warrantyDate`,.
+//     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV2, bool, error) {
@@ -121,6 +223,54 @@ func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string,
 // ListComputersInventoryV3 return paginated Computer Inventory records.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
+//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
+//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
+//     sort criteria are supported and must be separated with a comma.
+//     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
+//     `general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`,
+//     `general.lastCloudBackupDate`, `general.reportDate`, `general.mdmCertificateExpiration`,
+//     `general.platform`, `general.lastLoggedInUsernameSelfService`,
+//     `general.lastLoggedInUsernameSelfServiceTimestamp`, `general.lastLoggedInUsernameBinary`,
+//     `general.lastLoggedInUsernameBinaryTimestamp`, `general.lastLoggedInUsernameMdm`,
+//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.make`, `hardware.model`,
+//     `operatingSystem.build`, `operatingSystem.supplementalBuildVersion`,
+//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,
+//     `userAndLocation.realname`, `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
+//     Example: `sort=udid:desc,general.name:asc`.
+//   - filter: Query in the RSQL format, allowing to filter computer inventory collection. Default filter is empty
+//     query - returning all results for the requested page.
+//     Fields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`,
+//     `general.barcode2`, `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
+//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`, `general.lastContactTime`,
+//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`, `general.reportDate`,
+//     `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`,
+//     `general.managementId`, `general.remoteManagement.managed`, `general.mdmCapable.capable`,
+//     `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`,
+//     `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,
+//     `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,
+//     `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,
+//     `general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,
+//     `hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`,
+//     `hardware.modelIdentifier`, `hardware.serialNumber`,
+//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`,
+//     `operatingSystem.fileVault2Status`, `operatingSystem.build`,
+//     `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`,
+//     `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,
+//     `security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`,
+//     `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,
+//     `userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`,
+//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`, `purchasing.appleCareId`,
+//     `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
+//     `purchasing.warrantyDate`,.
+//     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV3(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV3, bool, error) {
@@ -283,6 +433,16 @@ func (c *Client) ListComputerInventoryFileVaultsV3(ctx context.Context) ([]Compu
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=general&section=hardware.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS",
+//     "SECURITY", "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
+//     "EXTENSION_ATTRIBUTES", "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section []string) (*ComputerInventory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerInventory
@@ -305,6 +465,16 @@ func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=general&section=hardware.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
+//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
+//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section []string) (*ComputerInventoryV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryV2
@@ -325,6 +495,16 @@ func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section 
 // GetComputerInventoryV3 return General section of a Computer.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
+//   - section: section of computer details, if not specified, General section data is returned. Multiple section
+//     parameters are supported, e.g. section=general&section=hardware.
+//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
+//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
+//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
+//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
+//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV3(ctx context.Context, id string, section []string) (*ComputerInventoryV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result ComputerInventoryV3
@@ -347,6 +527,9 @@ func (c *Client) GetComputerInventoryV3(ctx context.Context, id string, section 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) DeleteComputerInventoryV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
@@ -361,6 +544,9 @@ func (c *Client) DeleteComputerInventoryV1(ctx context.Context, id string) error
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) DeleteComputerInventoryV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
@@ -373,6 +559,9 @@ func (c *Client) DeleteComputerInventoryV2(ctx context.Context, id string) error
 // DeleteComputerInventoryV3 remove specified Computer record.
 //
 // Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) DeleteComputerInventoryV3(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
@@ -387,6 +576,9 @@ func (c *Client) DeleteComputerInventoryV3(ctx context.Context, id string) error
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryDetailV1(ctx context.Context, id string) (*ComputerInventory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerInventory
@@ -402,6 +594,9 @@ func (c *Client) GetComputerInventoryDetailV1(ctx context.Context, id string) (*
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryDetailV2(ctx context.Context, id string) (*ComputerInventoryV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryV2
@@ -415,6 +610,9 @@ func (c *Client) GetComputerInventoryDetailV2(ctx context.Context, id string) (*
 // GetComputerInventoryDetailV3 return all sections of a computer.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryDetailV3(ctx context.Context, id string) (*ComputerInventoryV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result ComputerInventoryV3
@@ -430,6 +628,9 @@ func (c *Client) GetComputerInventoryDetailV3(ctx context.Context, id string) (*
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) UpdateComputerInventoryDetailV1(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) (*ComputerInventory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerInventory
@@ -445,6 +646,9 @@ func (c *Client) UpdateComputerInventoryDetailV1(ctx context.Context, id string,
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) UpdateComputerInventoryDetailV2(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
@@ -457,6 +661,9 @@ func (c *Client) UpdateComputerInventoryDetailV2(ctx context.Context, id string,
 // UpdateComputerInventoryDetailV3 update specific fields on a computer.
 //
 // Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) UpdateComputerInventoryDetailV3(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
@@ -471,6 +678,9 @@ func (c *Client) UpdateComputerInventoryDetailV3(ctx context.Context, id string,
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -496,6 +706,9 @@ func (c *Client) UploadComputerInventoryAttachmentV1(ctx context.Context, id str
 //
 // Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
 //
+// Parameters:
+//   - id: instance id of computer record.
+//
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
 // Content-Length and retry once on a 429/Retry-After. A plain
@@ -517,6 +730,9 @@ func (c *Client) UploadComputerInventoryAttachmentV2(ctx context.Context, id str
 // UploadComputerInventoryAttachmentV3 upload attachment and assign to computer.
 //
 // Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -541,6 +757,10 @@ func (c *Client) UploadComputerInventoryAttachmentV3(ctx context.Context, id str
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
+//   - attachmentID: instance id of attachment object.
 func (c *Client) DownloadComputerInventoryAttachmentV1(ctx context.Context, id string, attachmentID string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -556,6 +776,10 @@ func (c *Client) DownloadComputerInventoryAttachmentV1(ctx context.Context, id s
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
+//   - attachmentID: instance id of attachment object.
 func (c *Client) DownloadComputerInventoryAttachmentV2(ctx context.Context, id string, attachmentID string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result []byte
@@ -569,6 +793,10 @@ func (c *Client) DownloadComputerInventoryAttachmentV2(ctx context.Context, id s
 // DownloadComputerInventoryAttachmentV3 download attachment file.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
+//   - attachmentID: instance id of attachment object.
 func (c *Client) DownloadComputerInventoryAttachmentV3(ctx context.Context, id string, attachmentID string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result []byte
@@ -584,6 +812,10 @@ func (c *Client) DownloadComputerInventoryAttachmentV3(ctx context.Context, id s
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
+//   - attachmentID: instance id of attachment object.
 func (c *Client) DeleteComputerInventoryAttachmentV1(ctx context.Context, id string, attachmentID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
@@ -598,6 +830,10 @@ func (c *Client) DeleteComputerInventoryAttachmentV1(ctx context.Context, id str
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
+//   - attachmentID: instance id of attachment object.
 func (c *Client) DeleteComputerInventoryAttachmentV2(ctx context.Context, id string, attachmentID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
@@ -610,6 +846,10 @@ func (c *Client) DeleteComputerInventoryAttachmentV2(ctx context.Context, id str
 // DeleteComputerInventoryAttachmentV3 remove attachment.
 //
 // Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+//
+// Parameters:
+//   - id: instance id of computer record.
+//   - attachmentID: instance id of attachment object.
 func (c *Client) DeleteComputerInventoryAttachmentV3(ctx context.Context, id string, attachmentID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
@@ -624,6 +864,9 @@ func (c *Client) DeleteComputerInventoryAttachmentV3(ctx context.Context, id str
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryFileVaultV1(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerInventoryFileVault
@@ -639,6 +882,9 @@ func (c *Client) GetComputerInventoryFileVaultV1(ctx context.Context, id string)
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryFileVaultV2(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryFileVault
@@ -652,6 +898,9 @@ func (c *Client) GetComputerInventoryFileVaultV2(ctx context.Context, id string)
 // GetComputerInventoryFileVaultV3 return FileVault information for a specific computer.
 //
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryFileVaultV3(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result ComputerInventoryFileVault
@@ -667,6 +916,9 @@ func (c *Client) GetComputerInventoryFileVaultV3(ctx context.Context, id string)
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerDeviceLockPinV1(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerInventoryDeviceLockPinResponse
@@ -682,6 +934,9 @@ func (c *Client) GetComputerDeviceLockPinV1(ctx context.Context, id string) (*Co
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerDeviceLockPinV2(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryDeviceLockPinResponse
@@ -695,6 +950,9 @@ func (c *Client) GetComputerDeviceLockPinV2(ctx context.Context, id string) (*Co
 // GetComputerDeviceLockPinV3 return a computer's Device Lock PIN.
 //
 // Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerDeviceLockPinV3(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result ComputerInventoryDeviceLockPinResponse
@@ -710,6 +968,9 @@ func (c *Client) GetComputerDeviceLockPinV3(ctx context.Context, id string) (*Co
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerRecoveryLockPasswordV1(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerInventoryRecoveryLockPasswordResponse
@@ -725,6 +986,9 @@ func (c *Client) GetComputerRecoveryLockPasswordV1(ctx context.Context, id strin
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
 // Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerRecoveryLockPasswordV2(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result ComputerInventoryRecoveryLockPasswordResponse
@@ -738,6 +1002,9 @@ func (c *Client) GetComputerRecoveryLockPasswordV2(ctx context.Context, id strin
 // GetComputerRecoveryLockPasswordV3 return a Computers Recovery Lock Password.
 //
 // Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
+//
+// Parameters:
+//   - id: instance id of computer record.
 func (c *Client) GetComputerRecoveryLockPasswordV3(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result ComputerInventoryRecoveryLockPasswordResponse

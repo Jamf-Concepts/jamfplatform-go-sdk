@@ -45,6 +45,10 @@ func (c *Client) UpdateOnboardingV1(ctx context.Context, request *OnboardingConf
 // ListOnboardingEligibleAppsV1 retrieves a list of applications that are eligible to be used in an onboarding configuration.
 //
 // Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListOnboardingEligibleAppsV1(ctx context.Context, sort []string) ([]OnboardingEligibleItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
@@ -74,6 +78,10 @@ func (c *Client) ListOnboardingEligibleAppsV1(ctx context.Context, sort []string
 // ListOnboardingEligibleConfigurationProfilesV1 retrieves a list of configuration profiles that are eligible to be used in an onboarding configuration.
 //
 // Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListOnboardingEligibleConfigurationProfilesV1(ctx context.Context, sort []string) ([]OnboardingEligibleItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
@@ -103,6 +111,10 @@ func (c *Client) ListOnboardingEligibleConfigurationProfilesV1(ctx context.Conte
 // ListOnboardingEligiblePoliciesV1 retrieves a list of policies that are eligible to be used in an onboarding configuration.
 //
 // Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListOnboardingEligiblePoliciesV1(ctx context.Context, sort []string) ([]OnboardingEligibleItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
@@ -132,6 +144,14 @@ func (c *Client) ListOnboardingEligiblePoliciesV1(ctx context.Context, sort []st
 // ListOnboardingHistoryV1 get Onboarding history object.
 //
 // Required privileges: read:pro:onboarding-configuration. Legacy Jamf Pro privilege name(s): Read Onboarding Configuration.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
+//     date<2019-12-15.
 func (c *Client) ListOnboardingHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

@@ -2057,7 +2057,7 @@ func TestAcceptance_ApplyInventoryPreloadRecordV2(t *testing.T) {
 
 	id, created, err := p.ApplyInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{
 		SerialNumber: serial,
-		DeviceType:   "Computer",
+		DeviceType:   pro.InventoryPreloadRecordV2DeviceTypeComputer,
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -2073,7 +2073,7 @@ func TestAcceptance_ApplyInventoryPreloadRecordV2(t *testing.T) {
 	tag := "updated-tag"
 	id2, created2, err := p.ApplyInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{
 		SerialNumber: serial,
-		DeviceType:   "Computer",
+		DeviceType:   pro.InventoryPreloadRecordV2DeviceTypeComputer,
 		AssetTag:     &tag,
 	})
 	if err != nil {

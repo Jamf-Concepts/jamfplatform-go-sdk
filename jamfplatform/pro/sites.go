@@ -33,6 +33,28 @@ func (c *Client) ListSitesV1(ctx context.Context) ([]V1Site, error) {
 // ListSiteObjectsV1 find and filter site objects for a site ID.
 //
 // Required privileges: read:pro:sites. Legacy Jamf Pro privilege name(s): Read Sites.
+//
+// Parameters:
+//   - id: Site ID to get objects for.
+//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `objectType:asc`. Multiple sort
+//     criteria are supported and must be separated with a comma.
+//     Example: `sort=objectId:asc,objectType:desc`.
+//   - filter: Query in the RSQL format, allowing filter of site object information. Default filter returns all
+//     objects for the site ID.
+//     Fields allowed in the query: `objectType`, `objectId`.
+//     Example: `filter=objectType=="User"`.
+//     List of `objectType` options (case-insensitive) ["Computer", "Peripheral", "Licensed Software",
+//     "Licensed Software Template", "Policy", "macOS Configuration Profile", "Restricted Software",
+//     "Managed Preference Profile", "Computer Group", "Mobile Device", "Apple TV", "Android Device", "User
+//     Group", "iOS Configuration Profile", "Mobile Device App", "E-book", "Mobile Device Group",
+//     "Classroom", "Advanced Computer Search", "Advanced Mobile Search", "Advanced User Search", "Advanced
+//     User Content Search", "Computer Invitation", "Mobile Device Invitation", "Mobile Device Enrollment
+//     Profile", "Device Enrollment Program Instance", "Mobile Device Prestage", "Computer DEP Prestage",
+//     "Enrollment Customization", "VPP Location", "VPP Subscription", "VPP Invitation", "VPP Assignment",
+//     "User", "Network Integration", "Mac App", "App Installer", "Self Service Plugin", "Software Title",
+//     "Patch Software Title Summary", "Patch Policy", "Patch Software Title Configuration", "Change
+//     Password", "Mobile Device Inventory", "Computer Inventory", "Change Management", "Licensed Software
+//     License"].
 func (c *Client) ListSiteObjectsV1(ctx context.Context, id string, sort []string, filter string) ([]SiteObject, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SiteObject, bool, error) {

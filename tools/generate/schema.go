@@ -6,6 +6,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"maps"
 	"sort"
 	"strings"
@@ -987,6 +988,21 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 	names := sortedKeys(doc.Components.Schemas)
 	var types []GoType
 
+	// Inline property enums are collected as schemaToGoType walks fields, then
+	// appended below. Both maps are reset per pass so one spec's enums can't
+	// leak into the next spec's output. The name set is a superset of what gets
+	// emitted (some allowed schemas produce no type), which only makes the
+	// collision check more conservative.
+	currentPropertyEnums = make(map[string]GoType)
+	currentSpecTypeNames = make(map[string]bool, len(allow))
+	for specName := range allow {
+		currentSpecTypeNames[goTypeName(specName)] = true
+	}
+	defer func() {
+		currentPropertyEnums = nil
+		currentSpecTypeNames = nil
+	}()
+
 	for _, specName := range names {
 		usage := allow[specName]
 		if usage == nil {
@@ -1032,11 +1048,12 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 			continue
 		}
 
-		// Enum string → type alias
+		// Enum string → type alias plus a constant per value.
 		if schema.Type.Is("string") && len(schema.Enum) > 0 {
 			types = append(types, GoType{
-				Name:    name,
-				Comment: fmt.Sprintf("%s represents a %s value.", name, camelToWords(name)),
+				Name:       name,
+				Comment:    fmt.Sprintf("%s represents a %s value.", name, camelToWords(name)),
+				EnumValues: enumConsts(name, schema.Enum),
 			})
 			continue
 		}
@@ -1126,7 +1143,18 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 		stripConflictingXMLNames(types)
 		addTopLevelIDsForClassic(types)
 	}
-	return types
+	return append(types, drainPropertyEnums()...)
+}
+
+// drainPropertyEnums returns the collected inline-property enum types, name
+// order, so output is stable across runs. Collisions are already resolved at
+// registration time; anything reaching here is safe to declare.
+func drainPropertyEnums() []GoType {
+	out := make([]GoType, 0, len(currentPropertyEnums))
+	for _, name := range sortedKeys(currentPropertyEnums) {
+		out = append(out, currentPropertyEnums[name])
+	}
+	return out
 }
 
 // classicListWrapper detects the Jamf Classic list schema shape and
@@ -1434,6 +1462,154 @@ func flattenAllOf(schema *openapi3.Schema) (map[string]*openapi3.SchemaRef, []st
 	return props, required
 }
 
+// fieldDocWidth is the wrap width for struct field documentation. Matches
+// parameterDocWidth; the rendered prefix is one tab plus "// ".
+const fieldDocWidth = 100
+
+// currentPropertyEnums collects the enum types synthesised for inline property
+// enums during one extractTypes pass, keyed by Go type name. Follows the same
+// pass-scoped-global convention as currentFieldOverrides: schemaToGoType is
+// called per schema and has nowhere to return extra declarations.
+var currentPropertyEnums map[string]GoType
+
+// currentSpecTypeNames is the set of Go type names the spec itself declares in
+// the current extractTypes pass. A synthesised <Owner><Property> name that
+// lands on one of these must be abandoned before the field references it —
+// checking at drain time instead left the field pointing at a type that has no
+// constants (Deployment.State → DeploymentState, an existing struct).
+var currentSpecTypeNames map[string]bool
+
+// registerPropertyEnum synthesises an enum type for an enum declared inline on
+// a property, and returns its Go type name so the field can point at it.
+// Returns "" when there is nothing to synthesise.
+//
+// Named as <OwningType><Property>: the same property name carries conflicting
+// value sets across schemas (`type` alone has 14 distinct sets across 18
+// schemas), so nothing shorter is safe. Identical value-sets under different
+// owners are deliberately duplicated rather than folded into one shared type —
+// a shared name would have to be invented, and it would then churn whenever
+// Jamf changed one owner's values but not the other's.
+//
+// Skipped cases, each for a reason:
+//   - $ref'd properties. The field's own type already names the enum, so a
+//     "see the X constants" line would just repeat the signature.
+//   - Non-string enums. The constants are typed to a `= string` alias.
+//   - Single-value enums. A constant for a one-value set is noise; the
+//     description already says what the value is.
+//   - Names the spec already uses for a schema. Redeclaring one would break
+//     the build, and referencing it from the field would point the reader at a
+//     type carrying no constants.
+func registerPropertyEnum(ownerType, pname string, propRef *openapi3.SchemaRef) string {
+	if currentPropertyEnums == nil || propRef == nil || propRef.Ref != "" || propRef.Value == nil {
+		return ""
+	}
+	prop := propRef.Value
+
+	// Repeatable properties model the constraint on the item schema. An item
+	// $ref is skipped for the same reason a property $ref is: the element type
+	// already names it.
+	enumSrc := prop
+	if len(enumSrc.Enum) == 0 && prop.Items != nil {
+		if prop.Items.Ref != "" {
+			return ""
+		}
+		if prop.Items.Value != nil {
+			enumSrc = prop.Items.Value
+		}
+	}
+	if len(enumSrc.Enum) < 2 || !enumSrc.Type.Is("string") {
+		return ""
+	}
+
+	typeName := ownerType + exportedGoName(pname)
+	// The Values accessor shares the type's namespace, so both spellings have
+	// to be free before the type can be declared.
+	if currentSpecTypeNames[typeName] || currentSpecTypeNames[typeName+"Values"] {
+		log.Printf("property enum %s.%s: skipping — %s is already declared by a spec schema",
+			ownerType, exportedGoName(pname), typeName)
+		return ""
+	}
+	if _, exists := currentPropertyEnums[typeName]; exists {
+		return typeName
+	}
+	consts := enumConsts(typeName, enumSrc.Enum)
+	if len(consts) == 0 {
+		return ""
+	}
+	currentPropertyEnums[typeName] = GoType{
+		Name: typeName,
+		Comment: fmt.Sprintf("%s is the set of values accepted by %s.%s.",
+			typeName, ownerType, exportedGoName(pname)),
+		EnumValues: consts,
+	}
+	return typeName
+}
+
+// namedEnumTypes returns the Go type names of the string-enum schemas that
+// extractTypes will emit for this spec, keyed for lookup. Parameter docs use
+// it to point at the generated type instead of re-listing its values inline —
+// the constants carry the same information, and godoc groups them under the
+// type they are declared with.
+//
+// Derived from the same referenced-schema set extractTypes consumes, so the
+// two cannot disagree about what exists. Enum schemas reached only from a
+// parameter are not emitted as types, which is exactly why the check is
+// needed: those keep their inline list.
+func namedEnumTypes(doc *openapi3.T, refs map[string]*schemaUsage) map[string]bool {
+	if doc.Components == nil || doc.Components.Schemas == nil {
+		return nil
+	}
+	out := make(map[string]bool)
+	for specName := range refs {
+		ref := doc.Components.Schemas[specName]
+		if ref == nil || ref.Value == nil {
+			continue
+		}
+		if ref.Value.Type.Is("string") && len(ref.Value.Enum) > 0 {
+			out[goTypeName(specName)] = true
+		}
+	}
+	return out
+}
+
+// enumConsts turns a named string-enum schema's values into typed constants.
+// Names are <TypeName><TitleCasedValue>; the wire value is what the constant
+// holds, so a value the spec spells oddly still reaches the server verbatim.
+// A godoc line is attached whenever the identifier does not read back as the
+// value it carries — the constant for "MII_UNATHORIZED_RESPONSE_NOTIFICATION"
+// should not hide the spec's misspelling from someone grepping for it.
+//
+// Constants are why these enums are worth generating at all: the alias is
+// `type X = string`, so a constant typed X assigns to any existing `string`
+// parameter with no cast and no signature change.
+//
+// Values that yield no identifier, and the second of any two values that
+// collide on one, are skipped with a log line. Silently dropping one would
+// read as "the server does not accept this".
+func enumConsts(typeName string, enum []any) []GoEnumConst {
+	out := make([]GoEnumConst, 0, len(enum))
+	seen := make(map[string]string, len(enum)) // const name → first wire value
+	for _, raw := range enum {
+		value, ok := raw.(string)
+		if !ok || value == "" {
+			continue
+		}
+		ident := enumConstIdent(value)
+		if ident == "" {
+			log.Printf("enum %s: skipping value %q — yields no Go identifier", typeName, value)
+			continue
+		}
+		constName := typeName + ident
+		if first, dup := seen[constName]; dup {
+			log.Printf("enum %s: skipping value %q — collides with %q on %s", typeName, value, first, constName)
+			continue
+		}
+		seen[constName] = value
+		out = append(out, GoEnumConst{Name: constName, Value: value})
+	}
+	return out
+}
+
 func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format string) GoType {
 	gt := GoType{
 		Name:    name,
@@ -1523,10 +1699,23 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 			jsonTag += ",omitempty"
 		}
 
-		var fieldComment string
-		if !suppressWriteOnly && prop != nil && (prop.WriteOnly || prop.Format == "password") {
-			fieldComment = "Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update."
+		// Field godoc: the property's own description first, then the
+		// write-only note as trailing metadata. Continuation lines carry
+		// "\t// " because the struct template indents one level.
+		var fieldDoc []string
+		if prop != nil {
+			fieldDoc = docParagraphs(prop.Description, fieldDocWidth)
 		}
+		if enumType := registerPropertyEnum(gt.Name, pname, propRef); enumType != "" {
+			fieldDoc = append(fieldDoc, wrapCommentText(
+				"Allowed values: see the "+enumType+" constants.", fieldDocWidth)...)
+		}
+		if !suppressWriteOnly && prop != nil && (prop.WriteOnly || prop.Format == "password") {
+			fieldDoc = append(fieldDoc, wrapCommentText(
+				"Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller can supply a value on update.",
+				fieldDocWidth)...)
+		}
+		fieldComment := strings.Join(fieldDoc, "\n\t// ")
 
 		// Strip ",omitempty" when the enclosing schema is listed in the
 		// per-spec EmitNullForOptional set. Lets callers emit explicit JSON

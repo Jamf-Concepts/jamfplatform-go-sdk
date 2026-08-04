@@ -15,6 +15,9 @@ import (
 // DownloadMobileDeviceEnrollmentProfileV1 retrieve the MDM Enrollment Profile.
 //
 // Required privileges: read:pro:enrollment-profiles. Legacy Jamf Pro privilege name(s): Read Enrollment Profiles.
+//
+// Parameters:
+//   - id: MDM Enrollment Profile identifier.
 func (c *Client) DownloadMobileDeviceEnrollmentProfileV1(ctx context.Context, id string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte

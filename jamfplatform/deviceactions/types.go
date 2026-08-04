@@ -7,30 +7,46 @@ package deviceactions
 
 // ApiError represents a api error.
 type ApiError struct {
-	Errors     []ApiErrorErrorsItem `json:"errors"`
-	HttpStatus int                  `json:"httpStatus"`
-	TraceID    string               `json:"traceId"`
+	Errors []ApiErrorErrorsItem `json:"errors"`
+	// HTTP status of the response.
+	HttpStatus int    `json:"httpStatus"`
+	TraceID    string `json:"traceId"`
 }
 
 // ApiErrorErrorsItem represents a api error errors item.
 type ApiErrorErrorsItem struct {
-	Code        string `json:"code"`
+	// Error-specific code that can be used to identify localization string, etc.
+	Code string `json:"code"`
+	// A general description of error for troubleshooting/debugging. Generally this text should not be
+	// displayed to a user; instead refer to errorCode and its localized text.
 	Description string `json:"description"`
-	Field       string `json:"field"`
-	ID          string `json:"id"`
+	// Name of the field that caused the error.
+	Field string `json:"field"`
+	// id of object with error. Optional.
+	ID string `json:"id"`
 }
 
 // DeviceCommandResponse represents a device command response.
 type DeviceCommandResponse struct {
+	// The ID of the command that was created to perform the requested action.
 	CommandID string `json:"commandId"`
-	DeviceID  string `json:"deviceId"`
+	// The ID of the device to which the command was sent.
+	DeviceID string `json:"deviceId"`
 }
 
 // EraseDeviceRequest represents a erase device request.
 type EraseDeviceRequest struct {
-	ClearActivationLock    *bool   `json:"clearActivationLock,omitempty"`
-	DisallowProximitySetup *bool   `json:"disallowProximitySetup,omitempty"`
-	Pin                    *string `json:"pin,omitempty"`
-	PreserveDataPlan       *bool   `json:"preserveDataPlan,omitempty"`
-	ReturnToService        *bool   `json:"returnToService,omitempty"`
+	// Clear the activation lock on the device. Applies to mobile devices only.
+	ClearActivationLock *bool `json:"clearActivationLock,omitempty"`
+	// If 'true', disable Proximity Setup on the next reboot and skip the pane in Setup Assistant. Applies
+	// to mobile devices only.
+	DisallowProximitySetup *bool `json:"disallowProximitySetup,omitempty"`
+	// The six-character PIN for Find My. Applies to computers only.
+	Pin *string `json:"pin,omitempty"`
+	// If 'true', preserve the data plan on an iPhone or iPad with eSIM functionality, if one exists.
+	// Applies to mobile devices only.
+	PreserveDataPlan *bool `json:"preserveDataPlan,omitempty"`
+	// If 'true', the device will be returned to service after the erase is complete. Applies to mobile
+	// devices only.
+	ReturnToService *bool `json:"returnToService,omitempty"`
 }
