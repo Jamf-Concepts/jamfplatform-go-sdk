@@ -9,8 +9,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -56,6 +59,59 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 	return c, nil
 })
 
+// egressIP reports this host's public egress IP, resolved once per run because a
+// rejected credential fails every test in the suite and a per-test lookup would
+// add three seconds each. An empty result is itself a signal: a host that cannot
+// reach checkip.amazonaws.com probably cannot reach Jamf either.
+var egressIP = sync.OnceValue(func() string {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://checkip.amazonaws.com", nil)
+	if err != nil {
+		return ""
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return ""
+	}
+	defer func() { _ = resp.Body.Close() }()
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 64))
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(body))
+})
+
+// credentialRejectedMessage builds the report to hand Jamf Support when the tenant
+// refuses credentials that were supplied, mirroring what
+// terraform-provider-jamfprotect emits for the same failure. The first question
+// support asks about a blocked request is always "from which IP, and when", and on
+// a CI runner nobody can go and check afterwards — the egress IP is gone with the
+// runner. Capturing it in the failure output is the only chance to have it.
+//
+// The base URL is read from the environment rather than the client, which was
+// never successfully constructed. In CI it renders as *** because it is a secret;
+// that is fine, whoever opens the ticket has it.
+func credentialRejectedMessage(err error) string {
+	ip := egressIP()
+	if ip == "" {
+		ip = "(unable to determine — run `curl -s https://checkip.amazonaws.com` on this host)"
+	}
+	return fmt.Sprintf(`acceptance credentials were supplied but the tenant rejected them.
+Failing rather than skipping: a skipped suite reports success while verifying nothing.
+
+If this is an edge or WAF block rather than a bad secret, give Jamf Support:
+  - Timestamp:    %s
+  - Instance URL: %s
+  - Egress IP:    %s
+
+Technical details: %v`,
+		time.Now().UTC().Format(time.RFC3339),
+		os.Getenv("JAMFPLATFORM_BASE_URL"),
+		ip,
+		err)
+}
+
 // accClient returns a live Jamf Platform API client. It skips the test when no
 // credentials are configured, and FAILS when credentials are configured but the
 // tenant rejected them — see errAccCredsUnset for why that distinction matters.
@@ -66,7 +122,7 @@ func accClient(t *testing.T) *jamfplatform.Client {
 	case errors.Is(err, errAccCredsUnset):
 		t.Skipf("Skipping acceptance test: %v", err)
 	case err != nil:
-		t.Fatalf("Acceptance credentials were supplied but the tenant rejected them, so this test cannot be trusted as skipped: %v", err)
+		t.Fatal(credentialRejectedMessage(err))
 	}
 	return c
 }
