@@ -168,10 +168,16 @@ func looksLikeJSON(b []byte) bool {
 }
 
 // annotateTokenError enriches an OAuth2 token-fetch failure whose response body
-// is not JSON. Jamf's token service always answers in JSON — including when it
-// rejects the credentials, which arrives as 401 {"error":"invalid_client"}. An
-// HTML or empty body therefore means something in front of Jamf replied instead:
-// a WAF, an IP allowlist, or a captive proxy.
+// is not JSON, and marks it with ErrUnexpectedResponse so consumers can branch
+// on it — a Terraform provider looking up the host's egress IP for a support
+// block, say — instead of matching on the message.
+//
+// Jamf's token service always answers in JSON, including when it rejects the
+// credentials, which arrives as 401 {"error":"invalid_client"}. An HTML or empty
+// body therefore means something in front of Jamf replied instead: a WAF, an IP
+// allowlist, or a captive proxy. A JSON body is returned untouched and never
+// carries the sentinel, so a genuine bad-secret error is never mistaken for a
+// network block.
 //
 // Worth distinguishing because the two causes need opposite remedies — rotate
 // the secret versus get the host's egress IP allowed — and the unannotated error
@@ -209,12 +215,13 @@ func annotateTokenError(err error) error {
 		if re.Response != nil {
 			contentType = re.Response.Header.Get("Content-Type")
 		}
-		return fmt.Errorf("%w\nThe body above is not JSON (content-type %q) — %s", err, contentType, guidance)
+		return fmt.Errorf("%w: %w\nThe body above is not JSON (content-type %q) — %s",
+			ErrUnexpectedResponse, err, contentType, guidance)
 	}
 
 	if strings.Contains(err.Error(), "oauth2: cannot parse json:") {
-		return fmt.Errorf("%w; the authentication endpoint returned a success status with a non-JSON body — %s (x/oauth2 discards the body on this path, so it cannot be shown here; capture the raw response with WithLogger to see it)",
-			err, guidance)
+		return fmt.Errorf("%w: %w; the authentication endpoint returned a success status with a non-JSON body — %s (x/oauth2 discards the body on this path, so it cannot be shown here; capture the raw response with WithLogger to see it)",
+			ErrUnexpectedResponse, err, guidance)
 	}
 
 	return err

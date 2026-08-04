@@ -5,6 +5,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -95,6 +96,11 @@ func TestValidateCredentials_NonJSONBodyIsDiagnosed(t *testing.T) {
 			if err == nil {
 				t.Fatal("expected an error from a non-JSON token response, got nil")
 			}
+			// The sentinel is the contract consumers branch on; the wording is
+			// only for humans. Assert both, but this one is the load-bearing half.
+			if !errors.Is(err, ErrUnexpectedResponse) {
+				t.Errorf("expected ErrUnexpectedResponse in the chain, got: %v", err)
+			}
 			if !strings.Contains(err.Error(), "security policy (WAF or IP allowlist)") {
 				t.Errorf("expected the WAF guidance in the error, got: %v", err)
 			}
@@ -120,6 +126,11 @@ func TestValidateCredentials_JSONRejectionIsNotDiagnosedAsWAF(t *testing.T) {
 	err := validateCredentials(context.Background(), config, base)
 	if err == nil {
 		t.Fatal("expected an error from a 401 token response, got nil")
+	}
+	// The sentinel must NOT be set: a consumer branching on it would look up an
+	// egress IP and send the user chasing a firewall over a wrong secret.
+	if errors.Is(err, ErrUnexpectedResponse) {
+		t.Errorf("a JSON credential rejection must not carry ErrUnexpectedResponse, got: %v", err)
 	}
 	if strings.Contains(err.Error(), "security policy (WAF or IP allowlist)") {
 		t.Errorf("a JSON credential rejection must not be reported as a network block, got: %v", err)

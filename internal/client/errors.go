@@ -11,6 +11,23 @@ import (
 	"strings"
 )
 
+// ErrUnexpectedResponse indicates the server returned a non-JSON body where a
+// JSON response was expected — typically an HTML error page from an edge proxy
+// or WAF — and is distinct from a genuine JSON syntax error from the API.
+//
+// The one sentinel the SDK exposes, deliberately. Everything else is
+// *APIResponseError, because a status code and structured details already say
+// what a caller needs. This case is different: the condition is inferred from
+// the body shape rather than reported by Jamf, and acting on it means doing
+// something extra — terraform-provider-jamfprotect looks up the host's public
+// egress IP and prints a support block. That is a branch, so it needs a
+// matchable error and not a string to grep.
+//
+// Named to match jamfprotect-go-sdk. The Protect provider's resources move into
+// terraform-provider-jamfplatform once Protect has Platform API support, and a
+// shared error surface is one less thing to rewrite when they do.
+var ErrUnexpectedResponse = errors.New("jamfplatform: unexpected non-JSON response")
+
 // traceIDHeaders lists the response headers the SDK consults to recover a
 // trace identifier when the response body doesn't carry one. Order matters:
 // Jamf-specific first, then the gateway's own header, then the distributed
