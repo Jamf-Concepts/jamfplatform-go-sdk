@@ -755,6 +755,91 @@ func TestAcceptance_ResolveComputerInventoryV3IDByName_Existing(t *testing.T) {
 	t.Logf("resolved %q → %s ✓", first.General.Name, gotID)
 }
 
+// ─── Computer Inventory (V4) ───────────────────────────────────────────────
+// V4 is the undeprecated successor to V1/V2/V3 (issue #50). The V4 resolvers
+// prove the RSQL `filter` the deprecated versions relied on still works on
+// the new path — the migration blocker the issue called out was that
+// /preview/computers, the only undeprecated alternative, takes no filter.
+
+func TestAcceptance_ResolveComputerInventoryV4_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveComputerInventoryV4IDByName(context.Background(), "sdk-does-not-exist-ci-"+runSuffix())
+	requireNotFoundErr(t, "ResolveComputerInventoryV4IDByName", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveComputerInventoryV4IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	computers, err := c.ListComputersInventoryV4(ctx, []string{"GENERAL"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListComputersInventoryV4: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("no computers — skipping")
+	}
+	first := computers[0]
+	if first.General == nil || first.General.Name == "" {
+		t.Skip("first computer has no name — skipping")
+	}
+	gotID, err := c.ResolveComputerInventoryV4IDByName(ctx, first.General.Name)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved %q → %s ✓", first.General.Name, gotID)
+}
+
+func TestAcceptance_ResolveComputerInventoryV4IDBySerialNumber_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	computers, err := c.ListComputersInventoryV4(ctx, []string{"HARDWARE"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListComputersInventoryV4: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("no computers — skipping")
+	}
+	first := computers[0]
+	if first.Hardware == nil || first.Hardware.SerialNumber == "" {
+		t.Skip("first computer has no serial number — skipping")
+	}
+	gotID, err := c.ResolveComputerInventoryV4IDBySerialNumber(ctx, first.Hardware.SerialNumber)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved serial %q → %s ✓", first.Hardware.SerialNumber, gotID)
+}
+
+func TestAcceptance_ResolveComputerInventoryV4IDByUDID_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	computers, err := c.ListComputersInventoryV4(ctx, nil, nil, "")
+	if err != nil {
+		t.Fatalf("ListComputersInventoryV4: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("no computers — skipping")
+	}
+	first := computers[0]
+	if first.UDID == "" {
+		t.Skip("first computer has no UDID — skipping")
+	}
+	gotID, err := c.ResolveComputerInventoryV4IDByUDID(ctx, first.UDID)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved UDID %q → %s ✓", first.UDID, gotID)
+}
+
 // ─── Sites ─────────────────────────────────────────────────────────────────
 // No create/delete endpoint. Read-only probe.
 
@@ -2374,6 +2459,68 @@ func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2ByName_Existing(t *t
 		t.Errorf("typed DisplayName = %q, want %q", got.DisplayName, first.DisplayName)
 	}
 	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
+}
+
+// ─── PatchSoftwareTitleConfigurations V3 ────────────────────────────────────
+// V3 is the undeprecated successor to V2 (issue #50). Unlike V2's read-only
+// probe these use a test-owned fixture, so the resolve path is exercised even
+// on a tenant with no configurations of its own.
+
+func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV3IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolvePatchSoftwareTitleConfigurationV3IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
+	requireNotFoundErr(t, "ResolvePatchSoftwareTitleConfigurationV3IDByName", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV3ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	id := seedPatchSoftwareTitleFixture(t)
+	cleanupDelete(t, "DeletePatchSoftwareTitleConfigurationV3 "+id, func() error {
+		return c.DeletePatchSoftwareTitleConfigurationV3(ctx, id)
+	})
+	seeded, err := c.GetPatchSoftwareTitleConfigurationV3(ctx, id)
+	if err != nil {
+		t.Fatalf("GetPatchSoftwareTitleConfigurationV3(%s): %v", id, err)
+	}
+
+	gotID, err := c.ResolvePatchSoftwareTitleConfigurationV3IDByName(ctx, seeded.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve id: %v", err)
+	}
+	if gotID != id {
+		t.Errorf("resolved id = %q, want %q", gotID, id)
+	}
+
+	got, err := c.ResolvePatchSoftwareTitleConfigurationV3ByName(ctx, seeded.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.DisplayName != seeded.DisplayName {
+		t.Errorf("typed DisplayName = %q, want %q", got.DisplayName, seeded.DisplayName)
+	}
+	t.Logf("resolved typed %q → %s ✓", seeded.DisplayName, got.ID)
+}
+
+// ─── ComputerInventoryV4 alternate resolvers (not-found) ────────────────────
+
+func TestAcceptance_ResolveComputerInventoryV4IDBySerialNumber_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveComputerInventoryV4IDBySerialNumber(context.Background(), "SDKNOTEXIST"+runSuffix())
+	requireNotFoundErr(t, "ResolveComputerInventoryV4IDBySerialNumber", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveComputerInventoryV4IDByUDID_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveComputerInventoryV4IDByUDID(context.Background(), "SDK-NOT-EXIST-"+runSuffix())
+	requireNotFoundErr(t, "ResolveComputerInventoryV4IDByUDID", err)
+	t.Log("not-found surfaced 404 ✓")
 }
 
 // ─── ComputerInventoryV3 alternate resolvers ───────────────────────────────

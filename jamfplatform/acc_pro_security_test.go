@@ -689,6 +689,275 @@ func TestAcceptance_Pro_Security_LocalAdminPasswordSettingsV2(t *testing.T) {
 	}
 }
 
+// --- LAPS (local admin password) per-device surface -----------------------
+//
+// New in the 11.30.0 spec alongside the settings endpoints already covered
+// above. Every method here is a read except SetLocalAdminPasswordV2.
+//
+// Reading a password is not side-effect-free: the server records a VIEWED
+// event in the device's LAPS history, attributed to the API client. That is
+// an audit-trail append, not a state change, and it is the only way to
+// exercise the endpoint at all — so these tests accept it. No password value
+// is ever logged.
+
+// lapsFixture finds a computer with at least one LAPS-capable account and
+// returns its management id, the account, and whether that account has an
+// issued password to read. It skips when no computer qualifies.
+//
+// An account whose rotation history holds only PENDING entries has no password
+// yet — the device has not completed the rotation — and the password endpoints
+// reject the read. A COMPLETED entry means one was issued. The fixture prefers
+// such an account so the 200 path is actually exercised, and reports which
+// case it settled for so the caller can assert accordingly.
+func lapsFixture(t *testing.T) (mgmtID string, account pro.LapsUserV2, hasPassword bool) {
+	t.Helper()
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	computers, err := p.ListComputersInventoryV4(ctx, []string{"GENERAL"}, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListComputersInventoryV4: %v", err)
+	}
+
+	var fallbackID string
+	var fallbackAccount pro.LapsUserV2
+	for _, comp := range computers {
+		if comp.General == nil || comp.General.ManagementID == "" {
+			continue
+		}
+		accounts, err := p.ListLocalAdminPasswordAccountsV2(ctx, comp.General.ManagementID)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("ListLocalAdminPasswordAccountsV2(%s): %v", comp.General.ManagementID, err)
+		}
+		for _, acct := range accounts.Results {
+			if fallbackID == "" {
+				fallbackID, fallbackAccount = comp.General.ManagementID, acct
+			}
+			history, err := p.ListLocalAdminPasswordAccountHistoryV2(ctx, comp.General.ManagementID, acct.Username)
+			if err != nil {
+				skipOnServerError(t, err)
+				t.Fatalf("ListLocalAdminPasswordAccountHistoryV2(%s, %s): %v", comp.General.ManagementID, acct.Username, err)
+			}
+			for _, h := range history.Results {
+				if h.RotationStatus == pro.LapsHistoryRotationStatusCompleted {
+					return comp.General.ManagementID, acct, true
+				}
+			}
+		}
+	}
+	if fallbackID == "" {
+		t.Skip("no computer on this tenant has a LAPS-capable account — no probes possible")
+	}
+	t.Logf("no LAPS account has a completed rotation — using %q, whose password reads will be rejected", fallbackAccount.Username)
+	return fallbackID, fallbackAccount, false
+}
+
+func TestAcceptance_Pro_Security_LocalAdminPasswordPendingRotationsV2(t *testing.T) {
+	c := accClient(t)
+
+	pending, err := pro.New(c).ListLocalAdminPasswordPendingRotationsV2(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListLocalAdminPasswordPendingRotationsV2: %v", err)
+	}
+	if pending.TotalCount != len(pending.Results) {
+		t.Errorf("totalCount = %d but %d results returned", pending.TotalCount, len(pending.Results))
+	}
+	t.Logf("LAPS pending rotations: %d", pending.TotalCount)
+	for _, r := range pending.Results {
+		if r.LapsUser == nil {
+			t.Error("pending rotation with nil lapsUser")
+			continue
+		}
+		t.Logf("  pending: username=%q source=%s clientManagementId=%s created=%s",
+			r.LapsUser.Username, r.LapsUser.UserSource, r.LapsUser.ClientManagementID, r.CreatedDate)
+	}
+}
+
+// TestAcceptance_Pro_Security_LocalAdminPasswordAccountReads walks the whole
+// per-device read surface: accounts, device history, and — for the first
+// account — password, audit and history in both the username and the
+// username+guid form.
+func TestAcceptance_Pro_Security_LocalAdminPasswordAccountReads(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	mgmtID, account, hasPassword := lapsFixture(t)
+	t.Logf("fixture: clientManagementId=%s username=%q guid=%s source=%s hasIssuedPassword=%v",
+		mgmtID, account.Username, account.Guid, account.UserSource, hasPassword)
+
+	// Device-wide history (viewed + rotation events).
+	history, err := p.ListLocalAdminPasswordHistoryV2(ctx, mgmtID)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("ListLocalAdminPasswordHistoryV2(%s): %v", mgmtID, err)
+	} else {
+		t.Logf("device LAPS history: %d events", history.TotalCount)
+	}
+
+	// Per-account rotation history — a LAPS-capable account always has at
+	// least the entry that made it capable.
+	acctHistory, err := p.ListLocalAdminPasswordAccountHistoryV2(ctx, mgmtID, account.Username)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("ListLocalAdminPasswordAccountHistoryV2(%s, %s): %v", mgmtID, account.Username, err)
+	} else {
+		if acctHistory.TotalCount == 0 {
+			t.Errorf("account %q has no rotation history", account.Username)
+		}
+		t.Logf("account history: %d entries", acctHistory.TotalCount)
+	}
+
+	// View audit — empty until someone reads the password, so no assertion
+	// on the count; the read itself is what's under test.
+	if audits, err := p.ListLocalAdminPasswordAuditsV2(ctx, mgmtID, account.Username); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("ListLocalAdminPasswordAuditsV2(%s, %s): %v", mgmtID, account.Username, err)
+	} else {
+		t.Logf("password view audit: %d entries", audits.TotalCount)
+	}
+
+	// Current password. When the account has a completed rotation this must
+	// return a value; when it doesn't the server rejects the read with 400
+	// carrying code NOT_FOUND (the status/code mismatch is Jamf's, verified on
+	// 11.30.2), so tolerate 400 or 404 only in that state.
+	assertLapsPassword(t, "GetLocalAdminPasswordV2", account.Username, hasPassword, func() (*pro.LapsPasswordResponseV2, error) {
+		return p.GetLocalAdminPasswordV2(ctx, mgmtID, account.Username)
+	})
+
+	if account.Guid == "" {
+		t.Log("account has no guid — skipping the guid-scoped variants")
+		return
+	}
+
+	// The guid-scoped triplet addresses the same account by its directory
+	// guid rather than its username; same shapes, separate paths.
+	assertLapsPassword(t, "GetLocalAdminPasswordByGuidV2", account.Username, hasPassword, func() (*pro.LapsPasswordResponseV2, error) {
+		return p.GetLocalAdminPasswordByGuidV2(ctx, mgmtID, account.Username, account.Guid)
+	})
+
+	if audits, err := p.ListLocalAdminPasswordAuditsByGuidV2(ctx, mgmtID, account.Username, account.Guid); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("ListLocalAdminPasswordAuditsByGuidV2(%s, %s, %s): %v", mgmtID, account.Username, account.Guid, err)
+	} else {
+		t.Logf("password view audit (by guid): %d entries", audits.TotalCount)
+	}
+
+	if h, err := p.ListLocalAdminPasswordAccountHistoryByGuidV2(ctx, mgmtID, account.Username, account.Guid); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("ListLocalAdminPasswordAccountHistoryByGuidV2(%s, %s, %s): %v", mgmtID, account.Username, account.Guid, err)
+	} else {
+		t.Logf("account history (by guid): %d entries", h.TotalCount)
+	}
+}
+
+// assertLapsPassword checks a password read against whether the account has an
+// issued password. The value is never logged — only its length.
+func assertLapsPassword(t *testing.T, label, username string, hasPassword bool, read func() (*pro.LapsPasswordResponseV2, error)) {
+	t.Helper()
+	pw, err := read()
+	if err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if !hasPassword && errors.As(err, &apiErr) && (apiErr.HasStatus(400) || apiErr.HasStatus(404)) {
+			t.Logf("%s(%s): %d — expected, account has no completed rotation so no password was issued; plumbing OK",
+				label, username, apiErr.StatusCode)
+			return
+		}
+		skipOnServerError(t, err)
+		t.Errorf("%s(%s): account has a completed rotation, read should have succeeded: %v", label, username, err)
+		return
+	}
+	if !hasPassword {
+		t.Logf("%s(%s): returned a password despite no completed rotation in history", label, username)
+	}
+	if pw.Password == "" {
+		t.Errorf("%s(%s) returned 200 with an empty password", label, username)
+		return
+	}
+	t.Logf("%s(%s): ok, %d characters (value not logged)", label, username, len(pw.Password))
+}
+
+// TestAcceptance_Pro_Security_LocalAdminPasswordBogusClient records how the
+// surface answers an unknown clientManagementId, which is not uniform: the
+// accounts list returns 200 with an empty collection while every other path
+// 404s. A consumer treating "no accounts" as an error, or a 404 as "device
+// doesn't exist", would be wrong on one of them.
+func TestAcceptance_Pro_Security_LocalAdminPasswordBogusClient(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	const bogus = "00000000-0000-0000-0000-000000000000"
+
+	accounts, err := p.ListLocalAdminPasswordAccountsV2(ctx, bogus)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListLocalAdminPasswordAccountsV2(bogus): expected 200 with an empty collection, got %v", err)
+	}
+	if len(accounts.Results) != 0 || accounts.TotalCount != 0 {
+		t.Errorf("ListLocalAdminPasswordAccountsV2(bogus) returned %d accounts", accounts.TotalCount)
+	}
+	t.Log("ListLocalAdminPasswordAccountsV2(bogus): 200 with empty results — expected, no 404 for an unknown client ✓")
+
+	notFound := []struct {
+		label string
+		call  func() error
+	}{
+		{"ListLocalAdminPasswordHistoryV2", func() error {
+			_, err := p.ListLocalAdminPasswordHistoryV2(ctx, bogus)
+			return err
+		}},
+		{"GetLocalAdminPasswordV2", func() error {
+			_, err := p.GetLocalAdminPasswordV2(ctx, bogus, "nobody")
+			return err
+		}},
+		{"ListLocalAdminPasswordAuditsV2", func() error {
+			_, err := p.ListLocalAdminPasswordAuditsV2(ctx, bogus, "nobody")
+			return err
+		}},
+		{"ListLocalAdminPasswordAccountHistoryV2", func() error {
+			_, err := p.ListLocalAdminPasswordAccountHistoryV2(ctx, bogus, "nobody")
+			return err
+		}},
+		{"GetLocalAdminPasswordByGuidV2", func() error {
+			_, err := p.GetLocalAdminPasswordByGuidV2(ctx, bogus, "nobody", bogus)
+			return err
+		}},
+		{"ListLocalAdminPasswordAuditsByGuidV2", func() error {
+			_, err := p.ListLocalAdminPasswordAuditsByGuidV2(ctx, bogus, "nobody", bogus)
+			return err
+		}},
+		{"ListLocalAdminPasswordAccountHistoryByGuidV2", func() error {
+			_, err := p.ListLocalAdminPasswordAccountHistoryByGuidV2(ctx, bogus, "nobody", bogus)
+			return err
+		}},
+		// Mutating, but safe against an id no device owns: the server has no
+		// LAPS user to write to and rejects before touching anything.
+		{"SetLocalAdminPasswordV2", func() error {
+			_, err := p.SetLocalAdminPasswordV2(ctx, bogus, &pro.LapsUserPasswordRequestV2{})
+			return err
+		}},
+	}
+	for _, tc := range notFound {
+		err := tc.call()
+		if err == nil {
+			t.Errorf("%s(bogus) succeeded — expected 404", tc.label)
+			continue
+		}
+		var apiErr *jamfplatform.APIResponseError
+		if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+			skipOnServerError(t, err)
+			t.Errorf("%s(bogus): want 404, got %v", tc.label, err)
+			continue
+		}
+		t.Logf("%s(bogus): 404 %s ✓", tc.label, apiErr.Summary())
+	}
+}
+
 // min is a tiny helper used in PEM slicing above.
 func min(a, b int) int {
 	if a < b {

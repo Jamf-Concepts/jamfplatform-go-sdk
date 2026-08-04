@@ -48,7 +48,11 @@ Each version has its own resolver / apply sugar: `ResolveComputerInventoryV1ByNa
 
 When Jamf publishes a new endpoint version, run `python3 tools/scripts/backfill_versions.py` from the repo root — it synthesizes missing version entries by cloning the closest sibling in config and version-suffixing the names. Re-run `make generate` afterwards. The script is idempotent.
 
+**The backfill only reaches base paths that already exist at more than one version.** It keys on the path with the `/vN` prefix stripped, so a path the new version *introduces* is invisible to it — `len(versions) == 1` means no sibling to clone. Jamf does this when it relocates an operation: 11.30.0 moved erase and remove-mdm-profile from `/v1/…/computer-inventory/{id}/` (singular, deprecated) to `/v4/…/computers-inventory/{id}/` (plural), which reads as two unrelated single-version bases. Those need config entries written by hand. After every spec bump, diff the spec's operation set against config and check the additions, don't just trust the insert count — a whole surface can end up deprecated with no successor emitted (issue #50).
+
 Endpoints marked `deprecated: true` in the spec are always emitted; the generator adds a `// Deprecated:` godoc line that includes the `x-deprecation-date` value (normalised to `YYYY-MM-DD`) so consumers see the removal window. There is no `skipDeprecated` knob — deprecation is opt-out by retaining the entry in config, opt-in (i.e. removed) by deleting it once Jamf drops the path.
+
+A `// Deprecated:` marker must never ship without its successor whitelisted alongside it: `staticcheck`'s SA1019 is on by default, so a release that deprecates a surface with nothing to migrate to turns every consumer's build red for no reason. Consumers also need both versions live at once — the deprecated one stays until Jamf removes the path.
 
 ### Parameter documentation
 
