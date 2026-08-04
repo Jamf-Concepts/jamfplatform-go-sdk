@@ -25,6 +25,16 @@ var runSuffix = sync.OnceValue(func() string {
 	return strconv.FormatInt(time.Now().Unix(), 10)
 })
 
+// errAccCredsUnset marks the one condition under which skipping the whole suite
+// is legitimate: no tenant was configured, as on a local run or a fork PR.
+//
+// Every other error from initAcceptanceClient means credentials WERE supplied and
+// the tenant refused them, which must fail. Conflating the two is how a total
+// auth outage reports success: on 2026-08-04 a WAF block made all 146 scoped
+// tests skip, the package still printed `ok`, and the acceptance check went green
+// having executed zero assertions against the tenant.
+var errAccCredsUnset = errors.New("acceptance credentials not configured")
+
 // initAcceptanceClient creates and validates the singleton acceptance client once.
 var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
 	baseURL := os.Getenv("JAMFPLATFORM_BASE_URL")
@@ -33,7 +43,7 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 	tenantID := os.Getenv("JAMFPLATFORM_TENANT_ID")
 
 	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
-		return nil, fmt.Errorf("missing required environment variables (JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID)")
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID", errAccCredsUnset)
 	}
 
 	opts := []jamfplatform.Option{jamfplatform.WithTenantID(tenantID)}
@@ -46,12 +56,17 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 	return c, nil
 })
 
-// accClient returns a live Jamf Platform API client, skipping the test if credentials are not set.
+// accClient returns a live Jamf Platform API client. It skips the test when no
+// credentials are configured, and FAILS when credentials are configured but the
+// tenant rejected them — see errAccCredsUnset for why that distinction matters.
 func accClient(t *testing.T) *jamfplatform.Client {
 	t.Helper()
 	c, err := initAcceptanceClient()
-	if err != nil {
+	switch {
+	case errors.Is(err, errAccCredsUnset):
 		t.Skipf("Skipping acceptance test: %v", err)
+	case err != nil:
+		t.Fatalf("Acceptance credentials were supplied but the tenant rejected them, so this test cannot be trusted as skipped: %v", err)
 	}
 	return c
 }
