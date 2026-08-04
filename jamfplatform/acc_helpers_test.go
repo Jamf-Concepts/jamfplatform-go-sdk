@@ -9,8 +9,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -25,6 +28,16 @@ var runSuffix = sync.OnceValue(func() string {
 	return strconv.FormatInt(time.Now().Unix(), 10)
 })
 
+// errAccCredsUnset marks the one condition under which skipping the whole suite
+// is legitimate: no tenant was configured, as on a local run or a fork PR.
+//
+// Every other error from initAcceptanceClient means credentials WERE supplied and
+// the tenant refused them, which must fail. Conflating the two is how a total
+// auth outage reports success: on 2026-08-04 a WAF block made all 146 scoped
+// tests skip, the package still printed `ok`, and the acceptance check went green
+// having executed zero assertions against the tenant.
+var errAccCredsUnset = errors.New("acceptance credentials not configured")
+
 // initAcceptanceClient creates and validates the singleton acceptance client once.
 var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
 	baseURL := os.Getenv("JAMFPLATFORM_BASE_URL")
@@ -33,7 +46,7 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 	tenantID := os.Getenv("JAMFPLATFORM_TENANT_ID")
 
 	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
-		return nil, fmt.Errorf("missing required environment variables (JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID)")
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID", errAccCredsUnset)
 	}
 
 	opts := []jamfplatform.Option{jamfplatform.WithTenantID(tenantID)}
@@ -46,12 +59,70 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 	return c, nil
 })
 
-// accClient returns a live Jamf Platform API client, skipping the test if credentials are not set.
+// egressIP reports this host's public egress IP, resolved once per run because a
+// rejected credential fails every test in the suite and a per-test lookup would
+// add three seconds each. An empty result is itself a signal: a host that cannot
+// reach checkip.amazonaws.com probably cannot reach Jamf either.
+var egressIP = sync.OnceValue(func() string {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://checkip.amazonaws.com", nil)
+	if err != nil {
+		return ""
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return ""
+	}
+	defer func() { _ = resp.Body.Close() }()
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 64))
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(body))
+})
+
+// credentialRejectedMessage builds the report to hand Jamf Support when the tenant
+// refuses credentials that were supplied, mirroring what
+// terraform-provider-jamfprotect emits for the same failure. The first question
+// support asks about a blocked request is always "from which IP, and when", and on
+// a CI runner nobody can go and check afterwards — the egress IP is gone with the
+// runner. Capturing it in the failure output is the only chance to have it.
+//
+// The base URL is read from the environment rather than the client, which was
+// never successfully constructed. In CI it renders as *** because it is a secret;
+// that is fine, whoever opens the ticket has it.
+func credentialRejectedMessage(err error) string {
+	ip := egressIP()
+	if ip == "" {
+		ip = "(unable to determine — run `curl -s https://checkip.amazonaws.com` on this host)"
+	}
+	return fmt.Sprintf(`acceptance credentials were supplied but the tenant rejected them.
+Failing rather than skipping: a skipped suite reports success while verifying nothing.
+
+If this is an edge or WAF block rather than a bad secret, give Jamf Support:
+  - Timestamp:    %s
+  - Instance URL: %s
+  - Egress IP:    %s
+
+Technical details: %v`,
+		time.Now().UTC().Format(time.RFC3339),
+		os.Getenv("JAMFPLATFORM_BASE_URL"),
+		ip,
+		err)
+}
+
+// accClient returns a live Jamf Platform API client. It skips the test when no
+// credentials are configured, and FAILS when credentials are configured but the
+// tenant rejected them — see errAccCredsUnset for why that distinction matters.
 func accClient(t *testing.T) *jamfplatform.Client {
 	t.Helper()
 	c, err := initAcceptanceClient()
-	if err != nil {
+	switch {
+	case errors.Is(err, errAccCredsUnset):
 		t.Skipf("Skipping acceptance test: %v", err)
+	case err != nil:
+		t.Fatal(credentialRejectedMessage(err))
 	}
 	return c
 }

@@ -19,6 +19,8 @@ import (
 
 // ListPatchSoftwareTitleConfigurationsV2 retrieve Patch Software Title Configurations.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 func (c *Client) ListPatchSoftwareTitleConfigurationsV2(ctx context.Context) ([]PatchSoftwareTitleConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
@@ -32,6 +34,8 @@ func (c *Client) ListPatchSoftwareTitleConfigurationsV2(ctx context.Context) ([]
 
 // CreatePatchSoftwareTitleConfigurationV2 create Patch Software Title Configurations.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: create:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Create Patch Management Software Titles.
 func (c *Client) CreatePatchSoftwareTitleConfigurationV2(ctx context.Context, request *PatchSoftwareTitleConfigurationBase) (*HrefResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
@@ -44,6 +48,8 @@ func (c *Client) CreatePatchSoftwareTitleConfigurationV2(ctx context.Context, re
 }
 
 // GetPatchSoftwareTitleConfigurationV2 retrieve Patch Software Title Configurations with the supplied id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
@@ -61,6 +67,8 @@ func (c *Client) GetPatchSoftwareTitleConfigurationV2(ctx context.Context, id st
 
 // DeletePatchSoftwareTitleConfigurationV2 delete Patch Software Title Configurations with the supplied id.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: delete:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Delete Patch Management Software Titles.
 //
 // Parameters:
@@ -75,6 +83,8 @@ func (c *Client) DeletePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 }
 
 // UpdatePatchSoftwareTitleConfigurationV2 update Patch Software Title Configurations.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
 // Required privileges: update:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
 //
@@ -92,6 +102,8 @@ func (c *Client) UpdatePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 
 // GetPatchSoftwareTitleDashboardStatusV2 return whether or not the requested software title configuration is on the dashboard.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
@@ -108,6 +120,8 @@ func (c *Client) GetPatchSoftwareTitleDashboardStatusV2(ctx context.Context, id 
 
 // AddPatchSoftwareTitleToDashboardV2 add a software title configuration to the dashboard.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
@@ -123,6 +137,8 @@ func (c *Client) AddPatchSoftwareTitleToDashboardV2(ctx context.Context, id stri
 
 // RemovePatchSoftwareTitleFromDashboardV2 remove a software title configuration from the dashboard.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
@@ -137,6 +153,8 @@ func (c *Client) RemovePatchSoftwareTitleFromDashboardV2(ctx context.Context, id
 }
 
 // ListPatchSoftwareTitleDefinitionsV2 retrieve Patch Software Title Definitions with the supplied id.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
@@ -179,6 +197,8 @@ func (c *Client) ListPatchSoftwareTitleDefinitionsV2(ctx context.Context, id str
 
 // GetPatchSoftwareTitleDependenciesV2 retrieve list of Patch Software Title Configuration Dependencies.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
@@ -194,6 +214,8 @@ func (c *Client) GetPatchSoftwareTitleDependenciesV2(ctx context.Context, id str
 }
 
 // ExportPatchSoftwareTitleReportV2 export Patch Reporting Data.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
@@ -226,6 +248,8 @@ func (c *Client) ExportPatchSoftwareTitleReportV2(ctx context.Context, id string
 
 // ListPatchSoftwareTitleExtensionAttributesV2 retrieve Software Title Extension Attributes with the supplied id.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
@@ -241,6 +265,8 @@ func (c *Client) ListPatchSoftwareTitleExtensionAttributesV2(ctx context.Context
 }
 
 // ListPatchSoftwareTitleHistoryV2 get specified Patch Software Title Configuration history object.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
@@ -283,6 +309,8 @@ func (c *Client) ListPatchSoftwareTitleHistoryV2(ctx context.Context, id string,
 
 // CreatePatchSoftwareTitleHistoryNoteV2 add Patch Software Title Configuration history object notes.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: update:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
 //
 // Parameters:
@@ -298,6 +326,8 @@ func (c *Client) CreatePatchSoftwareTitleHistoryNoteV2(ctx context.Context, id s
 }
 
 // ListPatchSoftwareTitlePatchReportV2 retrieve Patch Software Title Configuration Patch Report.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
@@ -341,6 +371,8 @@ func (c *Client) ListPatchSoftwareTitlePatchReportV2(ctx context.Context, id str
 
 // GetPatchSoftwareTitlePatchSummaryV2 return Active Patch Summary.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
+//
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
@@ -356,6 +388,8 @@ func (c *Client) GetPatchSoftwareTitlePatchSummaryV2(ctx context.Context, id str
 }
 
 // ListPatchSoftwareTitlePatchSummaryVersionsV2 returns patch versions.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //

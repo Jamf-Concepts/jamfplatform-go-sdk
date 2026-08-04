@@ -119,7 +119,16 @@ All API paths use `/api/{namespace}/{version}/tenant/{tenantId}/{resource}`. The
 
 ### Error handling
 
-The SDK exposes exactly one error type: `*APIResponseError`, returned for every non-success HTTP response. No sentinel errors — `errors.Is` on a sentinel was never honoured by the transport (dead pattern, removed). Non-HTTP errors (denylist refusal, context cancellation, IO failures) surface as plain wrapped errors; format them via `err.Error()`.
+The SDK exposes one error type, `*APIResponseError`, returned for every non-success HTTP response, plus exactly one sentinel, `ErrUnexpectedResponse`. Non-HTTP errors (denylist refusal, context cancellation, IO failures) surface as plain wrapped errors; format them via `err.Error()`.
+
+Sentinels stay a closed set of one. An earlier crop was removed because `errors.Is` on them was never honoured by the transport — dead pattern. `ErrUnexpectedResponse` earns its place on two counts the removed ones failed:
+
+- **It is inferred, not reported.** A non-JSON body where JSON was expected means an edge proxy, WAF, or IP allowlist answered instead of Jamf. No status code or structured detail says so, so there is nothing for `*APIResponseError` to carry.
+- **Callers branch on it, they don't just print it.** `terraform-provider-jamfprotect` looks up the host's public egress IP and emits a support block on this condition. A branch needs a matchable error, not a message to grep.
+
+Raised today on the OAuth token exchange (`annotateTokenError` in `internal/client/auth.go`), where such a block surfaces first. A rejected credential answers with JSON (`401 invalid_client`) and never carries the sentinel, keeping "wrong secret" and "blocked network" distinguishable — they need opposite remedies.
+
+The name matches `jamfprotect-go-sdk` deliberately: the Protect provider's resources fold into `terraform-provider-jamfplatform` once Protect has Platform API support, and a shared error surface is one less thing to rewrite. Prefer widening this sentinel's reach (e.g. to response bodies, which needs a format guard — Classic is XML and its error pages are Tomcat HTML) over adding a second one.
 
 Consumers inspect HTTP errors via the accessor API on `*APIResponseError`:
 - `HasStatus(code int) bool` — specific HTTP status check
