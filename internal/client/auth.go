@@ -4,10 +4,14 @@
 package client
 
 import (
+	"bytes"
 	"context"
+	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
+	"strings"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -112,7 +116,7 @@ func newOAuth2Client(config *clientcredentials.Config, userAgent string, throttl
 	base.Transport = rt
 
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
-	outer := config.Client(ctx)
+	outer := oauth2.NewClient(ctx, &annotatingTokenSource{source: config.TokenSource(ctx)})
 	outer.Jar = jar
 	return outer, base
 }
@@ -130,7 +134,7 @@ func wrapWithOAuth2(config *clientcredentials.Config, base *http.Client, throttl
 		base.Transport = &throttleTransport{base: rt, throttle: throttle}
 	}
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
-	outer := config.Client(ctx)
+	outer := oauth2.NewClient(ctx, &annotatingTokenSource{source: config.TokenSource(ctx)})
 	outer.Jar = base.Jar
 	return outer
 }
@@ -139,7 +143,7 @@ func wrapWithOAuth2(config *clientcredentials.Config, base *http.Client, throttl
 func newCachingOAuth2Client(config *clientcredentials.Config, base *http.Client, cache TokenCache, cacheKey string) *http.Client {
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
 	ts := &cachingTokenSource{
-		source:   config.TokenSource(ctx),
+		source:   &annotatingTokenSource{source: config.TokenSource(ctx)},
 		cache:    cache,
 		cacheKey: cacheKey,
 	}
@@ -153,10 +157,90 @@ func newCachingOAuth2Client(config *clientcredentials.Config, base *http.Client,
 	}
 }
 
+// looksLikeJSON reports whether the first non-whitespace byte of b begins a JSON
+// object or array. Used to tell a genuine API error body from an HTML error page.
+func looksLikeJSON(b []byte) bool {
+	t := bytes.TrimLeft(b, " \t\r\n")
+	if len(t) == 0 {
+		return false
+	}
+	return t[0] == '{' || t[0] == '['
+}
+
+// annotateTokenError enriches an OAuth2 token-fetch failure whose response body
+// is not JSON. Jamf's token service always answers in JSON — including when it
+// rejects the credentials, which arrives as 401 {"error":"invalid_client"}. An
+// HTML or empty body therefore means something in front of Jamf replied instead:
+// a WAF, an IP allowlist, or a captive proxy.
+//
+// Worth distinguishing because the two causes need opposite remedies — rotate
+// the secret versus get the host's egress IP allowed — and the unannotated error
+// reads like the first while being the second: `oauth2: cannot fetch token: 403
+// Forbidden` followed by an nginx page invites a credential hunt that finds
+// nothing wrong.
+//
+// The status code is deliberately not part of the test. A block arrives as a 403
+// (nginx), as a 200 carrying a login or SPA shell, or as a bare 503, so keying on
+// any single status would miss most of them.
+//
+// x/oauth2 splits these across two error shapes, hence the two branches:
+// a non-2xx body reaches us intact inside *oauth2.RetrieveError, whereas on a 2xx
+// it discards the body and returns a bare fmt.Errorf (see doTokenRoundTrip in
+// oauth2/internal/token.go). The second branch therefore has to match on that
+// message and cannot echo what the proxy actually said. Matching a library string
+// is brittle, but this only ever enriches an error that is already being
+// returned — if the message changes upstream we silently fall back to it.
+func annotateTokenError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	const guidance = "this is typically a security policy (WAF or IP allowlist) blocking the request from this host's IP address rather than a credential problem"
+
+	var re *oauth2.RetrieveError
+	if errors.As(err, &re) {
+		if looksLikeJSON(re.Body) {
+			return err
+		}
+		// No need to echo the body: RetrieveError.Error() already appends it in
+		// full, and repeating it buries the guidance under a second copy of the
+		// proxy's HTML. Content-type is added because that one it omits.
+		contentType := ""
+		if re.Response != nil {
+			contentType = re.Response.Header.Get("Content-Type")
+		}
+		return fmt.Errorf("%w\nThe body above is not JSON (content-type %q) — %s", err, contentType, guidance)
+	}
+
+	if strings.Contains(err.Error(), "oauth2: cannot parse json:") {
+		return fmt.Errorf("%w; the authentication endpoint returned a success status with a non-JSON body — %s (x/oauth2 discards the body on this path, so it cannot be shown here; capture the raw response with WithLogger to see it)",
+			err, guidance)
+	}
+
+	return err
+}
+
+// annotatingTokenSource applies annotateTokenError to every token fetch, so the
+// diagnostic reaches the caller whichever path triggered the fetch: an explicit
+// ValidateCredentials/AccessToken call, or oauth2.Transport refreshing a token
+// in the middle of an API request.
+type annotatingTokenSource struct {
+	source oauth2.TokenSource
+}
+
+// Token delegates to the wrapped source, annotating any failure.
+func (s *annotatingTokenSource) Token() (*oauth2.Token, error) {
+	token, err := s.source.Token()
+	if err != nil {
+		return nil, annotateTokenError(err)
+	}
+	return token, nil
+}
+
 // validateCredentials tests authentication by requesting an OAuth token.
 func validateCredentials(ctx context.Context, config *clientcredentials.Config, baseClient *http.Client) error {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, baseClient)
-	ts := config.TokenSource(ctx)
+	ts := &annotatingTokenSource{source: config.TokenSource(ctx)}
 	_, err := ts.Token()
 	return err
 }
@@ -170,7 +254,7 @@ func (c *Transport) AccessToken(ctx context.Context) (*oauth2.Token, error) {
 
 // tokenSource returns the appropriate TokenSource, wrapping with caching if configured.
 func (c *Transport) tokenSource(ctx context.Context) oauth2.TokenSource {
-	ts := c.oauthConfig.TokenSource(ctx)
+	ts := oauth2.TokenSource(&annotatingTokenSource{source: c.oauthConfig.TokenSource(ctx)})
 	if c.tokenCache == nil {
 		return ts
 	}
