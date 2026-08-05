@@ -1542,6 +1542,34 @@ type ComputerGeneralCreate struct {
 	UserApprovedMDM  *bool                           `json:"userApprovedMdm,omitempty"`
 }
 
+// ComputerGeneralCreateV4 represents a computer general create v4.
+type ComputerGeneralCreateV4 struct {
+	AssetTag                             *string    `json:"assetTag,omitempty"`
+	Barcode1                             *string    `json:"barcode1,omitempty"`
+	Barcode2                             *string    `json:"barcode2,omitempty"`
+	DeclarativeDeviceManagementEnabled   *bool      `json:"declarativeDeviceManagementEnabled,omitempty"`
+	DistributionPointID                  *string    `json:"distributionPointId,omitempty"`
+	EnrolledViaAutomatedDeviceEnrollment *bool      `json:"enrolledViaAutomatedDeviceEnrollment,omitempty"`
+	ItunesStoreAccountActive             *bool      `json:"itunesStoreAccountActive,omitempty"`
+	JamfBinaryVersion                    *string    `json:"jamfBinaryVersion,omitempty"`
+	LastCheckIn                          *time.Time `json:"lastCheckIn,omitempty"`
+	LastCloudBackupDate                  *time.Time `json:"lastCloudBackupDate,omitempty"`
+	// The most recent time the device communicated with Jamf Pro via any channel (binary check-in, MDM
+	// ack, or DDM status report).
+	LastContact      *time.Time `json:"lastContact,omitempty"`
+	LastEnrolledDate *time.Time `json:"lastEnrolledDate,omitempty"`
+	LastIPAddress    *string    `json:"lastIpAddress,omitempty"`
+	MDMCapable       *bool      `json:"mdmCapable,omitempty"`
+	Name             string     `json:"name"`
+	// Allowed values: see the ComputerGeneralCreateV4Platform constants.
+	Platform         *string                         `json:"platform,omitempty"`
+	RemoteManagement *ComputerRemoteManagementCreate `json:"remoteManagement,omitempty"`
+	ReportDate       *time.Time                      `json:"reportDate,omitempty"`
+	SiteID           *string                         `json:"siteId,omitempty"`
+	Supervised       *bool                           `json:"supervised,omitempty"`
+	UserApprovedMDM  *bool                           `json:"userApprovedMdm,omitempty"`
+}
+
 // ComputerGeneralUpdate represents a computer general update.
 type ComputerGeneralUpdate struct {
 	AssetTag            *string                       `json:"assetTag,omitempty"`
@@ -1552,6 +1580,45 @@ type ComputerGeneralUpdate struct {
 	Managed             *bool                         `json:"managed,omitempty"`
 	Name                *string                       `json:"name,omitempty"`
 	SiteID              *string                       `json:"siteId,omitempty"`
+}
+
+// ComputerGeneralV4 represents a computer general v4.
+type ComputerGeneralV4 struct {
+	AssetTag                                 string                       `json:"assetTag"`
+	Barcode1                                 string                       `json:"barcode1"`
+	Barcode2                                 string                       `json:"barcode2"`
+	DeclarativeDeviceManagementEnabled       bool                         `json:"declarativeDeviceManagementEnabled"`
+	DistributionPoint                        string                       `json:"distributionPoint"`
+	EnrolledViaAutomatedDeviceEnrollment     bool                         `json:"enrolledViaAutomatedDeviceEnrollment"`
+	EnrollmentMethod                         *EnrollmentMethod            `json:"enrollmentMethod,omitempty"`
+	ExtensionAttributes                      []ComputerExtensionAttribute `json:"extensionAttributes"`
+	InitialEntryDate                         string                       `json:"initialEntryDate"`
+	ItunesStoreAccountActive                 bool                         `json:"itunesStoreAccountActive"`
+	JamfBinaryVersion                        string                       `json:"jamfBinaryVersion"`
+	LastCheckIn                              *time.Time                   `json:"lastCheckIn,omitempty"`
+	LastCloudBackupDate                      *time.Time                   `json:"lastCloudBackupDate,omitempty"`
+	LastContact                              *time.Time                   `json:"lastContact,omitempty"`
+	LastEnrolledDate                         *time.Time                   `json:"lastEnrolledDate,omitempty"`
+	LastIPAddress                            string                       `json:"lastIpAddress"`
+	LastLoggedInUsernameBinary               *string                      `json:"lastLoggedInUsernameBinary,omitempty"`
+	LastLoggedInUsernameBinaryTimestamp      *time.Time                   `json:"lastLoggedInUsernameBinaryTimestamp,omitempty"`
+	LastLoggedInUsernameMDM                  *string                      `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time                   `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
+	LastLoggedInUsernameSelfService          *string                      `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp *time.Time                   `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	// Last reported IPv4 address.
+	LastReportedIPV4     string                    `json:"lastReportedIpV4"`
+	LastReportedIPV6     string                    `json:"lastReportedIpV6"`
+	ManagementID         string                    `json:"managementId"`
+	MDMCapable           *ComputerMDMCapability    `json:"mdmCapable,omitempty"`
+	MDMProfileExpiration *time.Time                `json:"mdmProfileExpiration,omitempty"`
+	Name                 string                    `json:"name"`
+	Platform             string                    `json:"platform"`
+	RemoteManagement     *ComputerRemoteManagement `json:"remoteManagement,omitempty"`
+	ReportDate           *time.Time                `json:"reportDate,omitempty"`
+	Site                 *ComputerSite             `json:"site,omitempty"`
+	Supervised           bool                      `json:"supervised"`
+	UserApprovedMDM      bool                      `json:"userApprovedMdm"`
 }
 
 // ComputerGroup represents a computer group.
@@ -1787,6 +1854,27 @@ type ComputerInventoryCreateRequestV2 struct {
 	UserAndLocation *ComputerUserAndLocationCreate  `json:"userAndLocation,omitempty"`
 }
 
+// ComputerInventoryCreateRequestV4 represents a computer inventory create request v4.
+type ComputerInventoryCreateRequestV4 struct {
+	Applications          *[]ComputerApplicationCreate          `json:"applications,omitempty"`
+	Certificates          *[]ComputerCertificateCreate          `json:"certificates,omitempty"`
+	ConfigurationProfiles *[]ComputerConfigurationProfileCreate `json:"configurationProfiles,omitempty"`
+	General               *ComputerGeneralCreateV4              `json:"general,omitempty"`
+	Hardware              *ComputerHardwareCreate               `json:"hardware,omitempty"`
+	LocalUserAccounts     *[]ComputerLocalUserAccountCreate     `json:"localUserAccounts,omitempty"`
+	OperatingSystem       *ComputerOperatingSystemCreate        `json:"operatingSystem,omitempty"`
+	// All package receipts are listed by their package name.
+	PackageReceipts *ComputerPackageReceiptsCreate  `json:"packageReceipts,omitempty"`
+	Printers        *[]ComputerPrinterCreate        `json:"printers,omitempty"`
+	Purchasing      *ComputerPurchaseCreate         `json:"purchasing,omitempty"`
+	Security        *ComputerSecurityCreate         `json:"security,omitempty"`
+	Services        *[]ComputerServiceCreate        `json:"services,omitempty"`
+	SoftwareUpdates *[]ComputerSoftwareUpdateCreate `json:"softwareUpdates,omitempty"`
+	Storage         *ComputerStorageCreate          `json:"storage,omitempty"`
+	UDID            *string                         `json:"udid,omitempty"`
+	UserAndLocation *ComputerUserAndLocationCreate  `json:"userAndLocation,omitempty"`
+}
+
 // ComputerInventoryDeviceLockPinResponse represents a computer inventory device lock pin response.
 type ComputerInventoryDeviceLockPinResponse struct {
 	Pin string `json:"pin"`
@@ -1832,6 +1920,12 @@ type ComputerInventorySearchResultsV2 struct {
 // ComputerInventorySearchResultsV3 represents a computer inventory search results v3.
 type ComputerInventorySearchResultsV3 struct {
 	Results    []ComputerInventoryV3 `json:"results"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+// ComputerInventorySearchResultsV4 represents a computer inventory search results v4.
+type ComputerInventorySearchResultsV4 struct {
+	Results    []ComputerInventoryV4 `json:"results"`
 	TotalCount int                   `json:"totalCount"`
 }
 
@@ -1885,6 +1979,35 @@ type ComputerInventoryV3 struct {
 	DiskEncryption        *ComputerDiskEncryption        `json:"diskEncryption,omitempty"`
 	ExtensionAttributes   []ComputerExtensionAttribute   `json:"extensionAttributes"`
 	General               *ComputerGeneral               `json:"general,omitempty"`
+	GroupMemberships      []GroupMembership              `json:"groupMemberships"`
+	Hardware              *ComputerHardware              `json:"hardware,omitempty"`
+	Ibeacons              []ComputerIbeacon              `json:"ibeacons"`
+	ID                    string                         `json:"id"`
+	LicensedSoftware      []ComputerLicensedSoftware     `json:"licensedSoftware"`
+	LocalUserAccounts     []ComputerLocalUserAccount     `json:"localUserAccounts"`
+	OperatingSystem       *ComputerOperatingSystem       `json:"operatingSystem,omitempty"`
+	// All package receipts are listed by their package name.
+	PackageReceipts *ComputerPackageReceipts `json:"packageReceipts,omitempty"`
+	Printers        []ComputerPrinter        `json:"printers"`
+	Purchasing      *ComputerPurchase        `json:"purchasing,omitempty"`
+	Security        *ComputerSecurity        `json:"security,omitempty"`
+	Services        []ComputerService        `json:"services"`
+	SoftwareUpdates []ComputerSoftwareUpdate `json:"softwareUpdates"`
+	Storage         *ComputerStorage         `json:"storage,omitempty"`
+	UDID            string                   `json:"udid"`
+	UserAndLocation *ComputerUserAndLocation `json:"userAndLocation,omitempty"`
+}
+
+// ComputerInventoryV4 represents a computer inventory v4.
+type ComputerInventoryV4 struct {
+	Applications          []ComputerApplicationV3        `json:"applications"`
+	Attachments           []ComputerAttachment           `json:"attachments"`
+	Certificates          []ComputerCertificate          `json:"certificates"`
+	ConfigurationProfiles []ComputerConfigurationProfile `json:"configurationProfiles"`
+	ContentCaching        *ComputerContentCaching        `json:"contentCaching,omitempty"`
+	DiskEncryption        *ComputerDiskEncryption        `json:"diskEncryption,omitempty"`
+	ExtensionAttributes   []ComputerExtensionAttribute   `json:"extensionAttributes"`
+	General               *ComputerGeneralV4             `json:"general,omitempty"`
 	GroupMemberships      []GroupMembership              `json:"groupMemberships"`
 	Hardware              *ComputerHardware              `json:"hardware,omitempty"`
 	Ibeacons              []ComputerIbeacon              `json:"ibeacons"`
@@ -4193,6 +4316,79 @@ type LanguageCode struct {
 	Value string `json:"value"`
 }
 
+// LapsAccountManagementHistory represents a laps account management history.
+type LapsAccountManagementHistory struct {
+	EventTime *time.Time `json:"eventTime,omitempty"`
+	// Allowed values: see the LapsAccountManagementHistoryEventType constants.
+	EventType string `json:"eventType"`
+	// Allowed values: see the LapsAccountManagementHistoryUserSource constants.
+	UserSource string  `json:"userSource"`
+	Username   string  `json:"username"`
+	ViewedBy   *string `json:"viewedBy,omitempty"`
+}
+
+// LapsAccountManagementHistoryResponse represents a laps account management history response.
+type LapsAccountManagementHistoryResponse struct {
+	Results    []LapsAccountManagementHistory `json:"results"`
+	TotalCount int                            `json:"totalCount"`
+}
+
+// LapsAuditV2 represents a laps audit v2.
+type LapsAuditV2 struct {
+	DateSeen *time.Time `json:"dateSeen,omitempty"`
+	ViewedBy *string    `json:"viewedBy,omitempty"`
+}
+
+// LapsHistory represents a laps history.
+type LapsHistory struct {
+	CreatedDate    *time.Time `json:"createdDate,omitempty"`
+	DateLastSeen   *time.Time `json:"dateLastSeen,omitempty"`
+	ExpirationTime *time.Time `json:"expirationTime,omitempty"`
+	// Allowed values: see the LapsHistoryRotationStatus constants.
+	RotationStatus string `json:"rotationStatus"`
+}
+
+// LapsHistoryResponse represents a laps history response.
+type LapsHistoryResponse struct {
+	Results    []LapsHistory `json:"results"`
+	TotalCount int           `json:"totalCount"`
+}
+
+// LapsPasswordAndAuditsV2 represents a laps password and audits v2.
+type LapsPasswordAndAuditsV2 struct {
+	Audits         []LapsAuditV2 `json:"audits"`
+	DateLastSeen   *time.Time    `json:"dateLastSeen,omitempty"`
+	ExpirationTime *time.Time    `json:"expirationTime,omitempty"`
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Password string `json:"password"`
+}
+
+// LapsPasswordAuditsResultsV2 represents a laps password audits results v2.
+type LapsPasswordAuditsResultsV2 struct {
+	Results    []LapsPasswordAndAuditsV2 `json:"results"`
+	TotalCount int                       `json:"totalCount"`
+}
+
+// LapsPasswordResponseV2 represents a laps password response v2.
+type LapsPasswordResponseV2 struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Password string `json:"password"`
+}
+
+// LapsPendingRotation represents a laps pending rotation.
+type LapsPendingRotation struct {
+	CreatedDate *time.Time  `json:"createdDate,omitempty"`
+	LapsUser    *LapsUserV2 `json:"lapsUser,omitempty"`
+}
+
+// LapsPendingRotationResponse represents a laps pending rotation response.
+type LapsPendingRotationResponse struct {
+	Results    []LapsPendingRotation `json:"results"`
+	TotalCount int                   `json:"totalCount"`
+}
+
 // LapsSettingsRequestV2 represents a laps settings request v2.
 type LapsSettingsRequestV2 struct {
 	// When enabled, all appropriate computers will have the SetAutoAdminPassword command sent to them
@@ -4221,6 +4417,39 @@ type LapsSettingsResponseV2 struct {
 	AutoRotateExpirationTime int `json:"autoRotateExpirationTime"`
 	// The amount of time in seconds that the local admin password will be rotated after viewing.
 	PasswordRotationTime int `json:"passwordRotationTime"`
+}
+
+// LapsUserPasswordRequestV2 represents a laps user password request v2.
+type LapsUserPasswordRequestV2 struct {
+	LapsUserPasswordList *[]LapsUserPasswordV2 `json:"lapsUserPasswordList,omitempty"`
+}
+
+// LapsUserPasswordResponseV2 represents a laps user password response v2.
+type LapsUserPasswordResponseV2 struct {
+	LapsUserPasswordList []LapsUserPasswordV2 `json:"lapsUserPasswordList"`
+}
+
+// LapsUserPasswordV2 represents a laps user password v2.
+type LapsUserPasswordV2 struct {
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Password *string `json:"password,omitempty"`
+	Username *string `json:"username,omitempty"`
+}
+
+// LapsUserResultsV2 represents a laps user results v2.
+type LapsUserResultsV2 struct {
+	Results    []LapsUserV2 `json:"results"`
+	TotalCount int          `json:"totalCount"`
+}
+
+// LapsUserV2 represents a laps user v2.
+type LapsUserV2 struct {
+	ClientManagementID string `json:"clientManagementId"`
+	Guid               string `json:"guid"`
+	// Allowed values: see the LapsUserV2UserSource constants.
+	UserSource string `json:"userSource"`
+	Username   string `json:"username"`
 }
 
 // LastLoginResponse represents a last login response.
@@ -6017,6 +6246,19 @@ type PatchPolicyV2OnDashboard struct {
 	OnDashboard bool `json:"onDashboard"`
 }
 
+// PatchReportV3 represents a patch report v3.
+type PatchReportV3 struct {
+	BuildingName           *string    `json:"buildingName,omitempty"`
+	ComputerName           *string    `json:"computerName,omitempty"`
+	DepartmentName         *string    `json:"departmentName,omitempty"`
+	DeviceID               *string    `json:"deviceId,omitempty"`
+	LastCheckIn            *time.Time `json:"lastCheckIn,omitempty"`
+	OperatingSystemVersion *string    `json:"operatingSystemVersion,omitempty"`
+	SiteName               *string    `json:"siteName,omitempty"`
+	Username               *string    `json:"username,omitempty"`
+	Version                *string    `json:"version,omitempty"`
+}
+
 // PatchSoftwareTitleConfiguration represents a patch software title configuration.
 type PatchSoftwareTitleConfiguration struct {
 	CategoryID             string                                               `json:"categoryId"`
@@ -6138,6 +6380,12 @@ type PatchSoftwareTitleReport struct {
 type PatchSoftwareTitleReportSearchResult struct {
 	Results    []PatchSoftwareTitleReport `json:"results"`
 	TotalCount int                        `json:"totalCount"`
+}
+
+// PatchSoftwareTitleReportV3SearchResult represents a patch software title report v3 search result.
+type PatchSoftwareTitleReportV3SearchResult struct {
+	Results    []PatchReportV3 `json:"results"`
+	TotalCount int             `json:"totalCount"`
 }
 
 // PatchSummary represents a patch summary.

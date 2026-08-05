@@ -1232,6 +1232,77 @@ func TestAcceptance_ApplyPatchSoftwareTitleConfigurationV2(t *testing.T) {
 	}
 }
 
+// ---------- PatchSoftwareTitleConfigurationV3 ----------
+
+// TestAcceptance_ApplyPatchSoftwareTitleConfigurationV3 exercises apply on the
+// undeprecated V3 surface (issue #50). Unlike the V2 test above it does not
+// depend on the tenant already having a configuration — the fixture seeds one.
+//
+// Only the update leg is reachable. On a Jamf-official patch source the
+// configuration id and its softwareTitleId are the same record (verified on
+// 11.30.2: seeding via Classic returns id N and the Pro configuration reports
+// softwareTitleId=N; deleting via Pro removes the Classic record too). So
+// there is no state in which a valid softwareTitleId exists with no
+// configuration attached, which is exactly what apply's create leg would need
+// — a create against a deleted fixture's id answers
+// [SOFTWARE_TITLE_ID_NOT_FOUND]. Reaching it needs an external patch source
+// feeding title ids independently of configurations, which this suite cannot
+// provision. The create path itself is still covered: see
+// TestAcceptance_Pro_Patch_CreateConfigV3 for the field-level rejection and
+// TestAcceptance_Pro_Patch_SoftwareTitleConfigV3Lifecycle for a real create
+// via the fixture.
+func TestAcceptance_ApplyPatchSoftwareTitleConfigurationV3(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	fixtureID := seedPatchSoftwareTitleFixture(t)
+	cleanupDelete(t, "PatchSoftwareTitleConfigV3 fixture "+fixtureID, func() error {
+		return p.DeletePatchSoftwareTitleConfigurationV3(ctx, fixtureID)
+	})
+	fixture, err := p.GetPatchSoftwareTitleConfigurationV3(ctx, fixtureID)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetPatchSoftwareTitleConfigurationV3(%s): %v", fixtureID, err)
+	}
+
+	// Apply resolves the fixture by name and PATCHes it, flipping a field so
+	// the update is observable rather than a no-op round-trip.
+	wantEmail := !fixture.EmailNotifications
+	id, created, err := p.ApplyPatchSoftwareTitleConfigurationV3(ctx, &pro.PatchSoftwareTitleConfigurationBase{
+		DisplayName:        fixture.DisplayName,
+		SoftwareTitleID:    fixture.SoftwareTitleID,
+		EmailNotifications: &wantEmail,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("apply update: %v", err)
+	}
+	if created {
+		t.Error("expected created = false — the fixture already exists under this name")
+	}
+	if id != fixtureID {
+		t.Errorf("id mismatch: fixture=%s apply=%s", fixtureID, id)
+	}
+	after, err := p.GetPatchSoftwareTitleConfigurationV3(ctx, id)
+	if err != nil {
+		t.Fatalf("GetPatchSoftwareTitleConfigurationV3(%s) after apply: %v", id, err)
+	}
+	if after.EmailNotifications != wantEmail {
+		t.Errorf("emailNotifications = %v after apply, want %v", after.EmailNotifications, wantEmail)
+	}
+	t.Logf("apply updated %q (id=%s): emailNotifications %v → %v",
+		fixture.DisplayName, id, fixture.EmailNotifications, after.EmailNotifications)
+
+	// Delete + verify the resolver reports not-found.
+	if err := p.DeletePatchSoftwareTitleConfigurationV3(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	if _, err := p.ResolvePatchSoftwareTitleConfigurationV3IDByName(ctx, fixture.DisplayName); err == nil {
+		t.Fatal("expected not-found after delete")
+	}
+}
+
 // ---------- SupervisionIdentityV1 ----------
 
 func TestAcceptance_ApplySupervisionIdentityV1(t *testing.T) {

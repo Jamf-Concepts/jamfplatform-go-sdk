@@ -1497,6 +1497,31 @@ func ComputerGeneralCreatePlatformValues() []ComputerGeneralCreatePlatform {
 	}
 }
 
+// ComputerGeneralCreateV4Platform is the set of values accepted by ComputerGeneralCreateV4.Platform.
+type ComputerGeneralCreateV4Platform = string
+
+// ComputerGeneralCreateV4Platform values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerGeneralCreateV4PlatformWindows ComputerGeneralCreateV4Platform = "WINDOWS"
+	ComputerGeneralCreateV4PlatformMac     ComputerGeneralCreateV4Platform = "MAC"
+	ComputerGeneralCreateV4PlatformNone    ComputerGeneralCreateV4Platform = "NONE"
+)
+
+// ComputerGeneralCreateV4PlatformValues returns every value the Jamf API accepts for ComputerGeneralCreateV4Platform,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ComputerGeneralCreateV4PlatformValues() []ComputerGeneralCreateV4Platform {
+	return []ComputerGeneralCreateV4Platform{
+		ComputerGeneralCreateV4PlatformWindows,
+		ComputerGeneralCreateV4PlatformMac,
+		ComputerGeneralCreateV4PlatformNone,
+	}
+}
+
 // ComputerHardwareBatteryHealth is the set of values accepted by ComputerHardware.BatteryHealth.
 type ComputerHardwareBatteryHealth = string
 
@@ -3027,6 +3052,110 @@ func InventoryPreloadRecordV2DeviceTypeValues() []InventoryPreloadRecordV2Device
 		InventoryPreloadRecordV2DeviceTypeComputer,
 		InventoryPreloadRecordV2DeviceTypeMobileDevice,
 		InventoryPreloadRecordV2DeviceTypeUnknown,
+	}
+}
+
+// LapsAccountManagementHistoryEventType is the set of values accepted by LapsAccountManagementHistory.EventType.
+type LapsAccountManagementHistoryEventType = string
+
+// LapsAccountManagementHistoryEventType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	LapsAccountManagementHistoryEventTypePending   LapsAccountManagementHistoryEventType = "PENDING"
+	LapsAccountManagementHistoryEventTypeCompleted LapsAccountManagementHistoryEventType = "COMPLETED"
+	LapsAccountManagementHistoryEventTypeViewed    LapsAccountManagementHistoryEventType = "VIEWED"
+	LapsAccountManagementHistoryEventTypeError     LapsAccountManagementHistoryEventType = "ERROR"
+	LapsAccountManagementHistoryEventTypeInvalid   LapsAccountManagementHistoryEventType = "INVALID"
+)
+
+// LapsAccountManagementHistoryEventTypeValues returns every value the Jamf API accepts for LapsAccountManagementHistoryEventType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func LapsAccountManagementHistoryEventTypeValues() []LapsAccountManagementHistoryEventType {
+	return []LapsAccountManagementHistoryEventType{
+		LapsAccountManagementHistoryEventTypePending,
+		LapsAccountManagementHistoryEventTypeCompleted,
+		LapsAccountManagementHistoryEventTypeViewed,
+		LapsAccountManagementHistoryEventTypeError,
+		LapsAccountManagementHistoryEventTypeInvalid,
+	}
+}
+
+// LapsAccountManagementHistoryUserSource is the set of values accepted by LapsAccountManagementHistory.UserSource.
+type LapsAccountManagementHistoryUserSource = string
+
+// LapsAccountManagementHistoryUserSource values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	LapsAccountManagementHistoryUserSourceMDM LapsAccountManagementHistoryUserSource = "MDM"
+	LapsAccountManagementHistoryUserSourceJmf LapsAccountManagementHistoryUserSource = "JMF"
+)
+
+// LapsAccountManagementHistoryUserSourceValues returns every value the Jamf API accepts for LapsAccountManagementHistoryUserSource,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func LapsAccountManagementHistoryUserSourceValues() []LapsAccountManagementHistoryUserSource {
+	return []LapsAccountManagementHistoryUserSource{
+		LapsAccountManagementHistoryUserSourceMDM,
+		LapsAccountManagementHistoryUserSourceJmf,
+	}
+}
+
+// LapsHistoryRotationStatus is the set of values accepted by LapsHistory.RotationStatus.
+type LapsHistoryRotationStatus = string
+
+// LapsHistoryRotationStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	LapsHistoryRotationStatusPending   LapsHistoryRotationStatus = "PENDING"
+	LapsHistoryRotationStatusCompleted LapsHistoryRotationStatus = "COMPLETED"
+	LapsHistoryRotationStatusViewed    LapsHistoryRotationStatus = "VIEWED"
+	LapsHistoryRotationStatusError     LapsHistoryRotationStatus = "ERROR"
+	LapsHistoryRotationStatusInvalid   LapsHistoryRotationStatus = "INVALID"
+)
+
+// LapsHistoryRotationStatusValues returns every value the Jamf API accepts for LapsHistoryRotationStatus,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func LapsHistoryRotationStatusValues() []LapsHistoryRotationStatus {
+	return []LapsHistoryRotationStatus{
+		LapsHistoryRotationStatusPending,
+		LapsHistoryRotationStatusCompleted,
+		LapsHistoryRotationStatusViewed,
+		LapsHistoryRotationStatusError,
+		LapsHistoryRotationStatusInvalid,
+	}
+}
+
+// LapsUserV2UserSource is the set of values accepted by LapsUserV2.UserSource.
+type LapsUserV2UserSource = string
+
+// LapsUserV2UserSource values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	LapsUserV2UserSourceMDM LapsUserV2UserSource = "MDM"
+	LapsUserV2UserSourceJmf LapsUserV2UserSource = "JMF"
+)
+
+// LapsUserV2UserSourceValues returns every value the Jamf API accepts for LapsUserV2UserSource,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func LapsUserV2UserSourceValues() []LapsUserV2UserSource {
+	return []LapsUserV2UserSource{
+		LapsUserV2UserSourceMDM,
+		LapsUserV2UserSourceJmf,
 	}
 }
 

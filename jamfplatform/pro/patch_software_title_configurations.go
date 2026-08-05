@@ -17,6 +17,19 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
+// ListPatchSoftwareTitleConfigurationsV3 retrieve Patch Software Title Configurations.
+//
+// Required privileges: read:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+func (c *Client) ListPatchSoftwareTitleConfigurationsV3(ctx context.Context) ([]PatchSoftwareTitleConfiguration, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result []PatchSoftwareTitleConfiguration
+	endpoint := prefix + "/patch-software-title-configurations"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatchSoftwareTitleConfigurationsV3: %w", err)
+	}
+	return result, nil
+}
+
 // ListPatchSoftwareTitleConfigurationsV2 retrieve Patch Software Title Configurations.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -32,6 +45,19 @@ func (c *Client) ListPatchSoftwareTitleConfigurationsV2(ctx context.Context) ([]
 	return result, nil
 }
 
+// CreatePatchSoftwareTitleConfigurationV3 create Patch Software Title Configurations.
+//
+// Required privileges: create:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Create Patch Management Software Titles.
+func (c *Client) CreatePatchSoftwareTitleConfigurationV3(ctx context.Context, request *PatchSoftwareTitleConfigurationBase) (*HrefResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result HrefResponse
+	endpoint := prefix + "/patch-software-title-configurations"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreatePatchSoftwareTitleConfigurationV3: %w", err)
+	}
+	return &result, nil
+}
+
 // CreatePatchSoftwareTitleConfigurationV2 create Patch Software Title Configurations.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -43,6 +69,22 @@ func (c *Client) CreatePatchSoftwareTitleConfigurationV2(ctx context.Context, re
 	endpoint := prefix + "/patch-software-title-configurations"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreatePatchSoftwareTitleConfigurationV2: %w", err)
+	}
+	return &result, nil
+}
+
+// GetPatchSoftwareTitleConfigurationV3 retrieve Patch Software Title Configurations with the supplied id.
+//
+// Required privileges: read:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
+func (c *Client) GetPatchSoftwareTitleConfigurationV3(ctx context.Context, id string) (*PatchSoftwareTitleConfiguration, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result PatchSoftwareTitleConfiguration
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchSoftwareTitleConfigurationV3(%s): %w", id, err)
 	}
 	return &result, nil
 }
@@ -65,6 +107,21 @@ func (c *Client) GetPatchSoftwareTitleConfigurationV2(ctx context.Context, id st
 	return &result, nil
 }
 
+// DeletePatchSoftwareTitleConfigurationV3 delete Patch Software Title Configurations with the supplied id.
+//
+// Required privileges: delete:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Delete Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
+func (c *Client) DeletePatchSoftwareTitleConfigurationV3(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("DeletePatchSoftwareTitleConfigurationV3(%s): %w", id, err)
+	}
+	return nil
+}
+
 // DeletePatchSoftwareTitleConfigurationV2 delete Patch Software Title Configurations with the supplied id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -82,6 +139,22 @@ func (c *Client) DeletePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 	return nil
 }
 
+// UpdatePatchSoftwareTitleConfigurationV3 update Patch Software Title Configurations.
+//
+// Required privileges: update:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
+func (c *Client) UpdatePatchSoftwareTitleConfigurationV3(ctx context.Context, id string, request *PatchSoftwareTitleConfigurationPatch) (*PatchSoftwareTitleConfiguration, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result PatchSoftwareTitleConfiguration
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdatePatchSoftwareTitleConfigurationV3(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // UpdatePatchSoftwareTitleConfigurationV2 update Patch Software Title Configurations.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -96,6 +169,22 @@ func (c *Client) UpdatePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("UpdatePatchSoftwareTitleConfigurationV2(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// GetPatchSoftwareTitleDashboardStatusV3 return whether or not the requested software title configuration is on the dashboard.
+//
+// Required privileges: read:env:dashboard. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: software title configuration id.
+func (c *Client) GetPatchSoftwareTitleDashboardStatusV3(ctx context.Context, id string) (*SoftwareTitleConfigurationOnDashboard, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result SoftwareTitleConfigurationOnDashboard
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchSoftwareTitleDashboardStatusV3(%s): %w", id, err)
 	}
 	return &result, nil
 }
@@ -118,6 +207,21 @@ func (c *Client) GetPatchSoftwareTitleDashboardStatusV2(ctx context.Context, id 
 	return &result, nil
 }
 
+// AddPatchSoftwareTitleToDashboardV3 add a software title configuration to the dashboard.
+//
+// Required privileges: create:env:dashboard. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: software title configuration id.
+func (c *Client) AddPatchSoftwareTitleToDashboardV3(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("AddPatchSoftwareTitleToDashboardV3(%s): %w", id, err)
+	}
+	return nil
+}
+
 // AddPatchSoftwareTitleToDashboardV2 add a software title configuration to the dashboard.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -131,6 +235,21 @@ func (c *Client) AddPatchSoftwareTitleToDashboardV2(ctx context.Context, id stri
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("AddPatchSoftwareTitleToDashboardV2(%s): %w", id, err)
+	}
+	return nil
+}
+
+// RemovePatchSoftwareTitleFromDashboardV3 remove a software title configuration from the dashboard.
+//
+// Required privileges: delete:env:dashboard. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: software title configuration id.
+func (c *Client) RemovePatchSoftwareTitleFromDashboardV3(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("RemovePatchSoftwareTitleFromDashboardV3(%s): %w", id, err)
 	}
 	return nil
 }
@@ -150,6 +269,47 @@ func (c *Client) RemovePatchSoftwareTitleFromDashboardV2(ctx context.Context, id
 		return fmt.Errorf("RemovePatchSoftwareTitleFromDashboardV2(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ListPatchSoftwareTitleDefinitionsV3 retrieve Patch Software Title Definitions with the supplied id.
+//
+// Required privileges: read:env:definitions. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title identifier.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is absoluteOrderId:asc. Multiple
+//     sort criteria are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter Patch Software Title Definition collection. Default
+//     filter is empty query - returning all results for the requested page. Fields allowed in the query:
+//     id, version, minimumOperatingSystem, releaseDate, reboot, standalone and absoluteOrderId. This param
+//     can be combined with paging and sorting.
+func (c *Client) ListPatchSoftwareTitleDefinitionsV3(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleDefinition, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleDefinition, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/definitions", prefix, url.PathEscape(id))
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int                            `json:"totalCount"`
+			Results    []PatchSoftwareTitleDefinition `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
 }
 
 // ListPatchSoftwareTitleDefinitionsV2 retrieve Patch Software Title Definitions with the supplied id.
@@ -195,6 +355,22 @@ func (c *Client) ListPatchSoftwareTitleDefinitionsV2(ctx context.Context, id str
 	})
 }
 
+// GetPatchSoftwareTitleDependenciesV3 retrieve list of Patch Software Title Configuration Dependencies.
+//
+// Required privileges: read:env:dependencies. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configuration Id.
+func (c *Client) GetPatchSoftwareTitleDependenciesV3(ctx context.Context, id string) (*PatchSoftwareTitleConfigurationDependencies, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result PatchSoftwareTitleConfigurationDependencies
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dependencies", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchSoftwareTitleDependenciesV3(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetPatchSoftwareTitleDependenciesV2 retrieve list of Patch Software Title Configuration Dependencies.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -211,6 +387,37 @@ func (c *Client) GetPatchSoftwareTitleDependenciesV2(ctx context.Context, id str
 		return nil, fmt.Errorf("GetPatchSoftwareTitleDependenciesV2(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ExportPatchSoftwareTitleReportV3 export Patch Reporting Data.
+//
+// Required privileges: read:env:export-report. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
+//   - filter: Query in the RSQL format, allowing to filter Patch Report collection on version equality only.
+//     Default filter is empty query - returning all results for the requested page. Fields allowed in the
+//     query: version. Comparators allowed in the query: ==, != This param can be combined with paging and
+//     sorting.
+//   - columnsToExport: List of column names to export.
+func (c *Client) ExportPatchSoftwareTitleReportV3(ctx context.Context, id string, filter string, columnsToExport []string) ([]byte, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result []byte
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/export-report", prefix, url.PathEscape(id))
+	params := url.Values{}
+	if filter != "" {
+		params.Set("filter", filter)
+	}
+	if len(columnsToExport) > 0 {
+		params.Set("columns-to-export", strings.Join(columnsToExport, ","))
+	}
+	if encoded := params.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ExportPatchSoftwareTitleReportV3(%s): %w", id, err)
+	}
+	return result, nil
 }
 
 // ExportPatchSoftwareTitleReportV2 export Patch Reporting Data.
@@ -246,6 +453,22 @@ func (c *Client) ExportPatchSoftwareTitleReportV2(ctx context.Context, id string
 	return result, nil
 }
 
+// ListPatchSoftwareTitleExtensionAttributesV3 retrieve Software Title Extension Attributes with the supplied id.
+//
+// Required privileges: read:env:extension-attributes. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title identifier.
+func (c *Client) ListPatchSoftwareTitleExtensionAttributesV3(ctx context.Context, id string) ([]PatchSoftwareTitleExtensionAttributes, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result []PatchSoftwareTitleExtensionAttributes
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/extension-attributes", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatchSoftwareTitleExtensionAttributesV3(%s): %w", id, err)
+	}
+	return result, nil
+}
+
 // ListPatchSoftwareTitleExtensionAttributesV2 retrieve Software Title Extension Attributes with the supplied id.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -262,6 +485,47 @@ func (c *Client) ListPatchSoftwareTitleExtensionAttributesV2(ctx context.Context
 		return nil, fmt.Errorf("ListPatchSoftwareTitleExtensionAttributesV2(%s): %w", id, err)
 	}
 	return result, nil
+}
+
+// ListPatchSoftwareTitleHistoryV3 get specified Patch Software Title Configuration history object.
+//
+// Required privileges: read:env:history. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configuration Id.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
+func (c *Client) ListPatchSoftwareTitleHistoryV3(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/history", prefix, url.PathEscape(id))
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int             `json:"totalCount"`
+			Results    []ObjectHistory `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
 }
 
 // ListPatchSoftwareTitleHistoryV2 get specified Patch Software Title Configuration history object.
@@ -307,6 +571,22 @@ func (c *Client) ListPatchSoftwareTitleHistoryV2(ctx context.Context, id string,
 	})
 }
 
+// CreatePatchSoftwareTitleHistoryNoteV3 add Patch Software Title Configuration history object notes.
+//
+// Required privileges: create:env:history. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configuration Id.
+func (c *Client) CreatePatchSoftwareTitleHistoryNoteV3(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result HrefResponse
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/history", prefix, url.PathEscape(id))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreatePatchSoftwareTitleHistoryNoteV3(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // CreatePatchSoftwareTitleHistoryNoteV2 add Patch Software Title Configuration history object notes.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -323,6 +603,48 @@ func (c *Client) CreatePatchSoftwareTitleHistoryNoteV2(ctx context.Context, id s
 		return nil, fmt.Errorf("CreatePatchSoftwareTitleHistoryNoteV2(%s): %w", id, err)
 	}
 	return &result, nil
+}
+
+// ListPatchSoftwareTitlePatchReportV3 retrieve Patch Software Title Configuration Patch Report.
+//
+// Required privileges: read:env:patch-report. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch Software Title Configurations identifier.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is computerName:asc. Multiple sort
+//     criteria are supported and must be separated with a comma. Supported fields: computerName, deviceId,
+//     username, operatingSystemVersion, lastCheckIn, buildingName, departmentName, siteName, version.
+//   - filter: Query in the RSQL format, allowing to filter Patch Report collection on version equality only.
+//     Default filter is empty query - returning all results for the requested page. Fields allowed in the
+//     query: version. Comparators allowed in the query: ==, != This param can be combined with paging and
+//     sorting.
+func (c *Client) ListPatchSoftwareTitlePatchReportV3(ctx context.Context, id string, sort []string, filter string) ([]PatchReportV3, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchReportV3, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+		if filter != "" {
+			params.Set("filter", filter)
+		}
+
+		endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/patch-report", prefix, url.PathEscape(id))
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int             `json:"totalCount"`
+			Results    []PatchReportV3 `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
 }
 
 // ListPatchSoftwareTitlePatchReportV2 retrieve Patch Software Title Configuration Patch Report.
@@ -369,6 +691,22 @@ func (c *Client) ListPatchSoftwareTitlePatchReportV2(ctx context.Context, id str
 	})
 }
 
+// GetPatchSoftwareTitlePatchSummaryV3 return Active Patch Summary.
+//
+// Required privileges: read:env:patch-summary. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch id.
+func (c *Client) GetPatchSoftwareTitlePatchSummaryV3(ctx context.Context, id string) (*PatchSummary, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result PatchSummary
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/patch-summary", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchSoftwareTitlePatchSummaryV3(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetPatchSoftwareTitlePatchSummaryV2 return Active Patch Summary.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -387,6 +725,22 @@ func (c *Client) GetPatchSoftwareTitlePatchSummaryV2(ctx context.Context, id str
 	return &result, nil
 }
 
+// ListPatchSoftwareTitlePatchSummaryVersionsV3 returns patch versions.
+//
+// Required privileges: read:env:versions. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+//
+// Parameters:
+//   - id: Patch id.
+func (c *Client) ListPatchSoftwareTitlePatchSummaryVersionsV3(ctx context.Context, id string) ([]PatchSummaryVersion, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	var result []PatchSummaryVersion
+	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/patch-summary/versions", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatchSoftwareTitlePatchSummaryVersionsV3(%s): %w", id, err)
+	}
+	return result, nil
+}
+
 // ListPatchSoftwareTitlePatchSummaryVersionsV2 returns patch versions.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
@@ -403,6 +757,32 @@ func (c *Client) ListPatchSoftwareTitlePatchSummaryVersionsV2(ctx context.Contex
 		return nil, fmt.Errorf("ListPatchSoftwareTitlePatchSummaryVersionsV2(%s): %w", id, err)
 	}
 	return result, nil
+}
+
+// ResolvePatchSoftwareTitleConfigurationV3IDByName looks up a PatchSoftwareTitleConfigurationV3 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolvePatchSoftwareTitleConfigurationV3IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/patch-software-title-configurations"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolvePatchSoftwareTitleConfigurationV3IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolvePatchSoftwareTitleConfigurationV3ByName looks up a PatchSoftwareTitleConfigurationV3 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolvePatchSoftwareTitleConfigurationV3ByName(ctx context.Context, name string) (*PatchSoftwareTitleConfiguration, error) {
+	prefix := c.transport.TenantPrefix("pro", "v3")
+	listPath := prefix + "/patch-software-title-configurations"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolvePatchSoftwareTitleConfigurationV3ByName(%s): %w", name, err)
+	}
+	var out PatchSoftwareTitleConfiguration
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolvePatchSoftwareTitleConfigurationV3ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
 }
 
 // ResolvePatchSoftwareTitleConfigurationV2IDByName looks up a PatchSoftwareTitleConfigurationV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
@@ -429,6 +809,39 @@ func (c *Client) ResolvePatchSoftwareTitleConfigurationV2ByName(ctx context.Cont
 		return nil, fmt.Errorf("ResolvePatchSoftwareTitleConfigurationV2ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
+}
+
+// ApplyPatchSoftwareTitleConfigurationV3 creates or updates a PatchSoftwareTitleConfigurationV3 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyPatchSoftwareTitleConfigurationV3(ctx context.Context, request *PatchSoftwareTitleConfigurationBase) (string, bool, error) {
+	name := request.DisplayName
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyPatchSoftwareTitleConfigurationV3: DisplayName must not be empty")
+	}
+	id, err := c.ResolvePatchSoftwareTitleConfigurationV3IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreatePatchSoftwareTitleConfigurationV3(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyPatchSoftwareTitleConfigurationV3: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyPatchSoftwareTitleConfigurationV3: resolve: %w", err)
+	}
+	// Convert create request to update type via JSON round-trip.
+	data, marshalErr := json.Marshal(request)
+	if marshalErr != nil {
+		return "", false, fmt.Errorf("ApplyPatchSoftwareTitleConfigurationV3: marshal for update(%s): %w", id, marshalErr)
+	}
+	var updateReq PatchSoftwareTitleConfigurationPatch
+	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
+		return "", false, fmt.Errorf("ApplyPatchSoftwareTitleConfigurationV3: unmarshal for update(%s): %w", id, unmarshalErr)
+	}
+	_, err = c.UpdatePatchSoftwareTitleConfigurationV3(ctx, id, &updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyPatchSoftwareTitleConfigurationV3: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }
 
 // ApplyPatchSoftwareTitleConfigurationV2 creates or updates a PatchSoftwareTitleConfigurationV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.

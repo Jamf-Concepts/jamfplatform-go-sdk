@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 // GetLocalAdminPasswordSettingsV2 get the current LAPS settings.
@@ -33,6 +34,173 @@ func (c *Client) UpdateLocalAdminPasswordSettingsV2(ctx context.Context, request
 	endpoint := prefix + "/local-admin-password/settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("UpdateLocalAdminPasswordSettingsV2: %w", err)
+	}
+	return &result, nil
+}
+
+// ListLocalAdminPasswordPendingRotationsV2 get a list of the current devices and usernames with pending LAPS rotations.
+//
+// Required privileges: read:pro:local-admin-password. Legacy Jamf Pro privilege name(s): View Local Admin Password.
+func (c *Client) ListLocalAdminPasswordPendingRotationsV2(ctx context.Context) (*LapsPendingRotationResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsPendingRotationResponse
+	endpoint := prefix + "/local-admin-password/pending-rotations"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListLocalAdminPasswordPendingRotationsV2: %w", err)
+	}
+	return &result, nil
+}
+
+// ListLocalAdminPasswordAccountsV2 get the LAPS capable admin accounts for a device.
+//
+// Required privileges: read:pro:local-admin-password. Legacy Jamf Pro privilege name(s): View Local Admin Password.
+//
+// Parameters:
+//   - clientManagementID: client management id of target device.
+func (c *Client) ListLocalAdminPasswordAccountsV2(ctx context.Context, clientManagementID string) (*LapsUserResultsV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsUserResultsV2
+	endpoint := fmt.Sprintf("%s/local-admin-password/%s/accounts", prefix, url.PathEscape(clientManagementID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListLocalAdminPasswordAccountsV2(%s): %w", clientManagementID, err)
+	}
+	return &result, nil
+}
+
+// ListLocalAdminPasswordHistoryV2 get LAPS password viewed history, and rotation history.
+//
+// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+//
+// Parameters:
+//   - clientManagementID: client management id of target device.
+func (c *Client) ListLocalAdminPasswordHistoryV2(ctx context.Context, clientManagementID string) (*LapsAccountManagementHistoryResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsAccountManagementHistoryResponse
+	endpoint := fmt.Sprintf("%s/local-admin-password/%s/history", prefix, url.PathEscape(clientManagementID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListLocalAdminPasswordHistoryV2(%s): %w", clientManagementID, err)
+	}
+	return &result, nil
+}
+
+// GetLocalAdminPasswordV2 get current LAPS password for specified username on a client.
+//
+// Required privileges: read:pro:local-admin-password. Legacy Jamf Pro privilege name(s): View Local Admin Password.
+//
+// Parameters:
+//   - clientManagementID: client management id of target device.
+//   - username: user name for the account.
+func (c *Client) GetLocalAdminPasswordV2(ctx context.Context, clientManagementID string, username string) (*LapsPasswordResponseV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsPasswordResponseV2
+	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/password", prefix, url.PathEscape(clientManagementID), url.PathEscape(username))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLocalAdminPasswordV2(%s): %w", clientManagementID, err)
+	}
+	return &result, nil
+}
+
+// ListLocalAdminPasswordAuditsV2 get LAPS password viewed history.
+//
+// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+//
+// Parameters:
+//   - clientManagementID: client management id of target device.
+//   - username: user name to view audit information for.
+func (c *Client) ListLocalAdminPasswordAuditsV2(ctx context.Context, clientManagementID string, username string) (*LapsPasswordAuditsResultsV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsPasswordAuditsResultsV2
+	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/audit", prefix, url.PathEscape(clientManagementID), url.PathEscape(username))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListLocalAdminPasswordAuditsV2(%s): %w", clientManagementID, err)
+	}
+	return &result, nil
+}
+
+// ListLocalAdminPasswordAccountHistoryV2 get LAPS historical records for target device and username.
+//
+// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+//
+// Parameters:
+//   - clientManagementID: client management id of target device.
+//   - username: user name to view history for.
+func (c *Client) ListLocalAdminPasswordAccountHistoryV2(ctx context.Context, clientManagementID string, username string) (*LapsHistoryResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsHistoryResponse
+	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/history", prefix, url.PathEscape(clientManagementID), url.PathEscape(username))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListLocalAdminPasswordAccountHistoryV2(%s): %w", clientManagementID, err)
+	}
+	return &result, nil
+}
+
+// GetLocalAdminPasswordByGuidV2 get current LAPS password for specified user guid on a client.
+//
+// Required privileges: read:pro:local-admin-password. Legacy Jamf Pro privilege name(s): View Local Admin Password.
+//
+// Parameters:
+//   - clientManagementID: client management id of target device.
+//   - username: user name for the account.
+//   - guid: user guid for the account.
+func (c *Client) GetLocalAdminPasswordByGuidV2(ctx context.Context, clientManagementID string, username string, guid string) (*LapsPasswordResponseV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsPasswordResponseV2
+	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/%s/password", prefix, url.PathEscape(clientManagementID), url.PathEscape(username), url.PathEscape(guid))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetLocalAdminPasswordByGuidV2(%s): %w", clientManagementID, err)
+	}
+	return &result, nil
+}
+
+// ListLocalAdminPasswordAuditsByGuidV2 get LAPS password viewed history.
+//
+// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+//
+// Parameters:
+//   - clientManagementID: client management id of target device.
+//   - username: user name to view audit information for.
+//   - guid: user guid to view audit information for.
+func (c *Client) ListLocalAdminPasswordAuditsByGuidV2(ctx context.Context, clientManagementID string, username string, guid string) (*LapsPasswordAuditsResultsV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsPasswordAuditsResultsV2
+	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/%s/audit", prefix, url.PathEscape(clientManagementID), url.PathEscape(username), url.PathEscape(guid))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListLocalAdminPasswordAuditsByGuidV2(%s): %w", clientManagementID, err)
+	}
+	return &result, nil
+}
+
+// ListLocalAdminPasswordAccountHistoryByGuidV2 get LAPS historical records for target device and user guid.
+//
+// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+//
+// Parameters:
+//   - clientManagementID: client management id of target device.
+//   - username: user name to view history for.
+//   - guid: user guid to view history for.
+func (c *Client) ListLocalAdminPasswordAccountHistoryByGuidV2(ctx context.Context, clientManagementID string, username string, guid string) (*LapsHistoryResponse, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsHistoryResponse
+	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/%s/history", prefix, url.PathEscape(clientManagementID), url.PathEscape(username), url.PathEscape(guid))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListLocalAdminPasswordAccountHistoryByGuidV2(%s): %w", clientManagementID, err)
+	}
+	return &result, nil
+}
+
+// SetLocalAdminPasswordV2 set the LAPS password for a device.
+//
+// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Local Admin Password Command.
+// The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - clientManagementID: client management id of target device.
+func (c *Client) SetLocalAdminPasswordV2(ctx context.Context, clientManagementID string, request *LapsUserPasswordRequestV2) (*LapsUserPasswordResponseV2, error) {
+	prefix := c.transport.TenantPrefix("pro", "v2")
+	var result LapsUserPasswordResponseV2
+	endpoint := fmt.Sprintf("%s/local-admin-password/%s/set-password", prefix, url.PathEscape(clientManagementID))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("SetLocalAdminPasswordV2(%s): %w", clientManagementID, err)
 	}
 	return &result, nil
 }
