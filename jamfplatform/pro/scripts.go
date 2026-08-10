@@ -33,7 +33,7 @@ import (
 //     filter=categoryName=="Category" and name=="*script name*".
 func (c *Client) ListScriptsV1(ctx context.Context, sort []string, filter string) ([]Script, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Script, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]Script, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -150,7 +150,7 @@ func (c *Client) DownloadScriptV1(ctx context.Context, id string) ([]byte, error
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListScriptHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

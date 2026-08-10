@@ -30,7 +30,7 @@ import (
 //     and sorting. Example: filter=city=="Chicago" and name=="*build*".
 func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter string) ([]Building, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Building, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]Building, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -161,7 +161,7 @@ func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameter
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListBuildingHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

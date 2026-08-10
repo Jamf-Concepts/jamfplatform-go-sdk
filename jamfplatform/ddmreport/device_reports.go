@@ -48,7 +48,7 @@ func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string
 //     criteria are supported.
 func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceID string, filter string, sort []string) ([]FilteredResultDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
+	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("size", strconv.Itoa(pageSize))

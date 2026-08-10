@@ -51,7 +51,7 @@ func (c *Client) UpdateOnboardingV1(ctx context.Context, request *OnboardingConf
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListOnboardingEligibleAppsV1(ctx context.Context, sort []string) ([]OnboardingEligibleItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -84,7 +84,7 @@ func (c *Client) ListOnboardingEligibleAppsV1(ctx context.Context, sort []string
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListOnboardingEligibleConfigurationProfilesV1(ctx context.Context, sort []string) ([]OnboardingEligibleItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -117,7 +117,7 @@ func (c *Client) ListOnboardingEligibleConfigurationProfilesV1(ctx context.Conte
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListOnboardingEligiblePoliciesV1(ctx context.Context, sort []string) ([]OnboardingEligibleItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]OnboardingEligibleItem, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -154,7 +154,7 @@ func (c *Client) ListOnboardingEligiblePoliciesV1(ctx context.Context, sort []st
 //     date<2019-12-15.
 func (c *Client) ListOnboardingHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

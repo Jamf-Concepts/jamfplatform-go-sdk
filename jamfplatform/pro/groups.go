@@ -36,7 +36,7 @@ import (
 //     groupDescription=="*Admin*".
 func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -86,7 +86,7 @@ func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string)
 //     groupDescription=="*Admin*".
 func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

@@ -71,6 +71,7 @@ type GoMethod struct {
 	ContentType      string
 	PaginationStyle  string
 	PageSizeParam    string
+	MaxPageSize      int
 	ItemType         string
 	ResultsField     string
 	ReturnsSlice     bool

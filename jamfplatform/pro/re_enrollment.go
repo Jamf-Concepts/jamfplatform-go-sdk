@@ -51,7 +51,7 @@ func (c *Client) UpdateReenrollmentSettingsV1(ctx context.Context, request *Reen
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListReenrollmentHistoryV1(ctx context.Context, sort string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

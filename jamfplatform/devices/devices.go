@@ -31,7 +31,7 @@ import (
 //     format. Example: `name=="*iPhone*" and lastInventoryUpdateTime>="2025-01-31T18:09:00.000Z"`.
 func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
+	return client.ListAllPages(ctx, 1000, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -114,7 +114,7 @@ func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 //     `version`. Example: `name=="*Safari*" and version>="26.0.0"`.
 func (c *Client) ListDeviceApplications(ctx context.Context, id string, sort []string, filter string) ([]DeviceInstalledApplicationReadRepresentationV1, error) {
 	prefix := c.transport.TenantPrefix("devices", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeviceInstalledApplicationReadRepresentationV1, bool, error) {
+	return client.ListAllPages(ctx, 1000, func(ctx context.Context, page, pageSize int) ([]DeviceInstalledApplicationReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

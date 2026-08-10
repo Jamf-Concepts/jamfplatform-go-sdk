@@ -23,7 +23,7 @@ import (
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ListAppInstallerDeploymentsV1(ctx context.Context) ([]AppInstallerDeploymentListEntry, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]AppInstallerDeploymentListEntry, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]AppInstallerDeploymentListEntry, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

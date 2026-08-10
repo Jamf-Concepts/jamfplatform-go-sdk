@@ -31,7 +31,7 @@ import (
 //     with paging and sorting.
 func (c *Client) ListPatchPoliciesV2(ctx context.Context, sort []string, filter string) ([]PatchPolicyListView, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchPolicyListView, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchPolicyListView, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -73,7 +73,7 @@ func (c *Client) ListPatchPoliciesV2(ctx context.Context, sort []string, filter 
 //     reminderFrequency, reminderEnabled. This param can be combined with paging and sorting.
 func (c *Client) ListPatchPolicyDetailsV2(ctx context.Context, sort []string, filter string) ([]PatchPolicyDetail, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchPolicyDetail, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchPolicyDetail, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

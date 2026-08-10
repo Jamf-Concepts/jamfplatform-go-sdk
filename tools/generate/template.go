@@ -684,7 +684,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ([]{{ .ItemType }}, error) {
 	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]{{ .ItemType }}, bool, error) {
+	return client.ListAllPages(ctx, {{ .MaxPageSize }}, func(ctx context.Context, page, pageSize int) ([]{{ .ItemType }}, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("{{ .PageSizeParam }}", strconv.Itoa(pageSize))

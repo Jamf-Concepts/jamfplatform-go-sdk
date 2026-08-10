@@ -14,6 +14,7 @@
           "op": "GET /v1/tenant/{tenantId}/devices",
           "name": "ListDevices",
           "pagination": "hasNext",
+          "maxPageSize": 1000,
           "params": [
             "sort:[]string",
             "filter"
@@ -52,6 +53,7 @@
           "op": "GET /v1/tenant/{tenantId}/devices/{id}/applications",
           "name": "ListDeviceApplications",
           "pagination": "hasNext",
+          "maxPageSize": 1000,
           "params": [
             "sort:[]string",
             "filter"
@@ -61,6 +63,7 @@
           "op": "GET /v1/tenant/{tenantId}/users/{id}/devices",
           "name": "ListDevicesForUser",
           "pagination": "hasNext",
+          "maxPageSize": 1000,
           "params": [
             "sort:[]string",
             "filter"

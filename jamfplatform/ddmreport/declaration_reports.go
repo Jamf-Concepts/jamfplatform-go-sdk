@@ -29,7 +29,7 @@ import (
 //     criteria are supported.
 func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationIdentifier string, sort []string) ([]DeclarationReportClientDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeclarationReportClientDto, bool, error) {
+	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]DeclarationReportClientDto, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("size", strconv.Itoa(pageSize))
@@ -66,7 +66,7 @@ func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationId
 //     criteria are supported.
 func (c *Client) ListDeclarationReportClientsFiltered(ctx context.Context, declarationIdentifier string, filter string, sort []string) ([]FilteredResultDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
+	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("size", strconv.Itoa(pageSize))

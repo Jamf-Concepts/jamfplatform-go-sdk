@@ -883,6 +883,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		ContentType:     opDef.ContentType,
 		PaginationStyle: opDef.Pagination,
 		PageSizeParam:   coalesce(opDef.PageSizeParam, "page-size"),
+		MaxPageSize:     coalesceInt(opDef.MaxPageSize, defaultMaxPageSize(spec.Package, opDef.Pagination)),
 		ResultsField:    "results",
 		SpecPath:        specPath,
 		UnwrapResults:   opDef.UnwrapResults,

@@ -108,7 +108,7 @@ func (c *Client) FailCloudDistributionPointUploadV1(ctx context.Context, id stri
 //     Default filter is an empty query and returns all results from the requested page.
 func (c *Client) ListCloudDistributionPointFilesV1(ctx context.Context, sort []string, filter string) ([]CloudDistributionPointInventoryFileInfo, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]CloudDistributionPointInventoryFileInfo, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]CloudDistributionPointInventoryFileInfo, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -147,7 +147,7 @@ func (c *Client) ListCloudDistributionPointFilesV1(ctx context.Context, sort []s
 //     requested page.
 func (c *Client) ListCloudDistributionPointHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

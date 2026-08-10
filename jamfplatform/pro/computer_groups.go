@@ -43,7 +43,7 @@ func (c *Client) ListComputerGroupsV1(ctx context.Context) ([]ComputerGroup, err
 //     siteId filtered automatically. Example: name=="*group*".
 func (c *Client) ListSmartComputerGroupsV3(ctx context.Context, sort []string, filter string) ([]SmartComputerGroupSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -85,7 +85,7 @@ func (c *Client) ListSmartComputerGroupsV3(ctx context.Context, sort []string, f
 //     siteId filtered automatically. Example: name=="*group*".
 func (c *Client) ListSmartComputerGroupsV2(ctx context.Context, sort []string, filter string) ([]SmartComputerGroupSearch, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SmartComputerGroupSearch, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -307,7 +307,7 @@ func (c *Client) GetSmartComputerGroupMembershipV2(ctx context.Context, id strin
 //     siteId filtered automatically. Example: name=="*group*".
 func (c *Client) ListStaticComputerGroupsV3(ctx context.Context, sort []string, filter string) ([]StaticComputerGroupSummary, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -349,7 +349,7 @@ func (c *Client) ListStaticComputerGroupsV3(ctx context.Context, sort []string, 
 //     siteId filtered automatically. Example: name=="*group*".
 func (c *Client) ListStaticComputerGroupsV2(ctx context.Context, sort []string, filter string) ([]StaticComputerGroupSummary, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]StaticComputerGroupSummary, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

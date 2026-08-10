@@ -139,6 +139,7 @@ type OperationDef struct {
 	ContentType    string            `json:"contentType,omitempty"`
 	Pagination     string            `json:"pagination,omitempty"` // hasNext, sizeCheck, totalCount, rawArray
 	PageSizeParam  string            `json:"pageSizeParam,omitempty"`
+	MaxPageSize    int               `json:"maxPageSize,omitempty"` // page-size requested per page; defaults to 100. Only raise this once the endpoint's true server-side cap is wire-verified — see CLAUDE.md "Wire-verified pagination limits".
 	Version        string            `json:"version,omitempty"`   // override version for tenantPrefix
 	PathNames      map[string]string `json:"pathNames,omitempty"` // spec param -> Go param name
 	Params         []string          `json:"params,omitempty"`    // "name", "name:type", "spec:type:goName"

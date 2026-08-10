@@ -116,7 +116,7 @@ func (c *Client) ListMdmCommandsV1(ctx context.Context, uuids []string, clientMa
 //     clientManagementId==fb511aae-c557-474f-a9c1-5dc845b90d0f;status==Pending;command==INSTALL_PROFILE;uuid==9e18f849-e689-4f2d-b616-a99d3da7db42;clientType==COMPUTER_USER;profileId==1;profileIdentifier==18cc61c2-01fc-11ed-b939-0242ac120002;dateCompleted=ge=2021-08-04T14:25:18.26Z;dateCompleted=le=2021-08-04T14:25:18.26Z;validAfter=ge=2021-08-05T14:25:18.26Z;active==true.
 func (c *Client) ListMdmCommandsV2(ctx context.Context, sort []string, filter string) ([]MDMCommand, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MDMCommand, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]MDMCommand, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

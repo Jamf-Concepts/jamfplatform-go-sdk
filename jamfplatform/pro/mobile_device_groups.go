@@ -59,7 +59,7 @@ func (c *Client) ListMobileDeviceGroupsV1(ctx context.Context) ([]MobileDeviceGr
 //     groupName=="smartGroup1".
 func (c *Client) ListSmartMobileDeviceGroupsV2(ctx context.Context, sort []string, filter string) ([]SmartGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -102,7 +102,7 @@ func (c *Client) ListSmartMobileDeviceGroupsV2(ctx context.Context, sort []strin
 //     groupName=="smartGroup1".
 func (c *Client) ListSmartMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]SmartGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -341,7 +341,7 @@ func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) 
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -434,7 +434,7 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id 
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListSmartMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -475,7 +475,7 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV1(ctx context.Context, id 
 //     groupName=="staticGroup1".
 func (c *Client) ListStaticMobileDeviceGroupsV2(ctx context.Context, sort []string, filter string) ([]StaticGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -518,7 +518,7 @@ func (c *Client) ListStaticMobileDeviceGroupsV2(ctx context.Context, sort []stri
 //     groupName=="staticGroup1".
 func (c *Client) ListStaticMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]StaticGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -757,7 +757,7 @@ func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, 
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -850,7 +850,7 @@ func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListStaticMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

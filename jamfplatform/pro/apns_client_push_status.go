@@ -30,7 +30,7 @@ import (
 //     filter=deviceType=="COMPUTER";disabledAt>2024-01-01T00:00:00Z.
 func (c *Client) ListApnsClientPushStatusesV1(ctx context.Context, sort []string, filter string) ([]ApnsClientPushStatus, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ApnsClientPushStatus, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ApnsClientPushStatus, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

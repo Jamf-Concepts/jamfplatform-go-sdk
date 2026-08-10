@@ -45,7 +45,7 @@ func (c *Client) GetJamfConnectSettingsV1(ctx context.Context) error {
 //     date<2019-12-15.
 func (c *Client) ListJamfConnectConfigProfilesV1(ctx context.Context, sort []string, filter string) ([]LinkedConnectProfile, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]LinkedConnectProfile, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]LinkedConnectProfile, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -104,7 +104,7 @@ func (c *Client) UpdateJamfConnectConfigProfileV1(ctx context.Context, id string
 //     date<2019-12-15.
 func (c *Client) ListJamfConnectDeploymentTasksV1(ctx context.Context, id string, sort []string, filter string) ([]DeploymentTask, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -161,7 +161,7 @@ func (c *Client) RetryJamfConnectDeploymentTasksV1(ctx context.Context, id strin
 //     date<2019-12-15.
 func (c *Client) ListJamfConnectHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

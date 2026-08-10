@@ -177,7 +177,7 @@ func (c *Client) ExportInventoryPreloadV2(ctx context.Context, request *ExportPa
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListInventoryPreloadHistoryV1(ctx context.Context, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -215,7 +215,7 @@ func (c *Client) ListInventoryPreloadHistoryV1(ctx context.Context, sort []strin
 //     Example: `filter=username=="admin"`.
 func (c *Client) ListInventoryPreloadHistoryV2(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -288,7 +288,7 @@ func (c *Client) CreateInventoryPreloadHistoryNoteV2(ctx context.Context, reques
 //     Example: `filter=categoryName=="Category"`.
 func (c *Client) ListInventoryPreloadRecordsV2(ctx context.Context, sort []string, filter string) ([]InventoryPreloadRecordV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]InventoryPreloadRecordV2, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryPreloadRecordV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

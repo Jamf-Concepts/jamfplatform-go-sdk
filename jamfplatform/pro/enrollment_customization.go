@@ -304,7 +304,7 @@ func (c *Client) GetEnrollmentCustomizationTextPanelMarkdownV1(ctx context.Conte
 //     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListEnrollmentCustomizationsV2(ctx context.Context, sort []string) ([]EnrollmentCustomizationV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]EnrollmentCustomizationV2, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]EnrollmentCustomizationV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -438,7 +438,7 @@ func (c *Client) DeleteEnrollmentCustomizationV2(ctx context.Context, id string)
 //     query param is duplicated for each sort criterion, e.g., ...&sort=name%2Casc&sort=date%2Cdesc.
 func (c *Client) ListEnrollmentCustomizationHistoryV2(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

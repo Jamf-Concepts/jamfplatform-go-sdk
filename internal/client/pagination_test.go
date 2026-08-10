@@ -11,7 +11,7 @@ import (
 
 func TestListAllPages(t *testing.T) {
 	t.Run("single page", func(t *testing.T) {
-		items, err := ListAllPages(context.Background(), func(_ context.Context, page, pageSize int) ([]string, bool, error) {
+		items, err := ListAllPages(context.Background(), 100, func(_ context.Context, page, pageSize int) ([]string, bool, error) {
 			if page != 0 {
 				t.Fatalf("unexpected page %d", page)
 			}
@@ -26,7 +26,7 @@ func TestListAllPages(t *testing.T) {
 	})
 
 	t.Run("multiple pages", func(t *testing.T) {
-		items, err := ListAllPages(context.Background(), func(_ context.Context, page, _ int) ([]int, bool, error) {
+		items, err := ListAllPages(context.Background(), 100, func(_ context.Context, page, _ int) ([]int, bool, error) {
 			switch page {
 			case 0:
 				return []int{1, 2}, true, nil
@@ -53,7 +53,7 @@ func TestListAllPages(t *testing.T) {
 	})
 
 	t.Run("empty first page", func(t *testing.T) {
-		items, err := ListAllPages(context.Background(), func(_ context.Context, _, _ int) ([]string, bool, error) {
+		items, err := ListAllPages(context.Background(), 100, func(_ context.Context, _, _ int) ([]string, bool, error) {
 			return nil, false, nil
 		})
 		if err != nil {
@@ -65,7 +65,7 @@ func TestListAllPages(t *testing.T) {
 	})
 
 	t.Run("error on first page", func(t *testing.T) {
-		_, err := ListAllPages(context.Background(), func(_ context.Context, _, _ int) ([]string, bool, error) {
+		_, err := ListAllPages(context.Background(), 100, func(_ context.Context, _, _ int) ([]string, bool, error) {
 			return nil, false, fmt.Errorf("fetch error")
 		})
 		if err == nil || err.Error() != "fetch error" {
@@ -74,7 +74,7 @@ func TestListAllPages(t *testing.T) {
 	})
 
 	t.Run("error on second page", func(t *testing.T) {
-		_, err := ListAllPages(context.Background(), func(_ context.Context, page, _ int) ([]string, bool, error) {
+		_, err := ListAllPages(context.Background(), 100, func(_ context.Context, page, _ int) ([]string, bool, error) {
 			if page == 0 {
 				return []string{"a"}, true, nil
 			}
@@ -87,7 +87,7 @@ func TestListAllPages(t *testing.T) {
 
 	t.Run("hasMore true but empty results stops", func(t *testing.T) {
 		calls := 0
-		items, err := ListAllPages(context.Background(), func(_ context.Context, _, _ int) ([]string, bool, error) {
+		items, err := ListAllPages(context.Background(), 100, func(_ context.Context, _, _ int) ([]string, bool, error) {
 			calls++
 			if calls == 1 {
 				return []string{"a"}, true, nil
