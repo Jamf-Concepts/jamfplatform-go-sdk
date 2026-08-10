@@ -12,8 +12,31 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 // (HasStatus/Details/FieldErrors/Summary) rather than string-matching
 // the Error() output. Non-HTTP errors (denylist refusal, context
 // cancellation, IO failures, etc.) surface as plain wrapped errors —
-// format them with err.Error().
+// format them with err.Error(), except for ErrUnexpectedResponse below.
 type APIResponseError = client.APIResponseError
+
+// ErrUnexpectedResponse reports that an endpoint answered with a non-JSON body
+// where JSON was expected — typically an HTML error page served by an edge proxy
+// or WAF, or by an IP allowlist rejecting the caller. Currently raised on the
+// OAuth token exchange, which is where such a block surfaces first.
+//
+// The only sentinel the SDK exposes, and the only error worth matching with
+// errors.Is; everything else is *APIResponseError. It exists because the
+// condition is inferred from the shape of the body rather than reported by Jamf,
+// and because acting on it means doing something extra rather than just
+// rendering a message:
+//
+//	if errors.Is(err, jamfplatform.ErrUnexpectedResponse) {
+//		// Not a credential problem. Report the host's egress IP and a
+//		// timestamp so Jamf Support can find the block.
+//	}
+//
+// A rejected credential returns JSON (401 invalid_client) and never carries this
+// sentinel, so the two causes stay distinguishable — they need opposite remedies.
+//
+// Named to match jamfprotect-go-sdk so provider code ports unchanged when the
+// Protect resources move into terraform-provider-jamfplatform.
+var ErrUnexpectedResponse = client.ErrUnexpectedResponse
 
 // ErrorDetail is a single structured error entry parsed from an API response
 // body. Consumers receive these via APIResponseError.Details() or

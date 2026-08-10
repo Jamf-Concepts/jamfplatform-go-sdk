@@ -302,14 +302,18 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 	}
 	hoistInlineObjects(doc, spec.Format)
 
-	methods, err := extractMethods(doc, spec)
+	// Only generate schemas that are actually referenced by the whitelisted operations
+	// and haven't already been emitted by a previous spec. Collected before the
+	// methods so their parameter docs can point at the enum types this set will
+	// produce; the pkg-level dedup below is applied after that read, since a
+	// type another spec already emitted is still present in the package.
+	referencedSchemas := collectReferencedSchemas(doc, spec)
+
+	methods, err := extractMethods(doc, spec, namedEnumTypes(doc, referencedSchemas))
 	if err != nil {
 		return err
 	}
 
-	// Only generate schemas that are actually referenced by the whitelisted operations
-	// and haven't already been emitted by a previous spec.
-	referencedSchemas := collectReferencedSchemas(doc, spec)
 	for name := range referencedSchemas {
 		if emittedTypes[name] {
 			delete(referencedSchemas, name)
@@ -453,13 +457,16 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
 		}
 		spec := ls.spec
-		methods, err := extractMethods(doc, spec)
+		// Collected before the methods so their parameter docs can point at the
+		// enum types this set will produce (see processSpec).
+		refs := collectReferencedSchemas(doc, spec)
+
+		methods, err := extractMethods(doc, spec, namedEnumTypes(doc, refs))
 		if err != nil {
 			return fmt.Errorf("spec %s: %w", spec.File, err)
 		}
 		allSpecs = append(allSpecs, specWithMethods{spec: spec, methods: methods, baseName: spec.baseName()})
 
-		refs := collectReferencedSchemas(doc, spec)
 		for name := range refs {
 			if pkgEmitted[name] {
 				delete(refs, name)
@@ -506,8 +513,12 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		return err
 	}
 
-	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
+	structTypes, enumTypeDecls := partitionEnumTypes(allTypes)
+	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: structTypes}
 	if err := emitTemplated(sourceTmpl, typesGF, filepath.Join(pkgDir, "types.go")); err != nil {
+		return err
+	}
+	if err := emitPkgEnums(pkgDir, cfg, goPkgName, pkgFormat, enumTypeDecls); err != nil {
 		return err
 	}
 
@@ -609,14 +620,53 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 		}
 	}
 
-	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: allTypes}
+	structTypes, enumTypeDecls := partitionEnumTypes(allTypes)
+	typesGF := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: structTypes}
 	if err := emitTemplated(sourceTmpl, typesGF, filepath.Join(pkgDir, "types.go")); err != nil {
+		return err
+	}
+	if err := emitPkgEnums(pkgDir, cfg, goPkgName, pkgFormat, enumTypeDecls); err != nil {
 		return err
 	}
 	if err := emitTypesOnlyTest(pkgDir, goPkgName, allTypes); err != nil {
 		return err
 	}
 	return nil
+}
+
+// partitionEnumTypes splits emitted declarations into the structs and scalar
+// aliases that belong in types.go, and the string enums that get their own
+// file. Order within each partition is preserved so output stays stable.
+//
+// Enums are separated because the set is about to grow well past the handful
+// of spec-named ones: every property-level enum produces a type too, and those
+// have no struct to sit beside. One file for all of them beats scattering some
+// next to an alias and leaving the rest floating in types.go.
+func partitionEnumTypes(types []GoType) (structs, enums []GoType) {
+	for _, t := range types {
+		if len(t.EnumValues) > 0 {
+			enums = append(enums, t)
+			continue
+		}
+		structs = append(structs, t)
+	}
+	return structs, enums
+}
+
+// emitPkgEnums writes enums.go: every string-enum type in the package with its
+// constants. Writes nothing when the package has no enums, and removes a stale
+// file if a spec change drops the last one — a leftover enums.go would keep
+// declaring types no spec backs any more.
+func emitPkgEnums(pkgDir string, cfg Config, goPkgName, pkgFormat string, enums []GoType) error {
+	outPath := filepath.Join(pkgDir, "enums.go")
+	if len(enums) == 0 {
+		if err := os.Remove(outPath); err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("removing stale enums.go: %w", err)
+		}
+		return nil
+	}
+	gf := GeneratedFile{Package: goPkgName, Module: cfg.Module, Format: pkgFormat, Types: enums}
+	return emitTemplated(sourceTmpl, gf, outPath)
 }
 
 // emitTypesOnlyTest writes a types_test.go file with JSON round-trip tests
@@ -913,7 +963,166 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 // and leading/trailing whitespace inside string values is trimmed.
 // Byte-identical round-trips are impossible by design; consumers must
 // compare payloads structurally, never byte-wise.
+//
+// Line breaks inside string values are their own wire law (wire-verified
+// 2026-08-03, Jamf Pro 11.30.2, both profile endpoints; rendering confirmed
+// on macOS 26.6):
+//
+//   - Literal LF and TAB are DELETED outright — not collapsed to a space,
+//     so the words either side merge — for every payload type the server
+//     stores verbatim and for every slot outside the PayloadContent array
+//     (e.g. the top-level ConsentText dictionary). MCX custom settings,
+//     com.apple.notificationsettings and com.apple.systempolicy.control
+//     keep them.
+//   - CR survives everywhere, which is why this type preserves CR
+//     references rather than decoding them, and why Jamf Pro's own UI emits
+//     `+"`&#13;`"+` for login-window banner line breaks.
+//   - U+2028, U+2029 and U+0085 also survive every slot untouched and
+//     render as line breaks, so they need no special handling here.
+//
+// Astral-plane characters (non-BMP, e.g. emoji) are a separate server
+// defect no client can work around: verbatim slots store two U+FFFD
+// replacement characters in their place, and an MCX payload drops its
+// entire mcx_preference_settings dictionary — taking untouched sibling keys
+// with it. macOS itself handles them correctly, so consumers should surface
+// this as a server-side failure rather than retry.
 type PayloadsXMLText string
+
+// minimizePlistSourceEscaping decodes every character/entity reference in
+// plist XML source EXCEPT those encoding `+"`&`"+`, `+"`<`"+` and carriage
+// return — i.e. `+"`&quot;`"+`/`+"`&#34;`"+` become literal `+"`\"`"+`,
+// `+"`&#xA;`"+` a literal newline, `+"`&gt;`"+` a literal `+"`>`"+`, and so on.
+// The parsed document is unchanged (both representations decode to identical
+// values), but the representation matters on the wire: the server stores
+// verbatim-category payload fragments with zero decodes, so every avoidable
+// entity in the source surfaces as literal text in stored values.
+// Serialisers built on encoding/xml (howett.net/plist — used by consumers
+// that re-serialise payloads before sending, e.g. UUID injection) escape
+// `+"`\"`"+` `+"`'`"+` and value newlines/tabs numerically, which corrupted TCC
+// CodeRequirement strings on update until normalised here.
+//
+// Three classes must survive undecoded:
+//
+//   - `+"`&amp;`"+`/`+"`&lt;`"+` (and their numeric forms): decoding them would
+//     make the plist source invalid XML.
+//   - Carriage-return references (`+"`&#13;`"+`, `+"`&#xD;`"+`, zero-padded and
+//     case variants): CR is the ONLY whitespace character Jamf Pro stores
+//     inside string values — literal LF and TAB are deleted outright — and
+//     XML 1.0 §2.11 line-end normalisation converts a literal CR to LF in
+//     transit, so a reference is the only way to transmit one. Decoding
+//     these turned a Jamf-authored multi-line value (its own UI emits
+//     `+"`&#13;`"+` for banner line breaks) into content the server then
+//     destroyed. Wire-verified 2026-08-03 against Jamf Pro 11.30.2 on both
+//     osxconfigurationprofiles and mobiledeviceconfigurationprofiles;
+//     rendering confirmed on macOS 26.6.
+//
+// A literal CR byte in the source is deliberately NOT re-encoded: per XML
+// 1.0 §2.11 it already means LF, so promoting it to a CR reference would
+// change the value.
+func minimizePlistSourceEscaping(s string) string {
+	var b strings.Builder
+	for i := 0; i < len(s); {
+		c := s[i]
+		if c != '&' {
+			b.WriteByte(c)
+			i++
+			continue
+		}
+		semi := strings.IndexByte(s[i:], ';')
+		if semi < 0 || semi > 12 {
+			b.WriteByte(c)
+			i++
+			continue
+		}
+		ref := s[i+1 : i+semi]
+		var r rune = -1
+		switch {
+		case ref == "quot":
+			r = '"'
+		case ref == "apos":
+			r = '\''
+		case ref == "gt":
+			r = '>'
+		case strings.HasPrefix(ref, "#x") || strings.HasPrefix(ref, "#X"):
+			if n, err := strconv.ParseInt(ref[2:], 16, 32); err == nil {
+				r = rune(n)
+			}
+		case strings.HasPrefix(ref, "#"):
+			if n, err := strconv.ParseInt(ref[1:], 10, 32); err == nil {
+				r = rune(n)
+			}
+		}
+		if r < 0 || r == '&' || r == '<' || r == '\r' {
+			b.WriteString(s[i : i+semi+1])
+		} else {
+			b.WriteRune(r)
+		}
+		i += semi + 1
+	}
+	return b.String()
+}
+
+// crRefLen reports the byte length of a carriage-return character reference
+// at the start of s — `+"`&#13;`"+`, `+"`&#xD;`"+` and their zero-padded and
+// case variants — or 0 when s does not start with one. Named references are
+// not considered: XML 1.0 predefines none for CR.
+func crRefLen(s string) int {
+	if !strings.HasPrefix(s, "&#") {
+		return 0
+	}
+	semi := strings.IndexByte(s, ';')
+	if semi < 0 || semi > 12 {
+		return 0
+	}
+	ref := s[2:semi]
+	if ref == "" {
+		return 0
+	}
+	var (
+		n   int64
+		err error
+	)
+	if ref[0] == 'x' || ref[0] == 'X' {
+		n, err = strconv.ParseInt(ref[1:], 16, 32)
+	} else {
+		n, err = strconv.ParseInt(ref, 10, 32)
+	}
+	if err != nil || n != int64('\r') {
+		return 0
+	}
+	return semi + 1
+}
+
+// escapeAmpPreservingCRRefs escapes every `+"`&`"+` once so the server's
+// single entity-decode restores the minimal source — except the `+"`&`"+` that
+// opens a carriage-return reference, which is emitted bare so the decode
+// yields an actual CR.
+//
+// Escaping those too stores the reference as literal text (the PI-827 extra
+// entity layer), so a device would display `+"`&#13;`"+` instead of breaking
+// the line. Leaving the reference bare is safe against the server's
+// bare-`+"`&`"+`/`+"`<`"+` rejection because it decodes to CR, not to `+"`&`"+`
+// — wire-verified 2026-08-03, Jamf Pro 11.30.2. Preserving other numeric
+// references is NOT safe and must not be generalised: `+"`&#38;`"+` decodes to
+// a bare `+"`&`"+` and the server rejects the write with 409.
+func escapeAmpPreservingCRRefs(s string) string {
+	var b strings.Builder
+	for i := 0; i < len(s); {
+		if s[i] != '&' {
+			b.WriteByte(s[i])
+			i++
+			continue
+		}
+		if n := crRefLen(s[i:]); n > 0 {
+			b.WriteString(s[i : i+n])
+			i += n
+			continue
+		}
+		b.WriteString("&amp;")
+		i++
+	}
+	return b.String()
+}
 
 // stripPayloadCDATASections rewrites every <![CDATA[...]]> section in a
 // plist as equivalent escaped character data. The parsed document is
@@ -945,18 +1154,24 @@ func stripPayloadCDATASections(s string) string {
 	return b.String()
 }
 
-// MarshalXML emits the plist as a single CDATA section with embedded
-// CDATA sections rewritten as escaped character data, any remaining
-// `+"`]]>`"+` entity-guarded, and every `+"`&`"+` escaped once — the one wire
-// form the Classic API stores byte-exact (see the type comment). The
-// innerxml field is used because xml.Encoder has no raw-CDATA API.
+// MarshalXML emits the plist as a single CDATA section: embedded CDATA
+// sections rewritten as escaped character data, source escaping minimised
+// (see minimizePlistSourceEscaping — avoidable entities become literal
+// text in verbatim-stored values otherwise), any `+"`]]>`"+` entity-guarded,
+// and every `+"`&`"+` escaped once apart from carriage-return references (see
+// escapeAmpPreservingCRRefs). The innerxml field is used because
+// xml.Encoder has no raw-CDATA API. Ordering is load-bearing: CDATA
+// sections must be rewritten before minimising (their content is literal
+// text whose references must NOT be decoded), and the `+"`]]>`"+` guard must
+// follow minimising (decoding `+"`&gt;`"+` can resurrect the terminator).
 func (p PayloadsXMLText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	s := string(p)
 	if strings.Contains(s, "]]>") {
 		s = stripPayloadCDATASections(s)
-		s = strings.ReplaceAll(s, "]]>", "]]&gt;")
 	}
-	s = strings.ReplaceAll(s, "&", "&amp;")
+	s = minimizePlistSourceEscaping(s)
+	s = strings.ReplaceAll(s, "]]>", "]]&gt;")
+	s = escapeAmpPreservingCRRefs(s)
 	return e.EncodeElement(struct {
 		S string `+"`xml:\",innerxml\"`"+`
 	}{S: "<![CDATA[" + s + "]]>"}, start)
@@ -1054,23 +1269,111 @@ func serverIngest(inner string) string {
 	return strings.ReplaceAll(inner, "&amp;", "&")
 }
 
-func TestPayloadsXMLText_ServerDecodeRestoresPlistExactly(t *testing.T) {
+func TestPayloadsXMLText_ServerDecodeRestoresMinimalSource(t *testing.T) {
 	// The marshalled form must be exactly one escape layer above the
-	// plist bytes: the server's single decode restores them byte-exact.
-	// Covers every reserved character in every legal representation.
+	// minimal-escaping plist source: the server's single decode restores
+	// that source, which parses to the same values as the input. Covers
+	// every reserved character in every legal representation.
 	plists := []string{
 		"<string>R&amp;D</string>",
 		"<string>a &lt; b &gt; c</string>",
 		"<string>A &#38; B &#x26; C</string>",
 		"<string>x > y</string>",
 		%s<string>q " q and p ' p</string>%s,
+		"<string>q &quot; q and p &#39; p and tab&#9;end</string>",
 		"<string>literal &amp;amp; entity text</string>",
 		"<string>target.signing_time >= timestamp('2025-05-31T00:00:00Z') &amp;&amp; ok</string>",
 		%sidentifier "com.foo" and anchor apple generic%s,
+		%sidentifier &#34;com.foo&#34; and anchor apple generic%s,
+		"<string>ALPHA&#13;BRAVO</string>",
+		"<string>ALPHA&#xD;BRAVO and R&amp;D</string>",
 	}
 	for _, p := range plists {
-		if got := serverIngest(marshalPayloads(t, p)); got != p {
-			t.Fatalf("server would store %%q, want %%q", got, p)
+		want := strings.ReplaceAll(minimizePlistSourceEscaping(p), "]]>", "]]&gt;")
+		if got := serverIngest(marshalPayloads(t, p)); got != want {
+			t.Fatalf("server would store %%q, want %%q", got, want)
+		}
+	}
+}
+
+func TestPayloadsXMLText_MinimizeSourceEscaping(t *testing.T) {
+	// Avoidable references decode to literal characters; the references
+	// encoding %s and %s (named or numeric) must survive untouched, as
+	// must non-reference ampersands, unknown entities, and every form of
+	// carriage-return reference (the one whitespace character Jamf Pro
+	// stores, unreachable as a literal because XML normalises it to LF).
+	cases := map[string]string{
+		"&#13;":         "&#13;",
+		"&#013;":        "&#013;",
+		"&#xD;":         "&#xD;",
+		"&#x0d;":        "&#x0d;",
+		"&quot;":        %s"%s,
+		"&#34;":         %s"%s,
+		"&#x22;":        %s"%s,
+		"&apos;":        "'",
+		"&#39;":         "'",
+		"&gt;":          ">",
+		"&#62;":         ">",
+		"&#xA;":         "\n",
+		"&#9;":          "\t",
+		"&amp;":         "&amp;",
+		"&lt;":          "&lt;",
+		"&#38;":         "&#38;",
+		"&#x26;":        "&#x26;",
+		"&#60;":         "&#60;",
+		"&#x3C;":        "&#x3C;",
+		"&bogus;":       "&bogus;",
+		"A & B; C":      "A & B; C",
+		"&amp;#34;":     "&amp;#34;",
+		"a]]&gt;b":      "a]]>b",
+	}
+	for in, want := range cases {
+		if got := minimizePlistSourceEscaping(in); got != want {
+			t.Fatalf("minimize(%%q) = %%q, want %%q", in, got, want)
+		}
+	}
+}
+
+func TestPayloadsXMLText_CRReferencesReachServerBare(t *testing.T) {
+	// A carriage-return reference must reach the server AS a reference,
+	// ampersand unescaped, so its single decode yields an actual CR. Jamf
+	// Pro deletes literal LF/TAB from verbatim-stored values and XML
+	// line-end normalisation would turn a literal CR into LF in transit, so
+	// this is the only representation of a line break that survives — and
+	// the one Jamf Pro's own UI emits for login-window banners.
+	for _, ref := range []string{"&#13;", "&#013;", "&#xD;", "&#x0d;"} {
+		inner := marshalPayloads(t, "<string>ALPHA"+ref+"BRAVO</string>")
+		if want := "<string>ALPHA" + ref + "BRAVO</string>"; inner != want {
+			t.Fatalf("wire form %%q, want %%q", inner, want)
+		}
+		if strings.Contains(inner, "&amp;") {
+			t.Fatalf("CR reference %%q was escaped — the server would store it as literal text: %%s", ref, inner)
+		}
+	}
+}
+
+func TestPayloadsXMLText_OnlyCRReferencesLeftBare(t *testing.T) {
+	// The exemption must NOT generalise to other numeric references: the
+	// numeric ampersand decodes to a bare ampersand, which the server
+	// rejects with 409, and preserved quote references store as literal
+	// text (wire-verified 2026-08-03). Everything but
+	// CR therefore stays escaped once (or, when it decodes to a harmless
+	// literal, arrives as that literal with no ampersand at all).
+	cases := map[string]string{
+		"&#38;":  "&amp;#38;",
+		"&#x26;": "&amp;#x26;",
+		"&#60;":  "&amp;#60;",
+		"&#x3C;": "&amp;#x3C;",
+		"&amp;":  "&amp;amp;",
+		"&lt;":   "&amp;lt;",
+		"&#39;":  "'",
+		"&#9;":   "\t",
+		"&#xA;":  "\n",
+	}
+	for in, want := range cases {
+		inner := marshalPayloads(t, "<string>ALPHA"+in+"BRAVO</string>")
+		if got := "<string>ALPHA" + want + "BRAVO</string>"; inner != got {
+			t.Fatalf("marshal(%%q) wire form = %%q, want %%q", in, inner, got)
 		}
 	}
 }
@@ -1129,6 +1432,11 @@ func TestPayloadsXMLText_NilOmitsField(t *testing.T) {
 }
 `, pkgName, "`", "`", "`", "`",
 		"`&`", "`&amp;`",
+		"`", "`",
+		"`", "`",
+		"`", "`",
+		"`&`", "`<`",
+		"`", "`",
 		"`", "`",
 		"`", "`")
 	outPath := filepath.Join(pkgDir, "xml_helpers_test.go")
@@ -2182,8 +2490,31 @@ import "%s/internal/client"
 // (HasStatus/Details/FieldErrors/Summary) rather than string-matching
 // the Error() output. Non-HTTP errors (denylist refusal, context
 // cancellation, IO failures, etc.) surface as plain wrapped errors —
-// format them with err.Error().
+// format them with err.Error(), except for ErrUnexpectedResponse below.
 type APIResponseError = client.APIResponseError
+
+// ErrUnexpectedResponse reports that an endpoint answered with a non-JSON body
+// where JSON was expected — typically an HTML error page served by an edge proxy
+// or WAF, or by an IP allowlist rejecting the caller. Currently raised on the
+// OAuth token exchange, which is where such a block surfaces first.
+//
+// The only sentinel the SDK exposes, and the only error worth matching with
+// errors.Is; everything else is *APIResponseError. It exists because the
+// condition is inferred from the shape of the body rather than reported by Jamf,
+// and because acting on it means doing something extra rather than just
+// rendering a message:
+//
+//	if errors.Is(err, jamfplatform.ErrUnexpectedResponse) {
+//		// Not a credential problem. Report the host's egress IP and a
+//		// timestamp so Jamf Support can find the block.
+//	}
+//
+// A rejected credential returns JSON (401 invalid_client) and never carries this
+// sentinel, so the two causes stay distinguishable — they need opposite remedies.
+//
+// Named to match jamfprotect-go-sdk so provider code ports unchanged when the
+// Protect resources move into terraform-provider-jamfplatform.
+var ErrUnexpectedResponse = client.ErrUnexpectedResponse
 
 // ErrorDetail is a single structured error entry parsed from an API response
 // body. Consumers receive these via APIResponseError.Details() or

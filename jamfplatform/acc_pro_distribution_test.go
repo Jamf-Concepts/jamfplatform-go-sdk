@@ -319,7 +319,7 @@ func TestAcceptance_Pro_Distribution_DistributionPointCRUDV1(t *testing.T) {
 	ipAddress := "dp.example.invalid"
 	created, err := p.CreateDistributionPointV1(ctx, &pro.DistributionPoint{
 		Name:                      name,
-		FileSharingConnectionType: "AFP",
+		FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeAfp,
 		ServerName:                ipAddress,
 		ShareName:                 &shareName,
 		ReadWriteUsername:         &readWriteUser,
@@ -411,7 +411,7 @@ func TestAcceptance_Pro_Distribution_DeleteMultipleDistributionPointsV1(t *testi
 		name := "sdk-acc-dp-bulk-" + suffix + "-" + tag
 		resp, err := p.CreateDistributionPointV1(ctx, &pro.DistributionPoint{
 			Name:                      name,
-			FileSharingConnectionType: "AFP",
+			FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeAfp,
 			ServerName:                ipAddress,
 			ShareName:                 &shareName,
 		})

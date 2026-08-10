@@ -15,6 +15,14 @@ import (
 // UploadFileByResourceIDTypeID creates file attachments in Jamf Pro.
 //
 // Required privileges: create:pro:file-uploads.
+//
+// Parameters:
+//   - resource: Resource to attach the file to.
+//     Allowed values: "computers", "mobiledevices", "enrollmentprofiles", "printers", "peripherals",
+//     "policies", "ebooks", "mobiledeviceapplicationsicon", "mobiledeviceapplicationsipa",
+//     "diskencryptionconfigurations".
+//   - idType: Name is supported for all but the peripherals resource.
+//     Allowed values: "id", "name".
 func (c *Client) UploadFileByResourceIDTypeID(ctx context.Context, resource string, idType string, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/fileuploads/%s/%s/%s", prefix, url.PathEscape(resource), url.PathEscape(idType), url.PathEscape(id))

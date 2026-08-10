@@ -15,6 +15,9 @@ import (
 // CheckInDevice request a device check in.
 //
 // Required privileges: execute:pro:device-actions.
+//
+// Parameters:
+//   - id: The ID of the device, in UUID format.
 func (c *Client) CheckInDevice(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s/check-in", prefix, url.PathEscape(id))
@@ -27,6 +30,9 @@ func (c *Client) CheckInDevice(ctx context.Context, id string) error {
 // EraseDevice erase a device.
 //
 // Required privileges: execute:pro:device-actions.
+//
+// Parameters:
+//   - id: The ID of the device, in UUID format.
 func (c *Client) EraseDevice(ctx context.Context, id string, request *EraseDeviceRequest) ([]DeviceCommandResponse, error) {
 	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
@@ -40,6 +46,9 @@ func (c *Client) EraseDevice(ctx context.Context, id string, request *EraseDevic
 // RestartDevice restart a device.
 //
 // Required privileges: execute:pro:device-actions.
+//
+// Parameters:
+//   - id: The ID of the device, in UUID format.
 func (c *Client) RestartDevice(ctx context.Context, id string) ([]DeviceCommandResponse, error) {
 	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
@@ -53,6 +62,9 @@ func (c *Client) RestartDevice(ctx context.Context, id string) ([]DeviceCommandR
 // ShutdownDevice shut down a device.
 //
 // Required privileges: execute:pro:device-actions.
+//
+// Parameters:
+//   - id: The ID of the device, in UUID format.
 func (c *Client) ShutdownDevice(ctx context.Context, id string) ([]DeviceCommandResponse, error) {
 	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
@@ -66,6 +78,9 @@ func (c *Client) ShutdownDevice(ctx context.Context, id string) ([]DeviceCommand
 // UnmanageDevice unmanage a device.
 //
 // Required privileges: execute:pro:device-actions.
+//
+// Parameters:
+//   - id: The ID of the device, in UUID format.
 func (c *Client) UnmanageDevice(ctx context.Context, id string) ([]DeviceCommandResponse, error) {
 	prefix := c.transport.TenantPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse

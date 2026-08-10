@@ -411,21 +411,21 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 				AutomaticActions: &blueprints.AutomaticActions{
 					Download: &blueprints.AutomaticAction{
 						Included: &boolTrue,
-						Value:    "AlwaysOn",
+						Value:    blueprints.AutomaticActionValueAlwaysOn,
 					},
 					InstallOSUpdates: &blueprints.AutomaticAction{
 						Included: &boolTrue,
-						Value:    "AlwaysOn",
+						Value:    blueprints.AutomaticActionValueAlwaysOn,
 					},
 					InstallSecurityUpdate: &blueprints.AutomaticAction{
 						Included: &boolTrue,
-						Value:    "AlwaysOn",
+						Value:    blueprints.AutomaticActionValueAlwaysOn,
 					},
 				},
 				Beta: &blueprints.Beta{
 					Included: &boolTrue,
 					Value: &blueprints.BetaSettings{
-						ProgramEnrollment: "Allowed",
+						ProgramEnrollment: blueprints.BetaSettingsProgramEnrollmentAllowed,
 						OfferPrograms: &[]blueprints.BetaProgram{
 							{Token: strPtr("test"), Description: strPtr("test")},
 						},
@@ -447,7 +447,7 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 				},
 				RecommendedCadence: &blueprints.RecommendedCadence{
 					Included: &boolTrue,
-					Value:    "Newest",
+					Value:    blueprints.RecommendedCadenceValueNewest,
 				},
 			},
 		},
@@ -521,7 +521,7 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 					Disabled: &boolFalse,
 					Configuration: &blueprints.TemporaryPairingConfig{
 						UnpairingTime: blueprints.UnpairingTime{
-							Policy: "Hour",
+							Policy: blueprints.UnpairingTimePolicyHour,
 							Hour:   &unpairingHour,
 						},
 					},

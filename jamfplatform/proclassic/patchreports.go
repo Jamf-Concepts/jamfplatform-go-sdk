@@ -17,6 +17,9 @@ import (
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: Patch software title id to filter by.
 func (c *Client) GetPatchReportByPatchSoftwareTitleID(ctx context.Context, id string) (*PatchReport, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchReport
@@ -32,6 +35,10 @@ func (c *Client) GetPatchReportByPatchSoftwareTitleID(ctx context.Context, id st
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: read:pro:patch-management-software-titles.
+//
+// Parameters:
+//   - id: Patch software title ID to filter by.
+//   - version: Version number to filter by.
 func (c *Client) GetPatchReportByTitleIDVersion(ctx context.Context, id string, version string) (*PatchReport, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result PatchReport

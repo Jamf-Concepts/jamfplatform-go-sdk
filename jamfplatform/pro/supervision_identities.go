@@ -20,6 +20,10 @@ import (
 // ListSupervisionIdentitiesV1 search for sorted and paged Supervision Identities.
 //
 // Required privileges: read:pro:apple-configurator-enrollment. Legacy Jamf Pro privilege name(s): Read Apple Configurator Enrollment.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
+//     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListSupervisionIdentitiesV1(ctx context.Context, sort []string) ([]SupervisionIdentity, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SupervisionIdentity, bool, error) {
@@ -62,6 +66,9 @@ func (c *Client) CreateSupervisionIdentityV1(ctx context.Context, request *Super
 // GetSupervisionIdentityV1 retrieve a Supervision Identity with the supplied id.
 //
 // Required privileges: read:pro:apple-configurator-enrollment. Legacy Jamf Pro privilege name(s): Read Apple Configurator Enrollment.
+//
+// Parameters:
+//   - id: Supervision Identity identifier.
 func (c *Client) GetSupervisionIdentityV1(ctx context.Context, id string) (*SupervisionIdentity, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SupervisionIdentity
@@ -75,6 +82,9 @@ func (c *Client) GetSupervisionIdentityV1(ctx context.Context, id string) (*Supe
 // UpdateSupervisionIdentityV1 update a Supervision Identity with the supplied information.
 //
 // Required privileges: update:pro:apple-configurator-enrollment. Legacy Jamf Pro privilege name(s): Update Apple Configurator Enrollment.
+//
+// Parameters:
+//   - id: Supervision Identity identifier.
 func (c *Client) UpdateSupervisionIdentityV1(ctx context.Context, id string, request *SupervisionIdentityUpdate) (*SupervisionIdentity, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result SupervisionIdentity
@@ -88,6 +98,9 @@ func (c *Client) UpdateSupervisionIdentityV1(ctx context.Context, id string, req
 // DeleteSupervisionIdentityV1 delete a Supervision Identity with the supplied id.
 //
 // Required privileges: update:pro:apple-configurator-enrollment. Legacy Jamf Pro privilege name(s): Update Apple Configurator Enrollment.
+//
+// Parameters:
+//   - id: Supervision Identity identifier.
 func (c *Client) DeleteSupervisionIdentityV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/supervision-identities/%s", prefix, url.PathEscape(id))
@@ -100,6 +113,9 @@ func (c *Client) DeleteSupervisionIdentityV1(ctx context.Context, id string) err
 // DownloadSupervisionIdentityV1 download the Supervision Identity .p12 file.
 //
 // Required privileges: read:pro:apple-configurator-enrollment. Legacy Jamf Pro privilege name(s): Read Apple Configurator Enrollment.
+//
+// Parameters:
+//   - id: Supervision Identity identifier.
 func (c *Client) DownloadSupervisionIdentityV1(ctx context.Context, id string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte

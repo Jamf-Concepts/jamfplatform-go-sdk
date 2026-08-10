@@ -29,6 +29,9 @@ func (c *Client) UpdateMdmRenewalDeviceCommonDetailsV1(ctx context.Context, requ
 //
 // Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - clientManagementID: The client management ID to retrieve device common details for.
 func (c *Client) GetMdmRenewalDeviceCommonDetailsV1(ctx context.Context, clientManagementID string) (*DeviceCommonDetails, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DeviceCommonDetails
@@ -43,6 +46,9 @@ func (c *Client) GetMdmRenewalDeviceCommonDetailsV1(ctx context.Context, clientM
 //
 // Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - clientManagementID: The client management ID to retrieve renewal strategies for.
 func (c *Client) GetMdmRenewalStrategiesV1(ctx context.Context, clientManagementID string) ([]MDMRenewalErrorStrategiesResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []MDMRenewalErrorStrategiesResponse
@@ -57,6 +63,9 @@ func (c *Client) GetMdmRenewalStrategiesV1(ctx context.Context, clientManagement
 //
 // Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - clientManagementID: The client management ID to delete renewal strategies for.
 func (c *Client) DeleteMdmRenewalStrategiesV1(ctx context.Context, clientManagementID string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mdm-renewal/renewal-strategies/%s", prefix, url.PathEscape(clientManagementID))

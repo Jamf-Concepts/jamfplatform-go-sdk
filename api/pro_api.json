@@ -2257,6 +2257,16 @@
         },
         "type": "object"
       },
+      "CancelEnhancedLogCollectionCommand": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MdmCommandBase"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
       "CategoriesSearchResults": {
         "properties": {
           "results": {
@@ -4815,6 +4825,109 @@
         ],
         "type": "object"
       },
+      "ComputerGeneralCreateV4": {
+        "properties": {
+          "assetTag": {
+            "example": "304822",
+            "type": "string"
+          },
+          "barcode1": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "barcode2": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "declarativeDeviceManagementEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "distributionPointId": {
+            "example": "1",
+            "type": "string"
+          },
+          "enrolledViaAutomatedDeviceEnrollment": {
+            "example": true,
+            "type": "boolean"
+          },
+          "itunesStoreAccountActive": {
+            "example": true,
+            "type": "boolean"
+          },
+          "jamfBinaryVersion": {
+            "example": "9.27",
+            "type": "string"
+          },
+          "lastCheckIn": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastCloudBackupDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastContact": {
+            "description": "The most recent time the device communicated with Jamf Pro via any channel\n(binary check-in, MDM ack, or DDM status report).\n",
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastEnrolledDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastIpAddress": {
+            "example": "247.185.82.186",
+            "type": "string"
+          },
+          "mdmCapable": {
+            "example": true,
+            "type": "boolean"
+          },
+          "name": {
+            "example": "Boalime",
+            "minLength": 1,
+            "type": "string"
+          },
+          "platform": {
+            "enum": [
+              "WINDOWS",
+              "MAC",
+              "NONE"
+            ],
+            "example": "MAC",
+            "type": "string"
+          },
+          "remoteManagement": {
+            "$ref": "#/components/schemas/ComputerRemoteManagementCreate"
+          },
+          "reportDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "type": "string"
+          },
+          "supervised": {
+            "example": true,
+            "type": "boolean"
+          },
+          "userApprovedMdm": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "ComputerGeneralUpdate": {
         "properties": {
           "assetTag": {
@@ -4850,6 +4963,164 @@
           "siteId": {
             "example": "1",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerGeneralV4": {
+        "properties": {
+          "assetTag": {
+            "example": "304822",
+            "type": "string"
+          },
+          "barcode1": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "barcode2": {
+            "example": "5 12345 678900",
+            "type": "string"
+          },
+          "declarativeDeviceManagementEnabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "distributionPoint": {
+            "example": "distribution point name",
+            "type": "string"
+          },
+          "enrolledViaAutomatedDeviceEnrollment": {
+            "example": true,
+            "type": "boolean"
+          },
+          "enrollmentMethod": {
+            "$ref": "#/components/schemas/EnrollmentMethod"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "initialEntryDate": {
+            "example": "2018-10-31",
+            "format": "date",
+            "type": "string"
+          },
+          "itunesStoreAccountActive": {
+            "example": true,
+            "type": "boolean"
+          },
+          "jamfBinaryVersion": {
+            "example": "9.27",
+            "type": "string"
+          },
+          "lastCheckIn": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastCloudBackupDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastContact": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastEnrolledDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastIpAddress": {
+            "example": "247.185.82.186",
+            "type": "string"
+          },
+          "lastLoggedInUsernameBinary": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastLoggedInUsernameBinaryTimestamp": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastLoggedInUsernameMdm": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastLoggedInUsernameMdmTimestamp": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastLoggedInUsernameSelfService": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastLoggedInUsernameSelfServiceTimestamp": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastReportedIpV4": {
+            "description": "Last reported IPv4 address",
+            "example": "247.185.82.186",
+            "type": "string"
+          },
+          "lastReportedIpV6": {
+            "example": "2001:0db8:85a3:0000:0000:8a2e:0370:7335",
+            "type": "string"
+          },
+          "managementId": {
+            "example": "73226fb6-61df-4c10-9552-eb9bc353d507",
+            "readOnly": true,
+            "type": "string"
+          },
+          "mdmCapable": {
+            "$ref": "#/components/schemas/ComputerMdmCapability"
+          },
+          "mdmProfileExpiration": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "example": "Boalime",
+            "minLength": 1,
+            "type": "string"
+          },
+          "platform": {
+            "example": "Mac",
+            "type": "string"
+          },
+          "remoteManagement": {
+            "$ref": "#/components/schemas/ComputerRemoteManagement"
+          },
+          "reportDate": {
+            "example": "2018-10-31T18:04:13Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "site": {
+            "$ref": "#/components/schemas/ComputerSite"
+          },
+          "supervised": {
+            "example": true,
+            "type": "boolean"
+          },
+          "userApprovedMdm": {
+            "example": true,
+            "type": "boolean"
           }
         },
         "type": "object"
@@ -5724,6 +5995,89 @@
         },
         "type": "object"
       },
+      "ComputerInventoryCreateRequestV4": {
+        "properties": {
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerApplicationCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerCertificateCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "configurationProfiles": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerConfigurationProfileCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "general": {
+            "$ref": "#/components/schemas/ComputerGeneralCreateV4"
+          },
+          "hardware": {
+            "$ref": "#/components/schemas/ComputerHardwareCreate"
+          },
+          "localUserAccounts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLocalUserAccountCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "operatingSystem": {
+            "$ref": "#/components/schemas/ComputerOperatingSystemCreate"
+          },
+          "packageReceipts": {
+            "$ref": "#/components/schemas/ComputerPackageReceiptsCreate"
+          },
+          "printers": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPrinterCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/ComputerPurchaseCreate"
+          },
+          "security": {
+            "$ref": "#/components/schemas/ComputerSecurityCreate"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerServiceCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "softwareUpdates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerSoftwareUpdateCreate"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/ComputerStorageCreate"
+          },
+          "udid": {
+            "example": "45436edf-864e-4364-982a-330b01d39e65",
+            "nullable": true,
+            "type": "string"
+          },
+          "userAndLocation": {
+            "$ref": "#/components/schemas/ComputerUserAndLocationCreate"
+          }
+        },
+        "type": "object"
+      },
       "ComputerInventoryDeviceLockPinResponse": {
         "properties": {
           "pin": {
@@ -5839,6 +6193,22 @@
           "results": {
             "items": {
               "$ref": "#/components/schemas/ComputerInventoryV3"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventorySearchResultsV4": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerInventoryV4"
             },
             "type": "array"
           },
@@ -6037,6 +6407,123 @@
           },
           "general": {
             "$ref": "#/components/schemas/ComputerGeneral"
+          },
+          "groupMemberships": {
+            "items": {
+              "$ref": "#/components/schemas/GroupMembership"
+            },
+            "type": "array"
+          },
+          "hardware": {
+            "$ref": "#/components/schemas/ComputerHardware"
+          },
+          "ibeacons": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerIbeacon"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "licensedSoftware": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLicensedSoftware"
+            },
+            "type": "array"
+          },
+          "localUserAccounts": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerLocalUserAccount"
+            },
+            "type": "array"
+          },
+          "operatingSystem": {
+            "$ref": "#/components/schemas/ComputerOperatingSystem"
+          },
+          "packageReceipts": {
+            "$ref": "#/components/schemas/ComputerPackageReceipts"
+          },
+          "printers": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerPrinter"
+            },
+            "type": "array"
+          },
+          "purchasing": {
+            "$ref": "#/components/schemas/ComputerPurchase"
+          },
+          "security": {
+            "$ref": "#/components/schemas/ComputerSecurity"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerService"
+            },
+            "type": "array"
+          },
+          "softwareUpdates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerSoftwareUpdate"
+            },
+            "type": "array"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/ComputerStorage"
+          },
+          "udid": {
+            "example": "123",
+            "type": "string"
+          },
+          "userAndLocation": {
+            "$ref": "#/components/schemas/ComputerUserAndLocation"
+          }
+        },
+        "type": "object"
+      },
+      "ComputerInventoryV4": {
+        "properties": {
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerApplicationV3"
+            },
+            "type": "array"
+          },
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerAttachment"
+            },
+            "type": "array"
+          },
+          "certificates": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerCertificate"
+            },
+            "type": "array"
+          },
+          "configurationProfiles": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerConfigurationProfile"
+            },
+            "type": "array"
+          },
+          "contentCaching": {
+            "$ref": "#/components/schemas/ComputerContentCaching"
+          },
+          "diskEncryption": {
+            "$ref": "#/components/schemas/ComputerDiskEncryption"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/ComputerExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "general": {
+            "$ref": "#/components/schemas/ComputerGeneralV4"
           },
           "groupMemberships": {
             "items": {
@@ -7123,6 +7610,34 @@
         "type": "string"
       },
       "ComputerSectionV3": {
+        "enum": [
+          "GENERAL",
+          "DISK_ENCRYPTION",
+          "PURCHASING",
+          "APPLICATIONS",
+          "STORAGE",
+          "USER_AND_LOCATION",
+          "CONFIGURATION_PROFILES",
+          "PRINTERS",
+          "SERVICES",
+          "HARDWARE",
+          "LOCAL_USER_ACCOUNTS",
+          "CERTIFICATES",
+          "ATTACHMENTS",
+          "PACKAGE_RECEIPTS",
+          "SECURITY",
+          "OPERATING_SYSTEM",
+          "LICENSED_SOFTWARE",
+          "IBEACONS",
+          "SOFTWARE_UPDATES",
+          "EXTENSION_ATTRIBUTES",
+          "CONTENT_CACHING",
+          "GROUP_MEMBERSHIPS"
+        ],
+        "example": "general",
+        "type": "string"
+      },
+      "ComputerSectionV4": {
         "enum": [
           "GENERAL",
           "DISK_ENCRYPTION",
@@ -12124,6 +12639,11 @@
             "format": "date-time",
             "type": "string"
           },
+          "lastContactDate": {
+            "example": "2022-10-17T11:48:56.307Z",
+            "format": "date-time",
+            "type": "string"
+          },
           "lastEnrolledDate": {
             "example": "2022-10-17T11:48:56.307Z",
             "format": "date-time",
@@ -12868,6 +13388,208 @@
         },
         "type": "object"
       },
+      "LapsAccountManagementHistory": {
+        "properties": {
+          "eventTime": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "eventType": {
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "VIEWED",
+              "ERROR",
+              "INVALID"
+            ],
+            "example": "VIEWED",
+            "type": "string"
+          },
+          "userSource": {
+            "enum": [
+              "MDM",
+              "JMF"
+            ],
+            "example": "MDM",
+            "type": "string"
+          },
+          "username": {
+            "example": "username",
+            "type": "string"
+          },
+          "viewedBy": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsAccountManagementHistoryResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsAccountManagementHistory"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsAuditV2": {
+        "properties": {
+          "dateSeen": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "viewedBy": {
+            "example": "admin",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsHistory": {
+        "properties": {
+          "createdDate": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "dateLastSeen": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "expirationTime": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "rotationStatus": {
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "VIEWED",
+              "ERROR",
+              "INVALID"
+            ],
+            "example": "PENDING",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsHistoryResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsHistory"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPasswordAndAuditsV2": {
+        "properties": {
+          "audits": {
+            "items": {
+              "$ref": "#/components/schemas/LapsAuditV2"
+            },
+            "type": "array"
+          },
+          "dateLastSeen": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "expirationTime": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "password": {
+            "example": "jamf12345",
+            "format": "password",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPasswordAuditsResultsV2": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsPasswordAndAuditsV2"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPasswordResponseV2": {
+        "properties": {
+          "password": {
+            "example": "jamf12345",
+            "format": "password",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPendingRotation": {
+        "properties": {
+          "createdDate": {
+            "example": "2019-05-16T20:43:43.945Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "lapsUser": {
+            "$ref": "#/components/schemas/LapsUserV2"
+          }
+        },
+        "type": "object"
+      },
+      "LapsPendingRotationResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsPendingRotation"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "LapsSettingsRequestV2": {
         "properties": {
           "autoDeployEnabled": {
@@ -12920,6 +13642,84 @@
             "description": "The amount of time in seconds that the local admin password will be rotated after viewing.",
             "example": 3600,
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserPasswordRequestV2": {
+        "properties": {
+          "lapsUserPasswordList": {
+            "items": {
+              "$ref": "#/components/schemas/LapsUserPasswordV2"
+            },
+            "minLength": 1,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserPasswordResponseV2": {
+        "properties": {
+          "lapsUserPasswordList": {
+            "items": {
+              "$ref": "#/components/schemas/LapsUserPasswordV2"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserPasswordV2": {
+        "properties": {
+          "password": {
+            "example": "jamf1234",
+            "format": "password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "username": {
+            "example": "username",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserResultsV2": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/LapsUserV2"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LapsUserV2": {
+        "properties": {
+          "clientManagementId": {
+            "example": "2db90ebf-ce9c-4078-b508-034c8ee3a060",
+            "type": "string"
+          },
+          "guid": {
+            "example": "602F96A6-7BC4-43CD-95F2-1DD3B8BC0AF3",
+            "type": "string"
+          },
+          "userSource": {
+            "enum": [
+              "MDM",
+              "JMF"
+            ],
+            "example": "MDM",
+            "type": "string"
+          },
+          "username": {
+            "example": "admin",
+            "type": "string"
           }
         },
         "type": "object"
@@ -14020,6 +14820,7 @@
             "discriminator": {
               "mapping": {
                 "APPLY_REDEMPTION_CODE": "#/components/schemas/ApplyRedemptionCodeCommand",
+                "CANCEL_ENHANCED_LOG_COLLECTION": "#/components/schemas/CancelEnhancedLogCollectionCommand",
                 "CERTIFICATE_LIST": "#/components/schemas/CertificateListCommand",
                 "CLEAR_PASSCODE": "#/components/schemas/ClearPasscodeCommand",
                 "CLEAR_RESTRICTIONS_PASSWORD": "#/components/schemas/ClearRestrictionsPasswordCommand",
@@ -14049,6 +14850,7 @@
                 "SET_RECOVERY_LOCK": "#/components/schemas/SetRecoveryLockCommand",
                 "SHUT_DOWN_DEVICE": "#/components/schemas/ShutDownDeviceCommand",
                 "STOP_MIRRORING": "#/components/schemas/StopMirroringCommand",
+                "TRIGGER_ENHANCED_LOG_COLLECTION": "#/components/schemas/TriggerEnhancedLogCollectionCommand",
                 "UNLOCK_USER_ACCOUNT": "#/components/schemas/UnlockUserAccountCommand",
                 "VALIDATE_APPLICATIONS": "#/components/schemas/ValidateApplicationsCommand",
                 "VERIFY_RECOVERY_LOCK": "#/components/schemas/VerifyRecoveryLockCommand"
@@ -14064,6 +14866,9 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ApplyRedemptionCodeCommand"
+              },
+              {
+                "$ref": "#/components/schemas/CancelEnhancedLogCollectionCommand"
               },
               {
                 "$ref": "#/components/schemas/CertificateListCommand"
@@ -14153,6 +14958,9 @@
                 "$ref": "#/components/schemas/StopMirroringCommand"
               },
               {
+                "$ref": "#/components/schemas/TriggerEnhancedLogCollectionCommand"
+              },
+              {
                 "$ref": "#/components/schemas/UnlockUserAccountCommand"
               },
               {
@@ -14186,7 +14994,8 @@
           "PENDING",
           "ACKNOWLEDGED",
           "NOT_NOW",
-          "ERROR"
+          "ERROR",
+          "COMMAND_FORMAT_ERROR"
         ],
         "example": "PENDING",
         "type": "string"
@@ -14194,6 +15003,7 @@
       "MdmCommandType": {
         "enum": [
           "APPLY_REDEMPTION_CODE",
+          "CANCEL_ENHANCED_LOG_COLLECTION",
           "CERTIFICATE_LIST",
           "CLEAR_PASSCODE",
           "CLEAR_RESTRICTIONS_PASSWORD",
@@ -14223,6 +15033,7 @@
           "SET_RECOVERY_LOCK",
           "SHUT_DOWN_DEVICE",
           "STOP_MIRRORING",
+          "TRIGGER_ENHANCED_LOG_COLLECTION",
           "UNLOCK_USER_ACCOUNT",
           "VALIDATE_APPLICATIONS",
           "VERIFY_RECOVERY_LOCK"
@@ -14617,6 +15428,11 @@
             "example": "10.0.0.1",
             "type": "string"
           },
+          "lastContactTimestamp": {
+            "example": "2018-10-15T16:39:56Z",
+            "format": "date-time",
+            "type": "string"
+          },
           "lastEnrollmentTimestamp": {
             "example": "2018-10-15T16:39:56.307Z",
             "format": "date-time",
@@ -14926,6 +15742,12 @@
           },
           "ipAddress": {
             "example": "10.0.0.1",
+            "type": "string"
+          },
+          "lastContactDate": {
+            "description": "The date and time of the most recent device contact via MDM or DDM channels.",
+            "example": "2022-10-17T11:48:56.307Z",
+            "format": "date-time",
             "type": "string"
           },
           "lastEnrolledDate": {
@@ -16968,6 +17790,12 @@
                   "example": "GENERIC_OIDC",
                   "type": "string"
                 },
+                "logoUrl": {
+                  "description": "Customer-provided icon served by jamf account URL for this connection. Null when no custom icon is configured (Jamf ID connections always return null).\n",
+                  "example": "https://acme.example.com/sso-logo.png",
+                  "nullable": true,
+                  "type": "string"
+                },
                 "redirectUrl": {
                   "example": "/oauth2/authorization/jamf-account-domain.name?original_url=aHR0cHM6Ly9qYW1mLXByby11cmwuY29tL2xvZ2dpbmcuaHRtbA==\u0026login_hint=YWRtaW5AZG9tYWluLm5hbWU=",
                   "type": "string"
@@ -17798,6 +18626,57 @@
         },
         "type": "object"
       },
+      "PatchReportV3": {
+        "properties": {
+          "buildingName": {
+            "example": "Building",
+            "nullable": true,
+            "type": "string"
+          },
+          "computerName": {
+            "example": "MacBook",
+            "nullable": true,
+            "type": "string"
+          },
+          "departmentName": {
+            "example": "Department",
+            "nullable": true,
+            "type": "string"
+          },
+          "deviceId": {
+            "example": "2",
+            "nullable": true,
+            "type": "string"
+          },
+          "lastCheckIn": {
+            "example": "1970-01-01T00:00:00Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "operatingSystemVersion": {
+            "example": "10.11",
+            "nullable": true,
+            "type": "string"
+          },
+          "siteName": {
+            "example": "Site",
+            "nullable": true,
+            "type": "string"
+          },
+          "username": {
+            "example": "User",
+            "nullable": true,
+            "type": "string"
+          },
+          "version": {
+            "example": "10.1",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "PatchSoftwareTitleConfiguration": {
         "allOf": [
           {
@@ -18132,6 +19011,22 @@
           },
           "totalCount": {
             "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PatchSoftwareTitleReportV3SearchResult": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/PatchReportV3"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 3,
+            "minimum": 0,
             "type": "integer"
           }
         },
@@ -21758,6 +22653,27 @@
         },
         "type": "object"
       },
+      "TriggerEnhancedLogCollectionCommand": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MdmCommandBase"
+          },
+          {
+            "properties": {
+              "appleCareToken": {
+                "description": "The AppleCare token the device uses for authenticating the enhanced log collection session.",
+                "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "appleCareToken"
+            ],
+            "type": "object"
+          }
+        ]
+      },
       "TvOsDetails": {
         "description": "will be populated if the type is appleTv.",
         "properties": {
@@ -23088,7 +24004,7 @@
     "description": "Comprehensive Jamf Pro management API for enterprise device management, configuration, and automation.",
     "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
     "title": "Jamf Pro API",
-    "version": "11.29.0"
+    "version": "11.30.0"
   },
   "openapi": "3.0.1",
   "paths": {
@@ -30549,6 +31465,7 @@
     },
     "/v1/tenant/{tenantId}/computer-inventory/{id}/erase": {
       "post": {
+        "deprecated": true,
         "description": "Erase a computer\n\n**Required Permissions:** `execute:pro:computer-commands`",
         "parameters": [
           {
@@ -30615,6 +31532,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "execute:pro:computer-commands"
         ],
@@ -30625,6 +31543,7 @@
     },
     "/v1/tenant/{tenantId}/computer-inventory/{id}/remove-mdm-profile": {
       "post": {
+        "deprecated": true,
         "description": "Remove a computer's MDM profile\n\n**Required Permissions:** `execute:pro:computer-commands`",
         "parameters": [
           {
@@ -30678,6 +31597,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "execute:pro:computer-commands"
         ],
@@ -39310,15 +40230,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/tenantId"
-          },
-          {
-            "description": "Path parameter id",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -39354,15 +40265,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/tenantId"
-          },
-          {
-            "description": "Path parameter id",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -57988,6 +58890,54 @@
         ]
       }
     },
+    "/v2/tenant/{tenantId}/local-admin-password/pending-rotations": {
+      "get": {
+        "description": "Return information about all devices and usernames currently in the state of a pending LAPS rotation\n\n**Required Permissions:** `read:pro:local-admin-password`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPendingRotationResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get a list of the current devices and usernames with pending LAPS rotations",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:local-admin-password"
+        ],
+        "x-required-privileges-legacy": [
+          "View Local Admin Password"
+        ]
+      }
+    },
     "/v2/tenant/{tenantId}/local-admin-password/settings": {
       "get": {
         "description": "Return information about the current LAPS settings.\n\n**Required Permissions:** `update:pro:local-admin-password-settings`",
@@ -58091,6 +59041,738 @@
         ],
         "x-required-privileges-legacy": [
           "Update Local Admin Password Settings"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/audit": {
+      "get": {
+        "description": "Get the full history of all local admin passwords for a specific username on a target device. History will include password, who viewed the password and when it was viewed. Get audit history by using the client management id and username as the path parameters. If multiple accounts with the same username exist, the MDM source will be selected by default.\n\n**Required Permissions:** `read:pro:local-admin-password-audit-history`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name to view audit information for",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPasswordAuditsResultsV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get LAPS password viewed history.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:local-admin-password-audit-history"
+        ],
+        "x-required-privileges-legacy": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/history": {
+      "get": {
+        "description": "Get the full history of all for a specific username on a target device. History will include date created, date last seen, expiration time, and rotational status. Get audit history by using the client management id and username as the path parameters.\n\n**Required Permissions:** `read:pro:local-admin-password-audit-history`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name to view history for",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsHistoryResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get LAPS historical records for target device and username.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:local-admin-password-audit-history"
+        ],
+        "x-required-privileges-legacy": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/password": {
+      "get": {
+        "description": "Get current LAPS password for specified client by using the client management id and username as the path parameters. Once the password is viewed it will be rotated out with a new password based on the rotation time settings. If multiple accounts with the same username exist, the MDM source will be selected by default.\n\n**Required Permissions:** `read:pro:local-admin-password`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name for the account",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPasswordResponseV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get current LAPS password for specified username on a client.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:local-admin-password"
+        ],
+        "x-required-privileges-legacy": [
+          "View Local Admin Password"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/{guid}/audit": {
+      "get": {
+        "description": "Get the full history of all local admin passwords for a specific user guid on a target device. History will include password, who viewed the password and when it was viewed. Get audit history by using the client management id, username, and user guid as the path parameters.\n\n**Required Permissions:** `read:pro:local-admin-password-audit-history`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name to view audit information for",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user guid to view audit information for",
+            "explode": false,
+            "in": "path",
+            "name": "guid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPasswordAuditsResultsV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get LAPS password viewed history.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:local-admin-password-audit-history"
+        ],
+        "x-required-privileges-legacy": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/{guid}/history": {
+      "get": {
+        "description": "Get the full history of all for a specific user guid on a target device. History will include date created, date last seen, expiration time, and rotational status. Get audit history by using the client management id, username, and user guid as the path parameters.\n\n**Required Permissions:** `read:pro:local-admin-password-audit-history`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name to view history for",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user guid to view history for",
+            "explode": false,
+            "in": "path",
+            "name": "guid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsHistoryResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get LAPS historical records for target device and user guid.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:local-admin-password-audit-history"
+        ],
+        "x-required-privileges-legacy": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/{guid}/password": {
+      "get": {
+        "description": "Get current LAPS password for specified client by using the client management id, username, and user guid as the path parameters. Once the password is viewed it will be rotated out with a new password based on the rotation time settings.\n\n**Required Permissions:** `read:pro:local-admin-password`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user name for the account",
+            "explode": false,
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "user guid for the account",
+            "explode": false,
+            "in": "path",
+            "name": "guid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsPasswordResponseV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get current LAPS password for specified user guid on a client.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:local-admin-password"
+        ],
+        "x-required-privileges-legacy": [
+          "View Local Admin Password"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/accounts": {
+      "get": {
+        "description": "Get a full list of admin accounts that are LAPS capable. Capable accounts are returned in the AutoSetupAdminAccounts from QueryResponses.\n\n**Required Permissions:** `read:pro:local-admin-password`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsUserResultsV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get the LAPS capable admin accounts for a device.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:local-admin-password"
+        ],
+        "x-required-privileges-legacy": [
+          "View Local Admin Password"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/history": {
+      "get": {
+        "description": "Get the full history of all local admin passwords for all accounts for a specific management ID. History will include password, who viewed the password and when it was viewed. This will include rotation history as well.\n\n**Required Permissions:** `read:pro:local-admin-password-audit-history`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsAccountManagementHistoryResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get LAPS password viewed history, and rotation history.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:pro:local-admin-password-audit-history"
+        ],
+        "x-required-privileges-legacy": [
+          "View Local Admin Password Audit History"
+        ]
+      }
+    },
+    "/v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/set-password": {
+      "put": {
+        "description": "Set the LAPS password for a device. This will set the password for all LAPS capable accounts.\n\n**Required Permissions:** `execute:pro:computer-commands`, `execute:pro:mobile-device-commands`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "client management id of target device.",
+            "explode": false,
+            "in": "path",
+            "name": "clientManagementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LapsUserPasswordRequestV2"
+              }
+            }
+          },
+          "description": "LAPS password to set",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LapsUserPasswordResponseV2"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to update passwords"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Set the LAPS password for a device.",
+        "tags": [
+          "local-admin-password"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "execute:pro:computer-commands",
+          "execute:pro:mobile-device-commands"
+        ],
+        "x-required-privileges-legacy": [
+          "Send Local Admin Password Command"
         ]
       }
     },
@@ -60580,7 +62262,7 @@
             "$ref": "#/components/parameters/page-size"
           },
           {
-            "description": "Sorting criteria in the format: property:asc/desc. Default sort\nis displayName:asc. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `batteryHealth`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,\n`devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`enrollmentSessionTokenValid`, `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`,\n`osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`,\n`mobileDeviceId`, `managementId`, `languages`, `lastBackupDate`, `lastEnrolledDate`, `lastCloudBackupDate`,\n`lastInventoryUpdateDate`, `locales`, `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`,\n`managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`,\n`modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`, `residentUsers`,\n`serialNumber`, `sharedIpad`, `supervised`, `tethered`,\n`timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,\n`deviceOwnershipType`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`,\n`poDate`, `poNumber`, `purchasePrice`, `purchasedOrLeased`,\n`purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,\n`activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,\n`hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`, `passcodeCompliantWithProfile`,\n`passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`, `carrierSettingsVersion`,\n`cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`, `currentMobileNetworkCode`,\n`dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,\n`homeMobileNetworkCode`, `iccid`, `imei`, `imei2`,\n`meid`, `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`\n\nExample: `sort=displayName:desc,username:asc`\n",
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort\nis displayName:asc. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `batteryHealth`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,\n`devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`enrollmentSessionTokenValid`, `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`,\n`osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`,\n`mobileDeviceId`, `managementId`, `languages`, `lastBackupDate`, `lastContactDate`, `lastEnrolledDate`, `lastCloudBackupDate`,\n`lastInventoryUpdateDate`, `locales`, `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`,\n`managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`,\n`modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`, `residentUsers`,\n`serialNumber`, `sharedIpad`, `supervised`, `tethered`,\n`timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,\n`deviceOwnershipType`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`,\n`poDate`, `poNumber`, `purchasePrice`, `purchasedOrLeased`,\n`purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,\n`activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,\n`hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`, `passcodeCompliantWithProfile`,\n`passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`, `carrierSettingsVersion`,\n`cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`, `currentMobileNetworkCode`,\n`dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,\n`homeMobileNetworkCode`, `iccid`, `imei`, `imei2`,\n`meid`, `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`\n\nExample: `sort=displayName:desc,username:asc`\n",
             "explode": true,
             "in": "query",
             "name": "sort",
@@ -60596,7 +62278,7 @@
             "style": "form"
           },
           {
-            "description": "Query in the RSQL format, allowing to filter mobile device collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,\n`diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`, `exchangeDeviceId`,\n`cloudBackupEnabled`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `managementId`, `languages`, `lastInventoryUpdateDate`, `locales`,\n`locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`, `model`,\n`modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`,\n`residentUsers`, `serialNumber`, `sharedIpad`, `supervised`,\n`tethered`, `timeZone`, `udid`, `usedSpacePercentage`,\n`wifiMacAddress`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,\n`purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`,\n`vendor`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,\n`fileEncryptionCapable`, `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,\n`passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`,\n`currentMobileCountryCode`, `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`,\n`network`, `homeMobileCountryCode`, `homeMobileNetworkCode`, `iccid`,\n`imei`, `imei2`, `meid`, `personalHotspotEnabled`,\n`roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`,\n`groupId`, `groupName`\n\nThis param can be combined with paging and sorting.\nExample: `filter=displayName==\"iPad\"`\n",
+            "description": "Query in the RSQL format, allowing to filter mobile device collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,\n`diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`, `exchangeDeviceId`,\n`cloudBackupEnabled`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `managementId`, `languages`, `lastContactDate`, `lastInventoryUpdateDate`, `locales`,\n`locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`, `model`,\n`modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`,\n`residentUsers`, `serialNumber`, `sharedIpad`, `supervised`,\n`tethered`, `timeZone`, `udid`, `usedSpacePercentage`,\n`wifiMacAddress`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,\n`purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`,\n`vendor`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,\n`fileEncryptionCapable`, `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,\n`passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`,\n`currentMobileCountryCode`, `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`,\n`network`, `homeMobileCountryCode`, `homeMobileNetworkCode`, `iccid`,\n`imei`, `imei2`, `meid`, `personalHotspotEnabled`,\n`roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`,\n`groupId`, `groupName`\n\nThis param can be combined with paging and sorting.\nExample: `filter=displayName==\"iPad\"`\n",
             "explode": true,
             "in": "query",
             "name": "filter",
@@ -60962,7 +62644,7 @@
             "$ref": "#/components/parameters/page-size"
           },
           {
-            "description": "Sorting criteria in the format: property:asc/desc. Default sort\nis displayName:asc. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,\n`devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`enrollmentSessionTokenValid`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastEnrolledDate`, `lastCloudBackupDate`,\n`lastInventoryUpdateDate`, `locales`, `lostModeEnabled`,\n`managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,\n`preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,\n`deviceOwnershipType`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`,\n`poDate`, `poNumber`, `purchasePrice`, `purchasedOrLeased`,\n`purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,\n`activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,\n`hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`, `passcodeCompliantWithProfile`,\n`passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`, `carrierSettingsVersion`,\n`cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`, `currentMobileNetworkCode`,\n`dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,\n`homeMobileNetworkCode`, `iccid`, `imei`, `imei2`,\n`meid`, `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`\n\nExample: `sort=displayName:desc,username:asc`\n",
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort\nis displayName:asc. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`lostModeEnabledDate`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,\n`devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`enrollmentSessionTokenValid`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastContactDate`, `lastEnrolledDate`, `lastCloudBackupDate`,\n`lastInventoryUpdateDate`, `locales`, `lostModeEnabled`,\n`managed`, `mdmProfileExpirationDate`, `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,\n`preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`,\n`deviceOwnershipType`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`,\n`poDate`, `poNumber`, `purchasePrice`, `purchasedOrLeased`,\n`purchasingAccount`, `purchasingContact`, `vendor`, `warrantyExpirationDate`,\n`activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,\n`hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`, `passcodeCompliantWithProfile`,\n`passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`, `carrierSettingsVersion`,\n`cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`, `currentMobileNetworkCode`,\n`dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,\n`homeMobileNetworkCode`, `iccid`, `imei`, `imei2`,\n`meid`, `personalHotspotEnabled`, `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`\n\nExample: `sort=displayName:desc,username:asc`\n",
             "explode": true,
             "in": "query",
             "name": "sort",
@@ -60978,7 +62660,7 @@
             "style": "form"
           },
           {
-            "description": "Query in the RSQL format, allowing to filter mobile device collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,\n`diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastInventoryUpdateDate`, `locales`,\n`lostModeEnabled`, `managed`, `model`,\n`modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`,\n`wifiMacAddress`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,\n`purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`,\n`vendor`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,\n`fileEncryptionCapable`, `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,\n`passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`,\n`currentMobileCountryCode`, `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`,\n`network`, `homeMobileCountryCode`, `homeMobileNetworkCode`, `iccid`,\n`imei`, `imei2`, `meid`, `personalHotspotEnabled`,\n`roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`,\n`groupId`, `groupName`\n\nThis param can be combined with paging and sorting.\nExample: `filter=displayName==\"iPad\"`\n",
+            "description": "Query in the RSQL format, allowing to filter mobile device collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`, `availableSpaceMb`,\n`batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`, `capacityMb`,\n`declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,\n`diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,\n`osBuild`, `osSupplementalBuildVersion`, `osVersion`, `osRapidSecurityResponse`,\n`ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`, `languages`, `lastContactDate`, `lastInventoryUpdateDate`, `locales`,\n`lostModeEnabled`, `managed`, `model`,\n`modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `serialNumber`, `supervised`, `timeZone`, `udid`, `usedSpacePercentage`,\n`wifiMacAddress`, `building`, `department`, `emailAddress`,\n`fullName`, `userPhoneNumber`, `position`, `room`,\n`username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,\n`purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`,\n`vendor`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,\n`fileEncryptionCapable`, `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,\n`passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`,\n`currentMobileCountryCode`, `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`,\n`network`, `homeMobileCountryCode`, `homeMobileNetworkCode`, `iccid`,\n`imei`, `imei2`, `meid`, `personalHotspotEnabled`,\n`roaming`, `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`,\n`groupId`, `groupName`\n\nThis param can be combined with paging and sorting.\nExample: `filter=displayName==\"iPad\"`\n",
             "explode": true,
             "in": "query",
             "name": "filter",
@@ -61874,6 +63556,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations": {
       "get": {
+        "deprecated": true,
         "description": "Retrieves patch software title configurations\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -61905,6 +63588,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -61913,6 +63597,7 @@
         ]
       },
       "post": {
+        "deprecated": true,
         "description": "Creates Patch Software Title Configurations using sToken\n\n**Required Permissions:** `create:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -61962,6 +63647,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "create:pro:patch-management-software-titles"
         ],
@@ -61972,6 +63658,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}": {
       "delete": {
+        "deprecated": true,
         "description": "Deletes Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `delete:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62014,6 +63701,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "delete:pro:patch-management-software-titles"
         ],
@@ -62022,6 +63710,7 @@
         ]
       },
       "get": {
+        "deprecated": true,
         "description": "Retrieves Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62071,6 +63760,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62079,6 +63769,7 @@
         ]
       },
       "patch": {
+        "deprecated": true,
         "description": "Updates Patch Software Title Configurations\n\n**Required Permissions:** `update:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62159,6 +63850,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:patch-management-software-titles"
         ],
@@ -62169,6 +63861,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard": {
       "delete": {
+        "deprecated": true,
         "description": "Removes a software title configuration from the dashboard.\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62201,6 +63894,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62209,6 +63903,7 @@
         ]
       },
       "get": {
+        "deprecated": true,
         "description": "Returns whether or not the requested software title configuration is on the dashboard\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62258,6 +63953,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62266,6 +63962,7 @@
         ]
       },
       "post": {
+        "deprecated": true,
         "description": "Adds asoftware title configuration to the dashboard.\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62299,6 +63996,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62309,6 +64007,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/definitions": {
       "get": {
+        "deprecated": true,
         "description": "Retrieves patch software title definitions with the supplied id\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62391,6 +64090,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62401,6 +64101,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dependencies": {
       "get": {
+        "deprecated": true,
         "description": "Retrieve list of Patch Software Title Configuration Dependencies\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62440,6 +64141,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62450,6 +64152,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/export-report": {
       "get": {
+        "deprecated": true,
         "description": "Export Patch Reporting Data\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62581,6 +64284,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62591,6 +64295,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/extension-attributes": {
       "get": {
+        "deprecated": true,
         "description": "Retrieves software title extension attributes with the supplied id\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62643,6 +64348,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62653,6 +64359,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/history": {
       "get": {
+        "deprecated": true,
         "description": "Gets specified Patch Software Title Configuration history object\n\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62735,6 +64442,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62743,6 +64451,7 @@
         ]
       },
       "post": {
+        "deprecated": true,
         "description": "Adds Patch Software Title Configuration history object notes\n\n**Required Permissions:** `update:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62823,6 +64532,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:patch-management-software-titles"
         ],
@@ -62833,6 +64543,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-report": {
       "get": {
+        "deprecated": true,
         "description": "Retrieve Patch Software Title Configuration Patch Report\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62925,6 +64636,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -62935,6 +64647,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary": {
       "get": {
+        "deprecated": true,
         "description": "Returns active patch summary.\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -62994,6 +64707,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -63004,6 +64718,7 @@
     },
     "/v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary/versions": {
       "get": {
+        "deprecated": true,
         "description": "Returns patch versions\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
@@ -63066,6 +64781,7 @@
           "patch-software-title-configurations"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:patch-management-software-titles"
         ],
@@ -64852,6 +66568,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory": {
       "get": {
+        "deprecated": true,
         "description": "Return paginated Computer Inventory records\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
@@ -64932,6 +66649,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computers"
         ],
@@ -64940,6 +66658,7 @@
         ]
       },
       "post": {
+        "deprecated": true,
         "description": "Creates Computer Inventory record\n\n**Required Permissions:** `create:pro:computers`",
         "parameters": [
           {
@@ -64978,6 +66697,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "create:pro:computers"
         ],
@@ -64988,6 +66708,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory-detail/{id}": {
       "get": {
+        "deprecated": true,
         "description": "Return all sections of a computer\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
@@ -65037,6 +66758,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computers"
         ],
@@ -65045,6 +66767,7 @@
         ]
       },
       "patch": {
+        "deprecated": true,
         "description": "Update specific fields on a computer, then return the updated computer object.\n\n**Required Permissions:** `update:pro:computers`",
         "parameters": [
           {
@@ -65097,6 +66820,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:computers"
         ],
@@ -65107,6 +66831,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/filevault": {
       "get": {
+        "deprecated": true,
         "description": "Return paginated FileVault information for all computers\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
         "parameters": [
           {
@@ -65141,6 +66866,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:disk-encryption-recovery-key"
         ],
@@ -65151,6 +66877,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}": {
       "delete": {
+        "deprecated": true,
         "description": "Remove specified Computer record\n\n**Required Permissions:** `delete:pro:computers`",
         "parameters": [
           {
@@ -65193,6 +66920,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "delete:pro:computers"
         ],
@@ -65201,6 +66929,7 @@
         ]
       },
       "get": {
+        "deprecated": true,
         "description": "Return General section of a Computer\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
@@ -65269,6 +66998,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computers"
         ],
@@ -65279,6 +67009,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/attachments": {
       "post": {
+        "deprecated": true,
         "description": "Upload attachment and assign to computer\n\n**Required Permissions:** `update:pro:computers`",
         "parameters": [
           {
@@ -65348,6 +67079,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:computers"
         ],
@@ -65358,6 +67090,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}": {
       "delete": {
+        "deprecated": true,
         "description": "Remove attachment\n\n**Required Permissions:** `update:pro:computers`",
         "parameters": [
           {
@@ -65411,6 +67144,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "update:pro:computers"
         ],
@@ -65419,6 +67153,7 @@
         ]
       },
       "get": {
+        "deprecated": true,
         "description": "Download attachment file\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
@@ -65481,6 +67216,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computers"
         ],
@@ -65491,6 +67227,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/filevault": {
       "get": {
+        "deprecated": true,
         "description": "Return FileVault information for a specific computer\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
         "parameters": [
           {
@@ -65540,6 +67277,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:disk-encryption-recovery-key"
         ],
@@ -65550,6 +67288,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin": {
       "get": {
+        "deprecated": true,
         "description": "Return a computer's Device Lock PIN\n\n**Required Permissions:** `read:pro:computer-device-lock-pin`",
         "parameters": [
           {
@@ -65599,6 +67338,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:computer-device-lock-pin"
         ],
@@ -65609,6 +67349,7 @@
     },
     "/v3/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password": {
       "get": {
+        "deprecated": true,
         "description": "Return a Computers Recovery Lock Password\n\n**Required Permissions:** `read:pro:recovery-lock`",
         "parameters": [
           {
@@ -65658,6 +67399,7 @@
           "computer-inventory"
         ],
         "x-authentication-required": true,
+        "x-deprecation-date": "2026-07-14",
         "x-required-privileges": [
           "read:pro:recovery-lock"
         ],
@@ -66974,6 +68716,1208 @@
         ]
       }
     },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations": {
+      "get": {
+        "description": "Retrieves patch software title configurations\n\n**Required Permissions:** `read:env:patch-software-title-configurations`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PatchSoftwareTitleConfiguration"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Retrieve Patch Software Title Configurations",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:patch-software-title-configurations"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      },
+      "post": {
+        "description": "Creates Patch Software Title Configurations using sToken\n\n**Required Permissions:** `create:env:patch-software-title-configurations`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchSoftwareTitleConfigurationBase"
+              }
+            }
+          },
+          "description": "Software title configurations to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Patch Software Title Configurations were created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Create Patch Software Title Configurations",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "create:env:patch-software-title-configurations"
+        ],
+        "x-required-privileges-legacy": [
+          "Create Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}": {
+      "delete": {
+        "description": "Deletes Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `delete:env:patch-software-title-configurations`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch Software Title Configurations identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Patch Software Title Configurations object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Delete Patch Software Title Configurations with the supplied id",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "delete:env:patch-software-title-configurations"
+        ],
+        "x-required-privileges-legacy": [
+          "Delete Patch Management Software Titles"
+        ]
+      },
+      "get": {
+        "description": "Retrieves Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `read:env:patch-software-title-configurations`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch Software Title Configurations identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatchSoftwareTitleConfiguration"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Patch Software Title Configurations with that id do not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Retrieve Patch Software Title Configurations with the supplied id",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:patch-software-title-configurations"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      },
+      "patch": {
+        "description": "Updates Patch Software Title Configurations\n\n**Required Permissions:** `update:env:patch-software-title-configurations`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch Software Title Configurations identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchSoftwareTitleConfigurationPatch"
+              }
+            }
+          },
+          "description": "Patch Software Title Configurations to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatchSoftwareTitleConfiguration"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Software Title Configurations with that id do not exist"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "There was an error applying the patch"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Update Patch Software Title Configurations",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "update:env:patch-software-title-configurations"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard": {
+      "delete": {
+        "description": "Removes a software title configuration from the dashboard.\n\n**Required Permissions:** `delete:env:dashboard`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "software title configuration id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Remove a software title configuration from the dashboard\n",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "delete:env:dashboard"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      },
+      "get": {
+        "description": "Returns whether or not the requested software title configuration is on the dashboard\n\n**Required Permissions:** `read:env:dashboard`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "software title configuration id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoftwareTitleConfigurationOnDashboard"
+                }
+              }
+            },
+            "description": "Whether the software title configuration is on the Dashboard."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "The requested software title configuration does not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return whether or not the requested software title configuration is on the dashboard\n",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:dashboard"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      },
+      "post": {
+        "description": "Adds a software title configuration to the dashboard.\n\n**Required Permissions:** `create:env:dashboard`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "software title configuration id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Add a software title configuration to the dashboard\n",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-action": true,
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "create:env:dashboard"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}/definitions": {
+      "get": {
+        "description": "Retrieves patch software title definitions with the supplied id\n\n**Required Permissions:** `read:env:definitions`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Patch Software Title identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is absoluteOrderId:asc. Multiple sort criteria are supported and must be separated with a comma.",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "absoluteOrderId:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter Patch Software Title Definition collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: id, version, minimumOperatingSystem, releaseDate, reboot, standalone and absoluteOrderId. This param can be combined with paging and sorting.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatchSoftwareTitleDefinitions"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Patch Software Title Definitions with that id do not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Retrieve Patch Software Title Definitions with the supplied id",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:definitions"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dependencies": {
+      "get": {
+        "description": "Retrieve list of Patch Software Title Configuration Dependencies\n\n**Required Permissions:** `read:env:dependencies`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch Software Title Configuration Id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatchSoftwareTitleConfigurationDependencies"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Retrieve list of Patch Software Title Configuration Dependencies",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:dependencies"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}/export-report": {
+      "get": {
+        "description": "Export Patch Reporting Data\n\n**Required Permissions:** `read:env:export-report`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter Patch Report collection on version equality only. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: version. Comparators allowed in the query: ==, != This param can be combined with paging and sorting.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "description": "File",
+            "explode": false,
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Patch Software Title Configurations identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "List of column names to export",
+            "explode": true,
+            "in": "query",
+            "name": "columns-to-export",
+            "required": true,
+            "schema": {
+              "default": [
+                "computerName",
+                "deviceId",
+                "username",
+                "operatingSystemVersion",
+                "lastCheckIn",
+                "buildingName",
+                "departmentName",
+                "siteName",
+                "version"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "format": "binary"
+                }
+              },
+              "text/tab": {
+                "schema": {
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "Export successful"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Patch Software Title Extension Attributes with that id do not exist"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Incorrect media type specified."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Export currently unavailable, all export-related resources are in use. Try again later."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Export Patch Reporting Data",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-action": true,
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:export-report"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}/extension-attributes": {
+      "get": {
+        "description": "Retrieves software title extension attributes with the supplied id\n\n**Required Permissions:** `read:env:extension-attributes`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch Software Title identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PatchSoftwareTitleExtensionAttributes"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Patch Software Title Extension Attributes with that id do not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Retrieve Software Title Extension Attributes with the supplied id",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:extension-attributes"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}/history": {
+      "get": {
+        "description": "Gets specified Patch Software Title Configuration history object\n\n\n**Required Permissions:** `read:env:history`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch Software Title Configuration Id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "date:desc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date\u003c2019-12-15",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Patch Software Title Configuration history were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified Patch Software Title Configuration object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Get specified Patch Software Title Configuration history object\n",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:history"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      },
+      "post": {
+        "description": "Adds Patch Software Title Configuration history object notes\n\n**Required Permissions:** `create:env:history`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch Software Title Configuration Id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Notes of Patch Software Title Configuration history were added"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Patch Software Title Configuration with that Id does not exist"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Patch Software Title Configuration history can not be saved"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Add Patch Software Title Configuration history object notes\n",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "create:env:history"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-report": {
+      "get": {
+        "description": "Retrieve Patch Software Title Configuration Patch Report\n\n**Required Permissions:** `read:env:patch-report`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch Software Title Configurations identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is computerName:asc. Multiple sort criteria are supported and must be separated with a comma. Supported fields: computerName, deviceId, username, operatingSystemVersion, lastCheckIn, buildingName, departmentName, siteName, version",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "computerName:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter Patch Report collection on version equality only. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: version. Comparators allowed in the query: ==, != This param can be combined with paging and sorting.",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatchSoftwareTitleReportV3SearchResult"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Patch Software Title Configuration with that id does not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Retrieve Patch Software Title Configuration Patch Report",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:patch-report"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary": {
+      "get": {
+        "description": "Returns active patch summary.\n\n**Required Permissions:** `read:env:patch-summary`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatchSummary"
+                }
+              }
+            },
+            "description": "Active Patch Summary"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Patch id does not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return Active Patch Summary",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:patch-summary"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      }
+    },
+    "/v3/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary/versions": {
+      "get": {
+        "description": "Returns patch versions\n\n**Required Permissions:** `read:env:versions`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Patch id",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PatchSummaryVersion"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Patch versions"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Patch id does not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Returns patch versions",
+        "tags": [
+          "patch-software-title-configurations"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:versions"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Patch Management Software Titles"
+        ]
+      }
+    },
     "/v3/tenant/{tenantId}/sso": {
       "get": {
         "description": "Retrieves the current Single Sign On configuration settings\n\n**Required Permissions:** `read:pro:sso-settings`",
@@ -67307,6 +70251,961 @@
         ],
         "x-required-privileges-legacy": [
           "Read SSO Settings"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory": {
+      "get": {
+        "description": "Return paginated Computer Inventory records\n\n**Required Permissions:** `read:env:computers-inventory`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "section of computer details, if not specified, General section data is returned. Multiple section parameters are supported, e.g. section=GENERAL\u0026amp;section=HARDWARE",
+            "explode": true,
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "default": [
+                "GENERAL"
+              ],
+              "example": [
+                "GENERAL"
+              ],
+              "items": {
+                "$ref": "#/components/schemas/ComputerSectionV4"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `general.name:asc`. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,\n`general.jamfBinaryVersion`, `general.lastCheckIn`, `general.lastContact`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`,\n`general.mdmCertificateExpiration`, `general.platform`, `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,\n`general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,\n`general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,\n`hardware.make`, `hardware.model`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,\n`userAndLocation.realname`,\n`purchasing.lifeExpectancy`, `purchasing.warrantyDate`\n\nExample: `sort=udid:desc,general.name:asc`.\n",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": [
+                "general.name:asc"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter computer inventory collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`, `general.barcode2`,\n`general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`, `general.itunesStoreAccountActive`,\n`general.jamfBinaryVersion`, `general.lastCheckIn`, `general.lastContact`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`, `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`, `general.managementId`, `general.remoteManagement.managed`,\n`general.mdmCapable.capable`, `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`, `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,\n`general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,\n`general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,\n`general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,\n`hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`, `hardware.modelIdentifier`, `hardware.serialNumber`,\n`hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`, `operatingSystem.fileVault2Status`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,\n`security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`, `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,\n`userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`, `userAndLocation.username`, `diskEncryption.fileVault2Enabled`,\n`purchasing.appleCareId`, `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`, `purchasing.warrantyDate`,\n\nThis param can be combined with paging and sorting.\nExample: `filter=general.name==\"Orchard\"`\n",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventorySearchResultsV4"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return paginated Computer Inventory records",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:computers-inventory"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Computers"
+        ]
+      },
+      "post": {
+        "description": "Creates Computer Inventory record\n\n**Required Permissions:** `create:env:computers-inventory`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryCreateRequestV4"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successful response - Computer Inventory record created"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Create Computer Inventory record",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "create:env:computers-inventory"
+        ],
+        "x-required-privileges-legacy": [
+          "Create Computers"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory-detail/{id}": {
+      "get": {
+        "description": "Return all sections of a computer\n\n**Required Permissions:** `read:env:computers-inventory-detail`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryV4"
+                }
+              }
+            },
+            "description": "Details of computer were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return all sections of a computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:computers-inventory-detail"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Computers"
+        ]
+      },
+      "patch": {
+        "description": "Update specific fields on a computer, then return the updated computer object.\n\n**Required Permissions:** `update:env:computers-inventory-detail`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerInventoryUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Details of computer were updated"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Update specific fields on a computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "update:env:computers-inventory-detail"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Computers"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory/filevault": {
+      "get": {
+        "description": "Return paginated FileVault information for all computers\n\n**Required Permissions:** `read:env:filevault`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryFileVaultSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return paginated FileVault information for all computers",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:filevault"
+        ],
+        "x-required-privileges-legacy": [
+          "View Disk Encryption Recovery Key"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory/{id}": {
+      "delete": {
+        "description": "Remove specified Computer record\n\n**Required Permissions:** `delete:env:computers-inventory`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Computer record successfully removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object id does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Remove specified Computer record",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "delete:env:computers-inventory"
+        ],
+        "x-required-privileges-legacy": [
+          "Delete Computers"
+        ]
+      },
+      "get": {
+        "description": "Return General section of a Computer\n\n**Required Permissions:** `read:env:computers-inventory`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "section of computer details, if not specified, General section data is returned. Multiple section parameters are supported, e.g. section=general\u0026amp;section=hardware",
+            "explode": true,
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "default": [
+                "GENERAL"
+              ],
+              "example": [
+                "GENERAL"
+              ],
+              "items": {
+                "$ref": "#/components/schemas/ComputerSectionV4"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryV4"
+                }
+              }
+            },
+            "description": "Details of computer were found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return General section of a Computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:computers-inventory"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Computers"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory/{id}/attachments": {
+      "post": {
+        "description": "Upload attachment and assign to computer\n\n**Required Permissions:** `create:env:attachments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The file to upload",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successfully uploaded attachment"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Upload attachment and assign to computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "create:env:attachments"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Computers"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}": {
+      "delete": {
+        "description": "Remove attachment\n\n**Required Permissions:** `delete:env:attachments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "instance id of attachment object",
+            "explode": false,
+            "in": "path",
+            "name": "attachmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Attachment successfully removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object or attachment does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Remove attachment",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "delete:env:attachments"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Computers"
+        ]
+      },
+      "get": {
+        "description": "Download attachment file\n\n**Required Permissions:** `read:env:attachments`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "instance id of attachment object",
+            "explode": false,
+            "in": "path",
+            "name": "attachmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "description": "Downloaded binary file, Content-Type will be dynamic, based on a file extension",
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Attachment successfully downloaded"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object or attachment does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Download attachment file",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:attachments"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Computers"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory/{id}/erase": {
+      "post": {
+        "description": "Erase a computer\n\n**Required Permissions:** `create:env:erase`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Id of the computer to erase",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EraseDeviceComputerRequest"
+              }
+            }
+          },
+          "description": "Options for eraseDevice command"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EraseDeviceComputerResponse"
+                }
+              }
+            },
+            "description": "Erase command was queued for this device."
+          },
+          "403": {
+            "description": "Insufficient privileges to perform this action."
+          },
+          "404": {
+            "description": "Computer not found."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to queue command."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Erase a computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-action": true,
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "create:env:erase"
+        ],
+        "x-required-privileges-legacy": [
+          "Send Computer Remote Wipe Command"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory/{id}/filevault": {
+      "get": {
+        "description": "Return FileVault information for a specific computer\n\n**Required Permissions:** `read:env:filevault`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryFileVault"
+                }
+              }
+            },
+            "description": "FileVault information for computer was found"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "FileVault information for specified computer does not exist"
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return FileVault information for a specific computer",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:filevault"
+        ],
+        "x-required-privileges-legacy": [
+          "View Disk Encryption Recovery Key"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory/{id}/remove-mdm-profile": {
+      "post": {
+        "description": "Remove a computer's MDM profile\n\n**Required Permissions:** `create:env:remove-mdm-profile`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "Id of the computer to remove the MDM profile from",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveComputerMdmProfileResponse"
+                }
+              }
+            },
+            "description": "Command to remove the MDM profile was queued."
+          },
+          "403": {
+            "description": "Insufficient privileges to perform this action."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to queue command."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Remove a computer's MDM profile",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-action": true,
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "create:env:remove-mdm-profile"
+        ],
+        "x-required-privileges-legacy": [
+          "Send Computer Unmanage Command"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin": {
+      "get": {
+        "description": "Return a computer's Device Lock PIN\n\n**Required Permissions:** `read:env:view-device-lock-pin`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryDeviceLockPinResponse"
+                }
+              }
+            },
+            "description": "Device Lock PIN"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return a computer's Device Lock PIN",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:view-device-lock-pin"
+        ],
+        "x-required-privileges-legacy": [
+          "View Computer Device Lock Pin"
+        ]
+      }
+    },
+    "/v4/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password": {
+      "get": {
+        "description": "Return a Computers Recovery Lock Password\n\n**Required Permissions:** `read:env:view-recovery-lock-password`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tenantId"
+          },
+          {
+            "description": "instance id of computer record",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerInventoryRecoveryLockPasswordResponse"
+                }
+              }
+            },
+            "description": "Recovery Lock Password"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Specified computer object does not exist."
+          }
+        },
+        "security": [
+          {
+            "OAuth2ClientCredentials": []
+          }
+        ],
+        "summary": "Return a Computers Recovery Lock Password",
+        "tags": [
+          "computer-inventory"
+        ],
+        "x-authentication-required": true,
+        "x-required-privileges": [
+          "read:env:view-recovery-lock-password"
+        ],
+        "x-required-privileges-legacy": [
+          "View Recovery Lock"
         ]
       }
     },

@@ -28,6 +28,9 @@ func (c *Client) CreateDigicertTrustLifecycleManagerV1(ctx context.Context, requ
 // GetDigicertTrustLifecycleManagerV1 retrieve DigiCert Trust Lifecycle Manager configuration.
 //
 // Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
+//
+// Parameters:
+//   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
 func (c *Client) GetDigicertTrustLifecycleManagerV1(ctx context.Context, id string) (*DigiCertSettingResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DigiCertSettingResponse
@@ -41,6 +44,9 @@ func (c *Client) GetDigicertTrustLifecycleManagerV1(ctx context.Context, id stri
 // UpdateDigicertTrustLifecycleManagerV1 update DigiCert Trust Lifecycle Manager configuration.
 //
 // Required privileges: update:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Update DigiCert Settings.
+//
+// Parameters:
+//   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
 func (c *Client) UpdateDigicertTrustLifecycleManagerV1(ctx context.Context, id string, request *DigiCertSetting) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s", prefix, url.PathEscape(id))
@@ -53,6 +59,9 @@ func (c *Client) UpdateDigicertTrustLifecycleManagerV1(ctx context.Context, id s
 // DeleteDigicertTrustLifecycleManagerV1 delete DigiCert Trust Lifecycle Manager configuration.
 //
 // Required privileges: delete:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Delete DigiCert Settings.
+//
+// Parameters:
+//   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
 func (c *Client) DeleteDigicertTrustLifecycleManagerV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s", prefix, url.PathEscape(id))
@@ -65,6 +74,9 @@ func (c *Client) DeleteDigicertTrustLifecycleManagerV1(ctx context.Context, id s
 // GetDigicertTrustLifecycleManagerConnectionStatusV1 get connection status of DigiCert Trust Lifecycle Manager for a given ID.
 //
 // Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
+//
+// Parameters:
+//   - id: ID of the DigiCert Trust Lifecycle Manager settings.
 func (c *Client) GetDigicertTrustLifecycleManagerConnectionStatusV1(ctx context.Context, id string) (*DigicertConnectionStatus, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DigicertConnectionStatus
@@ -78,6 +90,9 @@ func (c *Client) GetDigicertTrustLifecycleManagerConnectionStatusV1(ctx context.
 // GetDigicertTrustLifecycleManagerDependenciesV1 retrieve list of DigiCert Trust Lifecycle Manager Settings dependencies.
 //
 // Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
+//
+// Parameters:
+//   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
 func (c *Client) GetDigicertTrustLifecycleManagerDependenciesV1(ctx context.Context, id string) (*DigicertDependencies, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DigicertDependencies

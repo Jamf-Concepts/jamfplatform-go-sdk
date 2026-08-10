@@ -33,6 +33,16 @@ func (c *Client) GetJamfConnectSettingsV1(ctx context.Context) error {
 // ListJamfConnectConfigProfilesV1 search for config profiles linked to Jamf Connect.
 //
 // Required privileges: read:pro:jamf-connect-deployments. Legacy Jamf Pro privilege name(s): Read Jamf Connect Deployments.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is not duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc. Fields
+//     that can be sorted: status, updated.
+//   - filter: Query in the RSQL format, allowing to filter results. Default filter is empty query - returning all
+//     results for the requested page. Fields allowed in the query: status, updated, version This param can
+//     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
+//     date<2019-12-15.
 func (c *Client) ListJamfConnectConfigProfilesV1(ctx context.Context, sort []string, filter string) ([]LinkedConnectProfile, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]LinkedConnectProfile, bool, error) {
@@ -65,6 +75,9 @@ func (c *Client) ListJamfConnectConfigProfilesV1(ctx context.Context, sort []str
 // UpdateJamfConnectConfigProfileV1 update the way the Jamf Connect app gets updated on computers within scope of the associated configuration profile.
 //
 // Required privileges: update:pro:jamf-connect-deployments. Legacy Jamf Pro privilege name(s): Update Jamf Connect Deployments.
+//
+// Parameters:
+//   - id: the UUID of the profile to update.
 func (c *Client) UpdateJamfConnectConfigProfileV1(ctx context.Context, id string, request *LinkedConnectProfile) (*LinkedConnectProfile, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result LinkedConnectProfile
@@ -78,6 +91,17 @@ func (c *Client) UpdateJamfConnectConfigProfileV1(ctx context.Context, id string
 // ListJamfConnectDeploymentTasksV1 search for deployment tasks for a config profile linked to Jamf Connect.
 //
 // Required privileges: read:pro:jamf-connect-deployments. Legacy Jamf Pro privilege name(s): Read Jamf Connect Deployments.
+//
+// Parameters:
+//   - id: the UUID of the Jamf Connect deployment.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is not duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc. Fields
+//     that can be sorted: status, updated.
+//   - filter: Query in the RSQL format, allowing to filter results. Default filter is empty query - returning all
+//     results for the requested page. Fields allowed in the query: status, updated, version This param can
+//     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
+//     date<2019-12-15.
 func (c *Client) ListJamfConnectDeploymentTasksV1(ctx context.Context, id string, sort []string, filter string) ([]DeploymentTask, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
@@ -110,6 +134,9 @@ func (c *Client) ListJamfConnectDeploymentTasksV1(ctx context.Context, id string
 // RetryJamfConnectDeploymentTasksV1 request a retry of Connect install tasks.
 //
 // Required privileges: deploy:pro:jamf-connect-deployment-retry. Legacy Jamf Pro privilege name(s): Jamf Connect Deployment Retry.
+//
+// Parameters:
+//   - id: the UUID of the deployment associated with the retry.
 func (c *Client) RetryJamfConnectDeploymentTasksV1(ctx context.Context, id string, request *Ids) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/jamf-connect/deployments/%s/tasks/retry", prefix, url.PathEscape(id))
@@ -122,6 +149,16 @@ func (c *Client) RetryJamfConnectDeploymentTasksV1(ctx context.Context, id strin
 // ListJamfConnectHistoryV1 get Jamf Connect history.
 //
 // Required privileges: read:pro:jamf-connect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Connect Settings.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort
+//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
+//     query param is not duplicated for each sort criterion, e.g., ...&sort=name:asc,date:desc. Fields
+//     that can be sorted: status, updated.
+//   - filter: Query in the RSQL format, allowing to filter results. Default filter is empty query - returning all
+//     results for the requested page. Fields allowed in the query: status, updated, version This param can
+//     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
+//     date<2019-12-15.
 func (c *Client) ListJamfConnectHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {

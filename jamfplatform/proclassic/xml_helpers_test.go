@@ -55,23 +55,111 @@ func serverIngest(inner string) string {
 	return strings.ReplaceAll(inner, "&amp;", "&")
 }
 
-func TestPayloadsXMLText_ServerDecodeRestoresPlistExactly(t *testing.T) {
+func TestPayloadsXMLText_ServerDecodeRestoresMinimalSource(t *testing.T) {
 	// The marshalled form must be exactly one escape layer above the
-	// plist bytes: the server's single decode restores them byte-exact.
-	// Covers every reserved character in every legal representation.
+	// minimal-escaping plist source: the server's single decode restores
+	// that source, which parses to the same values as the input. Covers
+	// every reserved character in every legal representation.
 	plists := []string{
 		"<string>R&amp;D</string>",
 		"<string>a &lt; b &gt; c</string>",
 		"<string>A &#38; B &#x26; C</string>",
 		"<string>x > y</string>",
 		`<string>q " q and p ' p</string>`,
+		"<string>q &quot; q and p &#39; p and tab&#9;end</string>",
 		"<string>literal &amp;amp; entity text</string>",
 		"<string>target.signing_time >= timestamp('2025-05-31T00:00:00Z') &amp;&amp; ok</string>",
 		`identifier "com.foo" and anchor apple generic`,
+		`identifier &#34;com.foo&#34; and anchor apple generic`,
+		"<string>ALPHA&#13;BRAVO</string>",
+		"<string>ALPHA&#xD;BRAVO and R&amp;D</string>",
 	}
 	for _, p := range plists {
-		if got := serverIngest(marshalPayloads(t, p)); got != p {
-			t.Fatalf("server would store %q, want %q", got, p)
+		want := strings.ReplaceAll(minimizePlistSourceEscaping(p), "]]>", "]]&gt;")
+		if got := serverIngest(marshalPayloads(t, p)); got != want {
+			t.Fatalf("server would store %q, want %q", got, want)
+		}
+	}
+}
+
+func TestPayloadsXMLText_MinimizeSourceEscaping(t *testing.T) {
+	// Avoidable references decode to literal characters; the references
+	// encoding `&` and `<` (named or numeric) must survive untouched, as
+	// must non-reference ampersands, unknown entities, and every form of
+	// carriage-return reference (the one whitespace character Jamf Pro
+	// stores, unreachable as a literal because XML normalises it to LF).
+	cases := map[string]string{
+		"&#13;":     "&#13;",
+		"&#013;":    "&#013;",
+		"&#xD;":     "&#xD;",
+		"&#x0d;":    "&#x0d;",
+		"&quot;":    `"`,
+		"&#34;":     `"`,
+		"&#x22;":    `"`,
+		"&apos;":    "'",
+		"&#39;":     "'",
+		"&gt;":      ">",
+		"&#62;":     ">",
+		"&#xA;":     "\n",
+		"&#9;":      "\t",
+		"&amp;":     "&amp;",
+		"&lt;":      "&lt;",
+		"&#38;":     "&#38;",
+		"&#x26;":    "&#x26;",
+		"&#60;":     "&#60;",
+		"&#x3C;":    "&#x3C;",
+		"&bogus;":   "&bogus;",
+		"A & B; C":  "A & B; C",
+		"&amp;#34;": "&amp;#34;",
+		"a]]&gt;b":  "a]]>b",
+	}
+	for in, want := range cases {
+		if got := minimizePlistSourceEscaping(in); got != want {
+			t.Fatalf("minimize(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestPayloadsXMLText_CRReferencesReachServerBare(t *testing.T) {
+	// A carriage-return reference must reach the server AS a reference,
+	// ampersand unescaped, so its single decode yields an actual CR. Jamf
+	// Pro deletes literal LF/TAB from verbatim-stored values and XML
+	// line-end normalisation would turn a literal CR into LF in transit, so
+	// this is the only representation of a line break that survives — and
+	// the one Jamf Pro's own UI emits for login-window banners.
+	for _, ref := range []string{"&#13;", "&#013;", "&#xD;", "&#x0d;"} {
+		inner := marshalPayloads(t, "<string>ALPHA"+ref+"BRAVO</string>")
+		if want := "<string>ALPHA" + ref + "BRAVO</string>"; inner != want {
+			t.Fatalf("wire form %q, want %q", inner, want)
+		}
+		if strings.Contains(inner, "&amp;") {
+			t.Fatalf("CR reference %q was escaped — the server would store it as literal text: %s", ref, inner)
+		}
+	}
+}
+
+func TestPayloadsXMLText_OnlyCRReferencesLeftBare(t *testing.T) {
+	// The exemption must NOT generalise to other numeric references: the
+	// numeric ampersand decodes to a bare ampersand, which the server
+	// rejects with 409, and preserved quote references store as literal
+	// text (wire-verified 2026-08-03). Everything but
+	// CR therefore stays escaped once (or, when it decodes to a harmless
+	// literal, arrives as that literal with no ampersand at all).
+	cases := map[string]string{
+		"&#38;":  "&amp;#38;",
+		"&#x26;": "&amp;#x26;",
+		"&#60;":  "&amp;#60;",
+		"&#x3C;": "&amp;#x3C;",
+		"&amp;":  "&amp;amp;",
+		"&lt;":   "&amp;lt;",
+		"&#39;":  "'",
+		"&#9;":   "\t",
+		"&#xA;":  "\n",
+	}
+	for in, want := range cases {
+		inner := marshalPayloads(t, "<string>ALPHA"+in+"BRAVO</string>")
+		if got := "<string>ALPHA" + want + "BRAVO</string>"; inner != got {
+			t.Fatalf("marshal(%q) wire form = %q, want %q", in, inner, got)
 		}
 	}
 }

@@ -20,6 +20,17 @@ import (
 // ListScriptsV1 search for sorted and paged Scripts.
 //
 // Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Fields allowed in the query: `id`, `name`, `info`,
+//     `notes`, `priority`, `categoryId`, `categoryName`, `parameter4` up to `parameter11`,
+//     `osRequirements`, `scriptContents`. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter scripts collection. Default search is empty query -
+//     returning all results for the requested page. Fields allowed in the query: `id`, `name`, `info`,
+//     `notes`, `priority`, `categoryId`, `categoryName`, `parameter4` up to `parameter11`,
+//     `osRequirements`, `scriptContents`. This param can be combined with paging and sorting. Example:
+//     filter=categoryName=="Category" and name=="*script name*".
 func (c *Client) ListScriptsV1(ctx context.Context, sort []string, filter string) ([]Script, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Script, bool, error) {
@@ -65,6 +76,9 @@ func (c *Client) CreateScriptV1(ctx context.Context, request *Script) (*HrefResp
 // GetScriptV1 retrieve a full script object.
 //
 // Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
+//
+// Parameters:
+//   - id: Script object identifier.
 func (c *Client) GetScriptV1(ctx context.Context, id string) (*Script, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Script
@@ -78,6 +92,9 @@ func (c *Client) GetScriptV1(ctx context.Context, id string) (*Script, error) {
 // UpdateScriptV1 replace the script at the id with the supplied information.
 //
 // Required privileges: update:pro:scripts. Legacy Jamf Pro privilege name(s): Update Scripts.
+//
+// Parameters:
+//   - id: Script object identifier.
 func (c *Client) UpdateScriptV1(ctx context.Context, id string, request *Script) (*Script, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Script
@@ -91,6 +108,9 @@ func (c *Client) UpdateScriptV1(ctx context.Context, id string, request *Script)
 // DeleteScriptV1 delete a Script at the specified id.
 //
 // Required privileges: delete:pro:scripts. Legacy Jamf Pro privilege name(s): Delete Scripts.
+//
+// Parameters:
+//   - id: Script object identifier.
 func (c *Client) DeleteScriptV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/scripts/%s", prefix, url.PathEscape(id))
@@ -103,6 +123,9 @@ func (c *Client) DeleteScriptV1(ctx context.Context, id string) error {
 // DownloadScriptV1 download a text file of the Script contents.
 //
 // Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
+//
+// Parameters:
+//   - id: id of the script to be downloaded.
 func (c *Client) DownloadScriptV1(ctx context.Context, id string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -116,6 +139,15 @@ func (c *Client) DownloadScriptV1(ctx context.Context, id string) ([]byte, error
 // ListScriptHistoryV1 get specified Script history object.
 //
 // Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
+//
+// Parameters:
+//   - id: id of script history record.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
 func (c *Client) ListScriptHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -148,6 +180,9 @@ func (c *Client) ListScriptHistoryV1(ctx context.Context, id string, sort []stri
 // CreateScriptHistoryNoteV1 add specified Script history object notes.
 //
 // Required privileges: update:pro:scripts. Legacy Jamf Pro privilege name(s): Update Scripts.
+//
+// Parameters:
+//   - id: instance id of script history record.
 func (c *Client) CreateScriptHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory

@@ -18,6 +18,9 @@ import (
 // GetMobileDeviceApplicationByID finds mobile device applications by ID.
 //
 // Required privileges: read:pro:mobile-device-applications.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceApplicationByID(ctx context.Context, id string) (*MobileDeviceApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceApplication
@@ -31,6 +34,9 @@ func (c *Client) GetMobileDeviceApplicationByID(ctx context.Context, id string) 
 // CreateMobileDeviceApplicationByID creates a new mobile device application by ID.
 //
 // Required privileges: create:pro:mobile-device-applications.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceApplicationByID(ctx context.Context, id string, request *MobileDeviceApplication) (*MobileDeviceApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceApplication
@@ -44,6 +50,9 @@ func (c *Client) CreateMobileDeviceApplicationByID(ctx context.Context, id strin
 // UpdateMobileDeviceApplicationByID updates an existing mobile device application by ID.
 //
 // Required privileges: update:pro:mobile-device-applications.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateMobileDeviceApplicationByID(ctx context.Context, id string, request *MobileDeviceApplication) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateMobileDeviceApplicationByID(ctx context.Context, id strin
 // DeleteMobileDeviceApplicationByID deletes a mobile device application by ID.
 //
 // Required privileges: delete:pro:mobile-device-applications.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceApplicationByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteMobileDeviceApplicationByID(ctx context.Context, id strin
 // GetMobileDeviceApplicationByName finds mobile device applications by name.
 //
 // Required privileges: read:pro:mobile-device-applications.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetMobileDeviceApplicationByName(ctx context.Context, name string) (*MobileDeviceApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceApplication
@@ -81,6 +96,9 @@ func (c *Client) GetMobileDeviceApplicationByName(ctx context.Context, name stri
 // UpdateMobileDeviceApplicationByName updates an existing mobile device application by name.
 //
 // Required privileges: update:pro:mobile-device-applications.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceApplicationByName(ctx context.Context, name string, request *MobileDeviceApplication) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateMobileDeviceApplicationByName(ctx context.Context, name s
 // DeleteMobileDeviceApplicationByName deletes a mobile device application by name.
 //
 // Required privileges: delete:pro:mobile-device-applications.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceApplicationByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))
@@ -105,6 +126,9 @@ func (c *Client) DeleteMobileDeviceApplicationByName(ctx context.Context, name s
 // GetMobileDeviceApplicationByBundleID finds mobile device applications by bundle ID.
 //
 // Required privileges: read:pro:mobile-device-applications.
+//
+// Parameters:
+//   - bundleID: Bundle ID to filter by.
 func (c *Client) GetMobileDeviceApplicationByBundleID(ctx context.Context, bundleID string) (*MobileDeviceApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceApplication
@@ -131,6 +155,9 @@ func (c *Client) ListMobileDeviceApplications(ctx context.Context) (*MobileDevic
 // DeleteMobileDeviceApplicationByBundleID deletes a mobile device application by bundle ID.
 //
 // Required privileges: delete:pro:mobile-device-applications.
+//
+// Parameters:
+//   - bundleid: Bundle ID value to filter by.
 func (c *Client) DeleteMobileDeviceApplicationByBundleID(ctx context.Context, bundleid string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s", prefix, url.PathEscape(bundleid))
@@ -143,6 +170,9 @@ func (c *Client) DeleteMobileDeviceApplicationByBundleID(ctx context.Context, bu
 // UpdateMobileDeviceApplicationByBundleID updates an existing mobile device application by bundle ID.
 //
 // Required privileges: update:pro:mobile-device-applications.
+//
+// Parameters:
+//   - bundleid: Bundle ID value to filter by.
 func (c *Client) UpdateMobileDeviceApplicationByBundleID(ctx context.Context, bundleid string, request *MobileDeviceApplication) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s", prefix, url.PathEscape(bundleid))
@@ -155,6 +185,10 @@ func (c *Client) UpdateMobileDeviceApplicationByBundleID(ctx context.Context, bu
 // DeleteMobileDeviceApplicationByBundleIDVersion deletes a mobile device application by bundle ID and version.
 //
 // Required privileges: delete:pro:mobile-device-applications.
+//
+// Parameters:
+//   - bundleid: Bundle ID value to filter by.
+//   - version: Version to filter by.
 func (c *Client) DeleteMobileDeviceApplicationByBundleIDVersion(ctx context.Context, bundleid string, version string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s/version/%s", prefix, url.PathEscape(bundleid), url.PathEscape(version))
@@ -167,6 +201,10 @@ func (c *Client) DeleteMobileDeviceApplicationByBundleIDVersion(ctx context.Cont
 // GetMobileDeviceApplicationByBundleIDVersion finds mobile device applications by bundle ID and version.
 //
 // Required privileges: read:pro:mobile-device-applications.
+//
+// Parameters:
+//   - bundleid: Bundle ID to filter by.
+//   - version: Version to filter by.
 func (c *Client) GetMobileDeviceApplicationByBundleIDVersion(ctx context.Context, bundleid string, version string) (*MobileDeviceApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceApplication
@@ -180,6 +218,10 @@ func (c *Client) GetMobileDeviceApplicationByBundleIDVersion(ctx context.Context
 // UpdateMobileDeviceApplicationByBundleIDVersion updates an existing mobile device application by bundle ID and version.
 //
 // Required privileges: update:pro:mobile-device-applications.
+//
+// Parameters:
+//   - bundleid: Bundle ID value to filter by.
+//   - version: Version to filter by.
 func (c *Client) UpdateMobileDeviceApplicationByBundleIDVersion(ctx context.Context, bundleid string, version string, request *MobileDeviceApplication) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s/version/%s", prefix, url.PathEscape(bundleid), url.PathEscape(version))
@@ -192,6 +234,11 @@ func (c *Client) UpdateMobileDeviceApplicationByBundleIDVersion(ctx context.Cont
 // GetMobileDeviceApplicationByIDSubset finds a subset of data for a mobile device application by ID.
 //
 // Required privileges: read:pro:mobile-device-applications.
+//
+// Parameters:
+//   - id: ID to filter by.
+//   - subset: Subset to filter by.
+//     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP", "AppConfiguration".
 func (c *Client) GetMobileDeviceApplicationByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceApplication
@@ -205,6 +252,11 @@ func (c *Client) GetMobileDeviceApplicationByIDSubset(ctx context.Context, id st
 // GetMobileDeviceApplicationByNameSubset finds a subset of data for mobile device applications by name.
 //
 // Required privileges: read:pro:mobile-device-applications.
+//
+// Parameters:
+//   - name: Name to filter by.
+//   - subset: Subset to filter by.
+//     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP", "AppConfiguration".
 func (c *Client) GetMobileDeviceApplicationByNameSubset(ctx context.Context, name string, subset string) (*MobileDeviceApplication, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceApplication
@@ -218,6 +270,9 @@ func (c *Client) GetMobileDeviceApplicationByNameSubset(ctx context.Context, nam
 // CreateMobileDeviceApplicationByName creates a new mobile device application by ID.
 //
 // Required privileges: create:pro:mobile-device-applications.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateMobileDeviceApplicationByName(ctx context.Context, name string, request *MobileDeviceApplication) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))

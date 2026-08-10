@@ -20,6 +20,10 @@ import (
 // ListIOSBrandingConfigurationsV1 search for sorted and paged iOS branding configurations.
 //
 // Required privileges: read:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=id:desc,brandingName:asc.
 func (c *Client) ListIOSBrandingConfigurationsV1(ctx context.Context, sort []string) ([]IosBrandingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]IosBrandingConfiguration, bool, error) {
@@ -62,6 +66,9 @@ func (c *Client) CreateIOSBrandingConfigurationV1(ctx context.Context, request *
 // GetIOSBrandingConfigurationV1 read a single Self Service iOS branding configuration indicated by the provided id.
 //
 // Required privileges: read:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration.
+//
+// Parameters:
+//   - id: id of iOS branding configuration.
 func (c *Client) GetIOSBrandingConfigurationV1(ctx context.Context, id string) (*IosBrandingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result IosBrandingConfiguration
@@ -75,6 +82,9 @@ func (c *Client) GetIOSBrandingConfigurationV1(ctx context.Context, id string) (
 // UpdateIOSBrandingConfigurationV1 update a Self Service iOS branding configuration with the supplied details.
 //
 // Required privileges: update:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Update Self Service Branding Configuration.
+//
+// Parameters:
+//   - id: id of iOS branding configuration.
 func (c *Client) UpdateIOSBrandingConfigurationV1(ctx context.Context, id string, request *IosBrandingConfiguration) (*IosBrandingConfiguration, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result IosBrandingConfiguration
@@ -88,6 +98,9 @@ func (c *Client) UpdateIOSBrandingConfigurationV1(ctx context.Context, id string
 // DeleteIOSBrandingConfigurationV1 delete the Self Service iOS branding configuration indicated by the provided id.
 //
 // Required privileges: delete:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Delete Self Service Branding Configuration.
+//
+// Parameters:
+//   - id: id of iOS branding configuration.
 func (c *Client) DeleteIOSBrandingConfigurationV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/self-service/branding/ios/%s", prefix, url.PathEscape(id))

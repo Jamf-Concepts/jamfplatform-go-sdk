@@ -27,6 +27,13 @@ func (c *Client) DeleteCommandFlush(ctx context.Context, request *Commandflush) 
 // DeleteCommandFlushByIDTypeIDStatus flushes commands for devices.
 //
 // Required privileges: delete:pro:computer-commands.
+//
+// Parameters:
+//   - idtype: Type of device to be flushed.
+//     Allowed values: "computers", "computergroups", "mobiledevices", "mobiledevicegroups".
+//   - id: ID of device to be flushed.
+//   - status: Command status to be flushed.
+//     Allowed values: "Pending", "Failed", "Pending+Failed".
 func (c *Client) DeleteCommandFlushByIDTypeIDStatus(ctx context.Context, idtype string, id string, status string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/commandflush/%s/id/%s/status/%s", prefix, url.PathEscape(idtype), url.PathEscape(id), url.PathEscape(status))

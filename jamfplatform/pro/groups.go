@@ -21,6 +21,19 @@ import (
 //
 // Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is groupName:asc. Multiple sort
+//     criteria are supported and must be separated with a comma. Fields allowed in sorting: groupName,
+//     groupDescription, groupType, isSmart. Example: sort=groupName:asc,groupType:desc.
+//   - filter: Query in the RSQL format, allowing to filter group collection. Default filter is empty query -
+//     returning all results for the requested page. Fields allowed in the query: groupName,
+//     groupDescription, groupType, isSmart. This param can be combined with paging and sorting. When using
+//     groupType in the filter, the value must be either "MOBILE" or "COMPUTER" but not both. When using
+//     groupType in the filter, the value is case sensitive. When using groupType in the filter, it will
+//     exclude groups of the other type regardless of or/and conditionals. Example:
+//     filter=groupName=="*Managed*" and isSmart=="true" Example: filter=groupType=="COMPUTER" and
+//     groupDescription=="*Admin*".
 func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
@@ -56,6 +69,21 @@ func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string)
 //
 // Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is groupName:asc. Multiple sort
+//     criteria are supported and must be separated with a comma. Fields allowed in sorting: groupName,
+//     groupDescription, groupType, isSmart. Example: sort=groupName:asc,groupType:desc.
+//   - filter: Query in the RSQL format, allowing to filter group collection. Default filter is empty query -
+//     returning all results for the requested page. Fields allowed in the query: groupPlatformId,
+//     groupName, groupDescription, groupType, isSmart. This param can be combined with paging and sorting.
+//     When using groupPlatformId in the filter, the supported operators are: =in= (match any in list),
+//     =out= (exclude all in list). When using groupType in the filter, the value must be either "MOBILE"
+//     or "COMPUTER" but not both. When using groupType in the filter, the value is case sensitive. When
+//     using groupType in the filter, it will exclude groups of the other type regardless of or/and
+//     conditionals. Example: filter=groupPlatformId=in=('uuid1','uuid2','uuid3') Example:
+//     filter=groupName=="*Managed*" and isSmart=="true" Example: filter=groupType=="COMPUTER" and
+//     groupDescription=="*Admin*".
 func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
@@ -89,6 +117,9 @@ func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string)
 //
 // Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: The platform UUID of a group.
 func (c *Client) GetGroupV2(ctx context.Context, id string) (*GroupWithCriteriaDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	var result GroupWithCriteriaDtoV1
@@ -105,6 +136,9 @@ func (c *Client) GetGroupV2(ctx context.Context, id string) (*GroupWithCriteriaD
 //
 // Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: The platform UUID of a group.
 func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaDtoV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result GroupWithCriteriaDtoV1
@@ -119,6 +153,9 @@ func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaD
 //
 // Required privileges: delete:pro:computer-groups, delete:pro:mobile-device-groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: The platform UUID of a group.
 func (c *Client) DeleteGroupV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
@@ -134,6 +171,9 @@ func (c *Client) DeleteGroupV2(ctx context.Context, id string) error {
 //
 // Required privileges: delete:pro:computer-groups, delete:pro:mobile-device-groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: The platform UUID of a group.
 func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
@@ -147,6 +187,9 @@ func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
 //
 // Required privileges: update:pro:computer-groups, update:pro:mobile-device-groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: The platform UUID of a group.
 func (c *Client) PatchGroupV2(ctx context.Context, id string, request *GroupUpdateDtoV2) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
@@ -162,6 +205,9 @@ func (c *Client) PatchGroupV2(ctx context.Context, id string, request *GroupUpda
 //
 // Required privileges: update:pro:computer-groups, update:pro:mobile-device-groups.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - id: The platform UUID of a group.
 func (c *Client) PatchGroupV1(ctx context.Context, id string, request *GroupUpdateDtoV1) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))

@@ -15,6 +15,9 @@ import (
 // GetMobileDeviceCommandByUUID finds a mobile device command by UUID.
 //
 // Required privileges: read:pro:mobile-device-commands.
+//
+// Parameters:
+//   - uuid: UUID value to filter by.
 func (c *Client) GetMobileDeviceCommandByUUID(ctx context.Context, uuid string) (*MobileDeviceCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceCommand
@@ -42,6 +45,9 @@ func (c *Client) IssueMobileDeviceCommand(ctx context.Context, request *MobileDe
 // GetMobileDeviceCommandByName finds all mobile device commands by command name.
 //
 // Required privileges: read:pro:mobile-device-commands.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetMobileDeviceCommandByName(ctx context.Context, name string) (*MobileDeviceCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceCommand
@@ -68,6 +74,9 @@ func (c *Client) ListMobileDeviceCommands(ctx context.Context) (*MobileDeviceCom
 // GetMobileDeviceCommandByCommand finds all mobile device commands for specified command.
 //
 // Required privileges: read:pro:mobile-device-commands.
+//
+// Parameters:
+//   - command: Name to filter by.
 func (c *Client) GetMobileDeviceCommandByCommand(ctx context.Context, command string) (*MobileDeviceCommand, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceCommand
@@ -82,6 +91,14 @@ func (c *Client) GetMobileDeviceCommandByCommand(ctx context.Context, command st
 //
 // Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - command: Command to send device.
+//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)", "EnableLostMode",
+//     "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)", "PlayLostModeSound
+//     (PlayLostModeSound Deprecated on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on
+//     2026-03-13)".
+//   - id_list: Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15).
 func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, command string, id_list string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(id_list))
@@ -95,6 +112,13 @@ func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, comma
 //
 // Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - command: Command to send device.
+//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)", "EnableLostMode",
+//     "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)", "PlayLostModeSound
+//     (PlayLostModeSound Deprecated on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on
+//     2026-03-13)".
 func (c *Client) CreateMobileDeviceCommandByCommand(ctx context.Context, command string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s", prefix, url.PathEscape(command))
@@ -108,6 +132,15 @@ func (c *Client) CreateMobileDeviceCommandByCommand(ctx context.Context, command
 //
 // Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - command: Command to send device.
+//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)", "EnableLostMode",
+//     "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)", "PlayLostModeSound
+//     (PlayLostModeSound Deprecated on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on
+//     2026-03-13)".
+//   - parameter: Path parameter parameter.
+//   - idList: Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15).
 func (c *Client) CreateMobileDeviceCommandWithParameterByIDList(ctx context.Context, command string, parameter string, idList string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(parameter), url.PathEscape(idList))
@@ -121,6 +154,16 @@ func (c *Client) CreateMobileDeviceCommandWithParameterByIDList(ctx context.Cont
 //
 // Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - command: Command to send device.
+//     Allowed values: "DeviceLocation (DeviceLocation Deprecated on 2025-06-12)", "EnableLostMode",
+//     "PasscodeLockGracePeriod (PasscodeLockGracePeriod Deprecated on 2025-06-26)", "PlayLostModeSound
+//     (PlayLostModeSound Deprecated on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on
+//     2026-03-13)".
+//   - parameter: Path parameter parameter.
+//   - version: Path parameter version.
+//   - idList: Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15).
 func (c *Client) CreateMobileDeviceCommandWithParameterVersionByIDList(ctx context.Context, command string, parameter string, version string, idList string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/%s/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(parameter), url.PathEscape(version), url.PathEscape(idList))
@@ -134,6 +177,9 @@ func (c *Client) CreateMobileDeviceCommandWithParameterVersionByIDList(ctx conte
 //
 // Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - name: Path parameter name.
 func (c *Client) CreateMobileDeviceCommandByName(ctx context.Context, name string, request *MobileDeviceCommandPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/name/%s", prefix, url.PathEscape(name))

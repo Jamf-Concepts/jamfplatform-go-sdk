@@ -21,6 +21,13 @@ import (
 // ListComputerExtensionAttributesV1 retrieve Computer Extension Attributes.
 //
 // Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+//
+// Parameters:
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     name:asc. If using multiple criteria, separate with commas. Allows sort for id and name.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Fields allowed in the query: id, name Default filter is an empty
+//     query and returns all results from the requested page.
 func (c *Client) ListComputerExtensionAttributesV1(ctx context.Context, sort []string, filter string) ([]ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributes, bool, error) {
@@ -78,6 +85,15 @@ func (c *Client) DeleteMultipleComputerExtensionAttributesV1(ctx context.Context
 // ListComputerExtensionAttributeTemplatesV1 retrieve All Computer Extension Attributes Templates.
 //
 // Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+//
+// Parameters:
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     templateName:asc. If using multiple criteria, separate with commas. Allows sort for templateName and
+//     templateCategory.
+//   - filter: Filters results. Use RSQL format for queries. which allows filtering by multiple fields such as
+//     templateName, templateCategoryName. Can be combined with paging and sorting. Fields allowed in the
+//     query: templateName, templateCategoryName Default filter is an empty query and returns all results
+//     from the requested page.
 func (c *Client) ListComputerExtensionAttributeTemplatesV1(ctx context.Context, sort []string, filter string) ([]ComputerExtensionAttributeTemplates, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributeTemplates, bool, error) {
@@ -110,6 +126,9 @@ func (c *Client) ListComputerExtensionAttributeTemplatesV1(ctx context.Context, 
 // GetComputerExtensionAttributeTemplateV1 get specified Computer Extension Attribute Template object.
 //
 // Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+//
+// Parameters:
+//   - id: Unique Id of the Template.
 func (c *Client) GetComputerExtensionAttributeTemplateV1(ctx context.Context, id string) (*ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerExtensionAttributes
@@ -146,6 +165,9 @@ func (c *Client) UploadComputerExtensionAttributeV1(ctx context.Context, fileFil
 // GetComputerExtensionAttributeV1 get specified Computer Extension Attribute object.
 //
 // Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+//
+// Parameters:
+//   - id: Unique ID of Computer Extension Attribute.
 func (c *Client) GetComputerExtensionAttributeV1(ctx context.Context, id string) (*ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerExtensionAttributes
@@ -159,6 +181,9 @@ func (c *Client) GetComputerExtensionAttributeV1(ctx context.Context, id string)
 // UpdateComputerExtensionAttributeV1 update specified Computer Extension Attribute object.
 //
 // Required privileges: update:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Update Computer Extension Attributes.
+//
+// Parameters:
+//   - id: Unique ID of Computer Extension Attribute.
 func (c *Client) UpdateComputerExtensionAttributeV1(ctx context.Context, id string, request *ComputerExtensionAttributes) (*ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ComputerExtensionAttributes
@@ -172,6 +197,9 @@ func (c *Client) UpdateComputerExtensionAttributeV1(ctx context.Context, id stri
 // DeleteComputerExtensionAttributeV1 remove specified Computer Extension Attribute.
 //
 // Required privileges: delete:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Delete Computer Extension Attributes.
+//
+// Parameters:
+//   - id: Unique ID of Computer Extension Attribute.
 func (c *Client) DeleteComputerExtensionAttributeV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/computer-extension-attributes/%s", prefix, url.PathEscape(id))
@@ -184,6 +212,9 @@ func (c *Client) DeleteComputerExtensionAttributeV1(ctx context.Context, id stri
 // GetComputerExtensionAttributeDataDependencyV1 get smart group/advance search dependent objects for a specified computer extension attribute.
 //
 // Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+//
+// Parameters:
+//   - id: Unique ID of computer extension attribute.
 func (c *Client) GetComputerExtensionAttributeDataDependencyV1(ctx context.Context, id string) (*DependencyObjectResults, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result DependencyObjectResults
@@ -197,6 +228,9 @@ func (c *Client) GetComputerExtensionAttributeDataDependencyV1(ctx context.Conte
 // DownloadComputerExtensionAttributeV1 download the specified Computer Extension Attribute.
 //
 // Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+//
+// Parameters:
+//   - id: The unique ID of the Computer Extension Attribute to be downloaded.
 func (c *Client) DownloadComputerExtensionAttributeV1(ctx context.Context, id string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -210,6 +244,14 @@ func (c *Client) DownloadComputerExtensionAttributeV1(ctx context.Context, id st
 // ListComputerExtensionAttributeHistoryV1 get specified Computer Extension Attribute History object.
 //
 // Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+//
+// Parameters:
+//   - id: Instance ID of Computer Extension Attribute history.
+//   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
+//     ID:asc. If using multiple criteria, separate with commas.
+//   - filter: Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be
+//     combined with paging and sorting. Default filter is an empty query and returns all results from the
+//     requested page.
 func (c *Client) ListComputerExtensionAttributeHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -242,6 +284,9 @@ func (c *Client) ListComputerExtensionAttributeHistoryV1(ctx context.Context, id
 // CreateComputerExtensionAttributeHistoryNoteV1 add specified Computer Extension Attribute history object notes.
 //
 // Required privileges: update:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Update Computer Extension Attributes.
+//
+// Parameters:
+//   - id: Instance ID of Computer Extension Attribute history.
 func (c *Client) CreateComputerExtensionAttributeHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory

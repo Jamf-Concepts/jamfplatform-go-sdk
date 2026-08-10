@@ -18,6 +18,9 @@ import (
 // GetAccountByUserID finds accounts by ID.
 //
 // Required privileges: read:pro:accounts.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetAccountByUserID(ctx context.Context, id string) (*Account, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Account
@@ -31,6 +34,9 @@ func (c *Client) GetAccountByUserID(ctx context.Context, id string) (*Account, e
 // CreateAccountByUserID creates a new account by ID.
 //
 // Required privileges: create:pro:accounts.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateAccountByUserID(ctx context.Context, id string, request *Account) (*Account, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Account
@@ -44,6 +50,9 @@ func (c *Client) CreateAccountByUserID(ctx context.Context, id string, request *
 // UpdateAccountByUserID updates an existing account by ID.
 //
 // Required privileges: update:pro:accounts.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateAccountByUserID(ctx context.Context, id string, request *Account) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/userid/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateAccountByUserID(ctx context.Context, id string, request *
 // DeleteAccountByUserID deletes an account by ID.
 //
 // Required privileges: delete:pro:accounts.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteAccountByUserID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/userid/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteAccountByUserID(ctx context.Context, id string) error {
 // GetAccountGroupByID finds groups by ID.
 //
 // Required privileges: read:pro:accounts.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetAccountGroupByID(ctx context.Context, id string) (*Group, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Group
@@ -81,6 +96,9 @@ func (c *Client) GetAccountGroupByID(ctx context.Context, id string) (*Group, er
 // CreateAccountGroupByID creates a new group by ID.
 //
 // Required privileges: create:pro:accounts.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateAccountGroupByID(ctx context.Context, id string, request *Group) (*Group, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Group
@@ -94,6 +112,9 @@ func (c *Client) CreateAccountGroupByID(ctx context.Context, id string, request 
 // UpdateAccountGroupByID updates an existing group by ID.
 //
 // Required privileges: update:pro:accounts.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateAccountGroupByID(ctx context.Context, id string, request *Group) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/groupid/%s", prefix, url.PathEscape(id))
@@ -106,6 +127,9 @@ func (c *Client) UpdateAccountGroupByID(ctx context.Context, id string, request 
 // DeleteAccountGroupByID deletes a group by ID.
 //
 // Required privileges: delete:pro:accounts.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteAccountGroupByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/groupid/%s", prefix, url.PathEscape(id))
@@ -118,6 +142,9 @@ func (c *Client) DeleteAccountGroupByID(ctx context.Context, id string) error {
 // GetAccountGroupByName finds groups by name.
 //
 // Required privileges: read:pro:accounts.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetAccountGroupByName(ctx context.Context, name string) (*Group, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Group
@@ -131,6 +158,9 @@ func (c *Client) GetAccountGroupByName(ctx context.Context, name string) (*Group
 // UpdateAccountGroupByName updates an existing group by name.
 //
 // Required privileges: update:pro:accounts.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateAccountGroupByName(ctx context.Context, name string, request *Group) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/groupname/%s", prefix, url.PathEscape(name))
@@ -143,6 +173,9 @@ func (c *Client) UpdateAccountGroupByName(ctx context.Context, name string, requ
 // DeleteAccountGroupByName deletes a group by name.
 //
 // Required privileges: delete:pro:accounts.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteAccountGroupByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/groupname/%s", prefix, url.PathEscape(name))
@@ -155,6 +188,9 @@ func (c *Client) DeleteAccountGroupByName(ctx context.Context, name string) erro
 // GetAccountByUsername finds accounts by name.
 //
 // Required privileges: read:pro:accounts.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetAccountByUsername(ctx context.Context, name string) (*Account, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Account
@@ -168,6 +204,9 @@ func (c *Client) GetAccountByUsername(ctx context.Context, name string) (*Accoun
 // UpdateAccountByUsername updates an existing account by name.
 //
 // Required privileges: update:pro:accounts.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateAccountByUsername(ctx context.Context, name string, request *Account) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/username/%s", prefix, url.PathEscape(name))
@@ -180,6 +219,9 @@ func (c *Client) UpdateAccountByUsername(ctx context.Context, name string, reque
 // DeleteAccountByUsername deletes an account by name.
 //
 // Required privileges: delete:pro:accounts.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteAccountByUsername(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/username/%s", prefix, url.PathEscape(name))
@@ -205,6 +247,9 @@ func (c *Client) ListAccounts(ctx context.Context) (*Accounts, error) {
 // CreateAccountGroupByName creates a new group by ID.
 //
 // Required privileges: create:pro:accounts.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateAccountGroupByName(ctx context.Context, name string, request *Group) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/groupname/%s", prefix, url.PathEscape(name))
@@ -217,6 +262,9 @@ func (c *Client) CreateAccountGroupByName(ctx context.Context, name string, requ
 // CreateAccountByUsername creates a new account by ID.
 //
 // Required privileges: create:pro:accounts.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateAccountByUsername(ctx context.Context, name string, request *Account) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/accounts/username/%s", prefix, url.PathEscape(name))

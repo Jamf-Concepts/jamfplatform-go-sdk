@@ -18,6 +18,9 @@ import (
 // GetBuildingByID finds buildings by ID.
 //
 // Required privileges: read:pro:buildings.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetBuildingByID(ctx context.Context, id string) (*Building, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Building
@@ -31,6 +34,9 @@ func (c *Client) GetBuildingByID(ctx context.Context, id string) (*Building, err
 // CreateBuildingByID creates a new building.
 //
 // Required privileges: create:pro:buildings.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateBuildingByID(ctx context.Context, id string, request *Building) (*Building, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Building
@@ -44,6 +50,9 @@ func (c *Client) CreateBuildingByID(ctx context.Context, id string, request *Bui
 // UpdateBuildingByID updates an existing building by ID.
 //
 // Required privileges: update:pro:buildings.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateBuildingByID(ctx context.Context, id string, request *Building) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateBuildingByID(ctx context.Context, id string, request *Bui
 // DeleteBuildingByID deletes a building by ID.
 //
 // Required privileges: delete:pro:buildings.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteBuildingByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteBuildingByID(ctx context.Context, id string) error {
 // GetBuildingByName finds buildings by name.
 //
 // Required privileges: read:pro:buildings.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetBuildingByName(ctx context.Context, name string) (*Building, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Building
@@ -81,6 +96,9 @@ func (c *Client) GetBuildingByName(ctx context.Context, name string) (*Building,
 // UpdateBuildingByName updates an existing building by name.
 //
 // Required privileges: update:pro:buildings.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) UpdateBuildingByName(ctx context.Context, name string, request *Building) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateBuildingByName(ctx context.Context, name string, request 
 // DeleteBuildingByName deletes a building by name.
 //
 // Required privileges: delete:pro:buildings.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) DeleteBuildingByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,9 @@ func (c *Client) ListBuildings(ctx context.Context) (*Buildings, error) {
 // CreateBuildingByName creates a new building.
 //
 // Required privileges: create:pro:buildings.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateBuildingByName(ctx context.Context, name string, request *Building) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))

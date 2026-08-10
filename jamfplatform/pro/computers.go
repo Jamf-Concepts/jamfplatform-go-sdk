@@ -18,6 +18,10 @@ import (
 // ListPreviewComputers return a list of Computers.
 //
 // Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListPreviewComputers(ctx context.Context, sort []string) ([]ComputerOverview, error) {
 	prefix := c.transport.TenantPrefix("pro", "")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerOverview, bool, error) {

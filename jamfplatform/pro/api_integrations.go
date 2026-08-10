@@ -20,6 +20,14 @@ import (
 // ListApiIntegrationsV1 get the current API Integrations.
 //
 // Required privileges: read:pro:api-integrations. Legacy Jamf Pro privilege name(s): Read API Integrations.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Fields allowed in the query: id, displayName.
+//     Example: sort=displayName:desc.
+//   - filter: Query in the RSQL format, allowing to filter app titles collection. Default filter is empty query -
+//     returning all results for the requested page. Fields allowed in the query: id, displayName. Example:
+//     displayName=="*IntegrationName*".
 func (c *Client) ListApiIntegrationsV1(ctx context.Context, sort []string, filter string) ([]ApiIntegrationResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ApiIntegrationResponse, bool, error) {
@@ -65,6 +73,9 @@ func (c *Client) CreateApiIntegrationV1(ctx context.Context, request *ApiIntegra
 // GetApiIntegrationV1 get specified API integration object.
 //
 // Required privileges: read:pro:api-integrations. Legacy Jamf Pro privilege name(s): Read API Integrations.
+//
+// Parameters:
+//   - id: instance id of api integration object.
 func (c *Client) GetApiIntegrationV1(ctx context.Context, id string) (*ApiIntegrationResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ApiIntegrationResponse
@@ -78,6 +89,9 @@ func (c *Client) GetApiIntegrationV1(ctx context.Context, id string) (*ApiIntegr
 // UpdateApiIntegrationV1 update specified API integration object.
 //
 // Required privileges: update:pro:api-integrations. Legacy Jamf Pro privilege name(s): Update API Integrations.
+//
+// Parameters:
+//   - id: instance id of api integration object.
 func (c *Client) UpdateApiIntegrationV1(ctx context.Context, id string, request *ApiIntegrationRequest) (*ApiIntegrationResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ApiIntegrationResponse
@@ -91,6 +105,9 @@ func (c *Client) UpdateApiIntegrationV1(ctx context.Context, id string, request 
 // DeleteApiIntegrationV1 remove specified API integration.
 //
 // Required privileges: delete:pro:api-integrations. Legacy Jamf Pro privilege name(s): Delete API Integrations.
+//
+// Parameters:
+//   - id: instance id of api integration object.
 func (c *Client) DeleteApiIntegrationV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/api-integrations/%s", prefix, url.PathEscape(id))
@@ -103,6 +120,9 @@ func (c *Client) DeleteApiIntegrationV1(ctx context.Context, id string) error {
 // RotateApiIntegrationClientCredentialsV1 create client credentials for specified API integration.
 //
 // Required privileges: create:pro:api-integrations. Legacy Jamf Pro privilege name(s): Create API Integrations.
+//
+// Parameters:
+//   - id: instance id of api integration object.
 func (c *Client) RotateApiIntegrationClientCredentialsV1(ctx context.Context, id string) (*OAuthClientCredentials, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result OAuthClientCredentials

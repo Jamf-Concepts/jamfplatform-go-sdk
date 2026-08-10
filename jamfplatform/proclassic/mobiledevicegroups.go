@@ -18,6 +18,9 @@ import (
 // GetMobileDeviceGroupByID finds mobile device groups by ID.
 //
 // Required privileges: read:pro:mobile-device-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceGroupByID(ctx context.Context, id string) (*MobileDeviceGroup, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceGroup
@@ -31,6 +34,9 @@ func (c *Client) GetMobileDeviceGroupByID(ctx context.Context, id string) (*Mobi
 // CreateMobileDeviceGroupByID creates a new mobile device group by ID.
 //
 // Required privileges: create:pro:mobile-device-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceGroupByID(ctx context.Context, id string, request *MobileDeviceGroup) (*MobileDeviceGroup, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceGroup
@@ -44,6 +50,9 @@ func (c *Client) CreateMobileDeviceGroupByID(ctx context.Context, id string, req
 // UpdateMobileDeviceGroupByID updates an existing mobile device group by ID.
 //
 // Required privileges: update:pro:mobile-device-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateMobileDeviceGroupByID(ctx context.Context, id string, request *MobileDeviceGroup) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateMobileDeviceGroupByID(ctx context.Context, id string, req
 // DeleteMobileDeviceGroupByID deletes a mobile device group by ID.
 //
 // Required privileges: delete:pro:mobile-device-groups.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceGroupByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteMobileDeviceGroupByID(ctx context.Context, id string) err
 // GetMobileDeviceGroupByName finds mobile device groups by name.
 //
 // Required privileges: read:pro:mobile-device-groups.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetMobileDeviceGroupByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceGroup
@@ -81,6 +96,9 @@ func (c *Client) GetMobileDeviceGroupByName(ctx context.Context, name string) (*
 // UpdateMobileDeviceGroupByName updates an existing mobile device group by name.
 //
 // Required privileges: update:pro:mobile-device-groups.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceGroupByName(ctx context.Context, name string, request *MobileDeviceGroup) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateMobileDeviceGroupByName(ctx context.Context, name string,
 // DeleteMobileDeviceGroupByName deletes a mobile device group by name.
 //
 // Required privileges: delete:pro:mobile-device-groups.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceGroupByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,9 @@ func (c *Client) ListMobileDeviceGroups(ctx context.Context) (*MobileDeviceGroup
 // CreateMobileDeviceGroupByName creates a new mobile device group by ID.
 //
 // Required privileges: create:pro:mobile-device-groups.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateMobileDeviceGroupByName(ctx context.Context, name string, request *MobileDeviceGroup) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))

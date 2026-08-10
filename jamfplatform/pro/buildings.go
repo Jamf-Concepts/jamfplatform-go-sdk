@@ -20,6 +20,14 @@ import (
 // ListBuildingsV1 search for sorted and paged Buildings.
 //
 // Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter buildings collection. Default filter is empty query -
+//     returning all results for the requested page. Fields allowed in the query: name, streetAddress1,
+//     streetAddress2, city, stateProvince, zipPostalCode, country. This param can be combined with paging
+//     and sorting. Example: filter=city=="Chicago" and name=="*build*".
 func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter string) ([]Building, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Building, bool, error) {
@@ -65,6 +73,9 @@ func (c *Client) CreateBuildingV1(ctx context.Context, request *Building) (*Href
 // GetBuildingV1 get specified Building object.
 //
 // Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+//
+// Parameters:
+//   - id: instance id of building record.
 func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Building
@@ -78,6 +89,9 @@ func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error
 // UpdateBuildingV1 update specified Building object.
 //
 // Required privileges: update:pro:buildings. Legacy Jamf Pro privilege name(s): Update Buildings.
+//
+// Parameters:
+//   - id: instance id of building record.
 func (c *Client) UpdateBuildingV1(ctx context.Context, id string, request *Building) (*Building, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Building
@@ -91,6 +105,9 @@ func (c *Client) UpdateBuildingV1(ctx context.Context, id string, request *Build
 // DeleteBuildingV1 remove specified Building record.
 //
 // Required privileges: delete:pro:buildings. Legacy Jamf Pro privilege name(s): Delete Buildings.
+//
+// Parameters:
+//   - id: instance id of building record.
 func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/buildings/%s", prefix, url.PathEscape(id))
@@ -103,6 +120,13 @@ func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
 // ExportBuildingsV1 export Buildings collection.
 //
 // Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=id:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: id, name. This param
+//     can be combined with paging and sorting. Example: name=="*buildings*".
 func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameters, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte
@@ -126,6 +150,15 @@ func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameter
 // ListBuildingHistoryV1 get specified Building History object.
 //
 // Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+//
+// Parameters:
+//   - id: instance id of building history record.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
 func (c *Client) ListBuildingHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -170,6 +203,9 @@ func (c *Client) DeleteMultipleBuildingsV1(ctx context.Context, request *Ids) er
 // CreateBuildingHistoryNoteV1 add specified Building history object notes.
 //
 // Required privileges: update:pro:buildings. Legacy Jamf Pro privilege name(s): Update Buildings.
+//
+// Parameters:
+//   - id: instance id of building history record.
 func (c *Client) CreateBuildingHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory
@@ -183,6 +219,22 @@ func (c *Client) CreateBuildingHistoryNoteV1(ctx context.Context, id string, req
 // ExportBuildingHistoryV1 export history object collection in specified format for specified Buildings.
 //
 // Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+//
+// Parameters:
+//   - id: instance id of buildings.
+//   - exportFields: Export fields parameter, used to change default order or ignore some of the response properties.
+//     Default is empty array, which means that all fields of the response entity will be serialized.
+//     Example: export-fields=id,username.
+//   - exportLabels: Export labels parameter, used to customize fieldnames/columns in the exported file. Default is empty
+//     array, which means that response properties names will be used. Number of the provided labels must
+//     match the number of export-fields Example: export-labels=identifier,name with matching:
+//     export-fields=id,username.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
 func (c *Client) ExportBuildingHistoryV1(ctx context.Context, id string, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte

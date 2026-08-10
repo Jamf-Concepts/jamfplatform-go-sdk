@@ -7,9 +7,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path"
 	"regexp"
 	"slices"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -19,10 +21,10 @@ import (
 // Operations → Go methods
 // ---------------------------------------------------------------------------
 
-func extractMethods(doc *openapi3.T, spec SpecDef) ([]GoMethod, error) {
+func extractMethods(doc *openapi3.T, spec SpecDef, enumTypes map[string]bool) ([]GoMethod, error) {
 	var methods []GoMethod
 	for _, opDef := range spec.Operations {
-		m, err := buildMethod(doc, spec, opDef)
+		m, err := buildMethod(doc, spec, opDef, enumTypes)
 		if err != nil {
 			return nil, fmt.Errorf("operation %s: %w", opDef.Op, err)
 		}
@@ -702,7 +704,160 @@ func privilegeComment(m GoMethod) string {
 	return line
 }
 
-func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, error) {
+// parameterDocWidth is the wrap width for parameter documentation text; the
+// rendered line prefix is "//     " (7 columns), so emitted lines top out at
+// 107. Wider than an 80-column terminal on purpose: several Pro list
+// endpoints inline their whole sortable field set, and at 76 those blocks ran
+// to ~76 lines each. 100 costs ~17% fewer lines with nothing dropped.
+// Comments elsewhere in the generated tree are far longer still — 1711 lines
+// already exceed 100 columns — so this stays the narrowest prose we emit.
+const parameterDocWidth = 100
+
+// defaultMethodComment is the leading godoc sentence used when the spec gives
+// an operation no summary but the generator still has metadata to append.
+// The undocumented-spec wording matches the pass in extractMethods so the two
+// cannot drift apart.
+func defaultMethodComment(name string, spec SpecDef) string {
+	if spec.Undocumented {
+		return name + " calls an undocumented Jamf endpoint."
+	}
+	return name + " calls a Jamf Platform API endpoint."
+}
+
+// parameterComment renders a godoc block documenting the parameters a method
+// takes, sourced from the spec's parameter objects. Ordering follows the Go
+// signature — path params first, then the config-declared query params — so
+// the block reads against the call the consumer is writing. Without it the
+// only place a caller can learn which fields a `filter` or `sort` argument
+// accepts is the raw spec: those RSQL field lists live in the parameter
+// description and nowhere else in the SDK.
+//
+// Documentation only: parameter types stay exactly as config declares them.
+// That is what makes it safe to quote enum values verbatim — Jamf's Classic
+// path enums include values that are unusable as Go identifiers
+// ("Pending+Failed", "EnableRemoteDesktop (macOS 10.14.4 and later)") and one
+// outright typo ("Hardwre"), all of which are still what the server accepts.
+//
+// Params the spec doesn't describe are skipped, as are params declared in
+// config but absent from the spec (Classic operations that take undocumented
+// query keys). Returns "" when nothing is documentable.
+func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Operation, enumTypes map[string]bool) string {
+	specParams := make(map[string]*openapi3.Parameter)
+	collect := func(params openapi3.Parameters) {
+		for _, ref := range params {
+			if ref == nil || ref.Value == nil || ref.Value.Name == "" {
+				continue
+			}
+			specParams[ref.Value.Name] = ref.Value
+		}
+	}
+	// Operation-level parameters override same-named path-level ones per the
+	// OpenAPI spec, so they are collected second.
+	if pathItem != nil {
+		collect(pathItem.Parameters)
+	}
+	if op != nil {
+		collect(op.Parameters)
+	}
+	if len(specParams) == 0 {
+		return ""
+	}
+
+	type docParam struct{ goName, specName string }
+	ordered := make([]docParam, 0, len(m.PathParams)+len(m.QueryParams))
+	for _, p := range m.PathParams {
+		ordered = append(ordered, docParam{goName: p.GoName, specName: p.SpecName})
+	}
+	for _, q := range m.QueryParams {
+		ordered = append(ordered, docParam{goName: q.Go, specName: q.Spec})
+	}
+
+	var lines []string
+	for _, p := range ordered {
+		sp, ok := specParams[p.specName]
+		if !ok {
+			continue
+		}
+		body := parameterDocLines(sp, enumTypes)
+		if len(body) == 0 {
+			continue
+		}
+		lines = append(lines, "//   - "+p.goName+": "+body[0])
+		for _, cont := range body[1:] {
+			lines = append(lines, "//     "+cont)
+		}
+	}
+	if len(lines) == 0 {
+		return ""
+	}
+	return "\n//\n// Parameters:\n" + strings.Join(lines, "\n")
+}
+
+// parameterDocLines returns the wrapped godoc lines for one spec parameter:
+// its description, then its allowed values when the schema constrains them.
+// Returns nil when the spec says nothing useful about it.
+//
+// When the constraint comes from a named schema the generator emits as a type
+// (enumTypes), the values are named rather than listed: the type carries a
+// constant per value, and godoc groups those under it. That keeps the 60-plus
+// value enums out of every call site's doc comment while still naming them
+// somewhere the compiler checks.
+func parameterDocLines(p *openapi3.Parameter, enumTypes map[string]bool) []string {
+	out := docParagraphs(p.Description, parameterDocWidth)
+	if t := enumRefTypeName(p.Schema); t != "" && enumTypes[t] {
+		out = append(out, wrapCommentText("Allowed values: see the "+t+" constants.", parameterDocWidth)...)
+		return out
+	}
+	if vals := parameterEnumValues(p.Schema); len(vals) > 0 {
+		out = append(out, wrapCommentText("Allowed values: "+strings.Join(vals, ", ")+".", parameterDocWidth)...)
+	}
+	return out
+}
+
+// enumRefTypeName returns the Go type name a parameter schema $refs, following
+// the item schema for repeatable params. Empty when the schema is inline —
+// an inline enum has no type to point at, so its values are listed instead.
+func enumRefTypeName(ref *openapi3.SchemaRef) string {
+	if ref == nil {
+		return ""
+	}
+	if ref.Ref != "" {
+		return goTypeName(path.Base(ref.Ref))
+	}
+	if ref.Value != nil && ref.Value.Items != nil && ref.Value.Items.Ref != "" {
+		return goTypeName(path.Base(ref.Value.Items.Ref))
+	}
+	return ""
+}
+
+// parameterEnumValues formats a parameter schema's enum for godoc. Repeatable
+// params (e.g. sort) model the constraint on the item schema, so fall through
+// to Items when the top-level schema carries no enum. Strings are quoted
+// because Jamf's Classic enums contain spaces and parentheses; other scalars
+// print bare.
+func parameterEnumValues(ref *openapi3.SchemaRef) []string {
+	if ref == nil || ref.Value == nil {
+		return nil
+	}
+	enum := ref.Value.Enum
+	if len(enum) == 0 && ref.Value.Items != nil && ref.Value.Items.Value != nil {
+		enum = ref.Value.Items.Value.Enum
+	}
+	out := make([]string, 0, len(enum))
+	for _, v := range enum {
+		if v == nil {
+			continue
+		}
+		if s, ok := v.(string); ok {
+			out = append(out, strconv.Quote(s))
+			continue
+		}
+		out = append(out, fmt.Sprint(v))
+	}
+	return out
+}
+
+func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes map[string]bool) (GoMethod, error) {
 	httpMethod, specPath := opDef.parseOp()
 
 	pathItem := doc.Paths.Find(specPath)
@@ -784,6 +939,17 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef) (GoMethod, e
 	}
 
 	m.PathParams = extractPathParams(m.ResourcePath, opDef.PathNames)
+
+	// Parameter docs come last so the block sits below the summary and the
+	// privilege/deprecation lines, matching how godoc reads: prose, then
+	// metadata, then the per-argument list.
+	if pc := parameterComment(m, pathItem, op, enumTypes); pc != "" {
+		if m.Comment == "" {
+			m.Comment = defaultMethodComment(opDef.Name, spec)
+		}
+		m.Comment += pc
+	}
+
 	m.ExpectedStatus, m.ResponseType = detectResponse(op)
 	// When detectResponse populates ResponseType from the spec, capture
 	// the matching schema's XML wire name so test stubs emit bodies the

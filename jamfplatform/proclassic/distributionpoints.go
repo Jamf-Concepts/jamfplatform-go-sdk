@@ -18,6 +18,9 @@ import (
 // GetDistributionPointByID finds distribution points by ID.
 //
 // Required privileges: read:pro:distribution-points.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetDistributionPointByID(ctx context.Context, id string) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DistributionPoint
@@ -31,6 +34,9 @@ func (c *Client) GetDistributionPointByID(ctx context.Context, id string) (*Dist
 // CreateDistributionPointByID creates a new distribution point by ID.
 //
 // Required privileges: create:pro:distribution-points.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateDistributionPointByID(ctx context.Context, id string, request *DistributionPointPost) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DistributionPoint
@@ -44,6 +50,9 @@ func (c *Client) CreateDistributionPointByID(ctx context.Context, id string, req
 // UpdateDistributionPointByID updates an existing distribution point by ID.
 //
 // Required privileges: update:pro:distribution-points.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateDistributionPointByID(ctx context.Context, id string, request *DistributionPointPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateDistributionPointByID(ctx context.Context, id string, req
 // DeleteDistributionPointByID deletes a distribution point by ID.
 //
 // Required privileges: delete:pro:distribution-points.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteDistributionPointByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteDistributionPointByID(ctx context.Context, id string) err
 // GetDistributionPointByName finds distribution points by name.
 //
 // Required privileges: read:pro:distribution-points.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetDistributionPointByName(ctx context.Context, name string) (*DistributionPoint, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result DistributionPoint
@@ -81,6 +96,9 @@ func (c *Client) GetDistributionPointByName(ctx context.Context, name string) (*
 // UpdateDistributionPointByName updates an existing distribution point by name.
 //
 // Required privileges: update:pro:distribution-points.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateDistributionPointByName(ctx context.Context, name string, request *DistributionPointPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateDistributionPointByName(ctx context.Context, name string,
 // DeleteDistributionPointByName deletes a distribution point by name.
 //
 // Required privileges: delete:pro:distribution-points.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteDistributionPointByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,9 @@ func (c *Client) ListDistributionPoints(ctx context.Context) (*DistributionPoint
 // CreateDistributionPointByName creates a new distribution point by ID.
 //
 // Required privileges: create:pro:distribution-points.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateDistributionPointByName(ctx context.Context, name string, request *DistributionPointPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))

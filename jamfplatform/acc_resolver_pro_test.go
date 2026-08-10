@@ -558,11 +558,22 @@ func TestAcceptance_ResolveComputerExtensionAttributeV1_Lifecycle(t *testing.T) 
 	_, err := c.ResolveComputerExtensionAttributeV1IDByName(ctx, name)
 	requireNotFoundErr(t, "pre-create", err)
 
+	// manageExistingData is deliberately omitted. The server rejects it on
+	// create ("This field should be blank for first time CEA creation") and on
+	// any update whose inputType is not SCRIPT with enabled=false — a
+	// precondition the spec does not encode. This test previously sent
+	// "DELETE_EXISTING_DATA", which is not one of the two accepted values and
+	// only passed because the server silently drops enum members it does not
+	// recognise; the spec's own values would have produced a 400 here. Verified
+	// on the wire 2026-08-03: RETAIN and DELETE round-trip once inputType is
+	// SCRIPT and enabled is false.
 	newCEA := func(n string) *pro.ComputerExtensionAttributes {
 		return &pro.ComputerExtensionAttributes{
-			Name: n, Enabled: ptr(true), DataType: "STRING", InputType: "TEXT",
-			InventoryDisplayType: "GENERAL", ManageExistingData: ptr("DELETE_EXISTING_DATA"),
-			PopupMenuChoices: &[]string{},
+			Name: n, Enabled: ptr(true),
+			DataType:             pro.ComputerExtensionAttributesDataTypeString,
+			InputType:            pro.ComputerExtensionAttributesInputTypeText,
+			InventoryDisplayType: pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
+			PopupMenuChoices:     &[]string{},
 		}
 	}
 	resp, err := c.CreateComputerExtensionAttributeV1(ctx, newCEA(name))
@@ -628,8 +639,8 @@ func TestAcceptance_ResolveMobileDeviceExtensionAttributeV1_Lifecycle(t *testing
 
 	newMDEA := func(n string) *pro.MobileDeviceExtensionAttributes {
 		return &pro.MobileDeviceExtensionAttributes{
-			Name: n, DataType: "STRING", InputType: "TEXT",
-			InventoryDisplayType: "GENERAL", PopupMenuChoices: &[]string{},
+			Name: n, DataType: pro.MobileDeviceExtensionAttributesDataTypeString, InputType: pro.MobileDeviceExtensionAttributesInputTypeText,
+			InventoryDisplayType: pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral, PopupMenuChoices: &[]string{},
 		}
 	}
 	resp, err := c.CreateMobileDeviceExtensionAttributeV1(ctx, newMDEA(name))
@@ -742,6 +753,91 @@ func TestAcceptance_ResolveComputerInventoryV3IDByName_Existing(t *testing.T) {
 		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
 	}
 	t.Logf("resolved %q → %s ✓", first.General.Name, gotID)
+}
+
+// ─── Computer Inventory (V4) ───────────────────────────────────────────────
+// V4 is the undeprecated successor to V1/V2/V3 (issue #50). The V4 resolvers
+// prove the RSQL `filter` the deprecated versions relied on still works on
+// the new path — the migration blocker the issue called out was that
+// /preview/computers, the only undeprecated alternative, takes no filter.
+
+func TestAcceptance_ResolveComputerInventoryV4_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveComputerInventoryV4IDByName(context.Background(), "sdk-does-not-exist-ci-"+runSuffix())
+	requireNotFoundErr(t, "ResolveComputerInventoryV4IDByName", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveComputerInventoryV4IDByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	computers, err := c.ListComputersInventoryV4(ctx, []string{"GENERAL"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListComputersInventoryV4: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("no computers — skipping")
+	}
+	first := computers[0]
+	if first.General == nil || first.General.Name == "" {
+		t.Skip("first computer has no name — skipping")
+	}
+	gotID, err := c.ResolveComputerInventoryV4IDByName(ctx, first.General.Name)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved %q → %s ✓", first.General.Name, gotID)
+}
+
+func TestAcceptance_ResolveComputerInventoryV4IDBySerialNumber_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	computers, err := c.ListComputersInventoryV4(ctx, []string{"HARDWARE"}, nil, "")
+	if err != nil {
+		t.Fatalf("ListComputersInventoryV4: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("no computers — skipping")
+	}
+	first := computers[0]
+	if first.Hardware == nil || first.Hardware.SerialNumber == "" {
+		t.Skip("first computer has no serial number — skipping")
+	}
+	gotID, err := c.ResolveComputerInventoryV4IDBySerialNumber(ctx, first.Hardware.SerialNumber)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved serial %q → %s ✓", first.Hardware.SerialNumber, gotID)
+}
+
+func TestAcceptance_ResolveComputerInventoryV4IDByUDID_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+	computers, err := c.ListComputersInventoryV4(ctx, nil, nil, "")
+	if err != nil {
+		t.Fatalf("ListComputersInventoryV4: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("no computers — skipping")
+	}
+	first := computers[0]
+	if first.UDID == "" {
+		t.Skip("first computer has no UDID — skipping")
+	}
+	gotID, err := c.ResolveComputerInventoryV4IDByUDID(ctx, first.UDID)
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	if gotID != first.ID {
+		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
+	}
+	t.Logf("resolved UDID %q → %s ✓", first.UDID, gotID)
 }
 
 // ─── Sites ─────────────────────────────────────────────────────────────────
@@ -1070,7 +1166,7 @@ func TestAcceptance_ResolveDistributionPointV1_Lifecycle(t *testing.T) {
 
 	newDP := func(n string) *pro.DistributionPoint {
 		return &pro.DistributionPoint{
-			Name: n, FileSharingConnectionType: "SMB", ServerName: "localhost",
+			Name: n, FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb, ServerName: "localhost",
 			ShareName: strPtr("share"), ReadWriteUsername: strPtr("rw"), ReadWritePassword: strPtr("rw"),
 			ReadOnlyUsername: strPtr("ro"), ReadOnlyPassword: strPtr("ro"),
 		}
@@ -1620,7 +1716,7 @@ func TestAcceptance_ResolveInventoryPreloadRecordV2_Lifecycle(t *testing.T) {
 	t.Log("step 1: not-found ✓")
 
 	// Step 2: Create
-	resp, err := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: "Computer"})
+	resp, err := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: pro.InventoryPreloadRecordV2DeviceTypeComputer})
 	if err != nil {
 		t.Fatalf("CreateInventoryPreloadRecordV2: %v", err)
 	}
@@ -1650,7 +1746,7 @@ func TestAcceptance_ResolveInventoryPreloadRecordV2_Lifecycle(t *testing.T) {
 
 	// Step 5: Attempt duplicate — inventory preload keyed by serial, so duplicate should be rejected
 	id2, dupCreated := tryCreateDuplicate(t, "inventory preload record", func() (string, error) {
-		r, e := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: "Computer"})
+		r, e := c.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{SerialNumber: serial, DeviceType: pro.InventoryPreloadRecordV2DeviceTypeComputer})
 		if e != nil {
 			return "", e
 		}
@@ -2365,6 +2461,68 @@ func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2ByName_Existing(t *t
 	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
 }
 
+// ─── PatchSoftwareTitleConfigurations V3 ────────────────────────────────────
+// V3 is the undeprecated successor to V2 (issue #50). Unlike V2's read-only
+// probe these use a test-owned fixture, so the resolve path is exercised even
+// on a tenant with no configurations of its own.
+
+func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV3IDByName_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolvePatchSoftwareTitleConfigurationV3IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
+	requireNotFoundErr(t, "ResolvePatchSoftwareTitleConfigurationV3IDByName", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV3ByName_Existing(t *testing.T) {
+	c := pro.New(accClient(t))
+	ctx := context.Background()
+
+	id := seedPatchSoftwareTitleFixture(t)
+	cleanupDelete(t, "DeletePatchSoftwareTitleConfigurationV3 "+id, func() error {
+		return c.DeletePatchSoftwareTitleConfigurationV3(ctx, id)
+	})
+	seeded, err := c.GetPatchSoftwareTitleConfigurationV3(ctx, id)
+	if err != nil {
+		t.Fatalf("GetPatchSoftwareTitleConfigurationV3(%s): %v", id, err)
+	}
+
+	gotID, err := c.ResolvePatchSoftwareTitleConfigurationV3IDByName(ctx, seeded.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve id: %v", err)
+	}
+	if gotID != id {
+		t.Errorf("resolved id = %q, want %q", gotID, id)
+	}
+
+	got, err := c.ResolvePatchSoftwareTitleConfigurationV3ByName(ctx, seeded.DisplayName)
+	if err != nil {
+		t.Fatalf("resolve typed: %v", err)
+	}
+	if got == nil {
+		t.Fatal("resolve returned nil")
+	}
+	if got.DisplayName != seeded.DisplayName {
+		t.Errorf("typed DisplayName = %q, want %q", got.DisplayName, seeded.DisplayName)
+	}
+	t.Logf("resolved typed %q → %s ✓", seeded.DisplayName, got.ID)
+}
+
+// ─── ComputerInventoryV4 alternate resolvers (not-found) ────────────────────
+
+func TestAcceptance_ResolveComputerInventoryV4IDBySerialNumber_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveComputerInventoryV4IDBySerialNumber(context.Background(), "SDKNOTEXIST"+runSuffix())
+	requireNotFoundErr(t, "ResolveComputerInventoryV4IDBySerialNumber", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
+func TestAcceptance_ResolveComputerInventoryV4IDByUDID_NotFound(t *testing.T) {
+	c := pro.New(accClient(t))
+	_, err := c.ResolveComputerInventoryV4IDByUDID(context.Background(), "SDK-NOT-EXIST-"+runSuffix())
+	requireNotFoundErr(t, "ResolveComputerInventoryV4IDByUDID", err)
+	t.Log("not-found surfaced 404 ✓")
+}
+
 // ─── ComputerInventoryV3 alternate resolvers ───────────────────────────────
 
 func TestAcceptance_ResolveComputerInventoryV3IDBySerialNumber_NotFound(t *testing.T) {
@@ -2637,6 +2795,33 @@ func TestAcceptance_ResolveJamfConnectConfigProfileV1IDByName_NotFound(t *testin
 	t.Log("not-found ✓")
 }
 
+// uniqueJamfConnectProfile returns a profile whose name is held by exactly one
+// record, skipping the test when no such profile exists.
+//
+// Jamf Connect config profile names are not unique. On the acceptance tenant all
+// four profiles are named "App Installers - Custom values for Jamf Connect"
+// (ids 1780, 1782, 1783, 1787 — wire-probed 2026-07-31), because App Installers
+// creates one identically-named profile per deployment. Resolving items[0]'s name
+// therefore returned a correct *AmbiguousMatchError, which the test read as a
+// resolver failure. Name-based resolution is only meaningful for a name with a
+// single holder.
+func uniqueJamfConnectProfile(t *testing.T, items []pro.LinkedConnectProfile) pro.LinkedConnectProfile {
+	t.Helper()
+	counts := map[string]int{}
+	for _, it := range items {
+		if it.ProfileName != nil {
+			counts[*it.ProfileName]++
+		}
+	}
+	for _, it := range items {
+		if it.ProfileName != nil && it.ProfileID != nil && counts[*it.ProfileName] == 1 {
+			return it
+		}
+	}
+	t.Skipf("no uniquely-named Jamf Connect config profile in tenant (%d profiles, %d distinct names) — name resolution is ambiguous by construction", len(items), len(counts))
+	return pro.LinkedConnectProfile{}
+}
+
 func TestAcceptance_ResolveJamfConnectConfigProfileV1IDByName_Existing(t *testing.T) {
 	c := pro.New(accClient(t))
 	ctx := context.Background()
@@ -2649,10 +2834,7 @@ func TestAcceptance_ResolveJamfConnectConfigProfileV1IDByName_Existing(t *testin
 	if len(items) == 0 {
 		t.Skip("no Jamf Connect config profiles in tenant — skipping")
 	}
-	first := items[0]
-	if first.ProfileName == nil || first.ProfileID == nil {
-		t.Skip("first profile has nil name or id — skipping")
-	}
+	first := uniqueJamfConnectProfile(t, items)
 	gotID, err := c.ResolveJamfConnectConfigProfileV1IDByName(ctx, *first.ProfileName)
 	if err != nil {
 		t.Fatalf("resolve: %v", err)
@@ -2676,10 +2858,7 @@ func TestAcceptance_ResolveJamfConnectConfigProfileV1ByName_Existing(t *testing.
 	if len(items) == 0 {
 		t.Skip("no Jamf Connect config profiles in tenant — skipping")
 	}
-	first := items[0]
-	if first.ProfileName == nil {
-		t.Skip("first profile has nil name — skipping")
-	}
+	first := uniqueJamfConnectProfile(t, items)
 	got, err := c.ResolveJamfConnectConfigProfileV1ByName(ctx, *first.ProfileName)
 	if err != nil {
 		t.Fatalf("resolve typed: %v", err)

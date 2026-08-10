@@ -27,6 +27,34 @@
 //     those types cannot be stored faithfully by any client. Tests for
 //     that category assert the defect's exact shape.
 //
+//     Divergence observed 2026-08-03 on 11.30.2: a mobile
+//     com.apple.applicationaccess fragment stored `&amp;` DECODED, while
+//     the same profile's top-level ConsentText kept the extra layer — so
+//     "all mobile payloads are verbatim" does not hold on that version.
+//     Treat this per-type split as version-specific and empirical: assert
+//     it in acceptance tests, never encode it as a client-side rule.
+//
+//  3. Line breaks inside string values are a separate law (wire-verified
+//     2026-08-03, Jamf Pro 11.30.2, both profile endpoints; rendering
+//     confirmed on macOS 26.6). Literal LF and TAB are DELETED — not
+//     collapsed to a space, so the words either side merge — for every
+//     verbatim-stored payload type and every slot outside PayloadContent
+//     (e.g. the top-level ConsentText dictionary). CR survives, but only
+//     as a character reference: XML 1.0 §2.11 normalises a literal CR to
+//     LF in transit and the server then deletes it, which is why
+//     PayloadsXMLText preserves CR references rather than decoding them,
+//     and why Jamf Pro's own UI emits `&#13;` for banner line breaks.
+//     U+2028, U+2029 and U+0085 survive every slot untouched. The
+//     exemption must stay CR-only: leaving `&#38;` bare decodes to an
+//     ampersand and the server rejects the write with 409.
+//
+//  4. Astral-plane characters (non-BMP, e.g. emoji) cannot be stored at
+//     all: verbatim slots keep two U+FFFD replacement characters in their
+//     place, and an MCX payload drops its whole mcx_preference_settings
+//     dictionary, sibling keys included. macOS handles them correctly, so
+//     this is server-side. Not asserted here — the failure is data loss,
+//     not a shape worth pinning.
+//
 // The server canonicalises stored plists regardless of input form:
 // entities for `&` `<` `>` (`&amp;` `&lt;` `&gt;` — a raw `>` is stored
 // as `&gt;`), literals for `"` `'` (even when sent as `&quot;`/`&#39;`),
@@ -361,7 +389,10 @@ func TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip(t *testing.T) {
 // first assertion flips and this test fails — the desired signal.
 func assertVerbatimStorageDefect(t *testing.T, stage, got string) {
 	t.Helper()
-	if !strings.Contains(got, "Foo &amp;amp; Bar &amp;lt;br/&amp;gt; baz") {
+	// Note the tail: the source's &gt; is minimised to a literal ">" on
+	// the wire and the server canonicalises it back — value-correct. Only
+	// the &/< references keep the verbatim extra layer.
+	if !strings.Contains(got, "Foo &amp;amp; Bar &amp;lt;br/&gt; baz") {
 		t.Fatalf("%s: TCC description no longer stored with the verbatim extra entity layer — server ingest behaviour changed (PI-827 fixed?). Got:\n%s", stage, got)
 	}
 	if !strings.Contains(got, `identifier "com.example.sdk" and anchor apple generic`) {
@@ -677,6 +708,15 @@ func verbatimStored(c reservedCharCase) string {
 	if c.key == "embedded_cdata" {
 		src = `cdata section: &amp; &lt; &gt; " ' kept literal`
 	}
+	// Mirror PayloadsXMLText's source-escaping minimisation: references for
+	// `>` `"` `'` decode to literals on the wire, so they store
+	// value-correct even through verbatim storage. Only `&`/`<` references
+	// must stay encoded and therefore still gain the extra layer.
+	src = strings.NewReplacer(
+		"&gt;", ">", "&#62;", ">",
+		"&quot;", `"`, "&#34;", `"`,
+		"&apos;", "'", "&#39;", "'",
+	).Replace(src)
 	src = strings.ReplaceAll(src, "&", "&amp;")
 	return strings.ReplaceAll(src, ">", "&gt;")
 }
@@ -808,4 +848,199 @@ func TestAcceptance_Classic_MobileDeviceProfile_ReservedCharacterMatrix(t *testi
 		t.Fatalf("GET after create: profile or payloads missing: %+v", afterCreate)
 	}
 	assertMatrixStored(t, "after Create (POST)", string(*afterCreate.General.Payloads), true)
+}
+
+// ---------------------------------------------------------------------
+// Line breaks inside string values (wire-verified 2026-08-03, Jamf Pro
+// 11.30.2; trigger: Jamf-Concepts/terraform-jamf-platform#488).
+//
+// Literal LF and TAB are DELETED from string values of verbatim-stored
+// payload types and of every slot outside PayloadContent — not collapsed
+// to a space, so the words either side merge. CR survives, but only when
+// transmitted as a character reference: XML 1.0 §2.11 normalises a
+// literal CR to LF in transit, which the server then deletes. That is why
+// PayloadsXMLText preserves CR references instead of decoding them, and
+// why Jamf Pro's own UI emits `&#13;` for banner line breaks. U+2028 also
+// survives untouched and needs no special handling.
+// ---------------------------------------------------------------------
+
+// lineBreakProbePlist builds a profile carrying three line-break probes in
+// two slots each — the top-level ConsentText dictionary (outside
+// PayloadContent) and a direct com.apple.loginwindow payload (a
+// verbatim-stored type):
+//
+//	CR-A&#13;CR-B     carriage-return reference — must survive
+//	LF-A<literal>LF-B literal newline           — server deletes it
+//	LS-A&#8232;LS-B   U+2028 line separator     — must survive
+func lineBreakProbePlist(displayName string) string {
+	probes := "CR-A&#13;CR-B LF-A\nLF-B LS-A&#8232;LS-B"
+	return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ConsentText</key>
+	<dict>
+		<key>default</key>
+		<string>` + probes + `</string>
+	</dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadType</key>
+			<string>com.apple.loginwindow</string>
+			<key>PayloadIdentifier</key>
+			<string>com.example.linebreak.sdk-acc</string>
+			<key>PayloadUUID</key>
+			<string>11111111-2222-3333-4444-555555555555</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>LoginwindowText</key>
+			<string>` + probes + `</string>
+			<key>AdminHostInfo</key>
+			<string>HostName</string>
+		</dict>
+	</array>
+	<key>PayloadDisplayName</key>
+	<string>` + displayName + `</string>
+	<key>PayloadIdentifier</key>
+	<string>com.example.profile.linebreak.sdk-acc</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>66666666-7777-8888-9999-aaaaaaaaaaaa</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>
+`
+}
+
+// assertLineBreakStorage checks the three probes in the stored payload.
+//
+// A surviving CR may legitimately come back either as the reference the
+// wire carried or as a raw CR byte, depending on how the server
+// canonicalises the fragment — both parse to the same value, so either
+// counts. Failure means neither is present: the line break was destroyed,
+// which is the regression this test exists to catch.
+func assertLineBreakStorage(t *testing.T, stage, got string) {
+	t.Helper()
+
+	crSurvived := strings.Contains(got, "CR-A&#13;CR-B") ||
+		strings.Contains(got, "CR-A&#xD;CR-B") ||
+		strings.Contains(got, "CR-A\rCR-B")
+	if !crSurvived {
+		t.Fatalf("%s: carriage-return line break destroyed — expected the reference or a raw CR between CR-A and CR-B. Got:\n%s", stage, got)
+	}
+
+	// The literal-LF deletion is a server defect, asserted in its exact
+	// shape so a server-side fix is detected the moment it ships.
+	if !strings.Contains(got, "LF-ALF-B") {
+		t.Logf("%s: literal LF was NOT deleted — the server defect this file documents may be fixed; re-probe and update the model. Got:\n%s", stage, got)
+	}
+
+	lsSurvived := strings.Contains(got, "LS-A\u2028LS-B") || strings.Contains(got, "LS-A&#8232;LS-B")
+	if !lsSurvived {
+		t.Fatalf("%s: U+2028 line separator destroyed — expected it between LS-A and LS-B. Got:\n%s", stage, got)
+	}
+}
+
+// TestAcceptance_Classic_OSXProfile_LineBreakRoundtrip pins the line-break
+// wire law for the macOS resource across both write verbs. Without
+// PayloadsXMLText preserving CR references, the CR assertion fails: the
+// reference decodes to a literal CR, XML normalisation turns it into LF,
+// and the server deletes it.
+func TestAcceptance_Classic_OSXProfile_LineBreakRoundtrip(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-osxcp-linebreak-" + runSuffix()
+
+	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
+		General: &proclassic.OsXConfigurationProfileGeneral{
+			Name:     classicStrPtr(name),
+			Payloads: payloadsXMLPtr(lineBreakProbePlist(name)),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateOSXConfigurationProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateOSXConfigurationProfileByID: no ID returned: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteOSXConfigurationProfileByID", func() error {
+		return pc.DeleteOSXConfigurationProfileByID(ctx, intToStr(id))
+	})
+
+	afterCreate, err := pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetOSXConfigurationProfileByID after create: %v", err)
+	}
+	if afterCreate == nil || afterCreate.General == nil || afterCreate.General.Payloads == nil {
+		t.Fatalf("GET after create: profile or payloads missing: %+v", afterCreate)
+	}
+	assertLineBreakStorage(t, "after Create (POST)", string(*afterCreate.General.Payloads))
+
+	updateReq := &proclassic.OsXConfigurationProfile{
+		General: &proclassic.OsXConfigurationProfileGeneral{
+			Name:     classicStrPtr(name),
+			Payloads: payloadsXMLPtr(lineBreakProbePlist(name)),
+		},
+	}
+	if err := pc.UpdateOSXConfigurationProfileByID(ctx, intToStr(id), updateReq); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateOSXConfigurationProfileByID: %v", err)
+	}
+
+	afterUpdate, err := pc.GetOSXConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetOSXConfigurationProfileByID after update: %v", err)
+	}
+	if afterUpdate == nil || afterUpdate.General == nil || afterUpdate.General.Payloads == nil {
+		t.Fatalf("GET after update: profile or payloads missing: %+v", afterUpdate)
+	}
+	assertLineBreakStorage(t, "after Update (PUT)", string(*afterUpdate.General.Payloads))
+}
+
+// TestAcceptance_Classic_MobileDeviceProfile_LineBreakRoundtrip mirrors the
+// line-break law for the mobile device resource, which shares the same
+// PayloadsXMLText wire form.
+func TestAcceptance_Classic_MobileDeviceProfile_LineBreakRoundtrip(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	pc := proclassic.New(c)
+
+	name := "sdk-acc-mdcp-linebreak-" + runSuffix()
+
+	created, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
+		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
+			Name:     classicStrPtr(name),
+			Payloads: payloadsXMLPtr(lineBreakProbePlist(name)),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateMobileDeviceConfigurationProfileByID: %v", err)
+	}
+	if created == nil || created.ID == nil {
+		t.Fatalf("CreateMobileDeviceConfigurationProfileByID: no ID returned: %+v", created)
+	}
+	id := *created.ID
+	cleanupDelete(t, "DeleteMobileDeviceConfigurationProfileByID", func() error {
+		return pc.DeleteMobileDeviceConfigurationProfileByID(ctx, intToStr(id))
+	})
+
+	afterCreate, err := pc.GetMobileDeviceConfigurationProfileByID(ctx, intToStr(id))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetMobileDeviceConfigurationProfileByID after create: %v", err)
+	}
+	if afterCreate == nil || afterCreate.General == nil || afterCreate.General.Payloads == nil {
+		t.Fatalf("GET after create: profile or payloads missing: %+v", afterCreate)
+	}
+	assertLineBreakStorage(t, "after Create (POST)", string(*afterCreate.General.Payloads))
 }

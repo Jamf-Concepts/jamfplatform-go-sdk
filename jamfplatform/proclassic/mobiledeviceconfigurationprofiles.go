@@ -18,6 +18,9 @@ import (
 // GetMobileDeviceConfigurationProfileByID finds mobile device configuration profiles by ID.
 //
 // Required privileges: read:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceConfigurationProfileByID(ctx context.Context, id string) (*MobileDeviceConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceConfigurationProfile
@@ -31,6 +34,9 @@ func (c *Client) GetMobileDeviceConfigurationProfileByID(ctx context.Context, id
 // CreateMobileDeviceConfigurationProfileByID creates a new mobile device configuration profile by ID.
 //
 // Required privileges: create:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceConfigurationProfileByID(ctx context.Context, id string, request *MobileDeviceConfigurationProfile) (*MobileDeviceConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceConfigurationProfile
@@ -44,6 +50,9 @@ func (c *Client) CreateMobileDeviceConfigurationProfileByID(ctx context.Context,
 // UpdateMobileDeviceConfigurationProfileByID updates an existing mobile device configuration profile by ID.
 //
 // Required privileges: update:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdateMobileDeviceConfigurationProfileByID(ctx context.Context, id string, request *MobileDeviceConfigurationProfile) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
@@ -56,6 +65,9 @@ func (c *Client) UpdateMobileDeviceConfigurationProfileByID(ctx context.Context,
 // DeleteMobileDeviceConfigurationProfileByID deletes a mobile device configuration profile by ID.
 //
 // Required privileges: delete:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceConfigurationProfileByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
@@ -68,6 +80,9 @@ func (c *Client) DeleteMobileDeviceConfigurationProfileByID(ctx context.Context,
 // GetMobileDeviceConfigurationProfileByName finds mobile device configuration profiles by name.
 //
 // Required privileges: read:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetMobileDeviceConfigurationProfileByName(ctx context.Context, name string) (*MobileDeviceConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceConfigurationProfile
@@ -81,6 +96,9 @@ func (c *Client) GetMobileDeviceConfigurationProfileByName(ctx context.Context, 
 // UpdateMobileDeviceConfigurationProfileByName updates an existing mobile device configuration profile by name.
 //
 // Required privileges: update:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceConfigurationProfileByName(ctx context.Context, name string, request *MobileDeviceConfigurationProfile) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
@@ -93,6 +111,9 @@ func (c *Client) UpdateMobileDeviceConfigurationProfileByName(ctx context.Contex
 // DeleteMobileDeviceConfigurationProfileByName deletes a mobile device configuration profile by name.
 //
 // Required privileges: delete:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceConfigurationProfileByName(ctx context.Context, name string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
@@ -118,6 +139,11 @@ func (c *Client) ListMobileDeviceConfigurationProfiles(ctx context.Context) (*Mo
 // GetMobileDeviceConfigurationProfileByIDSubset finds a subset of data for a mobile device configuration profile by ID.
 //
 // Required privileges: read:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - id: ID to filter by.
+//   - subset: Subset to filter by.
+//     Allowed values: "General", "Scope", "SelfService".
 func (c *Client) GetMobileDeviceConfigurationProfileByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceConfigurationProfile
@@ -131,6 +157,11 @@ func (c *Client) GetMobileDeviceConfigurationProfileByIDSubset(ctx context.Conte
 // GetMobileDeviceConfigurationProfileByNameSubset finds a subset of data for mobile device configuration profiles by name.
 //
 // Required privileges: read:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - name: Name to filter by.
+//   - subset: Subset to filter by.
+//     Allowed values: "General", "Scope", "SelfService".
 func (c *Client) GetMobileDeviceConfigurationProfileByNameSubset(ctx context.Context, name string, subset string) (*MobileDeviceConfigurationProfile, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceConfigurationProfile
@@ -144,6 +175,9 @@ func (c *Client) GetMobileDeviceConfigurationProfileByNameSubset(ctx context.Con
 // CreateMobileDeviceConfigurationProfileByName creates a new mobile device configuration profile by ID.
 //
 // Required privileges: create:pro:ios-configuration-profiles.
+//
+// Parameters:
+//   - name: ID value to filter by.
 func (c *Client) CreateMobileDeviceConfigurationProfileByName(ctx context.Context, name string, request *MobileDeviceConfigurationProfile) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceconfigurationprofiles/name/%s", prefix, url.PathEscape(name))

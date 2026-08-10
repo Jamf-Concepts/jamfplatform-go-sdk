@@ -22,6 +22,9 @@ import (
 //
 // Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - deviceID: The platform deviceId.
 func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string) (*DeviceReportDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	var result DeviceReportDto
@@ -36,6 +39,13 @@ func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string
 //
 // Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - deviceID: The platform deviceId.
+//   - filter: RSQL filter expression. Allowed fields: declarationIdentifier, active, validityState,
+//     declarationType, dateUpdated, channel.
+//   - sort: Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort
+//     criteria are supported.
 func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceID string, filter string, sort []string) ([]FilteredResultDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
@@ -69,6 +79,9 @@ func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceI
 //
 // Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - deviceID: The platform deviceId.
 func (c *Client) GetDeviceChannels(ctx context.Context, deviceID string) (*DeviceChannelsDto, error) {
 	prefix := c.transport.TenantPrefix("ddm/report", "v1")
 	var result DeviceChannelsDto

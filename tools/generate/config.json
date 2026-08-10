@@ -423,6 +423,76 @@
           "name": "UpdateLocalAdminPasswordSettingsV2"
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/pending-rotations",
+          "name": "ListLocalAdminPasswordPendingRotationsV2"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/accounts",
+          "name": "ListLocalAdminPasswordAccountsV2",
+          "pathNames": {
+            "clientManagementId": "clientManagementID"
+          }
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/history",
+          "name": "ListLocalAdminPasswordHistoryV2",
+          "pathNames": {
+            "clientManagementId": "clientManagementID"
+          }
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/password",
+          "name": "GetLocalAdminPasswordV2",
+          "pathNames": {
+            "clientManagementId": "clientManagementID"
+          }
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/audit",
+          "name": "ListLocalAdminPasswordAuditsV2",
+          "pathNames": {
+            "clientManagementId": "clientManagementID"
+          }
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/history",
+          "name": "ListLocalAdminPasswordAccountHistoryV2",
+          "pathNames": {
+            "clientManagementId": "clientManagementID"
+          }
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/{guid}/password",
+          "name": "GetLocalAdminPasswordByGuidV2",
+          "pathNames": {
+            "clientManagementId": "clientManagementID",
+            "guid": "guid"
+          }
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/{guid}/audit",
+          "name": "ListLocalAdminPasswordAuditsByGuidV2",
+          "pathNames": {
+            "clientManagementId": "clientManagementID",
+            "guid": "guid"
+          }
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/{guid}/history",
+          "name": "ListLocalAdminPasswordAccountHistoryByGuidV2",
+          "pathNames": {
+            "clientManagementId": "clientManagementID",
+            "guid": "guid"
+          }
+        },
+        {
+          "op": "PUT /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/set-password",
+          "name": "SetLocalAdminPasswordV2",
+          "pathNames": {
+            "clientManagementId": "clientManagementID"
+          }
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/buildings",
           "name": "ListBuildingsV1",
           "pagination": "totalCount",
@@ -1629,6 +1699,24 @@
           "name": "ListPatchPolicyLogDetailsForDeviceV2"
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations",
+          "name": "ListPatchSoftwareTitleConfigurationsV3",
+          "resolver": {
+            "resourceType": "PatchSoftwareTitleConfigurationV3",
+            "nameField": "displayName",
+            "idField": "id",
+            "mode": "clientFilter",
+            "typedReturn": "PatchSoftwareTitleConfiguration",
+            "apply": {
+              "createOp": "CreatePatchSoftwareTitleConfigurationV3",
+              "updateOp": "UpdatePatchSoftwareTitleConfigurationV3",
+              "deleteOp": "DeletePatchSoftwareTitleConfigurationV3",
+              "nameGoField": "DisplayName",
+              "updateType": "PatchSoftwareTitleConfigurationPatch"
+            }
+          }
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations",
           "name": "ListPatchSoftwareTitleConfigurationsV2",
           "resolver": {
@@ -1647,12 +1735,24 @@
           }
         },
         {
+          "op": "POST /v3/tenant/{tenantId}/patch-software-title-configurations",
+          "name": "CreatePatchSoftwareTitleConfigurationV3"
+        },
+        {
           "op": "POST /v2/tenant/{tenantId}/patch-software-title-configurations",
           "name": "CreatePatchSoftwareTitleConfigurationV2"
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}",
+          "name": "GetPatchSoftwareTitleConfigurationV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}",
           "name": "GetPatchSoftwareTitleConfigurationV2"
+        },
+        {
+          "op": "DELETE /v3/tenant/{tenantId}/patch-software-title-configurations/{id}",
+          "name": "DeletePatchSoftwareTitleConfigurationV3"
         },
         {
           "op": "DELETE /v2/tenant/{tenantId}/patch-software-title-configurations/{id}",
@@ -1660,21 +1760,47 @@
           "expectedStatus": 204
         },
         {
+          "op": "PATCH /v3/tenant/{tenantId}/patch-software-title-configurations/{id}",
+          "name": "UpdatePatchSoftwareTitleConfigurationV3",
+          "contentType": "application/merge-patch+json"
+        },
+        {
           "op": "PATCH /v2/tenant/{tenantId}/patch-software-title-configurations/{id}",
           "name": "UpdatePatchSoftwareTitleConfigurationV2",
           "contentType": "application/merge-patch+json"
+        },
+        {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
+          "name": "GetPatchSoftwareTitleDashboardStatusV3"
         },
         {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
           "name": "GetPatchSoftwareTitleDashboardStatusV2"
         },
         {
+          "op": "POST /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
+          "name": "AddPatchSoftwareTitleToDashboardV3"
+        },
+        {
           "op": "POST /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
           "name": "AddPatchSoftwareTitleToDashboardV2"
         },
         {
+          "op": "DELETE /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
+          "name": "RemovePatchSoftwareTitleFromDashboardV3"
+        },
+        {
           "op": "DELETE /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
           "name": "RemovePatchSoftwareTitleFromDashboardV2"
+        },
+        {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/definitions",
+          "name": "ListPatchSoftwareTitleDefinitionsV3",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ]
         },
         {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/definitions",
@@ -1686,8 +1812,20 @@
           ]
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dependencies",
+          "name": "GetPatchSoftwareTitleDependenciesV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dependencies",
           "name": "GetPatchSoftwareTitleDependenciesV2"
+        },
+        {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/export-report",
+          "name": "ExportPatchSoftwareTitleReportV3",
+          "params": [
+            "filter",
+            "columns-to-export:[]string:columnsToExport"
+          ]
         },
         {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/export-report",
@@ -1698,8 +1836,21 @@
           ]
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/extension-attributes",
+          "name": "ListPatchSoftwareTitleExtensionAttributesV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/extension-attributes",
           "name": "ListPatchSoftwareTitleExtensionAttributesV2"
+        },
+        {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/history",
+          "name": "ListPatchSoftwareTitleHistoryV3",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ]
         },
         {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/history",
@@ -1711,8 +1862,21 @@
           ]
         },
         {
+          "op": "POST /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/history",
+          "name": "CreatePatchSoftwareTitleHistoryNoteV3"
+        },
+        {
           "op": "POST /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/history",
           "name": "CreatePatchSoftwareTitleHistoryNoteV2"
+        },
+        {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-report",
+          "name": "ListPatchSoftwareTitlePatchReportV3",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "filter"
+          ]
         },
         {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-report",
@@ -1724,8 +1888,16 @@
           ]
         },
         {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary",
+          "name": "GetPatchSoftwareTitlePatchSummaryV3"
+        },
+        {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary",
           "name": "GetPatchSoftwareTitlePatchSummaryV2"
+        },
+        {
+          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary/versions",
+          "name": "ListPatchSoftwareTitlePatchSummaryVersionsV3"
         },
         {
           "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary/versions",
@@ -1738,6 +1910,14 @@
         {
           "op": "POST /v1/tenant/{tenantId}/computer-inventory/{id}/remove-mdm-profile",
           "name": "RemoveMdmProfileFromComputerV1"
+        },
+        {
+          "op": "POST /v4/tenant/{tenantId}/computers-inventory/{id}/erase",
+          "name": "EraseComputerV4"
+        },
+        {
+          "op": "POST /v4/tenant/{tenantId}/computers-inventory/{id}/remove-mdm-profile",
+          "name": "RemoveMdmProfileFromComputerV4"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/computers-inventory",
@@ -1814,6 +1994,43 @@
           ]
         },
         {
+          "op": "GET /v4/tenant/{tenantId}/computers-inventory",
+          "name": "ListComputersInventoryV4",
+          "pagination": "totalCount",
+          "params": [
+            "section:[]string",
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "ComputerInventoryV4",
+            "nameField": "general.name",
+            "idField": "id",
+            "mode": "filtered",
+            "extraParams": "section=GENERAL",
+            "typedReturn": "ComputerInventoryV4"
+          },
+          "resolvers": [
+            {
+              "resourceType": "ComputerInventoryV4",
+              "nameField": "hardware.serialNumber",
+              "idField": "id",
+              "mode": "filtered",
+              "extraParams": "section=HARDWARE",
+              "typedReturn": "ComputerInventoryV4",
+              "byField": "BySerialNumber"
+            },
+            {
+              "resourceType": "ComputerInventoryV4",
+              "nameField": "udid",
+              "idField": "id",
+              "mode": "filtered",
+              "typedReturn": "ComputerInventoryV4",
+              "byField": "ByUDID"
+            }
+          ]
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory",
           "name": "ListComputersInventoryV3",
           "pagination": "totalCount",
@@ -1859,6 +2076,10 @@
           "name": "CreateComputerInventoryV2"
         },
         {
+          "op": "POST /v4/tenant/{tenantId}/computers-inventory",
+          "name": "CreateComputerInventoryV4"
+        },
+        {
           "op": "POST /v3/tenant/{tenantId}/computers-inventory",
           "name": "CreateComputerInventoryV3"
         },
@@ -1870,6 +2091,11 @@
         {
           "op": "GET /v2/tenant/{tenantId}/computers-inventory/filevault",
           "name": "ListComputerInventoryFileVaultsV2",
+          "pagination": "totalCount"
+        },
+        {
+          "op": "GET /v4/tenant/{tenantId}/computers-inventory/filevault",
+          "name": "ListComputerInventoryFileVaultsV4",
           "pagination": "totalCount"
         },
         {
@@ -1892,6 +2118,13 @@
           ]
         },
         {
+          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}",
+          "name": "GetComputerInventoryV4",
+          "params": [
+            "section:[]string"
+          ]
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}",
           "name": "GetComputerInventoryV3",
           "params": [
@@ -1907,6 +2140,10 @@
           "name": "DeleteComputerInventoryV2"
         },
         {
+          "op": "DELETE /v4/tenant/{tenantId}/computers-inventory/{id}",
+          "name": "DeleteComputerInventoryV4"
+        },
+        {
           "op": "DELETE /v3/tenant/{tenantId}/computers-inventory/{id}",
           "name": "DeleteComputerInventoryV3",
           "expectedStatus": 204
@@ -1920,6 +2157,10 @@
           "name": "GetComputerInventoryDetailV2"
         },
         {
+          "op": "GET /v4/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "name": "GetComputerInventoryDetailV4"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory-detail/{id}",
           "name": "GetComputerInventoryDetailV3"
         },
@@ -1930,6 +2171,10 @@
         {
           "op": "PATCH /v2/tenant/{tenantId}/computers-inventory-detail/{id}",
           "name": "UpdateComputerInventoryDetailV2"
+        },
+        {
+          "op": "PATCH /v4/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "name": "UpdateComputerInventoryDetailV4"
         },
         {
           "op": "PATCH /v3/tenant/{tenantId}/computers-inventory-detail/{id}",
@@ -1945,6 +2190,10 @@
           "name": "UploadComputerInventoryAttachmentV2"
         },
         {
+          "op": "POST /v4/tenant/{tenantId}/computers-inventory/{id}/attachments",
+          "name": "UploadComputerInventoryAttachmentV4"
+        },
+        {
           "op": "POST /v3/tenant/{tenantId}/computers-inventory/{id}/attachments",
           "name": "UploadComputerInventoryAttachmentV3"
         },
@@ -1957,6 +2206,10 @@
           "name": "DownloadComputerInventoryAttachmentV2"
         },
         {
+          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "name": "DownloadComputerInventoryAttachmentV4"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DownloadComputerInventoryAttachmentV3"
         },
@@ -1967,6 +2220,10 @@
         {
           "op": "DELETE /v2/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DeleteComputerInventoryAttachmentV2"
+        },
+        {
+          "op": "DELETE /v4/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "name": "DeleteComputerInventoryAttachmentV4"
         },
         {
           "op": "DELETE /v3/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
@@ -1982,6 +2239,10 @@
           "name": "GetComputerInventoryFileVaultV2"
         },
         {
+          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}/filevault",
+          "name": "GetComputerInventoryFileVaultV4"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/filevault",
           "name": "GetComputerInventoryFileVaultV3"
         },
@@ -1994,6 +2255,10 @@
           "name": "GetComputerDeviceLockPinV2"
         },
         {
+          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin",
+          "name": "GetComputerDeviceLockPinV4"
+        },
+        {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin",
           "name": "GetComputerDeviceLockPinV3"
         },
@@ -2004,6 +2269,10 @@
         {
           "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",
           "name": "GetComputerRecoveryLockPasswordV2"
+        },
+        {
+          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",
+          "name": "GetComputerRecoveryLockPasswordV4"
         },
         {
           "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",

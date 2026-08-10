@@ -29,6 +29,9 @@ func (c *Client) ListStaticUserGroupsV1(ctx context.Context) ([]StaticUserGroup,
 // GetStaticUserGroupV1 return a specific Static User Group by id.
 //
 // Required privileges: read:pro:user-groups. Legacy Jamf Pro privilege name(s): Read Static User Groups.
+//
+// Parameters:
+//   - id: Instance id of static user group record.
 func (c *Client) GetStaticUserGroupV1(ctx context.Context, id string) (*StaticUserGroup, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result StaticUserGroup

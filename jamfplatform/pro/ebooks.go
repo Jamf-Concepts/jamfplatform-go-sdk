@@ -20,6 +20,10 @@ import (
 // ListEbooksV1 get Ebook object.
 //
 // Required privileges: read:pro:ebooks. Legacy Jamf Pro privilege name(s): Read eBooks.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListEbooksV1(ctx context.Context, sort []string) ([]Ebook, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Ebook, bool, error) {
@@ -49,6 +53,9 @@ func (c *Client) ListEbooksV1(ctx context.Context, sort []string) ([]Ebook, erro
 // GetEbookV1 get specified Ebook object.
 //
 // Required privileges: read:pro:ebooks. Legacy Jamf Pro privilege name(s): Read eBooks.
+//
+// Parameters:
+//   - id: instance id of ebook record.
 func (c *Client) GetEbookV1(ctx context.Context, id string) (*Ebook, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Ebook
@@ -62,6 +69,9 @@ func (c *Client) GetEbookV1(ctx context.Context, id string) (*Ebook, error) {
 // GetEbookScopeV1 get specified scope of Ebook object.
 //
 // Required privileges: read:pro:ebooks. Legacy Jamf Pro privilege name(s): Read eBooks.
+//
+// Parameters:
+//   - id: instance id of ebook record.
 func (c *Client) GetEbookScopeV1(ctx context.Context, id string) (*EbookScope, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result EbookScope

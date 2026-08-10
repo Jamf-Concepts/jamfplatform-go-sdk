@@ -19,9 +19,9 @@ import (
 // Batch 6 — computer-inventory, computer-inventory-collection-settings,
 // inventory-preload, inventory-information.
 //
-// Destructive endpoints (EraseComputerV1, RemoveMdmProfileFromComputerV1,
-// DeleteComputerInventoryV3) are permanently skipped here. They affect
-// real managed computers — no automated probe is safe. Manual curl
+// Destructive endpoints (EraseComputerV1/V4,
+// RemoveMdmProfileFromComputerV1/V4) are permanently skipped here. They
+// affect real managed computers — no automated probe is safe. Manual curl
 // verification against a real target is the only path if needed.
 
 // --- inventory-information ---------------------------------------------
@@ -238,6 +238,215 @@ func TestAcceptance_Pro_Inventory_ComputerCRUDV3(t *testing.T) {
 	}
 }
 
+// --- computer-inventory V4 (read chain) --------------------------------
+//
+// V4 is the successor to the V1/V2/V3 computers-inventory surface, all of
+// which Jamf marked deprecated with a 2026-07-14 date in the 11.30.0 spec
+// (issue #50). The V4 tests below are deliberate duplicates of the V3 ones:
+// the point of retaining both is that a consumer can diff them to see the
+// migration is shape-for-shape, and a V4 regression is caught even while
+// the V3 tests still pass.
+
+func TestAcceptance_Pro_Inventory_ListComputersV4(t *testing.T) {
+	c := accClient(t)
+
+	items, err := pro.New(c).ListComputersInventoryV4(context.Background(), nil, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListComputersInventoryV4: %v", err)
+	}
+	t.Logf("Found %d computers", len(items))
+}
+
+func TestAcceptance_Pro_Inventory_ListComputerFileVaultsV4(t *testing.T) {
+	c := accClient(t)
+
+	items, err := pro.New(c).ListComputerInventoryFileVaultsV4(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListComputerInventoryFileVaultsV4: %v", err)
+	}
+	t.Logf("Found %d computer FileVault records", len(items))
+}
+
+// TestAcceptance_Pro_Inventory_ComputerReadChainV4 mirrors the V3 read chain
+// against V4. Sensitive reads (PIN / recovery password) fire but the values
+// are not logged.
+func TestAcceptance_Pro_Inventory_ComputerReadChainV4(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	computers, err := p.ListComputersInventoryV4(ctx, nil, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListComputersInventoryV4: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("tenant has no computers — no read probes possible")
+	}
+	id := computers[0].ID
+
+	if _, err := p.GetComputerInventoryV4(ctx, id, nil); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("GetComputerInventoryV4(%s): %v", id, err)
+	}
+	if _, err := p.GetComputerInventoryDetailV4(ctx, id); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("GetComputerInventoryDetailV4(%s): %v", id, err)
+	}
+
+	// Per-device FileVault — 404 if the machine isn't encrypted, plumbing ok.
+	if _, err := p.GetComputerInventoryFileVaultV4(ctx, id); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
+			t.Logf("GetComputerInventoryFileVaultV4(%s): 404 — no FileVault record, plumbing OK", id)
+		} else {
+			skipOnServerError(t, err)
+			t.Errorf("GetComputerInventoryFileVaultV4(%s): %v", id, err)
+		}
+	}
+
+	// Device lock PIN and recovery lock password — sensitive. Plumbing only;
+	// do not log values. 4xx on no-PIN-set is acceptable.
+	if _, err := p.GetComputerDeviceLockPinV4(ctx, id); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+			t.Logf("GetComputerDeviceLockPinV4(%s): %d — no PIN set or not eligible, plumbing OK", id, apiErr.StatusCode)
+		} else {
+			skipOnServerError(t, err)
+			t.Errorf("GetComputerDeviceLockPinV4(%s): %v", id, err)
+		}
+	} else {
+		t.Logf("GetComputerDeviceLockPinV4(%s): ok (value not logged)", id)
+	}
+
+	if _, err := p.GetComputerRecoveryLockPasswordV4(ctx, id); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+			t.Logf("GetComputerRecoveryLockPasswordV4(%s): %d — no password set or not eligible, plumbing OK", id, apiErr.StatusCode)
+		} else {
+			skipOnServerError(t, err)
+			t.Errorf("GetComputerRecoveryLockPasswordV4(%s): %v", id, err)
+		}
+	} else {
+		t.Logf("GetComputerRecoveryLockPasswordV4(%s): ok (value not logged)", id)
+	}
+}
+
+// Destructive: permanently skipped. V4 relocated these two actions from
+// /computer-inventory/{id}/… (singular, deprecated) to
+// /computers-inventory/{id}/… (plural), so they are separate methods rather
+// than a rename.
+func TestAcceptance_Pro_Inventory_EraseComputerV4(t *testing.T) {
+	t.Skip("destructive (wipes a real computer) — no automated probe is safe; verify manually via curl against a known disposable target if needed")
+}
+
+func TestAcceptance_Pro_Inventory_RemoveMdmProfileFromComputerV4(t *testing.T) {
+	t.Skip("destructive (removes MDM from a real computer, requires re-enrollment) — verify manually via curl")
+}
+
+// TestAcceptance_Pro_Inventory_ComputerCRUDV4 mirrors the V3 CRUD lifecycle
+// against V4 using a synthetic sdk-acc-* record. Note the create body type
+// differs from V3's: V4 has its own suffixed schema
+// (ComputerInventoryCreateRequestV4 / ComputerGeneralCreateV4) and renamed
+// two general fields — lastContactTime → lastContact, lastReportedIp →
+// lastCheckIn — so this is not a drop-in type swap for callers.
+func TestAcceptance_Pro_Inventory_ComputerCRUDV4(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	udid := "sdk-acc-udid-v4-" + runSuffix()
+	name := "sdk-acc-mac-v4-" + runSuffix()
+
+	created, err := p.CreateComputerInventoryV4(ctx, &pro.ComputerInventoryCreateRequestV4{
+		UDID: &udid,
+		General: &pro.ComputerGeneralCreateV4{
+			Name: name,
+		},
+		Hardware: &pro.ComputerHardwareCreate{
+			Make:            ptr("Apple"),
+			Model:           ptr("SDK Acceptance Virtual"),
+			ModelIdentifier: ptr("SDKAcc1,1"),
+		},
+		OperatingSystem: &pro.ComputerOperatingSystemCreate{
+			Name:    ptr("macOS"),
+			Version: ptr("14.0"),
+			Build:   ptr("23A344"),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateComputerInventoryV4: %v", err)
+	}
+	if created.ID == "" {
+		t.Fatalf("CreateComputerInventoryV4 returned no ID (href=%q)", created.Href)
+	}
+	cleanupDelete(t, "DeleteComputerInventoryV4", func() error { return p.DeleteComputerInventoryV4(ctx, created.ID) })
+	t.Logf("Created computer inventory record %s (udid=%s)", created.ID, udid)
+
+	// Round-trip verify.
+	got, err := p.GetComputerInventoryV4(ctx, created.ID, []string{"GENERAL", "HARDWARE"})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerInventoryV4(%s): %v", created.ID, err)
+	}
+	if got.UDID != udid {
+		t.Errorf("UDID = %q, want %q", got.UDID, udid)
+	}
+
+	// PATCH detail — returns 204.
+	assetTag := "sdk-acc-tag-" + runSuffix()
+	if err := p.UpdateComputerInventoryDetailV4(ctx, created.ID, &pro.ComputerInventoryUpdateRequest{
+		General: &pro.ComputerGeneralUpdate{AssetTag: &assetTag},
+	}); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateComputerInventoryDetailV4(%s): %v", created.ID, err)
+	}
+
+	// Upload attachment (inline bytes).
+	body := "sdk-acc attachment probe payload " + runSuffix()
+	att, err := p.UploadComputerInventoryAttachmentV4(ctx, created.ID, "probe.txt", strings.NewReader(body))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UploadComputerInventoryAttachmentV4(%s): %v", created.ID, err)
+	}
+	t.Logf("Uploaded attachment %s", att.ID)
+
+	// Download the attachment — returns text/plain bytes.
+	downloaded, err := p.DownloadComputerInventoryAttachmentV4(ctx, created.ID, att.ID)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DownloadComputerInventoryAttachmentV4(%s, %s): %v", created.ID, att.ID, err)
+	}
+	if !strings.Contains(string(downloaded), "sdk-acc attachment probe") {
+		t.Errorf("Download body %q does not contain expected probe string", downloaded)
+	}
+
+	// Delete attachment.
+	if err := p.DeleteComputerInventoryAttachmentV4(ctx, created.ID, att.ID); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteComputerInventoryAttachmentV4(%s, %s): %v", created.ID, att.ID, err)
+	}
+
+	// Delete record.
+	if err := p.DeleteComputerInventoryV4(ctx, created.ID); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteComputerInventoryV4(%s): %v", created.ID, err)
+	}
+
+	// Verify gone.
+	_, err = p.GetComputerInventoryV4(ctx, created.ID, nil)
+	if err == nil {
+		t.Fatalf("GetComputerInventoryV4(%s) after delete should 404", created.ID)
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("GetComputerInventoryV4(%s) after delete: want 404, got %v", created.ID, err)
+	}
+}
+
 // --- computer-inventory-collection-settings V2 --------------------------
 
 func TestAcceptance_Pro_Inventory_GetCollectionSettingsV2(t *testing.T) {
@@ -379,7 +588,7 @@ func TestAcceptance_Pro_Inventory_PreloadRecordCRUDV2(t *testing.T) {
 
 	created, err := p.CreateInventoryPreloadRecordV2(ctx, &pro.InventoryPreloadRecordV2{
 		SerialNumber: serial,
-		DeviceType:   "Computer",
+		DeviceType:   pro.InventoryPreloadRecordV2DeviceTypeComputer,
 		Department:   &dept,
 	})
 	if err != nil {

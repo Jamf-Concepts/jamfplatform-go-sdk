@@ -41,6 +41,9 @@ func (c *Client) UploadIconV1(ctx context.Context, fileFilename string, file io.
 // GetIconV1 get an icon.
 //
 // Required privileges: none (callable by any authenticated API client).
+//
+// Parameters:
+//   - id: id of the icon.
 func (c *Client) GetIconV1(ctx context.Context, id string) (*IconResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result IconResponse
@@ -54,6 +57,12 @@ func (c *Client) GetIconV1(ctx context.Context, id string) (*IconResponse, error
 // DownloadIconV1 download a self service icon.
 //
 // Required privileges: none (callable by any authenticated API client).
+//
+// Parameters:
+//   - id: id of the self service icon.
+//   - res: request a specific resolution of original, 300, or 512; invalid options will result in original
+//     resolution.
+//   - scale: request a scale; 0 results in original image, non-0 results in scaled to 300.
 func (c *Client) DownloadIconV1(ctx context.Context, id string, res int, scale string) ([]byte, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result []byte

@@ -21,6 +21,13 @@ import (
 //
 // Required privileges: read:pro:categories, read:pro:self-service. Legacy Jamf Pro privilege name(s): Read Categories, Read Self Service.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter categories collection. Default filter is empty query -
+//     returning all results for the requested page. Fields allowed in the query: name, priority. This
+//     param can be combined with paging and sorting. Example: filter=name=="Apps*" and priority>=5.
 func (c *Client) ListCategoriesV1(ctx context.Context, sort []string, filter string) ([]Category, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]Category, bool, error) {
@@ -78,6 +85,9 @@ func (c *Client) DeleteMultipleCategoriesV1(ctx context.Context, request *Ids) e
 // GetCategoryV1 get specified Category object.
 //
 // Required privileges: read:pro:categories. Legacy Jamf Pro privilege name(s): Read Categories.
+//
+// Parameters:
+//   - id: instance id of category record.
 func (c *Client) GetCategoryV1(ctx context.Context, id string) (*Category, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Category
@@ -91,6 +101,9 @@ func (c *Client) GetCategoryV1(ctx context.Context, id string) (*Category, error
 // UpdateCategoryV1 update specified Category object.
 //
 // Required privileges: update:pro:categories. Legacy Jamf Pro privilege name(s): Update Categories.
+//
+// Parameters:
+//   - id: instance id of category record.
 func (c *Client) UpdateCategoryV1(ctx context.Context, id string, request *Category) (*Category, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result Category
@@ -104,6 +117,9 @@ func (c *Client) UpdateCategoryV1(ctx context.Context, id string, request *Categ
 // DeleteCategoryV1 remove specified Category record.
 //
 // Required privileges: delete:pro:categories. Legacy Jamf Pro privilege name(s): Delete Categories.
+//
+// Parameters:
+//   - id: instance id of category record.
 func (c *Client) DeleteCategoryV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/categories/%s", prefix, url.PathEscape(id))
@@ -116,6 +132,15 @@ func (c *Client) DeleteCategoryV1(ctx context.Context, id string) error {
 // ListCategoryHistoryV1 get specified Category history object.
 //
 // Required privileges: read:pro:categories. Legacy Jamf Pro privilege name(s): Read Categories.
+//
+// Parameters:
+//   - id: instance id of category history record.
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+//   - filter: Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query
+//   - returning all results for the requested page. Fields allowed in the query: username, date, note,
+//     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
+//     details==*disabled* and date<2019-12-15.
 func (c *Client) ListCategoryHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
@@ -148,6 +173,9 @@ func (c *Client) ListCategoryHistoryV1(ctx context.Context, id string, sort []st
 // CreateCategoryHistoryNoteV1 add specified Category history object notes.
 //
 // Required privileges: update:pro:categories. Legacy Jamf Pro privilege name(s): Update Categories.
+//
+// Parameters:
+//   - id: instance id of category history record.
 func (c *Client) CreateCategoryHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result ObjectHistory

@@ -32,6 +32,9 @@ func (c *Client) ListSavedSearches(ctx context.Context) (*SavedSearches, error) 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: read:pro:advanced-computer-searches.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetSavedSearchByID(ctx context.Context, id string) (*SavedSearches, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SavedSearches
@@ -47,6 +50,9 @@ func (c *Client) GetSavedSearchByID(ctx context.Context, id string) (*SavedSearc
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
 // Required privileges: read:pro:advanced-computer-searches.
+//
+// Parameters:
+//   - name: Name to filter by.
 func (c *Client) GetSavedSearchByName(ctx context.Context, name string) (*SavedSearches, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result SavedSearches

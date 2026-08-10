@@ -54,6 +54,9 @@ func (c *Client) CreateLogFlushingTaskV1(ctx context.Context, request *LogFlushi
 // GetLogFlushingTaskV1 get log flushing task.
 //
 // Required privileges: read:pro:retention-policy. Legacy Jamf Pro privilege name(s): Read Retention Policy.
+//
+// Parameters:
+//   - id: The identifier of the log flushing task.
 func (c *Client) GetLogFlushingTaskV1(ctx context.Context, id string) (*LogFlushingTaskV1, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	var result LogFlushingTaskV1
@@ -67,6 +70,9 @@ func (c *Client) GetLogFlushingTaskV1(ctx context.Context, id string) (*LogFlush
 // DeleteLogFlushingTaskV1 cancels a log flushing task.
 //
 // Required privileges: update:pro:retention-policy. Legacy Jamf Pro privilege name(s): Update Retention Policy.
+//
+// Parameters:
+//   - id: The identifier of the log flushing task.
 func (c *Client) DeleteLogFlushingTaskV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/log-flushing/task/%s", prefix, url.PathEscape(id))

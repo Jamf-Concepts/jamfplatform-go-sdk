@@ -100,6 +100,9 @@ func (c *Client) CreateComputerInventoryCollectionCustomPathV2(ctx context.Conte
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
 // Required privileges: delete:pro:custom-paths. Legacy Jamf Pro privilege name(s): Delete Custom Paths.
+//
+// Parameters:
+//   - id: id of Custom Path.
 func (c *Client) DeleteComputerInventoryCollectionCustomPathV1(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/computer-inventory-collection-settings/custom-path/%s", prefix, url.PathEscape(id))
@@ -112,6 +115,9 @@ func (c *Client) DeleteComputerInventoryCollectionCustomPathV1(ctx context.Conte
 // DeleteComputerInventoryCollectionCustomPathV2 delete Custom Path from Computer Inventory Collection Settings.
 //
 // Required privileges: delete:pro:custom-paths. Legacy Jamf Pro privilege name(s): Delete Custom Paths.
+//
+// Parameters:
+//   - id: id of Custom Path.
 func (c *Client) DeleteComputerInventoryCollectionCustomPathV2(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computer-inventory-collection-settings/custom-path/%s", prefix, url.PathEscape(id))

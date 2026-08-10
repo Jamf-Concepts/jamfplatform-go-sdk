@@ -7,129 +7,181 @@ package devicegroups
 
 // ApiErrorCauseRepresentation represents a api error cause representation.
 type ApiErrorCauseRepresentation struct {
-	Code        string `json:"code"`
+	// Error-specific code that can be used to identify localization string, etc.
+	Code string `json:"code"`
+	// A general description of error for troubleshooting/debugging. Generally this text should not be
+	// displayed to a user; instead refer to errorCode and its localized text.
 	Description string `json:"description"`
-	Field       string `json:"field"`
-	ID          string `json:"id"`
+	// Name of the field that caused the error.
+	Field string `json:"field"`
+	// id of object with error. Optional.
+	ID string `json:"id"`
 }
 
 // ApiErrorRepresentation represents a api error representation.
 type ApiErrorRepresentation struct {
-	Errors     []ApiErrorCauseRepresentation `json:"errors"`
-	HttpStatus int                           `json:"httpStatus"`
-	TraceID    string                        `json:"traceId"`
+	Errors []ApiErrorCauseRepresentation `json:"errors"`
+	// HTTP status of the response.
+	HttpStatus int    `json:"httpStatus"`
+	TraceID    string `json:"traceId"`
 }
 
 // DeviceGroupCreateRepresentationV1 represents a device group create representation v1.
 type DeviceGroupCreateRepresentationV1 struct {
-	Criteria    *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
-	Description *string                                `json:"description,omitempty"`
-	DeviceType  DeviceTypeV1                           `json:"deviceType"`
-	GroupType   GroupTypeV1                            `json:"groupType"`
-	Members     *[]string                              `json:"members,omitempty"`
-	Name        string                                 `json:"name"`
+	// The criteria used to calculate the group's members. Can only be used if `groupType` is `SMART`.
+	Criteria *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
+	// Description of the device group.
+	Description *string `json:"description,omitempty"`
+	// Type of device.
+	DeviceType DeviceTypeV1 `json:"deviceType"`
+	// Type of the device group.
+	GroupType GroupTypeV1 `json:"groupType"`
+	// The IDs of the devices to be added to the group, in UUID format. Can only be used if `groupType` is
+	// `STATIC`.
+	Members *[]string `json:"members,omitempty"`
+	// Name of the device group.
+	Name string `json:"name"`
 }
 
 // DeviceGroupCriteriaRepresentationV1 represents a device group criteria representation v1.
 type DeviceGroupCriteriaRepresentationV1 struct {
-	AttributeName         string     `json:"attributeName"`
-	AttributeValue        string     `json:"attributeValue"`
-	HasClosingParenthesis *bool      `json:"hasClosingParenthesis,omitempty"`
-	HasOpeningParenthesis *bool      `json:"hasOpeningParenthesis,omitempty"`
-	JoinType              JoinTypeV1 `json:"joinType"`
-	Operator              string     `json:"operator"`
-	Order                 int        `json:"order"`
+	// Name of the attribute used in the criteria.
+	AttributeName string `json:"attributeName"`
+	// Value of the attribute used in the criteria.
+	AttributeValue string `json:"attributeValue"`
+	// Indicates if the criteria ends with a closing parenthesis.
+	HasClosingParenthesis *bool `json:"hasClosingParenthesis,omitempty"`
+	// Indicates if the criteria starts with an opening parenthesis.
+	HasOpeningParenthesis *bool `json:"hasOpeningParenthesis,omitempty"`
+	// Type of join for criteria.
+	JoinType JoinTypeV1 `json:"joinType"`
+	// Operator used for the criteria.
+	Operator string `json:"operator"`
+	// Order of the criteria in the group. All criteria must have a unique, sequential order starting from
+	// 0.
+	Order int `json:"order"`
 }
 
 // DeviceGroupListReadRepresentationV1 represents a device group list read representation v1.
 type DeviceGroupListReadRepresentationV1 struct {
-	Description string       `json:"description"`
-	DeviceType  DeviceTypeV1 `json:"deviceType"`
-	GroupType   GroupTypeV1  `json:"groupType"`
-	ID          string       `json:"id"`
-	MemberCount int          `json:"memberCount"`
-	Name        string       `json:"name"`
+	// Description of the device group.
+	Description string `json:"description"`
+	// Type of device.
+	DeviceType DeviceTypeV1 `json:"deviceType"`
+	// Type of the device group.
+	GroupType GroupTypeV1 `json:"groupType"`
+	// The ID of the device group, in UUID format.
+	ID string `json:"id"`
+	// Number of devices in the group.
+	MemberCount int `json:"memberCount"`
+	// Name of the device group.
+	Name string `json:"name"`
 }
 
 // DeviceGroupMemberOfRepresentationV1 represents a device group member of representation v1.
 type DeviceGroupMemberOfRepresentationV1 struct {
-	GroupID   string `json:"groupId"`
+	// The ID of the device group, in UUID format.
+	GroupID string `json:"groupId"`
+	// Name of the device group.
 	GroupName string `json:"groupName"`
 }
 
 // DeviceGroupMemberPatchRepresentationV1 represents a device group member patch representation v1.
 type DeviceGroupMemberPatchRepresentationV1 struct {
-	Added   *[]string `json:"added,omitempty"`
+	// List of device IDs to be added to the group, in UUID format.
+	Added *[]string `json:"added,omitempty"`
+	// List of device IDs to be removed from the group, in UUID format.
 	Removed *[]string `json:"removed,omitempty"`
 }
 
 // DeviceGroupReadRepresentationV1 represents a device group read representation v1.
 type DeviceGroupReadRepresentationV1 struct {
-	Criteria    *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
-	Description string                                 `json:"description"`
-	DeviceType  DeviceTypeV1                           `json:"deviceType"`
-	GroupType   GroupTypeV1                            `json:"groupType"`
-	ID          string                                 `json:"id"`
-	MemberCount int                                    `json:"memberCount"`
-	Name        string                                 `json:"name"`
+	// Criteria used to calculate the group's members, if applicable.
+	Criteria *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
+	// Description of the device group.
+	Description string `json:"description"`
+	// Type of device.
+	DeviceType DeviceTypeV1 `json:"deviceType"`
+	// Type of the device group.
+	GroupType GroupTypeV1 `json:"groupType"`
+	// The ID of the device group, in UUID format.
+	ID string `json:"id"`
+	// Number of devices in the group.
+	MemberCount int `json:"memberCount"`
+	// Name of the device group.
+	Name string `json:"name"`
 }
 
 // DeviceGroupUpdateRepresentationV1 represents a device group update representation v1.
 type DeviceGroupUpdateRepresentationV1 struct {
-	Criteria    *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
-	Description *string                                `json:"description,omitempty"`
-	Name        *string                                `json:"name,omitempty"`
+	// The criteria used to calculate the group's members. Can only be used if `groupType` is `SMART`.
+	Criteria *[]DeviceGroupCriteriaRepresentationV1 `json:"criteria,omitempty"`
+	// Description of the device group.
+	Description *string `json:"description,omitempty"`
+	// Name of the device group.
+	Name *string `json:"name,omitempty"`
 }
-
-// DeviceTypeV1 represents a device type v1 value.
-type DeviceTypeV1 = string
-
-// GroupTypeV1 represents a group type v1 value.
-type GroupTypeV1 = string
 
 // HrefRepresentation represents a href representation.
 type HrefRepresentation struct {
+	// URL of the resource.
 	Href string `json:"href"`
-	ID   string `json:"id"`
+	// The ID of the resource, in UUID format.
+	ID string `json:"id"`
 }
-
-// JoinTypeV1 represents a join type v1 value.
-type JoinTypeV1 = string
 
 // ListDeviceGroupMemberOfResponseRepresentation represents a list device group member of response representation.
 type ListDeviceGroupMemberOfResponseRepresentation struct {
-	Results    []DeviceGroupMemberOfRepresentationV1 `json:"results"`
-	TotalCount int                                   `json:"totalCount"`
+	// List of device groups for the specified device.
+	Results []DeviceGroupMemberOfRepresentationV1 `json:"results"`
+	// Total number of results across all pages.
+	TotalCount int `json:"totalCount"`
 }
 
 // ListDeviceGroupMemberReadRepresentation represents a list device group member read representation.
 type ListDeviceGroupMemberReadRepresentation struct {
-	Results    []string `json:"results"`
-	TotalCount int      `json:"totalCount"`
+	// List of device group members.
+	Results []string `json:"results"`
+	// Total number of results across all pages.
+	TotalCount int `json:"totalCount"`
 }
 
 // ListResponseRepresentation represents a list response representation.
 type ListResponseRepresentation struct {
+	// Total number of results across all pages.
 	TotalCount int `json:"totalCount"`
 }
 
 // PaginatedDeviceGroupResponseRepresentation represents a paginated device group response representation.
 type PaginatedDeviceGroupResponseRepresentation struct {
-	HasNext     bool                                  `json:"hasNext"`
-	HasPrevious bool                                  `json:"hasPrevious"`
-	Page        int                                   `json:"page"`
-	PageSize    int                                   `json:"pageSize"`
-	Results     []DeviceGroupListReadRepresentationV1 `json:"results"`
-	TotalCount  int                                   `json:"totalCount"`
-	TotalPages  int                                   `json:"totalPages"`
+	// Whether there is a next page.
+	HasNext bool `json:"hasNext"`
+	// Whether there is a previous page.
+	HasPrevious bool `json:"hasPrevious"`
+	// Current page number (0-based).
+	Page int `json:"page"`
+	// Number of items per page.
+	PageSize int `json:"pageSize"`
+	// List of device groups for the current page.
+	Results []DeviceGroupListReadRepresentationV1 `json:"results"`
+	// Total number of results across all pages.
+	TotalCount int `json:"totalCount"`
+	// Total number of pages.
+	TotalPages int `json:"totalPages"`
 }
 
 // PaginatedResponseRepresentation represents a paginated response representation.
 type PaginatedResponseRepresentation struct {
-	HasNext     bool `json:"hasNext"`
+	// Whether there is a next page.
+	HasNext bool `json:"hasNext"`
+	// Whether there is a previous page.
 	HasPrevious bool `json:"hasPrevious"`
-	Page        int  `json:"page"`
-	PageSize    int  `json:"pageSize"`
-	TotalCount  int  `json:"totalCount"`
-	TotalPages  int  `json:"totalPages"`
+	// Current page number (0-based).
+	Page int `json:"page"`
+	// Number of items per page.
+	PageSize int `json:"pageSize"`
+	// Total number of results across all pages.
+	TotalCount int `json:"totalCount"`
+	// Total number of pages.
+	TotalPages int `json:"totalPages"`
 }

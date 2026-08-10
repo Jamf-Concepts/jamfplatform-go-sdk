@@ -15,6 +15,9 @@ import (
 // GetPeripheralByID finds peripherals by ID.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetPeripheralByID(ctx context.Context, id string) (*Peripheral, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Peripheral
@@ -28,6 +31,9 @@ func (c *Client) GetPeripheralByID(ctx context.Context, id string) (*Peripheral,
 // CreatePeripheralByID creates a new peripheral by ID.
 //
 // Required privileges: create:pro:computers.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreatePeripheralByID(ctx context.Context, id string, request *PeripheralPost) (*Peripheral, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Peripheral
@@ -41,6 +47,9 @@ func (c *Client) CreatePeripheralByID(ctx context.Context, id string, request *P
 // UpdatePeripheralByID updates an existing peripheral by ID.
 //
 // Required privileges: update:pro:computers.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) UpdatePeripheralByID(ctx context.Context, id string, request *PeripheralPost) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/peripherals/id/%s", prefix, url.PathEscape(id))
@@ -53,6 +62,9 @@ func (c *Client) UpdatePeripheralByID(ctx context.Context, id string, request *P
 // DeletePeripheralByID deletes a peripheral by ID.
 //
 // Required privileges: delete:pro:computers.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeletePeripheralByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/peripherals/id/%s", prefix, url.PathEscape(id))
@@ -65,6 +77,11 @@ func (c *Client) DeletePeripheralByID(ctx context.Context, id string) error {
 // GetPeripheralByIDSubset finds a subset of data for a peripheral.
 //
 // Required privileges: read:pro:computers.
+//
+// Parameters:
+//   - id: ID to filter by.
+//   - subset: Subset to filter by.
+//     Allowed values: "General", "Location", "Purchasing", "Attachments".
 func (c *Client) GetPeripheralByIDSubset(ctx context.Context, id string, subset string) (*Peripheral, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result Peripheral

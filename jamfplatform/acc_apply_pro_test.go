@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -314,9 +315,9 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 	id, created, err := p.ApplyComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                          name,
 		Enabled:                       &boolTrue,
-		DataType:                      "STRING",
-		InputType:                     "TEXT",
-		InventoryDisplayType:          "GENERAL",
+		DataType:                      pro.ComputerExtensionAttributesDataTypeString,
+		InputType:                     pro.ComputerExtensionAttributesInputTypeText,
+		InventoryDisplayType:          pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
 		Description:                   strPtr("SDK acceptance test"),
 		LdapAttributeMapping:          &emptyStr,
 		LdapExtensionAttributeAllowed: &boolFalse,
@@ -333,9 +334,9 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 	id2, created2, err := p.ApplyComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                          name,
 		Enabled:                       &boolTrue,
-		DataType:                      "STRING",
-		InputType:                     "TEXT",
-		InventoryDisplayType:          "GENERAL",
+		DataType:                      pro.ComputerExtensionAttributesDataTypeString,
+		InputType:                     pro.ComputerExtensionAttributesInputTypeText,
+		InventoryDisplayType:          pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
 		Description:                   strPtr("SDK acceptance test updated"),
 		LdapAttributeMapping:          &emptyStr,
 		LdapExtensionAttributeAllowed: &boolFalse,
@@ -371,9 +372,9 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 	id, created, err := p.ApplyMobileDeviceExtensionAttributeV1(ctx, &pro.MobileDeviceExtensionAttributes{
 		Name:                          name,
-		DataType:                      "STRING",
-		InputType:                     "TEXT",
-		InventoryDisplayType:          "GENERAL",
+		DataType:                      pro.MobileDeviceExtensionAttributesDataTypeString,
+		InputType:                     pro.MobileDeviceExtensionAttributesInputTypeText,
+		InventoryDisplayType:          pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
 		Description:                   ptr("SDK acceptance test"),
 		LdapAttributeMapping:          ptr(""),
 		LdapExtensionAttributeAllowed: ptr(false),
@@ -389,9 +390,9 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 	id2, created2, err := p.ApplyMobileDeviceExtensionAttributeV1(ctx, &pro.MobileDeviceExtensionAttributes{
 		Name:                          name,
-		DataType:                      "STRING",
-		InputType:                     "TEXT",
-		InventoryDisplayType:          "GENERAL",
+		DataType:                      pro.MobileDeviceExtensionAttributesDataTypeString,
+		InputType:                     pro.MobileDeviceExtensionAttributesInputTypeText,
+		InventoryDisplayType:          pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
 		Description:                   ptr("SDK acceptance test updated"),
 		LdapAttributeMapping:          ptr(""),
 		LdapExtensionAttributeAllowed: ptr(false),
@@ -611,7 +612,7 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 	principal := true
 	id, created, err := p.ApplyDistributionPointV1(ctx, &pro.DistributionPoint{
 		Name:                      name,
-		FileSharingConnectionType: "SMB",
+		FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb,
 		ServerName:                "test-server.example.com",
 		ShareName:                 strPtr("share"),
 		ReadOnlyUsername:          strPtr("rouser"),
@@ -629,7 +630,7 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 
 	id2, created2, err := p.ApplyDistributionPointV1(ctx, &pro.DistributionPoint{
 		Name:                      name,
-		FileSharingConnectionType: "SMB",
+		FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb,
 		ServerName:                "test-server-updated.example.com",
 		ShareName:                 strPtr("share"),
 		ReadOnlyUsername:          strPtr("rouser"),
@@ -1007,8 +1008,8 @@ func TestAcceptance_ApplyAppInstallerDeploymentV1(t *testing.T) {
 	req := &pro.AppInstallerDeploymentCreate{
 		Name:           name,
 		AppTitleID:     titleID,
-		DeploymentType: "INSTALL_AUTOMATICALLY",
-		UpdateBehavior: "AUTOMATIC",
+		DeploymentType: pro.AppInstallerDeploymentCreateDeploymentTypeInstallAutomatically,
+		UpdateBehavior: pro.AppInstallerDeploymentCreateUpdateBehaviorAutomatic,
 	}
 
 	id, created, err := p.ApplyAppInstallerDeploymentV1(ctx, req)
@@ -1231,6 +1232,77 @@ func TestAcceptance_ApplyPatchSoftwareTitleConfigurationV2(t *testing.T) {
 	}
 }
 
+// ---------- PatchSoftwareTitleConfigurationV3 ----------
+
+// TestAcceptance_ApplyPatchSoftwareTitleConfigurationV3 exercises apply on the
+// undeprecated V3 surface (issue #50). Unlike the V2 test above it does not
+// depend on the tenant already having a configuration — the fixture seeds one.
+//
+// Only the update leg is reachable. On a Jamf-official patch source the
+// configuration id and its softwareTitleId are the same record (verified on
+// 11.30.2: seeding via Classic returns id N and the Pro configuration reports
+// softwareTitleId=N; deleting via Pro removes the Classic record too). So
+// there is no state in which a valid softwareTitleId exists with no
+// configuration attached, which is exactly what apply's create leg would need
+// — a create against a deleted fixture's id answers
+// [SOFTWARE_TITLE_ID_NOT_FOUND]. Reaching it needs an external patch source
+// feeding title ids independently of configurations, which this suite cannot
+// provision. The create path itself is still covered: see
+// TestAcceptance_Pro_Patch_CreateConfigV3 for the field-level rejection and
+// TestAcceptance_Pro_Patch_SoftwareTitleConfigV3Lifecycle for a real create
+// via the fixture.
+func TestAcceptance_ApplyPatchSoftwareTitleConfigurationV3(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	fixtureID := seedPatchSoftwareTitleFixture(t)
+	cleanupDelete(t, "PatchSoftwareTitleConfigV3 fixture "+fixtureID, func() error {
+		return p.DeletePatchSoftwareTitleConfigurationV3(ctx, fixtureID)
+	})
+	fixture, err := p.GetPatchSoftwareTitleConfigurationV3(ctx, fixtureID)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetPatchSoftwareTitleConfigurationV3(%s): %v", fixtureID, err)
+	}
+
+	// Apply resolves the fixture by name and PATCHes it, flipping a field so
+	// the update is observable rather than a no-op round-trip.
+	wantEmail := !fixture.EmailNotifications
+	id, created, err := p.ApplyPatchSoftwareTitleConfigurationV3(ctx, &pro.PatchSoftwareTitleConfigurationBase{
+		DisplayName:        fixture.DisplayName,
+		SoftwareTitleID:    fixture.SoftwareTitleID,
+		EmailNotifications: &wantEmail,
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("apply update: %v", err)
+	}
+	if created {
+		t.Error("expected created = false — the fixture already exists under this name")
+	}
+	if id != fixtureID {
+		t.Errorf("id mismatch: fixture=%s apply=%s", fixtureID, id)
+	}
+	after, err := p.GetPatchSoftwareTitleConfigurationV3(ctx, id)
+	if err != nil {
+		t.Fatalf("GetPatchSoftwareTitleConfigurationV3(%s) after apply: %v", id, err)
+	}
+	if after.EmailNotifications != wantEmail {
+		t.Errorf("emailNotifications = %v after apply, want %v", after.EmailNotifications, wantEmail)
+	}
+	t.Logf("apply updated %q (id=%s): emailNotifications %v → %v",
+		fixture.DisplayName, id, fixture.EmailNotifications, after.EmailNotifications)
+
+	// Delete + verify the resolver reports not-found.
+	if err := p.DeletePatchSoftwareTitleConfigurationV3(ctx, id); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	if _, err := p.ResolvePatchSoftwareTitleConfigurationV3IDByName(ctx, fixture.DisplayName); err == nil {
+		t.Fatal("expected not-found after delete")
+	}
+}
+
 // ---------- SupervisionIdentityV1 ----------
 
 func TestAcceptance_ApplySupervisionIdentityV1(t *testing.T) {
@@ -1332,6 +1404,31 @@ func TestAcceptance_ApplyVolumePurchasingLocationV1(t *testing.T) {
 
 // ---------- Prestage Apply (Computer + Mobile, shared DEP token) ----------
 
+// prestagePut500 reports whether err is the specific known prestage PUT defect:
+// HTTP 500 carrying an empty `errors` array while the write commits.
+//
+// Wire-probed 2026-07-31 against us.apigw.jamf.com, both endpoints:
+//
+//	PUT computer-prestages/{id}       500 {"httpStatus":500,"errors":[]}, displayName applied, versionLock 0 → 1
+//	PUT mobile-device-prestages/{id}  500 {"httpStatus":500,"errors":[]}, displayName applied, versionLock 1 → 2
+//
+// PI-1414 (Triaged, regression since 11.28) covers the computer endpoint;
+// PI-1529 covers the mobile endpoint.
+//
+// Deliberately narrow: it matches only 500 with an EMPTY error list, so a 500
+// that carries real detail, or any other status, still fails the test. Callers
+// must keep asserting the resulting state — tolerating the status is not the
+// same as tolerating a failed write.
+func prestagePut500(t *testing.T, err error, endpoint string) bool {
+	t.Helper()
+	apiErr := jamfplatform.AsAPIError(err)
+	if apiErr == nil || !apiErr.HasStatus(http.StatusInternalServerError) || len(apiErr.Details()) > 0 {
+		return false
+	}
+	t.Logf("tolerating known %s-prestage PUT 500 (write commits; PI-1414 computer / PI-1529 mobile): %v", endpoint, err)
+	return true
+}
+
 // TestAcceptance_ApplyPrestages exercises both ComputerPrestageV3 and
 // MobileDevicePrestageV3 Apply lifecycle sharing a single DEP token:
 //  1. Upload DEP token
@@ -1390,11 +1487,11 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 			RequireAuthentication:              false,
 			EnableRecoveryLock:                 &falseVal,
 			RotateRecoveryLockPassword:         &falseVal,
-			RecoveryLockPasswordType:           ptr("MANUAL"),
+			RecoveryLockPasswordType:           ptr(pro.PostComputerPrestageV3RecoveryLockPasswordTypeManual),
 			EnrollmentSiteID:                   "-1",
 			CustomPackageDistributionPointID:   "-1",
 			EnrollmentCustomizationID:          &zeroStr,
-			PrestageMinimumOsTargetVersionType: ptr("NO_ENFORCEMENT"),
+			PrestageMinimumOsTargetVersionType: ptr(pro.PostComputerPrestageV3PrestageMinimumOsTargetVersionTypeNoEnforcement),
 			SkipSetupItems:                     &map[string]bool{},
 			AnchorCertificates:                 &[]string{},
 			CustomPackageIds:                   []string{},
@@ -1437,7 +1534,14 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		req.Mandatory = true // change something to force a real update
 		id2, created2, err := p.ApplyComputerPrestageV3(ctx, req)
 		if err != nil {
-			t.Fatalf("apply update: %v", err)
+			// PI-1414: PUT /api/v3/computer-prestages/{id} answers 500 with an
+			// empty error list on every request while committing the write. The
+			// state assertions below still run, so a real update failure is
+			// still caught — only the misleading status is tolerated.
+			if !prestagePut500(t, err, "computer") {
+				t.Fatalf("apply update: %v", err)
+			}
+			id2, created2 = id, false
 		}
 		if created2 {
 			t.Error("expected created = false on second apply")
@@ -1452,6 +1556,9 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		}
 		if got2.VersionLock <= got.VersionLock {
 			t.Errorf("versionLock did not advance: was %d, now %d", got.VersionLock, got2.VersionLock)
+		}
+		if !got2.Mandatory {
+			t.Error("update did not commit: mandatory is still false")
 		}
 		t.Logf("after update: versionLock=%d", got2.VersionLock)
 
@@ -1539,7 +1646,15 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		req.Mandatory = false // flip from true to force a real update
 		id2, created2, err := p.ApplyMobileDevicePrestageV3(ctx, req)
 		if err != nil {
-			t.Fatalf("apply update: %v", err)
+			// Same defect as PI-1414, on the mobile endpoint: PUT
+			// /api/v3/mobile-device-prestages/{id} answers 500 with an empty
+			// error list while committing the write (wire-probed 2026-07-31,
+			// versionLock 1 → 2 on a renaming PUT). Filed as PI-1529;
+			// PI-1414 names only computer-prestages.
+			if !prestagePut500(t, err, "mobile-device") {
+				t.Fatalf("apply update: %v", err)
+			}
+			id2, created2 = id, false
 		}
 		if created2 {
 			t.Error("expected created = false on second apply")
@@ -1554,6 +1669,9 @@ func TestAcceptance_ApplyPrestages(t *testing.T) {
 		}
 		if got2.VersionLock <= got.VersionLock {
 			t.Errorf("versionLock did not advance: was %d, now %d", got.VersionLock, got2.VersionLock)
+		}
+		if got2.Mandatory {
+			t.Error("update did not commit: mandatory is still true")
 		}
 		t.Logf("after update: versionLock=%d", got2.VersionLock)
 

@@ -273,7 +273,7 @@ func TestAcceptance_Classic_ScriptCRUD(t *testing.T) {
 	created, err := pc.CreateScriptByID(ctx, "0", &proclassic.Script{
 		Name:           classicStrPtr(name),
 		ScriptContents: classicStrPtr(contents),
-		Priority:       classicStrPtr("After"),
+		Priority:       classicStrPtr(proclassic.ScriptPriorityAfter),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -360,7 +360,7 @@ func TestAcceptance_Classic_ComputerEACRUD(t *testing.T) {
 	name := "sdk-acc-classic-ea-" + runSuffix()
 	created, err := pc.CreateComputerExtensionAttributeByID(ctx, "0", &proclassic.ComputerExtensionAttribute{
 		Name:     classicStrPtr(name),
-		DataType: classicStrPtr("String"),
+		DataType: classicStrPtr(proclassic.ComputerExtensionAttributeDataTypeString),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -400,7 +400,7 @@ func TestAcceptance_Classic_MobileDeviceEACRUD(t *testing.T) {
 	name := "sdk-acc-classic-mdea-" + runSuffix()
 	created, err := pc.CreateMobileDeviceExtensionAttributeByID(ctx, "0", &proclassic.MobileDeviceExtensionAttribute{
 		Name:     classicStrPtr(name),
-		DataType: classicStrPtr("String"),
+		DataType: classicStrPtr(proclassic.MobileDeviceExtensionAttributeDataTypeString),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -431,7 +431,7 @@ func TestAcceptance_Classic_UserEACRUD(t *testing.T) {
 	name := "sdk-acc-classic-uea-" + runSuffix()
 	created, err := pc.CreateUserExtensionAttributeByID(ctx, "0", &proclassic.UserExtensionAttribute{
 		Name:     classicStrPtr(name),
-		DataType: classicStrPtr("String"),
+		DataType: classicStrPtr(proclassic.UserExtensionAttributeDataTypeString),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1151,8 +1151,8 @@ func TestAcceptance_Classic_LDAPServerCRUD(t *testing.T) {
 			Name:               classicStrPtr(name),
 			Hostname:           classicStrPtr(hostname),
 			Port:               &port,
-			ServerType:         classicStrPtr("Active Directory"),
-			AuthenticationType: classicStrPtr("none"),
+			ServerType:         classicStrPtr(proclassic.LdapServerPostConnectionServerTypeActiveDirectory),
+			AuthenticationType: classicStrPtr(proclassic.LdapServerPostConnectionAuthenticationTypeNone),
 		},
 	})
 	if err != nil {
@@ -1395,8 +1395,8 @@ func TestAcceptance_Classic_DiskEncryptionConfigurationCRUD(t *testing.T) {
 	name := "sdk-acc-dec-" + runSuffix()
 	created, err := pc.CreateDiskEncryptionConfigurationByID(ctx, "0", &proclassic.DiskEncryptionConfiguration{
 		Name:                  classicStrPtr(name),
-		KeyType:               classicStrPtr("Individual"),
-		FileVaultEnabledUsers: classicStrPtr("Management Account"),
+		KeyType:               classicStrPtr(proclassic.DiskEncryptionConfigurationKeyTypeIndividual),
+		FileVaultEnabledUsers: classicStrPtr(proclassic.DiskEncryptionConfigurationFileVaultEnabledUsersManagementAccount),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1455,7 +1455,7 @@ func TestAcceptance_Classic_DockItemCRUD(t *testing.T) {
 	created, err := pc.CreateDockItemByID(ctx, "0", &proclassic.DockItem{
 		Name: classicStrPtr(name),
 		Path: classicStrPtr("file:///Applications/Safari.app/"),
-		Type: classicStrPtr("App"),
+		Type: classicStrPtr(proclassic.DockItemTypeApp),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1585,8 +1585,8 @@ func TestAcceptance_Classic_WebhookCRUD(t *testing.T) {
 	created, err := pc.CreateWebhookByID(ctx, "0", &proclassic.Webhook{
 		Name:        classicStrPtr(name),
 		URL:         classicStrPtr("https://webhook.example.test/receiver"),
-		Event:       classicStrPtr("ComputerAdded"),
-		ContentType: classicStrPtr("application/json"),
+		Event:       classicStrPtr(proclassic.WebhookEventComputerAdded),
+		ContentType: classicStrPtr(proclassic.WebhookContentTypeApplicationJson),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1623,8 +1623,8 @@ func TestAcceptance_Classic_AccountUserCRUD(t *testing.T) {
 		FullName:     classicStrPtr("SDK Acceptance User"),
 		Email:        classicStrPtr(name + "@sdk.test"),
 		Password:     classicStrPtr("SDK-acc-pw-" + runSuffix() + "!"),
-		AccessLevel:  classicStrPtr("Full Access"),
-		PrivilegeSet: classicStrPtr("Administrator"),
+		AccessLevel:  classicStrPtr(proclassic.AccountAccessLevelFullAccess),
+		PrivilegeSet: classicStrPtr(proclassic.AccountPrivilegeSetAdministrator),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1667,8 +1667,8 @@ func TestAcceptance_Classic_AccountGroupCRUD(t *testing.T) {
 	name := "sdk-acc-grp-" + runSuffix()
 	created, err := pc.CreateAccountGroupByID(ctx, "0", &proclassic.Group{
 		Name:         classicStrPtr(name),
-		AccessLevel:  classicStrPtr("Full Access"),
-		PrivilegeSet: classicStrPtr("Administrator"),
+		AccessLevel:  classicStrPtr(proclassic.GroupAccessLevelFullAccess),
+		PrivilegeSet: classicStrPtr(proclassic.GroupPrivilegeSetAdministrator),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -2023,7 +2023,12 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 //
 // Defect #4 (exclusions user_group shape): wire-probed with DataJARLDAPS_JamfPro_Admins
 // — server returns name-only, no <id>. Original spec's name-only struct was correct.
-// Set JAMFPLATFORM_VPP_INVITATION_ID to override the default id "2".
+//
+// The id is discovered from ListVPPInvitations rather than hardcoded. It used to
+// default to "2", which 404s on any tenant that never had that record — the
+// acceptance tenant has zero VPP invitations (wire-probed 2026-07-31), so the
+// test was reporting a missing fixture as an endpoint failure. Set
+// JAMFPLATFORM_VPP_INVITATION_ID to pin a specific record.
 func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)
@@ -2031,7 +2036,19 @@ func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 
 	id := os.Getenv("JAMFPLATFORM_VPP_INVITATION_ID")
 	if id == "" {
-		id = "2"
+		list, err := pc.ListVPPInvitations(ctx)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("ListVPPInvitations: %v", err)
+		}
+		if list == nil || len(list.VppInvitations) == 0 {
+			t.Skip("tenant has no VPP invitations; set JAMFPLATFORM_VPP_INVITATION_ID to override")
+		}
+		first := list.VppInvitations[0]
+		if first.ID == nil {
+			t.Fatalf("first VPP invitation has no ID: %+v", first)
+		}
+		id = intToStr(*first.ID)
 	}
 
 	inv, err := pc.GetVPPInvitationByID(ctx, id)
@@ -2079,17 +2096,37 @@ func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 // the field-order fix: Classic <general> is order-sensitive and returns HTTP
 // 500 when fields arrive alphabetically instead of the required wire order.
 //
-// Uses VPP account id 3 and distribution_method "Make Available in Self
-// Service" (non-emailing) to avoid triggering invite emails. No %@ is used
-// in any string field (separate known server-500 bug for plist strings).
+// Uses distribution_method "Make Available in Self Service" (non-emailing) to
+// avoid triggering invite emails. No %@ is used in any string field (separate
+// known server-500 bug for plist strings).
+//
+// The VPP account is discovered rather than hardcoded to id 3. An invitation
+// referencing a nonexistent VPP account is rejected with a misleading
+// `409 Invalid distribution method` — wire-probed 2026-07-31, where every
+// distribution_method value (including "Email", "Self Service" and "") returned
+// that same 409 on a tenant with zero VPP accounts. Without a real account the
+// endpoint cannot be exercised at all, so the test skips instead of reporting an
+// unconfigured prerequisite as an endpoint defect.
 func TestAcceptance_Classic_VPPInvitationCRUD(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)
 	ctx := context.Background()
 
+	accts, err := pc.ListVPPAccounts(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListVPPAccounts: %v", err)
+	}
+	if accts == nil || len(accts.VppAccounts) == 0 {
+		t.Skip("tenant has no VPP accounts (no content token configured); VPP invitations cannot be created")
+	}
+	if accts.VppAccounts[0].ID == nil {
+		t.Fatalf("first VPP account has no ID: %+v", accts.VppAccounts[0])
+	}
+	vppAccID := *accts.VppAccounts[0].ID
+
 	name := "sdk-acc-vpp-inv-" + runSuffix()
 	dist := "Make Available in Self Service"
-	vppAccID := 3
 	req := &proclassic.VppInvitation{
 		General: &proclassic.VppInvitationGeneral{
 			Name:               &name,

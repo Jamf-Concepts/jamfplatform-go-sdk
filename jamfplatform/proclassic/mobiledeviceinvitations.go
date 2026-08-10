@@ -15,6 +15,9 @@ import (
 // GetMobileDeviceInvitationByID finds mobile device invitations by id.
 //
 // Required privileges: read:pro:mobile-device-enrollment-invitations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceInvitationByID(ctx context.Context, id string) (*MobileDeviceInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceInvitation
@@ -28,6 +31,9 @@ func (c *Client) GetMobileDeviceInvitationByID(ctx context.Context, id string) (
 // CreateMobileDeviceInvitationByID creates a new mobile device invitation by id.
 //
 // Required privileges: create:pro:mobile-device-enrollment-invitations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceInvitationByID(ctx context.Context, id string, request *MobileDeviceInvitationPost) (*MobileDeviceInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceInvitation
@@ -41,6 +47,9 @@ func (c *Client) CreateMobileDeviceInvitationByID(ctx context.Context, id string
 // DeleteMobileDeviceInvitationByID deletes a mobile device invitation by id.
 //
 // Required privileges: delete:pro:mobile-device-enrollment-invitations.
+//
+// Parameters:
+//   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceInvitationByID(ctx context.Context, id string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/id/%s", prefix, url.PathEscape(id))
@@ -66,6 +75,9 @@ func (c *Client) ListMobileDeviceInvitations(ctx context.Context) (*MobileDevice
 // DeleteMobileDeviceInvitationByInvitation deletes a mobile device invitation by invitation.
 //
 // Required privileges: delete:pro:mobile-device-enrollment-invitations.
+//
+// Parameters:
+//   - invitation: Invitation value to filter by.
 func (c *Client) DeleteMobileDeviceInvitationByInvitation(ctx context.Context, invitation string) error {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/invitation/%s", prefix, url.PathEscape(invitation))
@@ -78,6 +90,9 @@ func (c *Client) DeleteMobileDeviceInvitationByInvitation(ctx context.Context, i
 // GetMobileDeviceInvitationByInvitation finds mobile device invitations by invitation.
 //
 // Required privileges: read:pro:mobile-device-enrollment-invitations.
+//
+// Parameters:
+//   - invitation: Invitation value to filter by.
 func (c *Client) GetMobileDeviceInvitationByInvitation(ctx context.Context, invitation string) (*MobileDeviceInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceInvitation
@@ -91,6 +106,9 @@ func (c *Client) GetMobileDeviceInvitationByInvitation(ctx context.Context, invi
 // CreateMobileDeviceInvitationByInvitation creates a new mobile device invitation by invitation.
 //
 // Required privileges: create:pro:mobile-device-enrollment-invitations.
+//
+// Parameters:
+//   - invitation: Invitation value to filter by.
 func (c *Client) CreateMobileDeviceInvitationByInvitation(ctx context.Context, invitation string, request *MobileDeviceInvitationPost) (*MobileDeviceInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceInvitation
@@ -104,6 +122,9 @@ func (c *Client) CreateMobileDeviceInvitationByInvitation(ctx context.Context, i
 // UpdateMobileDeviceInvitationByInvitation creates a new mobile device invitation by id.
 //
 // Required privileges: update:pro:mobile-device-enrollment-invitations.
+//
+// Parameters:
+//   - invitation: ID value to filter by.
 func (c *Client) UpdateMobileDeviceInvitationByInvitation(ctx context.Context, invitation string, request *MobileDeviceInvitationPost) (*MobileDeviceInvitation, error) {
 	prefix := c.transport.TenantPrefix("proclassic", "")
 	var result MobileDeviceInvitation
