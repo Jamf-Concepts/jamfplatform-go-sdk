@@ -141,7 +141,7 @@ func (c *Client) RemoveMdmProfileFromComputerV4(ctx context.Context, id string) 
 //     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -226,7 +226,7 @@ func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string,
 //     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV2, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -309,7 +309,7 @@ func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string,
 //     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV4(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV4, error) {
 	prefix := c.transport.TenantPrefix("pro", "v4")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV4, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV4, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -394,7 +394,7 @@ func (c *Client) ListComputersInventoryV4(ctx context.Context, section []string,
 //     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV3(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV3, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV3, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -489,7 +489,7 @@ func (c *Client) CreateComputerInventoryV3(ctx context.Context, request *Compute
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV1(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -517,7 +517,7 @@ func (c *Client) ListComputerInventoryFileVaultsV1(ctx context.Context) ([]Compu
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV2(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -543,7 +543,7 @@ func (c *Client) ListComputerInventoryFileVaultsV2(ctx context.Context) ([]Compu
 // Required privileges: read:env:filevault. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV4(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.TenantPrefix("pro", "v4")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -571,7 +571,7 @@ func (c *Client) ListComputerInventoryFileVaultsV4(ctx context.Context) ([]Compu
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV3(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

@@ -30,7 +30,7 @@ import (
 //     query and returns all results from the requested page.
 func (c *Client) ListComputerExtensionAttributesV1(ctx context.Context, sort []string, filter string) ([]ComputerExtensionAttributes, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributes, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributes, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -96,7 +96,7 @@ func (c *Client) DeleteMultipleComputerExtensionAttributesV1(ctx context.Context
 //     from the requested page.
 func (c *Client) ListComputerExtensionAttributeTemplatesV1(ctx context.Context, sort []string, filter string) ([]ComputerExtensionAttributeTemplates, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributeTemplates, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributeTemplates, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -254,7 +254,7 @@ func (c *Client) DownloadComputerExtensionAttributeV1(ctx context.Context, id st
 //     requested page.
 func (c *Client) ListComputerExtensionAttributeHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

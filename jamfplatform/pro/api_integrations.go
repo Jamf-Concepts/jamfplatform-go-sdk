@@ -30,7 +30,7 @@ import (
 //     displayName=="*IntegrationName*".
 func (c *Client) ListApiIntegrationsV1(ctx context.Context, sort []string, filter string) ([]ApiIntegrationResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ApiIntegrationResponse, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ApiIntegrationResponse, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

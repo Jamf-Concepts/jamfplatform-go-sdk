@@ -30,7 +30,7 @@ import (
 //     combined with paging and sorting.
 func (c *Client) ListPatchPolicyLogsV2(ctx context.Context, id string, sort []string, filter string) ([]PatchPolicyLogV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchPolicyLogV2, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchPolicyLogV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

@@ -35,7 +35,7 @@ import (
 //     and accountStatus==Enabled and failedLoginAttempts==0.
 func (c *Client) ListAccountsV1(ctx context.Context, sort []string, filter string) ([]UserAccount, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]UserAccount, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]UserAccount, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

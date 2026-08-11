@@ -26,7 +26,7 @@ import (
 //     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListSupervisionIdentitiesV1(ctx context.Context, sort []string) ([]SupervisionIdentity, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SupervisionIdentity, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SupervisionIdentity, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

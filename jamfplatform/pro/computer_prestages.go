@@ -103,7 +103,7 @@ func (c *Client) RemoveFromComputerPrestageScopeV2(ctx context.Context, id strin
 //     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListComputerPrestagesV3(ctx context.Context, sort []string) ([]GetComputerPrestageV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]GetComputerPrestageV3, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GetComputerPrestageV3, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

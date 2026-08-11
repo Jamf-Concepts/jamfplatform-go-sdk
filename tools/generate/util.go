@@ -252,6 +252,43 @@ func coalesce(val, fallback string) string {
 	return fallback
 }
 
+// coalesceInt returns val if non-zero, otherwise fallback.
+func coalesceInt(val, fallback int) int {
+	if val != 0 {
+		return val
+	}
+	return fallback
+}
+
+// defaultMaxPageSize returns the page size ListAllPages requests per call when
+// an operation doesn't set "maxPageSize" explicitly in config.json.
+//
+// Wire-verified 2026-08-10: every "totalCount"-style pagination operation in
+// the pro package that was pushed past 2000 real rows (33 endpoints sampled —
+// ListGroupsV1/V2, AccountsV1, EnrollmentAccessGroupV3, and 29 History
+// endpoints spanning wildly different resource types) clamped at exactly
+// 2000, silently, with zero exceptions. That is strong enough evidence to
+// treat 2000 as the pro API gateway's pagination ceiling for this pagination
+// style, rather than requiring per-operation verification before raising it.
+//
+// Scoped narrowly on purpose: only pro + totalCount. Two pro operations use a
+// different pagination mechanism (ListUsersV1 is "hasNext", ListSiteObjectsV1
+// is "rawArray") and were not part of the verified sample — both mechanisms
+// compute continuation from the requested page size in a way that fails
+// differently under a wrong cap (hasNext can still skip a chunk; rawArray can
+// stop early and silently truncate), so they stay at the conservative
+// default until independently verified. Every other package (devices,
+// devicegroups, blueprints, ddmreport, compliancebenchmarks) is a distinct
+// backend service — devices/v1 was probed in the same session and behaves
+// completely differently (hard 400 rejection above page-size=1000, not a
+// silent clamp), which is exactly why this default doesn't extend to them.
+func defaultMaxPageSize(pkg, paginationStyle string) int {
+	if pkg == "pro" && paginationStyle == "totalCount" {
+		return 2000
+	}
+	return 100
+}
+
 func sortedKeys[V any](m map[string]V) []string {
 	keys := make([]string, 0, len(m))
 	for k := range m {

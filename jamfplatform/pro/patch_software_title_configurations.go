@@ -285,7 +285,7 @@ func (c *Client) RemovePatchSoftwareTitleFromDashboardV2(ctx context.Context, id
 //     can be combined with paging and sorting.
 func (c *Client) ListPatchSoftwareTitleDefinitionsV3(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleDefinition, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleDefinition, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleDefinition, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -328,7 +328,7 @@ func (c *Client) ListPatchSoftwareTitleDefinitionsV3(ctx context.Context, id str
 //     can be combined with paging and sorting.
 func (c *Client) ListPatchSoftwareTitleDefinitionsV2(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleDefinition, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleDefinition, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleDefinition, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -501,7 +501,7 @@ func (c *Client) ListPatchSoftwareTitleExtensionAttributesV2(ctx context.Context
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListPatchSoftwareTitleHistoryV3(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -544,7 +544,7 @@ func (c *Client) ListPatchSoftwareTitleHistoryV3(ctx context.Context, id string,
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListPatchSoftwareTitleHistoryV2(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -620,7 +620,7 @@ func (c *Client) CreatePatchSoftwareTitleHistoryNoteV2(ctx context.Context, id s
 //     sorting.
 func (c *Client) ListPatchSoftwareTitlePatchReportV3(ctx context.Context, id string, sort []string, filter string) ([]PatchReportV3, error) {
 	prefix := c.transport.TenantPrefix("pro", "v3")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchReportV3, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchReportV3, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -664,7 +664,7 @@ func (c *Client) ListPatchSoftwareTitlePatchReportV3(ctx context.Context, id str
 //     sorting.
 func (c *Client) ListPatchSoftwareTitlePatchReportV2(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleReport, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleReport, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleReport, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

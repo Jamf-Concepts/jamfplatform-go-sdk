@@ -80,7 +80,7 @@ import (
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string, sort []string, filter string) ([]MobileDeviceResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -119,7 +119,7 @@ func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListMobileDevicesV2(ctx context.Context, sort []string) ([]MobileDeviceV2, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceV2, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]MobileDeviceV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -268,7 +268,7 @@ func (c *Client) EraseMobileDeviceV2(ctx context.Context, id string, request *Er
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListMobileDevicePairedDevicesV2(ctx context.Context, id string, section []string, sort []string, filter string) ([]MobileDeviceResponse, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

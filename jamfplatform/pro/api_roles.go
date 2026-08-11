@@ -30,7 +30,7 @@ import (
 //     displayName=="*myRole*".
 func (c *Client) ListApiRolesV1(ctx context.Context, sort []string, filter string) ([]ApiRole, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ApiRole, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ApiRole, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

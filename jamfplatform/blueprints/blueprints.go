@@ -30,7 +30,7 @@ import (
 //   - search: Search query to match against `name` and `description` properties.
 func (c *Client) ListBlueprints(ctx context.Context, sort []string, search string) ([]BlueprintOverview, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]BlueprintOverview, bool, error) {
+	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]BlueprintOverview, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -174,7 +174,7 @@ func (c *Client) GetBlueprintReport(ctx context.Context, blueprintID string) (*B
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListBlueprintComponents(ctx context.Context) ([]ComponentDescription, error) {
 	prefix := c.transport.TenantPrefix("blueprints", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ComponentDescription, bool, error) {
+	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]ComponentDescription, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

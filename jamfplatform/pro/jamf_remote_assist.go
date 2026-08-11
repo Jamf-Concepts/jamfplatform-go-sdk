@@ -59,7 +59,7 @@ func (c *Client) GetJamfRemoteAssistSessionV1(ctx context.Context, id string) (*
 //     sessionAdminId=="*Andrzej*".
 func (c *Client) ListJamfRemoteAssistSessionsV2(ctx context.Context, sort []string, filter string) ([]SessionHistoryItem, error) {
 	prefix := c.transport.TenantPrefix("pro", "v2")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SessionHistoryItem, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SessionHistoryItem, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

@@ -57,7 +57,7 @@ func (c *Client) ListSitesV1(ctx context.Context) ([]V1Site, error) {
 //     License"].
 func (c *Client) ListSiteObjectsV1(ctx context.Context, id string, sort []string, filter string) ([]SiteObject, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]SiteObject, bool, error) {
+	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]SiteObject, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))

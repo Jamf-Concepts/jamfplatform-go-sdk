@@ -71,7 +71,7 @@ func (c *Client) UnregisterJamfProtectV1(ctx context.Context) error {
 //     date<2019-12-15.
 func (c *Client) ListJamfProtectDeploymentTasksV1(ctx context.Context, id string, sort []string, filter string) ([]DeploymentTask, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -128,7 +128,7 @@ func (c *Client) RetryJamfProtectDeploymentTasksV1(ctx context.Context, id strin
 //     date<2019-12-15.
 func (c *Client) ListJamfProtectHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
@@ -183,7 +183,7 @@ func (c *Client) CreateJamfProtectHistoryNoteV1(ctx context.Context, request *Ob
 //     date<2019-12-15.
 func (c *Client) ListJamfProtectPlansV1(ctx context.Context, sort []string, filter string) ([]JamfProtectPlan, error) {
 	prefix := c.transport.TenantPrefix("pro", "v1")
-	return client.ListAllPages(ctx, func(ctx context.Context, page, pageSize int) ([]JamfProtectPlan, bool, error) {
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]JamfProtectPlan, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
