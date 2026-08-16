@@ -125,6 +125,23 @@ func WithMinRequestInterval(d time.Duration) Option {
 	}
 }
 
+// WithRetryPolicy overrides the transport's automatic-retry timing for
+// transient failures (see retry.go's isRetryableWriteStatus for what gets
+// retried). Exists primarily for test harnesses that mock a
+// persistently-failing transient status (e.g. an always-500 GET) and need
+// the retry loop to run in milliseconds rather than the production 1s-60s
+// window with up to 5 total attempts — without this, such a test would hang
+// for the full backoff duration on every run. maxRetries follows
+// retryablehttp's own semantics: total attempts = maxRetries+1, so 0 means
+// no retries at all.
+func WithRetryPolicy(waitMin, waitMax time.Duration, maxRetries int) Option {
+	return func(c *Transport) {
+		c.retry.RetryWaitMin = waitMin
+		c.retry.RetryWaitMax = waitMax
+		c.retry.RetryMax = maxRetries
+	}
+}
+
 // NewTransport creates a new Jamf Platform API transport.
 func NewTransport(baseURL, clientID, clientSecret string) *Transport {
 	return NewTransportWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")

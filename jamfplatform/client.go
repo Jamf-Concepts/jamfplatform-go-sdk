@@ -56,6 +56,9 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	if cfg.minRequestIntervalSet {
 		transportOpts = append(transportOpts, client.WithMinRequestInterval(cfg.minRequestInterval))
 	}
+	if cfg.retryPolicySet {
+		transportOpts = append(transportOpts, client.WithRetryPolicy(cfg.retryWaitMin, cfg.retryWaitMax, cfg.retryMax))
+	}
 
 	transport := client.NewTransportWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
 	if cfg.logger != nil {
@@ -101,6 +104,11 @@ type clientConfig struct {
 
 	minRequestInterval    time.Duration
 	minRequestIntervalSet bool
+
+	retryWaitMin   time.Duration
+	retryWaitMax   time.Duration
+	retryMax       int
+	retryPolicySet bool
 }
 
 // Option configures a Client.
@@ -171,5 +179,28 @@ func WithMinRequestInterval(d time.Duration) Option {
 	return func(cfg *clientConfig) {
 		cfg.minRequestInterval = d
 		cfg.minRequestIntervalSet = true
+	}
+}
+
+// WithRetryPolicy overrides the SDK's automatic retry timing for transient
+// failures (429, 503, and 500/502/504 on GET/DELETE/PUT/HEAD — see
+// isRetryableWriteStatus's godoc in the SDK's internal transport for the
+// exact policy). The production default is a 1s-60s backoff window with up
+// to 5 total attempts per request.
+//
+// This exists primarily for test harnesses: a unit test that mocks a
+// persistently-failing transient status (e.g. an always-500 GET, used to
+// exercise a caller's error-handling path) will otherwise hang for the full
+// production backoff window on every run, since the SDK retries it several
+// times before giving up. Pass a small waitMin/waitMax (e.g. a few
+// milliseconds) and/or a small maxRetries to make such tests fast.
+// maxRetries follows retryablehttp's own semantics: total attempts per
+// request = maxRetries+1, so 0 means no automatic retry at all.
+func WithRetryPolicy(waitMin, waitMax time.Duration, maxRetries int) Option {
+	return func(cfg *clientConfig) {
+		cfg.retryWaitMin = waitMin
+		cfg.retryWaitMax = waitMax
+		cfg.retryMax = maxRetries
+		cfg.retryPolicySet = true
 	}
 }
