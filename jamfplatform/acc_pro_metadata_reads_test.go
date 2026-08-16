@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
+	"slices"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -82,6 +83,12 @@ func TestAcceptance_Pro_MiscReadsV1(t *testing.T) {
 		}
 	} else {
 		t.Logf("Cloud services environment: %s", env.Environment)
+		// Probed direct against an 11.31.0 sandbox instance (2026-08-16): returned
+		// "production", one of the three values the spec enumerates.
+		if !slices.Contains(pro.EnvironmentTypeEnvironmentValues(), env.Environment) {
+			t.Errorf("environment %q absent from the generated constants %v — spec enum has drifted",
+				env.Environment, pro.EnvironmentTypeEnvironmentValues())
+		}
 	}
 
 	cloud, err := p.GetCloudInformationV1(ctx)

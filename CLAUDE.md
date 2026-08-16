@@ -180,7 +180,19 @@ The API gateway (`{region}.apigw.jamf.com`) keeps a **per-path allowlist**, and 
 
 Jamf Pro pretty-prints its JSON (spaces around colons, newlines); the gateway emits compact JSON. So a compact `BAD_PERMISSIONS` body means the request never reached Pro, and **no scope grant will fix it** — the endpoint has to be allowlisted upstream. Do not encode this in the transport: it is a body-formatting tell, not a contract, and it would break the moment either side changes its serialiser. It is a diagnostic for whoever is debugging a fresh 403, which is why it lives here.
 
-This is exactly what all three endpoints added in the 11.31 drop do (`GetEnvironmentTypeV2`, `ListSmtpServerAllowedAuthTypesV2`, `CheckDigicertTrustLifecycleManagerPrivilegesV1`) — including `environment-type`, which declares no required privilege at all. Their acceptance tests skip/log on 403 with that reasoning named, and should be tightened to `t.Fatalf` once the gateway routes them. Corollary: `expectedStatus: 204` on the privilege-check op is spec-derived and **not** wire-verified.
+This is exactly what all three endpoints added in the 11.31 drop do (`GetEnvironmentTypeV2`, `ListSmtpServerAllowedAuthTypesV2`, `CheckDigicertTrustLifecycleManagerPrivilegesV1`) — including `environment-type`, which declares no required privilege at all. Their acceptance tests skip/log on 403 with that reasoning named, and should be tightened to `t.Fatalf` once the gateway routes them.
+
+**Proven by bypassing the gateway** (2026-08-16): provision an all-privileges API role + client through the gateway (`POST /api/pro/v1/tenant/{id}/api-roles` with every value from `api-role-privileges`, then `api-integrations` + `.../client-credentials`), read the instance host from `jamf-pro-server-url`, then authenticate straight at the instance via `POST https://<instance-host>/api/oauth/token` and call the **tenant-less** Pro paths (`/api/v2/environment-type`, not `/api/pro/v2/tenant/{id}/...`). All three answered:
+
+| endpoint | direct | via gateway |
+|---|---|---|
+| `GET /api/v2/environment-type` | **200** `{"environment":"production"}` | 403 |
+| `GET /api/v2/smtp-server/allowed-auth-types` | **200** `{"allowedAuthenticationTypes":["NONE","BASIC","GRAPH_API","GOOGLE_MAIL"]}` | 403 |
+| `GET /api/v1/pki/digicert/trust-lifecycle-manager/{id}/privilege-check` | routed (400/500, see below) | 403 |
+
+So the endpoints work in Jamf Pro 11.31 and the generated types are correct — both payloads strict-decode into `EnvironmentType` / `SmtpAuthenticationTypeList` with `DisallowUnknownFields`, and the SMTP response returned *every* value the spec enumerates, making that enum wire-confirmed complete. Only the gateway routing is missing, so nothing in the SDK needs changing. This bypass is the technique to reach for whenever a gateway 403 blocks verification — it separates "Jamf Pro can't do this" from "the gateway won't forward it".
+
+`privilege-check`'s **204 remains unverified** and `expectedStatus: 204` is spec-derived. A bogus id gives 400 `NOT_FOUND` (not the spec's documented 404), and a DigiCert TLM settings object created with a self-signed cert 500s on `privilege-check` *and* on the long-standing `connection-status` alike — both call out to the DigiCert account, so confirming the success path needs real DigiCert credentials. Same class of wall as `pki/adcs-settings` in the pagination notes.
 
 ### Name→ID resolvers
 

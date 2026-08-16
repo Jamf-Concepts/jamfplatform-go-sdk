@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
+	"slices"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -95,6 +96,17 @@ func TestAcceptance_Pro_Settings_SmtpServerAllowedAuthTypesV2(t *testing.T) {
 		t.Fatalf("ListSmtpServerAllowedAuthTypesV2: %v", err)
 	}
 	t.Logf("SMTP allowed auth types: %v", l.AllowedAuthenticationTypes)
+
+	// Probed direct against an 11.31.0 sandbox instance (2026-08-16, bypassing the
+	// gateway): the instance returned exactly the four values the spec
+	// enumerates, so every value the server can send is nameable as a constant.
+	// A value outside the set means the spec's enum has drifted.
+	allowed := pro.SmtpAuthenticationTypeListAllowedAuthenticationTypesValues()
+	for _, got := range l.AllowedAuthenticationTypes {
+		if !slices.Contains(allowed, got) {
+			t.Errorf("server returned auth type %q absent from the generated constants %v — spec enum has drifted", got, allowed)
+		}
+	}
 }
 
 func TestAcceptance_Pro_Settings_SmtpServerHistoryV1(t *testing.T) {
