@@ -290,6 +290,8 @@ func (c *Client) UpdateMobileDevicePrestageV2(ctx context.Context, id string, re
 
 // UpdateMobileDevicePrestageV3 update a Mobile Device Prestage.
 //
+// This endpoint requires an optimistic-lock precondition in its request body, sourced from a prior GET. The transport does NOT auto-retry a 5xx here — unlike other PUT/DELETE/GET/HEAD calls — because a blind retry would replay the now-stale precondition and could turn a successful-but-500ing write into a masked conflict on the retried attempt. See client.DoWithContentTypeNoRetry.
+//
 // Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
 //
 // Parameters:
@@ -298,7 +300,7 @@ func (c *Client) UpdateMobileDevicePrestageV3(ctx context.Context, id string, re
 	prefix := c.transport.TenantPrefix("pro", "v3")
 	var result GetMobileDevicePrestageV3
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+	if err := c.transport.DoWithContentTypeNoRetry(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("UpdateMobileDevicePrestageV3(%s): %w", id, err)
 	}
 	return &result, nil

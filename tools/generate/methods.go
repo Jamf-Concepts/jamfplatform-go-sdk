@@ -887,6 +887,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		ResultsField:    "results",
 		SpecPath:        specPath,
 		UnwrapResults:   opDef.UnwrapResults,
+		NoRetry:         opDef.NoRetry,
 	}
 
 	if op.Summary != "" {
@@ -899,9 +900,17 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 
 	if isRateLimited(op) {
 		if m.Comment != "" {
-			m.Comment += "\n//\n// This endpoint is rate-limited. The transport retries a 429 response once if the server returns a bounded Retry-After; otherwise the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy."
+			m.Comment += "\n//\n// This endpoint is rate-limited. The transport automatically retries a 429 with backoff (honoring a server-supplied Retry-After when present, clamped to a ceiling), giving up only after exhausting its retry budget — at which point the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy."
 		} else {
 			m.Comment = opDef.Name + " is rate-limited."
+		}
+	}
+
+	if opDef.NoRetry {
+		if m.Comment != "" {
+			m.Comment += "\n//\n// This endpoint requires an optimistic-lock precondition in its request body, sourced from a prior GET. The transport does NOT auto-retry a 5xx here — unlike other PUT/DELETE/GET/HEAD calls — because a blind retry would replay the now-stale precondition and could turn a successful-but-500ing write into a masked conflict on the retried attempt. See client.DoWithContentTypeNoRetry."
+		} else {
+			m.Comment = opDef.Name + " does not auto-retry on a 5xx; see client.DoWithContentTypeNoRetry."
 		}
 	}
 

@@ -505,7 +505,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 {{- if .ContentType }}
-	if err := c.transport.DoWithContentType(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, &result); err != nil {
+	if err := c.transport.{{ if .NoRetry }}DoWithContentTypeNoRetry{{ else }}DoWithContentType{{ end }}(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, &result); err != nil {
 {{- else }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, {{ statusConst .ExpectedStatus }}, &result); err != nil {
 {{- end }}
@@ -548,7 +548,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 {{- if .ContentType }}
-	if err := c.transport.DoWithContentType(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, nil); err != nil {
+	if err := c.transport.{{ if .NoRetry }}DoWithContentTypeNoRetry{{ else }}DoWithContentType{{ end }}(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, nil); err != nil {
 {{- else }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, {{ statusConst .ExpectedStatus }}, nil); err != nil {
 {{- end }}

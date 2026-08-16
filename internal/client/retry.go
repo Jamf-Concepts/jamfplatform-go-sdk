@@ -12,7 +12,7 @@ import (
 )
 
 // retryWaitMin/retryWaitMax/retryMax bound the transport's automatic retry
-// of transient failures (429/503, 500/502/504 on an idempotent method, and
+// of transient failures (429/503, 500/502/504 on GET/DELETE/HEAD, and
 // recoverable network errors — see isRetryableWriteStatus). Total attempts
 // per request is retryMax+1. retryWaitMax also acts as a hard ceiling on a
 // server-supplied Retry-After: retryablehttp honors that header verbatim
@@ -36,8 +36,30 @@ const (
 // methods that are idempotent by definition (GET/DELETE/PUT/HEAD) — retrying
 // a POST or PATCH risks double-applying a write the server actually
 // completed before the client saw the failure (e.g. creating a duplicate
-// object). All other statuses (2xx, and 4xx other than 429) are left alone:
-// a byte-identical retry won't change a client-request problem, and this
+// object).
+//
+// PUT's idempotency assumption has one important carve-out: it only holds
+// when the server has no side-channel precondition that advances as a side
+// effect of a successful write. A handful of Jamf Pro V3 endpoints (computer
+// and mobile-device prestage enrollment — see jamfplatform/pro's
+// version_lock_helpers.go and its two callers, the only VersionLock users in
+// the whole SDK) require an optimistic-lock field in the PUT body, sourced
+// from a GET taken before the write. Confirmed live: such a PUT can commit
+// successfully server-side (bumping the lock) and still return a 500 if the
+// response serializer then crashes; blindly retrying it replays the
+// now-stale lock and gets a genuine 409 OPTIMISTIC_LOCK_FAILED instead of the
+// original 500 — turning a successful write into a reported failure.
+//
+// Given that's a small, enumerable set today rather than an inherent
+// property of PUT in general, the default here stays retry-on for PUT, and
+// the known exceptions opt OUT individually via DoWithContentTypeNoRetry
+// (see its doc). Any future endpoint that gains a similar precondition
+// (VersionLock, ETag, If-Match, or equivalent) must route through that
+// no-retry entrypoint too — this function has no way to know from a bare
+// method+status that a given PUT carries one.
+//
+// All other statuses (2xx, and 4xx other than 429) are left alone: a
+// byte-identical retry won't change a client-request problem, and this
 // function is never consulted for them in the first place since
 // DefaultRetryPolicy already excludes them upstream of this check.
 func isRetryableWriteStatus(method string, status int) bool {

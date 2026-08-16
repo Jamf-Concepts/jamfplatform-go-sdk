@@ -224,13 +224,34 @@ func (c *Transport) Do(ctx context.Context, method, path string, body, result an
 
 // DoExpect performs an authenticated API request expecting the given HTTP status.
 func (c *Transport) DoExpect(ctx context.Context, method, path string, body any, expectedStatus int, result any) error {
-	return c.execute(ctx, method, path, body, "", nil, expectedStatus, result)
+	return c.execute(ctx, method, path, body, "", nil, expectedStatus, result, c.httpClient)
 }
 
 // DoWithContentType performs an authenticated API request with a custom Content-Type header.
 // It expects HTTP 200 OK as the success status.
 func (c *Transport) DoWithContentType(ctx context.Context, method, path string, body any, contentType string, expectedStatus int, result any) error {
-	return c.execute(ctx, method, path, body, contentType, nil, expectedStatus, result)
+	return c.execute(ctx, method, path, body, contentType, nil, expectedStatus, result, c.httpClient)
+}
+
+// DoWithContentTypeNoRetry is DoWithContentType without the transport's
+// automatic 5xx retry (see isRetryableWriteStatus). It exists for the small,
+// enumerable set of PUT/PATCH endpoints that carry a side-channel
+// precondition — an optimistic-lock field sourced from a GET taken before
+// the write — where a successful-but-500ing write, if blindly retried,
+// replays a now-stale precondition and turns into a genuine conflict the
+// caller's own 500-specific compensation never expects. Route through this
+// method instead of DoWithContentType for any such endpoint; see
+// isRetryableWriteStatus's doc for the mechanism and the current callers
+// (computer/mobile-device prestage enrollment). 429/503 retry still applies
+// — those are gateway-level rejections that never reached the precondition
+// check in the first place, so they carry none of this risk.
+//
+// This is a workaround for an upstream response-serializer bug, not a
+// permanent architectural split: once Jamf fixes it, this opt-out and its
+// callers' own GET-diff compensation (e.g. isPutSerializerBug in
+// terraform-provider-jamfplatform) should both be removed together.
+func (c *Transport) DoWithContentTypeNoRetry(ctx context.Context, method, path string, body any, contentType string, expectedStatus int, result any) error {
+	return c.execute(ctx, method, path, body, contentType, nil, expectedStatus, result, c.uploadClient)
 }
 
 // DoWithHeaders performs an authenticated API request with extra headers and decodes the response.
@@ -241,17 +262,19 @@ func (c *Transport) DoWithHeaders(ctx context.Context, method, path string, body
 
 // DoExpectWithHeaders performs an authenticated API request with extra headers expecting the given HTTP status.
 func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, expectedStatus int, result any) error {
-	return c.execute(ctx, method, path, body, "", headers, expectedStatus, result)
+	return c.execute(ctx, method, path, body, "", headers, expectedStatus, result, c.httpClient)
 }
 
 // execute funnels every Do* variant through one place so Deprecation-header
-// logging lives in a single hook point. Retrying transient failures (429,
-// 503, and 500/502/504 on an idempotent method) happens one layer down, in
-// c.httpClient itself — see retry.go. Non-retried statuses surface
-// immediately as an *APIResponseError — eventual-consistency handling of a
-// specific endpoint's error semantics is a caller concern.
-func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any) error {
-	resp, classic, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
+// logging lives in a single hook point. client selects whether transient
+// failures (429, 503, and 500/502/504 on an idempotent method — see
+// isRetryableWriteStatus) are retried one layer down: c.httpClient retries,
+// c.uploadClient doesn't — see DoWithContentTypeNoRetry. Non-retried
+// statuses surface immediately as an *APIResponseError —
+// eventual-consistency handling of a specific endpoint's error semantics is
+// a caller concern.
+func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any, client *http.Client) error {
+	resp, classic, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders, client)
 	if err != nil {
 		return err
 	}
@@ -286,11 +309,12 @@ func (c *Transport) buildURL(endpoint string) string {
 }
 
 // doRequestFull performs an authenticated API request with optional content
-// type and extra headers. Returns the response, the classic-codec flag
-// captured from the request URL (used by the caller to route XML vs JSON
-// unmarshal — avoids re-sniffing the response URL, which may have mutated
-// through redirects), and any transport error.
-func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header) (*http.Response, bool, error) {
+// type and extra headers, dispatching through client (c.httpClient or
+// c.uploadClient — see execute). Returns the response, the classic-codec
+// flag captured from the request URL (used by the caller to route XML vs
+// JSON unmarshal — avoids re-sniffing the response URL, which may have
+// mutated through redirects), and any transport error.
+func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header, client *http.Client) (*http.Response, bool, error) {
 	var requestBodyBytes []byte
 
 	fullURL := c.buildURL(endpoint)
@@ -354,7 +378,7 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 		}
 	}
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, false, fmt.Errorf("API request failed: %w", err)
 	}

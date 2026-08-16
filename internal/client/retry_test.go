@@ -125,7 +125,7 @@ func TestIsRetryableWriteStatus(t *testing.T) {
 		{http.MethodPost, http.StatusNotImplemented, false},      // 501 never retryable
 		{http.MethodGet, http.StatusInternalServerError, true},   // 500 on idempotent method
 		{http.MethodDelete, http.StatusBadGateway, true},         // 502 on idempotent method
-		{http.MethodPut, http.StatusGatewayTimeout, true},        // 504 on idempotent method
+		{http.MethodPut, http.StatusGatewayTimeout, true},        // 504 on idempotent method — see DoWithContentTypeNoRetry for the small set of PUT endpoints that must opt out instead
 		{http.MethodHead, http.StatusInternalServerError, true},  // 500 on idempotent method
 		{http.MethodPost, http.StatusInternalServerError, false}, // 500 on non-idempotent method — don't risk double-apply
 		{http.MethodPatch, http.StatusBadGateway, false},         // 502 on non-idempotent method
@@ -212,6 +212,34 @@ func TestRetryOn500_PostDoesNotRetry(t *testing.T) {
 	}
 	if got := calls.Load(); got != 1 {
 		t.Errorf("expected exactly 1 call (no retry on POST+500), got %d", got)
+	}
+}
+
+// TestDoWithContentTypeNoRetry_SkipsAutoRetryOnPut pins the opt-out
+// mechanism itself: a PUT through DoWithContentTypeNoRetry must dispatch
+// exactly once on a 500, even though the same call through DoWithContentType
+// would retry (see TestRetryOn500_GetSucceedsAfterRetry for the retrying
+// case on a different idempotent method).
+func TestDoWithContentTypeNoRetry_SkipsAutoRetryOnPut(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, 2*time.Millisecond, 5*time.Millisecond)
+	var calls atomic.Int32
+	mux.HandleFunc("/api/versionlocked", func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	err := c.DoWithContentTypeNoRetry(context.Background(), http.MethodPut, "/api/versionlocked", nil, "application/json", http.StatusOK, nil)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusInternalServerError) {
+		t.Fatalf("expected APIResponseError(500), got %v", err)
+	}
+	if got := calls.Load(); got != 1 {
+		t.Errorf("expected exactly 1 call (DoWithContentTypeNoRetry must not auto-retry), got %d", got)
 	}
 }
 

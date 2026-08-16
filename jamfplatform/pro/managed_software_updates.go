@@ -72,7 +72,7 @@ func (c *Client) ListManagedSoftwareUpdatePlansV1(ctx context.Context, sort []st
 
 // CreateManagedSoftwareUpdatePlanV1 create a Managed Software Update Plan.
 //
-// This endpoint is rate-limited. The transport retries a 429 response once if the server returns a bounded Retry-After; otherwise the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy.
+// This endpoint is rate-limited. The transport automatically retries a 429 with backoff (honoring a server-supplied Retry-After when present, clamped to a ceiling), giving up only after exhausting its retry budget — at which point the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy.
 //
 // Required privileges: create:pro:managed-software-updates, read:pro:computers, execute:pro:computer-commands, read:pro:mobile-devices, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Create Managed Software Updates, Read Computers, Read Mobile Devices, Send Computer Remote Command to Download and Install OS X Update, Send Mobile Device Remote Command to Download and Install iOS Update.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
@@ -141,7 +141,7 @@ func (c *Client) GetManagedSoftwareUpdateFeatureToggleStatusV1(ctx context.Conte
 
 // CreateManagedSoftwareUpdateGroupPlanV1 create Managed Software Update Plans for a Group.
 //
-// This endpoint is rate-limited. The transport retries a 429 response once if the server returns a bounded Retry-After; otherwise the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy.
+// This endpoint is rate-limited. The transport automatically retries a 429 with backoff (honoring a server-supplied Retry-After when present, clamped to a ceiling), giving up only after exhausting its retry budget — at which point the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy.
 //
 // Required privileges: create:pro:managed-software-updates, read:pro:computers, read:pro:computer-groups, execute:pro:computer-commands, read:pro:mobile-devices, read:pro:mobile-device-groups, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Create Managed Software Updates, Read Computers, Read Mobile Devices, Read Smart Computer Groups, Read Static Computer Groups, Read Smart Mobile Device Groups, Read Static Mobile Device Groups, Send Computer Remote Command to Download and Install OS X Update, Send Mobile Device Remote Command to Download and Install iOS Update.
 // The Jamf API spec does not encode whether these are required together or as alternatives.

@@ -2556,7 +2556,8 @@
         },
         {
           "op": "PUT /v3/tenant/{tenantId}/computer-prestages/{id}",
-          "name": "UpdateComputerPrestageV3"
+          "name": "UpdateComputerPrestageV3",
+          "noRetry": true
         },
         {
           "op": "DELETE /v3/tenant/{tenantId}/computer-prestages/{id}",
@@ -2663,7 +2664,8 @@
         },
         {
           "op": "PUT /v3/tenant/{tenantId}/mobile-device-prestages/{id}",
-          "name": "UpdateMobileDevicePrestageV3"
+          "name": "UpdateMobileDevicePrestageV3",
+          "noRetry": true
         },
         {
           "op": "DELETE /v2/tenant/{tenantId}/mobile-device-prestages/{id}",
