@@ -75,11 +75,12 @@ func TestAcceptance_Pro_Settings_SmtpServerV2Read(t *testing.T) {
 // current SMTP settings, so it can legitimately be narrower than the
 // SmtpServerV2AuthenticationType constants.
 //
-// Known gateway gap (probed 2026-08-16 against an 11.31.0 tenant): 403
-// BAD_PERMISSIONS even though the spec declares the same read:pro:smtp-server
-// that GetSmtpServerV2 accepts on the same credentials. The sub-path appears
-// to be missing from the gateway's authz mapping; skip rather than fail so the
-// gap stays visible without blocking the suite.
+// Not yet routed by the API gateway (probed 2026-08-16, two credential sets, an
+// 11.31.0 tenant): 403 BAD_PERMISSIONS in the gateway's own compact error
+// shape, byte-identical to what a typo'd path returns — see the gateway-vs-Pro
+// note in CLAUDE.md's error-handling section. Not a privilege problem, so no
+// scope grant will clear it. Skip rather than fail; tighten to t.Fatalf once
+// the gateway allowlists the path.
 func TestAcceptance_Pro_Settings_SmtpServerAllowedAuthTypesV2(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -89,7 +90,7 @@ func TestAcceptance_Pro_Settings_SmtpServerAllowedAuthTypesV2(t *testing.T) {
 		skipOnServerError(t, err)
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("allowed-auth-types forbidden despite read:pro:smtp-server — gateway authz gap: %v", err)
+			t.Skipf("allowed-auth-types not routed by the API gateway (403 while GetSmtpServerV2 200s on the same scope): %v", err)
 		}
 		t.Fatalf("ListSmtpServerAllowedAuthTypesV2: %v", err)
 	}

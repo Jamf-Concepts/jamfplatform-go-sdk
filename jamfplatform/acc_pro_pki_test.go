@@ -53,9 +53,11 @@ func TestAcceptance_Pro_PKI_DigicertTLMProbe(t *testing.T) {
 
 // CheckDigicertTrustLifecycleManagerPrivilegesV1 answers 204 when the linked
 // DigiCert account holds every permission needed to deploy certificates, and
-// 403 with the missing permission names when it does not — so a 403 here is
-// indistinguishable from the tenant-level authz gap and both are non-fatal.
-// Without a real DigiCert fixture the id probe can only reach 404.
+// 403 with the missing permission names when it does not. As of 2026-08-16 the
+// path is not routed by the API gateway either, which also answers 403 — the
+// two are indistinguishable from here, and both are non-fatal. Sibling
+// sub-paths under the same id (/dependencies, /connection-status) do reach Pro,
+// so the 204 in config's expectedStatus is spec-derived, not wire-verified.
 func TestAcceptance_Pro_PKI_DigicertPrivilegeCheck(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()

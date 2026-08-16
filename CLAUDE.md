@@ -166,6 +166,22 @@ Empirical per-family behaviour (see `acc_api_errors_test.go` for the probes that
 
 Rule for consumers doing field-attributed diagnostics (Terraform `AddAttributeError`, CLI per-field output): iterate `FieldErrors()` and fall through to a generic diagnostic when the field key is empty. That pattern works across every family.
 
+#### Gateway rejection vs Jamf Pro rejection
+
+The API gateway (`{region}.apigw.jamf.com`) keeps a **per-path allowlist**, and a path it doesn't recognise gets `403` `BAD_PERMISSIONS` — not `404`. That is the same answer a genuine privilege failure gives, so status code alone cannot tell "you lack the scope" from "this endpoint isn't exposed here yet". The response *body formatting* can (probed 2026-08-16, two credential sets, an 11.31.0 tenant):
+
+| probe | status | body | layer |
+|---|---|---|---|
+| `not-a-namespace/v1/…` | 404 | `404 page not found` (plain text) | gateway, unknown namespace |
+| `pro/v2/…/this-endpoint-does-not-exist` | 403 | compact JSON, `BAD_PERMISSIONS`, top-level `traceId` | gateway, path not allowlisted |
+| `pro/v9/…/smtp-server` | 403 | same compact `BAD_PERMISSIONS` | gateway, path not allowlisted |
+| `pro/v1/…/buildings/nonsense-subresource` | 400 | pretty-printed (`"code" : "INVALID_ID"`) | reached Jamf Pro |
+| `pro/v1/…/digicert/trust-lifecycle-manager/-1` | 404 | pretty-printed, `INVALID_ID` | reached Jamf Pro |
+
+Jamf Pro pretty-prints its JSON (spaces around colons, newlines); the gateway emits compact JSON. So a compact `BAD_PERMISSIONS` body means the request never reached Pro, and **no scope grant will fix it** — the endpoint has to be allowlisted upstream. Do not encode this in the transport: it is a body-formatting tell, not a contract, and it would break the moment either side changes its serialiser. It is a diagnostic for whoever is debugging a fresh 403, which is why it lives here.
+
+This is exactly what all three endpoints added in the 11.31 drop do (`GetEnvironmentTypeV2`, `ListSmtpServerAllowedAuthTypesV2`, `CheckDigicertTrustLifecycleManagerPrivilegesV1`) — including `environment-type`, which declares no required privilege at all. Their acceptance tests skip/log on 403 with that reasoning named, and should be tightened to `t.Fatalf` once the gateway routes them. Corollary: `expectedStatus: 204` on the privilege-check op is spec-derived and **not** wire-verified.
+
 ### Name→ID resolvers
 
 Every resource that supports name-based lookup exposes two generator-emitted methods: `Resolve<X>IDByName(ctx, name) (string, error)` and `Resolve<X>ByName(ctx, name) (*<Type>, error)`. Attached via a `"resolver": {...}` block on an operation in `tools/generate/config.json`. Three modes selected per-resource by the shape the API actually supports:
