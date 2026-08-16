@@ -65,6 +65,22 @@ func TestAcceptance_Pro_MiscReadsV1(t *testing.T) {
 	}
 	t.Logf("Time zones: %d", len(tzs))
 
+	// Known gateway gap (probed 2026-08-16 against an 11.31.0 tenant): the
+	// spec declares no required privilege at all, yet the gateway answers 403
+	// BAD_PERMISSIONS. Logged rather than fatal so the rest of the batch runs.
+	env, err := p.GetEnvironmentTypeV2(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Logf("GetEnvironmentTypeV2 forbidden despite declaring no privilege — gateway authz gap: %v", err)
+		} else {
+			t.Fatalf("GetEnvironmentTypeV2: %v", err)
+		}
+	} else {
+		t.Logf("Cloud services environment: %s", env.Environment)
+	}
+
 	cloud, err := p.GetCloudInformationV1(ctx)
 	if err != nil {
 		skipOnServerError(t, err)

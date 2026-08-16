@@ -51,6 +51,30 @@ func TestAcceptance_Pro_PKI_DigicertTLMProbe(t *testing.T) {
 	t.Fatalf("GetDigicertTrustLifecycleManagerV1: %v", err)
 }
 
+// CheckDigicertTrustLifecycleManagerPrivilegesV1 answers 204 when the linked
+// DigiCert account holds every permission needed to deploy certificates, and
+// 403 with the missing permission names when it does not — so a 403 here is
+// indistinguishable from the tenant-level authz gap and both are non-fatal.
+// Without a real DigiCert fixture the id probe can only reach 404.
+func TestAcceptance_Pro_PKI_DigicertPrivilegeCheck(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	err := p.CheckDigicertTrustLifecycleManagerPrivilegesV1(ctx, "-1")
+	if err == nil {
+		t.Log("CheckDigicertTrustLifecycleManagerPrivilegesV1(-1): 204, account holds all permissions")
+		return
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+		t.Logf("DigiCert privilege-check rejected: status=%d — expected without a DigiCert TLM fixture", apiErr.StatusCode)
+		return
+	}
+	skipOnServerError(t, err)
+	t.Fatalf("CheckDigicertTrustLifecycleManagerPrivilegesV1: %v", err)
+}
+
 func TestAcceptance_Pro_PKI_DigicertValidateCertificate(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()

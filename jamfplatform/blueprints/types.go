@@ -262,10 +262,19 @@ func (m BookmarkItem) MarshalJSON() ([]byte, error) {
 
 // Calculator represents a calculator.
 type Calculator struct {
-	BasicMode      *BasicMode      `json:"BasicMode,omitempty"`
-	InputModes     *InputModes     `json:"InputModes,omitempty"`
-	MathNotesMode  *MathNotesMode  `json:"MathNotesMode,omitempty"`
+	// If present, configures the basic mode of the calculator. Basic mode is always enabled.
+	BasicMode *BasicMode `json:"BasicMode,omitempty"`
+	// If present, controls global input options of the calculator. If not present, all input modes are
+	// enabled.
+	InputModes *InputModes `json:"InputModes,omitempty"`
+	// If present, configures the Math Notes mode of the calculator. If not present, math notes mode is
+	// enabled.
+	MathNotesMode *MathNotesMode `json:"MathNotesMode,omitempty"`
+	// If present, configures the programmer mode of the calculator. If not present, programmer mode is
+	// enabled.
 	ProgrammerMode *ProgrammerMode `json:"ProgrammerMode,omitempty"`
+	// If present, configures the scientific mode of the calculator. If not present, scientific mode is
+	// enabled.
 	ScientificMode *ScientificMode `json:"ScientificMode,omitempty"`
 }
 
@@ -735,7 +744,9 @@ type MathSettingsComponent struct {
 
 // MathSettingsConfiguration Math settings configuration. Configures Calculator app modes and system-wide math behavior including keyboard suggestions and Math Notes.
 type MathSettingsConfiguration struct {
-	Calculator     *Calculator     `json:"Calculator,omitempty"`
+	// If present, configures the built-in Calculator app.
+	Calculator *Calculator `json:"Calculator,omitempty"`
+	// If present, configures math behavior in the system.
 	SystemBehavior *SystemBehavior `json:"SystemBehavior,omitempty"`
 }
 
@@ -982,14 +993,22 @@ type SafariSettingsComponent struct {
 
 // SafariSettingsConfiguration Safari settings configuration. Configures Safari browser behavior including cookies, JavaScript, popups, private browsing, and start page settings.
 type SafariSettingsConfiguration struct {
-	AcceptCookies              *AcceptCookies              `json:"AcceptCookies,omitempty"`
+	// The policy Safari uses for managing cookies.
+	AcceptCookies *AcceptCookies `json:"AcceptCookies,omitempty"`
+	// If false, the system forces fraud warnings on in Safari.
 	AllowDisablingFraudWarning *AllowDisablingFraudWarning `json:"AllowDisablingFraudWarning,omitempty"`
-	AllowHistoryClearing       *AllowHistoryClearing       `json:"AllowHistoryClearing,omitempty"`
-	AllowJavaScript            *AllowJavaScript            `json:"AllowJavaScript,omitempty"`
-	AllowPopups                *AllowPopups                `json:"AllowPopups,omitempty"`
-	AllowPrivateBrowsing       *AllowPrivateBrowsing       `json:"AllowPrivateBrowsing,omitempty"`
-	AllowSummary               *AllowSummary               `json:"AllowSummary,omitempty"`
-	NewTabStartPage            *NewTabStartPage            `json:"NewTabStartPage,omitempty"`
+	// If false, the system disables clearing history in Safari.
+	AllowHistoryClearing *AllowHistoryClearing `json:"AllowHistoryClearing,omitempty"`
+	// If false, the system disables JavaScript in Safari.
+	AllowJavaScript *AllowJavaScript `json:"AllowJavaScript,omitempty"`
+	// If false, the system disables popups in Safari.
+	AllowPopups *AllowPopups `json:"AllowPopups,omitempty"`
+	// If false, the system disables private browsing in Safari.
+	AllowPrivateBrowsing *AllowPrivateBrowsing `json:"AllowPrivateBrowsing,omitempty"`
+	// If false, the system disables summarization of content in Safari.
+	AllowSummary *AllowSummary `json:"AllowSummary,omitempty"`
+	// Sets the start page for new tabs in Safari.
+	NewTabStartPage *NewTabStartPage `json:"NewTabStartPage,omitempty"`
 }
 
 // ScientificMode represents a scientific mode.

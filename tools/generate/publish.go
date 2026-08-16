@@ -56,6 +56,7 @@ func publishSpecs(root string, cfg Config) error {
 		// Go-type-shaping passes (flattenClassicSizeWrappers, hoistInlineObjects)
 		// are deliberately excluded — they restructure schemas purely for Go
 		// struct emission and don't affect what the published spec documents.
+		applySchemaCreations(doc, spec.SchemaCreations)
 		applySchemaRenames(doc, spec.SchemaRenames)
 		applySchemaAdditions(doc, spec.SchemaAdditions)
 		applySchemaPatches(doc, spec.SchemaPatches)

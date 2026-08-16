@@ -71,6 +71,31 @@ func TestAcceptance_Pro_Settings_SmtpServerV2Read(t *testing.T) {
 	t.Logf("SMTP server: enabled=%v authType=%s", s.Enabled, s.AuthenticationType)
 }
 
+// The allowed set is gated at instance/knobs level and is independent of the
+// current SMTP settings, so it can legitimately be narrower than the
+// SmtpServerV2AuthenticationType constants.
+//
+// Known gateway gap (probed 2026-08-16 against an 11.31.0 tenant): 403
+// BAD_PERMISSIONS even though the spec declares the same read:pro:smtp-server
+// that GetSmtpServerV2 accepts on the same credentials. The sub-path appears
+// to be missing from the gateway's authz mapping; skip rather than fail so the
+// gap stays visible without blocking the suite.
+func TestAcceptance_Pro_Settings_SmtpServerAllowedAuthTypesV2(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	l, err := pro.New(c).ListSmtpServerAllowedAuthTypesV2(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("allowed-auth-types forbidden despite read:pro:smtp-server — gateway authz gap: %v", err)
+		}
+		t.Fatalf("ListSmtpServerAllowedAuthTypesV2: %v", err)
+	}
+	t.Logf("SMTP allowed auth types: %v", l.AllowedAuthenticationTypes)
+}
+
 func TestAcceptance_Pro_Settings_SmtpServerHistoryV1(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()

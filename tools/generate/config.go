@@ -45,6 +45,18 @@ type SpecDef struct {
 	// silently shadow it). Outer key: old schema name. Value: new schema name.
 	SchemaRenames map[string]string `json:"schemaRenames,omitempty"`
 
+	// SchemaCreations adds whole named component schemas the spec no longer
+	// declares but the server still returns. Key: schema name. Value: raw JSON
+	// for an OpenAPI 3 Schema object, which may `$ref` other created schemas.
+	// Applied before every other pass, so a created schema is indistinguishable
+	// from a spec-declared one downstream — SchemaPatches can `$ref` it, and it
+	// is emitted as a Go type once a whitelisted operation reaches it.
+	//
+	// Only for a schema upstream *dropped*: panics if the name already exists,
+	// which is the signal that the spec has been repaired and the entry (and
+	// the patches pointing at it) should be deleted.
+	SchemaCreations map[string]json.RawMessage `json:"schemaCreations,omitempty"`
+
 	// SchemaPatches injects (or replaces) arbitrary OpenAPI schema fragments at
 	// dotted property paths under a named component schema. Used when a spec
 	// omits a richer sub-structure the server actually returns (e.g. policy

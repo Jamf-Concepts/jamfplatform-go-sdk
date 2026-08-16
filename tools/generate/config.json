@@ -246,12 +246,6 @@
       "package": "ddmreport",
       "splitByTag": true,
       "specFile": "declaration_reporting_service.json",
-      "fieldTypeOverrides": {
-        "error_dto.id": "*string",
-        "status_report_declaration_dto.dateUpdated": "*time.Time",
-        "filtered_result_dto.dateUpdated": "*time.Time",
-        "filtered_result_dto.lastReportTime": "*time.Time"
-      },
       "operations": [
         {
           "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}",
@@ -298,6 +292,48 @@
       "package": "compliancebenchmarks",
       "splitByTag": true,
       "specFile": "compliance_benchmark_engine.json",
+      "schemaCreations": {
+        "ODVRecommendation": {
+          "type": "object",
+          "description": "The recommended organization-defined value for a rule on one OS version.",
+          "properties": {
+            "hint": {
+              "type": "string",
+              "description": "Guidance on what values the rule accepts."
+            },
+            "value": {
+              "type": "string",
+              "description": "The recommended value for this OS version."
+            }
+          }
+        },
+        "OsSpecificRuleInfo": {
+          "type": "object",
+          "description": "Per-OS-version overrides of a rule's title, description and recommended organization-defined value.",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "odv": {
+              "$ref": "#/components/schemas/ODVRecommendation"
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "schemaPatches": {
+        "RuleInfo": {
+          "osSpecificDefaults": {
+            "type": "object",
+            "description": "Per-OS-version rule overrides, keyed by OS identifier (MAC_OS_13, MAC_OS_14, ...). Empty when the rule is identical on every supported OS.",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/OsSpecificRuleInfo"
+            }
+          }
+        }
+      },
       "operations": [
         {
           "op": "GET /v1/tenant/{tenantId}/benchmarks",
@@ -4134,6 +4170,14 @@
           "name": "UpdateSmtpServerV2"
         },
         {
+          "op": "GET /v2/tenant/{tenantId}/smtp-server/allowed-auth-types",
+          "name": "ListSmtpServerAllowedAuthTypesV2"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/environment-type",
+          "name": "GetEnvironmentTypeV2"
+        },
+        {
           "op": "GET /v1/tenant/{tenantId}/jamf-pro-server-url",
           "name": "GetJamfProServerURLV1"
         },
@@ -4318,6 +4362,11 @@
         {
           "op": "GET /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}/dependencies",
           "name": "GetDigicertTrustLifecycleManagerDependenciesV1"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}/privilege-check",
+          "name": "CheckDigicertTrustLifecycleManagerPrivilegesV1",
+          "expectedStatus": 204
         },
         {
           "op": "POST /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/validate-client-certificate",

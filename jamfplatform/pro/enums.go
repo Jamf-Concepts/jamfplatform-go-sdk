@@ -2590,6 +2590,31 @@ func EnrollmentSettingsV4FlushMDMCommandsOnReenrollValues() []EnrollmentSettings
 	}
 }
 
+// EnvironmentTypeEnvironment is the set of values accepted by EnvironmentType.Environment.
+type EnvironmentTypeEnvironment = string
+
+// EnvironmentTypeEnvironment values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	EnvironmentTypeEnvironmentStaging    EnvironmentTypeEnvironment = "staging"
+	EnvironmentTypeEnvironmentProduction EnvironmentTypeEnvironment = "production"
+	EnvironmentTypeEnvironmentSandbox    EnvironmentTypeEnvironment = "sandbox"
+)
+
+// EnvironmentTypeEnvironmentValues returns every value the Jamf API accepts for EnvironmentTypeEnvironment,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func EnvironmentTypeEnvironmentValues() []EnvironmentTypeEnvironment {
+	return []EnvironmentTypeEnvironment{
+		EnvironmentTypeEnvironmentStaging,
+		EnvironmentTypeEnvironmentProduction,
+		EnvironmentTypeEnvironmentSandbox,
+	}
+}
+
 // EraseDeviceCommandObliterationBehavior is the set of values accepted by EraseDeviceCommand.ObliterationBehavior.
 type EraseDeviceCommandObliterationBehavior = string
 
@@ -5178,6 +5203,33 @@ func SlasaAcceptanceSlasaAcceptanceStatusValues() []SlasaAcceptanceSlasaAcceptan
 	return []SlasaAcceptanceSlasaAcceptanceStatus{
 		SlasaAcceptanceSlasaAcceptanceStatusAccepted,
 		SlasaAcceptanceSlasaAcceptanceStatusNotAccepted,
+	}
+}
+
+// SmtpAuthenticationTypeListAllowedAuthenticationTypes is the set of values accepted by SmtpAuthenticationTypeList.AllowedAuthenticationTypes.
+type SmtpAuthenticationTypeListAllowedAuthenticationTypes = string
+
+// SmtpAuthenticationTypeListAllowedAuthenticationTypes values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SmtpAuthenticationTypeListAllowedAuthenticationTypesNone       SmtpAuthenticationTypeListAllowedAuthenticationTypes = "NONE"
+	SmtpAuthenticationTypeListAllowedAuthenticationTypesBasic      SmtpAuthenticationTypeListAllowedAuthenticationTypes = "BASIC"
+	SmtpAuthenticationTypeListAllowedAuthenticationTypesGraphApi   SmtpAuthenticationTypeListAllowedAuthenticationTypes = "GRAPH_API"
+	SmtpAuthenticationTypeListAllowedAuthenticationTypesGoogleMail SmtpAuthenticationTypeListAllowedAuthenticationTypes = "GOOGLE_MAIL"
+)
+
+// SmtpAuthenticationTypeListAllowedAuthenticationTypesValues returns every value the Jamf API accepts for SmtpAuthenticationTypeListAllowedAuthenticationTypes,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SmtpAuthenticationTypeListAllowedAuthenticationTypesValues() []SmtpAuthenticationTypeListAllowedAuthenticationTypes {
+	return []SmtpAuthenticationTypeListAllowedAuthenticationTypes{
+		SmtpAuthenticationTypeListAllowedAuthenticationTypesNone,
+		SmtpAuthenticationTypeListAllowedAuthenticationTypesBasic,
+		SmtpAuthenticationTypeListAllowedAuthenticationTypesGraphApi,
+		SmtpAuthenticationTypeListAllowedAuthenticationTypesGoogleMail,
 	}
 }
 

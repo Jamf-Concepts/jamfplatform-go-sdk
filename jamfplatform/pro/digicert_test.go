@@ -161,6 +161,21 @@ func TestGetDigicertTrustLifecycleManagerDependenciesV1_NotFound(t *testing.T) {
 	}
 }
 
+func TestCheckDigicertTrustLifecycleManagerPrivilegesV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/digicert/trust-lifecycle-manager/test-id/privilege-check", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.CheckDigicertTrustLifecycleManagerPrivilegesV1(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestValidateDigicertClientCertificateV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/digicert/trust-lifecycle-manager/validate-client-certificate", func(w http.ResponseWriter, r *http.Request) {
