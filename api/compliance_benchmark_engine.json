@@ -166,7 +166,8 @@
             "type": "string"
           },
           "target": {
-            "$ref": "#/components/schemas/TargetV2"
+            "$ref": "#/components/schemas/TargetV2",
+            "description": "The target device groups for this benchmark"
           },
           "title": {
             "description": "A short, descriptive name for the benchmark",
