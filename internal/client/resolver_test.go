@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 )
 
 // ---------------------------------------------------------------------------
@@ -129,6 +130,9 @@ func TestResolveByNameFiltered_DuplicateSameID(t *testing.T) {
 
 func TestResolveByNameFiltered_ServerError(t *testing.T) {
 	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, 2*time.Millisecond, 5*time.Millisecond)
+	c.retry.RetryMax = 1
 	mux.HandleFunc("/api/blueprints/v1/blueprints", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte(`{"errors":[{"code":"OOPS","description":"server broke"}]}`))

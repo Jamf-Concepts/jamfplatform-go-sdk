@@ -20,11 +20,11 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
@@ -47,7 +47,8 @@ type Logger interface {
 type Transport struct {
 	baseURL         string
 	tenantID        string
-	httpClient      *http.Client
+	httpClient      *http.Client // retry.StandardClient() — used by execute() for all JSON/XML Do* calls
+	uploadClient    *http.Client // authed + paced, NOT retry-wrapped — used directly by multipart.go; see retry.go's newRetryClient doc
 	baseClient      *http.Client
 	oauthConfig     *clientcredentials.Config
 	logger          Logger
@@ -57,6 +58,7 @@ type Transport struct {
 	cookieJar       http.CookieJar
 	deprecationSeen sync.Map // dedup runtime Deprecation header warnings
 	throttle        *requestThrottle
+	retry           *retryablehttp.Client // backs httpClient; mutating retry.HTTPClient (see SetHTTPClient/SetUserAgent) updates httpClient's behavior in place
 }
 
 // PaginatedResponseRepresentation captures pagination metadata shared by multiple endpoints.
@@ -80,7 +82,8 @@ func WithHTTPClient(httpClient *http.Client) Option {
 				httpClient.Jar = newCookieJar()
 			}
 			c.baseClient = httpClient
-			c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
+			c.uploadClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
+			c.retry.HTTPClient = c.uploadClient
 		}
 	}
 }
@@ -136,24 +139,28 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 	}
 
 	throttle := newRequestThrottle(defaultMinRequestInterval)
-	httpClient, baseClient := newOAuth2Client(oauthConfig, userAgent, throttle)
+	uploadClient, baseClient := newOAuth2Client(oauthConfig, userAgent, throttle)
+	retry := newRetryClient(uploadClient)
 
 	c := &Transport{
-		baseURL:     baseURL,
-		httpClient:  httpClient,
-		baseClient:  baseClient,
-		oauthConfig: oauthConfig,
-		userAgent:   userAgent,
-		throttle:    throttle,
+		baseURL:      baseURL,
+		uploadClient: uploadClient,
+		httpClient:   retry.StandardClient(),
+		baseClient:   baseClient,
+		oauthConfig:  oauthConfig,
+		userAgent:    userAgent,
+		throttle:     throttle,
+		retry:        retry,
 	}
 	for _, opt := range opts {
 		opt(c)
 	}
 	if c.tokenCache != nil {
-		c.httpClient = newCachingOAuth2Client(c.oauthConfig, c.baseClient, c.tokenCache, c.cacheKey)
+		c.uploadClient = newCachingOAuth2Client(c.oauthConfig, c.baseClient, c.tokenCache, c.cacheKey)
+		c.retry.HTTPClient = c.uploadClient
 	}
 	if c.cookieJar != nil {
-		c.httpClient.Jar = c.cookieJar
+		c.uploadClient.Jar = c.cookieJar
 		c.baseClient.Jar = c.cookieJar
 	}
 	return c
@@ -185,7 +192,7 @@ func (c *Transport) ValidateCredentials(ctx context.Context) error {
 	return validateCredentials(ctx, c.oauthConfig, c.baseClient)
 }
 
-// HTTPClient returns the underlying OAuth2-managed HTTP client for raw authenticated requests.
+// HTTPClient returns the underlying OAuth2-managed, retry-wrapped HTTP client for raw authenticated requests.
 func (c *Transport) HTTPClient() *http.Client {
 	return c.httpClient
 }
@@ -193,7 +200,8 @@ func (c *Transport) HTTPClient() *http.Client {
 // SetHTTPClient sets a custom base HTTP client (useful for testing).
 func (c *Transport) SetHTTPClient(httpClient *http.Client) {
 	c.baseClient = httpClient
-	c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
+	c.uploadClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
+	c.retry.HTTPClient = c.uploadClient
 }
 
 // SetLogger sets the logger for the client.
@@ -204,7 +212,8 @@ func (c *Transport) SetLogger(logger Logger) {
 // SetUserAgent sets the User-Agent header value used for token and API requests.
 func (c *Transport) SetUserAgent(ua string) {
 	c.userAgent = ua
-	c.httpClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua, c.throttle)
+	c.uploadClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua, c.throttle)
+	c.retry.HTTPClient = c.uploadClient
 }
 
 // Do performs an authenticated API request and decodes the response.
@@ -235,64 +244,18 @@ func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string
 	return c.execute(ctx, method, path, body, "", headers, expectedStatus, result)
 }
 
-// execute funnels every Do* variant through one place so the 429/Retry-After
-// retry and Deprecation-header logging live in a single hook point. Non-success
-// statuses other than a server-instructed 429 surface immediately as an
-// *APIResponseError — eventual-consistency handling is a caller concern.
+// execute funnels every Do* variant through one place so Deprecation-header
+// logging lives in a single hook point. Retrying transient failures (429,
+// 503, and 500/502/504 on an idempotent method) happens one layer down, in
+// c.httpClient itself — see retry.go. Non-retried statuses surface
+// immediately as an *APIResponseError — eventual-consistency handling of a
+// specific endpoint's error semantics is a caller concern.
 func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any) error {
 	resp, classic, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode == http.StatusTooManyRequests {
-		delay := parseRetryAfter(resp.Header.Get("Retry-After"), time.Now())
-		if delay > 0 && delay <= 60*time.Second {
-			// Capture the 429 error before discarding the body so we can
-			// surface it if the context is cancelled during the wait.
-			lastErr := c.handleResponse(ctx, resp, classic, expectedStatus, result)
-			select {
-			case <-time.After(delay):
-			case <-ctx.Done():
-				if lastErr != nil {
-					return lastErr
-				}
-				return ctx.Err()
-			}
-			resp, classic, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
-			if err != nil {
-				return err
-			}
-		}
-		// Out-of-policy Retry-After (missing, negative, or >60s) or retry
-		// also returned 429: fall through to handleResponse so the caller
-		// sees the server's actual error body + traceId, not a synthetic
-		// one. handleResponse builds an APIResponseError for any status !=
-		// expectedStatus, which 429 will be.
-	}
-
 	return c.handleResponse(ctx, resp, classic, expectedStatus, result)
-}
-
-// parseRetryAfter interprets a Retry-After header value as either seconds
-// (integer) or an HTTP-date. Returns 0 for empty/invalid values.
-func parseRetryAfter(v string, now time.Time) time.Duration {
-	if v == "" {
-		return 0
-	}
-	if secs, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
-		if secs < 0 {
-			return 0
-		}
-		return time.Duration(secs) * time.Second
-	}
-	if t, err := http.ParseTime(v); err == nil {
-		d := t.Sub(now)
-		if d < 0 {
-			return 0
-		}
-		return d
-	}
-	return 0
 }
 
 // logDeprecation logs once per (method, path) when a server response includes

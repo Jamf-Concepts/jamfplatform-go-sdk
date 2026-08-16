@@ -314,6 +314,9 @@ func TestDo_MalformedJSON(t *testing.T) {
 
 func TestDoExpect_NonJSONErrorBody(t *testing.T) {
 	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, 2*time.Millisecond, 5*time.Millisecond)
+	c.retry.RetryMax = 1
 	mux.HandleFunc("/api/text-error", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusBadGateway)
 		_, _ = w.Write([]byte("Bad Gateway"))
