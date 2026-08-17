@@ -11231,53 +11231,6 @@
       ]
     },
     {
-      "file": "testing/securitycloud-enrollment-api.yaml",
-      "namespace": "securitycloud",
-      "package": "securitycloud",
-      "specFile": "securitycloud_enrollment_api.json",
-      "splitByTag": true,
-      "schemaAdditions": {
-        "ActivationProfileResponse": {
-          "code": "string"
-        }
-      },
-      "propertyRemovals": {
-        "ActivationProfileResponse": [
-          "id",
-          "href"
-        ]
-      },
-      "operations": [
-        {
-          "op": "GET /v1/activation-profiles",
-          "name": "ListActivationProfilesV1",
-          "params": [
-            "origin"
-          ]
-        },
-        {
-          "op": "POST /v1/activation-profiles",
-          "name": "CreateActivationProfileV1"
-        },
-        {
-          "op": "POST /v1/activation-profiles/delete-multiple",
-          "name": "DeleteActivationProfilesV1"
-        },
-        {
-          "op": "POST /v1/activation-profiles/{activationProfileId}/pause",
-          "name": "PauseActivationProfileV1"
-        },
-        {
-          "op": "POST /v1/activation-profiles/{activationProfileId}/resume",
-          "name": "ResumeActivationProfileV1"
-        },
-        {
-          "op": "GET /v1/activation-profiles/{activationProfileId}",
-          "name": "GetActivationProfileV1"
-        }
-      ]
-    },
-    {
       "file": "testing/securitycloud-uem-connect-api.yaml",
       "namespace": "securitycloud",
       "package": "securitycloud",

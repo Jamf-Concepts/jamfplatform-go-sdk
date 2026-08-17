@@ -23,10 +23,14 @@ import (
 // tenants and separate API clients, and neither credential reaches the other's
 // surface (probed 2026-08-17: 403 BAD_PERMISSIONS in both directions).
 //
-// Three groups of endpoints are deliberately not exercised, each for a reason
-// named at the test that skips it: paths the gateway does not route yet, writes
-// that would provision or reconfigure real infrastructure on a shared tenant,
-// and one endpoint whose server-side delete is a confirmed no-op.
+// Two groups of endpoints are deliberately not exercised, each for a reason
+// named at the test that skips it: paths the gateway does not route yet, and
+// writes that would provision or reconfigure real infrastructure on a shared
+// tenant.
+//
+// Activation profiles are absent from this suite because they are absent from
+// the SDK: their spec is not published in any environment of the GitOps build,
+// and the SDK only ingests published specs.
 
 // jscName namespaces every artefact this suite creates, so a leftover from a
 // crashed run is identifiable and safe to remove by hand.
@@ -551,111 +555,6 @@ func TestAcceptance_SecurityCloudDeviceGroupsV2(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
-// Activation profiles
-// ---------------------------------------------------------------------------
-
-func TestAcceptance_SecurityCloudActivationProfileReads(t *testing.T) {
-	sc := accSecurityCloudClient(t)
-	ctx := context.Background()
-
-	all, err := sc.ListActivationProfilesV1(ctx, "")
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListActivationProfilesV1 failed: %v", err)
-	}
-	t.Logf("%d activation profiles", len(all.ActivationProfiles))
-
-	// The spec marks `origin` required; the server does not (both calls above
-	// and below return 200). It filters when supplied.
-	apiOnly, err := sc.ListActivationProfilesV1(ctx, "PUBLIC_API")
-	if err != nil {
-		t.Fatalf("ListActivationProfilesV1(origin=PUBLIC_API) failed: %v", err)
-	}
-	t.Logf("%d of them were created via the public API", len(apiOnly.ActivationProfiles))
-	if len(apiOnly.ActivationProfiles) > len(all.ActivationProfiles) {
-		t.Errorf("origin-filtered list (%d) is larger than the unfiltered list (%d)",
-			len(apiOnly.ActivationProfiles), len(all.ActivationProfiles))
-	}
-
-	if len(all.ActivationProfiles) == 0 {
-		t.Skip("tenant has no activation profiles to fetch")
-	}
-	code := all.ActivationProfiles[0].Code
-	got, err := sc.GetActivationProfileV1(ctx, code)
-	if err != nil {
-		t.Fatalf("GetActivationProfileV1(%s) failed: %v", code, err)
-	}
-	if got.Code != code {
-		t.Errorf("GetActivationProfileV1 returned code %q, want %q", got.Code, code)
-	}
-}
-
-// TestAcceptance_SecurityCloudActivationProfileLifecycle is opt-in because it
-// cannot clean up after itself: see the skip message.
-func TestAcceptance_SecurityCloudActivationProfileLifecycle(t *testing.T) {
-	sc := accSecurityCloudClient(t)
-	ctx := context.Background()
-
-	if os.Getenv("JAMFPLATFORM_JSC_ALLOW_ACTIVATION_PROFILE_CREATE") == "" {
-		t.Skip("CreateActivationProfileV1 leaks an undeletable enrollment profile: POST /activation-profiles/delete-multiple answers 204 but deletes nothing — wire-verified 2026-08-17 against both a real code (still readable and still listed after two calls and a 10s wait) and a bogus one (also 204). Until that server bug is fixed, every run of this test would add a permanent activation code to the tenant. Set JAMFPLATFORM_JSC_ALLOW_ACTIVATION_PROFILE_CREATE=1 to run it anyway and clean up by hand.")
-	}
-
-	enabled := true
-	// Server-side business rule, not in the spec: networkSecurity and
-	// vulnerabilityManagement must both be enabled or both disabled (400
-	// INVALID_FIELD on `capabilities` otherwise).
-	created, err := sc.CreateActivationProfileV1(ctx, &securitycloud.PublicApiCreateActivationProfileRequest{
-		Origin:    "PUBLIC_API",
-		Name:      jscName("profile"),
-		Platforms: []string{"iOS"},
-		Capabilities: securitycloud.PublicApiCapabilities{
-			NetworkSecurity:         &enabled,
-			VulnerabilityManagement: &enabled,
-		},
-	})
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("CreateActivationProfileV1 failed: %v", err)
-	}
-	// The spec declares {id, href}; the server returns {code}. The SDK's type
-	// is repaired to match, so an empty Code means that repair regressed.
-	if created.Code == "" {
-		t.Fatal("CreateActivationProfileV1 returned an empty code — the ActivationProfileResponse repair has regressed")
-	}
-	t.Logf("created activation profile %s", created.Code)
-
-	got, err := sc.GetActivationProfileV1(ctx, created.Code)
-	if err != nil {
-		t.Fatalf("GetActivationProfileV1(%s) failed: %v", created.Code, err)
-	}
-	if got.Code != created.Code {
-		t.Errorf("GetActivationProfileV1 returned %q, want %q", got.Code, created.Code)
-	}
-
-	// Pause/resume are only ever called against a profile this test created,
-	// never a pre-existing one — pausing a live enrollment profile would stop
-	// real devices enrolling.
-	if err := sc.PauseActivationProfileV1(ctx, created.Code); err != nil {
-		skipOnGatewayUnrouted(t, err, "POST /v1/activation-profiles/{code}/pause")
-		t.Fatalf("PauseActivationProfileV1(%s) failed: %v", created.Code, err)
-	}
-	if err := sc.ResumeActivationProfileV1(ctx, created.Code); err != nil {
-		skipOnGatewayUnrouted(t, err, "POST /v1/activation-profiles/{code}/resume")
-		t.Fatalf("ResumeActivationProfileV1(%s) failed: %v", created.Code, err)
-	}
-
-	// Best-effort: this is the call that answers 204 and does nothing. It is
-	// still exercised so the request shape stays covered, and the leak is
-	// reported rather than hidden.
-	if err := sc.DeleteActivationProfilesV1(ctx, &securitycloud.BulkDeleteActivationProfilesRequest{Codes: []string{created.Code}}); err != nil {
-		t.Fatalf("DeleteActivationProfilesV1 failed: %v", err)
-	}
-	if _, err := sc.GetActivationProfileV1(ctx, created.Code); err == nil {
-		t.Logf("activation profile %s still exists after delete-multiple returned success — the known server-side no-op; remove it by hand", created.Code)
-	}
-}
-
-// ---------------------------------------------------------------------------
 // UEM Connect
 // ---------------------------------------------------------------------------
 
@@ -1053,10 +952,9 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 // isSecurityCloudNotFound reports whether err is a 404 from any Security Cloud
 // service. It exists because the family does not speak one error dialect: DNS,
 // ZTNA and UEM Connect answer the gateway's {httpStatus, traceId, errors[]}
-// envelope, activation profiles answer the same shape minus traceId, and device
-// groups answer an entirely different one ({message, error, logref,
-// statusCode}) that leaves Details() and FieldErrors() empty. The status code is
-// the only field every one of them populates.
+// envelope, while device groups answer an entirely different one ({message,
+// error, logref, statusCode}) that leaves Details() and FieldErrors() empty. The
+// status code is the only field both of them populate.
 func isSecurityCloudNotFound(err error) bool {
 	var apiErr *jamfplatform.APIResponseError
 	return errors.As(err, &apiErr) && apiErr.HasStatus(http.StatusNotFound)

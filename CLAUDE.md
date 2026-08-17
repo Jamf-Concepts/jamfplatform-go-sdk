@@ -123,7 +123,7 @@ The tenant ID is the client-wide `WithTenantID` value unless a namespace registe
 
 ### Jamf Security Cloud (`securitycloud` package)
 
-53 operations across six specs, all served on the shared `/api/securitycloud` gateway surface: DNS (zones, the search-domain singleton, custom hostname mappings), ZTNA (gateways, grouped gateways, access policies, plus the read-only shared-gateway and predefined-app catalogues), content categories, device groups, activation profiles, and UEM Connect.
+47 operations across five specs, all served on the shared `/api/securitycloud` gateway surface: DNS (zones, the search-domain singleton, custom hostname mappings), ZTNA (gateways, grouped gateways, access policies, plus the read-only shared-gateway and predefined-app catalogues), content categories, device groups, and UEM Connect.
 
 **Wire-verified URL shapes (probed 2026-08-17), because the published specs are wrong.** The gateway's Tyk definition is a catch-all proxy (`listen_path: /api/securitycloud/`, `strip_listen_path: true`) — the path globs in `tyk-gateway-management/prod/api-products/securitycloud/` are *audit* rules covering mutating methods only, not a routing allowlist, so they under-describe the surface and must not be read as one. What the gateway actually routes:
 
@@ -136,30 +136,31 @@ The tenant ID is the client-wide `WithTenantID` value unless a namespace registe
 
 The `-beta` spec variants inject `/tenant/{tenantId}` but never the `betaApiConfig.apiVersion`, so dns, ztna and categories ship versionless paths the gateway rejects. The SDK supplies the version through the spec-level `"version"` config key instead; UEM Connect sets none because its paths already carry `/v1`.
 
-**Spec provenance.** Sourced from the GitOps build's `-beta` variants (`internal/stage/*-beta`, or `external/` where a spec is published to prod) — the only ones carrying the `/api/securitycloud` namespace, tenant-scoped paths and `x-required-privileges`. `securitycloud-enrollment` is absent from that build in every environment, so activation profiles come from the team spec and their operations have no privilege metadata until the build picks the spec up.
+**Spec provenance: the GitOps build only, `-beta` variants only.** `internal/stage/*-beta`, or `external/*-beta` where a spec is published to prod. Those are the only variants carrying the `/api/securitycloud` namespace, tenant-scoped paths and `x-required-privileges`; the non-beta variants declare a per-service namespace (`/api/securitycloud-devices`) the gateway does not have, and answer `404 page not found`.
 
-**Not routed by the gateway** (403 `BAD_PERMISSIONS` with credentials that reach every other Security Cloud path — the unrouted-endpoint tell, not a privilege problem): `GET /v2/…/groups` (the successor to the deprecated device-groups v1), `POST /v1/activation-profiles/{code}/pause` and `/resume`, and the `jsc-api-gateway` ping. Their acceptance tests skip via `skipOnGatewayUnrouted` and should be tightened to `t.Fatalf` once routed.
+Do **not** fall back to the source specs in `public-apis-oas/redocly-implementation/teams/` when a spec is missing from the build. They carry no tenant segment, no version prefix, no `x-required-privileges` and no servers, so a spec taken from there produces methods whose URLs the gateway rejects and whose privilege metadata is empty — a difference invisible in the generated code until it is called. A spec absent from the build is a spec the SDK does not cover, and the gap gets reported upstream instead.
 
-**Spec/server disagreements encoded in `config.json`** — all four found by probing, none inferable from the spec:
+**Not covered for that reason: `securitycloud-enrollment`** (activation profiles — list, get, create, delete-multiple, pause, resume). It is `api_maturity: ga` with `prod: true` in its config, its endpoints answer in production, and it appears in *no* environment of build v1225. It was briefly generated from the team spec and then removed. Three things learned while it was in, worth having when the spec lands: `POST /v1/activation-profiles` returns `{"code"}` rather than the declared `{id, href}`; `capabilities.networkSecurity` and `capabilities.vulnerabilityManagement` must both be enabled or both disabled (400 `INVALID_FIELD`); and **`POST /v1/activation-profiles/delete-multiple` answers 204 and deletes nothing** — for a real code and a bogus one alike — so creating a profile leaks an undeletable enrollment code and any acceptance test that creates one has to be opt-in.
+
+**Not routed by the gateway** (403 `BAD_PERMISSIONS` with credentials that reach every other Security Cloud path — the unrouted-endpoint tell, not a privilege problem): `GET /v2/…/groups` (the successor to the deprecated device-groups v1), the `jsc-api-gateway` ping, and — while they were generated — `POST /v1/activation-profiles/{code}/pause` and `/resume`. The acceptance test for the one still in the SDK skips via `skipOnGatewayUnrouted` and should be tightened to `t.Fatalf` once routed.
+
+**Spec/server disagreements encoded in `config.json`** — all found by probing, none inferable from the spec:
 
 - `PUT /v1/…/groups/{id}` answers **200 with the updated `Group`**, not the spec's 204 no-content (`expectedStatus` + `responseType`).
 - `POST /ztna/apps` and `POST /ztna/grouped-gateways` answer **201 with the full resource object**, where the spec declares the shared `CreateResponse` (`{id, href}`) — of which the server sends only `id`, never `href`. Both carry a `responseType` override so callers get the created object rather than a reference to it. `POST /ztna/gateways` shares that spec response and is left on it: creating a gateway provisions real egress infrastructure, so its body was never probed, and `CreateResponse` still picks up the top-level `id` its two siblings return.
-- `POST /v1/activation-profiles` returns `{"code": "..."}`, not the declared `{id, href}`. `ActivationProfileResponse` is repaired to the wire shape — `id`/`href` removed rather than left as fields that silently decode to `""`, since the code is the only handle on the new profile.
 - `ZoneRef.href` is `required` but arrives `null`, and the create's `Location` header is a bare ID rather than the documented canonical URL. Only `id` is usable.
 
 **Server-side behaviour worth knowing before writing tests:**
 
-- **`POST /v1/activation-profiles/delete-multiple` is a no-op.** It answers 204 for a real code and for a bogus one alike, and the profile stays readable and listed afterwards. Creating an activation profile therefore leaks an undeletable enrollment code, which is why that acceptance test is opt-in behind `JAMFPLATFORM_JSC_ALLOW_ACTIVATION_PROFILE_CREATE`. Flag to Jamf; do not "fix" it in the SDK.
-- Activation-profile capabilities carry an unencoded rule: `networkSecurity` and `vulnerabilityManagement` must both be enabled or both disabled (400 `INVALID_FIELD` otherwise).
 - `App.routing.type` is `CUSTOM` or `DIRECT` only. `categoryName` validates against the **`displayName`** of the tenant's own category list, not a fixed enum, and an unknown value is a 409 `MISSING_CATEGORY_NAME` — a state conflict, not a malformed request.
-- `customer-id` (device groups) and `origin` (activation-profile list) are declared **required** query params the server ignores; the tenant in the path wins. `origin` does filter when supplied, so it stays in the signature.
+- `customer-id` (device groups) is declared a **required** query param the server ignores; the tenant in the path wins, so it is not in the signature.
 - Device groups v1 returns a **bare JSON array** (`GroupListResponse = []Group`, so the method returns `*[]Group`); v2 wraps it in `{groups: []}`.
 
 **Resolvers and apply.** No Security Cloud list endpoint offers RSQL or a `search` parameter, so every resolver is `clientFilter`; ZTNA gateways and apps additionally walk pages, the rest fetch one list. Six resources have name-based lookup — DNS zones, ZTNA gateways, grouped gateways and apps, device groups, and content categories (keyed on `displayName`, the value `categoryName` is validated against, which makes it the lookup a caller needs before creating an app). Five of those carry `apply`; content categories are a read-only catalogue.
 
 Three deliberate gaps, so nobody re-derives them:
 
-- **Activation profiles and UEM connectors have no resolver at all** — neither read model carries a name. An activation profile is `{code}` and nothing else; a connector is identified by vendor and URL. There is nothing to match on.
+- **UEM connectors have no resolver** — the read model carries no name; a connector is identified by vendor and URL. There is nothing to match on.
 - **`ApplyZtnaGatewayV1` exists but its create branch is unverified**, because creating a gateway provisions real egress infrastructure. The ID it returns comes from the spec's declared `CreateResponse`, not an observed payload.
 - **The device-group resolver hangs off the deprecated v1 list**, since v2 is not routed. The resolver methods themselves therefore carry no deprecation marker while calling a deprecated endpoint — move them to v2 when the gateway routes it.
 
@@ -298,7 +299,7 @@ Apply methods are declared entirely in `config.json` — never hand-code them. M
 - Every spec in `tools/generate/config.json` MUST set `"splitByTag": true`. The generator buckets methods by first OpenAPI tag into one file per tag (`<tag>.go` + `<tag>_test.go`); types pool into a shared `types.go`. Splitting by path would scatter CRUD for a single resource across many files; tag-split keeps each resource coherent.
 - Every spec MUST target a sub-package under `jamfplatform/` via `"package": "<name>"` — e.g. `devices`, `pro`, `proclassic`. Avoids name collisions across Jamf's API families (the same resource name exists in multiple APIs).
 - Sub-package names follow the namespace (kebab → snake → Go identifier). No invention.
-- Two specs in one package MUST NOT emit the same tag filename. `emitMethodsByTag` runs per spec and writes `<tag>.go`, so a shared tag means the second spec overwrites the first's file and its methods disappear with no error from the generator, the compiler or the tests. The generator now fails on the collision; resolve it with a per-spec `"tagRenames"` entry (filename only — method names, godoc and the published spec are untouched), as Security Cloud's uem-connect spec does for the `activation-profiles` tag it shares with the enrollment spec.
+- Two specs in one package MUST NOT emit the same tag filename. `emitMethodsByTag` runs per spec and writes `<tag>.go`, so a shared tag means the second spec overwrites the first's file and its methods disappear with no error from the generator, the compiler or the tests. The generator now fails on the collision; resolve it with a per-spec `"tagRenames"` entry (filename only — method names, godoc and the published spec are untouched), as Security Cloud's uem-connect spec does: its one activation-profile operation lands in `uem_connect_activation_profiles.go`, keeping `activation_profiles.go` free for the enrollment spec when that gets published.
 
 ## API formats
 

@@ -699,56 +699,6 @@ type UpdateGroupRequest struct {
 	Name string `json:"name"`
 }
 
-// ActivationProfile A single activation profile resource.
-type ActivationProfile struct {
-	// Unique identifier code for the activation profile.
-	Code string `json:"code"`
-}
-
-// ActivationProfileResponse Response body returned after successfully creating an activation profile.
-type ActivationProfileResponse struct {
-	Code string `json:"code"`
-}
-
-// ActivationProfilesResponse List of activation profiles for the customer.
-type ActivationProfilesResponse struct {
-	// List of activation profiles. Returns empty array if no profiles exist.
-	ActivationProfiles []ActivationProfile `json:"activationProfiles"`
-}
-
-// BulkDeleteActivationProfilesRequest Request body for bulk-deleting activation profiles by code.
-type BulkDeleteActivationProfilesRequest struct {
-	// Codes of the activation profiles to delete.
-	Codes []string `json:"codes"`
-}
-
-// PublicApiCapabilities Capability configuration. At least one capability must be enabled.
-type PublicApiCapabilities struct {
-	// Enable data policy capability.
-	DataPolicy *bool `json:"dataPolicy,omitempty"`
-	// Enable network security capability.
-	NetworkSecurity *bool `json:"networkSecurity,omitempty"`
-	// Optional note for this capability configuration.
-	Note *string `json:"note,omitempty"`
-	// Enable vulnerability management capability.
-	VulnerabilityManagement *bool `json:"vulnerabilityManagement,omitempty"`
-}
-
-// PublicApiCreateActivationProfileRequest Request body for creating a new activation profile via the public API.
-type PublicApiCreateActivationProfileRequest struct {
-	// Capability configuration. At least one capability must be enabled.
-	Capabilities PublicApiCapabilities `json:"capabilities"`
-	// Optional group ID to associate with the activation profile.
-	GroupID *string `json:"groupId,omitempty"`
-	// Name of the activation profile.
-	Name string `json:"name"`
-	// Creation origin.
-	Origin string `json:"origin"`
-	// Target platforms for this activation profile.
-	// Allowed values: see the PublicApiCreateActivationProfileRequestPlatforms constants.
-	Platforms []string `json:"platforms"`
-}
-
 // ActivationProfileDeployRequest Request to deploy activation profile configuration profiles to UEM.
 type ActivationProfileDeployRequest struct {
 	// The device platform type for the configuration profile.

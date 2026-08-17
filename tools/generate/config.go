@@ -148,12 +148,17 @@ type SpecDef struct {
 
 	// TagRenames remaps an OpenAPI tag before it picks the output filename,
 	// and nothing else — method names, godoc and the published spec are
-	// untouched. Only needed when two specs in one package share a tag, since
-	// splitByTag writes one <tag>.go per spec: Security Cloud's enrollment and
-	// uem-connect specs both tag operations "activation-profiles".
-	// emitMethodsByTag errors on such a collision rather than letting the
-	// second spec overwrite the first's file, so this is the escape hatch that
-	// resolves it.
+	// untouched. Needed when two specs in one package share a tag, since
+	// splitByTag writes one <tag>.go per spec and emitMethodsByTag errors on
+	// the collision rather than letting the second spec overwrite the first's
+	// file.
+	//
+	// Live use: Security Cloud's uem-connect spec tags one operation
+	// "activation-profiles", which is also the tag of every operation in the
+	// enrollment spec. That spec is not ingested today (it is absent from the
+	// GitOps build), so the rename is what keeps uem-connect's operation in
+	// uem_connect_activation_profiles.go and leaves activation_profiles.go
+	// free for the enrollment spec if it gets published.
 	TagRenames map[string]string `json:"tagRenames,omitempty"`
 }
 
