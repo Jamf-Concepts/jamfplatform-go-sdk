@@ -83,3 +83,76 @@ func TestTransportTenantPrefix(t *testing.T) {
 		})
 	}
 }
+
+// TestTransportTenantPrefixNamespaceOverride covers the case a customer holding
+// both Jamf Pro and Jamf Security Cloud hits: two products, two tenant IDs, one
+// Client. A regression here sends Security Cloud calls to the Jamf Pro tenant,
+// which answers 403 OWNERSHIP_FORBIDDEN rather than anything that reads like a
+// wrong-tenant bug.
+func TestTransportTenantPrefixNamespaceOverride(t *testing.T) {
+	tests := []struct {
+		name      string
+		overrides map[string]string
+		namespace string
+		version   string
+		want      string
+	}{
+		{
+			name:      "override applies to its own namespace",
+			overrides: map[string]string{"securitycloud": "jsc-tenant"},
+			namespace: "securitycloud",
+			version:   "v1",
+			want:      "/api/securitycloud/v1/tenant/jsc-tenant",
+		},
+		{
+			name:      "other namespaces keep the client-wide tenant",
+			overrides: map[string]string{"securitycloud": "jsc-tenant"},
+			namespace: "pro",
+			version:   "v1",
+			want:      "/api/pro/v1/tenant/pro-tenant",
+		},
+		{
+			name:      "override reaches a slashed sub-namespace via its first segment",
+			overrides: map[string]string{"securitycloud": "jsc-tenant"},
+			namespace: "securitycloud/uem-connect",
+			version:   "",
+			want:      "/api/securitycloud/uem-connect/tenant/jsc-tenant",
+		},
+		{
+			name:      "an exact slashed key wins over its first segment",
+			overrides: map[string]string{"ddm": "wrong", "ddm/report": "ddm-tenant"},
+			namespace: "ddm/report",
+			version:   "v1",
+			want:      "/api/ddm/report/v1/tenant/ddm-tenant",
+		},
+		{
+			name:      "no overrides configured",
+			namespace: "securitycloud",
+			version:   "v1",
+			want:      "/api/securitycloud/v1/tenant/pro-tenant",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tr := &Transport{tenantID: "pro-tenant", nsTenantIDs: tc.overrides}
+			if got := tr.TenantPrefix(tc.namespace, tc.version); got != tc.want {
+				t.Errorf("TenantPrefix(%q, %q) = %q, want %q", tc.namespace, tc.version, got, tc.want)
+			}
+		})
+	}
+}
+
+// TestWithNamespaceTenantID checks the option ignores empty inputs rather than
+// registering an override that would build /tenant/ with no ID.
+func TestWithNamespaceTenantID(t *testing.T) {
+	tr := &Transport{tenantID: "pro-tenant"}
+	WithNamespaceTenantID("securitycloud", "")(tr)
+	WithNamespaceTenantID("", "jsc-tenant")(tr)
+	if len(tr.nsTenantIDs) != 0 {
+		t.Errorf("empty namespace or tenant ID registered an override: %v", tr.nsTenantIDs)
+	}
+	WithNamespaceTenantID("securitycloud", "jsc-tenant")(tr)
+	if got := tr.TenantPrefix("securitycloud", "v1"); got != "/api/securitycloud/v1/tenant/jsc-tenant" {
+		t.Errorf("after WithNamespaceTenantID, TenantPrefix() = %q", got)
+	}
+}

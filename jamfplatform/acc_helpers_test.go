@@ -21,6 +21,7 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/compliancebenchmarks"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devicegroups"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/securitycloud"
 )
 
 // runSuffix computes a unique suffix (epoch timestamp) once for the entire test run.
@@ -58,6 +59,76 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 
 	return c, nil
 })
+
+// errAccJSCCredsUnset marks a Security Cloud acceptance run with no Security
+// Cloud credentials configured. It is deliberately separate from
+// errAccCredsUnset: Security Cloud is a different product with its own tenant
+// ID, and a Jamf Pro API client cannot reach it at all — probed 2026-08-17, a
+// Security Cloud client answers 403 BAD_PERMISSIONS on /api/pro and
+// /api/devices, and the reverse holds. So the suite needs a second credential
+// set, not just a second tenant ID, and a tenant configured for Jamf Pro only
+// must skip these tests rather than fail them.
+var errAccJSCCredsUnset = errors.New("Security Cloud acceptance credentials not configured")
+
+// initJSCAcceptanceClient creates and validates the singleton Security Cloud
+// acceptance client. JAMFPLATFORM_JSC_BASE_URL is optional and defaults to the
+// Jamf Pro base URL, since both products are served by the same regional
+// gateway; the credentials and tenant are not optional.
+var initJSCAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
+	baseURL := os.Getenv("JAMFPLATFORM_JSC_BASE_URL")
+	if baseURL == "" {
+		baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
+	}
+	clientID := os.Getenv("JAMFPLATFORM_JSC_CLIENT_ID")
+	clientSecret := os.Getenv("JAMFPLATFORM_JSC_CLIENT_SECRET")
+	tenantID := os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")
+
+	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_JSC_CLIENT_ID, JAMFPLATFORM_JSC_CLIENT_SECRET, JAMFPLATFORM_JSC_TENANT_ID (and JAMFPLATFORM_JSC_BASE_URL when it differs from JAMFPLATFORM_BASE_URL)", errAccJSCCredsUnset)
+	}
+
+	// The tenant goes to WithSecurityCloudTenantID rather than WithTenantID so
+	// this exercises the same option a dual-product consumer uses — a bug in
+	// the per-namespace override would otherwise only ever surface downstream.
+	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
+		jamfplatform.WithSecurityCloudTenantID(tenantID))
+	if err := c.ValidateCredentials(context.Background()); err != nil {
+		return nil, fmt.Errorf("failed to validate Security Cloud credentials: %w", err)
+	}
+
+	return c, nil
+})
+
+// accSecurityCloudClient returns a live client for the securitycloud package.
+// It skips when no Security Cloud credentials are configured and FAILS when
+// they are configured but rejected — the same distinction accClient draws, for
+// the same reason (see errAccCredsUnset).
+func accSecurityCloudClient(t *testing.T) *securitycloud.Client {
+	t.Helper()
+	c, err := initJSCAcceptanceClient()
+	switch {
+	case errors.Is(err, errAccJSCCredsUnset):
+		t.Skipf("Skipping Security Cloud acceptance test: %v", err)
+	case err != nil:
+		t.Fatal(credentialRejectedMessage(err))
+	}
+	return securitycloud.New(c)
+}
+
+// skipOnGatewayUnrouted skips when the API gateway answered 403
+// BAD_PERMISSIONS, which it returns for a path it does not route as well as
+// for a genuine privilege failure — status code alone cannot separate them
+// (see CLAUDE.md, "Gateway rejection vs Jamf Pro rejection"). Every use names
+// the endpoint known to be unrouted in the message, so the skip stays a
+// statement about routing rather than a blanket 403 tolerance. Tighten each
+// caller to t.Fatalf once the gateway maps its path.
+func skipOnGatewayUnrouted(t *testing.T, err error, endpoint string) {
+	t.Helper()
+	var apiErr *jamfplatform.APIResponseError
+	if errors.As(err, &apiErr) && apiErr.HasStatus(http.StatusForbidden) {
+		t.Skipf("%s: 403 BAD_PERMISSIONS — the gateway does not route this path yet (the same credentials reach every other Security Cloud endpoint), so this is unrouted rather than under-privileged: %v", endpoint, err)
+	}
+}
 
 // egressIP reports this host's public egress IP, resolved once per run because a
 // rejected credential fails every test in the suite and a per-test lookup would
