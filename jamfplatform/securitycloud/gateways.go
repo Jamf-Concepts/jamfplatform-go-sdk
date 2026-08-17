@@ -7,6 +7,7 @@ package securitycloud
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -101,4 +102,63 @@ func (c *Client) DeleteZtnaGatewayV1(ctx context.Context, gatewayID string) erro
 		return fmt.Errorf("DeleteZtnaGatewayV1(%s): %w", gatewayID, err)
 	}
 	return nil
+}
+
+// ResolveZtnaGatewayV1IDByName looks up a ZtnaGatewayV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveZtnaGatewayV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	listPath := prefix + "/ztna/gateways"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveZtnaGatewayV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveZtnaGatewayV1ByName looks up a ZtnaGatewayV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveZtnaGatewayV1ByName(ctx context.Context, name string) (*Gateway, error) {
+	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	listPath := prefix + "/ztna/gateways"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveZtnaGatewayV1ByName(%s): %w", name, err)
+	}
+	var out Gateway
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveZtnaGatewayV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyZtnaGatewayV1 creates or updates a ZtnaGatewayV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyZtnaGatewayV1(ctx context.Context, request *GatewayCreateRequest) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyZtnaGatewayV1: Name must not be empty")
+	}
+	id, err := c.ResolveZtnaGatewayV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateZtnaGatewayV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyZtnaGatewayV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyZtnaGatewayV1: resolve: %w", err)
+	}
+	// Convert create request to update type via JSON round-trip.
+	data, marshalErr := json.Marshal(request)
+	if marshalErr != nil {
+		return "", false, fmt.Errorf("ApplyZtnaGatewayV1: marshal for update(%s): %w", id, marshalErr)
+	}
+	var updateReq GatewayPatchRequest
+	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
+		return "", false, fmt.Errorf("ApplyZtnaGatewayV1: unmarshal for update(%s): %w", id, unmarshalErr)
+	}
+	err = c.UpdateZtnaGatewayV1(ctx, id, &updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyZtnaGatewayV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

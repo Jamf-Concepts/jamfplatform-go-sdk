@@ -706,6 +706,350 @@ func TestAcceptance_SecurityCloudUemConnectWrites(t *testing.T) {
 	t.Skip("UEM Connect writes all act on a live link to a real UEM instance and cannot be made safe on a shared tenant: CreateUemConnectorV1 needs working credentials for a separate Jamf Pro or Intune tenant (and would then start syncing its devices); DeleteUemConnectorV1 and DisableUemConnectorV1 / EnableUemConnectorV1 would tear down or toggle the tenant's existing connector; UpdateUemConnectorSyncSettingsV1 rewrites its sync configuration; TriggerUemConnectorSyncV1 and CancelUemConnectorSyncV1 start and abort a real inventory sync against the connected instance; DeployActivationProfileToUemV1 pushes an activation profile into that instance's device fleet. Exercising these needs a tenant with a disposable connector.")
 }
 
+// ---------------------------------------------------------------------------
+// Resolvers and Apply (upsert)
+// ---------------------------------------------------------------------------
+
+// TestAcceptance_SecurityCloudResolvers checks every read-only resolver against
+// live data. Security Cloud offers no RSQL filter and no search parameter on any
+// list endpoint, so all six resolvers run in clientFilter mode — the match
+// happens in memory, which makes "does the list element really carry this name
+// field" a wire question rather than a spec one.
+func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	// Content categories are a per-tenant system catalogue, so this resolver is
+	// always exercisable — and it is the one a caller needs before creating a
+	// ZTNA app, whose categoryName validates against displayName.
+	cats, err := sc.ListContentCategoriesV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListContentCategoriesV1 failed: %v", err)
+	}
+	if len(cats.Results) > 0 {
+		want := cats.Results[0]
+		id, err := sc.ResolveContentCategoryV1IDByName(ctx, want.DisplayName)
+		if err != nil {
+			t.Fatalf("ResolveContentCategoryV1IDByName(%q) failed: %v", want.DisplayName, err)
+		}
+		if id != want.ID {
+			t.Errorf("resolved category ID = %q, want %q", id, want.ID)
+		}
+		got, err := sc.ResolveContentCategoryV1ByName(ctx, want.DisplayName)
+		if err != nil {
+			t.Fatalf("ResolveContentCategoryV1ByName(%q) failed: %v", want.DisplayName, err)
+		}
+		if got.ID != want.ID {
+			t.Errorf("resolved category = %q, want %q", got.ID, want.ID)
+		}
+	}
+
+	// ZTNA gateways and apps resolve across pages; grouped gateways do not
+	// (their list endpoint declares no page params), so both transport walks
+	// get exercised.
+	gateways, err := sc.ListZtnaGatewaysV1(ctx)
+	if err != nil {
+		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
+	}
+	if len(gateways) > 0 {
+		id, err := sc.ResolveZtnaGatewayV1IDByName(ctx, gateways[0].Name)
+		if err != nil {
+			t.Fatalf("ResolveZtnaGatewayV1IDByName(%q) failed: %v", gateways[0].Name, err)
+		}
+		if id != gateways[0].ID {
+			t.Errorf("resolved gateway ID = %q, want %q", id, gateways[0].ID)
+		}
+	}
+
+	grouped, err := sc.ListZtnaGroupedGatewaysV1(ctx)
+	if err != nil {
+		t.Fatalf("ListZtnaGroupedGatewaysV1 failed: %v", err)
+	}
+	if len(grouped.Results) > 0 {
+		got, err := sc.ResolveZtnaGroupedGatewayV1ByName(ctx, grouped.Results[0].Name)
+		if err != nil {
+			t.Fatalf("ResolveZtnaGroupedGatewayV1ByName(%q) failed: %v", grouped.Results[0].Name, err)
+		}
+		if got.ID != grouped.Results[0].ID {
+			t.Errorf("resolved grouped gateway = %q, want %q", got.ID, grouped.Results[0].ID)
+		}
+	}
+
+	// An app created from a predefinedAppId has name null on the wire, so only
+	// a named app is resolvable — pick one rather than assuming the first has a
+	// name.
+	apps, err := sc.ListZtnaAppsV1(ctx)
+	if err != nil {
+		t.Fatalf("ListZtnaAppsV1 failed: %v", err)
+	}
+	var namedApp *securitycloud.App
+	for i := range apps {
+		if apps[i].Name != "" {
+			namedApp = &apps[i]
+			break
+		}
+	}
+	if namedApp == nil {
+		t.Logf("no ZTNA app has a name (all %d are predefined-template apps, which return name null) — ResolveZtnaAppV1ByName is covered by the app lifecycle test instead", len(apps))
+	} else {
+		id, err := sc.ResolveZtnaAppV1IDByName(ctx, namedApp.Name)
+		if err != nil {
+			t.Fatalf("ResolveZtnaAppV1IDByName(%q) failed: %v", namedApp.Name, err)
+		}
+		if id != namedApp.ID {
+			t.Errorf("resolved app ID = %q, want %q", id, namedApp.ID)
+		}
+	}
+
+	// A name nothing owns must be a 404, not an empty string — Apply branches
+	// on exactly this to decide create-vs-update.
+	absent := jscName("does-not-exist")
+	if _, err := sc.ResolveDnsZoneV1IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
+		t.Errorf("resolving an absent DNS zone: want 404 APIResponseError, got %v", err)
+	}
+	if _, err := sc.ResolveDeviceGroupV1IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
+		t.Errorf("resolving an absent device group: want 404 APIResponseError, got %v", err)
+	}
+
+	// An empty name is a caller bug, and must not degrade into "match the first
+	// element with no name" — which is exactly what a predefined ZTNA app would
+	// be.
+	if _, err := sc.ResolveZtnaAppV1IDByName(ctx, ""); err == nil {
+		t.Error("resolving an empty app name succeeded; want an error")
+	}
+}
+
+// TestAcceptance_SecurityCloudApplyDeviceGroup exercises both Apply branches on
+// the cheapest resource in the family: create-when-absent, then
+// update-when-present with the same name.
+func TestAcceptance_SecurityCloudApplyDeviceGroup(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	name := jscName("apply-group")
+	id, created, err := sc.ApplyDeviceGroupV1(ctx, &securitycloud.CreateGroupRequest{Name: name})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ApplyDeviceGroupV1 (create branch) failed: %v", err)
+	}
+	jscCleanupDelete(t, "device group "+id, func() error {
+		return sc.DeleteDeviceGroupV1(context.Background(), id)
+	})
+	if !created {
+		t.Errorf("first Apply of %q reported created=false; nothing owned that name", name)
+	}
+	if id == "" {
+		t.Fatal("ApplyDeviceGroupV1 returned an empty ID on the create branch")
+	}
+
+	// Second Apply with the same name must resolve to the same resource and
+	// take the update path — a create here would leave a duplicate behind,
+	// which is the failure mode Apply exists to prevent.
+	sameID, created, err := sc.ApplyDeviceGroupV1(ctx, &securitycloud.CreateGroupRequest{Name: name})
+	if err != nil {
+		t.Fatalf("ApplyDeviceGroupV1 (update branch) failed: %v", err)
+	}
+	if created {
+		t.Error("second Apply reported created=true; it should have resolved the existing group")
+	}
+	if sameID != id {
+		t.Errorf("second Apply returned ID %q, want %q", sameID, id)
+	}
+}
+
+// TestAcceptance_SecurityCloudApplyDnsZone covers the Apply variant that
+// converts the create request into a different update type (ZoneWrite →
+// ZonePatch) by JSON round-trip. A field the patch type does not carry would be
+// dropped silently, so the update branch checks the zone still holds what was
+// sent.
+func TestAcceptance_SecurityCloudApplyDnsZone(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	gateways, err := sc.ListZtnaGatewaysV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
+	}
+	if len(gateways) == 0 {
+		t.Skip("tenant has no ZTNA gateways — a DNS zone needs a gateway ID for its name servers")
+	}
+
+	name := jscName("apply-zone")
+	req := &securitycloud.ZoneWrite{
+		Name:        name,
+		Domains:     []string{"sdk-acc-apply.invalid"},
+		NameServers: []securitycloud.NameServer{{IP: "203.0.113.53", GatewayID: gateways[0].ID}},
+	}
+
+	id, created, err := sc.ApplyDnsZoneV1(ctx, req)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ApplyDnsZoneV1 (create branch) failed: %v", err)
+	}
+	jscCleanupDelete(t, "dns zone "+id, func() error {
+		return sc.DeleteDnsZoneV1(context.Background(), id)
+	})
+	if !created {
+		t.Errorf("first Apply of %q reported created=false", name)
+	}
+
+	// Same name, changed domains: must update in place, and the round-trip
+	// through ZonePatch must carry the new domain list.
+	req.Domains = []string{"sdk-acc-apply.invalid", "sdk-acc-apply-2.invalid"}
+	sameID, created, err := sc.ApplyDnsZoneV1(ctx, req)
+	if err != nil {
+		t.Fatalf("ApplyDnsZoneV1 (update branch) failed: %v", err)
+	}
+	if created {
+		t.Error("second Apply reported created=true; it should have resolved the existing zone")
+	}
+	if sameID != id {
+		t.Errorf("second Apply returned ID %q, want %q", sameID, id)
+	}
+	got, err := sc.GetDnsZoneV1(ctx, id)
+	if err != nil {
+		t.Fatalf("GetDnsZoneV1 after Apply update failed: %v", err)
+	}
+	if len(got.Domains) != 2 {
+		t.Errorf("after Apply update, zone has domains %v; the ZoneWrite→ZonePatch round-trip dropped them", got.Domains)
+	}
+	if len(got.NameServers) != 1 {
+		t.Errorf("after Apply update, zone has name servers %+v; want the one that was sent", got.NameServers)
+	}
+}
+
+// TestAcceptance_SecurityCloudApplyZtnaApp covers Apply on a resource whose
+// name field is an optional pointer, which the generator has to unwrap before
+// it can resolve.
+func TestAcceptance_SecurityCloudApplyZtnaApp(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	cats, err := sc.ListContentCategoriesV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListContentCategoriesV1 failed: %v", err)
+	}
+	if len(cats.Results) == 0 {
+		t.Skip("tenant exposes no content categories — an app needs a categoryName")
+	}
+	category := cats.Results[0].DisplayName
+	for _, c := range cats.Results {
+		if c.DisplayName == "Uncategorized" {
+			category = c.DisplayName
+			break
+		}
+	}
+
+	name := jscName("apply-app")
+	req := &securitycloud.AppCreateRequest{
+		Name:         &name,
+		CategoryName: category,
+		Hostnames:    &[]string{"sdk-acc-apply-app.invalid"},
+		Assignments:  securitycloud.Assignments{Inclusions: securitycloud.AssignmentsInclusions{AllUsers: true}},
+		Routing:      securitycloud.Routing{Type: "DIRECT"},
+	}
+
+	id, created, err := sc.ApplyZtnaAppV1(ctx, req)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ApplyZtnaAppV1 (create branch) failed: %v", err)
+	}
+	jscCleanupDelete(t, "ztna app "+id, func() error {
+		return sc.DeleteZtnaAppV1(context.Background(), id)
+	})
+	if !created {
+		t.Errorf("first Apply of %q reported created=false", name)
+	}
+
+	req.Hostnames = &[]string{"sdk-acc-apply-app.invalid", "sdk-acc-apply-app-2.invalid"}
+	sameID, created, err := sc.ApplyZtnaAppV1(ctx, req)
+	if err != nil {
+		t.Fatalf("ApplyZtnaAppV1 (update branch) failed: %v", err)
+	}
+	if created {
+		t.Error("second Apply reported created=true; it should have resolved the existing app")
+	}
+	if sameID != id {
+		t.Errorf("second Apply returned ID %q, want %q", sameID, id)
+	}
+	got, err := sc.GetZtnaAppV1(ctx, id)
+	if err != nil {
+		t.Fatalf("GetZtnaAppV1 after Apply update failed: %v", err)
+	}
+	if len(got.Hostnames) != 2 {
+		t.Errorf("after Apply update, app has hostnames %v; the AppCreateRequest→AppPatchRequest round-trip dropped them", got.Hostnames)
+	}
+	if got.Name == "" {
+		t.Error("after Apply update, app name is empty; the pointer name field was lost")
+	}
+}
+
+// TestAcceptance_SecurityCloudApplyZtnaGroupedGateway covers the last Apply
+// whose writes are safe on a shared tenant — a grouped gateway is metadata over
+// existing gateways, so creating and deleting one moves no traffic by itself.
+func TestAcceptance_SecurityCloudApplyZtnaGroupedGateway(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	gateways, err := sc.ListZtnaGatewaysV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
+	}
+	if len(gateways) < 2 {
+		t.Skipf("grouped gateways require at least 2 member gateways, tenant has %d", len(gateways))
+	}
+
+	name := jscName("apply-grouped")
+	req := &securitycloud.GroupedGatewayCreateRequest{
+		Name:            name,
+		GatewayIds:      []string{gateways[0].ID, gateways[1].ID},
+		TenantIds:       []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+		RoutingStrategy: "NEAREST",
+	}
+
+	id, created, err := sc.ApplyZtnaGroupedGatewayV1(ctx, req)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ApplyZtnaGroupedGatewayV1 (create branch) failed: %v", err)
+	}
+	jscCleanupDelete(t, "grouped gateway "+id, func() error {
+		return sc.DeleteZtnaGroupedGatewayV1(context.Background(), id)
+	})
+	if !created {
+		t.Errorf("first Apply of %q reported created=false", name)
+	}
+
+	req.RoutingStrategy = "RANDOM"
+	sameID, created, err := sc.ApplyZtnaGroupedGatewayV1(ctx, req)
+	if err != nil {
+		t.Fatalf("ApplyZtnaGroupedGatewayV1 (update branch) failed: %v", err)
+	}
+	if created {
+		t.Error("second Apply reported created=true; it should have resolved the existing grouped gateway")
+	}
+	if sameID != id {
+		t.Errorf("second Apply returned ID %q, want %q", sameID, id)
+	}
+	got, err := sc.GetZtnaGroupedGatewayV1(ctx, id)
+	if err != nil {
+		t.Fatalf("GetZtnaGroupedGatewayV1 after Apply update failed: %v", err)
+	}
+	if got.RoutingStrategy != "RANDOM" {
+		t.Errorf("after Apply update, routingStrategy = %q, want RANDOM", got.RoutingStrategy)
+	}
+}
+
+// TestAcceptance_SecurityCloudApplyZtnaGateway documents why the one remaining
+// Apply is not exercised.
+func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
+	accSecurityCloudClient(t)
+	t.Skip("ApplyZtnaGatewayV1's create branch provisions real network egress — see TestAcceptance_SecurityCloudZtnaGatewayWrites. Its resolve branch is covered by TestAcceptance_SecurityCloudResolvers, and the create/update branches by the generated unit tests. Note too that CreateZtnaGatewayV1's response body is unverified, so the ID this Apply returns on the create branch comes from the spec's declared CreateResponse rather than an observed payload.")
+}
+
 // isSecurityCloudNotFound reports whether err is a 404 from any Security Cloud
 // service. It exists because the family does not speak one error dialect: DNS,
 // ZTNA and UEM Connect answer the gateway's {httpStatus, traceId, errors[]}

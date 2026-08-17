@@ -10974,7 +10974,21 @@
           "name": "ListDnsZonesV1",
           "params": [
             "sort"
-          ]
+          ],
+          "resolver": {
+            "resourceType": "DnsZoneV1",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "clientFilter",
+            "typedReturn": "Zone",
+            "apply": {
+              "createOp": "CreateDnsZoneV1",
+              "updateOp": "UpdateDnsZoneV1",
+              "deleteOp": "DeleteDnsZoneV1",
+              "nameGoField": "Name",
+              "updateType": "ZonePatch"
+            }
+          }
         },
         {
           "op": "POST /tenant/{tenantId}/dns/zones",
@@ -11030,7 +11044,21 @@
         {
           "op": "GET /tenant/{tenantId}/ztna/gateways",
           "name": "ListZtnaGatewaysV1",
-          "pagination": "totalCount"
+          "pagination": "totalCount",
+          "resolver": {
+            "resourceType": "ZtnaGatewayV1",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "clientFilter",
+            "typedReturn": "Gateway",
+            "apply": {
+              "createOp": "CreateZtnaGatewayV1",
+              "updateOp": "UpdateZtnaGatewayV1",
+              "deleteOp": "DeleteZtnaGatewayV1",
+              "nameGoField": "Name",
+              "updateType": "GatewayPatchRequest"
+            }
+          }
         },
         {
           "op": "POST /tenant/{tenantId}/ztna/gateways",
@@ -11055,7 +11083,21 @@
         },
         {
           "op": "GET /tenant/{tenantId}/ztna/grouped-gateways",
-          "name": "ListZtnaGroupedGatewaysV1"
+          "name": "ListZtnaGroupedGatewaysV1",
+          "resolver": {
+            "resourceType": "ZtnaGroupedGatewayV1",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "clientFilter",
+            "typedReturn": "GroupedGateway",
+            "apply": {
+              "createOp": "CreateZtnaGroupedGatewayV1",
+              "updateOp": "UpdateZtnaGroupedGatewayV1",
+              "deleteOp": "DeleteZtnaGroupedGatewayV1",
+              "nameGoField": "Name",
+              "updateType": "GroupedGatewayPatchRequest"
+            }
+          }
         },
         {
           "op": "POST /tenant/{tenantId}/ztna/grouped-gateways",
@@ -11078,7 +11120,21 @@
         {
           "op": "GET /tenant/{tenantId}/ztna/apps",
           "name": "ListZtnaAppsV1",
-          "pagination": "totalCount"
+          "pagination": "totalCount",
+          "resolver": {
+            "resourceType": "ZtnaAppV1",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "clientFilter",
+            "typedReturn": "App",
+            "apply": {
+              "createOp": "CreateZtnaAppV1",
+              "updateOp": "UpdateZtnaAppV1",
+              "deleteOp": "DeleteZtnaAppV1",
+              "nameGoField": "Name",
+              "updateType": "AppPatchRequest"
+            }
+          }
         },
         {
           "op": "POST /tenant/{tenantId}/ztna/apps",
@@ -11114,7 +11170,14 @@
       "operations": [
         {
           "op": "GET /tenant/{tenantId}/categories",
-          "name": "ListContentCategoriesV1"
+          "name": "ListContentCategoriesV1",
+          "resolver": {
+            "resourceType": "ContentCategoryV1",
+            "nameField": "displayName",
+            "idField": "id",
+            "mode": "clientFilter",
+            "typedReturn": "Category"
+          }
         }
       ]
     },
@@ -11127,7 +11190,21 @@
       "operations": [
         {
           "op": "GET /v1/tenant/{tenantId}/groups",
-          "name": "ListDeviceGroupsV1"
+          "name": "ListDeviceGroupsV1",
+          "resolver": {
+            "resourceType": "DeviceGroupV1",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "clientFilter",
+            "typedReturn": "Group",
+            "apply": {
+              "createOp": "CreateDeviceGroupV1",
+              "updateOp": "UpdateDeviceGroupV1",
+              "deleteOp": "DeleteDeviceGroupV1",
+              "nameGoField": "Name",
+              "updateType": "UpdateGroupRequest"
+            }
+          }
         },
         {
           "op": "POST /v1/tenant/{tenantId}/groups",

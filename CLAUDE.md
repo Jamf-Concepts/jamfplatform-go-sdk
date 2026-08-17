@@ -155,6 +155,16 @@ The `-beta` spec variants inject `/tenant/{tenantId}` but never the `betaApiConf
 - `customer-id` (device groups) and `origin` (activation-profile list) are declared **required** query params the server ignores; the tenant in the path wins. `origin` does filter when supplied, so it stays in the signature.
 - Device groups v1 returns a **bare JSON array** (`GroupListResponse = []Group`, so the method returns `*[]Group`); v2 wraps it in `{groups: []}`.
 
+**Resolvers and apply.** No Security Cloud list endpoint offers RSQL or a `search` parameter, so every resolver is `clientFilter`; ZTNA gateways and apps additionally walk pages, the rest fetch one list. Six resources have name-based lookup — DNS zones, ZTNA gateways, grouped gateways and apps, device groups, and content categories (keyed on `displayName`, the value `categoryName` is validated against, which makes it the lookup a caller needs before creating an app). Five of those carry `apply`; content categories are a read-only catalogue.
+
+Three deliberate gaps, so nobody re-derives them:
+
+- **Activation profiles and UEM connectors have no resolver at all** — neither read model carries a name. An activation profile is `{code}` and nothing else; a connector is identified by vendor and URL. There is nothing to match on.
+- **`ApplyZtnaGatewayV1` exists but its create branch is unverified**, because creating a gateway provisions real egress infrastructure. The ID it returns comes from the spec's declared `CreateResponse`, not an observed payload.
+- **The device-group resolver hangs off the deprecated v1 list**, since v2 is not routed. The resolver methods themselves therefore carry no deprecation marker while calling a deprecated endpoint — move them to v2 when the gateway routes it.
+
+`ResolveZtnaAppV1ByName` has a real blind spot: an app created from a `predefinedAppId` inherits its name from the template and returns `name: null` on the wire, so it is unreachable by name. Only apps created with an explicit `name` resolve.
+
 ### Pagination
 
 `ListAllPages[T]` is a generic helper taking a `fetchPage(ctx, page, pageSize) ([]T, bool, error)` callback. Three styles configured per operation: `hasNext` (uses `HasNext` field), `sizeCheck` (compares result count to page size), `totalCount` (computes from total). The page size requested per call is `defaultMaxPageSize(pkg, paginationStyle)` (see `tools/generate/util.go`) unless overridden per operation via `"maxPageSize"` in `config.json` — threaded through as an explicit argument to `ListAllPages`, never a hardcoded constant.

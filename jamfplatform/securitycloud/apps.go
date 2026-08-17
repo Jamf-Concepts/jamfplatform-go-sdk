@@ -7,6 +7,7 @@ package securitycloud
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -98,4 +99,66 @@ func (c *Client) DeleteZtnaAppV1(ctx context.Context, appID string) error {
 		return fmt.Errorf("DeleteZtnaAppV1(%s): %w", appID, err)
 	}
 	return nil
+}
+
+// ResolveZtnaAppV1IDByName looks up a ZtnaAppV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveZtnaAppV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	listPath := prefix + "/ztna/apps"
+	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveZtnaAppV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveZtnaAppV1ByName looks up a ZtnaAppV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveZtnaAppV1ByName(ctx context.Context, name string) (*App, error) {
+	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	listPath := prefix + "/ztna/apps"
+	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveZtnaAppV1ByName(%s): %w", name, err)
+	}
+	var out App
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveZtnaAppV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyZtnaAppV1 creates or updates a ZtnaAppV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyZtnaAppV1(ctx context.Context, request *AppCreateRequest) (string, bool, error) {
+	var name string
+	if request.Name != nil {
+		name = *request.Name
+	}
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyZtnaAppV1: Name must not be empty")
+	}
+	id, err := c.ResolveZtnaAppV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateZtnaAppV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyZtnaAppV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyZtnaAppV1: resolve: %w", err)
+	}
+	// Convert create request to update type via JSON round-trip.
+	data, marshalErr := json.Marshal(request)
+	if marshalErr != nil {
+		return "", false, fmt.Errorf("ApplyZtnaAppV1: marshal for update(%s): %w", id, marshalErr)
+	}
+	var updateReq AppPatchRequest
+	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
+		return "", false, fmt.Errorf("ApplyZtnaAppV1: unmarshal for update(%s): %w", id, unmarshalErr)
+	}
+	err = c.UpdateZtnaAppV1(ctx, id, &updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyZtnaAppV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }

@@ -7,9 +7,12 @@ package securitycloud
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListDnsZonesV1 list DNS Zones.
@@ -94,4 +97,63 @@ func (c *Client) DeleteDnsZoneV1(ctx context.Context, id string) error {
 		return fmt.Errorf("DeleteDnsZoneV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// ResolveDnsZoneV1IDByName looks up a DnsZoneV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
+func (c *Client) ResolveDnsZoneV1IDByName(ctx context.Context, name string) (string, error) {
+	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	listPath := prefix + "/dns/zones"
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return "", fmt.Errorf("ResolveDnsZoneV1IDByName(%s): %w", name, err)
+	}
+	return id, nil
+}
+
+// ResolveDnsZoneV1ByName looks up a DnsZoneV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
+func (c *Client) ResolveDnsZoneV1ByName(ctx context.Context, name string) (*Zone, error) {
+	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	listPath := prefix + "/dns/zones"
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
+	if err != nil {
+		return nil, fmt.Errorf("ResolveDnsZoneV1ByName(%s): %w", name, err)
+	}
+	var out Zone
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("ResolveDnsZoneV1ByName(%s): decoding matched element: %w", name, err)
+	}
+	return &out, nil
+}
+
+// ApplyDnsZoneV1 creates or updates a DnsZoneV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
+func (c *Client) ApplyDnsZoneV1(ctx context.Context, request *ZoneWrite) (string, bool, error) {
+	name := request.Name
+	if name == "" {
+		return "", false, fmt.Errorf("ApplyDnsZoneV1: Name must not be empty")
+	}
+	id, err := c.ResolveDnsZoneV1IDByName(ctx, name)
+	if err != nil {
+		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
+			resp, createErr := c.CreateDnsZoneV1(ctx, request)
+			if createErr != nil {
+				return "", false, fmt.Errorf("ApplyDnsZoneV1: create: %w", createErr)
+			}
+			return resp.ID, true, nil
+		}
+		return "", false, fmt.Errorf("ApplyDnsZoneV1: resolve: %w", err)
+	}
+	// Convert create request to update type via JSON round-trip.
+	data, marshalErr := json.Marshal(request)
+	if marshalErr != nil {
+		return "", false, fmt.Errorf("ApplyDnsZoneV1: marshal for update(%s): %w", id, marshalErr)
+	}
+	var updateReq ZonePatch
+	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
+		return "", false, fmt.Errorf("ApplyDnsZoneV1: unmarshal for update(%s): %w", id, unmarshalErr)
+	}
+	err = c.UpdateDnsZoneV1(ctx, id, &updateReq)
+	if err != nil {
+		return "", false, fmt.Errorf("ApplyDnsZoneV1: update(%s): %w", id, err)
+	}
+	return id, false, nil
 }
