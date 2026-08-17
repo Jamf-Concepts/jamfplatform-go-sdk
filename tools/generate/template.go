@@ -1045,7 +1045,7 @@ func Test<% .Name %>(t *testing.T) {
 		}
 		<%- if eq .Format "xml" %>
 		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
-		<%- else if .ReturnsSlice %>
+		<%- else if .ResponseIsJSONArray %>
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 		<%- else %>
 		writeJSON(t, w, http.StatusOK, map[string]any{})
@@ -1091,7 +1091,7 @@ func Test<% .Name %>(t *testing.T) {
 		}
 <%- if eq .Format "xml" %>
 		writeXML(t, w, <% statusConst .ExpectedStatus %>, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
-<%- else if .ReturnsSlice %>
+<%- else if .ResponseIsJSONArray %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 <%- else %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})
@@ -1152,7 +1152,7 @@ func Test<% .Name %>(t *testing.T) {
 		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
 			t.Errorf("Content-Type = %q, want multipart/form-data", ct)
 		}
-		<%- if and .ResponseType .ReturnsSlice %>
+		<%- if and .ResponseType .ResponseIsJSONArray %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 		<%- else if .ResponseType %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})
@@ -1243,7 +1243,7 @@ func Test<% .Name %>(t *testing.T) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
 		}
-<%- if .ReturnsSlice %>
+<%- if .ResponseIsJSONArray %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 <%- else %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})

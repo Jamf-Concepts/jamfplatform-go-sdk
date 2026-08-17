@@ -53,6 +53,9 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	if cfg.tenantID != "" {
 		transportOpts = append(transportOpts, client.WithTenantID(cfg.tenantID))
 	}
+	if cfg.securityCloudTenantID != "" {
+		transportOpts = append(transportOpts, client.WithNamespaceTenantID(securityCloudNamespace, cfg.securityCloudTenantID))
+	}
 	if cfg.minRequestIntervalSet {
 		transportOpts = append(transportOpts, client.WithMinRequestInterval(cfg.minRequestInterval))
 	}
@@ -92,15 +95,22 @@ func (c *Client) Transport() *client.Transport {
 	return c.transport
 }
 
+// securityCloudNamespace is the URL namespace every Jamf Security Cloud
+// endpoint is served under, and the key WithSecurityCloudTenantID registers
+// its tenant override against. It matches the "namespace" the generator emits
+// for the securitycloud package's specs.
+const securityCloudNamespace = "securitycloud"
+
 // clientConfig holds configuration applied via Option functions.
 type clientConfig struct {
-	userAgent    string
-	httpClient   *http.Client
-	logger       Logger
-	tenantID     string
-	tokenCache   TokenCache
-	cacheDir     string
-	cookieJarDir string
+	userAgent             string
+	httpClient            *http.Client
+	logger                Logger
+	tenantID              string
+	securityCloudTenantID string
+	tokenCache            TokenCache
+	cacheDir              string
+	cookieJarDir          string
 
 	minRequestInterval    time.Duration
 	minRequestIntervalSet bool
@@ -167,6 +177,21 @@ func WithFileCookieJar(dir string) Option {
 func WithTenantID(id string) Option {
 	return func(cfg *clientConfig) {
 		cfg.tenantID = id
+	}
+}
+
+// WithSecurityCloudTenantID configures the tenant ID used to build URL paths
+// for the securitycloud package only, leaving every other API family on the
+// WithTenantID value.
+//
+// Jamf Security Cloud identifies a customer by its own tenant ID, distinct
+// from the Jamf Pro one, so a customer holding both products has two. Set this
+// alongside WithTenantID to reach both surfaces from a single Client; a
+// Security-Cloud-only integration can pass its tenant to WithTenantID and skip
+// this option entirely.
+func WithSecurityCloudTenantID(id string) Option {
+	return func(cfg *clientConfig) {
+		cfg.securityCloudTenantID = id
 	}
 }
 

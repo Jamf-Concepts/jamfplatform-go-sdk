@@ -526,9 +526,15 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		return err
 	}
 
+	// Which spec claimed each tag-derived filename, so a second spec tagging
+	// its operations the same way fails loudly instead of overwriting the
+	// first spec's file — the methods in it would vanish with no error from
+	// the generator, the compiler or the test suite.
+	tagFileOwner := make(map[string]string)
+
 	for _, sm := range allSpecs {
 		if sm.spec.SplitByTag {
-			if err := emitMethodsByTag(pkgDir, cfg, goPkgName, sm.spec, sm.methods); err != nil {
+			if err := emitMethodsByTag(pkgDir, cfg, goPkgName, sm.spec, sm.methods, tagFileOwner); err != nil {
 				return err
 			}
 			continue
@@ -2037,7 +2043,7 @@ func injectVersionLock(dst, src reflect.Value) {
 // normalize to the same base — e.g. `foo` + `foo-preview` after the
 // -preview strip — merge into one file instead of the second overwriting
 // the first.
-func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, methods []GoMethod) error {
+func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, methods []GoMethod, tagFileOwner map[string]string) error {
 	buckets := make(map[string][]GoMethod)
 	for _, m := range methods {
 		if m.Tag == "" {
@@ -2054,6 +2060,11 @@ func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, m
 	sort.Strings(bases)
 
 	for _, base := range bases {
+		if owner, taken := tagFileOwner[base]; taken && owner != spec.File {
+			return fmt.Errorf("spec %s: tag %q writes %s.go, already written by spec %s — two specs in package %s share an OpenAPI tag; add a tagRenames entry for %q in this spec to give it a distinct filename", spec.File, buckets[base][0].Tag, base, owner, pkgName, buckets[base][0].Tag)
+		}
+		tagFileOwner[base] = spec.File
+
 		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: spec.Format, Methods: buckets[base]}
 		if err := emitTemplated(sourceTmpl, mf, filepath.Join(pkgDir, base+".go")); err != nil {
 			return err

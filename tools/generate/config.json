@@ -10960,6 +10960,292 @@
           "name": "UpdateAppInstallerGlobalSettingsV1"
         }
       ]
+    },
+    {
+      "file": "testing/securitycloud-dns-api.yaml",
+      "namespace": "securitycloud",
+      "package": "securitycloud",
+      "specFile": "securitycloud_dns_api.json",
+      "splitByTag": true,
+      "version": "v1",
+      "operations": [
+        {
+          "op": "GET /tenant/{tenantId}/dns/zones",
+          "name": "ListDnsZonesV1",
+          "params": [
+            "sort"
+          ]
+        },
+        {
+          "op": "POST /tenant/{tenantId}/dns/zones",
+          "name": "CreateDnsZoneV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/dns/zones/{id}",
+          "name": "GetDnsZoneV1"
+        },
+        {
+          "op": "PATCH /tenant/{tenantId}/dns/zones/{id}",
+          "name": "UpdateDnsZoneV1",
+          "contentType": "application/merge-patch+json"
+        },
+        {
+          "op": "DELETE /tenant/{tenantId}/dns/zones/{id}",
+          "name": "DeleteDnsZoneV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/dns/search-domains",
+          "name": "GetDnsSearchDomainV1"
+        },
+        {
+          "op": "PUT /tenant/{tenantId}/dns/search-domains",
+          "name": "SetDnsSearchDomainV1"
+        },
+        {
+          "op": "DELETE /tenant/{tenantId}/dns/search-domains",
+          "name": "ClearDnsSearchDomainV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/dns/custom-hostname-mappings",
+          "name": "GetDnsCustomHostnameMappingsV1"
+        },
+        {
+          "op": "PUT /tenant/{tenantId}/dns/custom-hostname-mappings",
+          "name": "ReplaceDnsCustomHostnameMappingsV1"
+        },
+        {
+          "op": "DELETE /tenant/{tenantId}/dns/custom-hostname-mappings",
+          "name": "ClearDnsCustomHostnameMappingsV1"
+        }
+      ]
+    },
+    {
+      "file": "testing/securitycloud-ztna-api.yaml",
+      "namespace": "securitycloud",
+      "package": "securitycloud",
+      "specFile": "securitycloud_ztna_api.json",
+      "splitByTag": true,
+      "version": "v1",
+      "operations": [
+        {
+          "op": "GET /tenant/{tenantId}/ztna/gateways",
+          "name": "ListZtnaGatewaysV1",
+          "pagination": "totalCount"
+        },
+        {
+          "op": "POST /tenant/{tenantId}/ztna/gateways",
+          "name": "CreateZtnaGatewayV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/ztna/gateways/{gatewayId}",
+          "name": "GetZtnaGatewayV1"
+        },
+        {
+          "op": "PATCH /tenant/{tenantId}/ztna/gateways/{gatewayId}",
+          "name": "UpdateZtnaGatewayV1",
+          "contentType": "application/merge-patch+json"
+        },
+        {
+          "op": "DELETE /tenant/{tenantId}/ztna/gateways/{gatewayId}",
+          "name": "DeleteZtnaGatewayV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/ztna/shared-gateways",
+          "name": "ListZtnaSharedGatewaysV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/ztna/grouped-gateways",
+          "name": "ListZtnaGroupedGatewaysV1"
+        },
+        {
+          "op": "POST /tenant/{tenantId}/ztna/grouped-gateways",
+          "name": "CreateZtnaGroupedGatewayV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
+          "name": "GetZtnaGroupedGatewayV1"
+        },
+        {
+          "op": "PATCH /tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
+          "name": "UpdateZtnaGroupedGatewayV1",
+          "contentType": "application/merge-patch+json"
+        },
+        {
+          "op": "DELETE /tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
+          "name": "DeleteZtnaGroupedGatewayV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/ztna/apps",
+          "name": "ListZtnaAppsV1",
+          "pagination": "totalCount"
+        },
+        {
+          "op": "POST /tenant/{tenantId}/ztna/apps",
+          "name": "CreateZtnaAppV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/ztna/apps/{appId}",
+          "name": "GetZtnaAppV1"
+        },
+        {
+          "op": "PATCH /tenant/{tenantId}/ztna/apps/{appId}",
+          "name": "UpdateZtnaAppV1",
+          "contentType": "application/merge-patch+json"
+        },
+        {
+          "op": "DELETE /tenant/{tenantId}/ztna/apps/{appId}",
+          "name": "DeleteZtnaAppV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/ztna/predefined-apps",
+          "name": "ListZtnaPredefinedAppsV1"
+        }
+      ]
+    },
+    {
+      "file": "testing/securitycloud-categories-api.yaml",
+      "namespace": "securitycloud",
+      "package": "securitycloud",
+      "specFile": "securitycloud_categories_api.json",
+      "splitByTag": true,
+      "version": "v1",
+      "operations": [
+        {
+          "op": "GET /tenant/{tenantId}/categories",
+          "name": "ListContentCategoriesV1"
+        }
+      ]
+    },
+    {
+      "file": "testing/securitycloud-device-groups-api.yaml",
+      "namespace": "securitycloud",
+      "package": "securitycloud",
+      "specFile": "securitycloud_device_groups_api.json",
+      "splitByTag": true,
+      "operations": [
+        {
+          "op": "GET /v1/tenant/{tenantId}/groups",
+          "name": "ListDeviceGroupsV1"
+        },
+        {
+          "op": "POST /v1/tenant/{tenantId}/groups",
+          "name": "CreateDeviceGroupV1"
+        },
+        {
+          "op": "GET /v2/tenant/{tenantId}/groups",
+          "name": "ListDeviceGroupsV2"
+        },
+        {
+          "op": "GET /v1/tenant/{tenantId}/groups/{groupId}",
+          "name": "GetDeviceGroupV1"
+        },
+        {
+          "op": "PUT /v1/tenant/{tenantId}/groups/{groupId}",
+          "name": "UpdateDeviceGroupV1"
+        },
+        {
+          "op": "DELETE /v1/tenant/{tenantId}/groups/{groupId}",
+          "name": "DeleteDeviceGroupV1"
+        }
+      ]
+    },
+    {
+      "file": "testing/securitycloud-enrollment-api.yaml",
+      "namespace": "securitycloud",
+      "package": "securitycloud",
+      "specFile": "securitycloud_enrollment_api.json",
+      "splitByTag": true,
+      "operations": [
+        {
+          "op": "GET /v1/activation-profiles",
+          "name": "ListActivationProfilesV1",
+          "params": [
+            "origin"
+          ]
+        },
+        {
+          "op": "POST /v1/activation-profiles",
+          "name": "CreateActivationProfileV1"
+        },
+        {
+          "op": "POST /v1/activation-profiles/delete-multiple",
+          "name": "DeleteActivationProfilesV1"
+        },
+        {
+          "op": "POST /v1/activation-profiles/{activationProfileId}/pause",
+          "name": "PauseActivationProfileV1"
+        },
+        {
+          "op": "POST /v1/activation-profiles/{activationProfileId}/resume",
+          "name": "ResumeActivationProfileV1"
+        },
+        {
+          "op": "GET /v1/activation-profiles/{activationProfileId}",
+          "name": "GetActivationProfileV1"
+        }
+      ]
+    },
+    {
+      "file": "testing/securitycloud-uem-connect-api.yaml",
+      "namespace": "securitycloud",
+      "package": "securitycloud",
+      "specFile": "securitycloud_uem_connect_api.json",
+      "splitByTag": true,
+      "tagRenames": {
+        "activation-profiles": "uem-connect-activation-profiles"
+      },
+      "operations": [
+        {
+          "op": "GET /tenant/{tenantId}/uem-connect/v1/connectors",
+          "name": "ListUemConnectorsV1",
+          "pagination": "totalCount"
+        },
+        {
+          "op": "POST /tenant/{tenantId}/uem-connect/v1/connectors",
+          "name": "CreateUemConnectorV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/uem-connect/v1/connectors/{configId}",
+          "name": "GetUemConnectorV1"
+        },
+        {
+          "op": "DELETE /tenant/{tenantId}/uem-connect/v1/connectors/{configId}",
+          "name": "DeleteUemConnectorV1"
+        },
+        {
+          "op": "PUT /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/enablement",
+          "name": "EnableUemConnectorV1"
+        },
+        {
+          "op": "DELETE /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/enablement",
+          "name": "DisableUemConnectorV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync-settings",
+          "name": "GetUemConnectorSyncSettingsV1"
+        },
+        {
+          "op": "PUT /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync-settings",
+          "name": "UpdateUemConnectorSyncSettingsV1"
+        },
+        {
+          "op": "GET /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync/runs",
+          "name": "ListUemConnectorSyncRunsV1",
+          "pagination": "totalCount"
+        },
+        {
+          "op": "POST /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync/runs",
+          "name": "TriggerUemConnectorSyncV1"
+        },
+        {
+          "op": "DELETE /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync/runs/current",
+          "name": "CancelUemConnectorSyncV1"
+        },
+        {
+          "op": "POST /tenant/{tenantId}/uem-connect/v1/activation-profiles/{code}/deploy-to-uem",
+          "name": "DeployActivationProfileToUemV1"
+        }
+      ]
     }
   ]
 }

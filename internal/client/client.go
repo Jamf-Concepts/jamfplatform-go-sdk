@@ -47,8 +47,9 @@ type Logger interface {
 type Transport struct {
 	baseURL         string
 	tenantID        string
-	httpClient      *http.Client // retry.StandardClient() — used by execute() for all JSON/XML Do* calls
-	uploadClient    *http.Client // authed + paced, NOT retry-wrapped — used directly by multipart.go; see retry.go's newRetryClient doc
+	nsTenantIDs     map[string]string // namespace -> tenant ID, for API families that scope a tenant differently from Jamf Pro
+	httpClient      *http.Client      // retry.StandardClient() — used by execute() for all JSON/XML Do* calls
+	uploadClient    *http.Client      // authed + paced, NOT retry-wrapped — used directly by multipart.go; see retry.go's newRetryClient doc
 	baseClient      *http.Client
 	oauthConfig     *clientcredentials.Config
 	logger          Logger
@@ -102,6 +103,32 @@ func WithTokenCache(cache TokenCache, cacheKey string) Option {
 func WithTenantID(id string) Option {
 	return func(c *Transport) {
 		c.tenantID = id
+	}
+}
+
+// WithNamespaceTenantID overrides the tenant ID TenantPrefix injects for one
+// API namespace, leaving every other namespace on the WithTenantID value.
+//
+// Jamf Security Cloud is a separate product with its own tenant identifier: a
+// customer holding both products has one tenant ID for Jamf Pro and a
+// different one for Security Cloud, and a single Client is expected to reach
+// both. Without this, calling the securitycloud package would need a second
+// Client constructed with the other tenant — which also duplicates the token
+// cache, cookie jar and request throttle, so the two clients would pace and
+// authenticate independently against the same gateway.
+//
+// A namespace carrying a slash (e.g. "ddm/report") matches either in full or
+// on its first segment, so an override registered for "securitycloud" also
+// applies to a future "securitycloud/<sub>" namespace.
+func WithNamespaceTenantID(namespace, id string) Option {
+	return func(c *Transport) {
+		if namespace == "" || id == "" {
+			return
+		}
+		if c.nsTenantIDs == nil {
+			c.nsTenantIDs = make(map[string]string)
+		}
+		c.nsTenantIDs[namespace] = id
 	}
 }
 
@@ -196,12 +223,32 @@ func (c *Transport) TenantID() string {
 // TenantPrefix returns the /api/{namespace}/{version}/tenant/{tenantID} URL
 // prefix used by tenant-scoped resources. An empty version collapses the
 // segment for APIs that don't use a version in the URL (proclassic, Pro
-// preview paths).
+// preview paths). The tenant ID is the namespace's own override when one was
+// registered via WithNamespaceTenantID, otherwise the client-wide value.
 func (c *Transport) TenantPrefix(namespace, version string) string {
+	tenantID := c.tenantIDFor(namespace)
 	if version == "" {
-		return "/api/" + namespace + "/tenant/" + c.tenantID
+		return "/api/" + namespace + "/tenant/" + tenantID
 	}
-	return "/api/" + namespace + "/" + version + "/tenant/" + c.tenantID
+	return "/api/" + namespace + "/" + version + "/tenant/" + tenantID
+}
+
+// tenantIDFor resolves the tenant ID for one namespace: an exact override
+// first, then an override on the namespace's first path segment, then the
+// client-wide tenant ID.
+func (c *Transport) tenantIDFor(namespace string) string {
+	if len(c.nsTenantIDs) == 0 {
+		return c.tenantID
+	}
+	if id, ok := c.nsTenantIDs[namespace]; ok {
+		return id
+	}
+	if root, _, found := strings.Cut(namespace, "/"); found {
+		if id, ok := c.nsTenantIDs[root]; ok {
+			return id
+		}
+	}
+	return c.tenantID
 }
 
 // ValidateCredentials tests authentication by requesting an OAuth token.

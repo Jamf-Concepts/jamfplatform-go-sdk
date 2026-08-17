@@ -76,11 +76,18 @@ type GoMethod struct {
 	ItemType         string
 	ResultsField     string
 	ReturnsSlice     bool
-	SpecPath         string
-	UnwrapResults    string
-	Format           string      // carried from SpecDef so per-method templates can branch without $-scope
-	Resolver         *GoResolver // populated on synthetic resolver methods (Category resolverID/resolverTyped)
-	Apply            *GoApply    // populated on synthetic apply (upsert) methods
+	// ResponseIsJSONArray reports that the success body is a JSON array,
+	// which ReturnsSlice does not: a named schema declared `type: array`
+	// (Security Cloud's GroupListResponse = []Group) travels as an array but
+	// appears in the Go signature as its alias, not as a []T. Test stubs
+	// pick the body shape from this; the method templates keep using
+	// ReturnsSlice, which is about the Go type.
+	ResponseIsJSONArray bool
+	SpecPath            string
+	UnwrapResults       string
+	Format              string      // carried from SpecDef so per-method templates can branch without $-scope
+	Resolver            *GoResolver // populated on synthetic resolver methods (Category resolverID/resolverTyped)
+	Apply               *GoApply    // populated on synthetic apply (upsert) methods
 
 	// Required-privilege metadata, sourced from the operation's
 	// x-required-privileges / x-required-privileges-legacy vendor extensions.

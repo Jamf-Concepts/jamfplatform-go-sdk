@@ -903,8 +903,8 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		return GoMethod{}, fmt.Errorf("%s not found", opDef.Op)
 	}
 
-	// Version: operation override > extract from path > "v1"
-	version := coalesce(opDef.Version, extractVersion(specPath))
+	// Version: operation override > extract from path > spec-level default
+	version := coalesce(opDef.Version, coalesce(extractVersion(specPath), spec.Version))
 
 	m := GoMethod{
 		Name:            opDef.Name,
@@ -930,6 +930,9 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 
 	if len(op.Tags) > 0 {
 		m.Tag = op.Tags[0]
+		if renamed, ok := spec.TagRenames[m.Tag]; ok {
+			m.Tag = renamed
+		}
 	}
 
 	if isRateLimited(op) {
@@ -1067,6 +1070,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 	}
 
 	m.ReturnsSlice = strings.HasPrefix(m.ResponseType, "[]")
+	m.ResponseIsJSONArray = m.ReturnsSlice || namedResponseIsArray(doc, m.ResponseType)
 
 	// Determine category
 	m.Category = categorize(m)
@@ -1080,6 +1084,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		m.UnwrapResults = ""
 		m.ItemType = ""
 		m.ReturnsSlice = false
+		m.ResponseIsJSONArray = false
 		if httpMethod == http.MethodGet || httpMethod == http.MethodDelete {
 			m.RequestType = ""
 		} else {
@@ -1175,6 +1180,22 @@ func extractVersion(path string) string {
 		return ""
 	}
 	return match[1:] // strip leading "/"
+}
+
+// namedResponseIsArray reports whether goType names a component schema whose
+// own type is `array` — a Go type alias for a slice, so the wire body is a
+// JSON array even though the method signature shows a single named type.
+func namedResponseIsArray(doc *openapi3.T, goType string) bool {
+	if goType == "" || doc.Components == nil || doc.Components.Schemas == nil {
+		return false
+	}
+	for specName, ref := range doc.Components.Schemas {
+		if goTypeName(specName) != goType || ref.Value == nil {
+			continue
+		}
+		return ref.Value.Type.Is("array")
+	}
+	return false
 }
 
 func detectResponse(op *openapi3.Operation) (int, string) {

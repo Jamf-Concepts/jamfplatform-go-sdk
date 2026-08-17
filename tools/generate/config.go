@@ -131,6 +131,30 @@ type SpecDef struct {
 	// entries. Used when the server is order-sensitive within an XML element
 	// (e.g. Classic /vppinvitations <general> requires a fixed field order).
 	FieldOrder map[string][]string `json:"fieldOrder,omitempty"`
+
+	// Version supplies the URL version segment for every operation in this
+	// spec whose own path carries none. Precedence is operation override >
+	// version prefix on the spec path > this default, so a spec mixing
+	// versioned and unversioned paths still resolves each one correctly.
+	//
+	// Needed because the published Security Cloud specs (dns, ztna,
+	// categories) carry tenant-scoped paths with the version segment
+	// dropped — `/tenant/{tenantId}/dns/zones`, not
+	// `/v1/tenant/{tenantId}/dns/zones`. The gateway does not route the
+	// versionless form (wire-probed: 403 BAD_PERMISSIONS), so the version has
+	// to come from somewhere, and per-operation entries would mean 29 copies
+	// of the same "v1" across three specs.
+	Version string `json:"version,omitempty"`
+
+	// TagRenames remaps an OpenAPI tag before it picks the output filename,
+	// and nothing else — method names, godoc and the published spec are
+	// untouched. Only needed when two specs in one package share a tag, since
+	// splitByTag writes one <tag>.go per spec: Security Cloud's enrollment and
+	// uem-connect specs both tag operations "activation-profiles".
+	// emitMethodsByTag errors on such a collision rather than letting the
+	// second spec overwrite the first's file, so this is the escape hatch that
+	// resolves it.
+	TagRenames map[string]string `json:"tagRenames,omitempty"`
 }
 
 // baseName derives a Go file base name from the spec file path.
