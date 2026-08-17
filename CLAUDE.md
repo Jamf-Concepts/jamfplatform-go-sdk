@@ -119,6 +119,42 @@ Spec prose is wrapped at 100 columns, paragraph by paragraph (blank-line separat
 
 All API paths use `/api/{namespace}/{version}/tenant/{tenantId}/{resource}`. The `tenantPrefix(namespace, version)` method builds this prefix. Namespace and version are derived from the spec path in config.
 
+The tenant ID is the client-wide `WithTenantID` value unless a namespace registered its own via `WithNamespaceTenantID` (internal) / `WithSecurityCloudTenantID` (exported). An override matches the namespace exactly or on its first path segment, so one registered for `securitycloud` also covers a future `securitycloud/<sub>`. This exists because Jamf Security Cloud is a separate product with its own tenant identifier — see below.
+
+### Jamf Security Cloud (`securitycloud` package)
+
+53 operations across six specs, all served on the shared `/api/securitycloud` gateway surface: DNS (zones, the search-domain singleton, custom hostname mappings), ZTNA (gateways, grouped gateways, access policies, plus the read-only shared-gateway and predefined-app catalogues), content categories, device groups, activation profiles, and UEM Connect.
+
+**Wire-verified URL shapes (probed 2026-08-17), because the published specs are wrong.** The gateway's Tyk definition is a catch-all proxy (`listen_path: /api/securitycloud/`, `strip_listen_path: true`) — the path globs in `tyk-gateway-management/prod/api-products/securitycloud/` are *audit* rules covering mutating methods only, not a routing allowlist, so they under-describe the surface and must not be read as one. What the gateway actually routes:
+
+| form | result |
+|---|---|
+| `/api/securitycloud/v1/tenant/{t}/dns/zones` | 200 — the shape the SDK builds |
+| `/api/securitycloud/tenant/{t}/v1/dns/zones` | 200 — also routed |
+| `/api/securitycloud/tenant/{t}/dns/zones` | **403 BAD_PERMISSIONS** — the versionless form the published spec declares |
+| `/api/securitycloud/tenant/{t}/uem-connect/v1/connectors` | 200 — UEM Connect carries its own in-path version |
+
+The `-beta` spec variants inject `/tenant/{tenantId}` but never the `betaApiConfig.apiVersion`, so dns, ztna and categories ship versionless paths the gateway rejects. The SDK supplies the version through the spec-level `"version"` config key instead; UEM Connect sets none because its paths already carry `/v1`.
+
+**Spec provenance.** Sourced from the GitOps build's `-beta` variants (`internal/stage/*-beta`, or `external/` where a spec is published to prod) — the only ones carrying the `/api/securitycloud` namespace, tenant-scoped paths and `x-required-privileges`. `securitycloud-enrollment` is absent from that build in every environment, so activation profiles come from the team spec and their operations have no privilege metadata until the build picks the spec up.
+
+**Not routed by the gateway** (403 `BAD_PERMISSIONS` with credentials that reach every other Security Cloud path — the unrouted-endpoint tell, not a privilege problem): `GET /v2/…/groups` (the successor to the deprecated device-groups v1), `POST /v1/activation-profiles/{code}/pause` and `/resume`, and the `jsc-api-gateway` ping. Their acceptance tests skip via `skipOnGatewayUnrouted` and should be tightened to `t.Fatalf` once routed.
+
+**Spec/server disagreements encoded in `config.json`** — all four found by probing, none inferable from the spec:
+
+- `PUT /v1/…/groups/{id}` answers **200 with the updated `Group`**, not the spec's 204 no-content (`expectedStatus` + `responseType`).
+- `POST /ztna/apps` and `POST /ztna/grouped-gateways` answer **201 with the full resource object**, where the spec declares the shared `CreateResponse` (`{id, href}`) — of which the server sends only `id`, never `href`. Both carry a `responseType` override so callers get the created object rather than a reference to it. `POST /ztna/gateways` shares that spec response and is left on it: creating a gateway provisions real egress infrastructure, so its body was never probed, and `CreateResponse` still picks up the top-level `id` its two siblings return.
+- `POST /v1/activation-profiles` returns `{"code": "..."}`, not the declared `{id, href}`. `ActivationProfileResponse` is repaired to the wire shape — `id`/`href` removed rather than left as fields that silently decode to `""`, since the code is the only handle on the new profile.
+- `ZoneRef.href` is `required` but arrives `null`, and the create's `Location` header is a bare ID rather than the documented canonical URL. Only `id` is usable.
+
+**Server-side behaviour worth knowing before writing tests:**
+
+- **`POST /v1/activation-profiles/delete-multiple` is a no-op.** It answers 204 for a real code and for a bogus one alike, and the profile stays readable and listed afterwards. Creating an activation profile therefore leaks an undeletable enrollment code, which is why that acceptance test is opt-in behind `JAMFPLATFORM_JSC_ALLOW_ACTIVATION_PROFILE_CREATE`. Flag to Jamf; do not "fix" it in the SDK.
+- Activation-profile capabilities carry an unencoded rule: `networkSecurity` and `vulnerabilityManagement` must both be enabled or both disabled (400 `INVALID_FIELD` otherwise).
+- `App.routing.type` is `CUSTOM` or `DIRECT` only. `categoryName` validates against the **`displayName`** of the tenant's own category list, not a fixed enum, and an unknown value is a 409 `MISSING_CATEGORY_NAME` — a state conflict, not a malformed request.
+- `customer-id` (device groups) and `origin` (activation-profile list) are declared **required** query params the server ignores; the tenant in the path wins. `origin` does filter when supplied, so it stays in the signature.
+- Device groups v1 returns a **bare JSON array** (`GroupListResponse = []Group`, so the method returns `*[]Group`); v2 wraps it in `{groups: []}`.
+
 ### Pagination
 
 `ListAllPages[T]` is a generic helper taking a `fetchPage(ctx, page, pageSize) ([]T, bool, error)` callback. Three styles configured per operation: `hasNext` (uses `HasNext` field), `sizeCheck` (compares result count to page size), `totalCount` (computes from total). The page size requested per call is `defaultMaxPageSize(pkg, paginationStyle)` (see `tools/generate/util.go`) unless overridden per operation via `"maxPageSize"` in `config.json` — threaded through as an explicit argument to `ListAllPages`, never a hardcoded constant.
@@ -163,6 +199,7 @@ Empirical per-family behaviour (see `acc_api_errors_test.go` for the probes that
 - **Compliance Benchmarks / App Installer Titles 404s** — empty body or `errors: []`. `Details` is nil. `Summary` returns status text.
 - **Classic (proclassic)** — returns Tomcat's default HTML error page, not structured XML. `Details`/`FieldErrors` are empty. The HTML body is preserved in `APIResponseError.Body` for diagnostic display; do not HTML-scrape it in the transport.
 - **DDM Report** — never emits errors for unknown devices; returns an empty report payload instead. Error accessors don't apply.
+- **Security Cloud** — not one dialect. DNS, ZTNA and UEM Connect return the standard `{httpStatus, traceId, errors[]}`, DNS being the only one that populates `field`/`id` (as nulls). Activation profiles return the same shape minus `traceId`. Device groups return a different envelope entirely — `{message, messageKey, messageParams, error, logref, statusCode}` — which parses to nothing, leaving `Details`/`FieldErrors` empty and `Summary` on its status-text fallback. The status code is the only thing every Security Cloud service populates, so branch on `HasStatus`, not on details.
 
 Rule for consumers doing field-attributed diagnostics (Terraform `AddAttributeError`, CLI per-field output): iterate `FieldErrors()` and fall through to a generic diagnostic when the field key is empty. That pattern works across every family.
 
@@ -251,6 +288,7 @@ Apply methods are declared entirely in `config.json` — never hand-code them. M
 - Every spec in `tools/generate/config.json` MUST set `"splitByTag": true`. The generator buckets methods by first OpenAPI tag into one file per tag (`<tag>.go` + `<tag>_test.go`); types pool into a shared `types.go`. Splitting by path would scatter CRUD for a single resource across many files; tag-split keeps each resource coherent.
 - Every spec MUST target a sub-package under `jamfplatform/` via `"package": "<name>"` — e.g. `devices`, `pro`, `proclassic`. Avoids name collisions across Jamf's API families (the same resource name exists in multiple APIs).
 - Sub-package names follow the namespace (kebab → snake → Go identifier). No invention.
+- Two specs in one package MUST NOT emit the same tag filename. `emitMethodsByTag` runs per spec and writes `<tag>.go`, so a shared tag means the second spec overwrites the first's file and its methods disappear with no error from the generator, the compiler or the tests. The generator now fails on the collision; resolve it with a per-spec `"tagRenames"` entry (filename only — method names, godoc and the published spec are untouched), as Security Cloud's uem-connect spec does for the `activation-profiles` tag it shares with the enrollment spec.
 
 ## API formats
 
@@ -310,5 +348,7 @@ Be clever about destructive endpoints — don't run them against shared state. E
 - **Delete endpoints**: always pair with a preceding create in the same test; never delete pre-existing resources the tenant owns.
 
 When an endpoint can't be exercised safely, `t.Skip()` with a comment explaining why. A skipped test still documents the intent; a destructive test that corrupts the tenant costs more than the coverage is worth.
+
+Security Cloud tests use their own credential set — `JAMFPLATFORM_JSC_CLIENT_ID`, `JAMFPLATFORM_JSC_CLIENT_SECRET`, `JAMFPLATFORM_JSC_TENANT_ID`, and optionally `JAMFPLATFORM_JSC_BASE_URL` when the gateway differs — via `accSecurityCloudClient`. A second tenant ID alone is not enough: a Security Cloud client answers 403 on `/api/pro` and `/api/devices`, and a Jamf Pro client answers 403 on `/api/securitycloud`, so the products need separate credentials. The tenant is passed through `WithSecurityCloudTenantID` rather than `WithTenantID` so the suite exercises the per-namespace override a dual-product consumer relies on. Unset credentials skip; supplied-but-rejected credentials fail, exactly as for the Jamf Pro suite.
 
 **Never silently tolerate real errors to make a test pass.** If an endpoint rejects a request with 400/500, fetch the full response body (not just the status code) and understand what the server is actually objecting to. Acceptable reactions: fix the payload, add a `fieldTypeOverride` for a spec/server drift, or explicitly surface the bug (leave the test failing / skipped with the server's error text captured in a comment). Not acceptable: catching a category of status codes (`>= 400 && < 500`) as a generic escape hatch that quietly hides real bugs — the first time you see a 4xx you don't understand, print `err.Error()` and read it. 4xx-tolerance is justified only when the rejection is an expected property of the probe (e.g. bogus-id probes, unconfigured-integration probes) and that property is named in the log message. If a server bug blocks coverage, flag it to the user — don't paper over it.
