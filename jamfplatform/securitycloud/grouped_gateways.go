@@ -28,9 +28,9 @@ func (c *Client) ListZtnaGroupedGatewaysV1(ctx context.Context) (*GroupedGateway
 // CreateZtnaGroupedGatewayV1 create a Grouped Gateway.
 //
 // Required privileges: create:jsc:all.
-func (c *Client) CreateZtnaGroupedGatewayV1(ctx context.Context, request *GroupedGatewayCreateRequest) (*CreateResponse, error) {
+func (c *Client) CreateZtnaGroupedGatewayV1(ctx context.Context, request *GroupedGatewayCreateRequest) (*GroupedGateway, error) {
 	prefix := c.transport.TenantPrefix("securitycloud", "v1")
-	var result CreateResponse
+	var result GroupedGateway
 	endpoint := prefix + "/ztna/grouped-gateways"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateZtnaGroupedGatewayV1: %w", err)

@@ -75,13 +75,14 @@ func (c *Client) GetDeviceGroupV1(ctx context.Context, groupID string) (*Group, 
 //
 // Parameters:
 //   - groupID: Unique identifier of the group to update.
-func (c *Client) UpdateDeviceGroupV1(ctx context.Context, groupID string, request *UpdateGroupRequest) error {
+func (c *Client) UpdateDeviceGroupV1(ctx context.Context, groupID string, request *UpdateGroupRequest) (*Group, error) {
 	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	var result Group
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(groupID))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("UpdateDeviceGroupV1(%s): %w", groupID, err)
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
+		return nil, fmt.Errorf("UpdateDeviceGroupV1(%s): %w", groupID, err)
 	}
-	return nil
+	return &result, nil
 }
 
 // DeleteDeviceGroupV1 delete a device group.

@@ -137,12 +137,15 @@ func TestUpdateDeviceGroupV1(t *testing.T) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
-		w.WriteHeader(http.StatusNoContent)
+		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
-	err := c.UpdateDeviceGroupV1(context.Background(), "test-id", &UpdateGroupRequest{})
+	result, err := c.UpdateDeviceGroupV1(context.Background(), "test-id", &UpdateGroupRequest{})
 	if err != nil {
 		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
 	}
 }
 

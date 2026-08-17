@@ -11059,7 +11059,8 @@
         },
         {
           "op": "POST /tenant/{tenantId}/ztna/grouped-gateways",
-          "name": "CreateZtnaGroupedGatewayV1"
+          "name": "CreateZtnaGroupedGatewayV1",
+          "responseType": "GroupedGateway"
         },
         {
           "op": "GET /tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
@@ -11081,7 +11082,8 @@
         },
         {
           "op": "POST /tenant/{tenantId}/ztna/apps",
-          "name": "CreateZtnaAppV1"
+          "name": "CreateZtnaAppV1",
+          "responseType": "App"
         },
         {
           "op": "GET /tenant/{tenantId}/ztna/apps/{appId}",
@@ -11141,7 +11143,9 @@
         },
         {
           "op": "PUT /v1/tenant/{tenantId}/groups/{groupId}",
-          "name": "UpdateDeviceGroupV1"
+          "name": "UpdateDeviceGroupV1",
+          "expectedStatus": 200,
+          "responseType": "Group"
         },
         {
           "op": "DELETE /v1/tenant/{tenantId}/groups/{groupId}",
@@ -11155,6 +11159,17 @@
       "package": "securitycloud",
       "specFile": "securitycloud_enrollment_api.json",
       "splitByTag": true,
+      "schemaAdditions": {
+        "ActivationProfileResponse": {
+          "code": "string"
+        }
+      },
+      "propertyRemovals": {
+        "ActivationProfileResponse": [
+          "id",
+          "href"
+        ]
+      },
       "operations": [
         {
           "op": "GET /v1/activation-profiles",

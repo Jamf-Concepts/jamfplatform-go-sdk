@@ -44,9 +44,9 @@ func (c *Client) ListZtnaAppsV1(ctx context.Context) ([]App, error) {
 // CreateZtnaAppV1 create an App.
 //
 // Required privileges: create:jsc:all.
-func (c *Client) CreateZtnaAppV1(ctx context.Context, request *AppCreateRequest) (*CreateResponse, error) {
+func (c *Client) CreateZtnaAppV1(ctx context.Context, request *AppCreateRequest) (*App, error) {
 	prefix := c.transport.TenantPrefix("securitycloud", "v1")
-	var result CreateResponse
+	var result App
 	endpoint := prefix + "/ztna/apps"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateZtnaAppV1: %w", err)

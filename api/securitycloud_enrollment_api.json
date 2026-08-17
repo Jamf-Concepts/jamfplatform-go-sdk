@@ -18,14 +18,7 @@
       "ActivationProfileResponse": {
         "description": "Response body returned after successfully creating an activation profile.",
         "properties": {
-          "href": {
-            "description": "URL of the created activation profile",
-            "example": "/v1/activation-profiles/245def",
-            "type": "string"
-          },
-          "id": {
-            "description": "Unique identifier code for the newly created activation profile",
-            "example": "245def",
+          "code": {
             "type": "string"
           }
         },

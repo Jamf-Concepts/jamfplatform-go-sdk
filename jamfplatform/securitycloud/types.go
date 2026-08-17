@@ -707,10 +707,7 @@ type ActivationProfile struct {
 
 // ActivationProfileResponse Response body returned after successfully creating an activation profile.
 type ActivationProfileResponse struct {
-	// URL of the created activation profile.
-	Href string `json:"href"`
-	// Unique identifier code for the newly created activation profile.
-	ID string `json:"id"`
+	Code string `json:"code"`
 }
 
 // ActivationProfilesResponse List of activation profiles for the customer.
