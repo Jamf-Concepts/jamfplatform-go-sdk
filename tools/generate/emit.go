@@ -290,12 +290,14 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 	// re-established in this process for hoistInlineObjects' dedup to work,
 	// and unlike the others it's provably safe to re-run (see its doc comment).
 	if !usedFallback {
+		applySchemaCreations(doc, spec.SchemaCreations)
 		applySchemaRenames(doc, spec.SchemaRenames)
 		applySchemaAdditions(doc, spec.SchemaAdditions)
 		applySchemaPatches(doc, spec.SchemaPatches)
 		applyPropertyRenames(doc, spec.PropertyRenames)
 		applyPropertyRemovals(doc, spec.PropertyRemovals)
 	}
+	normalizeNullableUnions(doc)
 	applyPostSymmetry(doc, spec.PostSymmetryExcludes)
 	if spec.Format == "xml" {
 		flattenClassicSizeWrappers(doc)
@@ -441,12 +443,14 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 			// its read/post pointer-sharing must happen in this process for
 			// hoistInlineObjects' dedup to work, and it's safe to re-run.
 			if !ls.usedFallback {
+				applySchemaCreations(doc, ls.spec.SchemaCreations)
 				applySchemaRenames(doc, ls.spec.SchemaRenames)
 				applySchemaAdditions(doc, ls.spec.SchemaAdditions)
 				applySchemaPatches(doc, ls.spec.SchemaPatches)
 				applyPropertyRenames(doc, ls.spec.PropertyRenames)
 				applyPropertyRemovals(doc, ls.spec.PropertyRemovals)
 			}
+			normalizeNullableUnions(doc)
 			applyPostSymmetry(doc, ls.spec.PostSymmetryExcludes)
 			if ls.spec.Format == "xml" {
 				flattenClassicSizeWrappers(doc)
@@ -585,11 +589,13 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 		if err != nil {
 			return fmt.Errorf("loading %s: %w", ls.spec.File, err)
 		}
+		applySchemaCreations(doc, ls.spec.SchemaCreations)
 		applySchemaRenames(doc, ls.spec.SchemaRenames)
 		applySchemaAdditions(doc, ls.spec.SchemaAdditions)
 		applySchemaPatches(doc, ls.spec.SchemaPatches)
 		applyPropertyRenames(doc, ls.spec.PropertyRenames)
 		applyPropertyRemovals(doc, ls.spec.PropertyRemovals)
+		normalizeNullableUnions(doc)
 		applyPostSymmetry(doc, ls.spec.PostSymmetryExcludes)
 		if ls.spec.Format == "xml" {
 			flattenClassicSizeWrappers(doc)
@@ -2316,8 +2322,12 @@ func testServerWithOpts(t *testing.T, opts ...Option) (*Client, *http.ServeMux) 
 	t.Cleanup(srv.Close)
 	// Disable inter-request pacing in unit tests so the per-method httptest
 	// suite isn't throttled to the default 100ms cadence. The gate's own
-	// behavior is covered in internal/client.
-	clientOpts := append([]Option{jamfplatform.WithMinRequestInterval(0)}, opts...)
+	// behavior is covered in internal/client. Also disable automatic
+	// retry-on-transient-failure: a handler that deliberately keeps
+	// returning e.g. 500 to exercise a caller's error-handling path would
+	// otherwise hang for the production 1s-60s backoff window on every
+	// run. Retry's own behavior is covered in internal/client too.
+	clientOpts := append([]Option{jamfplatform.WithMinRequestInterval(0), jamfplatform.WithRetryPolicy(0, 0, 0)}, opts...)
 	base := jamfplatform.NewClient(srv.URL, "test-id", "test-secret", clientOpts...)
 	return New(base), mux
 }
@@ -2673,8 +2683,12 @@ func testServerWithOpts(t *testing.T, opts ...Option) (*Client, *http.ServeMux) 
 	t.Cleanup(srv.Close)
 	// Disable inter-request pacing in unit tests so the per-method httptest
 	// suite isn't throttled to the default 100ms cadence. The gate's own
-	// behavior is covered in internal/client.
-	clientOpts := append([]Option{WithMinRequestInterval(0)}, opts...)
+	// behavior is covered in internal/client. Also disable automatic
+	// retry-on-transient-failure: a handler that deliberately keeps
+	// returning e.g. 500 to exercise a caller's error-handling path would
+	// otherwise hang for the production 1s-60s backoff window on every
+	// run. Retry's own behavior is covered in internal/client too.
+	clientOpts := append([]Option{WithMinRequestInterval(0), WithRetryPolicy(0, 0, 0)}, opts...)
 	c := NewClient(srv.URL, "test-id", "test-secret", clientOpts...)
 	return c, mux
 }

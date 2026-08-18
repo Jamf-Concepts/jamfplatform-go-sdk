@@ -508,19 +508,24 @@
       "Calculator": {
         "properties": {
           "BasicMode": {
-            "$ref": "#/components/schemas/BasicMode"
+            "$ref": "#/components/schemas/BasicMode",
+            "description": "If present, configures the basic mode of the calculator. Basic mode is always enabled."
           },
           "InputModes": {
-            "$ref": "#/components/schemas/InputModes"
+            "$ref": "#/components/schemas/InputModes",
+            "description": "If present, controls global input options of the calculator. If not present, all input modes are enabled."
           },
           "MathNotesMode": {
-            "$ref": "#/components/schemas/MathNotesMode"
+            "$ref": "#/components/schemas/MathNotesMode",
+            "description": "If present, configures the Math Notes mode of the calculator. If not present, math notes mode is enabled."
           },
           "ProgrammerMode": {
-            "$ref": "#/components/schemas/ProgrammerMode"
+            "$ref": "#/components/schemas/ProgrammerMode",
+            "description": "If present, configures the programmer mode of the calculator. If not present, programmer mode is enabled."
           },
           "ScientificMode": {
-            "$ref": "#/components/schemas/ScientificMode"
+            "$ref": "#/components/schemas/ScientificMode",
+            "description": "If present, configures the scientific mode of the calculator. If not present, scientific mode is enabled."
           }
         },
         "type": "object"
@@ -1342,10 +1347,12 @@
         "description": "Math settings configuration.\n\nConfigures Calculator app modes and system-wide math behavior including keyboard suggestions and Math Notes.\n",
         "properties": {
           "Calculator": {
-            "$ref": "#/components/schemas/Calculator"
+            "$ref": "#/components/schemas/Calculator",
+            "description": "If present, configures the built-in Calculator app."
           },
           "SystemBehavior": {
-            "$ref": "#/components/schemas/SystemBehavior"
+            "$ref": "#/components/schemas/SystemBehavior",
+            "description": "If present, configures math behavior in the system."
           }
         },
         "type": "object"
@@ -1887,28 +1894,36 @@
         "description": "Safari settings configuration.\n\nConfigures Safari browser behavior including cookies, JavaScript, popups, private browsing, and start page settings.\n",
         "properties": {
           "AcceptCookies": {
-            "$ref": "#/components/schemas/AcceptCookies"
+            "$ref": "#/components/schemas/AcceptCookies",
+            "description": "The policy Safari uses for managing cookies"
           },
           "AllowDisablingFraudWarning": {
-            "$ref": "#/components/schemas/AllowDisablingFraudWarning"
+            "$ref": "#/components/schemas/AllowDisablingFraudWarning",
+            "description": "If false, the system forces fraud warnings on in Safari"
           },
           "AllowHistoryClearing": {
-            "$ref": "#/components/schemas/AllowHistoryClearing"
+            "$ref": "#/components/schemas/AllowHistoryClearing",
+            "description": "If false, the system disables clearing history in Safari"
           },
           "AllowJavaScript": {
-            "$ref": "#/components/schemas/AllowJavaScript"
+            "$ref": "#/components/schemas/AllowJavaScript",
+            "description": "If false, the system disables JavaScript in Safari"
           },
           "AllowPopups": {
-            "$ref": "#/components/schemas/AllowPopups"
+            "$ref": "#/components/schemas/AllowPopups",
+            "description": "If false, the system disables popups in Safari"
           },
           "AllowPrivateBrowsing": {
-            "$ref": "#/components/schemas/AllowPrivateBrowsing"
+            "$ref": "#/components/schemas/AllowPrivateBrowsing",
+            "description": "If false, the system disables private browsing in Safari"
           },
           "AllowSummary": {
-            "$ref": "#/components/schemas/AllowSummary"
+            "$ref": "#/components/schemas/AllowSummary",
+            "description": "If false, the system disables summarization of content in Safari"
           },
           "NewTabStartPage": {
-            "$ref": "#/components/schemas/NewTabStartPage"
+            "$ref": "#/components/schemas/NewTabStartPage",
+            "description": "Sets the start page for new tabs in Safari"
           }
         },
         "type": "object"

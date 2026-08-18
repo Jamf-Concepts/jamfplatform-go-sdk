@@ -10,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // ---------------------------------------------------------------------------
@@ -56,6 +58,7 @@ func publishSpecs(root string, cfg Config) error {
 		// Go-type-shaping passes (flattenClassicSizeWrappers, hoistInlineObjects)
 		// are deliberately excluded — they restructure schemas purely for Go
 		// struct emission and don't affect what the published spec documents.
+		applySchemaCreations(doc, spec.SchemaCreations)
 		applySchemaRenames(doc, spec.SchemaRenames)
 		applySchemaAdditions(doc, spec.SchemaAdditions)
 		applySchemaPatches(doc, spec.SchemaPatches)
@@ -159,6 +162,10 @@ func publishSpecs(root string, cfg Config) error {
 		if err != nil {
 			return fmt.Errorf("marshaling %s: %w", specFile, err)
 		}
+		data, err = restoreRefSiblings(filepath.Join(root, spec.File), data)
+		if err != nil {
+			return fmt.Errorf("restoring $ref siblings for %s: %w", specFile, err)
+		}
 
 		outPath := filepath.Join(outDir, specFile)
 		if err := os.WriteFile(outPath, append(data, '\n'), 0644); err != nil {
@@ -167,4 +174,102 @@ func publishSpecs(root string, cfg Config) error {
 		log.Printf("wrote %s/%s", cfg.SpecDir, specFile)
 	}
 	return nil
+}
+
+// restoreRefSiblings re-applies keywords that sat beside a `$ref` in the source
+// spec but were destroyed when kin-openapi re-serialised the document.
+//
+// kin-openapi v0.146.0 parses `$ref` siblings into a *private* SchemaRef.sibling
+// field (refs.go, "OAS 3.1 / JSON Schema 2020-12: sibling keywords alongside
+// $ref are valid"), which is why the generator sees them and emits them as Go
+// field docs. But SchemaRef.MarshalYAML re-emits only `{$ref, x-extensions}` for
+// a reference, dropping sibling. So the description survives into the Go tree
+// and vanishes from api/*.json.
+//
+// That asymmetry is a CI trap, not just missing prose. CI has no testing/ specs
+// and regenerates from api/, so a sibling description present locally and absent
+// in api/ makes `git diff --exit-code` fail on a tree that is genuinely current
+// — the blueprints and compliance-benchmarks specs use the pattern heavily. The
+// historical workaround was to revert those doc lines by hand on every regen.
+//
+// Rather than reach into a private field, walk the source document and the
+// marshalled output in parallel and copy siblings back at matching paths.
+// publishSpecs prunes operations and schemas but never relocates them, so a node
+// that survives is still at its original path. Missing paths are simply skipped.
+// Only non-`x-` keywords are copied; extensions already round-trip.
+func restoreRefSiblings(sourcePath string, marshalled []byte) ([]byte, error) {
+	raw, err := os.ReadFile(sourcePath)
+	if err != nil {
+		// Source spec absent means we are publishing from a fallback, which has
+		// already had siblings restored by an earlier run. Nothing to do.
+		return marshalled, nil
+	}
+	var src any
+	if strings.HasSuffix(strings.ToLower(sourcePath), ".yaml") || strings.HasSuffix(strings.ToLower(sourcePath), ".yml") {
+		if err := yaml.Unmarshal(raw, &src); err != nil {
+			return marshalled, nil
+		}
+		src = yamlMapsToJSON(src)
+	} else if err := json.Unmarshal(raw, &src); err != nil {
+		return marshalled, nil
+	}
+
+	var out any
+	if err := json.Unmarshal(marshalled, &out); err != nil {
+		return nil, err
+	}
+	if !copyRefSiblings(src, out) {
+		return marshalled, nil
+	}
+	data, err := json.MarshalIndent(out, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// copyRefSiblings walks src and dst in lockstep, copying `$ref` siblings from
+// src onto any dst object that has been reduced to a bare `$ref`. Reports
+// whether anything changed. Recurses through objects and arrays only where both
+// sides agree on shape, so a pruned or restructured subtree is left alone.
+func copyRefSiblings(src, dst any) bool {
+	changed := false
+	switch s := src.(type) {
+	case map[string]any:
+		d, ok := dst.(map[string]any)
+		if !ok {
+			return false
+		}
+		if _, srcHasRef := s["$ref"]; srcHasRef {
+			if _, dstHasRef := d["$ref"]; dstHasRef {
+				for k, v := range s {
+					if k == "$ref" || strings.HasPrefix(k, "x-") {
+						continue
+					}
+					if _, exists := d[k]; !exists {
+						d[k] = v
+						changed = true
+					}
+				}
+			}
+		}
+		for k, sv := range s {
+			if dv, exists := d[k]; exists {
+				if copyRefSiblings(sv, dv) {
+					changed = true
+				}
+			}
+		}
+	case []any:
+		d, ok := dst.([]any)
+		if !ok || len(d) != len(s) {
+			return false
+		}
+		for i := range s {
+			if copyRefSiblings(s[i], d[i]) {
+				changed = true
+			}
+		}
+	}
+	return changed
 }

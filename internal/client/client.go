@@ -20,11 +20,11 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
@@ -47,7 +47,8 @@ type Logger interface {
 type Transport struct {
 	baseURL         string
 	tenantID        string
-	httpClient      *http.Client
+	httpClient      *http.Client // retry.StandardClient() — used by execute() for all JSON/XML Do* calls
+	uploadClient    *http.Client // authed + paced, NOT retry-wrapped — used directly by multipart.go; see retry.go's newRetryClient doc
 	baseClient      *http.Client
 	oauthConfig     *clientcredentials.Config
 	logger          Logger
@@ -57,6 +58,7 @@ type Transport struct {
 	cookieJar       http.CookieJar
 	deprecationSeen sync.Map // dedup runtime Deprecation header warnings
 	throttle        *requestThrottle
+	retry           *retryablehttp.Client // backs httpClient; mutating retry.HTTPClient (see SetHTTPClient/SetUserAgent) updates httpClient's behavior in place
 }
 
 // PaginatedResponseRepresentation captures pagination metadata shared by multiple endpoints.
@@ -80,7 +82,8 @@ func WithHTTPClient(httpClient *http.Client) Option {
 				httpClient.Jar = newCookieJar()
 			}
 			c.baseClient = httpClient
-			c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
+			c.uploadClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
+			c.retry.HTTPClient = c.uploadClient
 		}
 	}
 }
@@ -122,6 +125,23 @@ func WithMinRequestInterval(d time.Duration) Option {
 	}
 }
 
+// WithRetryPolicy overrides the transport's automatic-retry timing for
+// transient failures (see retry.go's isRetryableWriteStatus for what gets
+// retried). Exists primarily for test harnesses that mock a
+// persistently-failing transient status (e.g. an always-500 GET) and need
+// the retry loop to run in milliseconds rather than the production 1s-60s
+// window with up to 5 total attempts — without this, such a test would hang
+// for the full backoff duration on every run. maxRetries follows
+// retryablehttp's own semantics: total attempts = maxRetries+1, so 0 means
+// no retries at all.
+func WithRetryPolicy(waitMin, waitMax time.Duration, maxRetries int) Option {
+	return func(c *Transport) {
+		c.retry.RetryWaitMin = waitMin
+		c.retry.RetryWaitMax = waitMax
+		c.retry.RetryMax = maxRetries
+	}
+}
+
 // NewTransport creates a new Jamf Platform API transport.
 func NewTransport(baseURL, clientID, clientSecret string) *Transport {
 	return NewTransportWithUserAgent(baseURL, clientID, clientSecret, "jamfplatform-go-sdk/dev")
@@ -136,24 +156,28 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 	}
 
 	throttle := newRequestThrottle(defaultMinRequestInterval)
-	httpClient, baseClient := newOAuth2Client(oauthConfig, userAgent, throttle)
+	uploadClient, baseClient := newOAuth2Client(oauthConfig, userAgent, throttle)
+	retry := newRetryClient(uploadClient)
 
 	c := &Transport{
-		baseURL:     baseURL,
-		httpClient:  httpClient,
-		baseClient:  baseClient,
-		oauthConfig: oauthConfig,
-		userAgent:   userAgent,
-		throttle:    throttle,
+		baseURL:      baseURL,
+		uploadClient: uploadClient,
+		httpClient:   retry.StandardClient(),
+		baseClient:   baseClient,
+		oauthConfig:  oauthConfig,
+		userAgent:    userAgent,
+		throttle:     throttle,
+		retry:        retry,
 	}
 	for _, opt := range opts {
 		opt(c)
 	}
 	if c.tokenCache != nil {
-		c.httpClient = newCachingOAuth2Client(c.oauthConfig, c.baseClient, c.tokenCache, c.cacheKey)
+		c.uploadClient = newCachingOAuth2Client(c.oauthConfig, c.baseClient, c.tokenCache, c.cacheKey)
+		c.retry.HTTPClient = c.uploadClient
 	}
 	if c.cookieJar != nil {
-		c.httpClient.Jar = c.cookieJar
+		c.uploadClient.Jar = c.cookieJar
 		c.baseClient.Jar = c.cookieJar
 	}
 	return c
@@ -185,7 +209,7 @@ func (c *Transport) ValidateCredentials(ctx context.Context) error {
 	return validateCredentials(ctx, c.oauthConfig, c.baseClient)
 }
 
-// HTTPClient returns the underlying OAuth2-managed HTTP client for raw authenticated requests.
+// HTTPClient returns the underlying OAuth2-managed, retry-wrapped HTTP client for raw authenticated requests.
 func (c *Transport) HTTPClient() *http.Client {
 	return c.httpClient
 }
@@ -193,7 +217,8 @@ func (c *Transport) HTTPClient() *http.Client {
 // SetHTTPClient sets a custom base HTTP client (useful for testing).
 func (c *Transport) SetHTTPClient(httpClient *http.Client) {
 	c.baseClient = httpClient
-	c.httpClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
+	c.uploadClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
+	c.retry.HTTPClient = c.uploadClient
 }
 
 // SetLogger sets the logger for the client.
@@ -204,7 +229,8 @@ func (c *Transport) SetLogger(logger Logger) {
 // SetUserAgent sets the User-Agent header value used for token and API requests.
 func (c *Transport) SetUserAgent(ua string) {
 	c.userAgent = ua
-	c.httpClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua, c.throttle)
+	c.uploadClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua, c.throttle)
+	c.retry.HTTPClient = c.uploadClient
 }
 
 // Do performs an authenticated API request and decodes the response.
@@ -215,13 +241,34 @@ func (c *Transport) Do(ctx context.Context, method, path string, body, result an
 
 // DoExpect performs an authenticated API request expecting the given HTTP status.
 func (c *Transport) DoExpect(ctx context.Context, method, path string, body any, expectedStatus int, result any) error {
-	return c.execute(ctx, method, path, body, "", nil, expectedStatus, result)
+	return c.execute(ctx, method, path, body, "", nil, expectedStatus, result, c.httpClient)
 }
 
 // DoWithContentType performs an authenticated API request with a custom Content-Type header.
 // It expects HTTP 200 OK as the success status.
 func (c *Transport) DoWithContentType(ctx context.Context, method, path string, body any, contentType string, expectedStatus int, result any) error {
-	return c.execute(ctx, method, path, body, contentType, nil, expectedStatus, result)
+	return c.execute(ctx, method, path, body, contentType, nil, expectedStatus, result, c.httpClient)
+}
+
+// DoWithContentTypeNoRetry is DoWithContentType without the transport's
+// automatic 5xx retry (see isRetryableWriteStatus). It exists for the small,
+// enumerable set of PUT/PATCH endpoints that carry a side-channel
+// precondition — an optimistic-lock field sourced from a GET taken before
+// the write — where a successful-but-500ing write, if blindly retried,
+// replays a now-stale precondition and turns into a genuine conflict the
+// caller's own 500-specific compensation never expects. Route through this
+// method instead of DoWithContentType for any such endpoint; see
+// isRetryableWriteStatus's doc for the mechanism and the current callers
+// (computer/mobile-device prestage enrollment). 429/503 retry still applies
+// — those are gateway-level rejections that never reached the precondition
+// check in the first place, so they carry none of this risk.
+//
+// This is a workaround for an upstream response-serializer bug, not a
+// permanent architectural split: once Jamf fixes it, this opt-out and its
+// callers' own GET-diff compensation (e.g. isPutSerializerBug in
+// terraform-provider-jamfplatform) should both be removed together.
+func (c *Transport) DoWithContentTypeNoRetry(ctx context.Context, method, path string, body any, contentType string, expectedStatus int, result any) error {
+	return c.execute(ctx, method, path, body, contentType, nil, expectedStatus, result, c.uploadClient)
 }
 
 // DoWithHeaders performs an authenticated API request with extra headers and decodes the response.
@@ -232,67 +279,23 @@ func (c *Transport) DoWithHeaders(ctx context.Context, method, path string, body
 
 // DoExpectWithHeaders performs an authenticated API request with extra headers expecting the given HTTP status.
 func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, expectedStatus int, result any) error {
-	return c.execute(ctx, method, path, body, "", headers, expectedStatus, result)
+	return c.execute(ctx, method, path, body, "", headers, expectedStatus, result, c.httpClient)
 }
 
-// execute funnels every Do* variant through one place so the 429/Retry-After
-// retry and Deprecation-header logging live in a single hook point. Non-success
-// statuses other than a server-instructed 429 surface immediately as an
-// *APIResponseError — eventual-consistency handling is a caller concern.
-func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any) error {
-	resp, classic, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
+// execute funnels every Do* variant through one place so Deprecation-header
+// logging lives in a single hook point. client selects whether transient
+// failures (429, 503, and 500/502/504 on an idempotent method — see
+// isRetryableWriteStatus) are retried one layer down: c.httpClient retries,
+// c.uploadClient doesn't — see DoWithContentTypeNoRetry. Non-retried
+// statuses surface immediately as an *APIResponseError —
+// eventual-consistency handling of a specific endpoint's error semantics is
+// a caller concern.
+func (c *Transport) execute(ctx context.Context, method, path string, body any, contentType string, extraHeaders http.Header, expectedStatus int, result any, client *http.Client) error {
+	resp, classic, err := c.doRequestFull(ctx, method, path, body, contentType, extraHeaders, client)
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode == http.StatusTooManyRequests {
-		delay := parseRetryAfter(resp.Header.Get("Retry-After"), time.Now())
-		if delay > 0 && delay <= 60*time.Second {
-			// Capture the 429 error before discarding the body so we can
-			// surface it if the context is cancelled during the wait.
-			lastErr := c.handleResponse(ctx, resp, classic, expectedStatus, result)
-			select {
-			case <-time.After(delay):
-			case <-ctx.Done():
-				if lastErr != nil {
-					return lastErr
-				}
-				return ctx.Err()
-			}
-			resp, classic, err = c.doRequestFull(ctx, method, path, body, contentType, extraHeaders)
-			if err != nil {
-				return err
-			}
-		}
-		// Out-of-policy Retry-After (missing, negative, or >60s) or retry
-		// also returned 429: fall through to handleResponse so the caller
-		// sees the server's actual error body + traceId, not a synthetic
-		// one. handleResponse builds an APIResponseError for any status !=
-		// expectedStatus, which 429 will be.
-	}
-
 	return c.handleResponse(ctx, resp, classic, expectedStatus, result)
-}
-
-// parseRetryAfter interprets a Retry-After header value as either seconds
-// (integer) or an HTTP-date. Returns 0 for empty/invalid values.
-func parseRetryAfter(v string, now time.Time) time.Duration {
-	if v == "" {
-		return 0
-	}
-	if secs, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
-		if secs < 0 {
-			return 0
-		}
-		return time.Duration(secs) * time.Second
-	}
-	if t, err := http.ParseTime(v); err == nil {
-		d := t.Sub(now)
-		if d < 0 {
-			return 0
-		}
-		return d
-	}
-	return 0
 }
 
 // logDeprecation logs once per (method, path) when a server response includes
@@ -323,11 +326,12 @@ func (c *Transport) buildURL(endpoint string) string {
 }
 
 // doRequestFull performs an authenticated API request with optional content
-// type and extra headers. Returns the response, the classic-codec flag
-// captured from the request URL (used by the caller to route XML vs JSON
-// unmarshal — avoids re-sniffing the response URL, which may have mutated
-// through redirects), and any transport error.
-func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header) (*http.Response, bool, error) {
+// type and extra headers, dispatching through client (c.httpClient or
+// c.uploadClient — see execute). Returns the response, the classic-codec
+// flag captured from the request URL (used by the caller to route XML vs
+// JSON unmarshal — avoids re-sniffing the response URL, which may have
+// mutated through redirects), and any transport error.
+func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, body any, contentType string, extraHeaders http.Header, client *http.Client) (*http.Response, bool, error) {
 	var requestBodyBytes []byte
 
 	fullURL := c.buildURL(endpoint)
@@ -391,7 +395,7 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 		}
 	}
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, false, fmt.Errorf("API request failed: %w", err)
 	}

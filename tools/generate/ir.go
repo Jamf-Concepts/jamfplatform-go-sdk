@@ -69,6 +69,7 @@ type GoMethod struct {
 	ResponseWireName string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies
 	ExpectedStatus   int
 	ContentType      string
+	NoRetry          bool // from OperationDef.NoRetry — see its doc; drives DoWithContentTypeNoRetry vs DoWithContentType in template.go
 	PaginationStyle  string
 	PageSizeParam    string
 	MaxPageSize      int

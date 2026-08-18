@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
+	"time"
 )
 
 func TestDoMultipart_FileUpload(t *testing.T) {
@@ -179,5 +180,95 @@ func TestDoMultipart_RewindOn429(t *testing.T) {
 	}
 	if got := calls.Load(); got != 2 {
 		t.Errorf("server saw %d calls, want 2 (one 429, one retry)", got)
+	}
+}
+
+// TestDoMultipart_RewindOn500ForIdempotentMethod verifies the generalized
+// retry: a PUT (idempotent) upload rewinds and retries on a transient 500,
+// same as the JSON/XML transport's isRetryableWriteStatus policy.
+func TestDoMultipart_RewindOn500ForIdempotentMethod(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, 2*time.Millisecond, 5*time.Millisecond)
+
+	var calls atomic.Int32
+	mux.HandleFunc("/api/upload", func(w http.ResponseWriter, r *http.Request) {
+		n := calls.Add(1)
+		_, _ = io.Copy(io.Discard, r.Body)
+		if n == 1 {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	payload := strings.Repeat("D", 2048)
+	rd := bytes.NewReader([]byte(payload))
+	err := c.DoMultipart(context.Background(), http.MethodPut, "/api/upload", []MultipartField{
+		{Name: "file", Filename: "pkg.bin", Content: rd},
+	}, http.StatusCreated, nil)
+	if err != nil {
+		t.Fatalf("DoMultipart: %v", err)
+	}
+	if got := calls.Load(); got != 2 {
+		t.Errorf("server saw %d calls, want 2 (one 500, one retry)", got)
+	}
+}
+
+// TestDoMultipart_NoRetryOn500ForPost verifies the non-idempotency guard
+// carries over to multipart: a POST (create) upload must NOT retry on a
+// bare 500, matching isRetryableWriteStatus for the JSON/XML transport.
+func TestDoMultipart_NoRetryOn500ForPost(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, 2*time.Millisecond, 5*time.Millisecond)
+
+	var calls atomic.Int32
+	mux.HandleFunc("/api/create-upload", func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		_, _ = io.Copy(io.Discard, r.Body)
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	rd := bytes.NewReader([]byte("payload"))
+	err := c.DoMultipart(context.Background(), http.MethodPost, "/api/create-upload", []MultipartField{
+		{Name: "file", Filename: "pkg.bin", Content: rd},
+	}, http.StatusCreated, nil)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	apiErr := AsAPIError(err)
+	if apiErr == nil || !apiErr.HasStatus(http.StatusInternalServerError) {
+		t.Fatalf("expected APIResponseError(500), got %v", err)
+	}
+	if got := calls.Load(); got != 1 {
+		t.Errorf("expected exactly 1 call (no retry on POST+500), got %d", got)
+	}
+}
+
+// TestDoMultipart_NoRetryWhenNotRewindable verifies a retryable status
+// (500 on an idempotent method) is NOT retried when Content can't be seeked
+// back to the start — matches the doc comment: the caller must re-invoke
+// with a fresh reader instead.
+func TestDoMultipart_NoRetryWhenNotRewindable(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, 2*time.Millisecond, 5*time.Millisecond)
+
+	var calls atomic.Int32
+	mux.HandleFunc("/api/unseekable-upload", func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		_, _ = io.Copy(io.Discard, r.Body)
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	err := c.DoMultipart(context.Background(), http.MethodPut, "/api/unseekable-upload", []MultipartField{
+		{Name: "file", Filename: "pkg.bin", Content: unseekableReader{r: strings.NewReader("payload")}},
+	}, http.StatusCreated, nil)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if got := calls.Load(); got != 1 {
+		t.Errorf("expected exactly 1 call (not rewindable, must not retry), got %d", got)
 	}
 }

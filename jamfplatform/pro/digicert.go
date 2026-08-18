@@ -103,6 +103,21 @@ func (c *Client) GetDigicertTrustLifecycleManagerDependenciesV1(ctx context.Cont
 	return &result, nil
 }
 
+// CheckDigicertTrustLifecycleManagerPrivilegesV1 check DigiCert account permissions for certificate deployment.
+//
+// Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
+//
+// Parameters:
+//   - id: ID of the DigiCert Trust Lifecycle Manager settings.
+func (c *Client) CheckDigicertTrustLifecycleManagerPrivilegesV1(ctx context.Context, id string) error {
+	prefix := c.transport.TenantPrefix("pro", "v1")
+	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s/privilege-check", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodGet, endpoint, nil, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("CheckDigicertTrustLifecycleManagerPrivilegesV1(%s): %w", id, err)
+	}
+	return nil
+}
+
 // ValidateDigicertClientCertificateV1 validate DigiCert Trust Lifecycle Manager client certificate.
 //
 // Required privileges: create:pro:digicert-settings, update:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Create DigiCert Settings, Update DigiCert Settings.

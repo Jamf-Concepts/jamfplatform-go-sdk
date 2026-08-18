@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
+	"slices"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -64,6 +65,31 @@ func TestAcceptance_Pro_MiscReadsV1(t *testing.T) {
 		t.Fatalf("ListTimeZonesV1: %v", err)
 	}
 	t.Logf("Time zones: %d", len(tzs))
+
+	// Not yet routed by the API gateway (probed 2026-08-16, two credential sets,
+	// an 11.31.0 tenant): the spec declares no required privilege at all, yet
+	// the gateway answers 403 BAD_PERMISSIONS in its own compact error shape —
+	// the same answer a typo'd path gets, so no scope grant will clear it. See
+	// the gateway-vs-Pro note in CLAUDE.md's error-handling section. Logged
+	// rather than fatal so the rest of the batch still runs.
+	env, err := p.GetEnvironmentTypeV2(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Logf("GetEnvironmentTypeV2 not routed by the API gateway: %v", err)
+		} else {
+			t.Fatalf("GetEnvironmentTypeV2: %v", err)
+		}
+	} else {
+		t.Logf("Cloud services environment: %s", env.Environment)
+		// Probed direct against an 11.31.0 sandbox instance (2026-08-16): returned
+		// "production", one of the three values the spec enumerates.
+		if !slices.Contains(pro.EnvironmentTypeEnvironmentValues(), env.Environment) {
+			t.Errorf("environment %q absent from the generated constants %v — spec enum has drifted",
+				env.Environment, pro.EnvironmentTypeEnvironmentValues())
+		}
+	}
 
 	cloud, err := p.GetCloudInformationV1(ctx)
 	if err != nil {

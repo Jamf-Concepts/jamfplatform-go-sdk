@@ -45,6 +45,18 @@ type SpecDef struct {
 	// silently shadow it). Outer key: old schema name. Value: new schema name.
 	SchemaRenames map[string]string `json:"schemaRenames,omitempty"`
 
+	// SchemaCreations adds whole named component schemas the spec no longer
+	// declares but the server still returns. Key: schema name. Value: raw JSON
+	// for an OpenAPI 3 Schema object, which may `$ref` other created schemas.
+	// Applied before every other pass, so a created schema is indistinguishable
+	// from a spec-declared one downstream — SchemaPatches can `$ref` it, and it
+	// is emitted as a Go type once a whitelisted operation reaches it.
+	//
+	// Only for a schema upstream *dropped*: panics if the name already exists,
+	// which is the signal that the spec has been repaired and the entry (and
+	// the patches pointing at it) should be deleted.
+	SchemaCreations map[string]json.RawMessage `json:"schemaCreations,omitempty"`
+
 	// SchemaPatches injects (or replaces) arbitrary OpenAPI schema fragments at
 	// dotted property paths under a named component schema. Used when a spec
 	// omits a richer sub-structure the server actually returns (e.g. policy
@@ -140,15 +152,28 @@ type OperationDef struct {
 	Pagination     string            `json:"pagination,omitempty"` // hasNext, sizeCheck, totalCount, rawArray
 	PageSizeParam  string            `json:"pageSizeParam,omitempty"`
 	MaxPageSize    int               `json:"maxPageSize,omitempty"` // page-size requested per page; defaults to 100. Only raise this once the endpoint's true server-side cap is wire-verified — see CLAUDE.md "Wire-verified pagination limits".
-	Version        string            `json:"version,omitempty"`   // override version for tenantPrefix
-	PathNames      map[string]string `json:"pathNames,omitempty"` // spec param -> Go param name
-	Params         []string          `json:"params,omitempty"`    // "name", "name:type", "spec:type:goName"
+	Version        string            `json:"version,omitempty"`     // override version for tenantPrefix
+	PathNames      map[string]string `json:"pathNames,omitempty"`   // spec param -> Go param name
+	Params         []string          `json:"params,omitempty"`      // "name", "name:type", "spec:type:goName"
 	UnwrapResults  string            `json:"unwrapResults,omitempty"`
 	RequestType    string            `json:"requestType,omitempty"`    // explicit request schema name (used when spec body is untyped, e.g. Classic)
 	ResponseType   string            `json:"responseType,omitempty"`   // explicit response schema name (same)
 	ExpectedStatus int               `json:"expectedStatus,omitempty"` // explicit success status code (default 200)
 	Resolver       *ResolverConfig   `json:"resolver,omitempty"`       // attach name->ID resolver emission to this operation (typically a List op)
 	Resolvers      []ResolverConfig  `json:"resolvers,omitempty"`      // attach multiple resolvers to one operation (e.g. resolve device by name AND by serialNumber)
+
+	// NoRetry opts this operation out of the transport's automatic 5xx retry
+	// (internal/client/retry.go's isRetryableWriteStatus), even though its
+	// HTTP method would otherwise qualify. Set this ONLY when the endpoint
+	// requires a side-channel precondition in its request body — an
+	// optimistic-lock field sourced from a GET taken before the write — that
+	// a blind byte-for-byte retry would replay stale, turning a
+	// successful-but-500ing write into a masked conflict on the retried
+	// attempt (see computer/mobile-device prestage enrollment for the
+	// confirmed live case). This is a small, enumerable exception list, not
+	// a general escape hatch: most PUT endpoints have no such precondition
+	// and should keep the default auto-retry.
+	NoRetry bool `json:"noRetry,omitempty"`
 }
 
 // ResolverConfig declares a name->ID resolver the generator should emit

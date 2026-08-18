@@ -3390,6 +3390,13 @@ type EnrollmentSsoConfig struct {
 	ManagementHint *string   `json:"managementHint"`
 }
 
+// EnvironmentType represents a environment type.
+type EnvironmentType struct {
+	// The cloud services environment type.
+	// Allowed values: see the EnvironmentTypeEnvironment constants.
+	Environment string `json:"environment"`
+}
+
 // EraseDeviceCommand represents a erase device command.
 type EraseDeviceCommand struct {
 	CommandType MDMCommandType `json:"commandType"`
@@ -7431,6 +7438,12 @@ type SmartSearchCriterion struct {
 	Value        string `json:"value"`
 }
 
+// SmtpAuthenticationTypeList represents a smtp authentication type list.
+type SmtpAuthenticationTypeList struct {
+	// Allowed values: see the SmtpAuthenticationTypeListAllowedAuthenticationTypes constants.
+	AllowedAuthenticationTypes []string `json:"allowedAuthenticationTypes"`
+}
+
 // SmtpBasicCredentials represents a smtp basic credentials.
 type SmtpBasicCredentials struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
@@ -7486,6 +7499,9 @@ type SmtpServerTest struct {
 
 // SmtpServerV2 represents a smtp server v2.
 type SmtpServerV2 struct {
+	// The authentication type to use for the SMTP server. Note that NONE and BASIC may not be available
+	// depending on the server configuration. Check allowedAuthenticationTypes for the list of currently
+	// supported values.
 	// Allowed values: see the SmtpServerV2AuthenticationType constants.
 	AuthenticationType    string                     `json:"authenticationType"`
 	BasicAuthCredentials  *SmtpBasicCredentials      `json:"basicAuthCredentials,omitempty"`

@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-// ListBaselines return list of the mSCP baselines.
+// ListBaselines returns list of the mSCP baselines.
 //
 // Required privileges: read:pro:compliance-benchmarks.
 func (c *Client) ListBaselines(ctx context.Context) (*BaselinesResponse, error) {

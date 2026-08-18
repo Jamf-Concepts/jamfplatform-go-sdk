@@ -37,8 +37,12 @@ func testServerWithOpts(t *testing.T, opts ...Option) (*Client, *http.ServeMux) 
 	t.Cleanup(srv.Close)
 	// Disable inter-request pacing in unit tests so the per-method httptest
 	// suite isn't throttled to the default 100ms cadence. The gate's own
-	// behavior is covered in internal/client.
-	clientOpts := append([]Option{jamfplatform.WithMinRequestInterval(0)}, opts...)
+	// behavior is covered in internal/client. Also disable automatic
+	// retry-on-transient-failure: a handler that deliberately keeps
+	// returning e.g. 500 to exercise a caller's error-handling path would
+	// otherwise hang for the production 1s-60s backoff window on every
+	// run. Retry's own behavior is covered in internal/client too.
+	clientOpts := append([]Option{jamfplatform.WithMinRequestInterval(0), jamfplatform.WithRetryPolicy(0, 0, 0)}, opts...)
 	base := jamfplatform.NewClient(srv.URL, "test-id", "test-secret", clientOpts...)
 	return New(base), mux
 }

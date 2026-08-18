@@ -26,7 +26,7 @@ type ApiErrorErrorsItem struct {
 	Field string `json:"field"`
 }
 
-// BaselineInfo represents a baseline info.
+// BaselineInfo Summary information about a compliance baseline including its ID, title, description, and rule count.
 type BaselineInfo struct {
 	BaselineID  string `json:"baselineId"`
 	Description string `json:"description"`
@@ -35,12 +35,12 @@ type BaselineInfo struct {
 	Title       string `json:"title"`
 }
 
-// BaselinesResponse represents a baselines response.
+// BaselinesResponse List of available compliance baselines.
 type BaselinesResponse struct {
 	Baselines []BaselineInfo `json:"baselines"`
 }
 
-// BenchmarkRequestV2 represents a benchmark request v2.
+// BenchmarkRequestV2 Request body for creating a new compliance benchmark from a source baseline.
 type BenchmarkRequestV2 struct {
 	// A detailed description of the benchmark.
 	Description *string `json:"description,omitempty"`
@@ -52,13 +52,14 @@ type BenchmarkRequestV2 struct {
 	// The selected OS versions for this benchmark, default is all available baseline OS versions.
 	SelectedOsVersions *[]OsVersion `json:"selectedOsVersions,omitempty"`
 	// The identifier of the source baseline from which this benchmark is derived.
-	SourceBaselineID string   `json:"sourceBaselineId"`
-	Target           TargetV2 `json:"target"`
+	SourceBaselineID string `json:"sourceBaselineId"`
+	// The target device groups for this benchmark.
+	Target TargetV2 `json:"target"`
 	// A short, descriptive name for the benchmark.
 	Title string `json:"title"`
 }
 
-// BenchmarkResponseV2 represents a benchmark response v2.
+// BenchmarkResponseV2 Detailed view of a compliance benchmark including its configuration, rules, and sync state.
 type BenchmarkResponseV2 struct {
 	// Available OS versions that this baseline supports.
 	AvailableOsVersions []OsVersion `json:"availableOsVersions"`
@@ -74,10 +75,11 @@ type BenchmarkResponseV2 struct {
 	// The user-selected OS versions with full metadata.
 	SelectedOsVersions []OsVersion `json:"selectedOsVersions"`
 	Sources            []Source    `json:"sources"`
-	Target             *TargetV2   `json:"target,omitempty"`
-	TenantID           string      `json:"tenantId"`
-	Title              string      `json:"title"`
-	UpdateAvailable    bool        `json:"updateAvailable"`
+	// The target device group IDs to which a benchmark is deployed.
+	Target          *TargetV2 `json:"target,omitempty"`
+	TenantID        string    `json:"tenantId"`
+	Title           string    `json:"title"`
+	UpdateAvailable bool      `json:"updateAvailable"`
 }
 
 // BenchmarkRuleDevicesResponse Representation of devices for a benchmark rule. Used for drill-down view controller.
@@ -92,19 +94,20 @@ type BenchmarkRulesStatsResponse struct {
 	TotalCount int          `json:"totalCount"`
 }
 
-// BenchmarkV2 represents a benchmark v2.
+// BenchmarkV2 Summary view of a compliance benchmark for list display.
 type BenchmarkV2 struct {
 	Description string `json:"description"`
 	ID          string `json:"id"`
 	Modified    bool   `json:"modified"`
 	// Allowed values: see the BenchmarkV2SyncState constants.
-	SyncState       string    `json:"syncState"`
+	SyncState string `json:"syncState"`
+	// The target device group IDs to which a benchmark is deployed.
 	Target          *TargetV2 `json:"target,omitempty"`
 	Title           string    `json:"title"`
 	UpdateAvailable bool      `json:"updateAvailable"`
 }
 
-// BenchmarksResponseV2 represents a benchmarks response v2.
+// BenchmarksResponseV2 List of compliance benchmarks for the tenant.
 type BenchmarksResponseV2 struct {
 	Benchmarks []BenchmarkV2 `json:"benchmarks"`
 }
@@ -118,27 +121,31 @@ type CompliancePercentage struct {
 type DeviceRuleResult struct {
 	// Device Platform ID.
 	DeviceID   string          `json:"deviceId"`
-	DeviceName any             `json:"deviceName"`
+	DeviceName *string         `json:"deviceName,omitempty"`
 	State      RuleResultState `json:"state"`
 }
 
-// ODVRecommendation represents a o d v recommendation.
+// ODVRecommendation The recommended organization-defined value for a rule on one OS version.
 type ODVRecommendation struct {
-	Hint  string `json:"hint"`
+	// Guidance on what values the rule accepts.
+	Hint string `json:"hint"`
+	// The recommended value for this OS version.
 	Value string `json:"value"`
 }
 
-// ODVRequest represents a o d v request.
+// ODVRequest User-supplied value for an organization-defined value (ODV) rule parameter.
 type ODVRequest struct {
 	Value string `json:"value"`
 }
 
-// OrganizationDefinedValue represents a organization defined value.
+// OrganizationDefinedValue An organization-defined value (ODV) that customizes a parameterized compliance rule.
 type OrganizationDefinedValue struct {
 	Hint        string `json:"hint"`
 	Placeholder string `json:"placeholder"`
 	// Allowed values: see the OrganizationDefinedValueType constants.
-	Type       string                 `json:"type"`
+	Type string `json:"type"`
+	// Validation constraints for an organization-defined value (ODV), specifying allowed range, enum
+	// values, or regex pattern.
 	Validation *ValidationConstraints `json:"validation,omitempty"`
 	Value      string                 `json:"value"`
 }
@@ -152,11 +159,12 @@ type OsInfo struct {
 	OsVersion int    `json:"osVersion"`
 }
 
-// OsSpecificRuleInfo represents a os specific rule info.
+// OsSpecificRuleInfo Per-OS-version overrides of a rule's title, description and recommended organization-defined value.
 type OsSpecificRuleInfo struct {
-	Description string             `json:"description"`
-	ODV         *ODVRecommendation `json:"odv,omitempty"`
-	Title       string             `json:"title"`
+	Description string `json:"description"`
+	// The recommended organization-defined value for a rule on one OS version.
+	ODV   *ODVRecommendation `json:"odv,omitempty"`
+	Title string             `json:"title"`
 }
 
 // OsVersion represents a os version.
@@ -168,34 +176,39 @@ type OsVersion struct {
 	OsVersion int `json:"osVersion"`
 }
 
-// RuleInfo represents a rule info.
+// RuleInfo A compliance rule definition including its title, description, enabled state, supported OS targets, and optional ODV configuration.
 type RuleInfo struct {
-	Description        string                        `json:"description"`
-	Enabled            bool                          `json:"enabled"`
-	ID                 string                        `json:"id"`
-	ODV                *OrganizationDefinedValue     `json:"odv,omitempty"`
+	Description string `json:"description"`
+	Enabled     bool   `json:"enabled"`
+	ID          string `json:"id"`
+	// An organization-defined value (ODV) that customizes a parameterized compliance rule.
+	ODV *OrganizationDefinedValue `json:"odv,omitempty"`
+	// Per-OS-version rule overrides, keyed by OS identifier (MAC_OS_13, MAC_OS_14, ...). Empty when the
+	// rule is identical on every supported OS.
 	OsSpecificDefaults map[string]OsSpecificRuleInfo `json:"osSpecificDefaults"`
-	References         []string                      `json:"references"`
+	References         *[]string                     `json:"references,omitempty"`
 	Reportable         bool                          `json:"reportable"`
-	RuleRelation       *RuleRelation                 `json:"ruleRelation,omitempty"`
-	SectionName        string                        `json:"sectionName"`
-	SmartCard          bool                          `json:"smartCard"`
-	SupportedOs        []OsInfo                      `json:"supportedOs"`
-	Title              string                        `json:"title"`
+	// Dependency and conflict relationships between compliance rules.
+	RuleRelation *RuleRelation `json:"ruleRelation,omitempty"`
+	SectionName  string        `json:"sectionName"`
+	SmartCard    bool          `json:"smartCard"`
+	SupportedOs  []OsInfo      `json:"supportedOs"`
+	Title        string        `json:"title"`
 }
 
-// RuleRelation represents a rule relation.
+// RuleRelation Dependency and conflict relationships between compliance rules.
 type RuleRelation struct {
 	ConflictsWith   []string `json:"conflictsWith"`
 	DefaultDisabled bool     `json:"defaultDisabled"`
 	DependsOn       []string `json:"dependsOn"`
 }
 
-// RuleRequest represents a rule request.
+// RuleRequest A rule configuration within a benchmark request, specifying the rule ID, enabled state, and optional ODV value.
 type RuleRequest struct {
-	Enabled bool        `json:"enabled"`
-	ID      string      `json:"id"`
-	ODV     *ODVRequest `json:"odv,omitempty"`
+	Enabled bool   `json:"enabled"`
+	ID      string `json:"id"`
+	// User-supplied value for an organization-defined value (ODV) rule parameter.
+	ODV *ODVRequest `json:"odv,omitempty"`
 }
 
 // RuleResult represents a rule result.
@@ -212,25 +225,25 @@ type RuleResult struct {
 	Unknown    int    `json:"unknown"`
 }
 
-// Source represents a source.
+// Source A Git source reference identifying a branch and revision of the compliance rules repository.
 type Source struct {
 	Branch   string `json:"branch"`
 	Revision string `json:"revision"`
 }
 
-// SourcedRules represents a sourced rules.
+// SourcedRules A set of compliance rules sourced from one or more Git branches, with the available OS versions.
 type SourcedRules struct {
 	AvailableOsVersions []OsVersion `json:"availableOsVersions"`
 	Rules               []RuleInfo  `json:"rules"`
 	Sources             []Source    `json:"sources"`
 }
 
-// TargetV2 represents a target v2.
+// TargetV2 The target device group IDs to which a benchmark is deployed.
 type TargetV2 struct {
 	DeviceGroups []string `json:"deviceGroups"`
 }
 
-// ValidationConstraints represents a validation constraints.
+// ValidationConstraints Validation constraints for an organization-defined value (ODV), specifying allowed range, enum values, or regex pattern.
 type ValidationConstraints struct {
 	EnumValues []string `json:"enumValues"`
 	Max        int      `json:"max"`

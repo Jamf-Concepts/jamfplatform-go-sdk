@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
+	"slices"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -69,6 +70,43 @@ func TestAcceptance_Pro_Settings_SmtpServerV2Read(t *testing.T) {
 		t.Fatalf("GetSmtpServerV2: %v", err)
 	}
 	t.Logf("SMTP server: enabled=%v authType=%s", s.Enabled, s.AuthenticationType)
+}
+
+// The allowed set is gated at instance/knobs level and is independent of the
+// current SMTP settings, so it can legitimately be narrower than the
+// SmtpServerV2AuthenticationType constants.
+//
+// Not yet routed by the API gateway (probed 2026-08-16, two credential sets, an
+// 11.31.0 tenant): 403 BAD_PERMISSIONS in the gateway's own compact error
+// shape, byte-identical to what a typo'd path returns — see the gateway-vs-Pro
+// note in CLAUDE.md's error-handling section. Not a privilege problem, so no
+// scope grant will clear it. Skip rather than fail; tighten to t.Fatalf once
+// the gateway allowlists the path.
+func TestAcceptance_Pro_Settings_SmtpServerAllowedAuthTypesV2(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+
+	l, err := pro.New(c).ListSmtpServerAllowedAuthTypesV2(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Skipf("allowed-auth-types not routed by the API gateway (403 while GetSmtpServerV2 200s on the same scope): %v", err)
+		}
+		t.Fatalf("ListSmtpServerAllowedAuthTypesV2: %v", err)
+	}
+	t.Logf("SMTP allowed auth types: %v", l.AllowedAuthenticationTypes)
+
+	// Probed direct against an 11.31.0 sandbox instance (2026-08-16, bypassing the
+	// gateway): the instance returned exactly the four values the spec
+	// enumerates, so every value the server can send is nameable as a constant.
+	// A value outside the set means the spec's enum has drifted.
+	allowed := pro.SmtpAuthenticationTypeListAllowedAuthenticationTypesValues()
+	for _, got := range l.AllowedAuthenticationTypes {
+		if !slices.Contains(allowed, got) {
+			t.Errorf("server returned auth type %q absent from the generated constants %v — spec enum has drifted", got, allowed)
+		}
+	}
 }
 
 func TestAcceptance_Pro_Settings_SmtpServerHistoryV1(t *testing.T) {

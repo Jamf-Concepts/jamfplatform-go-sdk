@@ -347,8 +347,45 @@ func resolvePatchRefs(ref *openapi3.SchemaRef, doc *openapi3.T) {
 	if ref.Value.Items != nil {
 		resolvePatchRefs(ref.Value.Items, doc)
 	}
+	if ref.Value.AdditionalProperties.Schema != nil {
+		resolvePatchRefs(ref.Value.AdditionalProperties.Schema, doc)
+	}
 	for _, s := range ref.Value.AllOf {
 		resolvePatchRefs(s, doc)
+	}
+}
+
+// applySchemaCreations adds whole named component schemas a spec has stopped
+// declaring. Panics when the name already exists: the only reason to create a
+// schema here is that upstream dropped one the server still returns, so the
+// name reappearing means the spec has been repaired and the config entry (plus
+// whatever SchemaPatches referenced it) should be deleted. Failing loudly at
+// generate time is the point — a silent skip would leave the local definition
+// shadowing the real one indefinitely.
+//
+// Runs first, before applySchemaRenames, so created schemas are indistinguishable
+// from spec-declared ones for every pass that follows.
+func applySchemaCreations(doc *openapi3.T, creations map[string]json.RawMessage) {
+	if doc == nil || doc.Components == nil || len(creations) == 0 {
+		return
+	}
+	if doc.Components.Schemas == nil {
+		doc.Components.Schemas = openapi3.Schemas{}
+	}
+	for _, name := range sortedKeys(creations) {
+		if _, exists := doc.Components.Schemas[name]; exists {
+			panic(fmt.Sprintf("schemaCreations[%q]: schema already declared by the spec — delete the config entry", name))
+		}
+		sub, err := parsePatchSchema(creations[name])
+		if err != nil {
+			panic(fmt.Sprintf("schemaCreations[%q]: %v", name, err))
+		}
+		doc.Components.Schemas[name] = sub
+	}
+	// Second pass: a created schema may $ref another created one, so refs are
+	// resolved only once every name is present.
+	for _, name := range sortedKeys(creations) {
+		resolvePatchRefs(doc.Components.Schemas[name], doc)
 	}
 }
 
@@ -426,6 +463,133 @@ func flattenClassicSizeWrappers(doc *openapi3.T) {
 			flattenClassicSizeWrappersInSchema(ref.Value, visited)
 		}
 	}
+}
+
+// normalizeNullableUnions rewrites OpenAPI 3.1's two nullability idioms into
+// the 3.0 shape (`nullable: true`) the rest of the generator reasons about.
+// kin-openapi models 3.1 faithfully, and `Types.Is` only matches a
+// single-element type list, so without this pass every nullable property falls
+// through schemaRefToGoType's default branch and lands as `any`:
+//
+//	type: [string, "null"]                    -> type: string,  nullable: true
+//	oneOf: [{$ref: X}, {type: "null"}]        -> $ref: X,       nullable: true
+//
+// Both forms are how Jamf's newer 3.1 specs (compliance benchmarks, DDM
+// report) spell an optional object or a nullable scalar. The 3.0 specs
+// (Pro, Classic, devices) contain neither, so this is a no-op for them.
+//
+// Idempotent, so it runs for published (api/) specs too — the transform's
+// output contains no 3.1 union left to rewrite.
+//
+// Runs before hoistInlineObjects and collectReferencedSchemas: hoisting must
+// see the collapsed shape, and a $ref reachable only through a nullable union
+// has to be visible to the reference walker or its type is never emitted.
+func normalizeNullableUnions(doc *openapi3.T) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
+		return
+	}
+	seen := map[*openapi3.Schema]bool{}
+	var walk func(ref *openapi3.SchemaRef, collapsible bool) *openapi3.SchemaRef
+	walk = func(ref *openapi3.SchemaRef, collapsible bool) *openapi3.SchemaRef {
+		if ref == nil || ref.Value == nil {
+			return ref
+		}
+		if collapsible {
+			if repl, ok := collapseNullableOneOf(ref); ok {
+				ref = repl
+			}
+		}
+		s := ref.Value
+		if seen[s] {
+			return ref
+		}
+		seen[s] = true
+		stripNullFromTypeList(s)
+		for _, pname := range sortedKeys(s.Properties) {
+			s.Properties[pname] = walk(s.Properties[pname], true)
+		}
+		s.Items = walk(s.Items, true)
+		if s.AdditionalProperties.Schema != nil {
+			s.AdditionalProperties.Schema = walk(s.AdditionalProperties.Schema, true)
+		}
+		for _, list := range []openapi3.SchemaRefs{s.AllOf, s.AnyOf, s.OneOf} {
+			for i := range list {
+				list[i] = walk(list[i], false)
+			}
+		}
+		return ref
+	}
+	// A named component is never itself collapsed: replacing the map entry
+	// would drop the schema name the rest of the generator emits a type for.
+	for _, name := range sortedKeys(doc.Components.Schemas) {
+		walk(doc.Components.Schemas[name], false)
+	}
+}
+
+// collapseNullableOneOf rewrites `oneOf: [{$ref: X}, {type: "null"}]` to a
+// plain reference to X marked nullable. Returns false unless the union is
+// exactly that shape: one non-null member, at least one bare `type: "null"`,
+// and no sibling constraints of its own that the collapse would discard.
+func collapseNullableOneOf(ref *openapi3.SchemaRef) (*openapi3.SchemaRef, bool) {
+	if ref.Ref != "" || ref.Value == nil {
+		return ref, false
+	}
+	s := ref.Value
+	if len(s.OneOf) < 2 || len(s.AllOf) > 0 || len(s.AnyOf) > 0 ||
+		len(s.Properties) > 0 || len(s.Enum) > 0 || (s.Type != nil && len(*s.Type) > 0) {
+		return ref, false
+	}
+	var member *openapi3.SchemaRef
+	nulls := 0
+	for _, m := range s.OneOf {
+		if m == nil || m.Value == nil {
+			return ref, false
+		}
+		if m.Ref == "" && m.Value.Type.Is("null") {
+			nulls++
+			continue
+		}
+		if member != nil {
+			return ref, false
+		}
+		member = m
+	}
+	if nulls == 0 || member == nil {
+		return ref, false
+	}
+	out := &openapi3.SchemaRef{Ref: member.Ref, Value: member.Value}
+	// A description sitting beside the oneOf is the only documentation the
+	// property carries; keep it when the target has none of its own. When the
+	// member is a $ref there is nowhere to hang it — the referenced schema's
+	// own description is what the field comment uses.
+	if member.Ref == "" && out.Value.Description == "" {
+		out.Value.Description = s.Description
+	}
+	out.Value.Nullable = true
+	return out, true
+}
+
+// stripNullFromTypeList rewrites 3.1's `type: [T, "null"]` union to `type: T`
+// with `nullable: true`. Unions of two or more non-null types are left alone —
+// there is no single Go type for them, and `any` is the honest answer.
+func stripNullFromTypeList(s *openapi3.Schema) {
+	if s.Type == nil || len(*s.Type) < 2 {
+		return
+	}
+	kept := make(openapi3.Types, 0, len(*s.Type))
+	sawNull := false
+	for _, t := range *s.Type {
+		if t == "null" {
+			sawNull = true
+			continue
+		}
+		kept = append(kept, t)
+	}
+	if !sawNull || len(kept) != 1 {
+		return
+	}
+	s.Type = &kept
+	s.Nullable = true
 }
 
 func flattenClassicSizeWrappersInSchema(schema *openapi3.Schema, visited map[*openapi3.Schema]bool) {

@@ -44,42 +44,65 @@ type MultipartField struct {
 // O(file). result follows the same rules as Do — either a JSON-unmarshal
 // target or *[]byte for raw responses.
 //
-// 429/Retry-After retry is applied only when every file part's Content is an
-// io.Seeker (rewindable). Otherwise a 429 surfaces as an APIResponseError and
-// the caller is expected to re-invoke with a fresh Content reader.
+// Retries a transient failure (429, 503, or 500/502/504 on an idempotent
+// method — see isRetryableWriteStatus) up to retryMax times, with the same
+// backoff policy as the JSON/XML transport (jamfBackoff), but ONLY when
+// every file part's Content is an io.Seeker (rewindable): sendMultipart
+// streams the body through an io.Pipe consumed exactly once, so a retry can
+// only resend it by seeking each part back to the start and re-streaming.
+// Otherwise the failure surfaces as an APIResponseError/transport error
+// immediately and the caller is expected to re-invoke with fresh Content
+// readers.
+//
+// This is a separate, manual retry loop rather than a ride on c.httpClient's
+// automatic one deliberately: retryablehttp makes a request body replayable
+// by buffering it wholesale (see FromRequest/getBodyReaderAndContentLength),
+// which for a multi-GB package upload would defeat the entire point of
+// streaming it — see sendMultipart's use of c.uploadClient instead of
+// c.httpClient.
 func (c *Transport) DoMultipart(ctx context.Context, method, path string, fields []MultipartField, expectedStatus int, result any) error {
 	fullURL := c.buildURL(path)
 	if err := checkDeniedPath(method, fullURL); err != nil {
 		return err
 	}
 
-	resp, err := c.sendMultipart(ctx, method, fullURL, fields)
-	if err != nil {
-		return err
-	}
-	// Retry once on 429 if all file parts are rewindable and the server
-	// provides a Retry-After delay. The ctx bounds the total wait — callers
-	// that want a hard ceiling pass a deadline context. We do not cap the
-	// delay ourselves: a server-specified Retry-After of >N seconds is a
-	// real signal and silently skipping the retry would surface a 429 error
-	// with no indication that a retry was possible.
-	if resp.StatusCode == http.StatusTooManyRequests && multipartRewindable(fields) {
-		delay := parseRetryAfter(resp.Header.Get("Retry-After"), time.Now())
-		if delay > 0 {
+	var resp *http.Response
+	var err error
+	for attempt := 0; ; attempt++ {
+		resp, err = c.sendMultipart(ctx, method, fullURL, fields)
+
+		retryable := false
+		switch {
+		case err != nil:
+			// A network-level failure happens before anything reaches the
+			// server, so it's always safe to retry regardless of method —
+			// same reasoning as jamfCheckRetry's resp == nil branch.
+			retryable = true
+		case isRetryableWriteStatus(method, resp.StatusCode):
+			retryable = true
+		}
+		if !retryable || attempt >= retryMax || !multipartRewindable(fields) {
+			break
+		}
+
+		wait := jamfBackoff(retryWaitMin, retryWaitMax, attempt, resp)
+		if resp != nil {
 			_ = resp.Body.Close()
-			if err := rewindMultipart(fields); err != nil {
-				return err
-			}
-			select {
-			case <-time.After(delay):
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-			resp, err = c.sendMultipart(ctx, method, fullURL, fields)
+		}
+		if rerr := rewindMultipart(fields); rerr != nil {
+			return rerr
+		}
+		select {
+		case <-time.After(wait):
+		case <-ctx.Done():
 			if err != nil {
 				return err
 			}
+			return ctx.Err()
 		}
+	}
+	if err != nil {
+		return err
 	}
 	return c.handleMultipartResponse(ctx, resp, expectedStatus, result)
 }
@@ -115,7 +138,15 @@ func (c *Transport) sendMultipart(ctx context.Context, method, fullURL string, f
 		c.logger.LogRequest(ctx, method, fullURL, []byte("<multipart body>"))
 	}
 
-	resp, err := c.httpClient.Do(req)
+	// Deliberately c.uploadClient, not c.httpClient: req's body is a live
+	// io.Pipe, consumed exactly once. Routing it through the retry-wrapped
+	// client would make retryablehttp buffer the entire body into memory up
+	// front (its only fallback for a non-seekable io.Reader) just to make it
+	// theoretically replayable — for a multi-GB package upload that defeats
+	// the whole point of streaming. Retrying multipart requests is handled
+	// one layer up, in DoMultipart, by re-streaming from a rewound source
+	// instead.
+	resp, err := c.uploadClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("API request failed: %w", err)
 	}
