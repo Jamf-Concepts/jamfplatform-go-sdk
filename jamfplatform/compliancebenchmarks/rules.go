@@ -15,13 +15,16 @@ import (
 // GetBaselineRules get list of rules for given baseline.
 //
 // Required privileges: read:pro:compliance-benchmarks.
+//
+// Parameters:
+//   - baselineID: Given baseline ID.
 func (c *Client) GetBaselineRules(ctx context.Context, baselineID string) (*SourcedRules, error) {
 	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
 	var result SourcedRules
 	endpoint := prefix + "/rules"
 	params := url.Values{}
 	if baselineID != "" {
-		params.Set("baselineId", baselineID)
+		params.Set("baseline-id", baselineID)
 	}
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
