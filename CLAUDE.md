@@ -148,7 +148,7 @@ Do **not** fall back to the source specs in `public-apis-oas/redocly-implementat
 
 **Spec/server disagreements encoded in `config.json`** — all found by probing, none inferable from the spec:
 
-- `PUT /v1/…/groups/{id}` answers **200 with the updated `Group`**, not the spec's 204 no-content (`expectedStatus` + `responseType`).
+- `PUT /v1/…/groups/{id}` answers **200 with the updated `Group`**, not the spec's 204 no-content (`expectedStatus` + `responseType`). This is the only PUT that disagrees: `PUT dns/search-domains`, `PUT dns/custom-hostname-mappings`, `PUT uem-connect/.../enablement`, and `PUT uem-connect/.../sync-settings` were each wire-probed (idempotent round-trip — GET current state, PUT it back unchanged, confirm nothing moved) and all four genuinely return **204**, matching the spec with no override needed.
 - `POST /ztna/apps` and `POST /ztna/grouped-gateways` answer **201 with the full resource object**, where the spec declares the shared `CreateResponse` (`{id, href}`) — of which the server sends only `id`, never `href`. Both carry a `responseType` override so callers get the created object rather than a reference to it. `POST /ztna/gateways` shares that spec response and is left on it: creating a gateway provisions real egress infrastructure, so its body was never probed, and `CreateResponse` still picks up the top-level `id` its two siblings return.
 - `ZoneRef.href` is `required` but arrives `null`, and the create's `Location` header is a bare ID rather than the documented canonical URL. Only `id` is usable.
 
