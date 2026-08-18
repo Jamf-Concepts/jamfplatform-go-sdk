@@ -81,7 +81,7 @@ func TestParameterComment(t *testing.T) {
 
 	m := GoMethod{
 		PathParams:  []GoPathParam{{SpecName: "id", GoName: "id"}, {SpecName: "subset", GoName: "subset"}},
-		QueryParams: []ExtraParam{{Spec: "filter", Go: "filter"}, {Spec: "undocumented-key", Go: "undocumentedKey"}},
+		QueryParams: []ExtraParam{{Spec: "filter", Go: "filter"}, {Spec: "undocumented-key", Go: "undocumentedKey", Undocumented: true}},
 	}
 	pathItem := &openapi3.PathItem{Parameters: openapi3.Parameters{param("id", "ID to filter by")}}
 	op := &openapi3.Operation{Parameters: openapi3.Parameters{
@@ -90,7 +90,10 @@ func TestParameterComment(t *testing.T) {
 		param("ignored", "Not in the Go signature, must not appear"),
 	}}
 
-	got := parameterComment(m, pathItem, op, nil)
+	got, err := parameterComment(m, pathItem, op, nil)
+	if err != nil {
+		t.Fatalf("parameterComment: %v", err)
+	}
 	wantLines := []string{
 		"\n//\n// Parameters:",
 		"//   - id: ID to filter by.",
@@ -102,18 +105,46 @@ func TestParameterComment(t *testing.T) {
 	if want := strings.Join(wantLines, "\n"); got != want {
 		t.Errorf("parameterComment mismatch\ngot:\n%s\nwant:\n%s", got, want)
 	}
-	// Params declared in config but absent from the spec are skipped, not
-	// emitted as empty entries.
+	// A param declared ":undocumented" is skipped, not emitted as an empty
+	// entry — the spec genuinely says nothing about it.
 	if strings.Contains(got, "undocumentedKey") {
-		t.Error("config-only param leaked into the comment")
+		t.Error("undocumented param leaked into the comment")
 	}
 
 	// Nothing documentable → no block at all, so the method keeps its
 	// single-line godoc.
 	bare := GoMethod{PathParams: []GoPathParam{{SpecName: "id", GoName: "id"}}}
 	bareItem := &openapi3.PathItem{Parameters: openapi3.Parameters{param("id", "")}}
-	if got := parameterComment(bare, bareItem, &openapi3.Operation{}, nil); got != "" {
-		t.Errorf("undescribed param produced %q, want empty", got)
+	if got, err := parameterComment(bare, bareItem, &openapi3.Operation{}, nil); err != nil || got != "" {
+		t.Errorf("undescribed param produced (%q, %v), want (\"\", nil)", got, err)
+	}
+}
+
+func TestParameterCommentRejectsUnmatchedQueryParam(t *testing.T) {
+	m := GoMethod{
+		HTTPMethod:  "GET",
+		SpecPath:    "/v1/tenant/{tenantId}/rules",
+		QueryParams: []ExtraParam{{Spec: "baselineId", Go: "baselineID"}},
+	}
+	op := &openapi3.Operation{Parameters: openapi3.Parameters{
+		{Value: &openapi3.Parameter{Name: "baseline-id", Description: "Given baseline ID"}},
+	}}
+
+	got, err := parameterComment(m, nil, op, nil)
+	if err == nil {
+		t.Fatal("expected an error for a config param absent from the spec, got nil")
+	}
+	if !strings.Contains(err.Error(), "baselineId") || !strings.Contains(err.Error(), "baseline-id") {
+		t.Errorf("error %q should name both the unmatched config param and the spec's actual param", err)
+	}
+	if got != "" {
+		t.Errorf("got %q, want empty string alongside the error", got)
+	}
+
+	// Marking the same mismatch ":undocumented" opts it out of the check.
+	m.QueryParams[0].Undocumented = true
+	if _, err := parameterComment(m, nil, op, nil); err != nil {
+		t.Errorf("undocumented opt-out should suppress the error, got %v", err)
 	}
 }
 
@@ -131,7 +162,10 @@ func TestParameterCommentNamesEmittedEnumTypes(t *testing.T) {
 	m := GoMethod{PathParams: []GoPathParam{{SpecName: "notificationType", GoName: "notificationType"}}}
 	op := &openapi3.Operation{Parameters: openapi3.Parameters{refd}}
 
-	got := parameterComment(m, nil, op, map[string]bool{"NotificationType": true})
+	got, err := parameterComment(m, nil, op, map[string]bool{"NotificationType": true})
+	if err != nil {
+		t.Fatalf("parameterComment: %v", err)
+	}
 	if !strings.Contains(got, "Allowed values: see the NotificationType constants.") {
 		t.Errorf("expected a pointer to the emitted type, got:\n%s", got)
 	}
@@ -141,7 +175,10 @@ func TestParameterCommentNamesEmittedEnumTypes(t *testing.T) {
 
 	// The same schema when NO type is emitted for it (enum reachable only from
 	// a parameter) must fall back to the inline list.
-	got = parameterComment(m, nil, op, nil)
+	got, err = parameterComment(m, nil, op, nil)
+	if err != nil {
+		t.Fatalf("parameterComment: %v", err)
+	}
 	if !strings.Contains(got, `"APNS_CERT_REVOKED", "GSX_CERT_EXPIRED"`) {
 		t.Errorf("expected an inline list with no emitted type, got:\n%s", got)
 	}

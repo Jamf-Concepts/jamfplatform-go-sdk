@@ -376,7 +376,7 @@
           "op": "GET /v1/tenant/{tenantId}/rules",
           "name": "GetBaselineRules",
           "params": [
-            "baselineId:string:baselineID"
+            "baseline-id:string:baselineID"
           ]
         },
         {
