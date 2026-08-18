@@ -2707,5 +2707,6 @@
       "description": "Read-only catalogue of predefined SaaS application definitions. Reference an `id` as `predefinedAppId` when creating an App based on a known SaaS app.\n",
       "name": "Predefined Apps"
     }
-  ]
+  ],
+  "x-jamf-tenant-path-version": "v1"
 }

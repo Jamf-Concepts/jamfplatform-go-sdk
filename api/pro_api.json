@@ -24301,6 +24301,7 @@
           "self-service-branding-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:self-service-branding-configuration"
         ],
@@ -24689,6 +24690,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-rate-limit": false,
         "x-required-privileges": [
           "create:pro:accounts"
@@ -24732,6 +24734,7 @@
           "accounts"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:accounts"
         ],
@@ -24884,6 +24887,7 @@
           "activation-code"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "update:pro:activation-code"
         ],
@@ -25022,6 +25026,7 @@
           "activation-code"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:activation-code"
         ],
@@ -25171,6 +25176,7 @@
           "activation-code"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "update:pro:activation-code"
         ],
@@ -25523,6 +25529,7 @@
           "advanced-mobile-device-searches"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:advanced-mobile-device-searches"
         ],
@@ -25783,6 +25790,7 @@
           "advanced-user-content-searches"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:advanced-user-content-searches"
         ],
@@ -26026,6 +26034,7 @@
           "api-integrations"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "create:pro:api-integrations"
         ],
@@ -26079,6 +26088,7 @@
           "api-integrations"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:api-integrations"
         ],
@@ -26581,6 +26591,7 @@
           "api-roles"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:api-roles"
         ],
@@ -27033,6 +27044,7 @@
           "app-request-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:app-request-settings"
         ],
@@ -27158,6 +27170,7 @@
           "app-request-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:app-request-settings"
         ],
@@ -27635,6 +27648,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:buildings"
         ],
@@ -28071,6 +28085,7 @@
           "buildings"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:buildings"
         ],
@@ -28691,6 +28706,7 @@
           "categories"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:categories"
         ],
@@ -28949,6 +28965,7 @@
           "cloud-azure"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:ldap-servers"
         ],
@@ -29144,6 +29161,7 @@
           "cloud-distribution-point"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:cloud-distribution-point"
         ],
@@ -29246,6 +29264,7 @@
           "cloud-distribution-point"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "update:pro:cloud-distribution-point"
         ],
@@ -30960,6 +30979,7 @@
           "computer-extension-attributes"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "update:pro:computer-extension-attributes"
         ],
@@ -32829,6 +32849,7 @@
           "csa"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:cloud-services-settings"
         ],
@@ -32966,7 +32987,8 @@
           "dashboard"
         ],
         "x-action": true,
-        "x-authentication-required": true
+        "x-authentication-required": true,
+        "x-jamf-expected-status": 202
       }
     },
     "/v1/tenant/{tenantId}/ddm/{clientManagementId}/status-items": {
@@ -33948,6 +33970,7 @@
           "device-communication-settings"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:automatically-renew-mdm-profile-settings"
         ],
@@ -34203,6 +34226,7 @@
           "device-enrollments"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:device-enrollment-program-instances"
         ],
@@ -35064,6 +35088,7 @@
           "distribution-point"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:distribution-points"
         ],
@@ -35490,6 +35515,7 @@
           "dock-items"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:dock-items"
         ],
@@ -35542,6 +35568,7 @@
           "dock-items"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:dock-items"
         ],
@@ -36016,6 +36043,7 @@
           "enrollment-customization-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:enrollment-customizations"
         ],
@@ -36207,6 +36235,7 @@
           "enrollment-customization-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:enrollment-customizations"
         ],
@@ -36477,6 +36506,7 @@
           "enrollment-customization-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:enrollment-customizations"
         ],
@@ -36747,6 +36777,7 @@
           "enrollment-customization-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:enrollment-customizations"
         ],
@@ -37109,6 +37140,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-05-28",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:computer-groups",
           "delete:pro:mobile-device-groups"
@@ -37658,6 +37690,7 @@
           "gsx-connection"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:gsx-connection"
         ],
@@ -37700,6 +37733,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "read:pro:gsx-connection"
         ],
@@ -37730,7 +37764,8 @@
         "tags": [
           "health-check"
         ],
-        "x-authentication-required": true
+        "x-authentication-required": true,
+        "x-jamf-expected-status": 204
       }
     },
     "/v1/tenant/{tenantId}/health-status": {
@@ -38041,6 +38076,7 @@
           "impact-alert-notification-settings"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:impact-alert-notification-settings"
         ],
@@ -38276,6 +38312,7 @@
           "jamf-connect"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "read:pro:jamf-connect-deployments",
           "read:pro:jamf-connect-settings"
@@ -38524,6 +38561,7 @@
           "jamf-connect"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "deploy:pro:jamf-connect-deployment-retry"
         ],
@@ -38691,6 +38729,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "read:pro:computer-check-in",
           "execute:pro:computer-commands"
@@ -38934,6 +38973,7 @@
           "jamf-protect"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:jamf-protect-settings"
         ],
@@ -39186,6 +39226,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "deploy:pro:jamf-protect-deployment-retry"
         ],
@@ -39395,6 +39436,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "read:pro:jamf-protect-settings"
         ],
@@ -39700,6 +39742,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2025-08-28",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:jamf-cloud-distribution-service-files"
         ],
@@ -39806,6 +39849,7 @@
         "x-action": true,
         "x-authentication-required": true,
         "x-deprecation-date": "2025-08-28",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "read:pro:jamf-cloud-distribution-service-files"
         ],
@@ -40259,6 +40303,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "update:pro:retention-policy"
         ],
@@ -40296,6 +40341,7 @@
           "log-flushing"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:retention-policy"
         ],
@@ -41821,6 +41867,7 @@
           "mdm-renewal"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "execute:pro:computer-commands",
           "execute:pro:mobile-device-commands"
@@ -42081,7 +42128,8 @@
           "mobile-device-apps"
         ],
         "x-action": true,
-        "x-authentication-required": false
+        "x-authentication-required": false,
+        "x-jamf-expected-status": 204
       }
     },
     "/v1/tenant/{tenantId}/mobile-device-enrollment-profile/{id}/download-profile": {
@@ -42454,6 +42502,7 @@
           "mobile-device-extension-attributes"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "update:pro:mobile-device-extension-attributes"
         ],
@@ -43009,6 +43058,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-05-28",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:mobile-device-groups"
         ],
@@ -43137,6 +43187,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-05-28",
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:mobile-device-groups"
         ],
@@ -43419,6 +43470,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-05-28",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:mobile-device-groups"
         ],
@@ -43751,6 +43803,7 @@
           "jamf-pro-notifications"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "execute:pro:dismiss-notifications"
         ],
@@ -44387,6 +44440,7 @@
           "onboarding"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:onboarding-configuration"
         ],
@@ -44667,6 +44721,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:packages"
         ],
@@ -45103,6 +45158,7 @@
           "packages"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:packages"
         ],
@@ -45275,6 +45331,7 @@
           "packages"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "read:pro:packages",
           "update:pro:packages"
@@ -45374,6 +45431,7 @@
           "packages"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "read:pro:packages",
           "update:pro:packages"
@@ -45668,6 +45726,7 @@
           "parent-app-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:parent-app-settings"
         ],
@@ -45952,6 +46011,7 @@
           "adcs-settings"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:ad-cs-settings"
         ],
@@ -46059,6 +46119,7 @@
           "adcs-settings"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:ad-cs-settings"
         ],
@@ -46647,6 +46708,7 @@
           "digicert"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:digicert-settings"
         ],
@@ -46704,6 +46766,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "create:pro:digicert-settings",
           "update:pro:digicert-settings"
@@ -46768,6 +46831,7 @@
           "digicert"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:digicert-settings"
         ],
@@ -46885,6 +46949,7 @@
           "digicert"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:digicert-settings"
         ],
@@ -47050,6 +47115,7 @@
           "digicert"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "read:pro:digicert-settings"
         ],
@@ -47108,6 +47174,7 @@
           "venafi-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:pki"
         ],
@@ -47170,6 +47237,7 @@
           "venafi-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:pki"
         ],
@@ -47582,6 +47650,7 @@
           "venafi-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:pki"
         ],
@@ -47705,6 +47774,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:pki"
         ],
@@ -47757,6 +47827,7 @@
           "venafi-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:pki"
         ],
@@ -47896,6 +47967,7 @@
           "venafi-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:pki"
         ],
@@ -48076,6 +48148,7 @@
           "re-enrollment-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:re-enrollment"
         ],
@@ -48194,6 +48267,7 @@
           "re-enrollment-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:re-enrollment"
         ],
@@ -48450,6 +48524,7 @@
           "return-to-service"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:return-to-service-configurations"
         ],
@@ -49250,6 +49325,7 @@
           "scripts"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:scripts"
         ],
@@ -49284,7 +49360,8 @@
         "tags": [
           "self-service-plus"
         ],
-        "x-authentication-required": true
+        "x-authentication-required": true,
+        "x-jamf-expected-status": 204
       }
     },
     "/v1/tenant/{tenantId}/self-service-plus/settings": {
@@ -49359,6 +49436,7 @@
           "self-service-plus"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:self-service"
         ],
@@ -49465,6 +49543,7 @@
           "self-service-branding-ios"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:self-service-branding-configuration"
         ],
@@ -49517,6 +49596,7 @@
           "self-service-branding-ios"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:self-service-branding-configuration"
         ],
@@ -49739,6 +49819,7 @@
           "self-service-branding-macos"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:self-service-branding-configuration"
         ],
@@ -49791,6 +49872,7 @@
           "self-service-branding-macos"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:self-service-branding-configuration"
         ],
@@ -50087,6 +50169,7 @@
           "self-service"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:self-service"
         ],
@@ -50423,6 +50506,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:activation-code",
           "read:pro:jss-information"
@@ -50746,6 +50830,7 @@
           "smtp-server"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:smtp-server"
         ],
@@ -50799,6 +50884,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "read:pro:smtp-server"
         ],
@@ -51103,6 +51189,7 @@
           "supervision-identities-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:apple-configurator-enrollment"
         ],
@@ -51163,6 +51250,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:apple-configurator-enrollment"
         ],
@@ -51215,6 +51303,7 @@
           "supervision-identities-preview"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:apple-configurator-enrollment"
         ],
@@ -51703,6 +51792,7 @@
           "teacher-app"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:teacher-app-settings"
         ],
@@ -51978,7 +52068,8 @@
         "tags": [
           "jamf-pro-user-account-settings"
         ],
-        "x-authentication-required": true
+        "x-authentication-required": true,
+        "x-jamf-expected-status": 204
       },
       "get": {
         "description": "Gets the user setting for the authenticated user and key.\n",
@@ -52287,6 +52378,7 @@
           "users"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:user"
         ],
@@ -52651,6 +52743,7 @@
           "volume-purchasing-locations"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:volume-purchasing-locations"
         ],
@@ -53058,6 +53151,7 @@
           "volume-purchasing-locations"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:volume-purchasing-locations"
         ],
@@ -53333,6 +53427,7 @@
           "volume-purchasing-subscriptions"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:volume-purchasing-locations"
         ],
@@ -54025,6 +54120,7 @@
           "cloud-ldap"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:ldap-servers"
         ],
@@ -54791,6 +54887,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-05-28",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:computer-groups"
         ],
@@ -54919,6 +55016,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-05-28",
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "update:pro:computer-groups"
         ],
@@ -55125,6 +55223,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-05-28",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:computer-groups"
         ],
@@ -55263,6 +55362,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-05-28",
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "update:pro:computer-groups"
         ],
@@ -55452,6 +55552,7 @@
           "computer-inventory-collection-settings"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:custom-paths"
         ],
@@ -56825,6 +56926,7 @@
           "enrollment-customization"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:enrollment-customizations"
         ],
@@ -56911,6 +57013,7 @@
           "enrollment-customization"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:enrollment-customizations",
           "read:pro:enrollment-customizations"
@@ -58573,6 +58676,7 @@
           "inventory-preload"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:inventory-preload-records"
         ],
@@ -60610,6 +60714,7 @@
           "mobile-device-groups"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:pro:mobile-device-groups"
         ],
@@ -63495,6 +63600,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:patch-policies"
         ],
@@ -63541,6 +63647,7 @@
         ],
         "x-action": true,
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:patch-policies"
         ],
@@ -63840,6 +63947,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-07-14",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:patch-management-software-titles"
         ],
@@ -65115,6 +65223,7 @@
           "sso-certificate"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:sso-settings"
         ],
@@ -65452,7 +65561,8 @@
         "tags": [
           "jamf-pro-account-preferences"
         ],
-        "x-authentication-required": true
+        "x-authentication-required": true,
+        "x-jamf-expected-status": 204
       }
     },
     "/v3/tenant/{tenantId}/check-in": {
@@ -65663,6 +65773,7 @@
           "client-check-in"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computer-check-in"
         ],
@@ -66589,6 +66700,7 @@
           "computer-prestages"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:computer-prestage-enrollments"
         ],
@@ -66997,6 +67109,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-07-14",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:computers"
         ],
@@ -67097,6 +67210,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-07-14",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:computers"
         ],
@@ -67321,6 +67435,7 @@
         ],
         "x-authentication-required": true,
         "x-deprecation-date": "2026-07-14",
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:computers"
         ],
@@ -67766,6 +67881,7 @@
           "enrollment"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:user-initiated-enrollment"
         ],
@@ -68137,6 +68253,7 @@
           "enrollment"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "update:pro:user-initiated-enrollment"
         ],
@@ -68409,6 +68526,7 @@
           "mobile-device-prestages"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "delete:pro:mobile-device-prestage-enrollments"
         ],

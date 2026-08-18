@@ -17907,6 +17907,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:accounts"
         ]
@@ -17944,6 +17945,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:accounts"
         ]
@@ -18070,6 +18072,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:accounts"
         ]
@@ -18107,6 +18110,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:accounts"
         ]
@@ -18233,6 +18237,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:accounts"
         ]
@@ -18270,6 +18275,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:accounts"
         ]
@@ -18396,6 +18402,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:accounts"
         ]
@@ -18433,6 +18440,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:accounts"
         ]
@@ -18513,6 +18521,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:activation-code"
         ]
@@ -18681,6 +18690,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:advanced-computer-searches"
         ]
@@ -18718,6 +18728,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:advanced-computer-searches"
         ]
@@ -18842,6 +18853,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:advanced-computer-searches"
         ]
@@ -18879,6 +18891,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:advanced-computer-searches"
         ]
@@ -19044,6 +19057,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:advanced-mobile-device-searches"
         ]
@@ -19081,6 +19095,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:advanced-mobile-device-searches"
         ]
@@ -19205,6 +19220,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:advanced-mobile-device-searches"
         ]
@@ -19242,6 +19258,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:advanced-mobile-device-searches"
         ]
@@ -19407,6 +19424,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:advanced-user-searches"
         ]
@@ -19444,6 +19462,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:advanced-user-searches"
         ]
@@ -19568,6 +19587,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:advanced-user-searches"
         ]
@@ -19605,6 +19625,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:advanced-user-searches"
         ]
@@ -19820,6 +19841,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:allowed-file-extension"
         ]
@@ -19985,6 +20007,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:buildings"
         ]
@@ -20022,6 +20045,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:buildings"
         ]
@@ -20146,6 +20170,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:buildings"
         ]
@@ -20183,6 +20208,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:buildings"
         ]
@@ -20348,6 +20374,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:categories"
         ]
@@ -20385,6 +20412,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:categories"
         ]
@@ -20509,6 +20537,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:categories"
         ]
@@ -20546,6 +20575,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:categories"
         ]
@@ -20711,6 +20741,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:classes"
         ]
@@ -20748,6 +20779,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:classes"
         ]
@@ -20872,6 +20904,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:classes"
         ]
@@ -20909,6 +20942,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:classes"
         ]
@@ -20948,6 +20982,7 @@
           "commandflush"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "delete:pro:computer-commands"
         ]
@@ -21015,6 +21050,7 @@
           "commandflush"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "delete:pro:computer-commands"
         ]
@@ -21672,6 +21708,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computer-check-in"
         ]
@@ -21803,6 +21840,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computer-commands"
         ]
@@ -21855,6 +21893,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computer-commands"
         ]
@@ -22170,6 +22209,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computer-extension-attributes"
         ]
@@ -22207,6 +22247,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computer-extension-attributes"
         ]
@@ -22331,6 +22372,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computer-extension-attributes"
         ]
@@ -22368,6 +22410,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computer-extension-attributes"
         ]
@@ -22533,6 +22576,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computer-groups"
         ]
@@ -22570,6 +22614,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computer-groups"
         ]
@@ -22694,6 +22739,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computer-groups"
         ]
@@ -22731,6 +22777,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computer-groups"
         ]
@@ -23566,6 +23613,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computer-inventory-collection"
         ]
@@ -23737,6 +23785,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "create:pro:computer-enrollment-invitations"
         ]
@@ -23867,6 +23916,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computer-enrollment-invitations"
         ]
@@ -23997,6 +24047,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computer-enrollment-invitations"
         ]
@@ -24824,6 +24875,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computers",
           "create:pro:users"
@@ -24864,6 +24916,7 @@
         "x-authentication-required": true,
         "x-deprecation-date": "2025-02-11T00:00:00.000Z",
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computers",
           "update:pro:users"
@@ -25055,6 +25108,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computers",
           "create:pro:users"
@@ -25095,6 +25149,7 @@
         "x-authentication-required": true,
         "x-deprecation-date": "2025-02-11T00:00:00.000Z",
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computers",
           "update:pro:users"
@@ -25304,6 +25359,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computers",
           "create:pro:users"
@@ -25344,6 +25400,7 @@
         "x-authentication-required": true,
         "x-deprecation-date": "2025-02-11T00:00:00.000Z",
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computers",
           "update:pro:users"
@@ -25473,6 +25530,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computers",
           "create:pro:users"
@@ -25513,6 +25571,7 @@
         "x-authentication-required": true,
         "x-deprecation-date": "2025-02-11T00:00:00.000Z",
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computers",
           "update:pro:users"
@@ -25685,6 +25744,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computers",
           "create:pro:users"
@@ -25725,6 +25785,7 @@
         "x-authentication-required": true,
         "x-deprecation-date": "2025-02-11T00:00:00.000Z",
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computers",
           "update:pro:users"
@@ -25891,6 +25952,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:departments"
         ]
@@ -25928,6 +25990,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:departments"
         ]
@@ -26040,6 +26103,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:departments"
         ]
@@ -26077,6 +26141,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:departments"
         ]
@@ -26242,6 +26307,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:directory-bindings"
         ]
@@ -26279,6 +26345,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:directory-bindings"
         ]
@@ -26403,6 +26470,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:directory-bindings"
         ]
@@ -26440,6 +26508,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:directory-bindings"
         ]
@@ -26605,6 +26674,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:disk-encryption-configurations"
         ]
@@ -26642,6 +26712,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:disk-encryption-configurations"
         ]
@@ -26766,6 +26837,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:disk-encryption-configurations"
         ]
@@ -26803,6 +26875,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:disk-encryption-configurations"
         ]
@@ -26968,6 +27041,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:distribution-points"
         ]
@@ -27005,6 +27079,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:distribution-points"
         ]
@@ -27129,6 +27204,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:distribution-points"
         ]
@@ -27166,6 +27242,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:distribution-points"
         ]
@@ -27331,6 +27408,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:dock-items"
         ]
@@ -27368,6 +27446,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:dock-items"
         ]
@@ -27492,6 +27571,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:dock-items"
         ]
@@ -27529,6 +27609,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:dock-items"
         ]
@@ -27694,6 +27775,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:ebooks"
         ]
@@ -27731,6 +27813,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:ebooks"
         ]
@@ -27907,6 +27990,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:ebooks"
         ]
@@ -27944,6 +28028,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:ebooks"
         ]
@@ -28023,6 +28108,7 @@
           "fileuploads"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:file-uploads"
         ]
@@ -28102,6 +28188,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:gsx-connection"
         ]
@@ -28230,6 +28317,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:infrastructure-managers"
         ]
@@ -28359,6 +28447,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:infrastructure-managers"
         ]
@@ -28396,6 +28485,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:infrastructure-managers"
         ]
@@ -28561,6 +28651,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:ibeacon"
         ]
@@ -28598,6 +28689,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:ibeacon"
         ]
@@ -28722,6 +28814,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:ibeacon"
         ]
@@ -28759,6 +28852,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:ibeacon"
         ]
@@ -28839,6 +28933,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "delete:pro:infrastructure-managers"
         ]
@@ -28924,6 +29019,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:infrastructure-managers"
         ]
@@ -29096,6 +29192,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:json-web-token-configuration"
         ]
@@ -29133,6 +29230,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:json-web-token-configuration"
         ]
@@ -29340,6 +29438,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:ldap-servers"
         ]
@@ -29377,6 +29476,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:ldap-servers"
         ]
@@ -29639,6 +29739,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:ldap-servers"
         ]
@@ -29676,6 +29777,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:ldap-servers"
         ]
@@ -29841,6 +29943,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:licensed-software"
         ]
@@ -29878,6 +29981,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:licensed-software"
         ]
@@ -30002,6 +30106,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:licensed-software"
         ]
@@ -30039,6 +30144,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:licensed-software"
         ]
@@ -30078,6 +30184,7 @@
           "logflush"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "delete:pro:policies",
           "execute:pro:flush-policy-logs"
@@ -30138,6 +30245,7 @@
           "logflush"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "delete:pro:policies",
           "execute:pro:flush-policy-logs"
@@ -30189,6 +30297,7 @@
           "logflush"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "delete:pro:policies",
           "execute:pro:flush-policy-logs"
@@ -30355,6 +30464,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mac-applications"
         ]
@@ -30392,6 +30502,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mac-applications"
         ]
@@ -30570,6 +30681,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mac-applications"
         ]
@@ -30607,6 +30719,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mac-applications"
         ]
@@ -30837,6 +30950,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-device-applications"
         ]
@@ -30987,6 +31101,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-device-applications"
         ]
@@ -31111,6 +31226,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-device-applications"
         ]
@@ -31148,6 +31264,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-device-applications"
         ]
@@ -31327,6 +31444,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-device-applications"
         ]
@@ -31364,6 +31482,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-device-applications"
         ]
@@ -31513,6 +31632,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:mobile-device-commands"
@@ -31609,6 +31729,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:mobile-device-commands"
@@ -31666,6 +31787,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:mobile-device-commands"
@@ -31732,6 +31854,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:mobile-device-commands"
@@ -31807,6 +31930,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:mobile-device-commands"
@@ -31906,6 +32030,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:mobile-device-commands"
@@ -32122,6 +32247,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:ios-configuration-profiles"
         ]
@@ -32159,6 +32285,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:ios-configuration-profiles"
         ]
@@ -32335,6 +32462,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:ios-configuration-profiles"
         ]
@@ -32372,6 +32500,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:ios-configuration-profiles"
         ]
@@ -32601,6 +32730,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:enrollment-profiles"
         ]
@@ -32638,6 +32768,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:enrollment-profiles"
         ]
@@ -32815,6 +32946,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:enrollment-profiles"
         ]
@@ -32852,6 +32984,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:enrollment-profiles"
         ]
@@ -33029,6 +33162,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:enrollment-profiles"
         ]
@@ -33066,6 +33200,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:enrollment-profiles"
         ]
@@ -33296,6 +33431,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-device-extension-attributes"
         ]
@@ -33333,6 +33469,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-device-extension-attributes"
         ]
@@ -33457,6 +33594,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-device-extension-attributes"
         ]
@@ -33494,6 +33632,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-device-extension-attributes"
         ]
@@ -33659,6 +33798,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-device-groups"
         ]
@@ -33696,6 +33836,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-device-groups"
         ]
@@ -33820,6 +33961,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-device-groups"
         ]
@@ -33857,6 +33999,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-device-groups"
         ]
@@ -34333,6 +34476,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "create:pro:mobile-device-enrollment-invitations"
         ]
@@ -34463,6 +34607,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-device-enrollment-invitations"
         ]
@@ -34507,6 +34652,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-device-enrollment-invitations"
         ]
@@ -34671,6 +34817,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:provisioning-profiles"
         ]
@@ -34720,6 +34867,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:provisioning-profiles"
         ]
@@ -34902,6 +35050,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:provisioning-profiles"
         ]
@@ -34951,6 +35100,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:provisioning-profiles"
         ]
@@ -35074,6 +35224,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:provisioning-profiles"
         ]
@@ -35123,6 +35274,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:provisioning-profiles"
         ]
@@ -35288,6 +35440,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:users"
@@ -35326,6 +35479,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-devices",
           "update:pro:users"
@@ -35511,6 +35665,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:users"
@@ -35549,6 +35704,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-devices",
           "update:pro:users"
@@ -35724,6 +35880,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:users"
@@ -35762,6 +35919,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-devices",
           "update:pro:users"
@@ -35887,6 +36045,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:users"
@@ -35925,6 +36084,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-devices",
           "update:pro:users"
@@ -36050,6 +36210,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:mobile-devices",
           "create:pro:users"
@@ -36088,6 +36249,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:mobile-devices",
           "update:pro:users"
@@ -36254,6 +36416,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:network-segments"
         ]
@@ -36291,6 +36454,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:network-segments"
         ]
@@ -36415,6 +36579,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:network-segments"
         ]
@@ -36452,6 +36617,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:network-segments"
         ]
@@ -36617,6 +36783,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:macos-configuration-profiles"
         ]
@@ -36654,6 +36821,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:macos-configuration-profiles"
         ]
@@ -36830,6 +36998,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:macos-configuration-profiles"
         ]
@@ -36867,6 +37036,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:macos-configuration-profiles"
         ]
@@ -37096,6 +37266,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:packages"
         ]
@@ -37133,6 +37304,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:packages"
         ]
@@ -37257,6 +37429,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:packages"
         ]
@@ -37294,6 +37467,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:packages"
         ]
@@ -37511,6 +37685,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:patch-management-software-titles"
         ]
@@ -37549,6 +37724,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:patch-management-software-titles"
         ]
@@ -37813,6 +37989,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:patch-external-source"
         ]
@@ -37850,6 +38027,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:patch-external-source"
         ]
@@ -37973,6 +38151,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:patch-external-source"
         ]
@@ -38010,6 +38189,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:patch-external-source"
         ]
@@ -38316,6 +38496,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:patch-policies"
         ]
@@ -38468,6 +38649,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:patch-policies"
         ]
@@ -38742,6 +38924,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:patch-management-software-titles"
         ]
@@ -38780,6 +38963,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:patch-management-software-titles"
         ]
@@ -38945,6 +39129,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:computers"
         ]
@@ -38982,6 +39167,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:computers"
         ]
@@ -39200,6 +39386,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:peripheral-types"
         ]
@@ -39237,6 +39424,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:peripheral-types"
         ]
@@ -39482,6 +39670,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:policies"
         ]
@@ -39519,6 +39708,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:policies"
         ]
@@ -39705,6 +39895,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:policies"
         ]
@@ -39742,6 +39933,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:policies"
         ]
@@ -39907,6 +40099,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:printers"
         ]
@@ -39944,6 +40137,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:printers"
         ]
@@ -40068,6 +40262,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:printers"
         ]
@@ -40105,6 +40300,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:printers"
         ]
@@ -40270,6 +40466,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:removable-mac-address"
         ]
@@ -40307,6 +40504,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:removable-mac-address"
         ]
@@ -40431,6 +40629,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:removable-mac-address"
         ]
@@ -40468,6 +40667,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:removable-mac-address"
         ]
@@ -40633,6 +40833,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:restricted-software"
         ]
@@ -40670,6 +40871,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:restricted-software"
         ]
@@ -40794,6 +40996,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:restricted-software"
         ]
@@ -40831,6 +41034,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:restricted-software"
         ]
@@ -41116,6 +41320,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:scripts"
         ]
@@ -41153,6 +41358,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:scripts"
         ]
@@ -41277,6 +41483,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:scripts"
         ]
@@ -41314,6 +41521,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:scripts"
         ]
@@ -41479,6 +41687,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:sites"
         ]
@@ -41516,6 +41725,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:sites"
         ]
@@ -41640,6 +41850,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:sites"
         ]
@@ -41677,6 +41888,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:sites"
         ]
@@ -41756,6 +41968,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:smtp-server"
         ]
@@ -41921,6 +42134,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:software-update-servers"
         ]
@@ -41958,6 +42172,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:software-update-servers"
         ]
@@ -42082,6 +42297,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:software-update-servers"
         ]
@@ -42119,6 +42335,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:software-update-servers"
         ]
@@ -42284,6 +42501,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:user-extension-attributes"
         ]
@@ -42321,6 +42539,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:user-extension-attributes"
         ]
@@ -42445,6 +42664,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:user-extension-attributes"
         ]
@@ -42482,6 +42702,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:user-extension-attributes"
         ]
@@ -42647,6 +42868,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:user-groups"
         ]
@@ -42684,6 +42906,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:user-groups"
         ]
@@ -42808,6 +43031,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:user-groups"
         ]
@@ -42845,6 +43069,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:user-groups"
         ]
@@ -43060,6 +43285,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:user"
         ]
@@ -43097,6 +43323,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:user"
         ]
@@ -43221,6 +43448,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:user"
         ]
@@ -43258,6 +43486,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:user"
         ]
@@ -43423,6 +43652,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:volume-purchasing-locations"
         ]
@@ -43460,6 +43690,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:volume-purchasing-locations"
         ]
@@ -43625,6 +43856,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:vpp-assignment"
         ]
@@ -43662,6 +43894,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:vpp-assignment"
         ]
@@ -43827,6 +44060,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:vpp-invitations"
         ]
@@ -43864,6 +44098,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:vpp-invitations"
         ]
@@ -44081,6 +44316,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:webhooks"
         ]
@@ -44118,6 +44354,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:webhooks"
         ]
@@ -44242,6 +44479,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "create:pro:webhooks"
         ]
@@ -44279,6 +44517,7 @@
         ],
         "x-authentication-required": true,
         "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "update:pro:webhooks"
         ]

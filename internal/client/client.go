@@ -220,6 +220,19 @@ func (c *Transport) TenantID() string {
 	return c.tenantID
 }
 
+// TenantIDFor returns the tenant ID that applies to one API namespace: the
+// namespace's own override when one was registered via WithNamespaceTenantID,
+// otherwise the client-wide value.
+//
+// Callers building tenant-scoped URLs themselves — rather than through
+// TenantPrefix — need this to stay namespace-correct. A customer holding both
+// Jamf Pro and Jamf Security Cloud has a different tenant ID for each, so
+// resolving the client-wide value for a Security Cloud path sends the Pro
+// tenant and the gateway answers 403 OWNERSHIP_FORBIDDEN.
+func (c *Transport) TenantIDFor(namespace string) string {
+	return c.tenantIDFor(namespace)
+}
+
 // TenantPrefix returns the /api/{namespace}/{version}/tenant/{tenantID} URL
 // prefix used by tenant-scoped resources. An empty version collapses the
 // segment for APIs that don't use a version in the URL (proclassic, Pro

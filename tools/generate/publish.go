@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/getkin/kin-openapi/openapi3"
 	"gopkg.in/yaml.v3"
 )
 
@@ -157,6 +158,11 @@ func publishSpecs(root string, cfg Config) error {
 			}
 		}
 
+		// Carry the config's wire corrections into the published spec so
+		// downstream generators build the same URLs and expect the same
+		// statuses as this one.
+		applyWireCorrectionExtensions(doc, spec)
+
 		// Marshal to JSON.
 		data, err := json.MarshalIndent(doc, "", "  ")
 		if err != nil {
@@ -272,4 +278,66 @@ func copyRefSiblings(src, dst any) bool {
 		}
 	}
 	return changed
+}
+
+// ---------------------------------------------------------------------------
+// Wire-correction extensions
+// ---------------------------------------------------------------------------
+
+// Extension keys carrying this generator's wire corrections into the published
+// spec, so downstream generators (jamf-cli) build the same URLs and expect the
+// same statuses without re-deriving knowledge that only wire probing revealed.
+const (
+	// extTenantPathVersion is the URL version segment an operation's path
+	// needs but does not carry. The Security Cloud -beta specs inject
+	// /tenant/{tenantId} without the version, and the gateway answers 403
+	// BAD_PERMISSIONS for the versionless form.
+	extTenantPathVersion = "x-jamf-tenant-path-version"
+
+	// extExpectedStatus is the success status the server actually answers,
+	// where it differs from the one the spec declares.
+	extExpectedStatus = "x-jamf-expected-status"
+)
+
+// applyWireCorrectionExtensions annotates doc with the config's path-version
+// and expected-status overrides.
+//
+// These are published as extensions rather than folded into the paths and
+// responses they correct because api/*.json doubles as this generator's own
+// fallback source (see sourceSpecPath) and config.json's operation keys are
+// the *source* spec's paths. Rewriting a path here would stop those keys
+// matching on a fallback regen, silently dropping every operation in the spec.
+func applyWireCorrectionExtensions(doc *openapi3.T, spec SpecDef) {
+	if spec.Version != "" {
+		if doc.Extensions == nil {
+			doc.Extensions = map[string]any{}
+		}
+		doc.Extensions[extTenantPathVersion] = spec.Version
+	}
+	if doc.Paths == nil {
+		return
+	}
+	for _, op := range spec.Operations {
+		if op.Version == "" && op.ExpectedStatus == 0 {
+			continue
+		}
+		method, path := op.parseOp()
+		item := doc.Paths.Find(path)
+		if item == nil {
+			continue
+		}
+		specOp := item.GetOperation(method)
+		if specOp == nil {
+			continue
+		}
+		if specOp.Extensions == nil {
+			specOp.Extensions = map[string]any{}
+		}
+		if op.Version != "" {
+			specOp.Extensions[extTenantPathVersion] = op.Version
+		}
+		if op.ExpectedStatus != 0 {
+			specOp.Extensions[extExpectedStatus] = op.ExpectedStatus
+		}
+	}
 }

@@ -543,6 +543,7 @@
           "device-groups"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "update:jsc:all"
         ]

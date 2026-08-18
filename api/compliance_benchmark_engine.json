@@ -1042,6 +1042,7 @@
           "benchmarks"
         ],
         "x-authentication-required": true,
+        "x-jamf-expected-status": 202,
         "x-required-privileges": [
           "create:pro:compliance-benchmarks"
         ]
