@@ -11044,7 +11044,6 @@
         {
           "op": "GET /tenant/{tenantId}/ztna/gateways",
           "name": "ListZtnaGatewaysV1",
-          "pagination": "totalCount",
           "resolver": {
             "resourceType": "ZtnaGatewayV1",
             "nameField": "name",
@@ -11242,8 +11241,7 @@
       "operations": [
         {
           "op": "GET /tenant/{tenantId}/uem-connect/v1/connectors",
-          "name": "ListUemConnectorsV1",
-          "pagination": "totalCount"
+          "name": "ListUemConnectorsV1"
         },
         {
           "op": "POST /tenant/{tenantId}/uem-connect/v1/connectors",

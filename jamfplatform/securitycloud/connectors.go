@@ -10,35 +10,19 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
-
-	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListUemConnectorsV1 list connectors.
 //
 // Required privileges: read:jsc:all.
-func (c *Client) ListUemConnectorsV1(ctx context.Context) ([]ConnectorConfig, error) {
+func (c *Client) ListUemConnectorsV1(ctx context.Context) (*ConnectorPage, error) {
 	prefix := c.transport.TenantPrefix("securitycloud", "")
-	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]ConnectorConfig, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-
-		endpoint := prefix + "/uem-connect/v1/connectors"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int               `json:"totalCount"`
-			Results    []ConnectorConfig `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
+	var result ConnectorPage
+	endpoint := prefix + "/uem-connect/v1/connectors"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListUemConnectorsV1: %w", err)
+	}
+	return &result, nil
 }
 
 // CreateUemConnectorV1 create connector.

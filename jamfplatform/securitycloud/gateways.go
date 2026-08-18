@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
@@ -19,27 +18,14 @@ import (
 // ListZtnaGatewaysV1 list Gateways.
 //
 // Required privileges: read:jsc:all.
-func (c *Client) ListZtnaGatewaysV1(ctx context.Context) ([]Gateway, error) {
+func (c *Client) ListZtnaGatewaysV1(ctx context.Context) (*GatewayListResponse, error) {
 	prefix := c.transport.TenantPrefix("securitycloud", "v1")
-	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]Gateway, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-
-		endpoint := prefix + "/ztna/gateways"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int       `json:"totalCount"`
-			Results    []Gateway `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
+	var result GatewayListResponse
+	endpoint := prefix + "/ztna/gateways"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListZtnaGatewaysV1: %w", err)
+	}
+	return &result, nil
 }
 
 // CreateZtnaGatewayV1 create a Gateway.
@@ -108,7 +94,7 @@ func (c *Client) DeleteZtnaGatewayV1(ctx context.Context, gatewayID string) erro
 func (c *Client) ResolveZtnaGatewayV1IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.TenantPrefix("securitycloud", "v1")
 	listPath := prefix + "/ztna/gateways"
-	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
 		return "", fmt.Errorf("ResolveZtnaGatewayV1IDByName(%s): %w", name, err)
 	}
@@ -119,7 +105,7 @@ func (c *Client) ResolveZtnaGatewayV1IDByName(ctx context.Context, name string) 
 func (c *Client) ResolveZtnaGatewayV1ByName(ctx context.Context, name string) (*Gateway, error) {
 	prefix := c.transport.TenantPrefix("securitycloud", "v1")
 	listPath := prefix + "/ztna/gateways"
-	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
+	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveZtnaGatewayV1ByName(%s): %w", name, err)
 	}
