@@ -270,9 +270,15 @@ func (o OperationDef) parseOp() (method, path string) {
 
 // parseParams expands compact param notation into ExtraParam structs.
 //
-//	"sort"                → {Spec:"sort", Go:"sort", Type:"string"}
-//	"sort:[]string"       → {Spec:"sort", Go:"sort", Type:"[]string"}
-//	"rule-id:string:ruleID" → {Spec:"rule-id", Go:"ruleID", Type:"string"}
+//	"sort"                          → {Spec:"sort", Go:"sort", Type:"string"}
+//	"sort:[]string"                 → {Spec:"sort", Go:"sort", Type:"[]string"}
+//	"rule-id:string:ruleID"         → {Spec:"rule-id", Go:"ruleID", Type:"string"}
+//	"foo:string:foo:undocumented"   → same, plus Undocumented:true
+//
+// The trailing ":undocumented" segment opts a param out of the spec
+// name-match check in parameterComment — for a query param that is
+// wire-verified to work but that the spec doesn't declare under any name
+// (as opposed to a typo or a spec rename, which the check exists to catch).
 func (o OperationDef) parseParams() []ExtraParam {
 	params := make([]ExtraParam, 0, len(o.Params))
 	for _, p := range o.Params {
@@ -284,15 +290,19 @@ func (o OperationDef) parseParams() []ExtraParam {
 		if len(parts) >= 3 {
 			ep.Go = parts[2]
 		}
+		if len(parts) >= 4 && parts[3] == "undocumented" {
+			ep.Undocumented = true
+		}
 		params = append(params, ep)
 	}
 	return params
 }
 
 type ExtraParam struct {
-	Spec string
-	Go   string
-	Type string
+	Spec         string
+	Go           string
+	Type         string
+	Undocumented bool // set via a trailing ":undocumented" in config.json; skips the spec name-match check
 }
 
 // validateConfig rejects misconfigured specs before generation runs.

@@ -738,10 +738,13 @@ func defaultMethodComment(name string, spec SpecDef) string {
 // ("Pending+Failed", "EnableRemoteDesktop (macOS 10.14.4 and later)") and one
 // outright typo ("Hardwre"), all of which are still what the server accepts.
 //
-// Params the spec doesn't describe are skipped, as are params declared in
-// config but absent from the spec (Classic operations that take undocumented
-// query keys). Returns "" when nothing is documentable.
-func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Operation, enumTypes map[string]bool) string {
+// Params the spec doesn't describe are skipped. A config-declared query
+// param absent from the spec is an error unless marked ":undocumented" in
+// config.json (see parseParams) — that marker is reserved for a param
+// wire-verified to work despite the spec's silence; anything else absent is
+// almost always a typo or a spec rename the config wasn't updated for.
+// Returns "" when nothing is documentable.
+func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Operation, enumTypes map[string]bool) (string, error) {
 	specParams := make(map[string]*openapi3.Parameter)
 	collect := func(params openapi3.Parameters) {
 		for _, ref := range params {
@@ -770,8 +773,36 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 	if op != nil {
 		collect(op.Parameters)
 	}
+
+	// config.json's "params" entries hand-type the wire query-parameter name
+	// as a literal string with nothing else cross-checking it against the
+	// spec. If Jamf renames or drops the parameter, or the entry was simply
+	// mistyped, the generated method keeps compiling and keeps sending a
+	// query key the server silently ignores — the GetBaselineRules
+	// baselineId/baseline-id incident. Catch it at generate time instead,
+	// unless the entry opts out via ":undocumented" (a param that is
+	// wire-verified to work but that the spec doesn't declare at all).
+	var unmatched []string
+	for _, q := range m.QueryParams {
+		if q.Undocumented {
+			continue
+		}
+		if _, ok := specParams[q.Spec]; !ok {
+			unmatched = append(unmatched, q.Spec)
+		}
+	}
+	if len(unmatched) > 0 {
+		known := make([]string, 0, len(specParams))
+		for name := range specParams {
+			known = append(known, name)
+		}
+		sort.Strings(known)
+		return "", fmt.Errorf("%s %s: config declares query param(s) %v not found in spec (spec declares: %v) — the spec may have renamed or removed it, fix config.json; if this is a wire-verified param the spec genuinely omits, mark the entry \":undocumented\"",
+			m.HTTPMethod, m.SpecPath, unmatched, known)
+	}
+
 	if len(specParams) == 0 {
-		return ""
+		return "", nil
 	}
 
 	type docParam struct{ goName, specName string }
@@ -799,9 +830,9 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 		}
 	}
 	if len(lines) == 0 {
-		return ""
+		return "", nil
 	}
-	return "\n//\n// Parameters:\n" + strings.Join(lines, "\n")
+	return "\n//\n// Parameters:\n" + strings.Join(lines, "\n"), nil
 }
 
 // isPlaceholderParamDoc reports whether a parameter's description says nothing
@@ -990,7 +1021,11 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 	// Parameter docs come last so the block sits below the summary and the
 	// privilege/deprecation lines, matching how godoc reads: prose, then
 	// metadata, then the per-argument list.
-	if pc := parameterComment(m, pathItem, op, enumTypes); pc != "" {
+	pc, err := parameterComment(m, pathItem, op, enumTypes)
+	if err != nil {
+		return GoMethod{}, fmt.Errorf("%s: %w", opDef.Name, err)
+	}
+	if pc != "" {
 		if m.Comment == "" {
 			m.Comment = defaultMethodComment(opDef.Name, spec)
 		}
