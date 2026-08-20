@@ -11061,7 +11061,8 @@
         },
         {
           "op": "POST /tenant/{tenantId}/ztna/gateways",
-          "name": "CreateZtnaGatewayV1"
+          "name": "CreateZtnaGatewayV1",
+          "responseType": "Gateway"
         },
         {
           "op": "GET /tenant/{tenantId}/ztna/gateways/{gatewayId}",
