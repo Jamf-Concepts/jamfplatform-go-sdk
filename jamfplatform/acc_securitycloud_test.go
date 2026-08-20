@@ -741,9 +741,11 @@ func TestAcceptance_SecurityCloudDeviceGroupLifecycle(t *testing.T) {
 		t.Errorf("group name = %q, want %q", got.Name, jscName("group"))
 	}
 
-	// ListDeviceGroupsV1 is deprecated (2026-08-12) in favour of v2, but v2 is
-	// not routed by the gateway yet (see TestAcceptance_SecurityCloudDeviceGroupsV2),
-	// so v1 is the only version a consumer can actually call today.
+	// ListDeviceGroupsV1 is deprecated (2026-08-12) and v2 is routed as of
+	// 2026-08-20, but v1 stays in the SDK — and stays covered — until Jamf
+	// removes the path, so consumers get a real migration window. Both
+	// versions' resolvers and Apply methods exist side by side for the same
+	// reason (see the pro packages, where V1/V2/V3 coexist).
 	groups, err := sc.ListDeviceGroupsV1(ctx)
 	if err != nil {
 		t.Fatalf("ListDeviceGroupsV1 failed: %v", err)
@@ -951,8 +953,15 @@ func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
 	if _, err := sc.ResolveDnsZoneV1IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
 		t.Errorf("resolving an absent DNS zone: want 404 APIResponseError, got %v", err)
 	}
+	// Both device-group resolver versions are live and hit different endpoints:
+	// v1 walks the deprecated bare-array list, v2 the {groups: []} envelope.
+	// Cover both — the envelope unwrap is the only resultsField in the package,
+	// so a regression there would otherwise be invisible.
 	if _, err := sc.ResolveDeviceGroupV1IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
-		t.Errorf("resolving an absent device group: want 404 APIResponseError, got %v", err)
+		t.Errorf("resolving an absent device group (v1): want 404 APIResponseError, got %v", err)
+	}
+	if _, err := sc.ResolveDeviceGroupV2IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
+		t.Errorf("resolving an absent device group (v2): want 404 APIResponseError, got %v", err)
 	}
 
 	// An empty name is a caller bug, and must not degrade into "match the first
@@ -966,38 +975,56 @@ func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
 // TestAcceptance_SecurityCloudApplyDeviceGroup exercises both Apply branches on
 // the cheapest resource in the family: create-when-absent, then
 // update-when-present with the same name.
+//
+// Run once per endpoint version. Both Apply methods share the v1 create,
+// update and delete ops — only the resolve step differs, and it differs in the
+// way most likely to break silently: v1 walks a bare JSON array, v2 unwraps a
+// {groups: []} envelope. Covering only one version would leave the other's
+// resolve path untested while it stayed exported and callable, which is the
+// cost of the SDK's additive-versioning rule and the reason to pay it here.
 func TestAcceptance_SecurityCloudApplyDeviceGroup(t *testing.T) {
 	sc := accSecurityCloudClient(t)
-	ctx := context.Background()
 
-	name := jscName("apply-group")
-	id, created, err := sc.ApplyDeviceGroupV1(ctx, &securitycloud.CreateGroupRequest{Name: name})
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ApplyDeviceGroupV1 (create branch) failed: %v", err)
-	}
-	jscCleanupDelete(t, "device group "+id, func() error {
-		return sc.DeleteDeviceGroupV1(context.Background(), id)
-	})
-	if !created {
-		t.Errorf("first Apply of %q reported created=false; nothing owned that name", name)
-	}
-	if id == "" {
-		t.Fatal("ApplyDeviceGroupV1 returned an empty ID on the create branch")
-	}
+	for _, tc := range []struct {
+		version string
+		apply   func(context.Context, *securitycloud.CreateGroupRequest) (string, bool, error)
+	}{
+		{"v1", sc.ApplyDeviceGroupV1},
+		{"v2", sc.ApplyDeviceGroupV2},
+	} {
+		t.Run(tc.version, func(t *testing.T) {
+			ctx := context.Background()
+			name := jscName("apply-group-" + tc.version)
 
-	// Second Apply with the same name must resolve to the same resource and
-	// take the update path — a create here would leave a duplicate behind,
-	// which is the failure mode Apply exists to prevent.
-	sameID, created, err := sc.ApplyDeviceGroupV1(ctx, &securitycloud.CreateGroupRequest{Name: name})
-	if err != nil {
-		t.Fatalf("ApplyDeviceGroupV1 (update branch) failed: %v", err)
-	}
-	if created {
-		t.Error("second Apply reported created=true; it should have resolved the existing group")
-	}
-	if sameID != id {
-		t.Errorf("second Apply returned ID %q, want %q", sameID, id)
+			id, created, err := tc.apply(ctx, &securitycloud.CreateGroupRequest{Name: name})
+			if err != nil {
+				skipOnServerError(t, err)
+				t.Fatalf("ApplyDeviceGroup%s (create branch) failed: %v", tc.version, err)
+			}
+			jscCleanupDelete(t, "device group "+id, func() error {
+				return sc.DeleteDeviceGroupV1(context.Background(), id)
+			})
+			if !created {
+				t.Errorf("first Apply of %q reported created=false; nothing owned that name", name)
+			}
+			if id == "" {
+				t.Fatalf("ApplyDeviceGroup%s returned an empty ID on the create branch", tc.version)
+			}
+
+			// Second Apply with the same name must resolve to the same resource
+			// and take the update path — a create here would leave a duplicate
+			// behind, which is the failure mode Apply exists to prevent.
+			sameID, created, err := tc.apply(ctx, &securitycloud.CreateGroupRequest{Name: name})
+			if err != nil {
+				t.Fatalf("ApplyDeviceGroup%s (update branch) failed: %v", tc.version, err)
+			}
+			if created {
+				t.Error("second Apply reported created=true; it should have resolved the existing group")
+			}
+			if sameID != id {
+				t.Errorf("second Apply returned ID %q, want %q", sameID, id)
+			}
+		})
 	}
 }
 

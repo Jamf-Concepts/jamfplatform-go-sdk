@@ -11211,7 +11211,22 @@
         },
         {
           "op": "GET /v2/tenant/{tenantId}/groups",
-          "name": "ListDeviceGroupsV2"
+          "name": "ListDeviceGroupsV2",
+          "resolver": {
+            "resourceType": "DeviceGroupV2",
+            "nameField": "name",
+            "idField": "id",
+            "mode": "clientFilter",
+            "resultsField": "groups",
+            "typedReturn": "Group",
+            "apply": {
+              "createOp": "CreateDeviceGroupV1",
+              "updateOp": "UpdateDeviceGroupV1",
+              "deleteOp": "DeleteDeviceGroupV1",
+              "nameGoField": "Name",
+              "updateType": "UpdateGroupRequest"
+            }
+          }
         },
         {
           "op": "GET /v1/tenant/{tenantId}/groups/{groupId}",

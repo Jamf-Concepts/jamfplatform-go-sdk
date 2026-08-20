@@ -205,11 +205,20 @@ type GoApply struct {
 	MembershipRequestFieldIsPtr bool   // true when request.Assignments is *[]T
 
 	// Test generation paths (pre-computed from the source ops).
-	ListNamespace      string // namespace for the list/resolver call
-	ListVersion        string // version for the list/resolver call
-	ListPath           string // resource path for the list endpoint
-	ListNameField      string // JSON name field for resolver response stubs
-	ListIDField        string // JSON id field for resolver response stubs
+	ListNamespace string // namespace for the list/resolver call
+	ListVersion   string // version for the list/resolver call
+	ListPath      string // resource path for the list endpoint
+	ListNameField string // JSON name field for resolver response stubs
+	ListIDField   string // JSON id field for resolver response stubs
+	// ListResultsField is the envelope key holding the element array, mirrored
+	// from the resolver config so the generated Apply test stubs answer with
+	// the same shape the resolver actually reads. Empty means "results".
+	// Without this the stubs hardcode "results" and an Apply whose resolver
+	// declares a non-standard envelope (securitycloud device groups v2:
+	// {groups: []}) generates an _Update test that silently takes the *create*
+	// branch — the resolver finds nothing under the key it looks for, so the
+	// test fails on an unstubbed create path rather than on the real mismatch.
+	ListResultsField   string
 	CreateNS           string // namespace for create
 	CreateVer          string // version for create
 	CreatePath         string // resource path for create endpoint (e.g. "/buildings")

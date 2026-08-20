@@ -145,6 +145,17 @@ var funcMap = template.FuncMap{
 		}
 		return ", " + strings.Join(args, ", ")
 	},
+	// applyResultsKey is the envelope key the apply method's resolver reads the
+	// element array from. Defaults to "results"; a resolver declaring
+	// resultsField (e.g. securitycloud device groups v2's {groups: []}) needs
+	// its stubs to answer under that key or the generated _Update test takes
+	// the create branch instead of the update one.
+	"applyResultsKey": func(a *GoApply) string {
+		if a.ListResultsField == "" {
+			return "results"
+		}
+		return a.ListResultsField
+	},
 	// applyListPath builds the test-server handler path for the list endpoint
 	// used by the apply method's resolver call.
 	"applyListPath": func(a *GoApply) string {
@@ -1400,8 +1411,8 @@ func Test<% .Name %>_Create(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []any{},
-			"totalCount": 0,
+			"<% applyResultsKey .Apply %>": []any{},
+			"totalCount":                    0,
 		})
 	})
 	// Token upload creates the resource.
@@ -1449,8 +1460,8 @@ func Test<% .Name %>_Create(t *testing.T) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
-				"results":    []any{},
-				"totalCount": 0,
+				"<% applyResultsKey .Apply %>": []any{},
+				"totalCount":                    0,
 			})
 		case http.MethodPost:
 			writeJSON(t, w, <% applyCreateStatus .Apply %>, map[string]any{
@@ -1468,8 +1479,8 @@ func Test<% .Name %>_Create(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []any{},
-			"totalCount": 0,
+			"<% applyResultsKey .Apply %>": []any{},
+			"totalCount":                    0,
 		})
 	})
 	mux.HandleFunc("<% applyCreatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
@@ -1512,7 +1523,7 @@ func Test<% .Name %>_Update(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
+			"<% applyResultsKey .Apply %>": []map[string]any{
 				{"<% .Apply.ListIDField %>": "existing-id", "<% .Apply.ListNameField %>": "target"},
 			},
 			"totalCount": 1,
@@ -1570,7 +1581,7 @@ func Test<% .Name %>_Update(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
+			"<% applyResultsKey .Apply %>": []map[string]any{
 				{"<% .Apply.ListIDField %>": "existing-id", "<% .Apply.ListNameField %>": "target"},
 			},
 			"totalCount": 1,

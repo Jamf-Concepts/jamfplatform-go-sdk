@@ -210,6 +210,50 @@ func TestResolveDeviceGroupV1ByName(t *testing.T) {
 	}
 }
 
+func TestResolveDeviceGroupV2IDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"groups": []map[string]any{
+				{"id": "resolved-id", "name": "target"},
+			},
+		})
+	})
+
+	id, err := c.ResolveDeviceGroupV2IDByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveDeviceGroupV2ByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"groups": []map[string]any{
+				{"id": "resolved-id", "name": "target"},
+			},
+		})
+	})
+
+	result, err := c.ResolveDeviceGroupV2ByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestApplyDeviceGroupV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
@@ -261,6 +305,70 @@ func TestApplyDeviceGroupV1_Update(t *testing.T) {
 	})
 
 	id, created, err := c.ApplyDeviceGroupV1(context.Background(), &CreateGroupRequest{Name: "target"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Error("expected created = false")
+	}
+	if id != "existing-id" {
+		t.Errorf("id = %q, want existing-id", id)
+	}
+}
+
+func TestApplyDeviceGroupV2_Create(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns no matches → resolver returns 404 → apply creates.
+	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"groups":     []any{},
+			"totalCount": 0,
+		})
+	})
+	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, 201, map[string]any{
+			"id":   "new-id",
+			"href": "/new-id",
+		})
+	})
+
+	id, created, err := c.ApplyDeviceGroupV2(context.Background(), &CreateGroupRequest{Name: "target"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !created {
+		t.Error("expected created = true")
+	}
+	if id != "new-id" {
+		t.Errorf("id = %q, want new-id", id)
+	}
+}
+
+func TestApplyDeviceGroupV2_Update(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// List returns a match → resolver succeeds → apply updates.
+	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"groups": []map[string]any{
+				{"id": "existing-id", "name": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
+	})
+
+	id, created, err := c.ApplyDeviceGroupV2(context.Background(), &CreateGroupRequest{Name: "target"})
 	if err != nil {
 		t.Fatal(err)
 	}
