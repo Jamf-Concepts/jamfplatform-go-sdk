@@ -320,13 +320,13 @@ type ConfigurationProfile struct {
 	// ### Example — `com.apple.wifi.managed`.
 	// The same pattern works for any payload. For
 	// [com.apple.wifi.managed](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.wifi.managed.yaml),
-	// look up its `payloadkeys` and send:.
+	// look up its `payloadkeys` and send:
 	// ```json { "payloadDisplayName": "Corporate Wi-Fi", "payloadContent": [ { "payloadType":
 	// "com.apple.wifi.managed", "SSID_STR": "Corporate-WiFi", "EncryptionType": "WPA2", "AutoJoin": true,
 	// "IsHotspot": false } ] } ```.
 	// ### Combining multiple Apple payloads in one component.
 	// A single `com.jamf.ddm-configuration-profile` component can contain multiple Apple payloads in the
-	// `payloadContent` array:.
+	// `payloadContent` array:
 	// ```json { "payloadDisplayName": "Network & Domains", "payloadContent": [ { "payloadType":
 	// "com.apple.domains", "WebDomains": ["*.corp.example.com"], "EmailDomains": ["corp.example.com"] }, {
 	// "payloadType": "com.apple.wifi.managed", "SSID_STR": "CorpNet", "EncryptionType": "WPA3" } ] } ```.
@@ -345,21 +345,28 @@ type ConfigurationProfile struct {
 	// > **Unsupported payload types:** Blueprints with > `com.apple.font` or `com.apple.webClip.managed`
 	// payloads > cannot be created.
 	// ### Step 2 — Build the `configuration` object.
-	// The `configuration` has two mandatory fields:.
-	// | Field | Type | Description | |---|---|---| | `payloadDisplayName` | string | A human-readable name
-	// shown on the device (e.g., `"Managed Domains"`) | | `payloadContent` | array | An array of payload
-	// objects — each one represents a single Apple payload |.
-	// Each entry in `payloadContent` **must** contain:.
-	// | Field | Type | Description | |---|---|---| | `payloadType` | string | The Apple payload type
-	// identifier (e.g., `com.apple.domains`) |.
+	// The `configuration` has two mandatory fields:
+	// | Field | Type | Description |
+	// |---|---|---|
+	// | `payloadDisplayName` | string | A human-readable name shown on the device (e.g., `"Managed Domains"`) |
+	// | `payloadContent` | array | An array of payload objects — each one represents a single Apple payload |
+	// Each entry in `payloadContent` **must** contain:
+	// | Field | Type | Description |
+	// |---|---|---|
+	// | `payloadType` | string | The Apple payload type identifier (e.g., `com.apple.domains`) |
 	// In addition to `payloadType`, include the payload-specific keys from the `payloadkeys` section of
 	// the Apple payload YAML.
 	// ### Apple type → JSON type mapping.
-	// | Apple type | JSON value type | Example | |---|---|---| | `<string>` | string | `"example.com"` | |
-	// `<integer>` | number | `42` | | `<real>` | number | `3.14` | | `<boolean>` | boolean | `true` | |
-	// `<data>` | string (Base64-encoded) | `"SGVsbG8="` | | `<date>` | string (ISO 8601) |
-	// `"2026-01-15T00:00:00Z"` | | `<array>` | array | `["a", "b"]` | | `<dictionary>` | object | `{
-	// "key": "value" }` |.
+	// | Apple type | JSON value type | Example |
+	// |---|---|---|
+	// | `<string>` | string | `"example.com"` |
+	// | `<integer>` | number | `42` |
+	// | `<real>` | number | `3.14` |
+	// | `<boolean>` | boolean | `true` |
+	// | `<data>` | string (Base64-encoded) | `"SGVsbG8="` |
+	// | `<date>` | string (ISO 8601) | `"2026-01-15T00:00:00Z"` |
+	// | `<array>` | array | `["a", "b"]` |
+	// | `<dictionary>` | object | `{ "key": "value" }` |
 	// Only include the keys you want to configure. Keys marked `presence: optional` in the Apple YAML can
 	// be omitted; keys marked `presence: required` must be present.
 	// ### Reference.
@@ -447,7 +454,7 @@ type CustomDeclarationsComponent struct {
 	// A configuration declaration can reference an asset declaration defined in the same `declarations`
 	// array using the `$PAYLOAD_<payloadKey>` placeholder. The `payloadKey` values are local to the
 	// declarations list in this request — they do not need to be globally unique or consistent across
-	// requests:.
+	// requests:
 	// ```json { "declarations": [ { "type": "com.apple.asset.credential.userpassword", "channelType":
 	// "SYSTEM", "kind": "ASSET", "payload": { "Reference": { "DataURL":
 	// "https://example.com/asset-data/credential.json", "ContentType": "application/json" } },
@@ -467,12 +474,16 @@ type CustomDeclarationsComponent struct {
 	// `com.apple.configuration.passcode.settings`, `com.apple.asset.useridentity`) identifies each
 	// declaration.
 	// ### Step 2 — Set the `kind` field.
-	// The `kind` maps to the declaration group, derived from the Apple declaration type prefix:.
-	// | `kind` | Apple declaration type prefix | |---|---| | `CONFIGURATION` | `com.apple.configuration.`
-	// | | `ASSET` | `com.apple.asset.` |.
+	// The `kind` maps to the declaration group, derived from the Apple declaration type prefix:
+	// | `kind` | Apple declaration type prefix |
+	// |---|---|
+	// | `CONFIGURATION` | `com.apple.configuration.` |
+	// | `ASSET` | `com.apple.asset.` |
 	// ### Step 3 — Set the `channelType` field.
-	// | `channelType` | Description | |---|---| | `SYSTEM` | Applies the declaration to the system
-	// (device) channel | | `USER` | Applies the declaration to the user channel |.
+	// | `channelType` | Description |
+	// |---|---|
+	// | `SYSTEM` | Applies the declaration to the system (device) channel |
+	// | `USER` | Applies the declaration to the user channel |
 	// ### Step 4 — Build the `payload` object.
 	// The `payload` is a JSON object containing the declaration-specific keys from the `payloadkeys`
 	// section of the corresponding Apple declaration YAML.
@@ -647,27 +658,29 @@ type ManagedAppComponent struct {
 	// available blueprint components](../listComponents) endpoint (`GET /v1/blueprint-components`) to
 	// discover apps available to your organization and retrieve their identifiers.
 	// ### Required fields per app.
-	// | Field | Type | Description | |---|---|---| | `AssetId` | string | volume purchasing asset
-	// identifier for the app | | `AppAndBookTokenId` | string | Identifier of the volume purchasing token
-	// that licenses the app | | `AppId` | string | App bundle identifier (e.g., `com.microsoft.Excel`) |.
+	// | Field | Type | Description |
+	// |---|---|---|
+	// | `AssetId` | string | volume purchasing asset identifier for the app |
+	// | `AppAndBookTokenId` | string | Identifier of the volume purchasing token that licenses the app |
+	// | `AppId` | string | App bundle identifier (e.g., `com.microsoft.Excel`) |
 	// ### Optional management fields.
-	// | Field | Type | Values | Description | |---|---|---|---| | `Install` | string | `Required`,
-	// `Optional` | Whether the app must be installed. Defaults to `Required`. | |
-	// `AllowDownloadsOverCellular` | string | `AlwaysOn`, `AlwaysOff`, `StoreSettings` | Controls cellular
-	// downloads. Defaults to `StoreSettings`. | | `AutomaticAppUpdates` | string | `AlwaysOn`,
-	// `AlwaysOff`, `StoreSettings` | Controls automatic updates. Defaults to `StoreSettings`. | |
-	// `IncludeInBackup` | boolean | `true`, `false` | Whether app data is included in device backups. | |
-	// `Attributes` | object | — | Fine-grained app behavior settings. See `Attributes` fields below. |.
+	// | Field | Type | Values | Description |
+	// |---|---|---|---|
+	// | `Install` | string | `Required`, `Optional` | Whether the app must be installed. Defaults to `Required`. |
+	// | `AllowDownloadsOverCellular` | string | `AlwaysOn`, `AlwaysOff`, `StoreSettings` | Controls cellular downloads. Defaults to `StoreSettings`. |
+	// | `AutomaticAppUpdates` | string | `AlwaysOn`, `AlwaysOff`, `StoreSettings` | Controls automatic updates. Defaults to `StoreSettings`. |
+	// | `IncludeInBackup` | boolean | `true`, `false` | Whether app data is included in device backups. |
+	// | `Attributes` | object | — | Fine-grained app behavior settings. See `Attributes` fields below. |
 	// ### `Attributes` fields (all optional).
-	// | Field | Type | Description | |---|---|---| | `Hideable` | boolean | Allow the user to hide the app
-	// (requires iOS 18.1 or later). When `Lockable` is `false`, `Hideable` must also be `false`. | |
-	// `Lockable` | boolean | Allow the user to lock the app behind Face ID / Touch ID (requires iOS 18.1
-	// or later). | | `TapToPayScreenLock` | boolean | Require screen lock when Tap to Pay is used. | |
-	// `AssociatedDomains` | array of strings | Associated domains for the app (e.g., `["example.com"]`). |
-	// | `AssociatedDomainsEnableDirectDownloads` | boolean | Enable direct downloads for the associated
-	// domains. | | `CellularSliceUUID` | string (UUID) | Network slicing UUID for the app's cellular
-	// connection. | | `DNSProxyUUID` | string (UUID) | UUID of the DNS proxy configuration to apply to the
-	// app. |.
+	// | Field | Type | Description |
+	// |---|---|---|
+	// | `Hideable` | boolean | Allow the user to hide the app (requires iOS 18.1 or later). When `Lockable` is `false`, `Hideable` must also be `false`. |
+	// | `Lockable` | boolean | Allow the user to lock the app behind Face ID / Touch ID (requires iOS 18.1 or later). |
+	// | `TapToPayScreenLock` | boolean | Require screen lock when Tap to Pay is used. |
+	// | `AssociatedDomains` | array of strings | Associated domains for the app (e.g., `["example.com"]`). |
+	// | `AssociatedDomainsEnableDirectDownloads` | boolean | Enable direct downloads for the associated domains. |
+	// | `CellularSliceUUID` | string (UUID) | Network slicing UUID for the app's cellular connection. |
+	// | `DNSProxyUUID` | string (UUID) | UUID of the DNS proxy configuration to apply to the app. |
 	// > **Validation rule:** When `Lockable` is `false`, `Hideable` is required and must also be `false`.
 	Identifier string `json:"identifier"`
 }

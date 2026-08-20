@@ -93,7 +93,12 @@ func toLowerCamelCase(s string) string {
 func cleanComment(s string) string {
 	s = strings.ReplaceAll(s, "\n", " ")
 	s = strings.Join(strings.Fields(s), " ")
-	if !strings.HasSuffix(s, ".") {
+	// A paragraph ending in a colon introduces something that follows — a list,
+	// or (since GitOps build v1369) a markdown table. Appending a full stop
+	// there yields "Valid IPs per datacenter:." Any other terminal punctuation
+	// is already an ending, so only a bare word needs the period.
+	if !strings.HasSuffix(s, ".") && !strings.HasSuffix(s, ":") &&
+		!strings.HasSuffix(s, "!") && !strings.HasSuffix(s, "?") {
 		s += "."
 	}
 	return s
@@ -137,9 +142,47 @@ func docParagraphs(text string, width int) []string {
 		if strings.TrimSpace(para) == "" {
 			continue
 		}
+		if rows := markdownTableRows(para); rows != nil {
+			out = append(out, rows...)
+			continue
+		}
 		out = append(out, wrapCommentText(cleanComment(para), width)...)
 	}
 	return out
+}
+
+// markdownTableRows emits a pipe-delimited markdown table one row per comment
+// line, or nil when para is not one.
+//
+// Reflowing a table destroys it: wrapCommentText collapses the rows into a
+// single run of `| a | b | |---|---| | c | d |`, which is neither readable nor
+// greppable for the one row a caller wants. Two specs ship tables in a
+// description — blueprints (Apple payload field references) and, since GitOps
+// build v1369, ztna, whose availabilityZones tables carry the per-datacenter
+// source IPs a peer firewall has to allow. Those IPs are operational
+// configuration, so a caller has to be able to read the row for their region.
+//
+// Rows are emitted verbatim and may exceed the wrap width. That is deliberate —
+// a table is only legible with its columns intact, and no wrap point preserves
+// them.
+func markdownTableRows(para string) []string {
+	var rows []string
+	for _, line := range strings.Split(para, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		if !strings.HasPrefix(line, "|") {
+			return nil // any non-row line means this is prose, not a table
+		}
+		rows = append(rows, line)
+	}
+	// A lone row is prose that happens to start with a pipe; a table needs at
+	// least a header and its separator.
+	if len(rows) < 2 {
+		return nil
+	}
+	return rows
 }
 
 // wrapCommentText greedily wraps s to width columns without splitting a word.
