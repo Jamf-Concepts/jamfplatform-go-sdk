@@ -373,16 +373,34 @@ type DohIntegration struct {
 
 // Gateway A dedicated ZTNA Gateway. Always has exactly one deployment. All deployment fields are at the top level — no nesting.
 type Gateway struct {
-	// Public IPv4 addresses of the availability zone nodes (e.g. `52.16.181.207`). Must belong to the
+	// Public IPv4 addresses of the availability zone nodes (e.g. `18.202.42.169`). Must belong to the
 	// gateway's datacenter region. Note: despite the field name, values are IPv4 addresses — not zone
 	// identifier strings. TRS `/external/v1` translates these to/from TRS internal zone IDs (e.g.
 	// `eu-west-1a`) transparently.
+	// For **IPsec gateways**, these are the source addresses the peer firewall must allow. Valid IPs per
+	// datacenter:
+	// | Datacenter | Name | IP 1 | IP 2 |
+	// |---|---|---|---|
+	// | `af-south-1` | Africa - Cape Town | `13.244.169.182` | `13.246.106.52` |
+	// | `ap-east-1` | Asia - Hong Kong | `16.163.54.105` | `16.163.15.242` |
+	// | `ap-northeast-1` | Asia - Japan | `35.76.189.152` | `52.192.166.230` |
+	// | `ap-south-1` | Asia - Mumbai | `3.109.252.176` | `65.1.247.99` |
+	// | `ap-southeast-1` | Asia - Singapore | `18.140.158.235` | `52.77.139.71` |
+	// | `ap-southeast-2` | Australia | `54.66.243.182` | `13.238.46.250` |
+	// | `ca-central-1` | North America - Canada | `15.222.200.189` | `3.98.80.44` |
+	// | `eu-central-1` | Europe - Germany | `3.66.107.208` | `3.121.43.105` |
+	// | `eu-west-1` | Europe - Ireland | `54.220.161.57` | `18.202.42.169` |
+	// | `eu-west-2` | Europe - UK | `3.9.67.90` | `18.130.213.235` |
+	// | `sa-east-1` | South America - Brazil | `54.207.180.94` | `54.232.123.56` |
+	// | `us-east-1` | North America - USA East | `163.123.175.1` | `163.123.175.2` |
+	// | `us-west-2` | North America - USA West | `163.123.174.1` | `163.123.174.2` |
 	AvailabilityZones []string `json:"availabilityZones"`
 	// Operational contact for this gateway.
 	Contact *GatewayContact `json:"contact,omitempty"`
 	// Datacenter this gateway is deployed to (e.g. `eu-west-1`). Can be changed on PATCH — triggers
 	// re-provisioning; `availabilityZones` must match the new datacenter prefix (TRS enforces this and
 	// returns `400` on mismatch).
+	// Allowed values: see the GatewayDatacenter constants.
 	Datacenter string `json:"datacenter"`
 	// Dedicated egress IP configuration.
 	DedicatedIps *DedicatedIps `json:"dedicatedIps,omitempty"`
@@ -411,14 +429,32 @@ type GatewayContact struct {
 
 // GatewayCreateRequest Flat request body for creating a dedicated Gateway.
 type GatewayCreateRequest struct {
-	// Public IPv4 addresses of the availability zone nodes to deploy into (e.g. `52.16.181.207`). Must
+	// Public IPv4 addresses of the availability zone nodes to deploy into (e.g. `18.202.42.169`). Must
 	// belong to the gateway's datacenter region. Must be empty when `dedicatedIps.enabled: true`. Note:
 	// despite the field name, values are IPv4 addresses — TRS `/external/v1` translates to/from TRS
 	// internal zone IDs (e.g. `eu-west-1a`) transparently.
+	// For **IPsec gateways**, these are the source addresses the peer firewall must allow. Valid IPs per
+	// datacenter:
+	// | Datacenter | Name | IP 1 | IP 2 |
+	// |---|---|---|---|
+	// | `af-south-1` | Africa - Cape Town | `13.244.169.182` | `13.246.106.52` |
+	// | `ap-east-1` | Asia - Hong Kong | `16.163.54.105` | `16.163.15.242` |
+	// | `ap-northeast-1` | Asia - Japan | `35.76.189.152` | `52.192.166.230` |
+	// | `ap-south-1` | Asia - Mumbai | `3.109.252.176` | `65.1.247.99` |
+	// | `ap-southeast-1` | Asia - Singapore | `18.140.158.235` | `52.77.139.71` |
+	// | `ap-southeast-2` | Australia | `54.66.243.182` | `13.238.46.250` |
+	// | `ca-central-1` | North America - Canada | `15.222.200.189` | `3.98.80.44` |
+	// | `eu-central-1` | Europe - Germany | `3.66.107.208` | `3.121.43.105` |
+	// | `eu-west-1` | Europe - Ireland | `54.220.161.57` | `18.202.42.169` |
+	// | `eu-west-2` | Europe - UK | `3.9.67.90` | `18.130.213.235` |
+	// | `sa-east-1` | South America - Brazil | `54.207.180.94` | `54.232.123.56` |
+	// | `us-east-1` | North America - USA East | `163.123.175.1` | `163.123.175.2` |
+	// | `us-west-2` | North America - USA West | `163.123.174.1` | `163.123.174.2` |
 	AvailabilityZones *[]string `json:"availabilityZones,omitempty"`
 	// Operational contact for this gateway.
 	Contact *GatewayContact `json:"contact,omitempty"`
 	// Target datacenter identifier (e.g. `eu-west-1`).
+	// Allowed values: see the GatewayCreateRequestDatacenter constants.
 	Datacenter string `json:"datacenter"`
 	// Dedicated egress IP configuration.
 	DedicatedIps *DedicatedIps `json:"dedicatedIps,omitempty"`
@@ -476,8 +512,25 @@ type GatewayListResponse struct {
 
 // GatewayPatchRequest Flat merge-patch body (`application/merge-patch+json`). All fields optional. When `datacenter` is omitted, the existing value is preserved. When `datacenter` changes, `availabilityZones` must match the new datacenter prefix (e.g. `eu-central-1a` for `eu-central-1`) — returns `400` on mismatch.
 type GatewayPatchRequest struct {
-	// Replaces the availability zone node list. Accepts public IPv4 addresses (e.g. `52.16.181.207`).
+	// Replaces the availability zone node list. Accepts public IPv4 addresses (e.g. `18.202.42.169`).
 	// Zones must belong to the (new or existing) datacenter.
+	// For **IPsec gateways**, these are the source addresses the peer firewall must allow. Valid IPs per
+	// datacenter:
+	// | Datacenter | Name | IP 1 | IP 2 |
+	// |---|---|---|---|
+	// | `af-south-1` | Africa - Cape Town | `13.244.169.182` | `13.246.106.52` |
+	// | `ap-east-1` | Asia - Hong Kong | `16.163.54.105` | `16.163.15.242` |
+	// | `ap-northeast-1` | Asia - Japan | `35.76.189.152` | `52.192.166.230` |
+	// | `ap-south-1` | Asia - Mumbai | `3.109.252.176` | `65.1.247.99` |
+	// | `ap-southeast-1` | Asia - Singapore | `18.140.158.235` | `52.77.139.71` |
+	// | `ap-southeast-2` | Australia | `54.66.243.182` | `13.238.46.250` |
+	// | `ca-central-1` | North America - Canada | `15.222.200.189` | `3.98.80.44` |
+	// | `eu-central-1` | Europe - Germany | `3.66.107.208` | `3.121.43.105` |
+	// | `eu-west-1` | Europe - Ireland | `54.220.161.57` | `18.202.42.169` |
+	// | `eu-west-2` | Europe - UK | `3.9.67.90` | `18.130.213.235` |
+	// | `sa-east-1` | South America - Brazil | `54.207.180.94` | `54.232.123.56` |
+	// | `us-east-1` | North America - USA East | `163.123.175.1` | `163.123.175.2` |
+	// | `us-west-2` | North America - USA West | `163.123.174.1` | `163.123.174.2` |
 	AvailabilityZones *[]string `json:"availabilityZones,omitempty"`
 	// Operational contact for this gateway.
 	Contact *GatewayContact `json:"contact,omitempty"`
@@ -485,6 +538,7 @@ type GatewayPatchRequest struct {
 	// match the new datacenter prefix — returns `400` on mismatch. **Destructive:** triggers
 	// re-provisioning, connectivity outage, and immediate `status.state` reset to `PENDING`.
 	// `dedicatedIps.ips` remain stale until VSC completes provisioning in the new datacenter.
+	// Allowed values: see the GatewayPatchRequestDatacenter constants.
 	Datacenter *string `json:"datacenter,omitempty"`
 	// Whether the deployment should be active.
 	Enabled *bool `json:"enabled,omitempty"`

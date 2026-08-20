@@ -236,6 +236,96 @@ func CypherSuiteConfigIntegrityValues() []CypherSuiteConfigIntegrity {
 	}
 }
 
+// GatewayCreateRequestDatacenter is the set of values accepted by GatewayCreateRequest.Datacenter.
+type GatewayCreateRequestDatacenter = string
+
+// GatewayCreateRequestDatacenter values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GatewayCreateRequestDatacenterAfSouth1     GatewayCreateRequestDatacenter = "af-south-1"
+	GatewayCreateRequestDatacenterApEast1      GatewayCreateRequestDatacenter = "ap-east-1"
+	GatewayCreateRequestDatacenterApNortheast1 GatewayCreateRequestDatacenter = "ap-northeast-1"
+	GatewayCreateRequestDatacenterApSouth1     GatewayCreateRequestDatacenter = "ap-south-1"
+	GatewayCreateRequestDatacenterApSoutheast1 GatewayCreateRequestDatacenter = "ap-southeast-1"
+	GatewayCreateRequestDatacenterApSoutheast2 GatewayCreateRequestDatacenter = "ap-southeast-2"
+	GatewayCreateRequestDatacenterCaCentral1   GatewayCreateRequestDatacenter = "ca-central-1"
+	GatewayCreateRequestDatacenterEuCentral1   GatewayCreateRequestDatacenter = "eu-central-1"
+	GatewayCreateRequestDatacenterEuWest1      GatewayCreateRequestDatacenter = "eu-west-1"
+	GatewayCreateRequestDatacenterEuWest2      GatewayCreateRequestDatacenter = "eu-west-2"
+	GatewayCreateRequestDatacenterSaEast1      GatewayCreateRequestDatacenter = "sa-east-1"
+	GatewayCreateRequestDatacenterUsEast1      GatewayCreateRequestDatacenter = "us-east-1"
+	GatewayCreateRequestDatacenterUsWest2      GatewayCreateRequestDatacenter = "us-west-2"
+)
+
+// GatewayCreateRequestDatacenterValues returns every value the Jamf API accepts for GatewayCreateRequestDatacenter,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func GatewayCreateRequestDatacenterValues() []GatewayCreateRequestDatacenter {
+	return []GatewayCreateRequestDatacenter{
+		GatewayCreateRequestDatacenterAfSouth1,
+		GatewayCreateRequestDatacenterApEast1,
+		GatewayCreateRequestDatacenterApNortheast1,
+		GatewayCreateRequestDatacenterApSouth1,
+		GatewayCreateRequestDatacenterApSoutheast1,
+		GatewayCreateRequestDatacenterApSoutheast2,
+		GatewayCreateRequestDatacenterCaCentral1,
+		GatewayCreateRequestDatacenterEuCentral1,
+		GatewayCreateRequestDatacenterEuWest1,
+		GatewayCreateRequestDatacenterEuWest2,
+		GatewayCreateRequestDatacenterSaEast1,
+		GatewayCreateRequestDatacenterUsEast1,
+		GatewayCreateRequestDatacenterUsWest2,
+	}
+}
+
+// GatewayDatacenter is the set of values accepted by Gateway.Datacenter.
+type GatewayDatacenter = string
+
+// GatewayDatacenter values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GatewayDatacenterAfSouth1     GatewayDatacenter = "af-south-1"
+	GatewayDatacenterApEast1      GatewayDatacenter = "ap-east-1"
+	GatewayDatacenterApNortheast1 GatewayDatacenter = "ap-northeast-1"
+	GatewayDatacenterApSouth1     GatewayDatacenter = "ap-south-1"
+	GatewayDatacenterApSoutheast1 GatewayDatacenter = "ap-southeast-1"
+	GatewayDatacenterApSoutheast2 GatewayDatacenter = "ap-southeast-2"
+	GatewayDatacenterCaCentral1   GatewayDatacenter = "ca-central-1"
+	GatewayDatacenterEuCentral1   GatewayDatacenter = "eu-central-1"
+	GatewayDatacenterEuWest1      GatewayDatacenter = "eu-west-1"
+	GatewayDatacenterEuWest2      GatewayDatacenter = "eu-west-2"
+	GatewayDatacenterSaEast1      GatewayDatacenter = "sa-east-1"
+	GatewayDatacenterUsEast1      GatewayDatacenter = "us-east-1"
+	GatewayDatacenterUsWest2      GatewayDatacenter = "us-west-2"
+)
+
+// GatewayDatacenterValues returns every value the Jamf API accepts for GatewayDatacenter,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func GatewayDatacenterValues() []GatewayDatacenter {
+	return []GatewayDatacenter{
+		GatewayDatacenterAfSouth1,
+		GatewayDatacenterApEast1,
+		GatewayDatacenterApNortheast1,
+		GatewayDatacenterApSouth1,
+		GatewayDatacenterApSoutheast1,
+		GatewayDatacenterApSoutheast2,
+		GatewayDatacenterCaCentral1,
+		GatewayDatacenterEuCentral1,
+		GatewayDatacenterEuWest1,
+		GatewayDatacenterEuWest2,
+		GatewayDatacenterSaEast1,
+		GatewayDatacenterUsEast1,
+		GatewayDatacenterUsWest2,
+	}
+}
+
 // GatewayIpSecKeyExchange is the set of values accepted by GatewayIpSec.KeyExchange.
 type GatewayIpSecKeyExchange = string
 
@@ -279,6 +369,51 @@ func GatewayIpSecRequestKeyExchangeValues() []GatewayIpSecRequestKeyExchange {
 	return []GatewayIpSecRequestKeyExchange{
 		GatewayIpSecRequestKeyExchangeIkev1,
 		GatewayIpSecRequestKeyExchangeIkev2,
+	}
+}
+
+// GatewayPatchRequestDatacenter is the set of values accepted by GatewayPatchRequest.Datacenter.
+type GatewayPatchRequestDatacenter = string
+
+// GatewayPatchRequestDatacenter values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GatewayPatchRequestDatacenterAfSouth1     GatewayPatchRequestDatacenter = "af-south-1"
+	GatewayPatchRequestDatacenterApEast1      GatewayPatchRequestDatacenter = "ap-east-1"
+	GatewayPatchRequestDatacenterApNortheast1 GatewayPatchRequestDatacenter = "ap-northeast-1"
+	GatewayPatchRequestDatacenterApSouth1     GatewayPatchRequestDatacenter = "ap-south-1"
+	GatewayPatchRequestDatacenterApSoutheast1 GatewayPatchRequestDatacenter = "ap-southeast-1"
+	GatewayPatchRequestDatacenterApSoutheast2 GatewayPatchRequestDatacenter = "ap-southeast-2"
+	GatewayPatchRequestDatacenterCaCentral1   GatewayPatchRequestDatacenter = "ca-central-1"
+	GatewayPatchRequestDatacenterEuCentral1   GatewayPatchRequestDatacenter = "eu-central-1"
+	GatewayPatchRequestDatacenterEuWest1      GatewayPatchRequestDatacenter = "eu-west-1"
+	GatewayPatchRequestDatacenterEuWest2      GatewayPatchRequestDatacenter = "eu-west-2"
+	GatewayPatchRequestDatacenterSaEast1      GatewayPatchRequestDatacenter = "sa-east-1"
+	GatewayPatchRequestDatacenterUsEast1      GatewayPatchRequestDatacenter = "us-east-1"
+	GatewayPatchRequestDatacenterUsWest2      GatewayPatchRequestDatacenter = "us-west-2"
+)
+
+// GatewayPatchRequestDatacenterValues returns every value the Jamf API accepts for GatewayPatchRequestDatacenter,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func GatewayPatchRequestDatacenterValues() []GatewayPatchRequestDatacenter {
+	return []GatewayPatchRequestDatacenter{
+		GatewayPatchRequestDatacenterAfSouth1,
+		GatewayPatchRequestDatacenterApEast1,
+		GatewayPatchRequestDatacenterApNortheast1,
+		GatewayPatchRequestDatacenterApSouth1,
+		GatewayPatchRequestDatacenterApSoutheast1,
+		GatewayPatchRequestDatacenterApSoutheast2,
+		GatewayPatchRequestDatacenterCaCentral1,
+		GatewayPatchRequestDatacenterEuCentral1,
+		GatewayPatchRequestDatacenterEuWest1,
+		GatewayPatchRequestDatacenterEuWest2,
+		GatewayPatchRequestDatacenterSaEast1,
+		GatewayPatchRequestDatacenterUsEast1,
+		GatewayPatchRequestDatacenterUsWest2,
 	}
 }
 

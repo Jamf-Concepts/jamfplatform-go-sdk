@@ -492,7 +492,7 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 	enabled := false
 	created, err := sc.CreateZtnaGatewayV1(ctx, &securitycloud.GatewayCreateRequest{
 		Name:       name,
-		Datacenter: "eu-west-2",
+		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
 		TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
 		Contact: &securitycloud.GatewayContact{
@@ -1226,7 +1226,7 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 	enabled := false
 	req := &securitycloud.GatewayCreateRequest{
 		Name:       jscName("apply-gateway"),
-		Datacenter: "eu-west-2",
+		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
 		TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
 		Contact: &securitycloud.GatewayContact{
@@ -1273,7 +1273,7 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 		t.Fatal("ApplyZtnaGatewayV1 returned an empty ID on create")
 	}
 
-	req.Datacenter = "eu-west-1"
+	req.Datacenter = securitycloud.GatewayCreateRequestDatacenterEuWest1
 	sameID, createdAgain, err := sc.ApplyZtnaGatewayV1(ctx, req)
 	if err != nil {
 		t.Fatalf("ApplyZtnaGatewayV1 update failed: %v", err)
@@ -1288,7 +1288,7 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetZtnaGatewayV1 after Apply update failed: %v", err)
 	}
-	if got.Datacenter != "eu-west-1" {
+	if got.Datacenter != securitycloud.GatewayDatacenterEuWest1 {
 		t.Errorf("after Apply update, datacenter = %q, want eu-west-1", got.Datacenter)
 	}
 }
