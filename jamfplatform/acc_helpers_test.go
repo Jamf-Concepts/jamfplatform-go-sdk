@@ -115,21 +115,6 @@ func accSecurityCloudClient(t *testing.T) *securitycloud.Client {
 	return securitycloud.New(c)
 }
 
-// skipOnGatewayUnrouted skips when the API gateway answered 403
-// BAD_PERMISSIONS, which it returns for a path it does not route as well as
-// for a genuine privilege failure — status code alone cannot separate them
-// (see CLAUDE.md, "Gateway rejection vs Jamf Pro rejection"). Every use names
-// the endpoint known to be unrouted in the message, so the skip stays a
-// statement about routing rather than a blanket 403 tolerance. Tighten each
-// caller to t.Fatalf once the gateway maps its path.
-func skipOnGatewayUnrouted(t *testing.T, err error, endpoint string) {
-	t.Helper()
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) && apiErr.HasStatus(http.StatusForbidden) {
-		t.Skipf("%s: 403 BAD_PERMISSIONS — the gateway does not route this path yet (the same credentials reach every other Security Cloud endpoint), so this is unrouted rather than under-privileged: %v", endpoint, err)
-	}
-}
-
 // egressIP reports this host's public egress IP, resolved once per run because a
 // rejected credential fails every test in the suite and a per-test lookup would
 // add three seconds each. An empty result is itself a signal: a host that cannot

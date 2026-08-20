@@ -779,13 +779,18 @@ func TestAcceptance_SecurityCloudDeviceGroupLifecycle(t *testing.T) {
 	}
 }
 
+// TestAcceptance_SecurityCloudDeviceGroupsV2 no longer tolerates a 403: the
+// gateway routes /v2/.../groups as of 2026-08-20 (wire-verified on eu, tenant
+// wisconsam, where it returns the {groups: []} envelope). It was 403
+// BAD_PERMISSIONS when the surface was first generated, so a 403 resurfacing
+// here means routing regressed or the region in use lags eu — either way that
+// is worth a failure rather than a skip.
 func TestAcceptance_SecurityCloudDeviceGroupsV2(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
 	groups, err := sc.ListDeviceGroupsV2(ctx)
 	if err != nil {
-		skipOnGatewayUnrouted(t, err, "GET /v2/tenant/{id}/groups")
 		skipOnServerError(t, err)
 		t.Fatalf("ListDeviceGroupsV2 failed: %v", err)
 	}
