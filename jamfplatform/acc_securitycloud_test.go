@@ -62,11 +62,12 @@ func TestAcceptance_SecurityCloudDnsZoneLifecycle(t *testing.T) {
 
 	// A zone's name servers must point at a real gateway ID; there is no
 	// synthetic value the server accepts.
-	gateways, err := sc.ListZtnaGatewaysV1(ctx)
+	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
 	}
+	gateways := gatewayPage.Results
 	if len(gateways) == 0 {
 		t.Skip("tenant has no ZTNA gateways — a DNS zone needs a gateway ID for its name servers")
 	}
@@ -264,11 +265,12 @@ func TestAcceptance_SecurityCloudZtnaReads(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	gateways, err := sc.ListZtnaGatewaysV1(ctx)
+	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
 	}
+	gateways := gatewayPage.Results
 	t.Logf("%d ZTNA gateways", len(gateways))
 	if len(gateways) > 0 {
 		g, err := sc.GetZtnaGatewayV1(ctx, gateways[0].ID)
@@ -401,11 +403,12 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	gateways, err := sc.ListZtnaGatewaysV1(ctx)
+	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
 	}
+	gateways := gatewayPage.Results
 	if len(gateways) < 2 {
 		t.Skipf("grouped gateways require at least 2 member gateways, tenant has %d", len(gateways))
 	}
@@ -562,12 +565,12 @@ func TestAcceptance_SecurityCloudUemConnectReads(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	connectors, err := sc.ListUemConnectorsV1(ctx)
+	connectorPage, err := sc.ListUemConnectorsV1(ctx)
 	if err != nil {
-		skipOnGatewayUnrouted(t, err, "GET /tenant/{id}/uem-connect/v1/connectors")
 		skipOnServerError(t, err)
 		t.Fatalf("ListUemConnectorsV1 failed: %v", err)
 	}
+	connectors := connectorPage.Results
 	t.Logf("%d UEM connectors", len(connectors))
 	if len(connectors) == 0 {
 		t.Skip("tenant has no UEM connector configured")
@@ -647,10 +650,11 @@ func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
 	// ZTNA gateways and apps resolve across pages; grouped gateways do not
 	// (their list endpoint declares no page params), so both transport walks
 	// get exercised.
-	gateways, err := sc.ListZtnaGatewaysV1(ctx)
+	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
 	if err != nil {
 		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
 	}
+	gateways := gatewayPage.Results
 	if len(gateways) > 0 {
 		id, err := sc.ResolveZtnaGatewayV1IDByName(ctx, gateways[0].Name)
 		if err != nil {
@@ -766,11 +770,12 @@ func TestAcceptance_SecurityCloudApplyDnsZone(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	gateways, err := sc.ListZtnaGatewaysV1(ctx)
+	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
 	}
+	gateways := gatewayPage.Results
 	if len(gateways) == 0 {
 		t.Skip("tenant has no ZTNA gateways — a DNS zone needs a gateway ID for its name servers")
 	}
@@ -893,11 +898,12 @@ func TestAcceptance_SecurityCloudApplyZtnaGroupedGateway(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	gateways, err := sc.ListZtnaGatewaysV1(ctx)
+	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
 	}
+	gateways := gatewayPage.Results
 	if len(gateways) < 2 {
 		t.Skipf("grouped gateways require at least 2 member gateways, tenant has %d", len(gateways))
 	}
