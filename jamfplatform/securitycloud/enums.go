@@ -67,6 +67,88 @@ func RoutingStrategyValues() []RoutingStrategy {
 	}
 }
 
+// ConnectionConfigRequestNoSecretVendor is the set of values accepted by ConnectionConfigRequestNoSecret.Vendor.
+type ConnectionConfigRequestNoSecretVendor = string
+
+// ConnectionConfigRequestNoSecretVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ConnectionConfigRequestNoSecretVendorCheckpoint ConnectionConfigRequestNoSecretVendor = "Checkpoint"
+	ConnectionConfigRequestNoSecretVendorCisco      ConnectionConfigRequestNoSecretVendor = "Cisco"
+	ConnectionConfigRequestNoSecretVendorFortinet   ConnectionConfigRequestNoSecretVendor = "Fortinet"
+	ConnectionConfigRequestNoSecretVendorJuniper    ConnectionConfigRequestNoSecretVendor = "Juniper"
+	ConnectionConfigRequestNoSecretVendorPaloAlto   ConnectionConfigRequestNoSecretVendor = "Palo Alto"
+	ConnectionConfigRequestNoSecretVendorSonicWall  ConnectionConfigRequestNoSecretVendor = "SonicWall"
+	ConnectionConfigRequestNoSecretVendorSophos     ConnectionConfigRequestNoSecretVendor = "Sophos"
+	ConnectionConfigRequestNoSecretVendorSourcefire ConnectionConfigRequestNoSecretVendor = "Sourcefire"
+	ConnectionConfigRequestNoSecretVendorStrongSwan ConnectionConfigRequestNoSecretVendor = "strongSwan"
+	ConnectionConfigRequestNoSecretVendorWatchguard ConnectionConfigRequestNoSecretVendor = "Watchguard"
+	ConnectionConfigRequestNoSecretVendorOther      ConnectionConfigRequestNoSecretVendor = "Other"
+)
+
+// ConnectionConfigRequestNoSecretVendorValues returns every value the Jamf API accepts for ConnectionConfigRequestNoSecretVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ConnectionConfigRequestNoSecretVendorValues() []ConnectionConfigRequestNoSecretVendor {
+	return []ConnectionConfigRequestNoSecretVendor{
+		ConnectionConfigRequestNoSecretVendorCheckpoint,
+		ConnectionConfigRequestNoSecretVendorCisco,
+		ConnectionConfigRequestNoSecretVendorFortinet,
+		ConnectionConfigRequestNoSecretVendorJuniper,
+		ConnectionConfigRequestNoSecretVendorPaloAlto,
+		ConnectionConfigRequestNoSecretVendorSonicWall,
+		ConnectionConfigRequestNoSecretVendorSophos,
+		ConnectionConfigRequestNoSecretVendorSourcefire,
+		ConnectionConfigRequestNoSecretVendorStrongSwan,
+		ConnectionConfigRequestNoSecretVendorWatchguard,
+		ConnectionConfigRequestNoSecretVendorOther,
+	}
+}
+
+// ConnectionConfigRightResponseVendor is the set of values accepted by ConnectionConfigRightResponse.Vendor.
+type ConnectionConfigRightResponseVendor = string
+
+// ConnectionConfigRightResponseVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ConnectionConfigRightResponseVendorCheckpoint ConnectionConfigRightResponseVendor = "Checkpoint"
+	ConnectionConfigRightResponseVendorCisco      ConnectionConfigRightResponseVendor = "Cisco"
+	ConnectionConfigRightResponseVendorFortinet   ConnectionConfigRightResponseVendor = "Fortinet"
+	ConnectionConfigRightResponseVendorJuniper    ConnectionConfigRightResponseVendor = "Juniper"
+	ConnectionConfigRightResponseVendorPaloAlto   ConnectionConfigRightResponseVendor = "Palo Alto"
+	ConnectionConfigRightResponseVendorSonicWall  ConnectionConfigRightResponseVendor = "SonicWall"
+	ConnectionConfigRightResponseVendorSophos     ConnectionConfigRightResponseVendor = "Sophos"
+	ConnectionConfigRightResponseVendorSourcefire ConnectionConfigRightResponseVendor = "Sourcefire"
+	ConnectionConfigRightResponseVendorStrongSwan ConnectionConfigRightResponseVendor = "strongSwan"
+	ConnectionConfigRightResponseVendorWatchguard ConnectionConfigRightResponseVendor = "Watchguard"
+	ConnectionConfigRightResponseVendorOther      ConnectionConfigRightResponseVendor = "Other"
+)
+
+// ConnectionConfigRightResponseVendorValues returns every value the Jamf API accepts for ConnectionConfigRightResponseVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ConnectionConfigRightResponseVendorValues() []ConnectionConfigRightResponseVendor {
+	return []ConnectionConfigRightResponseVendor{
+		ConnectionConfigRightResponseVendorCheckpoint,
+		ConnectionConfigRightResponseVendorCisco,
+		ConnectionConfigRightResponseVendorFortinet,
+		ConnectionConfigRightResponseVendorJuniper,
+		ConnectionConfigRightResponseVendorPaloAlto,
+		ConnectionConfigRightResponseVendorSonicWall,
+		ConnectionConfigRightResponseVendorSophos,
+		ConnectionConfigRightResponseVendorSourcefire,
+		ConnectionConfigRightResponseVendorStrongSwan,
+		ConnectionConfigRightResponseVendorWatchguard,
+		ConnectionConfigRightResponseVendorOther,
+	}
+}
+
 // CypherSuiteConfigDhGroups is the set of values accepted by CypherSuiteConfig.DhGroups.
 type CypherSuiteConfigDhGroups = string
 

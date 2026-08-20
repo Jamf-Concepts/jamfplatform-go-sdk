@@ -137,12 +137,12 @@ type App struct {
 	Assignments *Assignments `json:"assignments,omitempty"`
 	// IPv4 CIDR subnets (e.g. `192.168.1.0/24`). Duplicating a subnet across Apps returns 409.
 	BareIps []string `json:"bareIps"`
-	// App category name. Use the `displayName` field from `GET /categories` — that endpoint is the
+	// App category name. Use the `displayName` field from `GET /v1/categories` — that endpoint is the
 	// authoritative source. The value must exactly match a `displayName` returned by
 	// `content-block-service`. Unknown values return `409 MISSING_CATEGORY_NAME` — the category list is
-	// per-customer and may change, so an unrecognised name is a state conflict, not a malformed request.
-	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the machine-readable `name`
-	// slug.
+	// server-owned and may change, so an unrecognised name is a state conflict, not a malformed request.
+	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the internal `name` (e.g.
+	// `"Category - Business & Industry"`).
 	CategoryName CategoryName `json:"categoryName"`
 	// Per-group routing overrides that take precedence over the App's default routing. Each override's
 	// `groupIds` must be a subset of `assignments.inclusions.groups` (or `allUsers: true`); references to
@@ -173,12 +173,12 @@ type AppCreateRequest struct {
 	Assignments Assignments `json:"assignments"`
 	// IPv4 CIDR subnets (e.g. `192.168.1.0/24`). Duplicating a subnet across Apps returns 409.
 	BareIps *[]string `json:"bareIps,omitempty"`
-	// App category name. Use the `displayName` field from `GET /categories` — that endpoint is the
+	// App category name. Use the `displayName` field from `GET /v1/categories` — that endpoint is the
 	// authoritative source. The value must exactly match a `displayName` returned by
 	// `content-block-service`. Unknown values return `409 MISSING_CATEGORY_NAME` — the category list is
-	// per-customer and may change, so an unrecognised name is a state conflict, not a malformed request.
-	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the machine-readable `name`
-	// slug.
+	// server-owned and may change, so an unrecognised name is a state conflict, not a malformed request.
+	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the internal `name` (e.g.
+	// `"Category - Business & Industry"`).
 	CategoryName CategoryName `json:"categoryName"`
 	// Per-group routing overrides that take precedence over the App's default routing. Each override's
 	// `groupIds` must be a subset of `assignments.inclusions.groups` (or `allUsers: true`); references to
@@ -214,12 +214,12 @@ type AppPatchRequest struct {
 	Assignments *Assignments `json:"assignments,omitempty"`
 	// Replaces the full bareIps list. IPv4 CIDR subnets (e.g. `192.168.1.0/24`).
 	BareIps *[]string `json:"bareIps,omitempty"`
-	// App category name. Use the `displayName` field from `GET /categories` — that endpoint is the
+	// App category name. Use the `displayName` field from `GET /v1/categories` — that endpoint is the
 	// authoritative source. The value must exactly match a `displayName` returned by
 	// `content-block-service`. Unknown values return `409 MISSING_CATEGORY_NAME` — the category list is
-	// per-customer and may change, so an unrecognised name is a state conflict, not a malformed request.
-	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the machine-readable `name`
-	// slug.
+	// server-owned and may change, so an unrecognised name is a state conflict, not a malformed request.
+	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the internal `name` (e.g.
+	// `"Category - Business & Industry"`).
 	CategoryName *CategoryName `json:"categoryName,omitempty"`
 	// Per-group routing overrides that take precedence over the App's default routing. Each override's
 	// `groupIds` must be a subset of `assignments.inclusions.groups` (or `allUsers: true`); references to
@@ -267,10 +267,20 @@ type AssignmentsInclusions struct {
 // CategoryName is an alias for string.
 type CategoryName = string
 
+// ConnectionConfigLeftResponse IPSec Jamf-side endpoint returned on GET. Secrets are never included.
+type ConnectionConfigLeftResponse struct {
+	// Authentication method.
+	Auth string `json:"auth"`
+	// Endpoint address.
+	Host string `json:"host"`
+	// IKE identity.
+	ID string `json:"id"`
+	// CIDR subnets.
+	Subnets []string `json:"subnets"`
+}
+
 // ConnectionConfigRequest IPSec connection endpoint for write requests. Includes the `secret` field. `secret` is write-only — it is never returned in GET responses.
 type ConnectionConfigRequest struct {
-	// Authentication method. Currently only `psk` is supported.
-	Auth string `json:"auth"`
 	// Endpoint address or `%any`.
 	Host string `json:"host"`
 	// IKE identity (e.g. `wpa.wandera.com` or `%any`).
@@ -283,28 +293,23 @@ type ConnectionConfigRequest struct {
 	Secret *string `json:"secret,omitempty"`
 	// CIDR subnet routed through this endpoint (e.g. `0.0.0.0/0`). Exactly 1 element.
 	Subnets []string `json:"subnets"`
-	// Optional VPN vendor identifier of this endpoint (e.g. `cisco`, `strongSwan`). Optional on `left`;
-	// required on `right` (see `ConnectionConfigRequestNoSecret`).
-	Vendor *string `json:"vendor,omitempty"`
 }
 
-// ConnectionConfigRequestNoSecret IPSec connection endpoint for the `right` side. Identical to `left` but without `secret` — the secret is set automatically from `left.secret`. `vendor` is **required** — use the peer's VPN vendor identifier (e.g. `cisco`, `strongSwan`, `juniper`).
+// ConnectionConfigRequestNoSecret IPSec connection endpoint for the `right` side. Identical to `left` but without `secret` — the secret is set automatically from `left.secret`. `vendor` is **required** — use one of the fixed vendor identifiers listed under `ConnectionConfigRequestNoSecret.vendor`. Values are case-sensitive.
 type ConnectionConfigRequestNoSecret struct {
-	// Authentication method.
-	Auth string `json:"auth"`
 	// Endpoint address.
 	Host string `json:"host"`
 	// IKE identity.
 	ID string `json:"id"`
 	// CIDR subnet routed through this endpoint (e.g. `0.0.0.0/0`). Exactly 1 element.
 	Subnets []string `json:"subnets"`
-	// VPN vendor identifier of the remote peer (e.g. `cisco`, `strongSwan`, `juniper`). Free string — no
-	// fixed enum. **Required**.
+	// VPN vendor identifier of the remote peer. Case-sensitive. **Required**.
+	// Allowed values: see the ConnectionConfigRequestNoSecretVendor constants.
 	Vendor string `json:"vendor"`
 }
 
-// ConnectionConfigResponse IPSec connection endpoint returned on GET. Secrets are never included.
-type ConnectionConfigResponse struct {
+// ConnectionConfigRightResponse IPSec remote-peer endpoint returned on GET. Secrets are never included.
+type ConnectionConfigRightResponse struct {
 	// Authentication method.
 	Auth string `json:"auth"`
 	// Endpoint address.
@@ -313,7 +318,8 @@ type ConnectionConfigResponse struct {
 	ID string `json:"id"`
 	// CIDR subnets.
 	Subnets []string `json:"subnets"`
-	// Optional VPN vendor identifier.
+	// VPN vendor identifier of the remote peer.
+	// Allowed values: see the ConnectionConfigRightResponseVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -437,10 +443,10 @@ type GatewayIpSec struct {
 	// IKE version.
 	// Allowed values: see the GatewayIpSecKeyExchange constants.
 	KeyExchange string `json:"keyExchange"`
-	// IPSec connection endpoint returned on GET. Secrets are never included.
-	Left *ConnectionConfigResponse `json:"left,omitempty"`
-	// IPSec connection endpoint returned on GET. Secrets are never included.
-	Right *ConnectionConfigResponse `json:"right,omitempty"`
+	// IPSec Jamf-side endpoint returned on GET. Secrets are never included.
+	Left *ConnectionConfigLeftResponse `json:"left,omitempty"`
+	// IPSec remote-peer endpoint returned on GET. Secrets are never included.
+	Right *ConnectionConfigRightResponse `json:"right,omitempty"`
 }
 
 // GatewayIpSecRequest IPSec tunnel configuration for POST / PATCH requests. Provide `left.secret` to set or rotate the PSK — it is automatically applied to both tunnel endpoints. All other fields are accepted as on create.
@@ -456,8 +462,8 @@ type GatewayIpSecRequest struct {
 	// — it is never returned in GET responses.
 	Left ConnectionConfigRequest `json:"left"`
 	// IPSec connection endpoint for the `right` side. Identical to `left` but without `secret` — the
-	// secret is set automatically from `left.secret`. `vendor` is **required** — use the peer's VPN
-	// vendor identifier (e.g. `cisco`, `strongSwan`, `juniper`).
+	// secret is set automatically from `left.secret`. `vendor` is **required** — use one of the fixed
+	// vendor identifiers listed under `ConnectionConfigRequestNoSecret.vendor`. Values are case-sensitive.
 	Right ConnectionConfigRequestNoSecret `json:"right"`
 }
 
@@ -658,15 +664,15 @@ type Category struct {
 	DisplayName string `json:"displayName"`
 	// Unique category identifier.
 	ID string `json:"id"`
-	// Machine-readable slug (e.g. `social`). Informational only — **do not use as `categoryName`**; TRS
-	// validates against `displayName`, not `name`.
+	// Internal category name (e.g. `Category - Social`). Informational only — do not use as
+	// `categoryName`; use `displayName`, which TRS validates against.
 	Name string `json:"name"`
 }
 
-// CategoryListResponse represents a category list response.
+// CategoryListResponse Full list of content categories. Not paginated; the same list is returned for all tenants.
 type CategoryListResponse struct {
 	Results []Category `json:"results"`
-	// Total number of content categories available to this tenant.
+	// Total number of content categories.
 	TotalCount int `json:"totalCount"`
 }
 

@@ -11165,10 +11165,9 @@
       "package": "securitycloud",
       "specFile": "securitycloud_categories_api.json",
       "splitByTag": true,
-      "version": "v1",
       "operations": [
         {
-          "op": "GET /tenant/{tenantId}/categories",
+          "op": "GET /v1/tenant/{tenantId}/categories",
           "name": "ListContentCategoriesV1",
           "resolver": {
             "resourceType": "ContentCategoryV1",
