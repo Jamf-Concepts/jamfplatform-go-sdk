@@ -319,7 +319,7 @@ type ConnectionConfigPatchRightRequest struct {
 	Host *string `json:"host,omitempty"`
 	// IKE identity (e.g. `wpa.wandera.com` or `%any`).
 	ID *string `json:"id,omitempty"`
-	// CIDR subnet routed through this endpoint. Exactly 1 element.
+	// CIDR subnets routed through this endpoint.
 	Subnets *[]string `json:"subnets,omitempty"`
 	// VPN vendor identifier of the remote peer. Case-sensitive.
 	// Allowed values: see the ConnectionConfigPatchRightRequestVendor constants.
@@ -332,7 +332,7 @@ type ConnectionConfigRightRequest struct {
 	Host string `json:"host"`
 	// IKE identity.
 	ID string `json:"id"`
-	// CIDR subnet routed through this endpoint (e.g. `0.0.0.0/0`). Exactly 1 element.
+	// CIDR subnets routed through this endpoint (e.g. `0.0.0.0/0`).
 	Subnets []string `json:"subnets"`
 	// VPN vendor identifier of the remote peer. Case-sensitive. **Required**.
 	// Allowed values: see the ConnectionConfigRightRequestVendor constants.
@@ -375,7 +375,7 @@ type CypherSuiteConfig struct {
 	// Allowed values: see the CypherSuiteConfigIntegrity constants.
 	Integrity []string `json:"integrity"`
 	// Key lifetime in seconds (e.g. `28800` for IKE, `3600` for ESP).
-	LifetimeInSec int `json:"lifetimeInSec"`
+	LifetimeInSec int64 `json:"lifetimeInSec"`
 }
 
 // DedicatedIps Dedicated egress IP configuration.
@@ -484,7 +484,7 @@ type GatewayCreateRequest struct {
 	// | `us-west-2` | North America - USA West | `163.123.174.1` | `163.123.174.2` |
 	AvailabilityZones *[]string `json:"availabilityZones,omitempty"`
 	// Operational contact for this gateway.
-	Contact *GatewayContact `json:"contact,omitempty"`
+	Contact GatewayContact `json:"contact"`
 	// Target datacenter identifier (e.g. `eu-west-1`).
 	// Allowed values: see the GatewayCreateRequestDatacenter constants.
 	Datacenter string `json:"datacenter"`

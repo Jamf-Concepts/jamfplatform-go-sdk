@@ -102,7 +102,7 @@ func jscEnsureGateways(t *testing.T, sc *securitycloud.Client, n int) []security
 			Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 			Enabled:    &enabled,
 			TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
-			Contact: &securitycloud.GatewayContact{
+			Contact: securitycloud.GatewayContact{
 				Email: "sdk-acc@example.invalid",
 				Name:  "SDK acceptance fixture",
 			},
@@ -622,7 +622,8 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	suite := func(lifetime int) securitycloud.CypherSuiteConfig {
+	// lifetimeInSec became int64 in build v1424 (the spec added format: int64).
+	suite := func(lifetime int64) securitycloud.CypherSuiteConfig {
 		return securitycloud.CypherSuiteConfig{
 			Encryption:    []string{"aes256"},
 			Integrity:     []string{"sha256"},
@@ -638,7 +639,7 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
 		TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
-		Contact: &securitycloud.GatewayContact{
+		Contact: securitycloud.GatewayContact{
 			Email: "sdk-acc@example.invalid",
 			Name:  "SDK acceptance",
 		},
@@ -652,10 +653,14 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 				Subnets: []string{"10.99.0.0/24"},
 				Secret:  &[]string{"SdkAcceptancePsk1234"}[0],
 			},
+			// Two right subnets, deliberately. Build v1424 dropped maxItems:1
+			// from right (and only right), and the server agrees — see the
+			// cardinality assertions below. Creating with two is what proves the
+			// relaxation is real rather than spec-only.
 			Right: securitycloud.ConnectionConfigRightRequest{
 				ID:      "peer.sdk-acc.example.invalid",
 				Host:    "203.0.113.10",
-				Subnets: []string{"10.98.0.0/16"},
+				Subnets: []string{"203.0.113.0/24", "198.51.100.0/24"},
 				Vendor:  securitycloud.ConnectionConfigRightRequestVendorCisco,
 			},
 		},
@@ -694,11 +699,63 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 	if got.Ipsec.Right.Vendor != securitycloud.ConnectionConfigRightResponseVendorCisco {
 		t.Errorf("right.vendor = %q, want Cisco", got.Ipsec.Right.Vendor)
 	}
+	// Both right subnets must survive the round trip. Wire-verified 2026-08-21:
+	// right accepts many, left is still capped at one, and build v1424's schema
+	// change removed maxItems from right alone — an asymmetry worth pinning
+	// because nothing in the spec explains it.
+	if len(got.Ipsec.Right.Subnets) != 2 {
+		t.Errorf("right.subnets = %v, want both subnets preserved — v1424 dropped maxItems:1 from right, so a single-element result means the server still caps it", got.Ipsec.Right.Subnets)
+	}
+	if len(got.Ipsec.Left.Subnets) != 1 {
+		t.Errorf("left.subnets = %v, want exactly 1", got.Ipsec.Left.Subnets)
+	}
+
+	// The other half of the asymmetry: two *left* subnets are refused. This
+	// needs an otherwise-valid request, because the deep IPSec check does not
+	// run while a required top-level field is missing — which is why it lives
+	// here rather than in the ungated rejections test, whose cases all fail
+	// earlier. The rejection means nothing is provisioned.
+	tooManyLeft := &securitycloud.GatewayCreateRequest{
+		Name:       jscName("gateway-leftpair"),
+		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
+		Enabled:    &enabled,
+		TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+		Contact:    securitycloud.GatewayContact{Email: "sdk-acc@example.invalid", Name: "SDK acceptance"},
+		Ipsec: &securitycloud.GatewayIpSecRequest{
+			KeyExchange: "ikev2",
+			Ike:         suite(28800),
+			Esp:         suite(3600),
+			Left: securitycloud.ConnectionConfigLeftRequest{
+				ID:      "sdk-acc.example.invalid",
+				Host:    "%any",
+				Subnets: []string{"10.99.0.0/24", "10.98.0.0/24"},
+				Secret:  &[]string{"SdkAcceptancePsk1234"}[0],
+			},
+			Right: securitycloud.ConnectionConfigRightRequest{
+				ID:      "peer.sdk-acc.example.invalid",
+				Host:    "203.0.113.10",
+				Subnets: []string{"203.0.113.0/24"},
+				Vendor:  securitycloud.ConnectionConfigRightRequestVendorCisco,
+			},
+		},
+	}
+	if extra, err := sc.CreateZtnaGatewayV1(ctx, tooManyLeft); err == nil {
+		jscCleanupDelete(t, "ztna gateway "+extra.ID, func() error {
+			return sc.DeleteZtnaGatewayV1(context.Background(), extra.ID)
+		})
+		t.Error("two left subnets were accepted — left's maxItems:1 is no longer enforced, so the spec should drop it there too")
+	} else if apiErr := jamfplatform.AsAPIError(err); apiErr == nil || !apiErr.HasStatus(400) {
+		t.Errorf("two left subnets: want 400, got %v", err)
+	} else {
+		// Reported against `ipsec`, not `ipsec.left.subnets` — the array-level
+		// checks surface at the block, so a caller gets no path to the field.
+		t.Logf("two left subnets -> %s", apiErr.Summary())
+	}
 
 	// A whole-block ipsec patch still works, and is the shape a caller uses to
 	// replace cipher suites and endpoints together. Omitting left.secret
 	// preserves the existing PSK — the secret can be rotated, never cleared.
-	full := func(espLifetime int) *securitycloud.GatewayIpSecPatchRequest {
+	full := func(espLifetime int64) *securitycloud.GatewayIpSecPatchRequest {
 		return &securitycloud.GatewayIpSecPatchRequest{
 			KeyExchange: &[]string{"ikev2"}[0],
 			Ike:         &[]securitycloud.CypherSuiteConfig{suite(28800)}[0],
@@ -1595,7 +1652,7 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
 		TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
-		Contact: &securitycloud.GatewayContact{
+		Contact: securitycloud.GatewayContact{
 			Email: "sdk-acc@example.invalid",
 			Name:  "SDK acceptance",
 		},

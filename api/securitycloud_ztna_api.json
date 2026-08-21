@@ -538,6 +538,7 @@
         "type": "object"
       },
       "AppSecurity": {
+        "additionalProperties": false,
         "description": "Security controls applied to App traffic.",
         "properties": {
           "deviceManagementBasedAccess": {
@@ -722,7 +723,7 @@
             "type": "string"
           },
           "subnets": {
-            "description": "CIDR subnet routed through this endpoint. Exactly 1 element.",
+            "description": "CIDR subnets routed through this endpoint.",
             "example": [
               "0.0.0.0/0"
             ],
@@ -730,7 +731,6 @@
               "description": "IPv4 CIDR notation (e.g. `0.0.0.0/0`, `172.31.140.203/29`).",
               "type": "string"
             },
-            "maxItems": 1,
             "minItems": 1,
             "type": "array",
             "uniqueItems": true
@@ -772,13 +772,12 @@
             "type": "string"
           },
           "subnets": {
-            "description": "CIDR subnet routed through this endpoint (e.g. `0.0.0.0/0`). Exactly 1 element.",
+            "description": "CIDR subnets routed through this endpoint (e.g. `0.0.0.0/0`).",
             "items": {
               "description": "IPv4 CIDR notation (e.g. `0.0.0.0/0`).",
               "example": "10.10.0.0/16",
               "type": "string"
             },
-            "maxItems": 1,
             "minItems": 1,
             "type": "array",
             "uniqueItems": true
@@ -949,6 +948,7 @@
           "lifetimeInSec": {
             "description": "Key lifetime in seconds (e.g. `28800` for IKE, `3600` for ESP).",
             "example": 28800,
+            "format": "int64",
             "minimum": 1,
             "type": "integer"
           }
@@ -1211,8 +1211,9 @@
           }
         },
         "required": [
-          "name",
+          "contact",
           "datacenter",
+          "name",
           "tenantIds"
         ],
         "type": "object"
