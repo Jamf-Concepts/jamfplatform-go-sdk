@@ -58,21 +58,73 @@ func jscCleanupDelete(t *testing.T, label string, fn func() error) {
 // DNS — zones
 // ---------------------------------------------------------------------------
 
+// jscEnsureGateways returns at least n dedicated ZTNA gateways, creating any
+// shortfall itself. Four tests need a real gateway ID and no synthetic value
+// works: DNS zones must point their name servers at one, and a grouped gateway
+// needs two dedicated members (shared ones are refused with 422
+// SHARED_GATEWAY_MEMBER). Those tests used to skip whenever the tenant happened
+// to have none, which meant their create paths went unexercised on exactly the
+// clean tenant a CI run starts from.
+//
+// Gateways it creates are `enabled: false` with `dedicatedIps` and no `ipsec`,
+// which is the cheapest form the server accepts — no subnets, vendor or PSK —
+// and they carry no traffic. Each is registered for deletion via
+// jscCleanupDelete, so a run leaves the tenant as it found it.
+//
+// Creating one still provisions real infrastructure, so it stays behind
+// JAMFPLATFORM_JSC_GATEWAY_WRITE_OK. The difference from a bare skip is that on
+// a tenant reserved for this suite nothing skips, and on a shared tenant the
+// skip names the variable that would fix it rather than an absent fixture the
+// reader cannot act on. Pre-existing gateways are used as-is and never deleted.
+func jscEnsureGateways(t *testing.T, sc *securitycloud.Client, n int) []securitycloud.Gateway {
+	t.Helper()
+	ctx := context.Background()
+
+	page, err := sc.ListZtnaGatewaysV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
+	}
+	existing := page.Results
+	if len(existing) >= n {
+		return existing
+	}
+	if os.Getenv("JAMFPLATFORM_JSC_GATEWAY_WRITE_OK") == "" {
+		t.Skipf("need %d dedicated ZTNA gateways, tenant has %d, and creating one provisions real network egress — set JAMFPLATFORM_JSC_GATEWAY_WRITE_OK to let this test create and delete its own on a tenant reserved for it", n, len(existing))
+	}
+
+	enabled := false
+	for len(existing) < n {
+		created, err := sc.CreateZtnaGatewayV1(ctx, &securitycloud.GatewayCreateRequest{
+			Name:       jscName("fixture-gateway"),
+			Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
+			Enabled:    &enabled,
+			TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+			Contact: &securitycloud.GatewayContact{
+				Email: "sdk-acc@example.invalid",
+				Name:  "SDK acceptance fixture",
+			},
+			DedicatedIps: &securitycloud.DedicatedIps{Enabled: true},
+		})
+		if err != nil {
+			t.Fatalf("creating fixture gateway %d/%d failed: %v", len(existing)+1, n, err)
+		}
+		id := created.ID
+		jscCleanupDelete(t, "fixture gateway "+id, func() error {
+			return sc.DeleteZtnaGatewayV1(context.Background(), id)
+		})
+		existing = append(existing, *created)
+	}
+	return existing
+}
+
 func TestAcceptance_SecurityCloudDnsZoneLifecycle(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
 	// A zone's name servers must point at a real gateway ID; there is no
 	// synthetic value the server accepts.
-	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
-	}
-	gateways := gatewayPage.Results
-	if len(gateways) == 0 {
-		t.Skip("tenant has no ZTNA gateways — a DNS zone needs a gateway ID for its name servers")
-	}
+	gateways := jscEnsureGateways(t, sc, 1)
 
 	created, err := sc.CreateDnsZoneV1(ctx, &securitycloud.ZoneWrite{
 		Name:        jscName("zone"),
@@ -405,15 +457,7 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
-	}
-	gateways := gatewayPage.Results
-	if len(gateways) < 2 {
-		t.Skipf("grouped gateways require at least 2 member gateways, tenant has %d", len(gateways))
-	}
+	gateways := jscEnsureGateways(t, sc, 2)
 
 	name := jscName("grouped")
 	created, err := sc.CreateZtnaGroupedGatewayV1(ctx, &securitycloud.GroupedGatewayCreateRequest{
@@ -600,17 +644,17 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 			KeyExchange: "ikev2",
 			Ike:         suite(28800),
 			Esp:         suite(3600),
-			Left: securitycloud.ConnectionConfigRequest{
+			Left: securitycloud.ConnectionConfigLeftRequest{
 				ID:      "sdk-acc.example.invalid",
 				Host:    "%any",
 				Subnets: []string{"10.99.0.0/24"},
 				Secret:  &[]string{"SdkAcceptancePsk1234"}[0],
 			},
-			Right: securitycloud.ConnectionConfigRequestNoSecret{
+			Right: securitycloud.ConnectionConfigRightRequest{
 				ID:      "peer.sdk-acc.example.invalid",
 				Host:    "203.0.113.10",
 				Subnets: []string{"10.98.0.0/16"},
-				Vendor:  securitycloud.ConnectionConfigRequestNoSecretVendorCisco,
+				Vendor:  securitycloud.ConnectionConfigRightRequestVendorCisco,
 			},
 		},
 	})
@@ -649,29 +693,24 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 		t.Errorf("right.vendor = %q, want Cisco", got.Ipsec.Right.Vendor)
 	}
 
-	// A partial ipsec merge-patch — {"ipsec":{"esp":{...}}} — is accepted by the
-	// server and deep-merges correctly (wire-verified with curl on 2026-08-20:
-	// esp is replaced, keyExchange/ike/left/right are preserved). It is
-	// unreachable through this SDK: GatewayPatchRequest.ipsec reuses the
-	// POST-shaped GatewayIpSecRequest, whose KeyExchange/Ike/Esp/Left/Right are
-	// all non-pointer because the spec marks them required, so a partial value
-	// marshals keyExchange:"" and empty ike/left/right and the server answers
-	// 400 "Request body is missing or malformed." The pending spec restructure
-	// (GatewayIpSecPatchRequest, all-optional) is what fixes this; until it
-	// lands, a caller must resend the whole ipsec block, which is what this
-	// asserts. Omitting left.secret on the resend preserves the existing PSK.
-	full := func(espLifetime int) *securitycloud.GatewayIpSecRequest {
-		return &securitycloud.GatewayIpSecRequest{
-			KeyExchange: "ikev2",
-			Ike:         suite(28800),
-			Esp:         suite(espLifetime),
-			Left: securitycloud.ConnectionConfigRequest{
-				ID: "sdk-acc.example.invalid", Host: "%any", Subnets: []string{"10.99.0.0/24"},
+	// A whole-block ipsec patch still works, and is the shape a caller uses to
+	// replace cipher suites and endpoints together. Omitting left.secret
+	// preserves the existing PSK — the secret can be rotated, never cleared.
+	full := func(espLifetime int) *securitycloud.GatewayIpSecPatchRequest {
+		return &securitycloud.GatewayIpSecPatchRequest{
+			KeyExchange: &[]string{"ikev2"}[0],
+			Ike:         &[]securitycloud.CypherSuiteConfig{suite(28800)}[0],
+			Esp:         &[]securitycloud.CypherSuiteConfig{suite(espLifetime)}[0],
+			Left: &securitycloud.ConnectionConfigPatchLeftRequest{
+				ID:      &[]string{"sdk-acc.example.invalid"}[0],
+				Host:    &[]string{"%any"}[0],
+				Subnets: &[]string{"10.99.0.0/24"},
 			},
-			Right: securitycloud.ConnectionConfigRequestNoSecret{
-				ID: "peer.sdk-acc.example.invalid", Host: "203.0.113.10",
-				Subnets: []string{"10.98.0.0/16"},
-				Vendor:  securitycloud.ConnectionConfigRequestNoSecretVendorCisco,
+			Right: &securitycloud.ConnectionConfigPatchRightRequest{
+				ID:      &[]string{"peer.sdk-acc.example.invalid"}[0],
+				Host:    &[]string{"203.0.113.10"}[0],
+				Subnets: &[]string{"10.98.0.0/16"},
+				Vendor:  &[]string{securitycloud.ConnectionConfigPatchRightRequestVendorCisco}[0],
 			},
 		}
 	}
@@ -691,15 +730,74 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 		t.Errorf("ipsec patch clobbered ike: lifetimeInSec = %d, want 28800", after.Ipsec.Ike.LifetimeInSec)
 	}
 
-	// Pin the limitation itself, so it fails loudly the day the spec's PATCH
-	// shape lands and this stops being a 400.
-	partialErr := sc.UpdateZtnaGatewayV1(ctx, created.ID, &securitycloud.GatewayPatchRequest{
-		Ipsec: &securitycloud.GatewayIpSecRequest{Esp: suite(3600)},
-	})
-	if partialErr == nil {
-		t.Error("a partial GatewayIpSecRequest patch now succeeds — the spec's all-optional PATCH shape has landed, drop the full-resend workaround above")
-	} else if apiErr := jamfplatform.AsAPIError(partialErr); apiErr == nil || !apiErr.HasStatus(400) {
-		t.Errorf("partial ipsec patch: want 400 malformed, got %v", partialErr)
+	// The partial ipsec merge-patch. The server has always deep-merged this
+	// correctly (curl-verified 2026-08-20) but it was unreachable from Go until
+	// build v1416 gave PATCH its own all-optional GatewayIpSecPatchRequest:
+	// GatewayPatchRequest.ipsec previously reused the POST-shaped
+	// GatewayIpSecRequest, whose required fields are non-pointer, so a partial
+	// value marshalled keyExchange:"" plus empty sub-objects and earned a 400
+	// "Request body is missing or malformed." Where an earlier revision of this
+	// test pinned that 400 so it would fail the day the shape landed, this
+	// asserts the capability instead — esp is replaced and every sibling
+	// survives, which is the whole point of the new schema.
+	if err := sc.UpdateZtnaGatewayV1(ctx, created.ID, &securitycloud.GatewayPatchRequest{
+		Ipsec: &securitycloud.GatewayIpSecPatchRequest{
+			Esp: &[]securitycloud.CypherSuiteConfig{suite(3600)}[0],
+		},
+	}); err != nil {
+		t.Fatalf("partial ipsec merge-patch failed — the all-optional PATCH shape landed in v1416 and should make this reachable: %v", err)
+	}
+	merged, err := sc.GetZtnaGatewayV1(ctx, created.ID)
+	if err != nil {
+		t.Fatalf("GetZtnaGatewayV1 after partial patch failed: %v", err)
+	}
+	if merged.Ipsec == nil {
+		t.Fatal("partial ipsec patch dropped the whole ipsec block")
+	}
+	if merged.Ipsec.Esp.LifetimeInSec != 3600 {
+		t.Errorf("partial patch did not apply: esp.lifetimeInSec = %d, want 3600", merged.Ipsec.Esp.LifetimeInSec)
+	}
+	// Everything not named in the patch must survive the deep merge. These are
+	// the assertions that would have caught a server-side replace-not-merge.
+	if merged.Ipsec.Ike.LifetimeInSec != 28800 {
+		t.Errorf("partial patch clobbered ike: lifetimeInSec = %d, want 28800", merged.Ipsec.Ike.LifetimeInSec)
+	}
+	if merged.Ipsec.KeyExchange != "ikev2" {
+		t.Errorf("partial patch clobbered keyExchange: %q, want ikev2", merged.Ipsec.KeyExchange)
+	}
+	if merged.Ipsec.Left == nil || merged.Ipsec.Left.ID != "sdk-acc.example.invalid" {
+		t.Errorf("partial patch clobbered left: %+v", merged.Ipsec.Left)
+	}
+	if merged.Ipsec.Right == nil || merged.Ipsec.Right.Vendor != securitycloud.ConnectionConfigRightResponseVendorCisco {
+		t.Errorf("partial patch clobbered right: %+v", merged.Ipsec.Right)
+	}
+
+	// Rotating the PSK alone is the use case the new PATCH schema exists for —
+	// its own description says "supply only `left.secret` to rotate the
+	// pre-shared key". The secret is write-only so the new value cannot be read
+	// back; what is checkable is that the call is accepted and clobbers nothing,
+	// which is what would break if `left` were replaced rather than merged.
+	if err := sc.UpdateZtnaGatewayV1(ctx, created.ID, &securitycloud.GatewayPatchRequest{
+		Ipsec: &securitycloud.GatewayIpSecPatchRequest{
+			Left: &securitycloud.ConnectionConfigPatchLeftRequest{
+				Secret: &[]string{"SdkAcceptancePskRotated9876"}[0],
+			},
+		},
+	}); err != nil {
+		t.Fatalf("secret-only ipsec rotation failed: %v", err)
+	}
+	rotated, err := sc.GetZtnaGatewayV1(ctx, created.ID)
+	if err != nil {
+		t.Fatalf("GetZtnaGatewayV1 after secret rotation failed: %v", err)
+	}
+	if rotated.Ipsec == nil || rotated.Ipsec.Left == nil {
+		t.Fatal("secret-only rotation dropped the ipsec left block")
+	}
+	if rotated.Ipsec.Left.ID != "sdk-acc.example.invalid" || len(rotated.Ipsec.Left.Subnets) != 1 {
+		t.Errorf("secret-only rotation clobbered the rest of left: %+v", rotated.Ipsec.Left)
+	}
+	if rotated.Ipsec.Esp.LifetimeInSec != 3600 {
+		t.Errorf("secret-only rotation clobbered esp: lifetimeInSec = %d, want 3600", rotated.Ipsec.Esp.LifetimeInSec)
 	}
 
 	// A merge-patch that touches nothing but the name leaves ipsec intact.
@@ -751,10 +849,10 @@ func TestAcceptance_SecurityCloudZtnaGatewayIpSecRejections(t *testing.T) {
 			KeyExchange: "ikev2",
 			Ike:         suite,
 			Esp:         suite,
-			Left: securitycloud.ConnectionConfigRequest{
+			Left: securitycloud.ConnectionConfigLeftRequest{
 				ID: "sdk-acc.example.invalid", Host: "%any", Subnets: []string{leftSubnet},
 			},
-			Right: securitycloud.ConnectionConfigRequestNoSecret{
+			Right: securitycloud.ConnectionConfigRightRequest{
 				ID: "peer.sdk-acc.example.invalid", Host: "203.0.113.10",
 				Subnets: []string{"10.98.0.0/16"}, Vendor: vendor,
 			},
@@ -767,7 +865,7 @@ func TestAcceptance_SecurityCloudZtnaGatewayIpSecRejections(t *testing.T) {
 		ipsec   *securitycloud.GatewayIpSecRequest
 		wantMsg string
 	}{
-		{"public left subnet", ipsec("8.8.8.0/24", securitycloud.ConnectionConfigRequestNoSecretVendorCisco), "private range"},
+		{"public left subnet", ipsec("8.8.8.0/24", securitycloud.ConnectionConfigRightRequestVendorCisco), "private range"},
 		// Deliberate literals: these are the values a caller would type without
 		// the constants, and the point is that the server refuses them.
 		{"lowercase vendor", ipsec("10.99.0.0/24", "cisco"), "malformed"},
@@ -1134,15 +1232,7 @@ func TestAcceptance_SecurityCloudApplyDnsZone(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
-	}
-	gateways := gatewayPage.Results
-	if len(gateways) == 0 {
-		t.Skip("tenant has no ZTNA gateways — a DNS zone needs a gateway ID for its name servers")
-	}
+	gateways := jscEnsureGateways(t, sc, 1)
 
 	name := jscName("apply-zone")
 	req := &securitycloud.ZoneWrite{
@@ -1262,15 +1352,7 @@ func TestAcceptance_SecurityCloudApplyZtnaGroupedGateway(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	gatewayPage, err := sc.ListZtnaGatewaysV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListZtnaGatewaysV1 failed: %v", err)
-	}
-	gateways := gatewayPage.Results
-	if len(gateways) < 2 {
-		t.Skipf("grouped gateways require at least 2 member gateways, tenant has %d", len(gateways))
-	}
+	gateways := jscEnsureGateways(t, sc, 2)
 
 	name := jscName("apply-grouped")
 	req := &securitycloud.GroupedGatewayCreateRequest{
@@ -1341,15 +1423,15 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 				Encryption: []string{"aes256"}, Integrity: []string{"sha256"},
 				DhGroups: []string{"modp2048"}, LifetimeInSec: 3600,
 			},
-			Left: securitycloud.ConnectionConfigRequest{
+			Left: securitycloud.ConnectionConfigLeftRequest{
 				ID: "sdk-acc.example.invalid", Host: "%any",
 				Subnets: []string{"10.99.0.0/24"},
 				Secret:  &[]string{"SdkAcceptancePsk1234"}[0],
 			},
-			Right: securitycloud.ConnectionConfigRequestNoSecret{
+			Right: securitycloud.ConnectionConfigRightRequest{
 				ID: "peer.sdk-acc.example.invalid", Host: "203.0.113.10",
 				Subnets: []string{"10.98.0.0/16"},
-				Vendor:  securitycloud.ConnectionConfigRequestNoSecretVendorCisco,
+				Vendor:  securitycloud.ConnectionConfigRightRequestVendorCisco,
 			},
 		},
 	}

@@ -267,6 +267,23 @@ type AssignmentsInclusions struct {
 // CategoryName is an alias for string.
 type CategoryName = string
 
+// ConnectionConfigLeftRequest IPSec connection endpoint for write requests. Includes the `secret` field. `secret` is write-only — it is never returned in GET responses.
+type ConnectionConfigLeftRequest struct {
+	// Endpoint address or `%any`.
+	Host string `json:"host"`
+	// IKE identity (e.g. `wpa.wandera.com` or `%any`).
+	ID string `json:"id"`
+	// Pre-shared key. Provide to set or rotate the secret. Omit to preserve the existing secret on PATCH
+	// — it can only be rotated, never cleared. Sending `null` explicitly returns `400
+	// IPSEC_SECRET_CLEAR_NOT_SUPPORTED`.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Secret *string `json:"secret,omitempty"`
+	// Jamf-side encryption domain. Must be a private (RFC1918) CIDR in one of the ranges above. Exactly 1
+	// element.
+	Subnets []string `json:"subnets"`
+}
+
 // ConnectionConfigLeftResponse IPSec Jamf-side endpoint returned on GET. Secrets are never included.
 type ConnectionConfigLeftResponse struct {
 	// Authentication method.
@@ -280,24 +297,37 @@ type ConnectionConfigLeftResponse struct {
 	Subnets []string `json:"subnets"`
 }
 
-// ConnectionConfigRequest IPSec connection endpoint for write requests. Includes the `secret` field. `secret` is write-only — it is never returned in GET responses.
-type ConnectionConfigRequest struct {
+// ConnectionConfigPatchLeftRequest IPSec connection endpoint for PATCH `left`. All fields optional — supply only the fields to update. `secret` is write-only; omit to preserve the existing PSK; sending `null` returns `400 IPSEC_SECRET_CLEAR_NOT_SUPPORTED`.
+type ConnectionConfigPatchLeftRequest struct {
 	// Endpoint address or `%any`.
-	Host string `json:"host"`
+	Host *string `json:"host,omitempty"`
 	// IKE identity (e.g. `wpa.wandera.com` or `%any`).
-	ID string `json:"id"`
-	// Pre-shared key. Provide to set or rotate the secret. Omit to preserve the existing secret on PATCH
-	// — it can only be rotated, never cleared. Sending `null` explicitly returns `400
-	// IPSEC_SECRET_CLEAR_NOT_SUPPORTED`.
+	ID *string `json:"id,omitempty"`
+	// Pre-shared key. Provide to set or rotate the PSK. Omit to preserve the existing secret. Sending
+	// `null` returns `400 IPSEC_SECRET_CLEAR_NOT_SUPPORTED`.
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
 	// can supply a value on update.
 	Secret *string `json:"secret,omitempty"`
-	// CIDR subnet routed through this endpoint (e.g. `0.0.0.0/0`). Exactly 1 element.
-	Subnets []string `json:"subnets"`
+	// Jamf-side encryption domain. Must be a private (RFC1918) CIDR in one of the ranges above. Exactly 1
+	// element.
+	Subnets *[]string `json:"subnets,omitempty"`
 }
 
-// ConnectionConfigRequestNoSecret IPSec connection endpoint for the `right` side. Identical to `left` but without `secret` — the secret is set automatically from `left.secret`. `vendor` is **required** — use one of the fixed vendor identifiers listed under `ConnectionConfigRequestNoSecret.vendor`. Values are case-sensitive.
-type ConnectionConfigRequestNoSecret struct {
+// ConnectionConfigPatchRightRequest IPSec connection endpoint for PATCH `right` (remote peer). The secret is always derived from `left.secret` — callers never supply it here.
+type ConnectionConfigPatchRightRequest struct {
+	// Endpoint address or `%any`.
+	Host *string `json:"host,omitempty"`
+	// IKE identity (e.g. `wpa.wandera.com` or `%any`).
+	ID *string `json:"id,omitempty"`
+	// CIDR subnet routed through this endpoint. Exactly 1 element.
+	Subnets *[]string `json:"subnets,omitempty"`
+	// VPN vendor identifier of the remote peer. Case-sensitive.
+	// Allowed values: see the ConnectionConfigPatchRightRequestVendor constants.
+	Vendor *string `json:"vendor,omitempty"`
+}
+
+// ConnectionConfigRightRequest IPSec connection endpoint for the `right` (remote peer) side. The secret is derived automatically from `left.secret` — callers never supply it here. `vendor` is **required** — use the peer's VPN vendor identifier (e.g. `cisco`, `strongSwan`, `juniper`).
+type ConnectionConfigRightRequest struct {
 	// Endpoint address.
 	Host string `json:"host"`
 	// IKE identity.
@@ -305,7 +335,7 @@ type ConnectionConfigRequestNoSecret struct {
 	// CIDR subnet routed through this endpoint (e.g. `0.0.0.0/0`). Exactly 1 element.
 	Subnets []string `json:"subnets"`
 	// VPN vendor identifier of the remote peer. Case-sensitive. **Required**.
-	// Allowed values: see the ConnectionConfigRequestNoSecretVendor constants.
+	// Allowed values: see the ConnectionConfigRightRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -462,9 +492,8 @@ type GatewayCreateRequest struct {
 	DedicatedIps *DedicatedIps `json:"dedicatedIps,omitempty"`
 	// Whether the deployment should be active on creation.
 	Enabled *bool `json:"enabled,omitempty"`
-	// IPSec tunnel configuration for POST / PATCH requests. Provide `left.secret` to set or rotate the PSK
-	// — it is automatically applied to both tunnel endpoints. All other fields are accepted as on
-	// create.
+	// IPSec tunnel configuration for POST requests. All fields required. `left.secret` sets the pre-shared
+	// key — it is automatically applied to both tunnel endpoints.
 	Ipsec *GatewayIpSecRequest `json:"ipsec,omitempty"`
 	// Human-readable name.
 	Name string `json:"name"`
@@ -487,7 +516,25 @@ type GatewayIpSec struct {
 	Right *ConnectionConfigRightResponse `json:"right,omitempty"`
 }
 
-// GatewayIpSecRequest IPSec tunnel configuration for POST / PATCH requests. Provide `left.secret` to set or rotate the PSK — it is automatically applied to both tunnel endpoints. All other fields are accepted as on create.
+// GatewayIpSecPatchRequest Partial IPSec configuration for PATCH. All fields optional — TRS performs a deep merge. Supply only `left.secret` to rotate the pre-shared key, or the full block to replace cipher suites and endpoint addresses simultaneously. `right.secret` is derived automatically from `left.secret` — callers never set it directly.
+type GatewayIpSecPatchRequest struct {
+	// Cipher suite configuration for an IKE or ESP phase.
+	Esp *CypherSuiteConfig `json:"esp,omitempty"`
+	// Cipher suite configuration for an IKE or ESP phase.
+	Ike *CypherSuiteConfig `json:"ike,omitempty"`
+	// IKE version.
+	// Allowed values: see the GatewayIpSecPatchRequestKeyExchange constants.
+	KeyExchange *string `json:"keyExchange,omitempty"`
+	// IPSec connection endpoint for PATCH `left`. All fields optional — supply only the fields to
+	// update. `secret` is write-only; omit to preserve the existing PSK; sending `null` returns `400
+	// IPSEC_SECRET_CLEAR_NOT_SUPPORTED`.
+	Left *ConnectionConfigPatchLeftRequest `json:"left,omitempty"`
+	// IPSec connection endpoint for PATCH `right` (remote peer). The secret is always derived from
+	// `left.secret` — callers never supply it here.
+	Right *ConnectionConfigPatchRightRequest `json:"right,omitempty"`
+}
+
+// GatewayIpSecRequest IPSec tunnel configuration for POST requests. All fields required. `left.secret` sets the pre-shared key — it is automatically applied to both tunnel endpoints.
 type GatewayIpSecRequest struct {
 	// Cipher suite configuration for an IKE or ESP phase.
 	Esp CypherSuiteConfig `json:"esp"`
@@ -498,11 +545,11 @@ type GatewayIpSecRequest struct {
 	KeyExchange string `json:"keyExchange"`
 	// IPSec connection endpoint for write requests. Includes the `secret` field. `secret` is write-only
 	// — it is never returned in GET responses.
-	Left ConnectionConfigRequest `json:"left"`
-	// IPSec connection endpoint for the `right` side. Identical to `left` but without `secret` — the
-	// secret is set automatically from `left.secret`. `vendor` is **required** — use one of the fixed
-	// vendor identifiers listed under `ConnectionConfigRequestNoSecret.vendor`. Values are case-sensitive.
-	Right ConnectionConfigRequestNoSecret `json:"right"`
+	Left ConnectionConfigLeftRequest `json:"left"`
+	// IPSec connection endpoint for the `right` (remote peer) side. The secret is derived automatically
+	// from `left.secret` — callers never supply it here. `vendor` is **required** — use the peer's VPN
+	// vendor identifier (e.g. `cisco`, `strongSwan`, `juniper`).
+	Right ConnectionConfigRightRequest `json:"right"`
 }
 
 // GatewayListResponse List of Gateways with a total count.
@@ -544,10 +591,11 @@ type GatewayPatchRequest struct {
 	Datacenter *string `json:"datacenter,omitempty"`
 	// Whether the deployment should be active.
 	Enabled *bool `json:"enabled,omitempty"`
-	// IPSec tunnel configuration for POST / PATCH requests. Provide `left.secret` to set or rotate the PSK
-	// — it is automatically applied to both tunnel endpoints. All other fields are accepted as on
-	// create.
-	Ipsec *GatewayIpSecRequest `json:"ipsec,omitempty"`
+	// Partial IPSec configuration for PATCH. All fields optional — TRS performs a deep merge. Supply
+	// only `left.secret` to rotate the pre-shared key, or the full block to replace cipher suites and
+	// endpoint addresses simultaneously. `right.secret` is derived automatically from `left.secret` —
+	// callers never set it directly.
+	Ipsec *GatewayIpSecPatchRequest `json:"ipsec,omitempty"`
 	// New name for the gateway.
 	Name *string `json:"name,omitempty"`
 	// Replaces the full tenantIds list. Validated against the caller's organization — **403** if

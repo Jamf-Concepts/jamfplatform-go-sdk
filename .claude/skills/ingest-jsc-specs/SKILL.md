@@ -64,12 +64,19 @@ Things that look alarming and are not:
 Things that matter: any `required` list change (it flips Go pointer-ness), any
 new `enum`, any path prefix change, any schema rename.
 
-**Check the path prefixes.** dns and ztna carry versionless paths and get their
-version from the spec-level `"version"` key in `tools/generate/config.json`;
-categories, device groups and uem-connect carry their own. If a spec starts
-carrying `/v1/` in its paths, the `"op"` strings must gain the prefix **and**
-the spec-level `"version"` key must be deleted in the same change — otherwise
-you get `/v1/v1/…`, or a hard `path %s not found in spec`.
+**Check the path prefixes.** As of v1416 all five specs carry their own `/vN/`
+prefix and **none** sets the spec-level `"version"` key in
+`tools/generate/config.json` — dns and ztna were the last to convert. If a spec
+changes its prefix, the `"op"` strings must gain or lose it **and** the
+spec-level `"version"` key must be deleted or added in the same change —
+otherwise you get `/v1/v1/…`, or a hard `path %s not found in spec`.
+
+The URL the SDK builds is unaffected by which of the two carries the version:
+the generator derives it from the path when the key is absent, so
+`TenantPrefix("securitycloud", "v1")` comes out either way. That makes a prefix
+migration pure spec hygiene — and also means a *correct* migration produces no
+diff in the generated methods or tests. Do not read an empty method diff as
+proof you missed something.
 
 ## 3. Wire-probe every behavioural change before ingesting
 
@@ -134,16 +141,36 @@ JAMFPLATFORM_ACC=1 JAMFPLATFORM_JSC_* … \
   go test -v -tags acceptance -count=1 -run TestAcceptance_SecurityCloud ./jamfplatform/
 ```
 
-Read the SKIPs, don't just count PASSes. A test that skips for want of a
-fixture has never verified anything — if the fixture is cheap to mint, mint it,
-run the test for real, and clean up. Gateway writes additionally need
-`JAMFPLATFORM_JSC_GATEWAY_WRITE_OK`.
+Read the SKIPs, don't just count PASSes — and treat a skip as a defect in the
+test, not a fact about the tenant. A test that skips for want of a fixture has
+never verified anything, and it skips hardest on the clean tenant a CI run
+starts from. If the fixture is mintable, **make the test mint it** rather than
+minting it by hand: `jscEnsureGateways` is the worked example, and it turned
+four permanent skips into four passes. Creating by hand fixes one run; making
+the test self-provision fixes every run.
+
+Keep the safety gate when the fixture provisions real infrastructure — the
+point is not to remove `JAMFPLATFORM_JSC_GATEWAY_WRITE_OK`, it is that on a
+tenant reserved for the suite nothing skips, and where a skip remains it names
+the variable that would fix it instead of an absent fixture the reader cannot
+act on. One skip is expected and correct: UEM Connect writes need live
+credentials for a *separate* Jamf Pro or Intune tenant.
+
+Gateway writes additionally need `JAMFPLATFORM_JSC_GATEWAY_WRITE_OK`.
 
 **Add an acceptance test for each behavioural change you probed**, pinning the
 observed status, `code` and field attribution. Prefer a test that cannot
 provision anything (see the validation-ordering trick above) so it runs
 unconditionally. If a test pins a current *limitation*, say so in a comment —
 it should fail the day the limitation lifts.
+
+**When a limitation does lift, flip the assertion; never delete it.** v1416
+landed `GatewayIpSecPatchRequest` and made the partial `ipsec` merge-patch
+reachable, so the test that pinned the resulting 400 became a test that the
+partial patch applies *and* that every unpatched sibling survives the deep
+merge. The negative test earned its keep by failing at the right moment; the
+positive one that replaces it must assert the new capability at least as
+precisely, or the coverage silently shrinks.
 
 ## 6. Record what was learned
 

@@ -10967,10 +10967,9 @@
       "package": "securitycloud",
       "specFile": "securitycloud_dns_api.json",
       "splitByTag": true,
-      "version": "v1",
       "operations": [
         {
-          "op": "GET /tenant/{tenantId}/dns/zones",
+          "op": "GET /v1/tenant/{tenantId}/dns/zones",
           "name": "ListDnsZonesV1",
           "params": [
             "sort"
@@ -10991,44 +10990,44 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/dns/zones",
+          "op": "POST /v1/tenant/{tenantId}/dns/zones",
           "name": "CreateDnsZoneV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/dns/zones/{id}",
+          "op": "GET /v1/tenant/{tenantId}/dns/zones/{id}",
           "name": "GetDnsZoneV1"
         },
         {
-          "op": "PATCH /tenant/{tenantId}/dns/zones/{id}",
+          "op": "PATCH /v1/tenant/{tenantId}/dns/zones/{id}",
           "name": "UpdateDnsZoneV1",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/dns/zones/{id}",
+          "op": "DELETE /v1/tenant/{tenantId}/dns/zones/{id}",
           "name": "DeleteDnsZoneV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/dns/search-domains",
+          "op": "GET /v1/tenant/{tenantId}/dns/search-domains",
           "name": "GetDnsSearchDomainV1"
         },
         {
-          "op": "PUT /tenant/{tenantId}/dns/search-domains",
+          "op": "PUT /v1/tenant/{tenantId}/dns/search-domains",
           "name": "SetDnsSearchDomainV1"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/dns/search-domains",
+          "op": "DELETE /v1/tenant/{tenantId}/dns/search-domains",
           "name": "ClearDnsSearchDomainV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/dns/custom-hostname-mappings",
+          "op": "GET /v1/tenant/{tenantId}/dns/custom-hostname-mappings",
           "name": "GetDnsCustomHostnameMappingsV1"
         },
         {
-          "op": "PUT /tenant/{tenantId}/dns/custom-hostname-mappings",
+          "op": "PUT /v1/tenant/{tenantId}/dns/custom-hostname-mappings",
           "name": "ReplaceDnsCustomHostnameMappingsV1"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/dns/custom-hostname-mappings",
+          "op": "DELETE /v1/tenant/{tenantId}/dns/custom-hostname-mappings",
           "name": "ClearDnsCustomHostnameMappingsV1"
         }
       ]
@@ -11039,10 +11038,9 @@
       "package": "securitycloud",
       "specFile": "securitycloud_ztna_api.json",
       "splitByTag": true,
-      "version": "v1",
       "operations": [
         {
-          "op": "GET /tenant/{tenantId}/ztna/gateways",
+          "op": "GET /v1/tenant/{tenantId}/ztna/gateways",
           "name": "ListZtnaGatewaysV1",
           "resolver": {
             "resourceType": "ZtnaGatewayV1",
@@ -11060,29 +11058,29 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/ztna/gateways",
+          "op": "POST /v1/tenant/{tenantId}/ztna/gateways",
           "name": "CreateZtnaGatewayV1",
           "responseType": "Gateway"
         },
         {
-          "op": "GET /tenant/{tenantId}/ztna/gateways/{gatewayId}",
+          "op": "GET /v1/tenant/{tenantId}/ztna/gateways/{gatewayId}",
           "name": "GetZtnaGatewayV1"
         },
         {
-          "op": "PATCH /tenant/{tenantId}/ztna/gateways/{gatewayId}",
+          "op": "PATCH /v1/tenant/{tenantId}/ztna/gateways/{gatewayId}",
           "name": "UpdateZtnaGatewayV1",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/ztna/gateways/{gatewayId}",
+          "op": "DELETE /v1/tenant/{tenantId}/ztna/gateways/{gatewayId}",
           "name": "DeleteZtnaGatewayV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/ztna/shared-gateways",
+          "op": "GET /v1/tenant/{tenantId}/ztna/shared-gateways",
           "name": "ListZtnaSharedGatewaysV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/ztna/grouped-gateways",
+          "op": "GET /v1/tenant/{tenantId}/ztna/grouped-gateways",
           "name": "ListZtnaGroupedGatewaysV1",
           "resolver": {
             "resourceType": "ZtnaGroupedGatewayV1",
@@ -11100,25 +11098,25 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/ztna/grouped-gateways",
+          "op": "POST /v1/tenant/{tenantId}/ztna/grouped-gateways",
           "name": "CreateZtnaGroupedGatewayV1",
           "responseType": "GroupedGateway"
         },
         {
-          "op": "GET /tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
+          "op": "GET /v1/tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
           "name": "GetZtnaGroupedGatewayV1"
         },
         {
-          "op": "PATCH /tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
+          "op": "PATCH /v1/tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
           "name": "UpdateZtnaGroupedGatewayV1",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
+          "op": "DELETE /v1/tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
           "name": "DeleteZtnaGroupedGatewayV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/ztna/apps",
+          "op": "GET /v1/tenant/{tenantId}/ztna/apps",
           "name": "ListZtnaAppsV1",
           "pagination": "totalCount",
           "resolver": {
@@ -11137,25 +11135,25 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/ztna/apps",
+          "op": "POST /v1/tenant/{tenantId}/ztna/apps",
           "name": "CreateZtnaAppV1",
           "responseType": "App"
         },
         {
-          "op": "GET /tenant/{tenantId}/ztna/apps/{appId}",
+          "op": "GET /v1/tenant/{tenantId}/ztna/apps/{appId}",
           "name": "GetZtnaAppV1"
         },
         {
-          "op": "PATCH /tenant/{tenantId}/ztna/apps/{appId}",
+          "op": "PATCH /v1/tenant/{tenantId}/ztna/apps/{appId}",
           "name": "UpdateZtnaAppV1",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/ztna/apps/{appId}",
+          "op": "DELETE /v1/tenant/{tenantId}/ztna/apps/{appId}",
           "name": "DeleteZtnaAppV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/ztna/predefined-apps",
+          "op": "GET /v1/tenant/{tenantId}/ztna/predefined-apps",
           "name": "ListZtnaPredefinedAppsV1"
         }
       ]

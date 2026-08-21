@@ -67,44 +67,85 @@ func RoutingStrategyValues() []RoutingStrategy {
 	}
 }
 
-// ConnectionConfigRequestNoSecretVendor is the set of values accepted by ConnectionConfigRequestNoSecret.Vendor.
-type ConnectionConfigRequestNoSecretVendor = string
+// ConnectionConfigPatchRightRequestVendor is the set of values accepted by ConnectionConfigPatchRightRequest.Vendor.
+type ConnectionConfigPatchRightRequestVendor = string
 
-// ConnectionConfigRequestNoSecretVendor values accepted by the Jamf API. The alias above is a string, so
+// ConnectionConfigPatchRightRequestVendor values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	ConnectionConfigRequestNoSecretVendorCheckpoint ConnectionConfigRequestNoSecretVendor = "Checkpoint"
-	ConnectionConfigRequestNoSecretVendorCisco      ConnectionConfigRequestNoSecretVendor = "Cisco"
-	ConnectionConfigRequestNoSecretVendorFortinet   ConnectionConfigRequestNoSecretVendor = "Fortinet"
-	ConnectionConfigRequestNoSecretVendorJuniper    ConnectionConfigRequestNoSecretVendor = "Juniper"
-	ConnectionConfigRequestNoSecretVendorPaloAlto   ConnectionConfigRequestNoSecretVendor = "Palo Alto"
-	ConnectionConfigRequestNoSecretVendorSonicWall  ConnectionConfigRequestNoSecretVendor = "SonicWall"
-	ConnectionConfigRequestNoSecretVendorSophos     ConnectionConfigRequestNoSecretVendor = "Sophos"
-	ConnectionConfigRequestNoSecretVendorSourcefire ConnectionConfigRequestNoSecretVendor = "Sourcefire"
-	ConnectionConfigRequestNoSecretVendorStrongSwan ConnectionConfigRequestNoSecretVendor = "strongSwan"
-	ConnectionConfigRequestNoSecretVendorWatchguard ConnectionConfigRequestNoSecretVendor = "Watchguard"
-	ConnectionConfigRequestNoSecretVendorOther      ConnectionConfigRequestNoSecretVendor = "Other"
+	ConnectionConfigPatchRightRequestVendorCheckpoint ConnectionConfigPatchRightRequestVendor = "Checkpoint"
+	ConnectionConfigPatchRightRequestVendorCisco      ConnectionConfigPatchRightRequestVendor = "Cisco"
+	ConnectionConfigPatchRightRequestVendorFortinet   ConnectionConfigPatchRightRequestVendor = "Fortinet"
+	ConnectionConfigPatchRightRequestVendorJuniper    ConnectionConfigPatchRightRequestVendor = "Juniper"
+	ConnectionConfigPatchRightRequestVendorPaloAlto   ConnectionConfigPatchRightRequestVendor = "Palo Alto"
+	ConnectionConfigPatchRightRequestVendorSonicWall  ConnectionConfigPatchRightRequestVendor = "SonicWall"
+	ConnectionConfigPatchRightRequestVendorSophos     ConnectionConfigPatchRightRequestVendor = "Sophos"
+	ConnectionConfigPatchRightRequestVendorSourcefire ConnectionConfigPatchRightRequestVendor = "Sourcefire"
+	ConnectionConfigPatchRightRequestVendorStrongSwan ConnectionConfigPatchRightRequestVendor = "strongSwan"
+	ConnectionConfigPatchRightRequestVendorWatchguard ConnectionConfigPatchRightRequestVendor = "Watchguard"
+	ConnectionConfigPatchRightRequestVendorOther      ConnectionConfigPatchRightRequestVendor = "Other"
 )
 
-// ConnectionConfigRequestNoSecretVendorValues returns every value the Jamf API accepts for ConnectionConfigRequestNoSecretVendor,
+// ConnectionConfigPatchRightRequestVendorValues returns every value the Jamf API accepts for ConnectionConfigPatchRightRequestVendor,
 // in the order the spec declares them. Returns a fresh slice per call, so no
 // caller can corrupt the set for the rest of the process — which a package
 // level var would allow. Suits attribute validation (Terraform's
 // stringvalidator.OneOf, say) and anything that needs to enumerate the set
 // rather than name one member.
-func ConnectionConfigRequestNoSecretVendorValues() []ConnectionConfigRequestNoSecretVendor {
-	return []ConnectionConfigRequestNoSecretVendor{
-		ConnectionConfigRequestNoSecretVendorCheckpoint,
-		ConnectionConfigRequestNoSecretVendorCisco,
-		ConnectionConfigRequestNoSecretVendorFortinet,
-		ConnectionConfigRequestNoSecretVendorJuniper,
-		ConnectionConfigRequestNoSecretVendorPaloAlto,
-		ConnectionConfigRequestNoSecretVendorSonicWall,
-		ConnectionConfigRequestNoSecretVendorSophos,
-		ConnectionConfigRequestNoSecretVendorSourcefire,
-		ConnectionConfigRequestNoSecretVendorStrongSwan,
-		ConnectionConfigRequestNoSecretVendorWatchguard,
-		ConnectionConfigRequestNoSecretVendorOther,
+func ConnectionConfigPatchRightRequestVendorValues() []ConnectionConfigPatchRightRequestVendor {
+	return []ConnectionConfigPatchRightRequestVendor{
+		ConnectionConfigPatchRightRequestVendorCheckpoint,
+		ConnectionConfigPatchRightRequestVendorCisco,
+		ConnectionConfigPatchRightRequestVendorFortinet,
+		ConnectionConfigPatchRightRequestVendorJuniper,
+		ConnectionConfigPatchRightRequestVendorPaloAlto,
+		ConnectionConfigPatchRightRequestVendorSonicWall,
+		ConnectionConfigPatchRightRequestVendorSophos,
+		ConnectionConfigPatchRightRequestVendorSourcefire,
+		ConnectionConfigPatchRightRequestVendorStrongSwan,
+		ConnectionConfigPatchRightRequestVendorWatchguard,
+		ConnectionConfigPatchRightRequestVendorOther,
+	}
+}
+
+// ConnectionConfigRightRequestVendor is the set of values accepted by ConnectionConfigRightRequest.Vendor.
+type ConnectionConfigRightRequestVendor = string
+
+// ConnectionConfigRightRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ConnectionConfigRightRequestVendorCheckpoint ConnectionConfigRightRequestVendor = "Checkpoint"
+	ConnectionConfigRightRequestVendorCisco      ConnectionConfigRightRequestVendor = "Cisco"
+	ConnectionConfigRightRequestVendorFortinet   ConnectionConfigRightRequestVendor = "Fortinet"
+	ConnectionConfigRightRequestVendorJuniper    ConnectionConfigRightRequestVendor = "Juniper"
+	ConnectionConfigRightRequestVendorPaloAlto   ConnectionConfigRightRequestVendor = "Palo Alto"
+	ConnectionConfigRightRequestVendorSonicWall  ConnectionConfigRightRequestVendor = "SonicWall"
+	ConnectionConfigRightRequestVendorSophos     ConnectionConfigRightRequestVendor = "Sophos"
+	ConnectionConfigRightRequestVendorSourcefire ConnectionConfigRightRequestVendor = "Sourcefire"
+	ConnectionConfigRightRequestVendorStrongSwan ConnectionConfigRightRequestVendor = "strongSwan"
+	ConnectionConfigRightRequestVendorWatchguard ConnectionConfigRightRequestVendor = "Watchguard"
+	ConnectionConfigRightRequestVendorOther      ConnectionConfigRightRequestVendor = "Other"
+)
+
+// ConnectionConfigRightRequestVendorValues returns every value the Jamf API accepts for ConnectionConfigRightRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ConnectionConfigRightRequestVendorValues() []ConnectionConfigRightRequestVendor {
+	return []ConnectionConfigRightRequestVendor{
+		ConnectionConfigRightRequestVendorCheckpoint,
+		ConnectionConfigRightRequestVendorCisco,
+		ConnectionConfigRightRequestVendorFortinet,
+		ConnectionConfigRightRequestVendorJuniper,
+		ConnectionConfigRightRequestVendorPaloAlto,
+		ConnectionConfigRightRequestVendorSonicWall,
+		ConnectionConfigRightRequestVendorSophos,
+		ConnectionConfigRightRequestVendorSourcefire,
+		ConnectionConfigRightRequestVendorStrongSwan,
+		ConnectionConfigRightRequestVendorWatchguard,
+		ConnectionConfigRightRequestVendorOther,
 	}
 }
 
@@ -346,6 +387,29 @@ func GatewayIpSecKeyExchangeValues() []GatewayIpSecKeyExchange {
 	return []GatewayIpSecKeyExchange{
 		GatewayIpSecKeyExchangeIkev1,
 		GatewayIpSecKeyExchangeIkev2,
+	}
+}
+
+// GatewayIpSecPatchRequestKeyExchange is the set of values accepted by GatewayIpSecPatchRequest.KeyExchange.
+type GatewayIpSecPatchRequestKeyExchange = string
+
+// GatewayIpSecPatchRequestKeyExchange values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GatewayIpSecPatchRequestKeyExchangeIkev1 GatewayIpSecPatchRequestKeyExchange = "ikev1"
+	GatewayIpSecPatchRequestKeyExchangeIkev2 GatewayIpSecPatchRequestKeyExchange = "ikev2"
+)
+
+// GatewayIpSecPatchRequestKeyExchangeValues returns every value the Jamf API accepts for GatewayIpSecPatchRequestKeyExchange,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func GatewayIpSecPatchRequestKeyExchangeValues() []GatewayIpSecPatchRequestKeyExchange {
+	return []GatewayIpSecPatchRequestKeyExchange{
+		GatewayIpSecPatchRequestKeyExchangeIkev1,
+		GatewayIpSecPatchRequestKeyExchangeIkev2,
 	}
 }
 
