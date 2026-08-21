@@ -140,7 +140,7 @@ type App struct {
 	// App category name. Use the `displayName` field from `GET /v1/categories` — that endpoint is the
 	// authoritative source. The value must exactly match a `displayName` returned by
 	// `content-block-service`. Unknown values return `409 MISSING_CATEGORY_NAME` — the category list is
-	// server-owned and may change, so an unrecognised name is a state conflict, not a malformed request.
+	// server-owned and may change, so an unrecognized name is a state conflict, not a malformed request.
 	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the internal `name` (e.g.
 	// `"Category - Business & Industry"`).
 	CategoryName CategoryName `json:"categoryName"`
@@ -176,7 +176,7 @@ type AppCreateRequest struct {
 	// App category name. Use the `displayName` field from `GET /v1/categories` — that endpoint is the
 	// authoritative source. The value must exactly match a `displayName` returned by
 	// `content-block-service`. Unknown values return `409 MISSING_CATEGORY_NAME` — the category list is
-	// server-owned and may change, so an unrecognised name is a state conflict, not a malformed request.
+	// server-owned and may change, so an unrecognized name is a state conflict, not a malformed request.
 	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the internal `name` (e.g.
 	// `"Category - Business & Industry"`).
 	CategoryName CategoryName `json:"categoryName"`
@@ -201,7 +201,7 @@ type AppCreateRequest struct {
 	Security *AppSecurity `json:"security,omitempty"`
 }
 
-// AppListResponse represents a app list response.
+// AppListResponse List of Apps with a total count.
 type AppListResponse struct {
 	Results []App `json:"results"`
 	// Total number of items across all pages.
@@ -217,7 +217,7 @@ type AppPatchRequest struct {
 	// App category name. Use the `displayName` field from `GET /v1/categories` — that endpoint is the
 	// authoritative source. The value must exactly match a `displayName` returned by
 	// `content-block-service`. Unknown values return `409 MISSING_CATEGORY_NAME` — the category list is
-	// server-owned and may change, so an unrecognised name is a state conflict, not a malformed request.
+	// server-owned and may change, so an unrecognized name is a state conflict, not a malformed request.
 	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the internal `name` (e.g.
 	// `"Category - Business & Industry"`).
 	CategoryName *CategoryName `json:"categoryName,omitempty"`
@@ -270,6 +270,7 @@ type CategoryName = string
 // ConnectionConfigLeftResponse IPSec Jamf-side endpoint returned on GET. Secrets are never included.
 type ConnectionConfigLeftResponse struct {
 	// Authentication method.
+	// Allowed values: "psk".
 	Auth string `json:"auth"`
 	// Endpoint address.
 	Host string `json:"host"`
@@ -311,6 +312,7 @@ type ConnectionConfigRequestNoSecret struct {
 // ConnectionConfigRightResponse IPSec remote-peer endpoint returned on GET. Secrets are never included.
 type ConnectionConfigRightResponse struct {
 	// Authentication method.
+	// Allowed values: "psk".
 	Auth string `json:"auth"`
 	// Endpoint address.
 	Host string `json:"host"`
@@ -323,9 +325,9 @@ type ConnectionConfigRightResponse struct {
 	Vendor string `json:"vendor"`
 }
 
-// CreateResponse represents a create response.
+// CreateResponse Identifier and canonical URL of a newly created resource.
 type CreateResponse struct {
-	// Canonical URL of the created resource.
+	// Tenant-scoped path of the created resource.
 	Href string `json:"href"`
 	// ID of the created resource.
 	ID string `json:"id"`
@@ -503,7 +505,7 @@ type GatewayIpSecRequest struct {
 	Right ConnectionConfigRequestNoSecret `json:"right"`
 }
 
-// GatewayListResponse represents a gateway list response.
+// GatewayListResponse List of Gateways with a total count.
 type GatewayListResponse struct {
 	Results []Gateway `json:"results"`
 	// Total number of items across all pages.
@@ -587,7 +589,9 @@ type GroupedGateway struct {
 	// Human-readable name.
 	Name string `json:"name"`
 	// Recovery delay in seconds for the `ACTIVE_STANDBY` strategy — how long to wait before failing back
-	// to the primary after it recovers. Defaults to `0`. Ignored for `RANDOM` and `NEAREST` strategies.
+	// to the primary after it recovers. New and updated grouped gateways use one of the supported
+	// durations (`300`, `1800`, `3600`, `10800`, `28800`); grouped gateways created earlier may return a
+	// legacy value. Ignored for `RANDOM` and `NEAREST` strategies.
 	RecoveryDelayInSec int `json:"recoveryDelayInSec"`
 	// `ACTIVE_STANDBY` — traffic goes to the primary gateway; failover to secondary on failure. `RANDOM`
 	// — traffic is distributed randomly across gateways. `NEAREST` — traffic routes to the
@@ -605,8 +609,11 @@ type GroupedGatewayCreateRequest struct {
 	GatewayIds []string `json:"gatewayIds"`
 	// Human-readable name.
 	Name string `json:"name"`
-	// Recovery delay in seconds for `ACTIVE_STANDBY` strategy. Defaults to `0` if omitted.
-	RecoveryDelayInSec *int `json:"recoveryDelayInSec,omitempty"`
+	// Required gateway stability before failover, in seconds, for the `ACTIVE_STANDBY` strategy. Must be
+	// one of the listed durations (mirrors the Jamf console). Required on create even for
+	// `RANDOM`/`NEAREST`, where it is ignored.
+	// Allowed values: 300, 1800, 3600, 10800, 28800.
+	RecoveryDelayInSec int `json:"recoveryDelayInSec"`
 	// `ACTIVE_STANDBY` — traffic goes to the primary gateway; failover to secondary on failure. `RANDOM`
 	// — traffic is distributed randomly across gateways. `NEAREST` — traffic routes to the
 	// geographically closest gateway.
@@ -615,7 +622,7 @@ type GroupedGatewayCreateRequest struct {
 	TenantIds []string `json:"tenantIds"`
 }
 
-// GroupedGatewayListResponse represents a grouped gateway list response.
+// GroupedGatewayListResponse List of Grouped Gateways with a total count.
 type GroupedGatewayListResponse struct {
 	Results []GroupedGateway `json:"results"`
 	// Total number of items across all pages.
@@ -628,7 +635,10 @@ type GroupedGatewayPatchRequest struct {
 	GatewayIds *[]string `json:"gatewayIds,omitempty"`
 	// New name for the grouped gateway.
 	Name *string `json:"name,omitempty"`
-	// Recovery delay in seconds for `ACTIVE_STANDBY` strategy. Omit to leave unchanged.
+	// Recovery delay in seconds for the `ACTIVE_STANDBY` strategy. If provided, must be one of the listed
+	// durations. Omit to leave unchanged. Grouped gateways created before this constraint may hold a
+	// legacy value; `recoveryDelayInSec` is unaffected on PATCH operations that omit it.
+	// Allowed values: 300, 1800, 3600, 10800, 28800.
 	RecoveryDelayInSec *int `json:"recoveryDelayInSec,omitempty"`
 	// `ACTIVE_STANDBY` — traffic goes to the primary gateway; failover to secondary on failure. `RANDOM`
 	// — traffic is distributed randomly across gateways. `NEAREST` — traffic routes to the
@@ -650,7 +660,7 @@ type PredefinedApp struct {
 	Name string `json:"name"`
 }
 
-// PredefinedAppListResponse represents a predefined app list response.
+// PredefinedAppListResponse List of Predefined Apps with a total count.
 type PredefinedAppListResponse struct {
 	Results []PredefinedApp `json:"results"`
 	// Total number of predefined app templates available.
@@ -703,7 +713,7 @@ type SharedGateway struct {
 	Name string `json:"name"`
 }
 
-// SharedGatewayListResponse represents a shared gateway list response.
+// SharedGatewayListResponse List of Shared Gateways with a total count.
 type SharedGatewayListResponse struct {
 	Results []SharedGateway `json:"results"`
 	// Total number of Shared Gateways available to this tenant.
@@ -765,6 +775,7 @@ type ActivationProfileDeployRequest struct {
 	// Allowed values: see the ActivationProfileDeployRequestPlatform constants.
 	Platform string `json:"platform"`
 	// The UEM platform to deploy profiles to.
+	// Allowed values: "JAMF".
 	Uem string `json:"uem"`
 	// Optional UEM groups to scope the deployment to. If omitted or empty, deploys to all UEM groups.
 	UemGroups *[]string `json:"uemGroups,omitempty"`

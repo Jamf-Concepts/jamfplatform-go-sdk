@@ -13,7 +13,7 @@ import (
 
 func TestGetDnsCustomHostnameMappingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/dns/custom-hostname-mappings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/dns/custom-hostname-mappings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetDnsCustomHostnameMappingsV1(t *testing.T) {
 
 func TestGetDnsCustomHostnameMappingsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/dns/custom-hostname-mappings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/dns/custom-hostname-mappings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetDnsCustomHostnameMappingsV1_NotFound(t *testing.T) {
 
 func TestReplaceDnsCustomHostnameMappingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/dns/custom-hostname-mappings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/dns/custom-hostname-mappings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -62,7 +62,7 @@ func TestReplaceDnsCustomHostnameMappingsV1(t *testing.T) {
 
 func TestClearDnsCustomHostnameMappingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/dns/custom-hostname-mappings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/dns/custom-hostname-mappings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

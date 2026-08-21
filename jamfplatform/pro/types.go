@@ -2510,7 +2510,8 @@ type CreatePath struct {
 
 // CreatePathV2 represents a create path v2.
 type CreatePathV2 struct {
-	Path  string `json:"path"`
+	Path string `json:"path"`
+	// Allowed values: "APP".
 	Scope string `json:"scope"`
 }
 
@@ -2776,8 +2777,10 @@ type DeviceCommunicationSettings struct {
 	AutoRenewComputerMDMProfileWhenDeviceIdentityCertExpiring     *bool `json:"autoRenewComputerMdmProfileWhenDeviceIdentityCertExpiring,omitempty"`
 	AutoRenewMobileDeviceMDMProfileWhenCaRenewed                  *bool `json:"autoRenewMobileDeviceMdmProfileWhenCaRenewed,omitempty"`
 	AutoRenewMobileDeviceMDMProfileWhenDeviceIdentityCertExpiring *bool `json:"autoRenewMobileDeviceMdmProfileWhenDeviceIdentityCertExpiring,omitempty"`
-	MDMProfileComputerExpirationLimitInDays                       *int  `json:"mdmProfileComputerExpirationLimitInDays,omitempty"`
-	MDMProfileMobileDeviceExpirationLimitInDays                   *int  `json:"mdmProfileMobileDeviceExpirationLimitInDays,omitempty"`
+	// Allowed values: 90, 120, 180.
+	MDMProfileComputerExpirationLimitInDays *int `json:"mdmProfileComputerExpirationLimitInDays,omitempty"`
+	// Allowed values: 90, 120, 180.
+	MDMProfileMobileDeviceExpirationLimitInDays *int `json:"mdmProfileMobileDeviceExpirationLimitInDays,omitempty"`
 }
 
 // DeviceComplianceInformation Device compliance information record.
@@ -4021,7 +4024,8 @@ type InstalledApplicationListCommand struct {
 
 // InternalRecipient represents a internal recipient.
 type InternalRecipient struct {
-	AccountID string  `json:"accountId"`
+	AccountID string `json:"accountId"`
+	// Allowed values: "DAILY".
 	Frequency *string `json:"frequency,omitempty"`
 }
 
@@ -7620,9 +7624,10 @@ type StartupStatus struct {
 	SetupAssistantNecessary bool    `json:"setupAssistantNecessary"`
 	Step                    string  `json:"step"`
 	// Allowed values: see the StartupStatusStepCode constants.
-	StepCode     string  `json:"stepCode"`
-	StepParam    *string `json:"stepParam,omitempty"`
-	Warning      *string `json:"warning,omitempty"`
+	StepCode  string  `json:"stepCode"`
+	StepParam *string `json:"stepParam,omitempty"`
+	Warning   *string `json:"warning,omitempty"`
+	// Allowed values: "SERVER_INIT_WARNING_DB_TABLE_ENCODING".
 	WarningCode  *string `json:"warningCode,omitempty"`
 	WarningParam *string `json:"warningParam,omitempty"`
 }

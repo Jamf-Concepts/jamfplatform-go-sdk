@@ -51,14 +51,8 @@ var funcMap = template.FuncMap{
 		return fmt.Sprintf(`"%s(%%s): %%w", %s, err`, m.Name, m.PathParams[0].GoName)
 	},
 	"testPath": func(m GoMethod) string {
-		var base string
-		if m.Version == "" {
-			base = fmt.Sprintf("/api/%s/tenant/t-test", m.Namespace)
-		} else {
-			base = fmt.Sprintf("/api/%s/%s/tenant/t-test", m.Namespace, m.Version)
-		}
 		path := pathParamRe.ReplaceAllString(m.ResourcePath, "test-id")
-		return base + path
+		return testTenantBase(m.Namespace, m.Version) + path
 	},
 	"testCallArgs": func(m GoMethod) string {
 		if len(m.PathParams) == 0 {
@@ -159,10 +153,7 @@ var funcMap = template.FuncMap{
 	// applyListPath builds the test-server handler path for the list endpoint
 	// used by the apply method's resolver call.
 	"applyListPath": func(a *GoApply) string {
-		if a.ListVersion == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.ListNamespace, a.ListPath)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.ListNamespace, a.ListVersion, a.ListPath)
+		return testTenantBase(a.ListNamespace, a.ListVersion) + a.ListPath
 	},
 	// applyCreatePath builds the test-server handler path for the create endpoint.
 	"applyCreatePath": func(a *GoApply) string {
@@ -171,10 +162,7 @@ var funcMap = template.FuncMap{
 			replacement = "0"
 		}
 		path := pathParamRe.ReplaceAllString(a.CreatePath, replacement)
-		if a.CreateVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.CreateNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.CreateNS, a.CreateVer, path)
+		return testTenantBase(a.CreateNS, a.CreateVer) + path
 	},
 	// applyUpdatePath builds the test-server handler path for the update endpoint.
 	"applyUpdatePath": func(a *GoApply) string {
@@ -183,56 +171,38 @@ var funcMap = template.FuncMap{
 			replacement = "42"
 		}
 		path := pathParamRe.ReplaceAllString(a.UpdatePath, replacement)
-		if a.UpdateVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.UpdateNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.UpdateNS, a.UpdateVer, path)
+		return testTenantBase(a.UpdateNS, a.UpdateVer) + path
 	},
 	// applyGetPath builds the test-server handler path for the get endpoint
 	// used by versionLock-enabled apply methods.
 	"applyGetPath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.GetPath, "existing-id")
-		if a.GetVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.GetNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.GetNS, a.GetVer, path)
+		return testTenantBase(a.GetNS, a.GetVer) + path
 	},
 	// applyTokenUploadPath builds the test-server handler path for the token
 	// upload endpoint used to create resources in tokenUploadMode.
 	"applyTokenUploadPath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.TokenUploadPath, "test-id")
-		if a.TokenUploadVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.TokenUploadNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.TokenUploadNS, a.TokenUploadVer, path)
+		return testTenantBase(a.TokenUploadNS, a.TokenUploadVer) + path
 	},
 	// applyTokenReplacePath builds the test-server handler path for the token
 	// replace endpoint used to re-upload tokens on update in tokenUploadMode.
 	"applyTokenReplacePath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.TokenReplacePath, "existing-id")
-		if a.TokenReplaceVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.TokenReplaceNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.TokenReplaceNS, a.TokenReplaceVer, path)
+		return testTenantBase(a.TokenReplaceNS, a.TokenReplaceVer) + path
 	},
 	// applyMembershipFetchPath builds the test-server handler path for the
 	// membership list endpoint used in membershipPreFetch apply mode.
 	"applyMembershipFetchPath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.MembershipFetchPath, "existing-id")
-		if a.MembershipFetchVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.MembershipFetchNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.MembershipFetchNS, a.MembershipFetchVer, path)
+		return testTenantBase(a.MembershipFetchNS, a.MembershipFetchVer) + path
 	},
 	// applyTokenCreateUpdatePath builds the test-server handler path for the
 	// metadata update endpoint in the token-upload create test. Uses "new-id"
 	// as the path parameter since the upload response returns that ID.
 	"applyTokenCreateUpdatePath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.UpdatePath, "new-id")
-		if a.UpdateVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.UpdateNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.UpdateNS, a.UpdateVer, path)
+		return testTenantBase(a.UpdateNS, a.UpdateVer) + path
 	},
 	// applyCreateStatus returns the HTTP status code for test create responses.
 	"applyCreateStatus": func(a *GoApply) int {
@@ -1661,3 +1631,35 @@ func Test<% .Name %>_Update(t *testing.T) {
 }
 <% end %>
 `
+
+// testTenantBase builds the tenant-scoped URL prefix the generated httptest
+// handlers register, for one namespace and version. It mirrors
+// Transport.TenantPrefix — including the tenant-before-version ordering some
+// namespaces use — so a generated test asserts the path the transport actually
+// builds.
+//
+// The ordering allowlist below is a deliberate second copy of
+// internal/client's tenantFirstNamespaces: the generator is its own Go module
+// and cannot import the SDK. The duplication is safe because it is
+// self-detecting rather than silent — if the two lists disagree, every
+// generated test for the affected namespace registers a handler at a path the
+// client never calls, and `make test` fails on the next run. Keep them in
+// sync; the transport's copy carries the rationale.
+func testTenantBase(namespace, version string) string {
+	if version == "" {
+		return fmt.Sprintf("/api/%s/tenant/t-test", namespace)
+	}
+	if testTenantFirstNamespaces[namespace] {
+		return fmt.Sprintf("/api/%s/tenant/t-test/%s", namespace, version)
+	}
+	if root, _, found := strings.Cut(namespace, "/"); found && testTenantFirstNamespaces[root] {
+		return fmt.Sprintf("/api/%s/tenant/t-test/%s", namespace, version)
+	}
+	return fmt.Sprintf("/api/%s/%s/tenant/t-test", namespace, version)
+}
+
+// testTenantFirstNamespaces mirrors internal/client's tenantFirstNamespaces.
+// See testTenantBase for why this is a copy and how a divergence surfaces.
+var testTenantFirstNamespaces = map[string]bool{
+	"securitycloud": true,
+}

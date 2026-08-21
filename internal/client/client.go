@@ -238,12 +238,54 @@ func (c *Transport) TenantIDFor(namespace string) string {
 // segment for APIs that don't use a version in the URL (proclassic, Pro
 // preview paths). The tenant ID is the namespace's own override when one was
 // registered via WithNamespaceTenantID, otherwise the client-wide value.
+//
+// Namespaces listed in tenantFirstNamespaces get the two segments the other
+// way round — /api/{namespace}/tenant/{tenantID}/{version} — see that variable
+// for why.
 func (c *Transport) TenantPrefix(namespace, version string) string {
 	tenantID := c.tenantIDFor(namespace)
 	if version == "" {
 		return "/api/" + namespace + "/tenant/" + tenantID
 	}
+	if TenantFirstNamespace(namespace) {
+		return "/api/" + namespace + "/tenant/" + tenantID + "/" + version
+	}
 	return "/api/" + namespace + "/" + version + "/tenant/" + tenantID
+}
+
+// tenantFirstNamespaces lists the namespaces whose URLs place the tenant
+// segment *before* the version. Everything else in the Jamf estate is
+// version-first, so this is an explicit allowlist rather than a default.
+//
+// Only Security Cloud is in it, and the reason is auditing, not routing: its
+// Tyk definition is a catch-all proxy that routes both orderings identically
+// (both wire-verified 200, 2026-08-21), but the audit rules that decide which
+// mutating requests get recorded are path globs of the form
+// `/**/v1/<service>/…`. Those match a stripped path only when the version
+// follows the tenant — `/tenant/{id}/v1/dns/zones` matches, and the
+// version-first `/v1/tenant/{id}/dns/zones` matches nothing. Under the old
+// ordering 19 of the SDK's 27 Security Cloud mutating operations were
+// executed but never audited. Tenant-first brings all 27 under a rule with no
+// gateway-side change.
+//
+// A namespace matches exactly or on its first path segment, mirroring
+// tenantIDFor, so a future `securitycloud/<sub>` inherits the ordering rather
+// than silently reverting to version-first.
+var tenantFirstNamespaces = map[string]bool{
+	"securitycloud": true,
+}
+
+// TenantFirstNamespace reports whether a namespace's URLs put the tenant
+// segment before the version. Exported so the code generator emits test
+// expectations against the same rule the transport applies at runtime — two
+// copies of this decision would drift, and the generated tests are the only
+// thing checking the shape offline.
+func TenantFirstNamespace(namespace string) bool {
+	if tenantFirstNamespaces[namespace] {
+		return true
+	}
+	root, _, found := strings.Cut(namespace, "/")
+	return found && tenantFirstNamespaces[root]
 }
 
 // tenantIDFor resolves the tenant ID for one namespace: an exact override

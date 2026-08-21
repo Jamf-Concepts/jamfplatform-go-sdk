@@ -1873,6 +1873,14 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 		if enumType := registerPropertyEnum(gt.Name, pname, propRef); enumType != "" {
 			fieldDoc = append(fieldDoc, wrapCommentText(
 				"Allowed values: see the "+enumType+" constants.", fieldDocWidth)...)
+		} else if vals := inlineFieldEnumValues(propRef); len(vals) > 0 {
+			// The enum exists but no Go type carries it: non-string values,
+			// a single-value set, or a name collision. Without this the
+			// field's only record of the constraint is the spec's own prose,
+			// which routinely says "must be one of the listed durations"
+			// and leaves the list to the schema — unreadable from Go.
+			fieldDoc = append(fieldDoc, wrapCommentText(
+				"Allowed values: "+strings.Join(vals, ", ")+".", fieldDocWidth)...)
 		}
 		if !suppressWriteOnly && prop != nil && (prop.WriteOnly || prop.Format == "password") {
 			fieldDoc = append(fieldDoc, wrapCommentText(
@@ -2011,4 +2019,22 @@ func xmlWireName(specName string, schema *openapi3.Schema) string {
 		return before
 	}
 	return specName
+}
+
+// inlineFieldEnumValues returns the formatted enum values of an inline
+// property schema, for the field-godoc fallback used when the enum has no
+// generated Go type to point at. A $ref'd property (or a $ref'd item schema)
+// returns nil: the field's own Go type already names the enum, so listing the
+// values again on every field that carries it is duplication that rots
+// independently. Values are formatted exactly as parameterEnumValues does, so
+// a field and a parameter constrained by the same enum read identically.
+func inlineFieldEnumValues(propRef *openapi3.SchemaRef) []string {
+	if propRef == nil || propRef.Ref != "" || propRef.Value == nil {
+		return nil
+	}
+	prop := propRef.Value
+	if len(prop.Enum) == 0 && prop.Items != nil && prop.Items.Ref != "" {
+		return nil
+	}
+	return parameterEnumValues(propRef)
 }

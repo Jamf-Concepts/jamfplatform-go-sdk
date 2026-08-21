@@ -92,6 +92,10 @@ Fields and parameters point at the type instead of re-listing values (`Allowed v
 
 Skipped, each deliberately: non-string enums (constants are typed to a `= string` alias), single-value sets, values yielding no Go identifier, the second of any two values colliding on one identifier, and any synthesised name the spec already uses — checked for both `<Owner><Property>` and `<Owner><Property>Values`, since the accessor shares the namespace. Every skip logs. `Deployment.State` is the only one firing today (`DeploymentState` is a struct); its values remain reachable as `DeploymentStateState`.
 
+**Every skip still gets its values into the godoc.** When `registerPropertyEnum` declines, `inlineFieldEnumValues` (`schema.go`) lists the values on the field instead: `// Allowed values: 300, 1800, 3600, 10800, 28800.` Without it the constraint reached callers nowhere at all — the spec's prose routinely says "must be one of the listed durations" and leaves the list to the schema, which is unreadable from Go. Added 2026-08-21 for `GroupedGatewayCreateRequest.RecoveryDelayInSec`; it also picked up, for free, the far larger population of **single-value** enums, which are the mandatory magic strings on DDM blueprint components (`Allowed values: "com.jamf.ddm.passcode-settings".`) — previously a required field with an undocumented sole legal value. Other newly-documented cases worth knowing: `DeviceCommunicationSettings.MDMProfile*ExpirationLimitInDays` (90, 120, 180), Classic's `ComputerCheckIn.CheckInFrequency` (60, 30, 15, 5), and `Deployment.State`, whose values were previously reachable only through the oddly-named `DeploymentStateState`.
+
+It is scoped to **inline** property schemas: a `$ref`'d property (or a `$ref`'d item schema) returns nil, because the field's Go type already names the enum and godoc groups the constants under it. Re-listing there would duplicate a list that then rots independently.
+
 **The collision check must happen at registration, not when draining the collected enums.** Draining late still writes the field's `see the X constants` line, leaving it pointing at a type that carries no constants.
 
 #### Wire-verified behaviour (probed 2026-08-03)
@@ -129,22 +133,44 @@ The tenant ID is the client-wide `WithTenantID` value unless a namespace registe
 
 **Wire-verified URL shapes (probed 2026-08-17), because the published specs are wrong.** The gateway's Tyk definition is a catch-all proxy (`listen_path: /api/securitycloud/`, `strip_listen_path: true`) — the path globs in `tyk-gateway-management/prod/api-products/securitycloud/` are *audit* rules covering mutating methods only, not a routing allowlist, so they under-describe the surface and must not be read as one.
 
-Those audit globs also do not currently match what this SDK sends (confirmed 2026-08-20 against the real matcher in `jamf/tyk-custom-plugins/plugins/audit-plugin`, where `CompileGlob` renders `**` as `.+` — one-or-more, so it can never match empty — and `AuditPre` matches on `stripListenPath(r.URL.Path, listenPath)`, i.e. the raw inbound path before any rewriting). Every glob is `/vN/<svc>/…` or `/**/vN/<svc>/…`, which assumes tenant-before-version; the SDK sends version-before-tenant for dns, ztna and device groups, so **every mutating request to those three families goes unaudited**. UEM Connect and `deploy-to-uem` are unaffected — their version sits after the tenant segment, so `/**/v1/connectors` and `/**/v1/activation-profiles/**` match. Closing it needs a `/v1/**/<svc>/…` glob per family added alongside the existing pair; that is a `tyk-gateway-management` change (five identical files: prod euc1/apne1/use1, stage use1, dev use2), not an SDK one, and it must not be "fixed" by changing the SDK's URL shape — the version-first form is the one the routing table below confirms.
+**The audit globs are why Security Cloud URLs are tenant-first (changed 2026-08-21, closing the gap recorded here since 2026-08-20).** The matcher is `jamf/tyk-custom-plugins/plugins/audit-plugin`: `CompileGlob` renders `**` as `.+` (one-or-more, so it can never match empty) and `AuditPre` matches on `stripListenPath(r.URL.Path, listenPath)`, i.e. the raw inbound path with `/api/securitycloud` removed and before any rewriting. Every glob in the api-product definition is `/vN/<svc>/…` or `/**/vN/<svc>/…` — version *after* the wildcard, so a stripped path only matches when the tenant segment precedes the version.
+
+The SDK used to send version-first (`/v1/tenant/{t}/dns/zones`), which matches no glob: **19 of its 27 Security Cloud mutating operations executed but were never audited** — all of dns, ztna and device groups. Only UEM Connect and `deploy-to-uem` matched, because their version already sits after the tenant.
+
+It is now fixed in the SDK, not upstream. `tenantFirstNamespaces` in `internal/client/client.go` lists `securitycloud`, and `TenantPrefix` emits `/api/securitycloud/tenant/{t}/{version}` for it — bringing all 27 under an existing rule with **no `tyk-gateway-management` change**. The earlier note here proposed adding a `/v1/**/<svc>/…` glob per family across five region files instead; that was the wrong trade, because both orderings are wire-verified 200 (see the table below) and one allowlist entry beats five files of new globs that then have to stay in sync with every new service. Recompute coverage after any change to either side — the glob semantics are simple enough to simulate in a few lines, and the answer is not guessable: tenant-first looks like it should also fail the bare `/v1/dns/zones` globs, and does, but the `/**/…` half of every pair carries it.
+
+The allowlist is deliberately narrow. Do **not** flip the default: every other Jamf namespace is version-first and wire-depends on it. A namespace matches exactly or on its first path segment, so `securitycloud/<sub>` inherits the ordering while the unrelated `securitycloud-devices` namespace does not. The generator keeps a second copy of the list (`testTenantFirstNamespaces` in `tools/generate/template.go`) because it is its own Go module and cannot import the SDK; a divergence is self-detecting rather than silent — the generated httptest handlers register at a path the client never calls and `make test` fails on the next run.
 
 What the gateway actually routes:
 
 | form | result |
 |---|---|
-| `/api/securitycloud/v1/tenant/{t}/dns/zones` | 200 — the shape the SDK builds |
-| `/api/securitycloud/tenant/{t}/v1/dns/zones` | 200 — also routed |
+| `/api/securitycloud/tenant/{t}/v1/dns/zones` | 200 — the shape the SDK builds, and the only one the audit globs match |
+| `/api/securitycloud/v1/tenant/{t}/dns/zones` | 200 — also routed; what the SDK sent before 2026-08-21 |
 | `/api/securitycloud/tenant/{t}/dns/zones` | **403 BAD_PERMISSIONS** — the versionless form the published spec declares |
 | `/api/securitycloud/tenant/{t}/uem-connect/v1/connectors` | 200 — UEM Connect carries its own in-path version |
+
+Both orderings were re-confirmed on 2026-08-21 for every family and for mutating methods, not just GET: a tenant-first `PATCH /tenant/{t}/v1/ztna/gateways/{id}` answered 204 and a `POST /tenant/{t}/v1/groups` created a real group. Routing is genuinely indifferent to the order; auditing is not.
 
 The `-beta` spec variants inject `/tenant/{tenantId}` but never the `betaApiConfig.apiVersion`, so dns and ztna ship versionless paths the gateway rejects. The SDK supplies the version through the spec-level `"version"` config key for those two; UEM Connect, device groups and — since build v1353 — categories set none, because their paths already carry the version. When a spec starts carrying its own prefix, the spec-level `"version"` key must be **deleted** in the same change as the `"op"` path gains `/v1/`: leaving it produces `/v1/v1/…`, and forgetting the path makes generation fail outright with `path %s not found in spec` (a hard error, not a silent miss).
 
 Also re-verified on EU (2026-08-20): the tenant segment must be the tenant **UUID**. The tenant *name* returns `400 REQUEST_CONTEXT_NOT_PROVIDED` and another organisation's tenant ID returns `403 OWNERSHIP_FORBIDDEN` — so a failing tenant segment is distinguishable from both an unrouted path and a privilege failure, all three of which used to look alike.
 
 **Spec provenance: the GitOps build only, `-beta` variants only.** `internal/stage/*-beta`, or `external/*-beta` where a spec is published to prod. Those are the only variants carrying the `/api/securitycloud` namespace, tenant-scoped paths and `x-required-privileges`; the non-beta variants declare a per-service namespace (`/api/securitycloud-devices`) the gateway does not have, and answer `404 page not found`.
+
+**The build's directory names for these specs are not stable.** Build v1401 renamed `securitycloud-dns` → `jsc-dns`, `securitycloud-ztna` → `jsc-ztna`, `securitycloud-categories` → `jsc-categories`; `uem-connect` and `securitycloud-devices` kept theirs. A name-keyed ingest step finds nothing and reports "no changes" rather than failing, so map source → destination by the spec's `info.title` and path set, not by directory name. Current mapping:
+
+| `testing/` file | v1401 source | env |
+|---|---|---|
+| `securitycloud-dns-api.yaml` | `internal/stage/jsc-dns-beta` | stage, internal |
+| `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna-beta` | stage, internal |
+| `securitycloud-categories-api.yaml` | `internal/stage/jsc-categories-beta` | stage, internal |
+| `securitycloud-uem-connect-api.yaml` | `internal/stage/uem-connect-beta` | stage, internal |
+| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices-beta` | prod, external |
+
+Note the last row's mismatch: the file is named for the *tag* (`device-groups`) but the spec is the **Security Cloud Devices API**, whose only whitelisted operations are the group ones. `internal/stage/device-groups-beta` is the unrelated *Platform* Device Groups API — diffing against that produces 800 lines of noise and, if copied, silently replaces the spec.
+
+Stage vs dev differ only in `info.title`, the `servers`/`tokenUrl` host, and an `x-generated`/`x-debug` block dev carries and stage does not. Take stage. Build v1401 also moved the beta hosts from `{region}.stage.apigw.jamfnebula.com` (us/eu/apac) to `{region}.api.stage.platform.jamflabs.com` (us1 only) — ingested verbatim because these specs are upstream mirrors, but it means the `servers` block in the published `api/*.json` names a labs stage host that is not the `{region}.apigw.jamf.com` prod gateway the SDK actually calls. Cosmetic for the SDK; worth reporting upstream rather than patching locally.
 
 Do **not** fall back to the source specs in `public-apis-oas/redocly-implementation/teams/` when a spec is missing from the build. They carry no tenant segment, no version prefix, no `x-required-privileges` and no servers, so a spec taken from there produces methods whose URLs the gateway rejects and whose privilege metadata is empty — a difference invisible in the generated code until it is called. A spec absent from the build is a spec the SDK does not cover, and the gap gets reported upstream instead.
 
@@ -153,6 +179,8 @@ Do **not** fall back to the source specs in `public-apis-oas/redocly-implementat
 **Not routed by the gateway** (403 `BAD_PERMISSIONS` with credentials that reach every other Security Cloud path — the unrouted-endpoint tell, not a privilege problem): the `jsc-api-gateway` ping, `securitycloud-devices`' `GET /v1/…/devices`, and — while they were generated — `POST /v1/activation-profiles/{code}/pause` and `/resume`.
 
 **Re-probed 2026-08-20 and now routed:** `GET /v2/…/groups` (200, `{groups: []}`) and `GET /v1/…/activation-profiles` (200). The `skipOnGatewayUnrouted` acceptance helper existed only for these two and has been deleted — both tests now fail on a 403 rather than skipping, which is the point: a 403 resurfacing means routing regressed or the region in use lags EU. Nothing else in the SDK needed it, so do not reintroduce a blanket-403 skip; name the endpoint and fail.
+
+**Re-checked against build v1401 (2026-08-21): the pending half has still not landed.** The ztna spec's path set and schema *set* are byte-identical to v1369 — no paths and no schemas added or removed — so `ConnectionConfigLeftRequest`/`RightRequest` and `GatewayIpSecPatchRequest` are still absent and the PATCH workaround below still stands. What v1401 did change in ztna: the OpenAPI tags were re-cased from Title Case to kebab-case (`Shared Gateways` → `shared-gateways`, no effect — `tagToFileBase` lowercases and maps both `-` and ` ` to `_`, so the filenames are unchanged), every `X-B3-TraceId` response header declaration was dropped, `ApiError` gained `required: [httpStatus]`, `CategoryName` gained `minLength: 1`, `GatewayContact.email` swapped `format: email` for a regex `pattern`, and grouped gateways gained a real constraint — see below.
 
 **Partly landed in build v1353 (2026-08-19), adopted; the rest still pending.** The ZTNA IPSec restructure previewed in run 1266 shipped as two separable halves, and only the first is in `internal/stage` + `internal/dev` of a real build:
 
@@ -176,6 +204,18 @@ Re-check on each new GitOps archive by diffing the spec's schema and path sets, 
 - `App.routing.type` is `CUSTOM` or `DIRECT` only. `categoryName` validates against the **`displayName`** of the tenant's own category list, not a fixed enum, and an unknown value is a 409 `MISSING_CATEGORY_NAME` — a state conflict, not a malformed request.
 - `customer-id` (device groups) is declared a **required** query param the server ignores; the tenant in the path wins, so it is not in the signature.
 - Device groups v1 returns a **bare JSON array** (`GroupListResponse = []Group`, so the method returns `*[]Group`); v2 wraps it in `{groups: []}`.
+
+**ZTNA grouped gateways — `recoveryDelayInSec`, wire-verified 2026-08-21.** Build v1401 turned a loose integer into a real constraint, and the server agrees on every point:
+
+- **Required on create, for every routing strategy.** `GroupedGatewayCreateRequest.required` gained it; omitting it or sending `null` is `400 INVALID_FIELD` / `must not be null`, and that holds for `RANDOM` and `NEAREST` too — even though the field's own prose says it is *ignored* for those. "Ignored" describes the semantic, not whether you must supply it. The Go field is now `int`, not `*int`, which is the breaking change for consumers.
+- **Value must be one of `300, 1800, 3600, 10800, 28800`.** The old spec declared `minimum: 0, default: 0`; `0` — the Go zero value a caller gets by forgetting the field — is now rejected, so the failure mode of the old signature is a 400, not a default. Unlike the `vendor` enum, this rejection *is* attributed: `field: "recoveryDelayInSec"` with a description naming all five durations, on both create and PATCH.
+- **PATCH enforces the same set**, plus `null` is rejected there as well (`400`, not a clear-to-default). A PATCH that omits the field leaves the stored value untouched, confirmed by round-trip. The 404-before-validation ordering means this can only be probed against a grouped gateway that actually exists.
+- **Field validation runs before the business rules.** A create carrying *shared* gateway IDs and a legal delay reaches `422 SHARED_GATEWAY_MEMBER`; the same request with an illegal delay stops at `400` first. `TestAcceptance_SecurityCloudZtnaGroupedGatewayRecoveryDelay` exploits exactly this to pin the whole matrix on a tenant with no dedicated gateways and without provisioning anything — its valid-value subtests assert the 422, and treat a 2xx as a failure demanding the test be redesigned.
+- Non-string enums get no generated constants (the alias is `= string`), so the five durations reach callers only through the field's `Allowed values:` godoc line — which is why that fallback was added; see **Enum constants** above.
+
+The two pre-existing grouped-gateway tests skipped on this tenant for want of two dedicated gateways, so neither had ever exercised create. Both were run for real on 2026-08-21 against two purpose-made `enabled: false` / `dedicatedIps` gateways and pass; the gateways were deleted afterwards. `dedicatedIps: {enabled: true}` with no `ipsec` block is the cheapest way to mint a throwaway member gateway — it needs no subnets, no vendor and no PSK.
+
+**`GatewayContact.email`: the spec is now stricter than the server.** v1401 replaced `format: email` with `pattern: ^[^@\s]+@[^@\s]+\.[^@\s]+$`, which requires a dot in the domain. The server validates with Bean Validation's `@Email`, which does not: `user@localhost` is accepted on the wire and rejected by the spec's own regex. No SDK impact — the generator emits neither format nor pattern as validation — but do not "fix" a caller by trusting the pattern, and report it upstream.
 
 **ZTNA gateway IPSec — wire-verified 2026-08-20** on the wisconsam sandbox, by creating a gateway with a full IPSec block (`enabled: false`, documentation-range subnets), driving it through GET and four PATCHes, and deleting it. Nothing else reaches these code paths: no gateway carries an `ipsec` block unless a test made one, which is why `TestAcceptance_SecurityCloudZtnaGatewayLifecycle` exists and why it is gated behind `JAMFPLATFORM_JSC_GATEWAY_WRITE_OK`.
 

@@ -88,7 +88,8 @@ type AudioAccessorySettingsComponent struct {
 	// Audio accessory settings configuration.
 	// Configures audio accessory temporary pairing behavior.
 	Configuration AudioAccessorySettingsConfiguration `json:"configuration"`
-	Identifier    string                              `json:"identifier"`
+	// Allowed values: "com.jamf.ddm.audio-accessory-settings".
+	Identifier string `json:"identifier"`
 }
 
 // AudioAccessorySettingsConfiguration Audio accessory settings configuration. Configures audio accessory temporary pairing behavior.
@@ -373,6 +374,7 @@ type ConfigurationProfile struct {
 	// - Apple payload definitions: https://github.com/apple/device-management/tree/release/mdm/profiles -
 	// Apple Configuration Profile reference:
 	// https://developer.apple.com/documentation/devicemanagement/profile-specific-payload-keys.
+	// Allowed values: "com.jamf.ddm-configuration-profile".
 	Identifier string `json:"identifier"`
 }
 
@@ -497,6 +499,7 @@ type CustomDeclarationsComponent struct {
 	// The `payloadKey` value is local to the declarations in this request — it does not need to be
 	// globally unique or consistent across requests. This is useful when a configuration declaration must
 	// reference an asset declaration defined in the same component.
+	// Allowed values: "com.jamf.ddm.custom-declarations".
 	Identifier string `json:"identifier"`
 }
 
@@ -531,6 +534,7 @@ type Deployment struct {
 	// Date when deployment job started.
 	Started time.Time `json:"started"`
 	// Deployment job state.
+	// Allowed values: "PENDING", "DEPLOYING", "SUCCEEDED", "FAILED".
 	State string `json:"state"`
 }
 
@@ -556,7 +560,8 @@ type DiskManagementComponent struct {
 	// Disk management settings configuration.
 	// Configures restrictions for external and network storage access.
 	Configuration DiskManagementSettingsConfiguration `json:"configuration"`
-	Identifier    string                              `json:"identifier"`
+	// Allowed values: "com.jamf.ddm.disk-management".
+	Identifier string `json:"identifier"`
 }
 
 // DiskManagementSettingsConfiguration Disk management settings configuration. Configures restrictions for external and network storage access.
@@ -564,6 +569,7 @@ type DiskManagementSettingsConfiguration struct {
 	// Storage restrictions configuration.
 	Restrictions *Restrictions `json:"Restrictions,omitempty"`
 	// Configuration version.
+	// Allowed values: 2.
 	Version int `json:"version"`
 }
 
@@ -595,7 +601,8 @@ type FolderBookmarkItem struct {
 	Folder *[]URLBookmarkItem `json:"Folder,omitempty"`
 	// The title of the folder shown in Safari.
 	Title string `json:"Title"`
-	Type  string `json:"Type"`
+	// Allowed values: "FOLDER".
+	Type string `json:"Type"`
 }
 
 // InputModes represents a input modes.
@@ -682,6 +689,7 @@ type ManagedAppComponent struct {
 	// | `CellularSliceUUID` | string (UUID) | Network slicing UUID for the app's cellular connection. |
 	// | `DNSProxyUUID` | string (UUID) | UUID of the DNS proxy configuration to apply to the app. |
 	// > **Validation rule:** When `Lockable` is `false`, `Hideable` is required and must also be `false`.
+	// Allowed values: "com.jamf.ddm.app-managed".
 	Identifier string `json:"identifier"`
 }
 
@@ -752,7 +760,8 @@ type MathSettingsComponent struct {
 	// Configures Calculator app modes and system-wide math behavior including keyboard suggestions and
 	// Math Notes.
 	Configuration MathSettingsConfiguration `json:"configuration"`
-	Identifier    string                    `json:"identifier"`
+	// Allowed values: "com.jamf.ddm.math-settings".
+	Identifier string `json:"identifier"`
 }
 
 // MathSettingsConfiguration Math settings configuration. Configures Calculator app modes and system-wide math behavior including keyboard suggestions and Math Notes.
@@ -885,7 +894,8 @@ type PasscodeSettingsComponent struct {
 	// Passcode settings configuration.
 	// Configures device passcode requirements including complexity, length, and expiration.
 	Configuration PasscodeSettingsConfiguration `json:"configuration"`
-	Identifier    string                        `json:"identifier"`
+	// Allowed values: "com.jamf.ddm.passcode-settings".
+	Identifier string `json:"identifier"`
 }
 
 // PasscodeSettingsConfiguration Passcode settings configuration. Configures device passcode requirements including complexity, length, and expiration.
@@ -904,6 +914,7 @@ type PasscodeSettingsConfiguration struct {
 	RequireComplexPasscode       *RequireComplexPasscode       `json:"RequireComplexPasscode,omitempty"`
 	RequirePasscode              *RequirePasscode              `json:"RequirePasscode,omitempty"`
 	// Configuration version.
+	// Allowed values: 2.
 	Version int `json:"version"`
 }
 
@@ -973,7 +984,8 @@ type SafariBookmarksComponent struct {
 	// Safari bookmarks configuration.
 	// Defines managed bookmark groups and folders that appear in Safari across managed devices.
 	Configuration SafariBookmarksConfiguration `json:"configuration"`
-	Identifier    string                       `json:"identifier"`
+	// Allowed values: "com.jamf.ddm.safari-bookmarks".
+	Identifier string `json:"identifier"`
 }
 
 // SafariBookmarksConfiguration Safari bookmarks configuration. Defines managed bookmark groups and folders that appear in Safari across managed devices.
@@ -987,7 +999,8 @@ type SafariExtensionsComponent struct {
 	// Safari extensions configuration.
 	// Manages Safari browser extensions including allowed/denied domains and private browsing settings.
 	Configuration SafariExtensionsConfiguration `json:"configuration"`
-	Identifier    string                        `json:"identifier"`
+	// Allowed values: "com.jamf.ddm.safari-extensions".
+	Identifier string `json:"identifier"`
 }
 
 // SafariExtensionsConfiguration Safari extensions configuration. Manages Safari browser extensions including allowed/denied domains and private browsing settings.
@@ -1001,7 +1014,8 @@ type SafariSettingsComponent struct {
 	// Configures Safari browser behavior including cookies, JavaScript, popups, private browsing, and
 	// start page settings.
 	Configuration SafariSettingsConfiguration `json:"configuration"`
-	Identifier    string                      `json:"identifier"`
+	// Allowed values: "com.jamf.ddm.safari-settings".
+	Identifier string `json:"identifier"`
 }
 
 // SafariSettingsConfiguration Safari settings configuration. Configures Safari browser behavior including cookies, JavaScript, popups, private browsing, and start page settings.
@@ -1040,7 +1054,8 @@ type SoftwareUpdateSettingsComponent struct {
 	// Configures OS update behavior including notifications, automatic actions, deferrals, and rapid
 	// security responses.
 	Configuration SoftwareUpdateSettingsConfiguration `json:"configuration"`
-	Identifier    string                              `json:"identifier"`
+	// Allowed values: "com.jamf.ddm.software-update-settings".
+	Identifier string `json:"identifier"`
 }
 
 // SoftwareUpdateSettingsConfiguration Software update settings configuration. Configures OS update behavior including notifications, automatic actions, deferrals, and rapid security responses.
@@ -1118,7 +1133,8 @@ type SwUpdateComponent struct {
 	// Configures OS update enforcement using either manual (specific version by date) or automatic
 	// strategies.
 	Configuration SwUpdateConfiguration `json:"configuration"`
-	Identifier    string                `json:"identifier"`
+	// Allowed values: "com.jamf.ddm.sw-updates".
+	Identifier string `json:"identifier"`
 }
 
 // SwUpdateConfiguration Software update enforcement configuration. Configures OS update enforcement using either manual (specific version by date) or automatic strategies.
@@ -1134,16 +1150,19 @@ type SwUpdateLatestConfiguration struct {
 	// Optional URL with details about the enforced update.
 	DetailsURL *DetailsURL `json:"detailsURL,omitempty"`
 	// The number of days after the OS update release.
-	EnforceAfterDays int    `json:"enforceAfterDays"`
-	EnforcementType  string `json:"enforcementType"`
-	Strategy         string `json:"strategy"`
+	EnforceAfterDays int `json:"enforceAfterDays"`
+	// Allowed values: "AUTOMATIC".
+	EnforcementType string `json:"enforcementType"`
+	// Allowed values: "LATEST".
+	Strategy string `json:"strategy"`
 }
 
 // SwUpdateManualConfiguration Manual software update enforcement configuration. Enforces a specific OS version by a specific date/time.
 type SwUpdateManualConfiguration struct {
 	// Optional URL with details about the enforced update.
-	DetailsURL      *DetailsURL `json:"detailsURL,omitempty"`
-	EnforcementType string      `json:"enforcementType"`
+	DetailsURL *DetailsURL `json:"detailsURL,omitempty"`
+	// Allowed values: "MANUAL".
+	EnforcementType string `json:"enforcementType"`
 	// Local time of the device until which update must be performed.
 	TargetLocalDateTime time.Time `json:"targetLocalDateTime"`
 	// Target OS version in semantic versioning format.
@@ -1153,11 +1172,13 @@ type SwUpdateManualConfiguration struct {
 // SwUpdateSemanticConfiguration Automatic software update with SEMANTIC strategy. Applies semantic versioning rules to determine update enforcement timing.
 type SwUpdateSemanticConfiguration struct {
 	// Optional URL with details about the enforced update.
-	DetailsURL      *DetailsURL `json:"detailsURL,omitempty"`
-	EnforcementType string      `json:"enforcementType"`
+	DetailsURL *DetailsURL `json:"detailsURL,omitempty"`
+	// Allowed values: "AUTOMATIC".
+	EnforcementType string `json:"enforcementType"`
 	// Rules for semantic update strategy.
-	Rules    UpdateRules `json:"rules"`
-	Strategy string      `json:"strategy"`
+	Rules UpdateRules `json:"rules"`
+	// Allowed values: "SEMANTIC".
+	Strategy string `json:"strategy"`
 }
 
 // SystemBehavior represents a system behavior.
@@ -1229,7 +1250,8 @@ type UpdateRules struct {
 type URLBookmarkItem struct {
 	// The title of the bookmark shown in Safari.
 	Title string `json:"Title"`
-	Type  string `json:"Type"`
+	// Allowed values: "BOOKMARK".
+	Type string `json:"Type"`
 	// The URL for the bookmark item.
 	URL string `json:"URL"`
 }

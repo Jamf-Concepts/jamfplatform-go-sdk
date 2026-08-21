@@ -13,7 +13,7 @@ import (
 
 func TestListDeviceGroupsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListDeviceGroupsV1(t *testing.T) {
 
 func TestListDeviceGroupsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListDeviceGroupsV1_NotFound(t *testing.T) {
 
 func TestCreateDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestCreateDeviceGroupV1(t *testing.T) {
 
 func TestListDeviceGroupsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v2/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestListDeviceGroupsV2(t *testing.T) {
 
 func TestListDeviceGroupsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v2/groups", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -99,7 +99,7 @@ func TestListDeviceGroupsV2_NotFound(t *testing.T) {
 
 func TestGetDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -117,7 +117,7 @@ func TestGetDeviceGroupV1(t *testing.T) {
 
 func TestGetDeviceGroupV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -133,7 +133,7 @@ func TestGetDeviceGroupV1_NotFound(t *testing.T) {
 
 func TestUpdateDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestUpdateDeviceGroupV1(t *testing.T) {
 
 func TestDeleteDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -166,7 +166,7 @@ func TestDeleteDeviceGroupV1(t *testing.T) {
 
 func TestResolveDeviceGroupV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -189,7 +189,7 @@ func TestResolveDeviceGroupV1IDByName(t *testing.T) {
 
 func TestResolveDeviceGroupV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -212,7 +212,7 @@ func TestResolveDeviceGroupV1ByName(t *testing.T) {
 
 func TestResolveDeviceGroupV2IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v2/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -234,7 +234,7 @@ func TestResolveDeviceGroupV2IDByName(t *testing.T) {
 
 func TestResolveDeviceGroupV2ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v2/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -257,7 +257,7 @@ func TestResolveDeviceGroupV2ByName(t *testing.T) {
 func TestApplyDeviceGroupV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -289,7 +289,7 @@ func TestApplyDeviceGroupV1_Create(t *testing.T) {
 func TestApplyDeviceGroupV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -300,7 +300,7 @@ func TestApplyDeviceGroupV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 
@@ -319,7 +319,7 @@ func TestApplyDeviceGroupV1_Update(t *testing.T) {
 func TestApplyDeviceGroupV2_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns no matches → resolver returns 404 → apply creates.
-	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v2/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -328,7 +328,7 @@ func TestApplyDeviceGroupV2_Create(t *testing.T) {
 			"totalCount": 0,
 		})
 	})
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -353,7 +353,7 @@ func TestApplyDeviceGroupV2_Create(t *testing.T) {
 func TestApplyDeviceGroupV2_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/securitycloud/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v2/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -364,7 +364,7 @@ func TestApplyDeviceGroupV2_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/securitycloud/v1/tenant/t-test/groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

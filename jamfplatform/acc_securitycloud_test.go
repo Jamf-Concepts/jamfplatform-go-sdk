@@ -8,6 +8,7 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -420,6 +421,10 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 		GatewayIds:      []string{gateways[0].ID, gateways[1].ID},
 		TenantIds:       []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
 		RoutingStrategy: "NEAREST",
+		// Required on create even for NEAREST, where the server ignores it
+		// (spec v1401, wire-confirmed). Leaving the Go zero value in place
+		// earns a 400 — see the RecoveryDelay validation test below.
+		RecoveryDelayInSec: 3600,
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -450,6 +455,98 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 	if err := sc.DeleteZtnaGroupedGatewayV1(ctx, created.ID); err != nil {
 		t.Fatalf("DeleteZtnaGroupedGatewayV1(%s) failed: %v", created.ID, err)
 	}
+}
+
+// TestAcceptance_SecurityCloudZtnaGroupedGatewayRecoveryDelay pins the
+// recoveryDelayInSec constraint the ztna spec gained in GitOps build v1401 and
+// that was wire-confirmed on 2026-08-21: the field is required on create for
+// every routing strategy, and its value must be one of five discrete durations.
+//
+// It runs unconditionally because it cannot provision anything. gatewayIds are
+// deliberately *shared* gateways, which the server refuses with 422
+// SHARED_GATEWAY_MEMBER — so the valid-value case proves the request cleared
+// field validation without ever creating a grouped gateway. Field validation
+// runs before that business rule, which is what makes the whole matrix
+// reachable from an empty tenant.
+func TestAcceptance_SecurityCloudZtnaGroupedGatewayRecoveryDelay(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	shared, err := sc.ListZtnaSharedGatewaysV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListZtnaSharedGatewaysV1 failed: %v", err)
+	}
+	if len(shared.Results) < 2 {
+		t.Skipf("need 2 shared gateways to build a rejectable member list, tenant has %d", len(shared.Results))
+	}
+	members := []string{shared.Results[0].ID, shared.Results[1].ID}
+
+	req := func(delay int) *securitycloud.GroupedGatewayCreateRequest {
+		return &securitycloud.GroupedGatewayCreateRequest{
+			Name:               jscName("grouped-delay"),
+			GatewayIds:         members,
+			TenantIds:          []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+			RoutingStrategy:    "ACTIVE_STANDBY",
+			RecoveryDelayInSec: delay,
+		}
+	}
+
+	// The Go zero value is not a legal duration. Before v1401 the spec declared
+	// `default: 0` and the field was optional, so a caller who left it unset got
+	// a working grouped gateway; now they get a 400. Asserted explicitly because
+	// that is the whole breaking change.
+	t.Run("zero value rejected", func(t *testing.T) {
+		_, err := sc.CreateZtnaGroupedGatewayV1(ctx, req(0))
+		assertRecoveryDelayRejected(t, err)
+	})
+
+	t.Run("non-enum value rejected", func(t *testing.T) {
+		_, err := sc.CreateZtnaGroupedGatewayV1(ctx, req(60))
+		assertRecoveryDelayRejected(t, err)
+	})
+
+	// Every legal duration must clear field validation and fall through to the
+	// shared-member business rule. A 400 here means the server's accepted set
+	// has drifted from the spec's enum.
+	for _, delay := range []int{300, 1800, 3600, 10800, 28800} {
+		t.Run(fmt.Sprintf("%d accepted", delay), func(t *testing.T) {
+			created, err := sc.CreateZtnaGroupedGatewayV1(ctx, req(delay))
+			if err == nil {
+				jscCleanupDelete(t, "grouped gateway "+created.ID, func() error {
+					return sc.DeleteZtnaGroupedGatewayV1(context.Background(), created.ID)
+				})
+				t.Fatalf("create with shared gateway members unexpectedly succeeded (id %s) — SHARED_GATEWAY_MEMBER is no longer enforced, so this test can now provision real grouped gateways and must be redesigned", created.ID)
+			}
+			apiErr := jamfplatform.AsAPIError(err)
+			if apiErr == nil || !apiErr.HasStatus(422) {
+				t.Fatalf("recoveryDelayInSec=%d: want 422 SHARED_GATEWAY_MEMBER (field validation passed), got %v", delay, err)
+			}
+			if fields := apiErr.FieldErrors(); len(fields["recoveryDelayInSec"]) > 0 {
+				t.Errorf("recoveryDelayInSec=%d rejected on the field itself: %v", delay, fields["recoveryDelayInSec"])
+			}
+			t.Logf("recoveryDelayInSec=%d -> %s", delay, apiErr.Summary())
+		})
+	}
+}
+
+// assertRecoveryDelayRejected asserts a grouped-gateway create failed on
+// recoveryDelayInSec specifically, not on some other field. The distinction
+// matters: a 400 attributed elsewhere would mean the probe stopped testing
+// what it claims to.
+func assertRecoveryDelayRejected(t *testing.T, err error) {
+	t.Helper()
+	if err == nil {
+		t.Fatal("CreateZtnaGroupedGatewayV1 unexpectedly succeeded — an illegal recoveryDelayInSec was accepted, and a grouped gateway may exist on the tenant")
+	}
+	apiErr := jamfplatform.AsAPIError(err)
+	if apiErr == nil || !apiErr.HasStatus(400) {
+		t.Fatalf("want 400, got %v", err)
+	}
+	if got := apiErr.FieldErrors()["recoveryDelayInSec"]; len(got) == 0 {
+		t.Fatalf("400 did not attribute the failure to recoveryDelayInSec; FieldErrors = %v", apiErr.FieldErrors())
+	}
+	t.Logf("rejected: %s", apiErr.Summary())
 }
 
 // jscGatewayWriteOK gates the two gateway write tests. Creating a gateway
@@ -1177,10 +1274,11 @@ func TestAcceptance_SecurityCloudApplyZtnaGroupedGateway(t *testing.T) {
 
 	name := jscName("apply-grouped")
 	req := &securitycloud.GroupedGatewayCreateRequest{
-		Name:            name,
-		GatewayIds:      []string{gateways[0].ID, gateways[1].ID},
-		TenantIds:       []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
-		RoutingStrategy: "NEAREST",
+		Name:               name,
+		GatewayIds:         []string{gateways[0].ID, gateways[1].ID},
+		TenantIds:          []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+		RoutingStrategy:    "NEAREST",
+		RecoveryDelayInSec: 3600,
 	}
 
 	id, created, err := sc.ApplyZtnaGroupedGatewayV1(ctx, req)

@@ -73,6 +73,16 @@ func TestTransportTenantPrefix(t *testing.T) {
 		{"compliance benchmarks", "t-abc", "compliance-benchmarks", "v1", "/api/compliance-benchmarks/v1/tenant/t-abc"},
 		{"version-less pro", "t-abc", "pro", "", "/api/pro/tenant/t-abc"},
 		{"proclassic has no version", "t-abc", "proclassic", "", "/api/proclassic/tenant/t-abc"},
+		// Security Cloud is the one namespace whose version follows the tenant;
+		// see tenantFirstNamespaces for why. Its sub-namespaces inherit the
+		// ordering, and a versionless call is unaffected because there is no
+		// version segment to order.
+		{"securitycloud is tenant-first", "t-jsc", "securitycloud", "v1", "/api/securitycloud/tenant/t-jsc/v1"},
+		{"securitycloud v2 is tenant-first too", "t-jsc", "securitycloud", "v2", "/api/securitycloud/tenant/t-jsc/v2"},
+		{"a securitycloud sub-namespace inherits the ordering", "t-jsc", "securitycloud/uem-connect", "v1", "/api/securitycloud/uem-connect/tenant/t-jsc/v1"},
+		{"versionless securitycloud is unchanged", "t-jsc", "securitycloud", "", "/api/securitycloud/tenant/t-jsc"},
+		// A namespace that merely starts with the same letters must not match.
+		{"securitycloud-devices is not securitycloud", "t-abc", "securitycloud-devices", "v1", "/api/securitycloud-devices/v1/tenant/t-abc"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -102,7 +112,7 @@ func TestTransportTenantPrefixNamespaceOverride(t *testing.T) {
 			overrides: map[string]string{"securitycloud": "jsc-tenant"},
 			namespace: "securitycloud",
 			version:   "v1",
-			want:      "/api/securitycloud/v1/tenant/jsc-tenant",
+			want:      "/api/securitycloud/tenant/jsc-tenant/v1",
 		},
 		{
 			name:      "other namespaces keep the client-wide tenant",
@@ -129,7 +139,7 @@ func TestTransportTenantPrefixNamespaceOverride(t *testing.T) {
 			name:      "no overrides configured",
 			namespace: "securitycloud",
 			version:   "v1",
-			want:      "/api/securitycloud/v1/tenant/pro-tenant",
+			want:      "/api/securitycloud/tenant/pro-tenant/v1",
 		},
 	}
 	for _, tc := range tests {
@@ -152,7 +162,7 @@ func TestWithNamespaceTenantID(t *testing.T) {
 		t.Errorf("empty namespace or tenant ID registered an override: %v", tr.nsTenantIDs)
 	}
 	WithNamespaceTenantID("securitycloud", "jsc-tenant")(tr)
-	if got := tr.TenantPrefix("securitycloud", "v1"); got != "/api/securitycloud/v1/tenant/jsc-tenant" {
+	if got := tr.TenantPrefix("securitycloud", "v1"); got != "/api/securitycloud/tenant/jsc-tenant/v1" {
 		t.Errorf("after WithNamespaceTenantID, TenantPrefix() = %q", got)
 	}
 }
