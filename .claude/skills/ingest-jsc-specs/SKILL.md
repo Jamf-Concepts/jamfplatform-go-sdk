@@ -172,6 +172,30 @@ merge. The negative test earned its keep by failing at the right moment; the
 positive one that replaces it must assert the new capability at least as
 precisely, or the coverage silently shrinks.
 
+## 5b. Check the local spec repairs are still needed
+
+`tools/generate/config.json` carries `schemaCreations` / `schemaPatches` entries
+that substitute for things these specs omit. Each is a liability once upstream
+fixes the spec: a creation shadows the real schema, a patch shadows the real
+property and discards its enum/format/required-ness.
+
+Both are guarded, so the check is mostly automatic — `schemaCreations` panics
+when the name reappears, and every stand-in patch is listed in
+`schemaPatchesRequireAbsent`, which panics when the path resolves. **A generate
+that panics with either message is not a problem to work around: it is the spec
+being repaired.** Delete the config entry (and the `schemaPatchesRequireAbsent`
+line, and any `schemaCreations` it depended on), regenerate, and check whether
+the upstream declaration is richer than the local one was — an enum you were
+missing usually means new generated constants.
+
+Currently outstanding for Security Cloud: `ConnectorCreateRequest.authStrategy`
+and `.deviceSyncAuth`, plus the `DeviceSyncAuth` schema they need. Without them
+`CreateUemConnectorV1` can only return 500.
+
+If you add a *new* stand-in patch, list it in `schemaPatchesRequireAbsent` in
+the same change. A patch that supplies a missing property without that line is
+the one failure mode nothing else catches.
+
 ## 6. Record what was learned
 
 Update `CLAUDE.md`'s Security Cloud section: the provenance table if directories

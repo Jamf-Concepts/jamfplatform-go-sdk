@@ -895,6 +895,20 @@ type ConnectorConfig struct {
 
 // ConnectorCreateRequest Request to create a connector. Contains the UEM server connection details. Vendor-specific fields may also be included; the `vendor` field determines which are applicable. Secret fields (credentials) are write-only and are never returned in responses.
 type ConnectorCreateRequest struct {
+	// How the connector authenticates to the UEM instance. Required on create despite the published spec
+	// omitting it: without it the server answers `500 INTERNAL_ERROR` rather than a validation error
+	// (wire-verified 2026-08-21), so a request built from the spec alone can only fail. With it present
+	// but `deviceSyncAuth` absent the server answers a proper `422 VALIDATION_FAILED`. `JAMF_PRO_OAUTH` is
+	// the strategy a Jamf Pro connector uses and the only one wire-confirmed.
+	AuthStrategy *string `json:"authStrategy,omitempty"`
+	// Credentials the connector uses to authenticate against the UEM instance. Absent from the published
+	// spec, which declares only `vendor`/`url`/`isoCountry` on the create request and defers the rest to
+	// an undocumented "vendor-specific fields may also be included". Restored here from the wire (probed
+	// 2026-08-21): a GET on a live JAMF_PRO connector returns `deviceSyncAuth` alongside `authStrategy`,
+	// and a create carrying both is accepted. Which members apply depends on `authStrategy` — OAuth
+	// strategies use `clientId`/`clientSecret`, basic-auth strategies use `username`/`password`. Secrets
+	// are write-only and never returned; a GET reports only `clientId`, `username` and an `empty` flag.
+	DeviceSyncAuth *DeviceSyncAuth `json:"deviceSyncAuth,omitempty"`
 	// ISO country code for the UEM instance, when applicable.
 	IsoCountry *string `json:"isoCountry,omitempty"`
 	// UEM server URL.
@@ -931,6 +945,23 @@ type DeviceFieldMappings struct {
 	UserIDMapping *string `json:"userIdMapping,omitempty"`
 	// UEM attribute the user name is read from.
 	UserNameMapping *string `json:"userNameMapping,omitempty"`
+}
+
+// DeviceSyncAuth Credentials the connector uses to authenticate against the UEM instance. Absent from the published spec, which declares only `vendor`/`url`/`isoCountry` on the create request and defers the rest to an undocumented "vendor-specific fields may also be included". Restored here from the wire (probed 2026-08-21): a GET on a live JAMF_PRO connector returns `deviceSyncAuth` alongside `authStrategy`, and a create carrying both is accepted. Which members apply depends on `authStrategy` — OAuth strategies use `clientId`/`clientSecret`, basic-auth strategies use `username`/`password`. Secrets are write-only and never returned; a GET reports only `clientId`, `username` and an `empty` flag.
+type DeviceSyncAuth struct {
+	// OAuth client ID. For `JAMF_PRO_OAUTH`, the client ID of an API integration on the target Jamf Pro
+	// instance.
+	ClientID *string `json:"clientId,omitempty"`
+	// OAuth client secret paired with `clientId`. Write-only — never returned on a read.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	ClientSecret *string `json:"clientSecret,omitempty"`
+	// Password paired with `username`. Write-only — never returned on a read.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Password *string `json:"password,omitempty"`
+	// Username, for the basic-auth strategies.
+	Username *string `json:"username,omitempty"`
 }
 
 // EmailMapping How the device email is derived. `EMAIL_ADDRESS` uses the UEM email attribute directly; any other type reads from that attribute and optionally decorates it into an address.

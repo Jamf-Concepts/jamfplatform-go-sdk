@@ -154,6 +154,38 @@ func applySchemaAdditions(doc *openapi3.T, additions map[string]map[string]strin
 	}
 }
 
+// assertSchemaPatchTargetsAbsent enforces SchemaPatchesRequireAbsent: every
+// listed "<SchemaName>.<dotted.path>" must NOT already resolve in the spec.
+// Panics when one does, because that means upstream has started declaring a
+// property we were substituting for and the config entry now shadows the real
+// declaration.
+//
+// Runs before applySchemaPatches, so the check sees the spec as published
+// rather than the patched result. A missing schema is not an error here — the
+// patch itself is a no-op in that case, and applySchemaPatches skips it too.
+func assertSchemaPatchTargetsAbsent(doc *openapi3.T, paths []string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
+		return
+	}
+	for _, full := range paths {
+		schemaName, path, found := strings.Cut(full, ".")
+		if !found || schemaName == "" || path == "" {
+			panic(fmt.Sprintf("schemaPatchesRequireAbsent[%q]: want \"<SchemaName>.<dotted.path>\"", full))
+		}
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			continue
+		}
+		parent, leaf, ok := walkPropertyPath(ref.Value, path)
+		if !ok || parent == nil {
+			continue
+		}
+		if _, exists := parent.Properties[leaf]; exists {
+			panic(fmt.Sprintf("schemaPatchesRequireAbsent[%q]: the spec now declares this property — delete the schemaPatches entry (and its schemaPatchesRequireAbsent line, and any schemaCreations it depended on) so the upstream declaration is used instead", full))
+		}
+	}
+}
+
 // applySchemaPatches inserts or replaces sub-schemas at dotted property paths
 // under named component schemas. Used when a spec omits a structured field the
 // server actually returns or accepts (e.g. policy missing top-level `reboot`,

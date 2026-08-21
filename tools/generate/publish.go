@@ -62,6 +62,7 @@ func publishSpecs(root string, cfg Config) error {
 		applySchemaCreations(doc, spec.SchemaCreations)
 		applySchemaRenames(doc, spec.SchemaRenames)
 		applySchemaAdditions(doc, spec.SchemaAdditions)
+		assertSchemaPatchTargetsAbsent(doc, spec.SchemaPatchesRequireAbsent)
 		applySchemaPatches(doc, spec.SchemaPatches)
 		applyPropertyRenames(doc, spec.PropertyRenames)
 		applyPropertyRemovals(doc, spec.PropertyRemovals)

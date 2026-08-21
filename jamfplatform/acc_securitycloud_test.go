@@ -11,10 +11,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/securitycloud"
 )
 
@@ -1038,11 +1040,195 @@ func TestAcceptance_SecurityCloudUemConnectReads(t *testing.T) {
 	}
 }
 
-// TestAcceptance_SecurityCloudUemConnectWrites documents why every UEM Connect
-// write stays unexercised.
+// jscProUemCredentials mints a throwaway API role, API integration and client
+// credential set on the *Jamf Pro* tenant and returns the instance URL plus the
+// credentials, all through the SDK. This is what a real JAMF_PRO UEM connector
+// authenticates with, so it is the only way to build a genuine connector create
+// request without hand-carrying a secret in an env var.
+//
+// It needs the Jamf Pro credential set (JAMFPLATFORM_*), which is a different
+// product and a different tenant from the Security Cloud one — see
+// errAccJSCCredsUnset. Both are required, and the Pro side is what skips when
+// absent.
+//
+// Everything it creates is registered for deletion. The role carries every
+// privilege the tenant offers rather than a guessed subset: UEM Connect's
+// required Pro privileges are not documented anywhere, and this is a throwaway
+// integration whose credentials never leave the test.
+func jscProUemCredentials(t *testing.T) (instanceURL, clientID, clientSecret string) {
+	t.Helper()
+	c := accClient(t)
+	p := pro.New(c)
+	ctx := context.Background()
+
+	serverURL, err := p.GetJamfProServerURLV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetJamfProServerURLV1 failed: %v", err)
+	}
+	if serverURL.URL == "" {
+		t.Fatal("GetJamfProServerURLV1 returned an empty URL — a UEM connector has nothing to point at")
+	}
+
+	privs, err := p.ListApiRolePrivilegesV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListApiRolePrivilegesV1 failed: %v", err)
+	}
+	if len(privs.Privileges) == 0 {
+		t.Fatal("ListApiRolePrivilegesV1 returned no privileges")
+	}
+
+	roleName := jscName("uem-role")
+	role, err := p.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{
+		DisplayName: roleName,
+		Privileges:  privs.Privileges,
+	})
+	if err != nil {
+		t.Fatalf("CreateApiRoleV1 failed: %v", err)
+	}
+	roleID := role.ID
+	cleanupDelete(t, "pro api role "+roleID, func() error {
+		return p.DeleteApiRoleV1(context.Background(), roleID)
+	})
+
+	integration, err := p.CreateApiIntegrationV1(ctx, &pro.ApiIntegrationRequest{
+		DisplayName:                jscName("uem-integration"),
+		AuthorizationScopes:        []string{roleName},
+		Enabled:                    &[]bool{true}[0],
+		AccessTokenLifetimeSeconds: &[]int{600}[0],
+	})
+	if err != nil {
+		t.Fatalf("CreateApiIntegrationV1 failed: %v", err)
+	}
+	// ApiIntegrationResponse.ID is an int; every path parameter is a string.
+	integrationID := strconv.Itoa(integration.ID)
+	cleanupDelete(t, "pro api integration "+integrationID, func() error {
+		return p.DeleteApiIntegrationV1(context.Background(), integrationID)
+	})
+
+	creds, err := p.RotateApiIntegrationClientCredentialsV1(ctx, integrationID)
+	if err != nil {
+		t.Fatalf("RotateApiIntegrationClientCredentialsV1 failed: %v", err)
+	}
+	if creds.ClientID == "" || creds.ClientSecret == "" {
+		t.Fatal("client-credentials returned an empty pair")
+	}
+	return serverURL.URL, creds.ClientID, creds.ClientSecret
+}
+
+// TestAcceptance_SecurityCloudUemConnectCreate drives CreateUemConnectorV1 with
+// a real, fully-populated request: a Jamf Pro instance URL and OAuth credentials
+// minted on the Pro tenant by jscProUemCredentials. It replaces a blanket skip
+// that claimed the whole family was unreachable — most of it is, but the create
+// path is not, and it was worth finding out where exactly it stops.
+//
+// Two things this pins that no spec states, both wire-verified 2026-08-21:
+//
+//   - `authStrategy` is required, and omitting it is a **500 INTERNAL_ERROR**
+//     rather than a validation error. That matters because the published
+//     ConnectorCreateRequest declares only vendor/url/isoCountry, so a request
+//     built from the spec alone could only ever 500. authStrategy and
+//     deviceSyncAuth are restored via schemaCreations/schemaPatches, and the
+//     500 subtest is the regression guard: if it starts returning 4xx the
+//     server bug is fixed and the note in CLAUDE.md should say so.
+//   - A tenant may hold **one connector, full stop**. A complete, correct
+//     request answers 409 CONNECTOR_CONFIG_ALREADY_EXISTS whenever any
+//     connector exists, whatever its vendor — the message says "incompatible
+//     UEM vendor" but INTUNE and JAMF_PRO are refused identically, and the
+//     check fires before credential validation (bogus credentials give the
+//     same 409).
+//
+// So on a tenant that already has a connector this exercises the create path
+// right up to the singleton pre-check without provisioning anything. On a tenant
+// with none it really does create one, which is why the success branch deletes
+// it immediately and then fails: that tenant can support the full lifecycle and
+// this test should be widened rather than silently starting to mutate a
+// connector other tests read.
+func TestAcceptance_SecurityCloudUemConnectCreate(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	instanceURL, clientID, clientSecret := jscProUemCredentials(t)
+	t.Logf("minted Pro OAuth credentials for %s (clientId %s)", instanceURL, clientID)
+
+	req := func() *securitycloud.ConnectorCreateRequest {
+		return &securitycloud.ConnectorCreateRequest{
+			Vendor:       securitycloud.ConnectorCreateRequestVendorJamfPro,
+			URL:          instanceURL,
+			AuthStrategy: &[]string{"JAMF_PRO_OAUTH"}[0],
+			DeviceSyncAuth: &securitycloud.DeviceSyncAuth{
+				ClientID:     &clientID,
+				ClientSecret: &clientSecret,
+			},
+		}
+	}
+
+	// Ordered deliberately: prove the spec-shaped request is unusable, then that
+	// authStrategy alone promotes the failure to real validation, then that a
+	// complete request clears validation entirely.
+	t.Run("authStrategy omitted is a 500, not a validation error", func(t *testing.T) {
+		bare := req()
+		bare.AuthStrategy = nil
+		bare.DeviceSyncAuth = nil
+		_, err := sc.CreateUemConnectorV1(ctx, bare)
+		if err == nil {
+			t.Fatal("a vendor+url-only create succeeded — the server bug is fixed and a connector may now exist on the tenant")
+		}
+		apiErr := jamfplatform.AsAPIError(err)
+		if apiErr == nil {
+			t.Fatalf("want an API error, got %v", err)
+		}
+		if !apiErr.HasStatus(500) {
+			t.Fatalf("want 500 INTERNAL_ERROR for a spec-shaped request, got %d (%s) — if this is now a 4xx the server bug is fixed; update CLAUDE.md and this assertion", apiErr.StatusCode, apiErr.Summary())
+		}
+		t.Logf("spec-shaped request -> %s", apiErr.Summary())
+	})
+
+	t.Run("authStrategy without credentials is a 422", func(t *testing.T) {
+		noAuth := req()
+		noAuth.DeviceSyncAuth = nil
+		_, err := sc.CreateUemConnectorV1(ctx, noAuth)
+		if err == nil {
+			t.Fatal("a create with no deviceSyncAuth succeeded — an unauthenticated connector may now exist on the tenant")
+		}
+		apiErr := jamfplatform.AsAPIError(err)
+		if apiErr == nil || !apiErr.HasStatus(422) {
+			t.Fatalf("want 422 VALIDATION_FAILED once authStrategy is present, got %v", err)
+		}
+		t.Logf("authStrategy without deviceSyncAuth -> %s", apiErr.Summary())
+	})
+
+	t.Run("a complete request clears validation", func(t *testing.T) {
+		created, err := sc.CreateUemConnectorV1(ctx, req())
+		if err == nil {
+			// The tenant had no connector, so this made one. Remove it before
+			// anything else observes it, then fail: the full lifecycle is now
+			// reachable here and deserves real coverage.
+			id := created.ID
+			jscCleanupDelete(t, "uem connector "+id, func() error {
+				return sc.DeleteUemConnectorV1(context.Background(), id)
+			})
+			t.Fatalf("CreateUemConnectorV1 succeeded (id %s) — this tenant holds no other connector, so enablement, sync-settings and sync runs are all exercisable now; widen this test rather than leaving the create unasserted", id)
+		}
+		apiErr := jamfplatform.AsAPIError(err)
+		if apiErr == nil || !apiErr.HasStatus(409) {
+			t.Fatalf("want 409 CONNECTOR_CONFIG_ALREADY_EXISTS (validation passed, singleton refused), got %v", err)
+		}
+		// A 409 here and a 422 above together prove the credential fields were
+		// structurally accepted: the request got past field validation to a
+		// state check, which is the furthest a shared tenant allows.
+		t.Logf("complete request -> %s", apiErr.Summary())
+	})
+}
+
+// TestAcceptance_SecurityCloudUemConnectWrites documents why the remaining UEM
+// Connect writes stay unexercised. Create is covered by
+// TestAcceptance_SecurityCloudUemConnectCreate; these are the ones that act on
+// whichever connector the tenant already owns.
 func TestAcceptance_SecurityCloudUemConnectWrites(t *testing.T) {
 	accSecurityCloudClient(t)
-	t.Skip("UEM Connect writes all act on a live link to a real UEM instance and cannot be made safe on a shared tenant: CreateUemConnectorV1 needs working credentials for a separate Jamf Pro or Intune tenant (and would then start syncing its devices); DeleteUemConnectorV1 and DisableUemConnectorV1 / EnableUemConnectorV1 would tear down or toggle the tenant's existing connector; UpdateUemConnectorSyncSettingsV1 rewrites its sync configuration; TriggerUemConnectorSyncV1 and CancelUemConnectorSyncV1 start and abort a real inventory sync against the connected instance; DeployActivationProfileToUemV1 pushes an activation profile into that instance's device fleet. Exercising these needs a tenant with a disposable connector.")
+	t.Skip("every remaining UEM Connect write mutates the tenant's existing connector, which is a live link to a real UEM instance whose credentials are write-only and therefore unrestorable: DeleteUemConnectorV1 would destroy it permanently (the clientSecret cannot be read back to recreate it); EnableUemConnectorV1 / DisableUemConnectorV1 toggle whether it syncs a real device fleet; UpdateUemConnectorSyncSettingsV1 is a documented full replacement whose read shape (ConnectorConfig, syncConfig nested) differs from its write shape (SyncSettings, those fields top-level), so a round-trip that mis-maps one field silently resets the connector's configuration; TriggerUemConnectorSyncV1 and CancelUemConnectorSyncV1 start and abort a real inventory sync against the connected instance; DeployActivationProfileToUemV1 pushes an activation profile into that instance's device fleet. Exercising these needs a tenant whose connector is disposable — note a tenant may hold only one, so it cannot be a tenant that also has a connector worth keeping.")
 }
 
 // ---------------------------------------------------------------------------

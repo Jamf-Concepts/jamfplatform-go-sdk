@@ -72,6 +72,26 @@ type SpecDef struct {
 	// to the read schema also flows into the *_post sibling.
 	SchemaPatches map[string]map[string]json.RawMessage `json:"schemaPatches,omitempty"`
 
+	// SchemaPatchesRequireAbsent marks the SchemaPatches entries that stand in
+	// for a property the spec does not declare at all, as opposed to the usual
+	// case of correcting one it declares wrongly. Each element is
+	// "<SchemaName>.<dotted.path>", and generation panics if that path already
+	// resolves in the spec.
+	//
+	// This is the SchemaPatches counterpart of the panic SchemaCreations gets
+	// for free. A patch silently overwrites, which is right when the point is to
+	// replace a wrong declaration — but wrong when the point is to supply a
+	// missing one, because the day upstream adds the real property our
+	// hand-written stand-in shadows it forever, discarding whatever enum,
+	// format or required-ness upstream declared. Listing the path here converts
+	// that silent shadowing into a build failure that names the entry to delete.
+	//
+	// Live case: securitycloud's ConnectorCreateRequest omits `authStrategy`
+	// and `deviceSyncAuth`, without which CreateUemConnectorV1 can only ever
+	// return 500 (wire-verified 2026-08-21). Both are patched in from the wire
+	// and both are listed here.
+	SchemaPatchesRequireAbsent []string `json:"schemaPatchesRequireAbsent,omitempty"`
+
 	// PropertyRenames renames property keys at dotted paths under a named
 	// component schema. Outer key: schema name. Inner key: dotted path to the
 	// property to rename (e.g. "self_service.re-install_button_text"). Inner
