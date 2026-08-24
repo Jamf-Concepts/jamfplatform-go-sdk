@@ -78,6 +78,27 @@ migration pure spec hygiene — and also means a *correct* migration produces no
 diff in the generated methods or tests. Do not read an empty method diff as
 proof you missed something.
 
+## 2b. Check the release state in tyk-gateway-management, not the spec
+
+`public-apis-oas` (and this bundle) publishes specs; it **does not control when an
+API change goes live**. `jamf/tyk-gateway-management` does — locally at
+`../../jamf/tyk-gateway-management`, with a directory per environment (`dev`,
+`stage`, `prod`, plus fedramp/hc/sbox variants) and an api-product YAML per
+region under `<env>/api-products/<product>/`.
+
+So when a spec changes shape, check whether the gateway has been configured to
+accept it before ingesting. The relevant switch for scoping is
+`config_data.request-context-allowed-sources`. In v1495 the specs moved the
+tenant from the path to an `X-Tenant-Id` header while prod still allowed only
+`path, token` — dev and stage had `header`, prod did not — so the specs were
+weeks ahead of the release and ingesting would have broken every call.
+
+`git log` in that repo is also the fastest way to explain a behaviour change
+that no spec mentions: the `href` mystery resolved to commit `b8f51878`
+"Enable href-injection plugin on all securitycloud clusters", and the plugin
+source in `jamf/tyk-custom-plugins/plugins/href-injection-plugin` states its own
+limitation on compressed bodies.
+
 ## 3. Wire-probe every behavioural change before ingesting
 
 Credentials: the Security Cloud sandbox (`JAMFPLATFORM_JSC_*`). Tenant segment
