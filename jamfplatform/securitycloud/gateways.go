@@ -31,9 +31,9 @@ func (c *Client) ListZtnaGatewaysV1(ctx context.Context) (*GatewayListResponse, 
 // CreateZtnaGatewayV1 create a Gateway.
 //
 // Required privileges: create:jsc:all.
-func (c *Client) CreateZtnaGatewayV1(ctx context.Context, request *GatewayCreateRequest) (*Gateway, error) {
+func (c *Client) CreateZtnaGatewayV1(ctx context.Context, request *GatewayCreateRequest) (*CreateResponse, error) {
 	prefix := c.transport.TenantPrefix("securitycloud", "v1")
-	var result Gateway
+	var result CreateResponse
 	endpoint := prefix + "/ztna/gateways"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateZtnaGatewayV1: %w", err)

@@ -11059,8 +11059,7 @@
         },
         {
           "op": "POST /v1/tenant/{tenantId}/ztna/gateways",
-          "name": "CreateZtnaGatewayV1",
-          "responseType": "Gateway"
+          "name": "CreateZtnaGatewayV1"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/ztna/gateways/{gatewayId}",
@@ -11099,8 +11098,7 @@
         },
         {
           "op": "POST /v1/tenant/{tenantId}/ztna/grouped-gateways",
-          "name": "CreateZtnaGroupedGatewayV1",
-          "responseType": "GroupedGateway"
+          "name": "CreateZtnaGroupedGatewayV1"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
@@ -11136,8 +11134,7 @@
         },
         {
           "op": "POST /v1/tenant/{tenantId}/ztna/apps",
-          "name": "CreateZtnaAppV1",
-          "responseType": "App"
+          "name": "CreateZtnaAppV1"
         },
         {
           "op": "GET /v1/tenant/{tenantId}/ztna/apps/{appId}",

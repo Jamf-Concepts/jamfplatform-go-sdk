@@ -533,8 +533,7 @@ func TestResolveByNameClientPaged_AmbiguousSamePage(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	var ambig *AmbiguousMatchError
-	if !errors.As(err, &ambig) {
+	if _, ok := errors.AsType[*AmbiguousMatchError](err); !ok {
 		t.Errorf("err type = %T, want *AmbiguousMatchError", err)
 	}
 }

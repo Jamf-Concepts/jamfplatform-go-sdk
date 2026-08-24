@@ -96,6 +96,23 @@ For each new constraint, establish on the wire:
   business rules, so a request that is guaranteed to fail a business rule can
   still exercise field validation without creating anything.
 
+**A quiet spec diff does not mean a quiet build.** v1439's only spec change was a
+spelling fix, and the same build silently reverted all three ZTNA creates from
+returning the full resource object to the spec's `{id, href}` — invisible to any
+diff, because the spec had always declared the shape the server was now finally
+using. The acceptance suite caught it. So always run the live suite even when the
+diff looks cosmetic, and treat a create-response assertion as load-bearing rather
+than noise.
+
+**Never trust an SDK-mediated observation as wire truth when a header could be
+involved.** v1439 also settled a fact that had been wrong in CLAUDE.md for weeks:
+`href` was recorded as "never sent" on Security Cloud creates. It is sent — but
+the gateway nulls it, and drops the `Location` header, whenever the response is
+gzipped. Go's `net/http` requests gzip on every call, so every SDK observation
+showed null while curl showed a value. When a probe and the SDK disagree, diff the
+*requests* header by header before believing either; `Accept-Encoding` is the one
+Go adds without being asked.
+
 Reversed direction too: check whether the server is *looser* than the new spec
 (v1401's `GatewayContact.email` pattern rejects `user@localhost`, which the
 server accepts).

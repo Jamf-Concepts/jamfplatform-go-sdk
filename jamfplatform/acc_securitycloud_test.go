@@ -60,6 +60,28 @@ func jscCleanupDelete(t *testing.T, label string, fn func() error) {
 // DNS — zones
 // ---------------------------------------------------------------------------
 
+// assertCreateHrefEmpty pins a server bug, not a capability: every Security
+// Cloud create returns `href` (and a Location header) when the response is
+// uncompressed, and returns `"href": null` with no Location header when it is
+// gzipped. Wire-verified 2026-08-24, 12/12 deterministic either way — content
+// encoding is mutating the response body.
+//
+// Go's net/http adds `Accept-Encoding: gzip` to every request and transparently
+// decompresses, so **no Go caller can ever see href**. That is why the
+// long-standing note "the server sends only id, never href" looked true: it was
+// only ever observed through this SDK.
+//
+// So the ID is the only usable member, and this asserts that emptiness on
+// purpose. It will fail the day the gateway stops varying the body by encoding,
+// which is the signal to flip it into a real href assertion and to drop the
+// caveat from CLAUDE.md.
+func assertCreateHrefEmpty(t *testing.T, href, what string) {
+	t.Helper()
+	if href != "" {
+		t.Errorf("%s href = %q, want empty: Go always sends Accept-Encoding: gzip and the gateway nulls href on the compressed path. A value here means that bug is fixed — assert the canonical path instead and update CLAUDE.md.", what, href)
+	}
+}
+
 // jscEnsureGateways returns at least n dedicated ZTNA gateways, creating any
 // shortfall itself. Four tests need a real gateway ID and no synthetic value
 // works: DNS zones must point their name servers at one, and a grouped gateway
@@ -115,7 +137,14 @@ func jscEnsureGateways(t *testing.T, sc *securitycloud.Client, n int) []security
 		jscCleanupDelete(t, "fixture gateway "+id, func() error {
 			return sc.DeleteZtnaGatewayV1(context.Background(), id)
 		})
-		existing = append(existing, *created)
+		// Create answers {id, href} (see the lifecycle test), so the full
+		// Gateway has to be read back — callers here want its Name as well as
+		// its ID, and the resolver test matches on Name.
+		full, err := sc.GetZtnaGatewayV1(ctx, id)
+		if err != nil {
+			t.Fatalf("GetZtnaGatewayV1(%s) after creating a fixture gateway failed: %v", id, err)
+		}
+		existing = append(existing, *full)
 	}
 	return existing
 }
@@ -140,6 +169,7 @@ func TestAcceptance_SecurityCloudDnsZoneLifecycle(t *testing.T) {
 	if created.ID == "" {
 		t.Fatal("CreateDnsZoneV1 returned an empty ID")
 	}
+	assertCreateHrefEmpty(t, created.Href, "dns zone")
 	jscCleanupDelete(t, "dns zone "+created.ID, func() error {
 		return sc.DeleteDnsZoneV1(context.Background(), created.ID)
 	})
@@ -420,13 +450,14 @@ func TestAcceptance_SecurityCloudZtnaAppLifecycle(t *testing.T) {
 	jscCleanupDelete(t, "ztna app "+created.ID, func() error {
 		return sc.DeleteZtnaAppV1(context.Background(), created.ID)
 	})
-	// The spec declares 201 with no content; the server returns the full App.
-	// The SDK carries a config-level responseType override for exactly this,
-	// so an empty ID here means the override regressed.
+	// 201 with the spec-declared {id, href}. The server used to answer with the
+	// whole App, which config.json encoded as a responseType override; build
+	// v1439 brought it in line with the spec and the override is gone.
 	if created.ID == "" {
-		t.Fatal("CreateZtnaAppV1 returned no ID — the 201 response body override has regressed")
+		t.Fatal("CreateZtnaAppV1 returned no ID")
 	}
-	t.Logf("created app %s name=%q category=%q", created.ID, created.Name, created.CategoryName)
+	assertCreateHrefEmpty(t, created.Href, "ztna app")
+	t.Logf("created app %s", created.ID)
 
 	renamed := name + "-renamed"
 	if err := sc.UpdateZtnaAppV1(ctx, created.ID, &securitycloud.AppPatchRequest{Name: &renamed}); err != nil {
@@ -480,8 +511,9 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 		return sc.DeleteZtnaGroupedGatewayV1(context.Background(), created.ID)
 	})
 	if created.ID == "" {
-		t.Fatal("CreateZtnaGroupedGatewayV1 returned no ID — the 201 response body override has regressed")
+		t.Fatal("CreateZtnaGroupedGatewayV1 returned no ID")
 	}
+	assertCreateHrefEmpty(t, created.Href, "ztna grouped gateway")
 
 	renamed := name + "-renamed"
 	if err := sc.UpdateZtnaGroupedGatewayV1(ctx, created.ID, &securitycloud.GroupedGatewayPatchRequest{Name: &renamed}); err != nil {
@@ -623,8 +655,8 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 	ctx := context.Background()
 
 	// lifetimeInSec became int64 in build v1424 (the spec added format: int64).
-	suite := func(lifetime int64) securitycloud.CypherSuiteConfig {
-		return securitycloud.CypherSuiteConfig{
+	suite := func(lifetime int64) securitycloud.CipherSuiteConfig {
+		return securitycloud.CipherSuiteConfig{
 			Encryption:    []string{"aes256"},
 			Integrity:     []string{"sha256"},
 			DhGroups:      []string{"modp2048"},
@@ -673,18 +705,16 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 		return sc.DeleteZtnaGatewayV1(context.Background(), created.ID)
 	})
 
-	// Wire-verified 2026-08-20: POST answers 201 with the whole Gateway, not
-	// the CreateResponse the spec declares, and sends no Location header.
-	// config.json carries the responseType override that encodes this.
+	// The 201 body is the spec-declared CreateResponse. This reverses what the
+	// server did until build v1439, when it answered with the whole Gateway —
+	// config.json carried a responseType override for that, now removed. The
+	// shape change is independent of content encoding (wire-verified on both
+	// the gzip and identity paths); only href's population varies, and see
+	// assertCreateHrefEmpty for why Go never sees it.
 	if created.ID == "" {
 		t.Fatal("CreateZtnaGatewayV1 returned an empty ID")
 	}
-	if created.Name != name {
-		t.Errorf("create response name = %q, want %q — the 201 body is not the full Gateway", created.Name, name)
-	}
-	if created.Ipsec == nil {
-		t.Fatal("create response carries no ipsec block")
-	}
+	assertCreateHrefEmpty(t, created.Href, "ztna gateway")
 
 	got, err := sc.GetZtnaGatewayV1(ctx, created.ID)
 	if err != nil {
@@ -758,8 +788,8 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 	full := func(espLifetime int64) *securitycloud.GatewayIpSecPatchRequest {
 		return &securitycloud.GatewayIpSecPatchRequest{
 			KeyExchange: &[]string{"ikev2"}[0],
-			Ike:         &[]securitycloud.CypherSuiteConfig{suite(28800)}[0],
-			Esp:         &[]securitycloud.CypherSuiteConfig{suite(espLifetime)}[0],
+			Ike:         &[]securitycloud.CipherSuiteConfig{suite(28800)}[0],
+			Esp:         &[]securitycloud.CipherSuiteConfig{suite(espLifetime)}[0],
 			Left: &securitycloud.ConnectionConfigPatchLeftRequest{
 				ID:      &[]string{"sdk-acc.example.invalid"}[0],
 				Host:    &[]string{"%any"}[0],
@@ -801,7 +831,7 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 	// survives, which is the whole point of the new schema.
 	if err := sc.UpdateZtnaGatewayV1(ctx, created.ID, &securitycloud.GatewayPatchRequest{
 		Ipsec: &securitycloud.GatewayIpSecPatchRequest{
-			Esp: &[]securitycloud.CypherSuiteConfig{suite(3600)}[0],
+			Esp: &[]securitycloud.CipherSuiteConfig{suite(3600)}[0],
 		},
 	}); err != nil {
 		t.Fatalf("partial ipsec merge-patch failed — the all-optional PATCH shape landed in v1416 and should make this reachable: %v", err)
@@ -897,7 +927,7 @@ func TestAcceptance_SecurityCloudZtnaGatewayIpSecRejections(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	suite := securitycloud.CypherSuiteConfig{
+	suite := securitycloud.CipherSuiteConfig{
 		Encryption:    []string{"aes256"},
 		Integrity:     []string{"sha256"},
 		DhGroups:      []string{"modp2048"},
@@ -1658,11 +1688,11 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 		},
 		Ipsec: &securitycloud.GatewayIpSecRequest{
 			KeyExchange: "ikev2",
-			Ike: securitycloud.CypherSuiteConfig{
+			Ike: securitycloud.CipherSuiteConfig{
 				Encryption: []string{"aes256"}, Integrity: []string{"sha256"},
 				DhGroups: []string{"modp2048"}, LifetimeInSec: 28800,
 			},
-			Esp: securitycloud.CypherSuiteConfig{
+			Esp: securitycloud.CipherSuiteConfig{
 				Encryption: []string{"aes256"}, Integrity: []string{"sha256"},
 				DhGroups: []string{"modp2048"}, LifetimeInSec: 3600,
 			},
@@ -1690,8 +1720,8 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 	if !created {
 		t.Errorf("first Apply reported created=false for a fresh name")
 	}
-	// The ID comes from the 201 body, which is the full Gateway (wire-verified
-	// 2026-08-20) rather than the CreateResponse the spec declares.
+	// The ID comes from the 201 body, which is the spec-declared CreateResponse
+	// since build v1439 (it used to be the whole Gateway).
 	if id == "" {
 		t.Fatal("ApplyZtnaGatewayV1 returned an empty ID on create")
 	}

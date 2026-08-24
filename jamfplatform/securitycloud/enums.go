@@ -67,6 +67,93 @@ func RoutingStrategyValues() []RoutingStrategy {
 	}
 }
 
+// CipherSuiteConfigDhGroups is the set of values accepted by CipherSuiteConfig.DhGroups.
+type CipherSuiteConfigDhGroups = string
+
+// CipherSuiteConfigDhGroups values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CipherSuiteConfigDhGroupsModp1024 CipherSuiteConfigDhGroups = "modp1024"
+	CipherSuiteConfigDhGroupsModp1536 CipherSuiteConfigDhGroups = "modp1536"
+	CipherSuiteConfigDhGroupsModp2048 CipherSuiteConfigDhGroups = "modp2048"
+	CipherSuiteConfigDhGroupsModp3072 CipherSuiteConfigDhGroups = "modp3072"
+	CipherSuiteConfigDhGroupsModp4096 CipherSuiteConfigDhGroups = "modp4096"
+	CipherSuiteConfigDhGroupsEcp256   CipherSuiteConfigDhGroups = "ecp256"
+	CipherSuiteConfigDhGroupsEcp384   CipherSuiteConfigDhGroups = "ecp384"
+	CipherSuiteConfigDhGroupsEcp521   CipherSuiteConfigDhGroups = "ecp521"
+)
+
+// CipherSuiteConfigDhGroupsValues returns every value the Jamf API accepts for CipherSuiteConfigDhGroups,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func CipherSuiteConfigDhGroupsValues() []CipherSuiteConfigDhGroups {
+	return []CipherSuiteConfigDhGroups{
+		CipherSuiteConfigDhGroupsModp1024,
+		CipherSuiteConfigDhGroupsModp1536,
+		CipherSuiteConfigDhGroupsModp2048,
+		CipherSuiteConfigDhGroupsModp3072,
+		CipherSuiteConfigDhGroupsModp4096,
+		CipherSuiteConfigDhGroupsEcp256,
+		CipherSuiteConfigDhGroupsEcp384,
+		CipherSuiteConfigDhGroupsEcp521,
+	}
+}
+
+// CipherSuiteConfigEncryption is the set of values accepted by CipherSuiteConfig.Encryption.
+type CipherSuiteConfigEncryption = string
+
+// CipherSuiteConfigEncryption values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CipherSuiteConfigEncryption3des   CipherSuiteConfigEncryption = "3des"
+	CipherSuiteConfigEncryptionAes128 CipherSuiteConfigEncryption = "aes128"
+	CipherSuiteConfigEncryptionAes256 CipherSuiteConfigEncryption = "aes256"
+)
+
+// CipherSuiteConfigEncryptionValues returns every value the Jamf API accepts for CipherSuiteConfigEncryption,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func CipherSuiteConfigEncryptionValues() []CipherSuiteConfigEncryption {
+	return []CipherSuiteConfigEncryption{
+		CipherSuiteConfigEncryption3des,
+		CipherSuiteConfigEncryptionAes128,
+		CipherSuiteConfigEncryptionAes256,
+	}
+}
+
+// CipherSuiteConfigIntegrity is the set of values accepted by CipherSuiteConfig.Integrity.
+type CipherSuiteConfigIntegrity = string
+
+// CipherSuiteConfigIntegrity values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CipherSuiteConfigIntegrityMd5    CipherSuiteConfigIntegrity = "md5"
+	CipherSuiteConfigIntegritySha1   CipherSuiteConfigIntegrity = "sha1"
+	CipherSuiteConfigIntegritySha256 CipherSuiteConfigIntegrity = "sha256"
+	CipherSuiteConfigIntegritySha512 CipherSuiteConfigIntegrity = "sha512"
+)
+
+// CipherSuiteConfigIntegrityValues returns every value the Jamf API accepts for CipherSuiteConfigIntegrity,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func CipherSuiteConfigIntegrityValues() []CipherSuiteConfigIntegrity {
+	return []CipherSuiteConfigIntegrity{
+		CipherSuiteConfigIntegrityMd5,
+		CipherSuiteConfigIntegritySha1,
+		CipherSuiteConfigIntegritySha256,
+		CipherSuiteConfigIntegritySha512,
+	}
+}
+
 // ConnectionConfigPatchRightRequestVendor is the set of values accepted by ConnectionConfigPatchRightRequest.Vendor.
 type ConnectionConfigPatchRightRequestVendor = string
 
@@ -187,93 +274,6 @@ func ConnectionConfigRightResponseVendorValues() []ConnectionConfigRightResponse
 		ConnectionConfigRightResponseVendorStrongSwan,
 		ConnectionConfigRightResponseVendorWatchguard,
 		ConnectionConfigRightResponseVendorOther,
-	}
-}
-
-// CypherSuiteConfigDhGroups is the set of values accepted by CypherSuiteConfig.DhGroups.
-type CypherSuiteConfigDhGroups = string
-
-// CypherSuiteConfigDhGroups values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	CypherSuiteConfigDhGroupsModp1024 CypherSuiteConfigDhGroups = "modp1024"
-	CypherSuiteConfigDhGroupsModp1536 CypherSuiteConfigDhGroups = "modp1536"
-	CypherSuiteConfigDhGroupsModp2048 CypherSuiteConfigDhGroups = "modp2048"
-	CypherSuiteConfigDhGroupsModp3072 CypherSuiteConfigDhGroups = "modp3072"
-	CypherSuiteConfigDhGroupsModp4096 CypherSuiteConfigDhGroups = "modp4096"
-	CypherSuiteConfigDhGroupsEcp256   CypherSuiteConfigDhGroups = "ecp256"
-	CypherSuiteConfigDhGroupsEcp384   CypherSuiteConfigDhGroups = "ecp384"
-	CypherSuiteConfigDhGroupsEcp521   CypherSuiteConfigDhGroups = "ecp521"
-)
-
-// CypherSuiteConfigDhGroupsValues returns every value the Jamf API accepts for CypherSuiteConfigDhGroups,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func CypherSuiteConfigDhGroupsValues() []CypherSuiteConfigDhGroups {
-	return []CypherSuiteConfigDhGroups{
-		CypherSuiteConfigDhGroupsModp1024,
-		CypherSuiteConfigDhGroupsModp1536,
-		CypherSuiteConfigDhGroupsModp2048,
-		CypherSuiteConfigDhGroupsModp3072,
-		CypherSuiteConfigDhGroupsModp4096,
-		CypherSuiteConfigDhGroupsEcp256,
-		CypherSuiteConfigDhGroupsEcp384,
-		CypherSuiteConfigDhGroupsEcp521,
-	}
-}
-
-// CypherSuiteConfigEncryption is the set of values accepted by CypherSuiteConfig.Encryption.
-type CypherSuiteConfigEncryption = string
-
-// CypherSuiteConfigEncryption values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	CypherSuiteConfigEncryption3des   CypherSuiteConfigEncryption = "3des"
-	CypherSuiteConfigEncryptionAes128 CypherSuiteConfigEncryption = "aes128"
-	CypherSuiteConfigEncryptionAes256 CypherSuiteConfigEncryption = "aes256"
-)
-
-// CypherSuiteConfigEncryptionValues returns every value the Jamf API accepts for CypherSuiteConfigEncryption,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func CypherSuiteConfigEncryptionValues() []CypherSuiteConfigEncryption {
-	return []CypherSuiteConfigEncryption{
-		CypherSuiteConfigEncryption3des,
-		CypherSuiteConfigEncryptionAes128,
-		CypherSuiteConfigEncryptionAes256,
-	}
-}
-
-// CypherSuiteConfigIntegrity is the set of values accepted by CypherSuiteConfig.Integrity.
-type CypherSuiteConfigIntegrity = string
-
-// CypherSuiteConfigIntegrity values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	CypherSuiteConfigIntegrityMd5    CypherSuiteConfigIntegrity = "md5"
-	CypherSuiteConfigIntegritySha1   CypherSuiteConfigIntegrity = "sha1"
-	CypherSuiteConfigIntegritySha256 CypherSuiteConfigIntegrity = "sha256"
-	CypherSuiteConfigIntegritySha512 CypherSuiteConfigIntegrity = "sha512"
-)
-
-// CypherSuiteConfigIntegrityValues returns every value the Jamf API accepts for CypherSuiteConfigIntegrity,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func CypherSuiteConfigIntegrityValues() []CypherSuiteConfigIntegrity {
-	return []CypherSuiteConfigIntegrity{
-		CypherSuiteConfigIntegrityMd5,
-		CypherSuiteConfigIntegritySha1,
-		CypherSuiteConfigIntegritySha256,
-		CypherSuiteConfigIntegritySha512,
 	}
 }
 

@@ -267,6 +267,21 @@ type AssignmentsInclusions struct {
 // CategoryName is an alias for string.
 type CategoryName = string
 
+// CipherSuiteConfig Cipher suite configuration for an IKE or ESP phase.
+type CipherSuiteConfig struct {
+	// Diffie-Hellman group. Exactly one value.
+	// Allowed values: see the CipherSuiteConfigDhGroups constants.
+	DhGroups []string `json:"dhGroups"`
+	// Encryption algorithm. Exactly one value.
+	// Allowed values: see the CipherSuiteConfigEncryption constants.
+	Encryption []string `json:"encryption"`
+	// Integrity algorithm. Exactly one value.
+	// Allowed values: see the CipherSuiteConfigIntegrity constants.
+	Integrity []string `json:"integrity"`
+	// Key lifetime in seconds (e.g. `28800` for IKE, `3600` for ESP).
+	LifetimeInSec int64 `json:"lifetimeInSec"`
+}
+
 // ConnectionConfigLeftRequest IPSec connection endpoint for write requests. Includes the `secret` field. `secret` is write-only — it is never returned in GET responses.
 type ConnectionConfigLeftRequest struct {
 	// Endpoint address or `%any`.
@@ -361,21 +376,6 @@ type CreateResponse struct {
 	Href string `json:"href"`
 	// ID of the created resource.
 	ID string `json:"id"`
-}
-
-// CypherSuiteConfig Cipher suite configuration for an IKE or ESP phase.
-type CypherSuiteConfig struct {
-	// Diffie-Hellman group. Exactly one value.
-	// Allowed values: see the CypherSuiteConfigDhGroups constants.
-	DhGroups []string `json:"dhGroups"`
-	// Encryption algorithm. Exactly one value.
-	// Allowed values: see the CypherSuiteConfigEncryption constants.
-	Encryption []string `json:"encryption"`
-	// Integrity algorithm. Exactly one value.
-	// Allowed values: see the CypherSuiteConfigIntegrity constants.
-	Integrity []string `json:"integrity"`
-	// Key lifetime in seconds (e.g. `28800` for IKE, `3600` for ESP).
-	LifetimeInSec int64 `json:"lifetimeInSec"`
 }
 
 // DedicatedIps Dedicated egress IP configuration.
@@ -504,9 +504,9 @@ type GatewayCreateRequest struct {
 // GatewayIpSec IPSec tunnel configuration returned on GET. Secrets are never included in responses.
 type GatewayIpSec struct {
 	// Cipher suite configuration for an IKE or ESP phase.
-	Esp *CypherSuiteConfig `json:"esp,omitempty"`
+	Esp *CipherSuiteConfig `json:"esp,omitempty"`
 	// Cipher suite configuration for an IKE or ESP phase.
-	Ike *CypherSuiteConfig `json:"ike,omitempty"`
+	Ike *CipherSuiteConfig `json:"ike,omitempty"`
 	// IKE version.
 	// Allowed values: see the GatewayIpSecKeyExchange constants.
 	KeyExchange string `json:"keyExchange"`
@@ -519,9 +519,9 @@ type GatewayIpSec struct {
 // GatewayIpSecPatchRequest Partial IPSec configuration for PATCH. All fields optional — TRS performs a deep merge. Supply only `left.secret` to rotate the pre-shared key, or the full block to replace cipher suites and endpoint addresses simultaneously. `right.secret` is derived automatically from `left.secret` — callers never set it directly.
 type GatewayIpSecPatchRequest struct {
 	// Cipher suite configuration for an IKE or ESP phase.
-	Esp *CypherSuiteConfig `json:"esp,omitempty"`
+	Esp *CipherSuiteConfig `json:"esp,omitempty"`
 	// Cipher suite configuration for an IKE or ESP phase.
-	Ike *CypherSuiteConfig `json:"ike,omitempty"`
+	Ike *CipherSuiteConfig `json:"ike,omitempty"`
 	// IKE version.
 	// Allowed values: see the GatewayIpSecPatchRequestKeyExchange constants.
 	KeyExchange *string `json:"keyExchange,omitempty"`
@@ -537,9 +537,9 @@ type GatewayIpSecPatchRequest struct {
 // GatewayIpSecRequest IPSec tunnel configuration for POST requests. All fields required. `left.secret` sets the pre-shared key — it is automatically applied to both tunnel endpoints.
 type GatewayIpSecRequest struct {
 	// Cipher suite configuration for an IKE or ESP phase.
-	Esp CypherSuiteConfig `json:"esp"`
+	Esp CipherSuiteConfig `json:"esp"`
 	// Cipher suite configuration for an IKE or ESP phase.
-	Ike CypherSuiteConfig `json:"ike"`
+	Ike CipherSuiteConfig `json:"ike"`
 	// IKE version.
 	// Allowed values: see the GatewayIpSecRequestKeyExchange constants.
 	KeyExchange string `json:"keyExchange"`
