@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetInventoryInformationV1(ctx context.Context) (*InventoryInformation, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result InventoryInformation
 	endpoint := prefix + "/inventory-information"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

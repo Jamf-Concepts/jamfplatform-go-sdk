@@ -24,7 +24,7 @@ import (
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadBrandingImageV1(ctx context.Context, fileFilename string, file io.Reader) (*BrandingImageURL, error) {
-	prefix := c.transport.TenantPrefix("pro", "")
+	prefix := c.transport.APIPrefix("pro", "")
 	var result BrandingImageURL
 	endpoint := prefix + "/self-service/branding/images"
 	parts := []client.MultipartField{

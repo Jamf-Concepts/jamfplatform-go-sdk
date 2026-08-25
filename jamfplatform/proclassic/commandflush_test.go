@@ -13,7 +13,7 @@ import (
 
 func TestDeleteCommandFlush(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/commandflush", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/commandflush", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -28,7 +28,7 @@ func TestDeleteCommandFlush(t *testing.T) {
 
 func TestDeleteCommandFlushByIDTypeIDStatus(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/commandflush/test-id/id/test-id/status/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/commandflush/test-id/id/test-id/status/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

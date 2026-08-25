@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) HealthCheckV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/health-check"
 	if err := c.transport.DoExpect(ctx, http.MethodGet, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("HealthCheckV1: %w", err)
@@ -27,7 +27,7 @@ func (c *Client) HealthCheckV1(ctx context.Context) error {
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetHealthStatusV1(ctx context.Context) (*HealthStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HealthStatus
 	endpoint := prefix + "/health-status"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

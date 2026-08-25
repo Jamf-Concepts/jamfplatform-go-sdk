@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetLicensedSoftwareByID(ctx context.Context, id string) (*LicensedSoftware, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LicensedSoftware
 	endpoint := fmt.Sprintf("%s/licensedsoftware/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetLicensedSoftwareByID(ctx context.Context, id string) (*Licen
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateLicensedSoftwareByID(ctx context.Context, id string, request *LicensedSoftware) (*LicensedSoftware, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LicensedSoftware
 	endpoint := fmt.Sprintf("%s/licensedsoftware/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateLicensedSoftwareByID(ctx context.Context, id string, requ
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateLicensedSoftwareByID(ctx context.Context, id string, request *LicensedSoftware) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateLicensedSoftwareByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateLicensedSoftwareByID(ctx context.Context, id string, requ
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteLicensedSoftwareByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteLicensedSoftwareByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteLicensedSoftwareByID(ctx context.Context, id string) erro
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetLicensedSoftwareByName(ctx context.Context, name string) (*LicensedSoftware, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LicensedSoftware
 	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetLicensedSoftwareByName(ctx context.Context, name string) (*L
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateLicensedSoftwareByName(ctx context.Context, name string, request *LicensedSoftware) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateLicensedSoftwareByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateLicensedSoftwareByName(ctx context.Context, name string, 
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteLicensedSoftwareByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteLicensedSoftwareByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteLicensedSoftwareByName(ctx context.Context, name string) 
 //
 // Required privileges: read:pro:licensed-software.
 func (c *Client) ListLicensedSoftware(ctx context.Context) (*LicensedSoftwareAll, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LicensedSoftwareAll
 	endpoint := prefix + "/licensedsoftware"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListLicensedSoftware(ctx context.Context) (*LicensedSoftwareAll
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateLicensedSoftwareByName(ctx context.Context, name string, request *LicensedSoftware) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/licensedsoftware/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateLicensedSoftwareByName(%s): %w", name, err)

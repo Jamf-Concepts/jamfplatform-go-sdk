@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: create:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Create DigiCert Settings.
 func (c *Client) CreateDigicertTrustLifecycleManagerV1(ctx context.Context, request *DigiCertSetting) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/pki/digicert/trust-lifecycle-manager"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) CreateDigicertTrustLifecycleManagerV1(ctx context.Context, requ
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
 func (c *Client) GetDigicertTrustLifecycleManagerV1(ctx context.Context, id string) (*DigiCertSettingResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DigiCertSettingResponse
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -48,7 +48,7 @@ func (c *Client) GetDigicertTrustLifecycleManagerV1(ctx context.Context, id stri
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
 func (c *Client) UpdateDigicertTrustLifecycleManagerV1(ctx context.Context, id string, request *DigiCertSetting) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDigicertTrustLifecycleManagerV1(%s): %w", id, err)
@@ -63,7 +63,7 @@ func (c *Client) UpdateDigicertTrustLifecycleManagerV1(ctx context.Context, id s
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
 func (c *Client) DeleteDigicertTrustLifecycleManagerV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDigicertTrustLifecycleManagerV1(%s): %w", id, err)
@@ -78,7 +78,7 @@ func (c *Client) DeleteDigicertTrustLifecycleManagerV1(ctx context.Context, id s
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager settings.
 func (c *Client) GetDigicertTrustLifecycleManagerConnectionStatusV1(ctx context.Context, id string) (*DigicertConnectionStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DigicertConnectionStatus
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s/connection-status", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -94,7 +94,7 @@ func (c *Client) GetDigicertTrustLifecycleManagerConnectionStatusV1(ctx context.
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
 func (c *Client) GetDigicertTrustLifecycleManagerDependenciesV1(ctx context.Context, id string) (*DigicertDependencies, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DigicertDependencies
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s/dependencies", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -110,7 +110,7 @@ func (c *Client) GetDigicertTrustLifecycleManagerDependenciesV1(ctx context.Cont
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager settings.
 func (c *Client) CheckDigicertTrustLifecycleManagerPrivilegesV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/digicert/trust-lifecycle-manager/%s/privilege-check", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodGet, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("CheckDigicertTrustLifecycleManagerPrivilegesV1(%s): %w", id, err)
@@ -123,7 +123,7 @@ func (c *Client) CheckDigicertTrustLifecycleManagerPrivilegesV1(ctx context.Cont
 // Required privileges: create:pro:digicert-settings, update:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Create DigiCert Settings, Update DigiCert Settings.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ValidateDigicertClientCertificateV1(ctx context.Context, request *Certificate) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/pki/digicert/trust-lifecycle-manager/validate-client-certificate"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("ValidateDigicertClientCertificateV1: %w", err)

@@ -22,7 +22,7 @@ import (
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ListAppInstallerDeploymentsV1(ctx context.Context) ([]AppInstallerDeploymentListEntry, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]AppInstallerDeploymentListEntry, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -50,7 +50,7 @@ func (c *Client) ListAppInstallerDeploymentsV1(ctx context.Context) ([]AppInstal
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) CreateAppInstallerDeploymentV1(ctx context.Context, request *AppInstallerDeploymentCreate) (*AppInstallerDeploymentHrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppInstallerDeploymentHrefResponse
 	endpoint := prefix + "/app-installers/deployments"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -68,7 +68,7 @@ func (c *Client) CreateAppInstallerDeploymentV1(ctx context.Context, request *Ap
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) GetAppInstallerDeploymentV1(ctx context.Context, id string) (*AppInstallerDeployment, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppInstallerDeployment
 	endpoint := fmt.Sprintf("%s/app-installers/deployments/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -86,7 +86,7 @@ func (c *Client) GetAppInstallerDeploymentV1(ctx context.Context, id string) (*A
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) UpdateAppInstallerDeploymentV1(ctx context.Context, id string, request *AppInstallerDeploymentCreate) (*AppInstallerDeployment, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppInstallerDeployment
 	endpoint := fmt.Sprintf("%s/app-installers/deployments/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -104,7 +104,7 @@ func (c *Client) UpdateAppInstallerDeploymentV1(ctx context.Context, id string, 
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) DeleteAppInstallerDeploymentV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/app-installers/deployments/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteAppInstallerDeploymentV1(%s): %w", id, err)
@@ -116,7 +116,7 @@ func (c *Client) DeleteAppInstallerDeploymentV1(ctx context.Context, id string) 
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ResolveAppInstallerDeploymentV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/app-installers/deployments"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -129,7 +129,7 @@ func (c *Client) ResolveAppInstallerDeploymentV1IDByName(ctx context.Context, na
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ResolveAppInstallerDeploymentV1ByName(ctx context.Context, name string) (*AppInstallerDeployment, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/app-installers/deployments"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) ListNotificationsV1(ctx context.Context) ([]NotificationV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []NotificationV1
 	endpoint := prefix + "/notifications"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -34,7 +34,7 @@ func (c *Client) ListNotificationsV1(ctx context.Context) ([]NotificationV1, err
 //     Allowed values: see the NotificationType constants.
 //   - id: instance ID of the notification.
 func (c *Client) DeleteNotificationV1(ctx context.Context, notificationType string, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/notifications/%s/%s", prefix, url.PathEscape(notificationType), url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteNotificationV1(%s): %w", notificationType, err)

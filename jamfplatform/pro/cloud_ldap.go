@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: create:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Create LDAP Servers.
 func (c *Client) VerifyLdapKeystoreV1(ctx context.Context, request *CloudLdapKeystoreFile) (*CloudLdapKeystore, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudLdapKeystore
 	endpoint := prefix + "/ldap-keystore/verify"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -29,7 +29,7 @@ func (c *Client) VerifyLdapKeystoreV1(ctx context.Context, request *CloudLdapKey
 //
 // Required privileges: create:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Create LDAP Servers.
 func (c *Client) CreateCloudLdapV2(ctx context.Context, request *LdapConfigurationRequest) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/cloud-ldaps"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -45,7 +45,7 @@ func (c *Client) CreateCloudLdapV2(ctx context.Context, request *LdapConfigurati
 // Parameters:
 //   - provider: Cloud Identity Provider name.
 func (c *Client) GetCloudLdapDefaultMappingsV2(ctx context.Context, provider string) (*CloudLdapMappingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result CloudLdapMappingsResponse
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/defaults/%s/mappings", prefix, url.PathEscape(provider))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -61,7 +61,7 @@ func (c *Client) GetCloudLdapDefaultMappingsV2(ctx context.Context, provider str
 // Parameters:
 //   - provider: Cloud Identity Provider name.
 func (c *Client) GetCloudLdapDefaultServerConfigurationV2(ctx context.Context, provider string) (*CloudLdapServerResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result CloudLdapServerResponse
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/defaults/%s/server-configuration", prefix, url.PathEscape(provider))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -77,7 +77,7 @@ func (c *Client) GetCloudLdapDefaultServerConfigurationV2(ctx context.Context, p
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) GetCloudLdapV2(ctx context.Context, id string) (*LdapConfigurationResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LdapConfigurationResponse
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -93,7 +93,7 @@ func (c *Client) GetCloudLdapV2(ctx context.Context, id string) (*LdapConfigurat
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) UpdateCloudLdapV2(ctx context.Context, id string, request *LdapConfigurationUpdate) (*LdapConfigurationResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LdapConfigurationResponse
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -109,7 +109,7 @@ func (c *Client) UpdateCloudLdapV2(ctx context.Context, id string, request *Ldap
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) DeleteCloudLdapV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteCloudLdapV2(%s): %w", id, err)
@@ -124,7 +124,7 @@ func (c *Client) DeleteCloudLdapV2(ctx context.Context, id string) error {
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) GetCloudLdapBindStatisticsV2(ctx context.Context, id string) (*CloudLdapConnectionPoolStatistics, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result CloudLdapConnectionPoolStatistics
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/%s/connection/bind", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -140,7 +140,7 @@ func (c *Client) GetCloudLdapBindStatisticsV2(ctx context.Context, id string) (*
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) GetCloudLdapSearchStatisticsV2(ctx context.Context, id string) (*CloudLdapConnectionPoolStatistics, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result CloudLdapConnectionPoolStatistics
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/%s/connection/search", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -156,7 +156,7 @@ func (c *Client) GetCloudLdapSearchStatisticsV2(ctx context.Context, id string) 
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) GetCloudLdapConnectionStatusV2(ctx context.Context, id string) (*CloudLdapConnectionStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result CloudLdapConnectionStatus
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/%s/connection/status", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -172,7 +172,7 @@ func (c *Client) GetCloudLdapConnectionStatusV2(ctx context.Context, id string) 
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) GetCloudLdapMappingsV2(ctx context.Context, id string) (*CloudLdapMappingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result CloudLdapMappingsResponse
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/%s/mappings", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -188,7 +188,7 @@ func (c *Client) GetCloudLdapMappingsV2(ctx context.Context, id string) (*CloudL
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) UpdateCloudLdapMappingsV2(ctx context.Context, id string, request *CloudLdapMappingsRequest) (*CloudLdapMappingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result CloudLdapMappingsResponse
 	endpoint := fmt.Sprintf("%s/cloud-ldaps/%s/mappings", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {

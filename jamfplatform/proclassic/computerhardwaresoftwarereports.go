@@ -21,7 +21,7 @@ import (
 //   - start_date: Start date (e.g. yyyy-mm-dd).
 //   - end_date: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerHardwareSoftwareReportByIDDateRange(ctx context.Context, id string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
 	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/id/%s/%s_%s", prefix, url.PathEscape(id), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -41,7 +41,7 @@ func (c *Client) GetComputerHardwareSoftwareReportByIDDateRange(ctx context.Cont
 //   - subset: Subset to filter by.
 //     Allowed values: "Software", "Hardwre", "Fonts", "Plugins".
 func (c *Client) GetComputerHardwareSoftwareReportByIDDateRangeSubset(ctx context.Context, id string, start_date string, end_date string, subset string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
 	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/id/%s/%s_%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(start_date), url.PathEscape(end_date), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -59,7 +59,7 @@ func (c *Client) GetComputerHardwareSoftwareReportByIDDateRangeSubset(ctx contex
 //   - start_date: Start date (e.g. yyyy-mm-dd).
 //   - end_date: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerHardwareSoftwareReportByMacAddressDateRange(ctx context.Context, macaddress string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
 	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/macaddress/%s/%s_%s", prefix, url.PathEscape(macaddress), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -77,7 +77,7 @@ func (c *Client) GetComputerHardwareSoftwareReportByMacAddressDateRange(ctx cont
 //   - start_date: Start date (e.g. yyyy-mm-dd).
 //   - end_date: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerHardwareSoftwareReportByNameDateRange(ctx context.Context, name string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
 	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/name/%s/%s_%s", prefix, url.PathEscape(name), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -95,7 +95,7 @@ func (c *Client) GetComputerHardwareSoftwareReportByNameDateRange(ctx context.Co
 //   - start_date: Start date (e.g. yyyy-mm-dd).
 //   - end_date: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerHardwareSoftwareReportBySerialNumberDateRange(ctx context.Context, serialnumber string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
 	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/serialnumber/%s/%s_%s", prefix, url.PathEscape(serialnumber), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -113,7 +113,7 @@ func (c *Client) GetComputerHardwareSoftwareReportBySerialNumberDateRange(ctx co
 //   - start_date: Start date (e.g. yyyy-mm-dd).
 //   - end_date: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerHardwareSoftwareReportByUDIDDateRange(ctx context.Context, udid string, start_date string, end_date string) (*ComputerHardwareSoftwareReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHardwareSoftwareReports
 	endpoint := fmt.Sprintf("%s/computerhardwaresoftwarereports/udid/%s/%s_%s", prefix, url.PathEscape(udid), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

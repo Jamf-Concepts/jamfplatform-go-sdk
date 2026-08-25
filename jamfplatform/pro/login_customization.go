@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetLoginCustomizationV1(ctx context.Context) (*LoginContent, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LoginContent
 	endpoint := prefix + "/login-customization"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetLoginCustomizationV1(ctx context.Context) (*LoginContent, er
 //
 // Required privileges: update:pro:login-disclaimer. Legacy Jamf Pro privilege name(s): Update Login Disclaimer.
 func (c *Client) UpdateLoginCustomizationV1(ctx context.Context, request *LoginContentPut) (*LoginContentPut, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LoginContentPut
 	endpoint := prefix + "/login-customization"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {

@@ -32,7 +32,7 @@ import (
 //     `osRequirements`, `scriptContents`. This param can be combined with paging and sorting. Example:
 //     filter=categoryName=="Category" and name=="*script name*".
 func (c *Client) ListScriptsV1(ctx context.Context, sort []string, filter string) ([]Script, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]Script, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -64,7 +64,7 @@ func (c *Client) ListScriptsV1(ctx context.Context, sort []string, filter string
 //
 // Required privileges: create:pro:scripts. Legacy Jamf Pro privilege name(s): Create Scripts.
 func (c *Client) CreateScriptV1(ctx context.Context, request *Script) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/scripts"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -80,7 +80,7 @@ func (c *Client) CreateScriptV1(ctx context.Context, request *Script) (*HrefResp
 // Parameters:
 //   - id: Script object identifier.
 func (c *Client) GetScriptV1(ctx context.Context, id string) (*Script, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Script
 	endpoint := fmt.Sprintf("%s/scripts/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -96,7 +96,7 @@ func (c *Client) GetScriptV1(ctx context.Context, id string) (*Script, error) {
 // Parameters:
 //   - id: Script object identifier.
 func (c *Client) UpdateScriptV1(ctx context.Context, id string, request *Script) (*Script, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Script
 	endpoint := fmt.Sprintf("%s/scripts/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -112,7 +112,7 @@ func (c *Client) UpdateScriptV1(ctx context.Context, id string, request *Script)
 // Parameters:
 //   - id: Script object identifier.
 func (c *Client) DeleteScriptV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/scripts/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteScriptV1(%s): %w", id, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteScriptV1(ctx context.Context, id string) error {
 // Parameters:
 //   - id: id of the script to be downloaded.
 func (c *Client) DownloadScriptV1(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/scripts/%s/download", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -149,7 +149,7 @@ func (c *Client) DownloadScriptV1(ctx context.Context, id string) ([]byte, error
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListScriptHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -184,7 +184,7 @@ func (c *Client) ListScriptHistoryV1(ctx context.Context, id string, sort []stri
 // Parameters:
 //   - id: instance id of script history record.
 func (c *Client) CreateScriptHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := fmt.Sprintf("%s/scripts/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -195,7 +195,7 @@ func (c *Client) CreateScriptHistoryNoteV1(ctx context.Context, id string, reque
 
 // ResolveScriptV1IDByName looks up a ScriptV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveScriptV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/scripts"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -206,7 +206,7 @@ func (c *Client) ResolveScriptV1IDByName(ctx context.Context, name string) (stri
 
 // ResolveScriptV1ByName looks up a ScriptV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveScriptV1ByName(ctx context.Context, name string) (*Script, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/scripts"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {

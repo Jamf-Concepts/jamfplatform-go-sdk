@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - baselineID: Given baseline ID.
 func (c *Client) GetBaselineRules(ctx context.Context, baselineID string) (*SourcedRules, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	var result SourcedRules
 	endpoint := prefix + "/rules"
 	params := url.Values{}

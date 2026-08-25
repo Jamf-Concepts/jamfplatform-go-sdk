@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: Computer ID value to filter by.
 func (c *Client) GetComputerManagementByID(ctx context.Context, id string) (*ComputerManagement, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerManagement
 	endpoint := fmt.Sprintf("%s/computermanagement/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetComputerManagementByID(ctx context.Context, id string) (*Com
 // Parameters:
 //   - name: Computer Name to filter by.
 func (c *Client) GetComputerManagementByName(ctx context.Context, name string) (*ComputerManagement, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerManagement
 	endpoint := fmt.Sprintf("%s/computermanagement/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) GetComputerManagementByName(ctx context.Context, name string) (
 // Parameters:
 //   - udid: Computer UDID to filter by.
 func (c *Client) GetComputerManagementByUDID(ctx context.Context, udid string) (*ComputerManagement, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerManagement
 	endpoint := fmt.Sprintf("%s/computermanagement/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -67,7 +67,7 @@ func (c *Client) GetComputerManagementByUDID(ctx context.Context, udid string) (
 // Parameters:
 //   - serialNumber: Computer Serial Number to filter by.
 func (c *Client) GetComputerManagementBySerialNumber(ctx context.Context, serialNumber string) (*ComputerManagement, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerManagement
 	endpoint := fmt.Sprintf("%s/computermanagement/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -83,7 +83,7 @@ func (c *Client) GetComputerManagementBySerialNumber(ctx context.Context, serial
 // Parameters:
 //   - macAddress: Computer Mac Address to filter by.
 func (c *Client) GetComputerManagementByMacAddress(ctx context.Context, macAddress string) (*ComputerManagement, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerManagement
 	endpoint := fmt.Sprintf("%s/computermanagement/macaddress/%s", prefix, url.PathEscape(macAddress))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetComputerManagementByMacAddress(ctx context.Context, macAddre
 //   - id: Computer ID to filter by.
 //   - filter: filter to apply.
 func (c *Client) GetComputerManagementByIDPatchFilter(ctx context.Context, id string, filter string) (*ComputerManagement, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerManagement
 	endpoint := fmt.Sprintf("%s/computermanagement/id/%s/patchfilter/%s", prefix, url.PathEscape(id), url.PathEscape(filter))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -119,7 +119,7 @@ func (c *Client) GetComputerManagementByIDPatchFilter(ctx context.Context, id st
 //     Allowed values: "General", "Policies", "Ebooks", "MacAppStoreApps", "OSXConfigurationProfiles",
 //     "RestrictedSoftware", "SmartGroups", "StaticGroups", "PatchReportingSoftwareTitles".
 func (c *Client) GetComputerManagementByIDSubset(ctx context.Context, id string, subset string) (*ComputerManagement, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerManagement
 	endpoint := fmt.Sprintf("%s/computermanagement/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -136,7 +136,7 @@ func (c *Client) GetComputerManagementByIDSubset(ctx context.Context, id string,
 //   - id: Computer ID to filter by.
 //   - username: Username to filter by.
 func (c *Client) GetComputerManagementByIDUsername(ctx context.Context, id string, username string) (*ComputerManagement, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerManagement
 	endpoint := fmt.Sprintf("%s/computermanagement/id/%s/username/%s", prefix, url.PathEscape(id), url.PathEscape(username))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -156,7 +156,7 @@ func (c *Client) GetComputerManagementByIDUsername(ctx context.Context, id strin
 //     Allowed values: "General", "Policies", "Ebooks", "MacAppStoreApps", "OSXConfigurationProfiles",
 //     "RestrictedSoftware", "SmartGroups", "StaticGroups", "PatchReportingSoftwareTitles".
 func (c *Client) GetComputerManagementByIDUsernameSubset(ctx context.Context, id string, username string, subset string) (*ComputerManagement, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerManagement
 	endpoint := fmt.Sprintf("%s/computermanagement/id/%s/username/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(username), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

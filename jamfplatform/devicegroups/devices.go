@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - deviceID: The ID of the device, in UUID format.
 func (c *Client) ListDeviceGroupsForDevice(ctx context.Context, deviceID string) ([]DeviceGroupMemberOfRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s/device-groups", prefix, url.PathEscape(deviceID))
 
 	var result struct {

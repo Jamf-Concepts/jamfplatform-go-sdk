@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetDashboardV1(ctx context.Context) (*DashboardSetup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DashboardSetup
 	endpoint := prefix + "/dashboard"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetDashboardV1(ctx context.Context) (*DashboardSetup, error) {
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) ToggleDashboardObjectV1(ctx context.Context, request *DashboardObject) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/dashboard/toggle"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {

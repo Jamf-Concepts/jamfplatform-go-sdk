@@ -13,7 +13,7 @@ import (
 
 func TestCheckInDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/test-id/check-in", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/device-actions/v1/devices/test-id/check-in", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -28,7 +28,7 @@ func TestCheckInDevice(t *testing.T) {
 
 func TestEraseDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/device-actions/v1/devices/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -46,7 +46,7 @@ func TestEraseDevice(t *testing.T) {
 
 func TestRestartDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/test-id/restart", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/device-actions/v1/devices/test-id/restart", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -64,7 +64,7 @@ func TestRestartDevice(t *testing.T) {
 
 func TestShutdownDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/test-id/shutdown", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/device-actions/v1/devices/test-id/shutdown", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -82,7 +82,7 @@ func TestShutdownDevice(t *testing.T) {
 
 func TestUnmanageDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/device-actions/v1/tenant/t-test/devices/test-id/unmanage", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/device-actions/v1/devices/test-id/unmanage", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

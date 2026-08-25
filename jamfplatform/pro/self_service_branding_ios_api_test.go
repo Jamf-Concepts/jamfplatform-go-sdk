@@ -13,7 +13,7 @@ import (
 
 func TestListIOSBrandingConfigurationsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListIOSBrandingConfigurationsV1(t *testing.T) {
 
 func TestCreateIOSBrandingConfigurationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestCreateIOSBrandingConfigurationV1(t *testing.T) {
 
 func TestGetIOSBrandingConfigurationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -71,7 +71,7 @@ func TestGetIOSBrandingConfigurationV1(t *testing.T) {
 
 func TestGetIOSBrandingConfigurationV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -87,7 +87,7 @@ func TestGetIOSBrandingConfigurationV1_NotFound(t *testing.T) {
 
 func TestUpdateIOSBrandingConfigurationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -105,7 +105,7 @@ func TestUpdateIOSBrandingConfigurationV1(t *testing.T) {
 
 func TestDeleteIOSBrandingConfigurationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -120,7 +120,7 @@ func TestDeleteIOSBrandingConfigurationV1(t *testing.T) {
 
 func TestResolveIOSBrandingConfigurationV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -143,7 +143,7 @@ func TestResolveIOSBrandingConfigurationV1IDByName(t *testing.T) {
 
 func TestResolveIOSBrandingConfigurationV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -167,7 +167,7 @@ func TestResolveIOSBrandingConfigurationV1ByName(t *testing.T) {
 func TestApplyIOSBrandingConfigurationV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -199,7 +199,7 @@ func TestApplyIOSBrandingConfigurationV1_Create(t *testing.T) {
 func TestApplyIOSBrandingConfigurationV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -210,7 +210,7 @@ func TestApplyIOSBrandingConfigurationV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/branding/ios/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/branding/ios/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

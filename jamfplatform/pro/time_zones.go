@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) ListTimeZonesV1(ctx context.Context) ([]TimeZone, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []TimeZone
 	endpoint := prefix + "/time-zones"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

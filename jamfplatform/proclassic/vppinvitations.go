@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetVPPInvitationByID(ctx context.Context, id string) (*VppInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppInvitation
 	endpoint := fmt.Sprintf("%s/vppinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetVPPInvitationByID(ctx context.Context, id string) (*VppInvit
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateVPPInvitationByID(ctx context.Context, id string, request *VppInvitation) (*VppInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppInvitation
 	endpoint := fmt.Sprintf("%s/vppinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreateVPPInvitationByID(ctx context.Context, id string, request
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateVPPInvitationByID(ctx context.Context, id string, request *VppInvitation) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateVPPInvitationByID(%s): %w", id, err)
@@ -66,7 +66,7 @@ func (c *Client) UpdateVPPInvitationByID(ctx context.Context, id string, request
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteVPPInvitationByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteVPPInvitationByID(%s): %w", id, err)
@@ -78,7 +78,7 @@ func (c *Client) DeleteVPPInvitationByID(ctx context.Context, id string) error {
 //
 // Required privileges: read:pro:vpp-invitations.
 func (c *Client) ListVPPInvitations(ctx context.Context) (*VppInvitations, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppInvitations
 	endpoint := prefix + "/vppinvitations"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -96,7 +96,7 @@ func (c *Client) ListVPPInvitations(ctx context.Context) (*VppInvitations, error
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Scope", "InvitationUsages".
 func (c *Client) GetVPPInvitationByIDSubset(ctx context.Context, id string, subset string) (*VppInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppInvitation
 	endpoint := fmt.Sprintf("%s/vppinvitations/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

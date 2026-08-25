@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: create:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Create AD CS Settings.
 func (c *Client) CreateAdcsSettingsV1(ctx context.Context, request *AdcsSettings) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/pki/adcs-settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -34,7 +34,7 @@ func (c *Client) CreateAdcsSettingsV1(ctx context.Context, request *AdcsSettings
 // Required privileges: update:pro:ad-cs-settings, create:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Update AD CS Settings, Create AD CS Settings.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ValidateAdcsCertificateV1(ctx context.Context, request *AdcsCertificate) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/pki/adcs-settings/validate-certificate"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("ValidateAdcsCertificateV1: %w", err)
@@ -47,7 +47,7 @@ func (c *Client) ValidateAdcsCertificateV1(ctx context.Context, request *AdcsCer
 // Required privileges: update:pro:ad-cs-settings, create:pro:ad-cs-settings. Legacy Jamf Pro privilege name(s): Update AD CS Settings, Create AD CS Settings.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ValidateAdcsClientCertificateV1(ctx context.Context, request *AdcsCertificate) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/pki/adcs-settings/validate-client-certificate"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("ValidateAdcsClientCertificateV1: %w", err)
@@ -62,7 +62,7 @@ func (c *Client) ValidateAdcsClientCertificateV1(ctx context.Context, request *A
 // Parameters:
 //   - id: ID of the AD CS Settings configuration.
 func (c *Client) GetAdcsSettingsV1(ctx context.Context, id string) (*AdcsSettingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdcsSettingsResponse
 	endpoint := fmt.Sprintf("%s/pki/adcs-settings/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -78,7 +78,7 @@ func (c *Client) GetAdcsSettingsV1(ctx context.Context, id string) (*AdcsSetting
 // Parameters:
 //   - id: ID of the AD CS Settings configuration.
 func (c *Client) DeleteAdcsSettingsV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/adcs-settings/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteAdcsSettingsV1(%s): %w", id, err)
@@ -93,7 +93,7 @@ func (c *Client) DeleteAdcsSettingsV1(ctx context.Context, id string) error {
 // Parameters:
 //   - id: ID of the AD CS Settings configuration.
 func (c *Client) UpdateAdcsSettingsV1(ctx context.Context, id string, request *AdcsSettings) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/adcs-settings/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateAdcsSettingsV1(%s): %w", id, err)
@@ -108,7 +108,7 @@ func (c *Client) UpdateAdcsSettingsV1(ctx context.Context, id string, request *A
 // Parameters:
 //   - id: AD CS Settings ID.
 func (c *Client) GetAdcsSettingsDependenciesV1(ctx context.Context, id string) (*AdcsDependencies, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdcsDependencies
 	endpoint := fmt.Sprintf("%s/pki/adcs-settings/%s/dependencies", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -130,7 +130,7 @@ func (c *Client) GetAdcsSettingsDependenciesV1(ctx context.Context, id string) (
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListAdcsSettingsHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -165,7 +165,7 @@ func (c *Client) ListAdcsSettingsHistoryV1(ctx context.Context, id string, sort 
 // Parameters:
 //   - id: Instance ID of AD CS Settings history record.
 func (c *Client) CreateAdcsSettingsHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/pki/adcs-settings/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {

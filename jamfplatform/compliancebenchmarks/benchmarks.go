@@ -17,7 +17,7 @@ import (
 //
 // Required privileges: read:pro:compliance-benchmarks.
 func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	var result BenchmarksResponseV2
 	endpoint := prefix + "/benchmarks"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -30,7 +30,7 @@ func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, err
 //
 // Required privileges: create:pro:compliance-benchmarks.
 func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV2) (*BenchmarkResponseV2, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
 	endpoint := prefix + "/benchmarks"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
@@ -46,7 +46,7 @@ func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV
 // Parameters:
 //   - id: Given benchmark ID.
 func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkResponseV2, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
 	endpoint := fmt.Sprintf("%s/benchmarks/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -62,7 +62,7 @@ func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkRespons
 // Parameters:
 //   - id: Given benchmark ID.
 func (c *Client) DeleteBenchmark(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	endpoint := fmt.Sprintf("%s/benchmarks/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteBenchmark(%s): %w", id, err)
@@ -72,7 +72,7 @@ func (c *Client) DeleteBenchmark(ctx context.Context, id string) error {
 
 // ResolveBenchmarkIDByName looks up a Benchmark by its title field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveBenchmarkIDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	listPath := prefix + "/benchmarks"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "benchmarks", "title", "id", name)
 	if err != nil {
@@ -83,7 +83,7 @@ func (c *Client) ResolveBenchmarkIDByName(ctx context.Context, name string) (str
 
 // ResolveBenchmarkByName looks up a Benchmark by its title field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveBenchmarkByName(ctx context.Context, name string) (*BenchmarkV2, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	listPath := prefix + "/benchmarks"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "benchmarks", "title", "id", name)
 	if err != nil {

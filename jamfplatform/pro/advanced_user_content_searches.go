@@ -19,7 +19,7 @@ import (
 //
 // Required privileges: read:pro:advanced-user-content-searches. Legacy Jamf Pro privilege name(s): Read Advanced User Content Searches.
 func (c *Client) ListAdvancedUserContentSearchesV1(ctx context.Context) (*AdvancedUserContentSearchSearchResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdvancedUserContentSearchSearchResults
 	endpoint := prefix + "/advanced-user-content-searches"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) ListAdvancedUserContentSearchesV1(ctx context.Context) (*Advanc
 //
 // Required privileges: create:pro:advanced-user-content-searches. Legacy Jamf Pro privilege name(s): Create Advanced User Content Searches.
 func (c *Client) CreateAdvancedUserContentSearchV1(ctx context.Context, request *AdvancedUserContentSearch) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/advanced-user-content-searches"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -48,7 +48,7 @@ func (c *Client) CreateAdvancedUserContentSearchV1(ctx context.Context, request 
 // Parameters:
 //   - id: id of target Advanced User Content Search.
 func (c *Client) GetAdvancedUserContentSearchV1(ctx context.Context, id string) (*AdvancedUserContentSearch, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdvancedUserContentSearch
 	endpoint := fmt.Sprintf("%s/advanced-user-content-searches/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -64,7 +64,7 @@ func (c *Client) GetAdvancedUserContentSearchV1(ctx context.Context, id string) 
 // Parameters:
 //   - id: id of target Advanced User Content Search.
 func (c *Client) UpdateAdvancedUserContentSearchV1(ctx context.Context, id string, request *AdvancedUserContentSearch) (*AdvancedUserContentSearch, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdvancedUserContentSearch
 	endpoint := fmt.Sprintf("%s/advanced-user-content-searches/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -80,7 +80,7 @@ func (c *Client) UpdateAdvancedUserContentSearchV1(ctx context.Context, id strin
 // Parameters:
 //   - id: instance id of Advanced User Content Search record.
 func (c *Client) DeleteAdvancedUserContentSearchV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/advanced-user-content-searches/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteAdvancedUserContentSearchV1(%s): %w", id, err)
@@ -90,7 +90,7 @@ func (c *Client) DeleteAdvancedUserContentSearchV1(ctx context.Context, id strin
 
 // ResolveAdvancedUserContentSearchV1IDByName looks up a AdvancedUserContentSearchV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveAdvancedUserContentSearchV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/advanced-user-content-searches"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -101,7 +101,7 @@ func (c *Client) ResolveAdvancedUserContentSearchV1IDByName(ctx context.Context,
 
 // ResolveAdvancedUserContentSearchV1ByName looks up a AdvancedUserContentSearchV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveAdvancedUserContentSearchV1ByName(ctx context.Context, name string) (*AdvancedUserContentSearch, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/advanced-user-content-searches"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

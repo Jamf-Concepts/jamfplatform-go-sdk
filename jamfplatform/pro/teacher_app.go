@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:teacher-app-settings. Legacy Jamf Pro privilege name(s): Read Teacher App Settings.
 func (c *Client) GetTeacherAppSettingsV1(ctx context.Context) (*TeacherSettingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result TeacherSettingsResponse
 	endpoint := prefix + "/teacher-app"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetTeacherAppSettingsV1(ctx context.Context) (*TeacherSettingsR
 //
 // Required privileges: update:pro:teacher-app-settings. Legacy Jamf Pro privilege name(s): Update Teacher App Settings.
 func (c *Client) UpdateTeacherAppSettingsV1(ctx context.Context, request *TeacherSettingsRequest) (*TeacherSettingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result TeacherSettingsResponse
 	endpoint := prefix + "/teacher-app"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -56,7 +56,7 @@ func (c *Client) UpdateTeacherAppSettingsV1(ctx context.Context, request *Teache
 //     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
 //     date<2019-12-15.
 func (c *Client) ListTeacherAppHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -88,7 +88,7 @@ func (c *Client) ListTeacherAppHistoryV1(ctx context.Context, sort []string, fil
 //
 // Required privileges: update:pro:teacher-app-settings. Legacy Jamf Pro privilege name(s): Update Teacher App Settings.
 func (c *Client) CreateTeacherAppHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/teacher-app/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {

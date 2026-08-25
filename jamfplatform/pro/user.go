@@ -17,7 +17,7 @@ import (
 //
 // Required privileges: execute:pro:change-password. Legacy Jamf Pro privilege name(s): Change Password.
 func (c *Client) ChangeUserPasswordV1(ctx context.Context, request *ChangePassword) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/user/change-password"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("ChangeUserPasswordV1: %w", err)

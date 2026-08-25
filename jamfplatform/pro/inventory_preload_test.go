@@ -15,7 +15,7 @@ import (
 
 func TestDownloadInventoryPreloadCsvV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/csv", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/csv", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -33,7 +33,7 @@ func TestDownloadInventoryPreloadCsvV2(t *testing.T) {
 
 func TestDownloadInventoryPreloadCsvV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/csv", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/csv", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -49,7 +49,7 @@ func TestDownloadInventoryPreloadCsvV2_NotFound(t *testing.T) {
 
 func TestUploadInventoryPreloadCsvV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/csv", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/csv", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -69,7 +69,7 @@ func TestUploadInventoryPreloadCsvV2(t *testing.T) {
 
 func TestDownloadInventoryPreloadCsvTemplateV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/inventory-preload/csv-template", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/inventory-preload/csv-template", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -87,7 +87,7 @@ func TestDownloadInventoryPreloadCsvTemplateV1(t *testing.T) {
 
 func TestDownloadInventoryPreloadCsvTemplateV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/inventory-preload/csv-template", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/inventory-preload/csv-template", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -103,7 +103,7 @@ func TestDownloadInventoryPreloadCsvTemplateV1_NotFound(t *testing.T) {
 
 func TestDownloadInventoryPreloadCsvTemplateV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/csv-template", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/csv-template", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -121,7 +121,7 @@ func TestDownloadInventoryPreloadCsvTemplateV2(t *testing.T) {
 
 func TestDownloadInventoryPreloadCsvTemplateV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/csv-template", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/csv-template", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -137,7 +137,7 @@ func TestDownloadInventoryPreloadCsvTemplateV2_NotFound(t *testing.T) {
 
 func TestValidateInventoryPreloadCsvV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/csv-validate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/csv-validate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -157,7 +157,7 @@ func TestValidateInventoryPreloadCsvV2(t *testing.T) {
 
 func TestListInventoryPreloadExtensionAttributeColumnsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/ea-columns", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/ea-columns", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -175,7 +175,7 @@ func TestListInventoryPreloadExtensionAttributeColumnsV2(t *testing.T) {
 
 func TestListInventoryPreloadExtensionAttributeColumnsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/ea-columns", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/ea-columns", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -191,7 +191,7 @@ func TestListInventoryPreloadExtensionAttributeColumnsV2_NotFound(t *testing.T) 
 
 func TestExportInventoryPreloadV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/export", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/export", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -209,7 +209,7 @@ func TestExportInventoryPreloadV2(t *testing.T) {
 
 func TestListInventoryPreloadHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/inventory-preload/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/inventory-preload/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -231,7 +231,7 @@ func TestListInventoryPreloadHistoryV1(t *testing.T) {
 
 func TestListInventoryPreloadHistoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -253,7 +253,7 @@ func TestListInventoryPreloadHistoryV2(t *testing.T) {
 
 func TestCreateInventoryPreloadHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/inventory-preload/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/inventory-preload/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -271,7 +271,7 @@ func TestCreateInventoryPreloadHistoryNoteV1(t *testing.T) {
 
 func TestCreateInventoryPreloadHistoryNoteV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -289,7 +289,7 @@ func TestCreateInventoryPreloadHistoryNoteV2(t *testing.T) {
 
 func TestListInventoryPreloadRecordsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -311,7 +311,7 @@ func TestListInventoryPreloadRecordsV2(t *testing.T) {
 
 func TestCreateInventoryPreloadRecordV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -329,7 +329,7 @@ func TestCreateInventoryPreloadRecordV2(t *testing.T) {
 
 func TestDeleteAllInventoryPreloadRecordsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records/delete-all", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records/delete-all", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -344,7 +344,7 @@ func TestDeleteAllInventoryPreloadRecordsV2(t *testing.T) {
 
 func TestGetInventoryPreloadRecordV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -362,7 +362,7 @@ func TestGetInventoryPreloadRecordV2(t *testing.T) {
 
 func TestGetInventoryPreloadRecordV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -378,7 +378,7 @@ func TestGetInventoryPreloadRecordV2_NotFound(t *testing.T) {
 
 func TestUpdateInventoryPreloadRecordV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -396,7 +396,7 @@ func TestUpdateInventoryPreloadRecordV2(t *testing.T) {
 
 func TestDeleteInventoryPreloadRecordV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -411,7 +411,7 @@ func TestDeleteInventoryPreloadRecordV2(t *testing.T) {
 
 func TestResolveInventoryPreloadRecordV2IDBySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -434,7 +434,7 @@ func TestResolveInventoryPreloadRecordV2IDBySerialNumber(t *testing.T) {
 
 func TestResolveInventoryPreloadRecordV2BySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -458,7 +458,7 @@ func TestResolveInventoryPreloadRecordV2BySerialNumber(t *testing.T) {
 func TestApplyInventoryPreloadRecordV2_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -490,7 +490,7 @@ func TestApplyInventoryPreloadRecordV2_Create(t *testing.T) {
 func TestApplyInventoryPreloadRecordV2_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -501,7 +501,7 @@ func TestApplyInventoryPreloadRecordV2_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/inventory-preload/records/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/inventory-preload/records/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

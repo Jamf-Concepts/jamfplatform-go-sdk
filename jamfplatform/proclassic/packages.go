@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetClassicPackageByID(ctx context.Context, id string) (*Package, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Package
 	endpoint := fmt.Sprintf("%s/packages/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetClassicPackageByID(ctx context.Context, id string) (*Package
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateClassicPackageByID(ctx context.Context, id string, request *Package) (*Package, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Package
 	endpoint := fmt.Sprintf("%s/packages/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateClassicPackageByID(ctx context.Context, id string, reques
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateClassicPackageByID(ctx context.Context, id string, request *Package) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateClassicPackageByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateClassicPackageByID(ctx context.Context, id string, reques
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteClassicPackageByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteClassicPackageByID(%s): %w", id, err)
@@ -81,7 +81,7 @@ func (c *Client) DeleteClassicPackageByID(ctx context.Context, id string) error 
 //
 // Required privileges: read:pro:packages.
 func (c *Client) ListClassicPackages(ctx context.Context) (*Packages, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Packages
 	endpoint := prefix + "/packages"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -97,7 +97,7 @@ func (c *Client) ListClassicPackages(ctx context.Context) (*Packages, error) {
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteClassicPackageByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteClassicPackageByName(%s): %w", name, err)
@@ -112,7 +112,7 @@ func (c *Client) DeleteClassicPackageByName(ctx context.Context, name string) er
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetClassicPackageByName(ctx context.Context, name string) (*Package, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Package
 	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -128,7 +128,7 @@ func (c *Client) GetClassicPackageByName(ctx context.Context, name string) (*Pac
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateClassicPackageByName(ctx context.Context, name string, request *Package) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateClassicPackageByName(%s): %w", name, err)
@@ -143,7 +143,7 @@ func (c *Client) UpdateClassicPackageByName(ctx context.Context, name string, re
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateClassicPackageByName(ctx context.Context, name string, request *Package) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/packages/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateClassicPackageByName(%s): %w", name, err)

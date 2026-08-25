@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - uuid: UUID value to filter by.
 func (c *Client) GetMobileDeviceCommandByUUID(ctx context.Context, uuid string) (*MobileDeviceCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceCommand
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/uuid/%s", prefix, url.PathEscape(uuid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetMobileDeviceCommandByUUID(ctx context.Context, uuid string) 
 // Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) IssueMobileDeviceCommand(ctx context.Context, request *MobileDeviceCommandPost) (*MobileDeviceCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceCommand
 	endpoint := prefix + "/mobiledevicecommands/command"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/xml", http.StatusCreated, &result); err != nil {
@@ -49,7 +49,7 @@ func (c *Client) IssueMobileDeviceCommand(ctx context.Context, request *MobileDe
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetMobileDeviceCommandByName(ctx context.Context, name string) (*MobileDeviceCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceCommand
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -62,7 +62,7 @@ func (c *Client) GetMobileDeviceCommandByName(ctx context.Context, name string) 
 //
 // Required privileges: read:pro:mobile-device-commands.
 func (c *Client) ListMobileDeviceCommands(ctx context.Context) (*MobileDeviceCommands, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceCommands
 	endpoint := prefix + "/mobiledevicecommands"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -78,7 +78,7 @@ func (c *Client) ListMobileDeviceCommands(ctx context.Context) (*MobileDeviceCom
 // Parameters:
 //   - command: Name to filter by.
 func (c *Client) GetMobileDeviceCommandByCommand(ctx context.Context, command string) (*MobileDeviceCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceCommand
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s", prefix, url.PathEscape(command))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetMobileDeviceCommandByCommand(ctx context.Context, command st
 //     2026-03-13)".
 //   - id_list: Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15).
 func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, command string, id_list string, request *MobileDeviceCommandPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(id_list))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceCommandByCommandID(%s): %w", command, err)
@@ -120,7 +120,7 @@ func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, comma
 //     (PlayLostModeSound Deprecated on 2025-06-12)", "Settings", "UpdateInventory (Deprecated on
 //     2026-03-13)".
 func (c *Client) CreateMobileDeviceCommandByCommand(ctx context.Context, command string, request *MobileDeviceCommandPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s", prefix, url.PathEscape(command))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceCommandByCommand(%s): %w", command, err)
@@ -142,7 +142,7 @@ func (c *Client) CreateMobileDeviceCommandByCommand(ctx context.Context, command
 //   - parameter: Path parameter parameter.
 //   - idList: Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15).
 func (c *Client) CreateMobileDeviceCommandWithParameterByIDList(ctx context.Context, command string, parameter string, idList string, request *MobileDeviceCommandPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(parameter), url.PathEscape(idList))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceCommandWithParameterByIDList(%s): %w", command, err)
@@ -165,7 +165,7 @@ func (c *Client) CreateMobileDeviceCommandWithParameterByIDList(ctx context.Cont
 //   - version: Path parameter version.
 //   - idList: Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15).
 func (c *Client) CreateMobileDeviceCommandWithParameterVersionByIDList(ctx context.Context, command string, parameter string, version string, idList string, request *MobileDeviceCommandPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/command/%s/%s/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(parameter), url.PathEscape(version), url.PathEscape(idList))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceCommandWithParameterVersionByIDList(%s): %w", command, err)
@@ -181,7 +181,7 @@ func (c *Client) CreateMobileDeviceCommandWithParameterVersionByIDList(ctx conte
 // Parameters:
 //   - name: Path parameter name.
 func (c *Client) CreateMobileDeviceCommandByName(ctx context.Context, name string, request *MobileDeviceCommandPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicecommands/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/xml", http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceCommandByName(%s): %w", name, err)

@@ -28,7 +28,7 @@ import (
 //     returning all results for the requested page. Fields allowed in the query: id, name. Example:
 //     name=="*department*".
 func (c *Client) ListDepartmentsV1(ctx context.Context, sort []string, filter string) ([]Department, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]Department, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -60,7 +60,7 @@ func (c *Client) ListDepartmentsV1(ctx context.Context, sort []string, filter st
 //
 // Required privileges: create:pro:departments. Legacy Jamf Pro privilege name(s): Create Departments.
 func (c *Client) CreateDepartmentV1(ctx context.Context, request *Department) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/departments"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -73,7 +73,7 @@ func (c *Client) CreateDepartmentV1(ctx context.Context, request *Department) (*
 //
 // Required privileges: delete:pro:departments. Legacy Jamf Pro privilege name(s): Delete Departments.
 func (c *Client) DeleteMultipleDepartmentsV1(ctx context.Context, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/departments/delete-multiple"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMultipleDepartmentsV1: %w", err)
@@ -88,7 +88,7 @@ func (c *Client) DeleteMultipleDepartmentsV1(ctx context.Context, request *Ids) 
 // Parameters:
 //   - id: instance id of department record.
 func (c *Client) GetDepartmentV1(ctx context.Context, id string) (*Department, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Department
 	endpoint := fmt.Sprintf("%s/departments/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -104,7 +104,7 @@ func (c *Client) GetDepartmentV1(ctx context.Context, id string) (*Department, e
 // Parameters:
 //   - id: instance id of department record.
 func (c *Client) UpdateDepartmentV1(ctx context.Context, id string, request *Department) (*Department, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Department
 	endpoint := fmt.Sprintf("%s/departments/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -120,7 +120,7 @@ func (c *Client) UpdateDepartmentV1(ctx context.Context, id string, request *Dep
 // Parameters:
 //   - id: instance id of department record.
 func (c *Client) DeleteDepartmentV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/departments/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDepartmentV1(%s): %w", id, err)
@@ -141,7 +141,7 @@ func (c *Client) DeleteDepartmentV1(ctx context.Context, id string) error {
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListDepartmentHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -176,7 +176,7 @@ func (c *Client) ListDepartmentHistoryV1(ctx context.Context, id string, sort []
 // Parameters:
 //   - id: instance id of department history record.
 func (c *Client) CreateDepartmentHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/departments/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -187,7 +187,7 @@ func (c *Client) CreateDepartmentHistoryNoteV1(ctx context.Context, id string, r
 
 // ResolveDepartmentV1IDByName looks up a DepartmentV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDepartmentV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/departments"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -198,7 +198,7 @@ func (c *Client) ResolveDepartmentV1IDByName(ctx context.Context, name string) (
 
 // ResolveDepartmentV1ByName looks up a DepartmentV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveDepartmentV1ByName(ctx context.Context, name string) (*Department, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/departments"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {

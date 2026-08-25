@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: create:pro:dock-items. Legacy Jamf Pro privilege name(s): Create Dock Items.
 func (c *Client) CreateDockItemV1(ctx context.Context, request *DockItem) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/dock-items"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) CreateDockItemV1(ctx context.Context, request *DockItem) (*Href
 // Parameters:
 //   - id: DockItem object identifier.
 func (c *Client) GetDockItemV1(ctx context.Context, id string) (*DockItem, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DockItem
 	endpoint := fmt.Sprintf("%s/dock-items/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -48,7 +48,7 @@ func (c *Client) GetDockItemV1(ctx context.Context, id string) (*DockItem, error
 // Parameters:
 //   - id: DockItem object identifier.
 func (c *Client) UpdateDockItemV1(ctx context.Context, id string, request *DockItem) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/dock-items/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -64,7 +64,7 @@ func (c *Client) UpdateDockItemV1(ctx context.Context, id string, request *DockI
 // Parameters:
 //   - id: DockItem object identifier.
 func (c *Client) DeleteDockItemV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/dock-items/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDockItemV1(%s): %w", id, err)

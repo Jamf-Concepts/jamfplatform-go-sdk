@@ -29,7 +29,7 @@ import (
 //     streetAddress2, city, stateProvince, zipPostalCode, country. This param can be combined with paging
 //     and sorting. Example: filter=city=="Chicago" and name=="*build*".
 func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter string) ([]Building, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]Building, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -61,7 +61,7 @@ func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter stri
 //
 // Required privileges: create:pro:buildings. Legacy Jamf Pro privilege name(s): Create Buildings.
 func (c *Client) CreateBuildingV1(ctx context.Context, request *Building) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/buildings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -77,7 +77,7 @@ func (c *Client) CreateBuildingV1(ctx context.Context, request *Building) (*Href
 // Parameters:
 //   - id: instance id of building record.
 func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Building
 	endpoint := fmt.Sprintf("%s/buildings/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -93,7 +93,7 @@ func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error
 // Parameters:
 //   - id: instance id of building record.
 func (c *Client) UpdateBuildingV1(ctx context.Context, id string, request *Building) (*Building, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Building
 	endpoint := fmt.Sprintf("%s/buildings/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -109,7 +109,7 @@ func (c *Client) UpdateBuildingV1(ctx context.Context, id string, request *Build
 // Parameters:
 //   - id: instance id of building record.
 func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/buildings/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteBuildingV1(%s): %w", id, err)
@@ -128,7 +128,7 @@ func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
 //   - returning all results for the requested page. Fields allowed in the query: id, name. This param
 //     can be combined with paging and sorting. Example: name=="*buildings*".
 func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameters, sort []string, filter string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/buildings/export"
 	params := url.Values{}
@@ -160,7 +160,7 @@ func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameter
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListBuildingHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -192,7 +192,7 @@ func (c *Client) ListBuildingHistoryV1(ctx context.Context, id string, sort []st
 //
 // Required privileges: delete:pro:buildings. Legacy Jamf Pro privilege name(s): Delete Buildings.
 func (c *Client) DeleteMultipleBuildingsV1(ctx context.Context, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/buildings/delete-multiple"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMultipleBuildingsV1: %w", err)
@@ -207,7 +207,7 @@ func (c *Client) DeleteMultipleBuildingsV1(ctx context.Context, request *Ids) er
 // Parameters:
 //   - id: instance id of building history record.
 func (c *Client) CreateBuildingHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := fmt.Sprintf("%s/buildings/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -236,7 +236,7 @@ func (c *Client) CreateBuildingHistoryNoteV1(ctx context.Context, id string, req
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ExportBuildingHistoryV1(ctx context.Context, id string, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/buildings/%s/history/export", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -263,7 +263,7 @@ func (c *Client) ExportBuildingHistoryV1(ctx context.Context, id string, request
 
 // ResolveBuildingV1IDByName looks up a BuildingV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveBuildingV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/buildings"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -274,7 +274,7 @@ func (c *Client) ResolveBuildingV1IDByName(ctx context.Context, name string) (st
 
 // ResolveBuildingV1ByName looks up a BuildingV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveBuildingV1ByName(ctx context.Context, name string) (*Building, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/buildings"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {

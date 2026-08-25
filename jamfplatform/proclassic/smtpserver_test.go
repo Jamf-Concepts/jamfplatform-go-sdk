@@ -13,7 +13,7 @@ import (
 
 func TestGetSMTPServer(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/smtpserver", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/smtpserver", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetSMTPServer(t *testing.T) {
 
 func TestGetSMTPServer_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/smtpserver", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/smtpserver", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetSMTPServer_NotFound(t *testing.T) {
 
 func TestUpdateSMTPServer(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/smtpserver", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/smtpserver", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}

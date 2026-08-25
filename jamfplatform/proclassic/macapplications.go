@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetMacApplicationByID(ctx context.Context, id string) (*MacApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MacApplication
 	endpoint := fmt.Sprintf("%s/macapplications/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetMacApplicationByID(ctx context.Context, id string) (*MacAppl
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateMacApplicationByID(ctx context.Context, id string, request *MacApplication) (*MacApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MacApplication
 	endpoint := fmt.Sprintf("%s/macapplications/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateMacApplicationByID(ctx context.Context, id string, reques
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateMacApplicationByID(ctx context.Context, id string, request *MacApplication) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMacApplicationByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateMacApplicationByID(ctx context.Context, id string, reques
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteMacApplicationByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMacApplicationByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteMacApplicationByID(ctx context.Context, id string) error 
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetMacApplicationByName(ctx context.Context, name string) (*MacApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MacApplication
 	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetMacApplicationByName(ctx context.Context, name string) (*Mac
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateMacApplicationByName(ctx context.Context, name string, request *MacApplication) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMacApplicationByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateMacApplicationByName(ctx context.Context, name string, re
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteMacApplicationByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMacApplicationByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteMacApplicationByName(ctx context.Context, name string) er
 //
 // Required privileges: read:pro:mac-applications.
 func (c *Client) ListMacApplications(ctx context.Context) (*MacApplications, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MacApplications
 	endpoint := prefix + "/macapplications"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -145,7 +145,7 @@ func (c *Client) ListMacApplications(ctx context.Context) (*MacApplications, err
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP".
 func (c *Client) GetMacApplicationByIDSubset(ctx context.Context, id string, subset string) (*MacApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MacApplication
 	endpoint := fmt.Sprintf("%s/macapplications/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -163,7 +163,7 @@ func (c *Client) GetMacApplicationByIDSubset(ctx context.Context, id string, sub
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP".
 func (c *Client) GetMacApplicationByNameSubset(ctx context.Context, name string, subset string) (*MacApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MacApplication
 	endpoint := fmt.Sprintf("%s/macapplications/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -179,7 +179,7 @@ func (c *Client) GetMacApplicationByNameSubset(ctx context.Context, name string,
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateMacApplicationByName(ctx context.Context, name string, request *MacApplication) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/macapplications/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMacApplicationByName(%s): %w", name, err)

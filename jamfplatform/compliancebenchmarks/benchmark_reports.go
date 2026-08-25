@@ -26,7 +26,7 @@ import (
 //     require to be specified, such as 'ruleNumber,ruleTitle'.
 //   - ruleSearch: string to search in rule title and rule id.
 func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort string, ruleSearch string) ([]RuleResult, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]RuleResult, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -65,7 +65,7 @@ func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort st
 //   - deviceSearch: Search devices with matching device name or device ID.
 //   - ruleResult: Allowed values: see the RuleResultState constants.
 func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID string, sort string, deviceSearch string, ruleResult string) ([]DeviceRuleResult, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]DeviceRuleResult, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -105,7 +105,7 @@ func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID
 // Parameters:
 //   - id: Tenant's benchmark ID.
 func (c *Client) GetBenchmarkCompliancePercentage(ctx context.Context, id string) (*CompliancePercentage, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	var result CompliancePercentage
 	endpoint := fmt.Sprintf("%s/benchmarks/%s/compliance-percentage", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

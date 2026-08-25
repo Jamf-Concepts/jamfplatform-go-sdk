@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) GetServiceDiscoveryEnrollmentWellKnownSettingsV1(ctx context.Context) (*WellKnownSettingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result WellKnownSettingsResponse
 	endpoint := prefix + "/service-discovery-enrollment/well-known-settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetServiceDiscoveryEnrollmentWellKnownSettingsV1(ctx context.Co
 //
 // Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) UpdateServiceDiscoveryEnrollmentWellKnownSettingsV1(ctx context.Context, request *WellKnownSettingsRequest) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/service-discovery-enrollment/well-known-settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateServiceDiscoveryEnrollmentWellKnownSettingsV1: %w", err)

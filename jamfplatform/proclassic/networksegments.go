@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetNetworkSegmentByID(ctx context.Context, id string) (*NetworkSegment, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result NetworkSegment
 	endpoint := fmt.Sprintf("%s/networksegments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetNetworkSegmentByID(ctx context.Context, id string) (*Network
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateNetworkSegmentByID(ctx context.Context, id string, request *NetworkSegmentPost) (*NetworkSegment, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result NetworkSegment
 	endpoint := fmt.Sprintf("%s/networksegments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateNetworkSegmentByID(ctx context.Context, id string, reques
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateNetworkSegmentByID(ctx context.Context, id string, request *NetworkSegmentPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/networksegments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateNetworkSegmentByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateNetworkSegmentByID(ctx context.Context, id string, reques
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteNetworkSegmentByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/networksegments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteNetworkSegmentByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteNetworkSegmentByID(ctx context.Context, id string) error 
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetNetworkSegmentByName(ctx context.Context, name string) (*NetworkSegment, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result NetworkSegment
 	endpoint := fmt.Sprintf("%s/networksegments/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetNetworkSegmentByName(ctx context.Context, name string) (*Net
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateNetworkSegmentByName(ctx context.Context, name string, request *NetworkSegmentPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/networksegments/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateNetworkSegmentByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateNetworkSegmentByName(ctx context.Context, name string, re
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteNetworkSegmentByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/networksegments/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteNetworkSegmentByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteNetworkSegmentByName(ctx context.Context, name string) er
 //
 // Required privileges: read:pro:network-segments.
 func (c *Client) ListNetworkSegments(ctx context.Context) (*NetworkSegments, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result NetworkSegments
 	endpoint := prefix + "/networksegments"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListNetworkSegments(ctx context.Context) (*NetworkSegments, err
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateNetworkSegmentByName(ctx context.Context, name string, request *NetworkSegmentPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/networksegments/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateNetworkSegmentByName(%s): %w", name, err)

@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - uuid: UUID to filter by.
 func (c *Client) GetComputerCommandByUUID(ctx context.Context, uuid string) (*ComputerCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCommand
 	endpoint := fmt.Sprintf("%s/computercommands/uuid/%s", prefix, url.PathEscape(uuid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -37,7 +37,7 @@ func (c *Client) GetComputerCommandByUUID(ctx context.Context, uuid string) (*Co
 //     Allowed values: "EnableRemoteDesktop", "DisableRemoteDesktop".
 //   - id: Computer ID - supports comma separated values (e.g. id/8,10,55).
 func (c *Client) IssueComputerCommandByID(ctx context.Context, command string, id string, request *ComputerCommandPost) (*ComputerCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCommand
 	endpoint := fmt.Sprintf("%s/computercommands/command/%s/id/%s", prefix, url.PathEscape(command), url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -53,7 +53,7 @@ func (c *Client) IssueComputerCommandByID(ctx context.Context, command string, i
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetComputerCommandByName(ctx context.Context, name string) (*ComputerCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCommand
 	endpoint := fmt.Sprintf("%s/computercommands/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -66,7 +66,7 @@ func (c *Client) GetComputerCommandByName(ctx context.Context, name string) (*Co
 //
 // Required privileges: read:pro:computer-commands.
 func (c *Client) ListComputerCommands(ctx context.Context) (*ComputerCommands, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCommands
 	endpoint := prefix + "/computercommands"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -83,7 +83,7 @@ func (c *Client) ListComputerCommands(ctx context.Context) (*ComputerCommands, e
 //   - command: Allowed values: "EnableRemoteDesktop (macOS 10.14.4 and later)", "DisableRemoteDesktop (macOS
 //     10.14.4 and later)".
 func (c *Client) CreateComputerCommandByCommand(ctx context.Context, command string, request *ComputerCommandPost) (*ComputerCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCommand
 	endpoint := fmt.Sprintf("%s/computercommands/command/%s", prefix, url.PathEscape(command))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -99,7 +99,7 @@ func (c *Client) CreateComputerCommandByCommand(ctx context.Context, command str
 // Parameters:
 //   - command: Name to filter by.
 func (c *Client) GetComputerCommandsByCommand(ctx context.Context, command string) (*ComputerCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCommand
 	endpoint := fmt.Sprintf("%s/computercommands/command/%s", prefix, url.PathEscape(command))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -115,7 +115,7 @@ func (c *Client) GetComputerCommandsByCommand(ctx context.Context, command strin
 // Parameters:
 //   - uuid: UUID to filter by.
 func (c *Client) GetComputerCommandsByStatus(ctx context.Context, uuid string) (*ComputerCommand, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCommand
 	endpoint := fmt.Sprintf("%s/computercommands/status/%s", prefix, url.PathEscape(uuid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

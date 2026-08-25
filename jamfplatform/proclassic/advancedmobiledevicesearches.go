@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetAdvancedMobileDeviceSearchByID(ctx context.Context, id string) (*AdvancedMobileDeviceSearch, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedMobileDeviceSearch
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetAdvancedMobileDeviceSearchByID(ctx context.Context, id strin
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateAdvancedMobileDeviceSearchByID(ctx context.Context, id string, request *AdvancedMobileDeviceSearch) (*AdvancedMobileDeviceSearch, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedMobileDeviceSearch
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateAdvancedMobileDeviceSearchByID(ctx context.Context, id string, request *AdvancedMobileDeviceSearch) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateAdvancedMobileDeviceSearchByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteAdvancedMobileDeviceSearchByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteAdvancedMobileDeviceSearchByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetAdvancedMobileDeviceSearchByName(ctx context.Context, name string) (*AdvancedMobileDeviceSearch, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedMobileDeviceSearch
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetAdvancedMobileDeviceSearchByName(ctx context.Context, name s
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) DeleteAdvancedMobileDeviceSearchByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteAdvancedMobileDeviceSearchByName(%s): %w", name, err)
@@ -112,7 +112,7 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 //
 // Required privileges: read:pro:advanced-mobile-device-searches.
 func (c *Client) ListAdvancedMobileDeviceSearches(ctx context.Context) (*AdvancedMobileDeviceSearches, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedMobileDeviceSearches
 	endpoint := prefix + "/advancedmobiledevicesearches"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -128,7 +128,7 @@ func (c *Client) ListAdvancedMobileDeviceSearches(ctx context.Context) (*Advance
 // Parameters:
 //   - name: Nameto filter by.
 func (c *Client) UpdateAdvancedMobileDeviceSearchByName(ctx context.Context, name string, request *AdvancedMobileDeviceSearch) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateAdvancedMobileDeviceSearchByName(%s): %w", name, err)
@@ -143,7 +143,7 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateAdvancedMobileDeviceSearchByName(ctx context.Context, name string, request *AdvancedMobileDeviceSearch) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedmobiledevicesearches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateAdvancedMobileDeviceSearchByName(%s): %w", name, err)

@@ -13,7 +13,7 @@ import (
 
 func TestGetAccountPreferencesV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/account-preferences", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/account-preferences", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetAccountPreferencesV2(t *testing.T) {
 
 func TestGetAccountPreferencesV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/account-preferences", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/account-preferences", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetAccountPreferencesV2_NotFound(t *testing.T) {
 
 func TestGetAccountPreferencesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/account-preferences", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/account-preferences", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestGetAccountPreferencesV3(t *testing.T) {
 
 func TestGetAccountPreferencesV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/account-preferences", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/account-preferences", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -81,7 +81,7 @@ func TestGetAccountPreferencesV3_NotFound(t *testing.T) {
 
 func TestUpdateAccountPreferencesV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/account-preferences", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/account-preferences", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -99,7 +99,7 @@ func TestUpdateAccountPreferencesV2(t *testing.T) {
 
 func TestUpdateAccountPreferencesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/account-preferences", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/account-preferences", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}

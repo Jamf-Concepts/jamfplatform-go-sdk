@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetHealthcareListenerRuleByID(ctx context.Context, id string) (*HealthcareListenerRule, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result HealthcareListenerRule
 	endpoint := fmt.Sprintf("%s/healthcarelistenerrule/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetHealthcareListenerRuleByID(ctx context.Context, id string) (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateHealthcareListenerRuleByID(ctx context.Context, id string, request *HealthcareListenerRule) (*HealthcareListenerRule, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result HealthcareListenerRule
 	endpoint := fmt.Sprintf("%s/healthcarelistenerrule/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreateHealthcareListenerRuleByID(ctx context.Context, id string
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateHealthcareListenerRuleByID(ctx context.Context, id string, request *HealthcareListenerRule) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/healthcarelistenerrule/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateHealthcareListenerRuleByID(%s): %w", id, err)
@@ -63,7 +63,7 @@ func (c *Client) UpdateHealthcareListenerRuleByID(ctx context.Context, id string
 //
 // Required privileges: read:pro:infrastructure-managers.
 func (c *Client) ListHealthcareListenerRules(ctx context.Context) (*HealthcareListenerRules, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result HealthcareListenerRules
 	endpoint := prefix + "/healthcarelistenerrule"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

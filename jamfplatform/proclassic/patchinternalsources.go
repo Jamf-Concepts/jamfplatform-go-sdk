@@ -20,7 +20,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetPatchInternalSourceByID(ctx context.Context, id string) (*PatchInternalSource, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchInternalSource
 	endpoint := fmt.Sprintf("%s/patchinternalsources/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -36,7 +36,7 @@ func (c *Client) GetPatchInternalSourceByID(ctx context.Context, id string) (*Pa
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetPatchInternalSourceByName(ctx context.Context, name string) (*PatchInternalSource, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchInternalSource
 	endpoint := fmt.Sprintf("%s/patchinternalsources/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -49,7 +49,7 @@ func (c *Client) GetPatchInternalSourceByName(ctx context.Context, name string) 
 //
 // Required privileges: read:pro:patch-internal-source.
 func (c *Client) ListPatchInternalSources(ctx context.Context) (*PatchInternalSources, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchInternalSources
 	endpoint := prefix + "/patchinternalsources"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

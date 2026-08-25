@@ -23,7 +23,7 @@ import (
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListPreviewComputers(ctx context.Context, sort []string) ([]ComputerOverview, error) {
-	prefix := c.transport.TenantPrefix("pro", "")
+	prefix := c.transport.APIPrefix("pro", "")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerOverview, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))

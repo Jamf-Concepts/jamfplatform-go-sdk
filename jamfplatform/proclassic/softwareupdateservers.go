@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetSoftwareUpdateServerByID(ctx context.Context, id string) (*SoftwareUpdateServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SoftwareUpdateServer
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetSoftwareUpdateServerByID(ctx context.Context, id string) (*S
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateSoftwareUpdateServerByID(ctx context.Context, id string, request *SoftwareUpdateServer) (*SoftwareUpdateServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SoftwareUpdateServer
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateSoftwareUpdateServerByID(ctx context.Context, id string, 
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateSoftwareUpdateServerByID(ctx context.Context, id string, request *SoftwareUpdateServer) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateSoftwareUpdateServerByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateSoftwareUpdateServerByID(ctx context.Context, id string, 
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteSoftwareUpdateServerByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteSoftwareUpdateServerByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteSoftwareUpdateServerByID(ctx context.Context, id string) 
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetSoftwareUpdateServerByName(ctx context.Context, name string) (*SoftwareUpdateServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SoftwareUpdateServer
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetSoftwareUpdateServerByName(ctx context.Context, name string)
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateSoftwareUpdateServerByName(ctx context.Context, name string, request *SoftwareUpdateServer) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateSoftwareUpdateServerByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateSoftwareUpdateServerByName(ctx context.Context, name stri
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteSoftwareUpdateServerByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteSoftwareUpdateServerByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteSoftwareUpdateServerByName(ctx context.Context, name stri
 //
 // Required privileges: read:pro:software-update-servers.
 func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdateServers, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SoftwareUpdateServers
 	endpoint := prefix + "/softwareupdateservers"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdate
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateSoftwareUpdateServerByName(ctx context.Context, name string, request *SoftwareUpdateServer) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/softwareupdateservers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateSoftwareUpdateServerByName(%s): %w", name, err)

@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetClassByID(ctx context.Context, id string) (*Class, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Class
 	endpoint := fmt.Sprintf("%s/classes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetClassByID(ctx context.Context, id string) (*Class, error) {
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateClassByID(ctx context.Context, id string, request *ClassPost) (*Class, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Class
 	endpoint := fmt.Sprintf("%s/classes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateClassByID(ctx context.Context, id string, request *ClassP
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateClassByID(ctx context.Context, id string, request *ClassPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateClassByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateClassByID(ctx context.Context, id string, request *ClassP
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteClassByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteClassByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteClassByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetClassByName(ctx context.Context, name string) (*Class, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Class
 	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetClassByName(ctx context.Context, name string) (*Class, error
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateClassByName(ctx context.Context, name string, request *ClassPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateClassByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateClassByName(ctx context.Context, name string, request *Cl
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteClassByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteClassByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteClassByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:classes.
 func (c *Client) ListClasses(ctx context.Context) (*Classes, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Classes
 	endpoint := prefix + "/classes"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListClasses(ctx context.Context) (*Classes, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateClassByName(ctx context.Context, name string, request *ClassPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/classes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateClassByName(%s): %w", name, err)

@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetRestrictedSoftwareByID(ctx context.Context, id string) (*RestrictedSoftware, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RestrictedSoftware
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetRestrictedSoftwareByID(ctx context.Context, id string) (*Res
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateRestrictedSoftwareByID(ctx context.Context, id string, request *RestrictedSoftware) (*RestrictedSoftware, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RestrictedSoftware
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateRestrictedSoftwareByID(ctx context.Context, id string, re
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateRestrictedSoftwareByID(ctx context.Context, id string, request *RestrictedSoftware) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateRestrictedSoftwareByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateRestrictedSoftwareByID(ctx context.Context, id string, re
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteRestrictedSoftwareByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteRestrictedSoftwareByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteRestrictedSoftwareByID(ctx context.Context, id string) er
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetRestrictedSoftwareByName(ctx context.Context, name string) (*RestrictedSoftware, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RestrictedSoftware
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetRestrictedSoftwareByName(ctx context.Context, name string) (
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateRestrictedSoftwareByName(ctx context.Context, name string, request *RestrictedSoftware) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateRestrictedSoftwareByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateRestrictedSoftwareByName(ctx context.Context, name string
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteRestrictedSoftwareByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteRestrictedSoftwareByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteRestrictedSoftwareByName(ctx context.Context, name string
 //
 // Required privileges: read:pro:restricted-software.
 func (c *Client) ListRestrictedSoftware(ctx context.Context) (*RestrictedSoftwareAll, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RestrictedSoftwareAll
 	endpoint := prefix + "/restrictedsoftware"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListRestrictedSoftware(ctx context.Context) (*RestrictedSoftwar
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateRestrictedSoftwareByName(ctx context.Context, name string, request *RestrictedSoftware) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/restrictedsoftware/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateRestrictedSoftwareByName(%s): %w", name, err)

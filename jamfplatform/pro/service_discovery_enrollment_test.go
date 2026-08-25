@@ -13,7 +13,7 @@ import (
 
 func TestGetServiceDiscoveryEnrollmentWellKnownSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/service-discovery-enrollment/well-known-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/service-discovery-enrollment/well-known-settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetServiceDiscoveryEnrollmentWellKnownSettingsV1(t *testing.T) {
 
 func TestGetServiceDiscoveryEnrollmentWellKnownSettingsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/service-discovery-enrollment/well-known-settings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/service-discovery-enrollment/well-known-settings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetServiceDiscoveryEnrollmentWellKnownSettingsV1_NotFound(t *testing.T)
 
 func TestUpdateServiceDiscoveryEnrollmentWellKnownSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/service-discovery-enrollment/well-known-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/service-discovery-enrollment/well-known-settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}

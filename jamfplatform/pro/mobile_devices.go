@@ -79,7 +79,7 @@ import (
 //     `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`, `groupId`, `groupName`.
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string, sort []string, filter string) ([]MobileDeviceResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -118,7 +118,7 @@ func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListMobileDevicesV2(ctx context.Context, sort []string) ([]MobileDeviceV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]MobileDeviceV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -150,7 +150,7 @@ func (c *Client) ListMobileDevicesV2(ctx context.Context, sort []string) ([]Mobi
 // Parameters:
 //   - id: instance id of mobile device record.
 func (c *Client) GetMobileDeviceV2(ctx context.Context, id string) (*MobileDeviceV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result MobileDeviceV2
 	endpoint := fmt.Sprintf("%s/mobile-devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -166,7 +166,7 @@ func (c *Client) GetMobileDeviceV2(ctx context.Context, id string) (*MobileDevic
 // Parameters:
 //   - id: instance id of mobile device record.
 func (c *Client) PatchMobileDeviceV2(ctx context.Context, id string, request *UpdateMobileDeviceV2) (*MobileDeviceDetailsV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result MobileDeviceDetailsV2
 	endpoint := fmt.Sprintf("%s/mobile-devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -182,7 +182,7 @@ func (c *Client) PatchMobileDeviceV2(ctx context.Context, id string, request *Up
 // Parameters:
 //   - id: instance id of mobile device record.
 func (c *Client) GetMobileDeviceDetailV2(ctx context.Context, id string) (*MobileDeviceDetailsGetV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result MobileDeviceDetailsGetV2
 	endpoint := fmt.Sprintf("%s/mobile-devices/%s/detail", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -198,7 +198,7 @@ func (c *Client) GetMobileDeviceDetailV2(ctx context.Context, id string) (*Mobil
 // Parameters:
 //   - id: Id of the Mobile Device to erase.
 func (c *Client) EraseMobileDeviceV2(ctx context.Context, id string, request *EraseDeviceMobileDeviceRequest) (*EraseDeviceMobileDeviceResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result EraseDeviceMobileDeviceResponse
 	endpoint := fmt.Sprintf("%s/mobile-devices/%s/erase", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -267,7 +267,7 @@ func (c *Client) EraseMobileDeviceV2(ctx context.Context, id string, request *Er
 //     `lastLoggedInUsernameMdmTimestamp`, `groupId`, `groupName`.
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListMobileDevicePairedDevicesV2(ctx context.Context, id string, section []string, sort []string, filter string) ([]MobileDeviceResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]MobileDeviceResponse, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -305,7 +305,7 @@ func (c *Client) ListMobileDevicePairedDevicesV2(ctx context.Context, id string,
 // Parameters:
 //   - id: Id of the mobile device to remove the MDM profile from.
 func (c *Client) UnmanageMobileDeviceV2(ctx context.Context, id string) (*UnmanageMobileDeviceResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result UnmanageMobileDeviceResponse
 	endpoint := fmt.Sprintf("%s/mobile-devices/%s/unmanage", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodPost, endpoint, nil, &result); err != nil {
@@ -316,7 +316,7 @@ func (c *Client) UnmanageMobileDeviceV2(ctx context.Context, id string) (*Unmana
 
 // ResolveMobileDeviceDetailV2IDByName looks up a MobileDeviceDetailV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveMobileDeviceDetailV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-devices/detail?section=GENERAL"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "general.displayName", "mobileDeviceId", name)
 	if err != nil {
@@ -327,7 +327,7 @@ func (c *Client) ResolveMobileDeviceDetailV2IDByName(ctx context.Context, name s
 
 // ResolveMobileDeviceDetailV2ByName looks up a MobileDeviceDetailV2 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveMobileDeviceDetailV2ByName(ctx context.Context, name string) (*MobileDeviceResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-devices/detail?section=GENERAL"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "general.displayName", "mobileDeviceId", name)
 	if err != nil {
@@ -342,7 +342,7 @@ func (c *Client) ResolveMobileDeviceDetailV2ByName(ctx context.Context, name str
 
 // ResolveMobileDeviceDetailV2IDBySerialNumber looks up a MobileDeviceDetailV2 by its serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveMobileDeviceDetailV2IDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-devices/detail?section=HARDWARE"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "hardware.serialNumber", "mobileDeviceId", name)
 	if err != nil {
@@ -353,7 +353,7 @@ func (c *Client) ResolveMobileDeviceDetailV2IDBySerialNumber(ctx context.Context
 
 // ResolveMobileDeviceDetailV2BySerialNumber looks up a MobileDeviceDetailV2 by its serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveMobileDeviceDetailV2BySerialNumber(ctx context.Context, name string) (*MobileDeviceResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-devices/detail?section=HARDWARE"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "hardware.serialNumber", "mobileDeviceId", name)
 	if err != nil {
@@ -368,7 +368,7 @@ func (c *Client) ResolveMobileDeviceDetailV2BySerialNumber(ctx context.Context, 
 
 // ResolveMobileDeviceDetailV2IDByUDID looks up a MobileDeviceDetailV2 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveMobileDeviceDetailV2IDByUDID(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-devices/detail?section=GENERAL"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "general.udid", "mobileDeviceId", name)
 	if err != nil {
@@ -379,7 +379,7 @@ func (c *Client) ResolveMobileDeviceDetailV2IDByUDID(ctx context.Context, name s
 
 // ResolveMobileDeviceDetailV2ByUDID looks up a MobileDeviceDetailV2 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveMobileDeviceDetailV2ByUDID(ctx context.Context, name string) (*MobileDeviceResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-devices/detail?section=GENERAL"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "general.udid", "mobileDeviceId", name)
 	if err != nil {

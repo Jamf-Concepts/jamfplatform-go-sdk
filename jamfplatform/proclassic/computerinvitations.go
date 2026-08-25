@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetComputerInvitationByID(ctx context.Context, id string) (*ComputerInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerInvitation
 	endpoint := fmt.Sprintf("%s/computerinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetComputerInvitationByID(ctx context.Context, id string) (*Com
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateComputerInvitationByID(ctx context.Context, id string, request *ComputerInvitation) (*ComputerInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerInvitation
 	endpoint := fmt.Sprintf("%s/computerinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusOK, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreateComputerInvitationByID(ctx context.Context, id string, re
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteComputerInvitationByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInvitationByID(%s): %w", id, err)
@@ -63,7 +63,7 @@ func (c *Client) DeleteComputerInvitationByID(ctx context.Context, id string) er
 //
 // Required privileges: read:pro:computer-enrollment-invitations.
 func (c *Client) ListComputerInvitations(ctx context.Context) (*ComputerInvitations, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerInvitations
 	endpoint := prefix + "/computerinvitations"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -79,7 +79,7 @@ func (c *Client) ListComputerInvitations(ctx context.Context) (*ComputerInvitati
 // Parameters:
 //   - invitation: Invitation value to filter by.
 func (c *Client) DeleteComputerInvitationByInvitation(ctx context.Context, invitation string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerinvitations/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInvitationByInvitation(%s): %w", invitation, err)
@@ -94,7 +94,7 @@ func (c *Client) DeleteComputerInvitationByInvitation(ctx context.Context, invit
 // Parameters:
 //   - invitation: Invitation value to filter by.
 func (c *Client) GetComputerInvitationByInvitation(ctx context.Context, invitation string) (*ComputerInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerInvitation
 	endpoint := fmt.Sprintf("%s/computerinvitations/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -110,7 +110,7 @@ func (c *Client) GetComputerInvitationByInvitation(ctx context.Context, invitati
 // Parameters:
 //   - invitation: Invitation value to filter by.
 func (c *Client) CreateComputerInvitationByInvitation(ctx context.Context, invitation string, request *ComputerInvitation) (*ComputerInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerInvitation
 	endpoint := fmt.Sprintf("%s/computerinvitations/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -126,7 +126,7 @@ func (c *Client) CreateComputerInvitationByInvitation(ctx context.Context, invit
 // Parameters:
 //   - name: Invitation value to filter by.
 func (c *Client) GetComputerInvitationByName(ctx context.Context, name string) (*ComputerInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerInvitation
 	endpoint := fmt.Sprintf("%s/computerinvitations/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -142,7 +142,7 @@ func (c *Client) GetComputerInvitationByName(ctx context.Context, name string) (
 // Parameters:
 //   - name: Invitation value to filter by.
 func (c *Client) CreateComputerInvitationByName(ctx context.Context, name string, request *ComputerInvitation) (*ComputerInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerInvitation
 	endpoint := fmt.Sprintf("%s/computerinvitations/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -158,7 +158,7 @@ func (c *Client) CreateComputerInvitationByName(ctx context.Context, name string
 // Parameters:
 //   - name: Invitation value to filter by.
 func (c *Client) DeleteComputerInvitationByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerinvitations/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInvitationByName(%s): %w", name, err)

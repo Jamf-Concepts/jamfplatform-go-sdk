@@ -13,7 +13,7 @@ import (
 
 func TestRecalculateSmartComputerGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/smart-computer-groups/test-id/recalculate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/smart-computer-groups/test-id/recalculate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestRecalculateSmartComputerGroupV1(t *testing.T) {
 
 func TestRecalculateSmartComputerGroupV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/smart-computer-groups/test-id/recalculate", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/smart-computer-groups/test-id/recalculate", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestRecalculateSmartComputerGroupV1_NotFound(t *testing.T) {
 
 func TestRecalculateComputerSmartGroupsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers/test-id/recalculate-smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers/test-id/recalculate-smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestRecalculateComputerSmartGroupsV1(t *testing.T) {
 
 func TestRecalculateComputerSmartGroupsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers/test-id/recalculate-smart-groups", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers/test-id/recalculate-smart-groups", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

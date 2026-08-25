@@ -26,7 +26,7 @@ import (
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
 //     are supported and must be separated with a comma. Example: sort=id:desc,brandingName:asc.
 func (c *Client) ListMacOSBrandingConfigurationsV1(ctx context.Context, sort []string) ([]MacOsBrandingConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]MacOsBrandingConfiguration, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -55,7 +55,7 @@ func (c *Client) ListMacOSBrandingConfigurationsV1(ctx context.Context, sort []s
 //
 // Required privileges: create:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Create Self Service Branding Configuration.
 func (c *Client) CreateMacOSBrandingConfigurationV1(ctx context.Context, request *MacOsBrandingConfiguration) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/self-service/branding/macos"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -71,7 +71,7 @@ func (c *Client) CreateMacOSBrandingConfigurationV1(ctx context.Context, request
 // Parameters:
 //   - id: id of macOS branding configuration.
 func (c *Client) GetMacOSBrandingConfigurationV1(ctx context.Context, id string) (*MacOsBrandingConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result MacOsBrandingConfiguration
 	endpoint := fmt.Sprintf("%s/self-service/branding/macos/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -87,7 +87,7 @@ func (c *Client) GetMacOSBrandingConfigurationV1(ctx context.Context, id string)
 // Parameters:
 //   - id: id of macOS branding configuration.
 func (c *Client) UpdateMacOSBrandingConfigurationV1(ctx context.Context, id string, request *MacOsBrandingConfiguration) (*MacOsBrandingConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result MacOsBrandingConfiguration
 	endpoint := fmt.Sprintf("%s/self-service/branding/macos/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -103,7 +103,7 @@ func (c *Client) UpdateMacOSBrandingConfigurationV1(ctx context.Context, id stri
 // Parameters:
 //   - id: id of macOS branding configuration.
 func (c *Client) DeleteMacOSBrandingConfigurationV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/self-service/branding/macos/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMacOSBrandingConfigurationV1(%s): %w", id, err)
@@ -113,7 +113,7 @@ func (c *Client) DeleteMacOSBrandingConfigurationV1(ctx context.Context, id stri
 
 // ResolveMacOSBrandingConfigurationV1IDByName looks up a MacOSBrandingConfigurationV1 by its brandingName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveMacOSBrandingConfigurationV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/self-service/branding/macos"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "brandingName", "id", name)
 	if err != nil {
@@ -124,7 +124,7 @@ func (c *Client) ResolveMacOSBrandingConfigurationV1IDByName(ctx context.Context
 
 // ResolveMacOSBrandingConfigurationV1ByName looks up a MacOSBrandingConfigurationV1 by its brandingName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveMacOSBrandingConfigurationV1ByName(ctx context.Context, name string) (*MacOsBrandingConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/self-service/branding/macos"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "brandingName", "id", name)
 	if err != nil {

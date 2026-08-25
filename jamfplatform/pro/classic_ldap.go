@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: OnPrem Ldap identifier.
 func (c *Client) GetClassicLdapMappingsV1(ctx context.Context, id string) (*ClassicLdapMappings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ClassicLdapMappings
 	endpoint := fmt.Sprintf("%s/classic-ldap/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

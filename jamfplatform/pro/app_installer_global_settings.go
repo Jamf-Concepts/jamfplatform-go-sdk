@@ -17,7 +17,7 @@ import (
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) GetAppInstallerGlobalSettingsV1(ctx context.Context) (*AppInstallerGlobalSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppInstallerGlobalSettings
 	endpoint := prefix + "/app-installers/global-settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) GetAppInstallerGlobalSettingsV1(ctx context.Context) (*AppInsta
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) UpdateAppInstallerGlobalSettingsV1(ctx context.Context, request *AppInstallerGlobalSettings) (*AppInstallerGlobalSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppInstallerGlobalSettings
 	endpoint := prefix + "/app-installers/global-settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {

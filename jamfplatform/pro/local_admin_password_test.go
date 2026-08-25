@@ -13,7 +13,7 @@ import (
 
 func TestGetLocalAdminPasswordSettingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetLocalAdminPasswordSettingsV2(t *testing.T) {
 
 func TestGetLocalAdminPasswordSettingsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/settings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/settings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetLocalAdminPasswordSettingsV2_NotFound(t *testing.T) {
 
 func TestUpdateLocalAdminPasswordSettingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestUpdateLocalAdminPasswordSettingsV2(t *testing.T) {
 
 func TestListLocalAdminPasswordPendingRotationsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/pending-rotations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/pending-rotations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestListLocalAdminPasswordPendingRotationsV2(t *testing.T) {
 
 func TestListLocalAdminPasswordPendingRotationsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/pending-rotations", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/pending-rotations", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -99,7 +99,7 @@ func TestListLocalAdminPasswordPendingRotationsV2_NotFound(t *testing.T) {
 
 func TestListLocalAdminPasswordAccountsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/accounts", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/accounts", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -117,7 +117,7 @@ func TestListLocalAdminPasswordAccountsV2(t *testing.T) {
 
 func TestListLocalAdminPasswordAccountsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/accounts", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/accounts", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -133,7 +133,7 @@ func TestListLocalAdminPasswordAccountsV2_NotFound(t *testing.T) {
 
 func TestListLocalAdminPasswordHistoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestListLocalAdminPasswordHistoryV2(t *testing.T) {
 
 func TestListLocalAdminPasswordHistoryV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/history", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/history", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -167,7 +167,7 @@ func TestListLocalAdminPasswordHistoryV2_NotFound(t *testing.T) {
 
 func TestGetLocalAdminPasswordV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/password", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/password", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -185,7 +185,7 @@ func TestGetLocalAdminPasswordV2(t *testing.T) {
 
 func TestGetLocalAdminPasswordV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/password", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/password", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -201,7 +201,7 @@ func TestGetLocalAdminPasswordV2_NotFound(t *testing.T) {
 
 func TestListLocalAdminPasswordAuditsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/audit", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/audit", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -219,7 +219,7 @@ func TestListLocalAdminPasswordAuditsV2(t *testing.T) {
 
 func TestListLocalAdminPasswordAuditsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/audit", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/audit", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -235,7 +235,7 @@ func TestListLocalAdminPasswordAuditsV2_NotFound(t *testing.T) {
 
 func TestListLocalAdminPasswordAccountHistoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -253,7 +253,7 @@ func TestListLocalAdminPasswordAccountHistoryV2(t *testing.T) {
 
 func TestListLocalAdminPasswordAccountHistoryV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/history", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/history", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -269,7 +269,7 @@ func TestListLocalAdminPasswordAccountHistoryV2_NotFound(t *testing.T) {
 
 func TestGetLocalAdminPasswordByGuidV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/test-id/password", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/test-id/password", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -287,7 +287,7 @@ func TestGetLocalAdminPasswordByGuidV2(t *testing.T) {
 
 func TestGetLocalAdminPasswordByGuidV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/test-id/password", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/test-id/password", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -303,7 +303,7 @@ func TestGetLocalAdminPasswordByGuidV2_NotFound(t *testing.T) {
 
 func TestListLocalAdminPasswordAuditsByGuidV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/test-id/audit", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/test-id/audit", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -321,7 +321,7 @@ func TestListLocalAdminPasswordAuditsByGuidV2(t *testing.T) {
 
 func TestListLocalAdminPasswordAuditsByGuidV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/test-id/audit", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/test-id/audit", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -337,7 +337,7 @@ func TestListLocalAdminPasswordAuditsByGuidV2_NotFound(t *testing.T) {
 
 func TestListLocalAdminPasswordAccountHistoryByGuidV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -355,7 +355,7 @@ func TestListLocalAdminPasswordAccountHistoryByGuidV2(t *testing.T) {
 
 func TestListLocalAdminPasswordAccountHistoryByGuidV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/account/test-id/test-id/history", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/account/test-id/test-id/history", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -371,7 +371,7 @@ func TestListLocalAdminPasswordAccountHistoryByGuidV2_NotFound(t *testing.T) {
 
 func TestSetLocalAdminPasswordV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/local-admin-password/test-id/set-password", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/local-admin-password/test-id/set-password", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}

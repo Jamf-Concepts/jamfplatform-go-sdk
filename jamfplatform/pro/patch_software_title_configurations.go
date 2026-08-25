@@ -21,7 +21,7 @@ import (
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 func (c *Client) ListPatchSoftwareTitleConfigurationsV3(ctx context.Context) ([]PatchSoftwareTitleConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []PatchSoftwareTitleConfiguration
 	endpoint := prefix + "/patch-software-title-configurations"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -36,7 +36,7 @@ func (c *Client) ListPatchSoftwareTitleConfigurationsV3(ctx context.Context) ([]
 //
 // Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 func (c *Client) ListPatchSoftwareTitleConfigurationsV2(ctx context.Context) ([]PatchSoftwareTitleConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []PatchSoftwareTitleConfiguration
 	endpoint := prefix + "/patch-software-title-configurations"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -49,7 +49,7 @@ func (c *Client) ListPatchSoftwareTitleConfigurationsV2(ctx context.Context) ([]
 //
 // Required privileges: create:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Create Patch Management Software Titles.
 func (c *Client) CreatePatchSoftwareTitleConfigurationV3(ctx context.Context, request *PatchSoftwareTitleConfigurationBase) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := prefix + "/patch-software-title-configurations"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -64,7 +64,7 @@ func (c *Client) CreatePatchSoftwareTitleConfigurationV3(ctx context.Context, re
 //
 // Required privileges: create:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Create Patch Management Software Titles.
 func (c *Client) CreatePatchSoftwareTitleConfigurationV2(ctx context.Context, request *PatchSoftwareTitleConfigurationBase) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/patch-software-title-configurations"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -80,7 +80,7 @@ func (c *Client) CreatePatchSoftwareTitleConfigurationV2(ctx context.Context, re
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
 func (c *Client) GetPatchSoftwareTitleConfigurationV3(ctx context.Context, id string) (*PatchSoftwareTitleConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result PatchSoftwareTitleConfiguration
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -98,7 +98,7 @@ func (c *Client) GetPatchSoftwareTitleConfigurationV3(ctx context.Context, id st
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
 func (c *Client) GetPatchSoftwareTitleConfigurationV2(ctx context.Context, id string) (*PatchSoftwareTitleConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PatchSoftwareTitleConfiguration
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -114,7 +114,7 @@ func (c *Client) GetPatchSoftwareTitleConfigurationV2(ctx context.Context, id st
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
 func (c *Client) DeletePatchSoftwareTitleConfigurationV3(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeletePatchSoftwareTitleConfigurationV3(%s): %w", id, err)
@@ -131,7 +131,7 @@ func (c *Client) DeletePatchSoftwareTitleConfigurationV3(ctx context.Context, id
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
 func (c *Client) DeletePatchSoftwareTitleConfigurationV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeletePatchSoftwareTitleConfigurationV2(%s): %w", id, err)
@@ -146,7 +146,7 @@ func (c *Client) DeletePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
 func (c *Client) UpdatePatchSoftwareTitleConfigurationV3(ctx context.Context, id string, request *PatchSoftwareTitleConfigurationPatch) (*PatchSoftwareTitleConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result PatchSoftwareTitleConfiguration
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusOK, &result); err != nil {
@@ -164,7 +164,7 @@ func (c *Client) UpdatePatchSoftwareTitleConfigurationV3(ctx context.Context, id
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
 func (c *Client) UpdatePatchSoftwareTitleConfigurationV2(ctx context.Context, id string, request *PatchSoftwareTitleConfigurationPatch) (*PatchSoftwareTitleConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PatchSoftwareTitleConfiguration
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusOK, &result); err != nil {
@@ -180,7 +180,7 @@ func (c *Client) UpdatePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 // Parameters:
 //   - id: software title configuration id.
 func (c *Client) GetPatchSoftwareTitleDashboardStatusV3(ctx context.Context, id string) (*SoftwareTitleConfigurationOnDashboard, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result SoftwareTitleConfigurationOnDashboard
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -198,7 +198,7 @@ func (c *Client) GetPatchSoftwareTitleDashboardStatusV3(ctx context.Context, id 
 // Parameters:
 //   - id: software title configuration id.
 func (c *Client) GetPatchSoftwareTitleDashboardStatusV2(ctx context.Context, id string) (*SoftwareTitleConfigurationOnDashboard, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SoftwareTitleConfigurationOnDashboard
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -214,7 +214,7 @@ func (c *Client) GetPatchSoftwareTitleDashboardStatusV2(ctx context.Context, id 
 // Parameters:
 //   - id: software title configuration id.
 func (c *Client) AddPatchSoftwareTitleToDashboardV3(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("AddPatchSoftwareTitleToDashboardV3(%s): %w", id, err)
@@ -231,7 +231,7 @@ func (c *Client) AddPatchSoftwareTitleToDashboardV3(ctx context.Context, id stri
 // Parameters:
 //   - id: software title configuration id.
 func (c *Client) AddPatchSoftwareTitleToDashboardV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("AddPatchSoftwareTitleToDashboardV2(%s): %w", id, err)
@@ -246,7 +246,7 @@ func (c *Client) AddPatchSoftwareTitleToDashboardV2(ctx context.Context, id stri
 // Parameters:
 //   - id: software title configuration id.
 func (c *Client) RemovePatchSoftwareTitleFromDashboardV3(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("RemovePatchSoftwareTitleFromDashboardV3(%s): %w", id, err)
@@ -263,7 +263,7 @@ func (c *Client) RemovePatchSoftwareTitleFromDashboardV3(ctx context.Context, id
 // Parameters:
 //   - id: software title configuration id.
 func (c *Client) RemovePatchSoftwareTitleFromDashboardV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dashboard", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("RemovePatchSoftwareTitleFromDashboardV2(%s): %w", id, err)
@@ -284,7 +284,7 @@ func (c *Client) RemovePatchSoftwareTitleFromDashboardV2(ctx context.Context, id
 //     id, version, minimumOperatingSystem, releaseDate, reboot, standalone and absoluteOrderId. This param
 //     can be combined with paging and sorting.
 func (c *Client) ListPatchSoftwareTitleDefinitionsV3(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleDefinition, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleDefinition, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -327,7 +327,7 @@ func (c *Client) ListPatchSoftwareTitleDefinitionsV3(ctx context.Context, id str
 //     id, version, minimumOperatingSystem, releaseDate, reboot, standalone and absoluteOrderId. This param
 //     can be combined with paging and sorting.
 func (c *Client) ListPatchSoftwareTitleDefinitionsV2(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleDefinition, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleDefinition, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -362,7 +362,7 @@ func (c *Client) ListPatchSoftwareTitleDefinitionsV2(ctx context.Context, id str
 // Parameters:
 //   - id: Patch Software Title Configuration Id.
 func (c *Client) GetPatchSoftwareTitleDependenciesV3(ctx context.Context, id string) (*PatchSoftwareTitleConfigurationDependencies, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result PatchSoftwareTitleConfigurationDependencies
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dependencies", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -380,7 +380,7 @@ func (c *Client) GetPatchSoftwareTitleDependenciesV3(ctx context.Context, id str
 // Parameters:
 //   - id: Patch Software Title Configuration Id.
 func (c *Client) GetPatchSoftwareTitleDependenciesV2(ctx context.Context, id string) (*PatchSoftwareTitleConfigurationDependencies, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PatchSoftwareTitleConfigurationDependencies
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/dependencies", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -401,7 +401,7 @@ func (c *Client) GetPatchSoftwareTitleDependenciesV2(ctx context.Context, id str
 //     sorting.
 //   - columnsToExport: List of column names to export.
 func (c *Client) ExportPatchSoftwareTitleReportV3(ctx context.Context, id string, filter string, columnsToExport []string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/export-report", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -434,7 +434,7 @@ func (c *Client) ExportPatchSoftwareTitleReportV3(ctx context.Context, id string
 //     sorting.
 //   - columnsToExport: List of column names to export.
 func (c *Client) ExportPatchSoftwareTitleReportV2(ctx context.Context, id string, filter string, columnsToExport []string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/export-report", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -460,7 +460,7 @@ func (c *Client) ExportPatchSoftwareTitleReportV2(ctx context.Context, id string
 // Parameters:
 //   - id: Patch Software Title identifier.
 func (c *Client) ListPatchSoftwareTitleExtensionAttributesV3(ctx context.Context, id string) ([]PatchSoftwareTitleExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []PatchSoftwareTitleExtensionAttributes
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/extension-attributes", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -478,7 +478,7 @@ func (c *Client) ListPatchSoftwareTitleExtensionAttributesV3(ctx context.Context
 // Parameters:
 //   - id: Patch Software Title identifier.
 func (c *Client) ListPatchSoftwareTitleExtensionAttributesV2(ctx context.Context, id string) ([]PatchSoftwareTitleExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []PatchSoftwareTitleExtensionAttributes
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/extension-attributes", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -500,7 +500,7 @@ func (c *Client) ListPatchSoftwareTitleExtensionAttributesV2(ctx context.Context
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListPatchSoftwareTitleHistoryV3(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -543,7 +543,7 @@ func (c *Client) ListPatchSoftwareTitleHistoryV3(ctx context.Context, id string,
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListPatchSoftwareTitleHistoryV2(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -578,7 +578,7 @@ func (c *Client) ListPatchSoftwareTitleHistoryV2(ctx context.Context, id string,
 // Parameters:
 //   - id: Patch Software Title Configuration Id.
 func (c *Client) CreatePatchSoftwareTitleHistoryNoteV3(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -596,7 +596,7 @@ func (c *Client) CreatePatchSoftwareTitleHistoryNoteV3(ctx context.Context, id s
 // Parameters:
 //   - id: Patch Software Title Configuration Id.
 func (c *Client) CreatePatchSoftwareTitleHistoryNoteV2(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -619,7 +619,7 @@ func (c *Client) CreatePatchSoftwareTitleHistoryNoteV2(ctx context.Context, id s
 //     query: version. Comparators allowed in the query: ==, != This param can be combined with paging and
 //     sorting.
 func (c *Client) ListPatchSoftwareTitlePatchReportV3(ctx context.Context, id string, sort []string, filter string) ([]PatchReportV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchReportV3, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -663,7 +663,7 @@ func (c *Client) ListPatchSoftwareTitlePatchReportV3(ctx context.Context, id str
 //     query: version. Comparators allowed in the query: ==, != This param can be combined with paging and
 //     sorting.
 func (c *Client) ListPatchSoftwareTitlePatchReportV2(ctx context.Context, id string, sort []string, filter string) ([]PatchSoftwareTitleReport, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchSoftwareTitleReport, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -698,7 +698,7 @@ func (c *Client) ListPatchSoftwareTitlePatchReportV2(ctx context.Context, id str
 // Parameters:
 //   - id: Patch id.
 func (c *Client) GetPatchSoftwareTitlePatchSummaryV3(ctx context.Context, id string) (*PatchSummary, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result PatchSummary
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/patch-summary", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -716,7 +716,7 @@ func (c *Client) GetPatchSoftwareTitlePatchSummaryV3(ctx context.Context, id str
 // Parameters:
 //   - id: Patch id.
 func (c *Client) GetPatchSoftwareTitlePatchSummaryV2(ctx context.Context, id string) (*PatchSummary, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PatchSummary
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/patch-summary", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -732,7 +732,7 @@ func (c *Client) GetPatchSoftwareTitlePatchSummaryV2(ctx context.Context, id str
 // Parameters:
 //   - id: Patch id.
 func (c *Client) ListPatchSoftwareTitlePatchSummaryVersionsV3(ctx context.Context, id string) ([]PatchSummaryVersion, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []PatchSummaryVersion
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/patch-summary/versions", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -750,7 +750,7 @@ func (c *Client) ListPatchSoftwareTitlePatchSummaryVersionsV3(ctx context.Contex
 // Parameters:
 //   - id: Patch id.
 func (c *Client) ListPatchSoftwareTitlePatchSummaryVersionsV2(ctx context.Context, id string) ([]PatchSummaryVersion, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []PatchSummaryVersion
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/patch-summary/versions", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -761,7 +761,7 @@ func (c *Client) ListPatchSoftwareTitlePatchSummaryVersionsV2(ctx context.Contex
 
 // ResolvePatchSoftwareTitleConfigurationV3IDByName looks up a PatchSoftwareTitleConfigurationV3 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolvePatchSoftwareTitleConfigurationV3IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/patch-software-title-configurations"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -772,7 +772,7 @@ func (c *Client) ResolvePatchSoftwareTitleConfigurationV3IDByName(ctx context.Co
 
 // ResolvePatchSoftwareTitleConfigurationV3ByName looks up a PatchSoftwareTitleConfigurationV3 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolvePatchSoftwareTitleConfigurationV3ByName(ctx context.Context, name string) (*PatchSoftwareTitleConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/patch-software-title-configurations"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -787,7 +787,7 @@ func (c *Client) ResolvePatchSoftwareTitleConfigurationV3ByName(ctx context.Cont
 
 // ResolvePatchSoftwareTitleConfigurationV2IDByName looks up a PatchSoftwareTitleConfigurationV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolvePatchSoftwareTitleConfigurationV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/patch-software-title-configurations"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -798,7 +798,7 @@ func (c *Client) ResolvePatchSoftwareTitleConfigurationV2IDByName(ctx context.Co
 
 // ResolvePatchSoftwareTitleConfigurationV2ByName looks up a PatchSoftwareTitleConfigurationV2 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolvePatchSoftwareTitleConfigurationV2ByName(ctx context.Context, name string) (*PatchSoftwareTitleConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/patch-software-title-configurations"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {

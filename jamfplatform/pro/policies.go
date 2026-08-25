@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:policies. Legacy Jamf Pro privilege name(s): Read Policies.
 func (c *Client) GetPolicyPropertiesV1(ctx context.Context) (*PolicyPropertiesV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result PolicyPropertiesV1
 	endpoint := prefix + "/policy-properties"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetPolicyPropertiesV1(ctx context.Context) (*PolicyPropertiesV1
 //
 // Required privileges: update:pro:policies. Legacy Jamf Pro privilege name(s): Update Policies.
 func (c *Client) UpdatePolicyPropertiesV1(ctx context.Context, request *PolicyPropertiesV1) (*PolicyPropertiesV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result PolicyPropertiesV1
 	endpoint := prefix + "/policy-properties"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {

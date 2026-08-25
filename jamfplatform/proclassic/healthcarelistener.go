@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetHealthcareListenerByID(ctx context.Context, id string) (*HealthcareListener, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result HealthcareListener
 	endpoint := fmt.Sprintf("%s/healthcarelistener/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetHealthcareListenerByID(ctx context.Context, id string) (*Hea
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateHealthcareListenerByID(ctx context.Context, id string, request *HealthcareListener) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/healthcarelistener/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateHealthcareListenerByID(%s): %w", id, err)
@@ -47,7 +47,7 @@ func (c *Client) UpdateHealthcareListenerByID(ctx context.Context, id string, re
 //
 // Required privileges: read:pro:infrastructure-managers.
 func (c *Client) ListHealthcareListeners(ctx context.Context) (*HealthcareListeners, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result HealthcareListeners
 	endpoint := prefix + "/healthcarelistener"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

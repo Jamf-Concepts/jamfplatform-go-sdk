@@ -13,7 +13,7 @@ import (
 
 func TestListCloudIdpV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListCloudIdpV1(t *testing.T) {
 
 func TestExportCloudIdpV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp/export", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp/export", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestExportCloudIdpV1(t *testing.T) {
 
 func TestGetCloudIdpV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -71,7 +71,7 @@ func TestGetCloudIdpV1(t *testing.T) {
 
 func TestGetCloudIdpV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -87,7 +87,7 @@ func TestGetCloudIdpV1_NotFound(t *testing.T) {
 
 func TestListCloudIdpHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestListCloudIdpHistoryV1(t *testing.T) {
 
 func TestCreateCloudIdpHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -127,7 +127,7 @@ func TestCreateCloudIdpHistoryNoteV1(t *testing.T) {
 
 func TestTestCloudIdpGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp/test-id/test-group", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp/test-id/test-group", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -145,7 +145,7 @@ func TestTestCloudIdpGroupV1(t *testing.T) {
 
 func TestTestCloudIdpUserV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp/test-id/test-user", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp/test-id/test-user", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -163,7 +163,7 @@ func TestTestCloudIdpUserV1(t *testing.T) {
 
 func TestTestCloudIdpUserMembershipV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp/test-id/test-user-membership", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp/test-id/test-user-membership", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -181,7 +181,7 @@ func TestTestCloudIdpUserMembershipV1(t *testing.T) {
 
 func TestResolveCloudIdpV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -204,7 +204,7 @@ func TestResolveCloudIdpV1IDByName(t *testing.T) {
 
 func TestResolveCloudIdpV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/cloud-idp", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/cloud-idp", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

@@ -46,7 +46,8 @@ type Logger interface {
 // Sub-packages in jamfplatform/ construct service clients that wrap a Transport.
 type Transport struct {
 	baseURL         string
-	tenantID        string
+	scopeKind       ScopeKind    // which request-context header carries the scope
+	scopeID         string       // the tenant (or environment) ID that header sends
 	httpClient      *http.Client // retry.StandardClient() — used by execute() for all JSON/XML Do* calls
 	uploadClient    *http.Client // authed + paced, NOT retry-wrapped — used directly by multipart.go; see retry.go's newRetryClient doc
 	baseClient      *http.Client
@@ -98,10 +99,12 @@ func WithTokenCache(cache TokenCache, cacheKey string) Option {
 	}
 }
 
-// WithTenantID sets the tenant ID used by TenantPrefix when building URLs.
+// WithTenantID sets the tenant this client is scoped to. It is sent as the
+// X-Tenant-Id request header on every API call; see ScopeHeader.
 func WithTenantID(id string) Option {
 	return func(c *Transport) {
-		c.tenantID = id
+		c.scopeKind = ScopeTenant
+		c.scopeID = id
 	}
 }
 
@@ -188,20 +191,80 @@ func (c *Transport) BaseURL() string {
 	return c.baseURL
 }
 
-// TenantID returns the tenant ID configured on the transport.
-func (c *Transport) TenantID() string {
-	return c.tenantID
+// ScopeKind identifies which kind of Jamf scope a client is bound to. The
+// gateway calls this the request context, and each kind travels in its own
+// request header.
+type ScopeKind int
+
+const (
+	// ScopeTenant scopes requests to a single product tenant, sent as
+	// X-Tenant-Id. This is what every API surface in this SDK uses today.
+	ScopeTenant ScopeKind = iota + 1
+	// ScopeEnvironment scopes requests to a platform environment — a grouping
+	// of tenants — sent as X-Environment-Id. Declared because the gateway
+	// accepts it on several namespaces and environment-scoped APIs exist
+	// (ai-governance, audit); no operation this SDK generates is
+	// environment-scoped yet, so no option sets it.
+	ScopeEnvironment
+)
+
+// ScopeHeader returns the request header that carries this scope kind, or ""
+// when the kind is unset.
+//
+// Organization scope deliberately has no entry: the gateway resolves it from
+// the access token alone (request-context-allowed-sources is `token` for the
+// account api-products, in every environment), so there is no header to send.
+func (k ScopeKind) ScopeHeader() string {
+	switch k {
+	case ScopeTenant:
+		return "X-Tenant-Id"
+	case ScopeEnvironment:
+		return "X-Environment-Id"
+	default:
+		return ""
+	}
 }
 
-// TenantPrefix returns the /api/{namespace}/{version}/tenant/{tenantID} URL
-// prefix used by tenant-scoped resources. An empty version collapses the
-// segment for APIs that don't use a version in the URL (proclassic, Pro
-// preview paths).
-func (c *Transport) TenantPrefix(namespace, version string) string {
-	if version == "" {
-		return "/api/" + namespace + "/tenant/" + c.tenantID
+// setScopeHeader stamps the scope header on a request. It is applied before
+// extraHeaders so an operation that needs to override the scope for one call
+// still can, and it is a no-op when no scope was configured — the gateway then
+// resolves the context from the access token, which is how organization-scoped
+// products work.
+func (c *Transport) setScopeHeader(req *http.Request) {
+	if h := c.scopeKind.ScopeHeader(); h != "" && c.scopeID != "" {
+		req.Header.Set(h, c.scopeID)
 	}
-	return "/api/" + namespace + "/" + version + "/tenant/" + c.tenantID
+}
+
+// TenantID returns the tenant ID configured on the transport, or "" when this
+// client is scoped to something other than a tenant.
+func (c *Transport) TenantID() string {
+	if c.scopeKind != ScopeTenant {
+		return ""
+	}
+	return c.scopeID
+}
+
+// APIPrefix returns the /api/{namespace}/{version} URL prefix for a namespace.
+// An empty version collapses that segment, for the APIs that carry no version
+// in the URL (proclassic, Pro preview paths).
+//
+// The scope is NOT in the path. Until 2026-08-25 every Jamf URL embedded it —
+// /api/{namespace}/{version}/tenant/{tenantID} — and the gateway's Tyk config
+// resolved the request context from `path`. `header` was added as an allowed
+// source in prod on that date (tyk-gateway-management 0793131b, "JSC-73421
+// Enable header context support - Prod"), and the published specs dropped the
+// path segment in GitOps build v1495 in favour of a required X-Tenant-Id
+// header. Both forms answered 200 during the transition, wire-verified across
+// EU securitycloud and US pro/blueprints/compliance-benchmarks/devices, so
+// this moved to headers only rather than carrying a selectable mode: a second
+// code path nothing exercises is how an earlier URL-shape bug went unnoticed
+// for weeks.
+func (c *Transport) APIPrefix(namespace, version string) string {
+	if version == "" {
+		return "/api/" + namespace
+	}
+	return "/api/" + namespace + "/" + version
 }
 
 // ValidateCredentials tests authentication by requesting an OAuth token.
@@ -373,6 +436,8 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to create request: %w", err)
 	}
+
+	c.setScopeHeader(req)
 
 	for key, values := range extraHeaders {
 		for _, v := range values {

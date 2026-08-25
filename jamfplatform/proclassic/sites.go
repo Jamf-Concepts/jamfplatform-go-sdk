@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetSiteByID(ctx context.Context, id string) (*Site, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Site
 	endpoint := fmt.Sprintf("%s/sites/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetSiteByID(ctx context.Context, id string) (*Site, error) {
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateSiteByID(ctx context.Context, id string, request *Site) (*Site, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Site
 	endpoint := fmt.Sprintf("%s/sites/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateSiteByID(ctx context.Context, id string, request *Site) (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateSiteByID(ctx context.Context, id string, request *Site) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateSiteByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateSiteByID(ctx context.Context, id string, request *Site) e
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteSiteByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteSiteByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteSiteByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetSiteByName(ctx context.Context, name string) (*Site, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Site
 	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetSiteByName(ctx context.Context, name string) (*Site, error) 
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateSiteByName(ctx context.Context, name string, request *Site) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateSiteByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateSiteByName(ctx context.Context, name string, request *Sit
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteSiteByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteSiteByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteSiteByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:sites.
 func (c *Client) ListSites(ctx context.Context) (*Sites, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Sites
 	endpoint := prefix + "/sites"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListSites(ctx context.Context) (*Sites, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateSiteByName(ctx context.Context, name string, request *Site) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/sites/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateSiteByName(%s): %w", name, err)

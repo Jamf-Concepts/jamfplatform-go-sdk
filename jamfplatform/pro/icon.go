@@ -26,7 +26,7 @@ import (
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadIconV1(ctx context.Context, fileFilename string, file io.Reader) (*IconResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result IconResponse
 	endpoint := prefix + "/icon"
 	parts := []client.MultipartField{
@@ -45,7 +45,7 @@ func (c *Client) UploadIconV1(ctx context.Context, fileFilename string, file io.
 // Parameters:
 //   - id: id of the icon.
 func (c *Client) GetIconV1(ctx context.Context, id string) (*IconResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result IconResponse
 	endpoint := fmt.Sprintf("%s/icon/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -64,7 +64,7 @@ func (c *Client) GetIconV1(ctx context.Context, id string) (*IconResponse, error
 //     resolution.
 //   - scale: request a scale; 0 results in original image, non-0 results in scaled to 300.
 func (c *Client) DownloadIconV1(ctx context.Context, id string, res int, scale string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/icon/download/%s", prefix, url.PathEscape(id))
 	params := url.Values{}

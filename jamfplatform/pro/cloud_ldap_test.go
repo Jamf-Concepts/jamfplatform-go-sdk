@@ -13,7 +13,7 @@ import (
 
 func TestVerifyLdapKeystoreV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/ldap-keystore/verify", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/ldap-keystore/verify", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestVerifyLdapKeystoreV1(t *testing.T) {
 
 func TestCreateCloudLdapV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -49,7 +49,7 @@ func TestCreateCloudLdapV2(t *testing.T) {
 
 func TestGetCloudLdapDefaultMappingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/defaults/test-id/mappings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/defaults/test-id/mappings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -67,7 +67,7 @@ func TestGetCloudLdapDefaultMappingsV2(t *testing.T) {
 
 func TestGetCloudLdapDefaultMappingsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/defaults/test-id/mappings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/defaults/test-id/mappings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -83,7 +83,7 @@ func TestGetCloudLdapDefaultMappingsV2_NotFound(t *testing.T) {
 
 func TestGetCloudLdapDefaultServerConfigurationV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/defaults/test-id/server-configuration", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/defaults/test-id/server-configuration", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -101,7 +101,7 @@ func TestGetCloudLdapDefaultServerConfigurationV2(t *testing.T) {
 
 func TestGetCloudLdapDefaultServerConfigurationV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/defaults/test-id/server-configuration", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/defaults/test-id/server-configuration", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -117,7 +117,7 @@ func TestGetCloudLdapDefaultServerConfigurationV2_NotFound(t *testing.T) {
 
 func TestGetCloudLdapV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -135,7 +135,7 @@ func TestGetCloudLdapV2(t *testing.T) {
 
 func TestGetCloudLdapV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -151,7 +151,7 @@ func TestGetCloudLdapV2_NotFound(t *testing.T) {
 
 func TestUpdateCloudLdapV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestUpdateCloudLdapV2(t *testing.T) {
 
 func TestDeleteCloudLdapV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -184,7 +184,7 @@ func TestDeleteCloudLdapV2(t *testing.T) {
 
 func TestGetCloudLdapBindStatisticsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id/connection/bind", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id/connection/bind", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -202,7 +202,7 @@ func TestGetCloudLdapBindStatisticsV2(t *testing.T) {
 
 func TestGetCloudLdapBindStatisticsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id/connection/bind", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id/connection/bind", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -218,7 +218,7 @@ func TestGetCloudLdapBindStatisticsV2_NotFound(t *testing.T) {
 
 func TestGetCloudLdapSearchStatisticsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id/connection/search", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id/connection/search", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -236,7 +236,7 @@ func TestGetCloudLdapSearchStatisticsV2(t *testing.T) {
 
 func TestGetCloudLdapSearchStatisticsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id/connection/search", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id/connection/search", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -252,7 +252,7 @@ func TestGetCloudLdapSearchStatisticsV2_NotFound(t *testing.T) {
 
 func TestGetCloudLdapConnectionStatusV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id/connection/status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id/connection/status", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -270,7 +270,7 @@ func TestGetCloudLdapConnectionStatusV2(t *testing.T) {
 
 func TestGetCloudLdapConnectionStatusV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id/connection/status", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id/connection/status", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -286,7 +286,7 @@ func TestGetCloudLdapConnectionStatusV2_NotFound(t *testing.T) {
 
 func TestGetCloudLdapMappingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id/mappings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id/mappings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -304,7 +304,7 @@ func TestGetCloudLdapMappingsV2(t *testing.T) {
 
 func TestGetCloudLdapMappingsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id/mappings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id/mappings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -320,7 +320,7 @@ func TestGetCloudLdapMappingsV2_NotFound(t *testing.T) {
 
 func TestUpdateCloudLdapMappingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/cloud-ldaps/test-id/mappings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/cloud-ldaps/test-id/mappings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}

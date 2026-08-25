@@ -13,7 +13,7 @@ import (
 
 func TestGetJamfProtectSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetJamfProtectSettingsV1(t *testing.T) {
 
 func TestGetJamfProtectSettingsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetJamfProtectSettingsV1_NotFound(t *testing.T) {
 
 func TestUpdateJamfProtectSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestUpdateJamfProtectSettingsV1(t *testing.T) {
 
 func TestUnregisterJamfProtectV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -80,7 +80,7 @@ func TestUnregisterJamfProtectV1(t *testing.T) {
 
 func TestListJamfProtectDeploymentTasksV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect/deployments/test-id/tasks", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect/deployments/test-id/tasks", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -102,7 +102,7 @@ func TestListJamfProtectDeploymentTasksV1(t *testing.T) {
 
 func TestRetryJamfProtectDeploymentTasksV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect/deployments/test-id/tasks/retry", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect/deployments/test-id/tasks/retry", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -117,7 +117,7 @@ func TestRetryJamfProtectDeploymentTasksV1(t *testing.T) {
 
 func TestListJamfProtectHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -139,7 +139,7 @@ func TestListJamfProtectHistoryV1(t *testing.T) {
 
 func TestCreateJamfProtectHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -157,7 +157,7 @@ func TestCreateJamfProtectHistoryNoteV1(t *testing.T) {
 
 func TestListJamfProtectPlansV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect/plans", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect/plans", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -179,7 +179,7 @@ func TestListJamfProtectPlansV1(t *testing.T) {
 
 func TestSyncJamfProtectPlansV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect/plans/sync", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect/plans/sync", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -194,7 +194,7 @@ func TestSyncJamfProtectPlansV1(t *testing.T) {
 
 func TestRegisterJamfProtectV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/jamf-protect/register", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/jamf-protect/register", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

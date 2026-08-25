@@ -15,7 +15,7 @@ import (
 
 func TestUploadBrandingImageV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/tenant/t-test/self-service/branding/images", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/self-service/branding/images", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

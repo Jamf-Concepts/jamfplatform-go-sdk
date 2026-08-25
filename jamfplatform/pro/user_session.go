@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:accounts. Legacy Jamf Pro privilege name(s): Read Accounts.
 func (c *Client) GetUserSessionV1(ctx context.Context) ([]Account, error) {
-	prefix := c.transport.TenantPrefix("pro", "")
+	prefix := c.transport.APIPrefix("pro", "")
 	var result []Account
 	endpoint := prefix + "/user"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetUserSessionV1(ctx context.Context) ([]Account, error) {
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) UpdateUserSessionV1(ctx context.Context, request *Session) (*Session, error) {
-	prefix := c.transport.TenantPrefix("pro", "")
+	prefix := c.transport.APIPrefix("pro", "")
 	var result Session
 	endpoint := prefix + "/user/updateSession"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {

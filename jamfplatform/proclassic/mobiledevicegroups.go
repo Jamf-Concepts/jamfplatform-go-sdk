@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceGroupByID(ctx context.Context, id string) (*MobileDeviceGroup, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceGroup
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetMobileDeviceGroupByID(ctx context.Context, id string) (*Mobi
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceGroupByID(ctx context.Context, id string, request *MobileDeviceGroup) (*MobileDeviceGroup, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceGroup
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateMobileDeviceGroupByID(ctx context.Context, id string, req
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateMobileDeviceGroupByID(ctx context.Context, id string, request *MobileDeviceGroup) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceGroupByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateMobileDeviceGroupByID(ctx context.Context, id string, req
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceGroupByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceGroupByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteMobileDeviceGroupByID(ctx context.Context, id string) err
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetMobileDeviceGroupByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceGroup
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetMobileDeviceGroupByName(ctx context.Context, name string) (*
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceGroupByName(ctx context.Context, name string, request *MobileDeviceGroup) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceGroupByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateMobileDeviceGroupByName(ctx context.Context, name string,
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceGroupByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceGroupByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteMobileDeviceGroupByName(ctx context.Context, name string)
 //
 // Required privileges: read:pro:mobile-device-groups.
 func (c *Client) ListMobileDeviceGroups(ctx context.Context) (*MobileDeviceGroups, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceGroups
 	endpoint := prefix + "/mobiledevicegroups"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListMobileDeviceGroups(ctx context.Context) (*MobileDeviceGroup
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateMobileDeviceGroupByName(ctx context.Context, name string, request *MobileDeviceGroup) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevicegroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceGroupByName(%s): %w", name, err)

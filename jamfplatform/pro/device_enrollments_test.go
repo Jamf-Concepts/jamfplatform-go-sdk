@@ -13,7 +13,7 @@ import (
 
 func TestListDeviceEnrollmentsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListDeviceEnrollmentsV1(t *testing.T) {
 
 func TestGetDeviceEnrollmentPublicKeyV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/public-key", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/public-key", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestGetDeviceEnrollmentPublicKeyV1(t *testing.T) {
 
 func TestGetDeviceEnrollmentPublicKeyV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/public-key", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/public-key", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -69,7 +69,7 @@ func TestGetDeviceEnrollmentPublicKeyV1_NotFound(t *testing.T) {
 
 func TestListAllDeviceEnrollmentSyncsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/syncs", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/syncs", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -87,7 +87,7 @@ func TestListAllDeviceEnrollmentSyncsV1(t *testing.T) {
 
 func TestListAllDeviceEnrollmentSyncsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/syncs", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/syncs", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -103,7 +103,7 @@ func TestListAllDeviceEnrollmentSyncsV1_NotFound(t *testing.T) {
 
 func TestUploadDeviceEnrollmentTokenV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/upload-token", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/upload-token", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -121,7 +121,7 @@ func TestUploadDeviceEnrollmentTokenV1(t *testing.T) {
 
 func TestGetDeviceEnrollmentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -139,7 +139,7 @@ func TestGetDeviceEnrollmentV1(t *testing.T) {
 
 func TestGetDeviceEnrollmentV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -155,7 +155,7 @@ func TestGetDeviceEnrollmentV1_NotFound(t *testing.T) {
 
 func TestUpdateDeviceEnrollmentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -173,7 +173,7 @@ func TestUpdateDeviceEnrollmentV1(t *testing.T) {
 
 func TestDeleteDeviceEnrollmentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -188,7 +188,7 @@ func TestDeleteDeviceEnrollmentV1(t *testing.T) {
 
 func TestDisownDeviceEnrollmentDevicesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id/disown", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id/disown", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -206,7 +206,7 @@ func TestDisownDeviceEnrollmentDevicesV1(t *testing.T) {
 
 func TestListDeviceEnrollmentHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -228,7 +228,7 @@ func TestListDeviceEnrollmentHistoryV1(t *testing.T) {
 
 func TestCreateDeviceEnrollmentHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -246,7 +246,7 @@ func TestCreateDeviceEnrollmentHistoryNoteV1(t *testing.T) {
 
 func TestListDeviceEnrollmentSyncsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id/syncs", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id/syncs", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -264,7 +264,7 @@ func TestListDeviceEnrollmentSyncsV1(t *testing.T) {
 
 func TestListDeviceEnrollmentSyncsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id/syncs", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id/syncs", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -280,7 +280,7 @@ func TestListDeviceEnrollmentSyncsV1_NotFound(t *testing.T) {
 
 func TestGetLatestDeviceEnrollmentSyncV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id/syncs/latest", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id/syncs/latest", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -298,7 +298,7 @@ func TestGetLatestDeviceEnrollmentSyncV1(t *testing.T) {
 
 func TestGetLatestDeviceEnrollmentSyncV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id/syncs/latest", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id/syncs/latest", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -314,7 +314,7 @@ func TestGetLatestDeviceEnrollmentSyncV1_NotFound(t *testing.T) {
 
 func TestReplaceDeviceEnrollmentTokenV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/test-id/upload-token", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/test-id/upload-token", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -332,7 +332,7 @@ func TestReplaceDeviceEnrollmentTokenV1(t *testing.T) {
 
 func TestResolveDeviceEnrollmentV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -355,7 +355,7 @@ func TestResolveDeviceEnrollmentV1IDByName(t *testing.T) {
 
 func TestResolveDeviceEnrollmentV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -379,7 +379,7 @@ func TestResolveDeviceEnrollmentV1ByName(t *testing.T) {
 func TestApplyDeviceEnrollmentV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns no matches → resolver returns 404 → apply creates via token upload.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -389,7 +389,7 @@ func TestApplyDeviceEnrollmentV1_Create(t *testing.T) {
 		})
 	})
 	// Token upload creates the resource.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/upload-token", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/upload-token", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -399,7 +399,7 @@ func TestApplyDeviceEnrollmentV1_Create(t *testing.T) {
 		})
 	})
 	// Metadata update after creation.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/new-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/new-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{"id": "new-id", "name": "target"})
 	})
 
@@ -418,7 +418,7 @@ func TestApplyDeviceEnrollmentV1_Create(t *testing.T) {
 func TestApplyDeviceEnrollmentV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates with token replace + metadata.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -430,11 +430,11 @@ func TestApplyDeviceEnrollmentV1_Update(t *testing.T) {
 		})
 	})
 	// Token replace (re-upload).
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/existing-id/upload-token", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/existing-id/upload-token", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "name": "target"})
 	})
 	// Metadata update.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/device-enrollments/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/device-enrollments/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "name": "target"})
 	})
 

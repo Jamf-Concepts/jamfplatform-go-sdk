@@ -195,8 +195,7 @@ func (e *APIResponseError) Summary() string {
 // directly so they don't need to import the concrete error type or manage
 // the target pointer themselves.
 func AsAPIError(err error) *APIResponseError {
-	var apiErr *APIResponseError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*APIResponseError](err); ok {
 		return apiErr
 	}
 	return nil

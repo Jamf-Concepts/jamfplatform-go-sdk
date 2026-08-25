@@ -29,7 +29,7 @@ import (
 //     deviceName, statusCode, statusDate, attemptNumber, ignoredForPatchPolicyId. This param can be
 //     combined with paging and sorting.
 func (c *Client) ListPatchPolicyLogsV2(ctx context.Context, id string, sort []string, filter string) ([]PatchPolicyLogV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]PatchPolicyLogV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -64,7 +64,7 @@ func (c *Client) ListPatchPolicyLogsV2(ctx context.Context, id string, sort []st
 // Parameters:
 //   - id: patch policy id.
 func (c *Client) GetPatchPolicyEligibleRetryCountV2(ctx context.Context, id string) (*PatchPolicyLogEligibleRetryCount, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PatchPolicyLogEligibleRetryCount
 	endpoint := fmt.Sprintf("%s/patch-policies/%s/logs/eligible-retry-count", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -80,7 +80,7 @@ func (c *Client) GetPatchPolicyEligibleRetryCountV2(ctx context.Context, id stri
 // Parameters:
 //   - id: patch policy id.
 func (c *Client) RetryPatchPolicyLogsV2(ctx context.Context, id string, request *PatchPolicyLogRetry) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-policies/%s/logs/retry", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("RetryPatchPolicyLogsV2(%s): %w", id, err)
@@ -95,7 +95,7 @@ func (c *Client) RetryPatchPolicyLogsV2(ctx context.Context, id string, request 
 // Parameters:
 //   - id: patch policy id.
 func (c *Client) RetryAllPatchPolicyLogsV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/patch-policies/%s/logs/retry-all", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("RetryAllPatchPolicyLogsV2(%s): %w", id, err)
@@ -111,7 +111,7 @@ func (c *Client) RetryAllPatchPolicyLogsV2(ctx context.Context, id string) error
 //   - id: patch policy id.
 //   - deviceID: device id.
 func (c *Client) GetPatchPolicyLogForDeviceV2(ctx context.Context, id string, deviceID string) (*PatchPolicyLogV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PatchPolicyLogV2
 	endpoint := fmt.Sprintf("%s/patch-policies/%s/logs/%s", prefix, url.PathEscape(id), url.PathEscape(deviceID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -128,7 +128,7 @@ func (c *Client) GetPatchPolicyLogForDeviceV2(ctx context.Context, id string, de
 //   - id: patch policy id.
 //   - deviceID: device id.
 func (c *Client) ListPatchPolicyLogDetailsForDeviceV2(ctx context.Context, id string, deviceID string) ([]PatchPolicyLogDetail, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []PatchPolicyLogDetail
 	endpoint := fmt.Sprintf("%s/patch-policies/%s/logs/%s/details", prefix, url.PathEscape(id), url.PathEscape(deviceID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

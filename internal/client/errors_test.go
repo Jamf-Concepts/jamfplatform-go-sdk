@@ -126,7 +126,7 @@ func TestAPIResponseError_Summary(t *testing.T) {
 			err: &APIResponseError{
 				StatusCode: 400,
 				Method:     "POST",
-				URL:        "/api/pro/v1/tenant/x/buildings",
+				URL:        "/api/pro/v1/buildings",
 				Errors: []Error{
 					{Code: "INVALID_VALUE", Field: "name", Description: "must be unique"},
 				},
@@ -138,7 +138,7 @@ func TestAPIResponseError_Summary(t *testing.T) {
 			err: &APIResponseError{
 				StatusCode: 403,
 				Method:     "GET",
-				URL:        "/api/pro/v1/tenant/x/buildings",
+				URL:        "/api/pro/v1/buildings",
 				Errors: []Error{
 					{Code: "FORBIDDEN", Field: "", Description: "insufficient privileges"},
 				},
@@ -150,7 +150,7 @@ func TestAPIResponseError_Summary(t *testing.T) {
 			err: &APIResponseError{
 				StatusCode: 500,
 				Method:     "POST",
-				URL:        "/api/pro/v1/tenant/x/buildings",
+				URL:        "/api/pro/v1/buildings",
 			},
 			wants: []string{"POST", "buildings", "500", "Internal Server Error"},
 		},
@@ -159,7 +159,7 @@ func TestAPIResponseError_Summary(t *testing.T) {
 			err: &APIResponseError{
 				StatusCode: 599,
 				Method:     "GET",
-				URL:        "/api/pro/v1/tenant/x/foo",
+				URL:        "/api/pro/v1/foo",
 			},
 			wants: []string{"GET", "foo", "599"},
 		},
@@ -168,7 +168,7 @@ func TestAPIResponseError_Summary(t *testing.T) {
 			err: &APIResponseError{
 				StatusCode: 400,
 				Method:     "PUT",
-				URL:        "/api/pro/v1/tenant/x/buildings/1",
+				URL:        "/api/pro/v1/buildings/1",
 				Errors: []Error{
 					{Code: "INVALID_VALUE", Field: "name", Description: ""},
 				},

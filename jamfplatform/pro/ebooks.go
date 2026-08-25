@@ -25,7 +25,7 @@ import (
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListEbooksV1(ctx context.Context, sort []string) ([]Ebook, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]Ebook, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -57,7 +57,7 @@ func (c *Client) ListEbooksV1(ctx context.Context, sort []string) ([]Ebook, erro
 // Parameters:
 //   - id: instance id of ebook record.
 func (c *Client) GetEbookV1(ctx context.Context, id string) (*Ebook, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Ebook
 	endpoint := fmt.Sprintf("%s/ebooks/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -73,7 +73,7 @@ func (c *Client) GetEbookV1(ctx context.Context, id string) (*Ebook, error) {
 // Parameters:
 //   - id: instance id of ebook record.
 func (c *Client) GetEbookScopeV1(ctx context.Context, id string) (*EbookScope, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result EbookScope
 	endpoint := fmt.Sprintf("%s/ebooks/%s/scope", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -84,7 +84,7 @@ func (c *Client) GetEbookScopeV1(ctx context.Context, id string) (*EbookScope, e
 
 // ResolveEbookV1IDByName looks up a EbookV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveEbookV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/ebooks"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -95,7 +95,7 @@ func (c *Client) ResolveEbookV1IDByName(ctx context.Context, name string) (strin
 
 // ResolveEbookV1ByName looks up a EbookV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveEbookV1ByName(ctx context.Context, name string) (*Ebook, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/ebooks"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

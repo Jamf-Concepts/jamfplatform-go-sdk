@@ -35,7 +35,7 @@ import (
 //     filter=groupName=="*Managed*" and isSmart=="true" Example: filter=groupType=="COMPUTER" and
 //     groupDescription=="*Admin*".
 func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -85,7 +85,7 @@ func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string)
 //     filter=groupName=="*Managed*" and isSmart=="true" Example: filter=groupType=="COMPUTER" and
 //     groupDescription=="*Admin*".
 func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -121,7 +121,7 @@ func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string)
 // Parameters:
 //   - id: The platform UUID of a group.
 func (c *Client) GetGroupV2(ctx context.Context, id string) (*GroupWithCriteriaDtoV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result GroupWithCriteriaDtoV1
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -140,7 +140,7 @@ func (c *Client) GetGroupV2(ctx context.Context, id string) (*GroupWithCriteriaD
 // Parameters:
 //   - id: The platform UUID of a group.
 func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaDtoV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GroupWithCriteriaDtoV1
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -157,7 +157,7 @@ func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaD
 // Parameters:
 //   - id: The platform UUID of a group.
 func (c *Client) DeleteGroupV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteGroupV2(%s): %w", id, err)
@@ -175,7 +175,7 @@ func (c *Client) DeleteGroupV2(ctx context.Context, id string) error {
 // Parameters:
 //   - id: The platform UUID of a group.
 func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteGroupV1(%s): %w", id, err)
@@ -191,7 +191,7 @@ func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
 // Parameters:
 //   - id: The platform UUID of a group.
 func (c *Client) PatchGroupV2(ctx context.Context, id string, request *GroupUpdateDtoV2) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("PatchGroupV2(%s): %w", id, err)
@@ -209,7 +209,7 @@ func (c *Client) PatchGroupV2(ctx context.Context, id string, request *GroupUpda
 // Parameters:
 //   - id: The platform UUID of a group.
 func (c *Client) PatchGroupV1(ctx context.Context, id string, request *GroupUpdateDtoV1) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("PatchGroupV1(%s): %w", id, err)
@@ -219,7 +219,7 @@ func (c *Client) PatchGroupV1(ctx context.Context, id string, request *GroupUpda
 
 // ResolveGroupV2IDByName looks up a GroupV2 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveGroupV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/groups"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
 	if err != nil {
@@ -230,7 +230,7 @@ func (c *Client) ResolveGroupV2IDByName(ctx context.Context, name string) (strin
 
 // ResolveGroupV2ByName looks up a GroupV2 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveGroupV2ByName(ctx context.Context, name string) (*GroupDtoV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/groups"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
 	if err != nil {
@@ -245,7 +245,7 @@ func (c *Client) ResolveGroupV2ByName(ctx context.Context, name string) (*GroupD
 
 // ResolveGroupV1IDByName looks up a GroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/groups"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
 	if err != nil {
@@ -256,7 +256,7 @@ func (c *Client) ResolveGroupV1IDByName(ctx context.Context, name string) (strin
 
 // ResolveGroupV1ByName looks up a GroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveGroupV1ByName(ctx context.Context, name string) (*GroupDtoV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/groups"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
 	if err != nil {

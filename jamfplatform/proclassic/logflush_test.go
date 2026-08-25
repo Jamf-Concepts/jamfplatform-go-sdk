@@ -13,7 +13,7 @@ import (
 
 func TestDeleteLogFlush(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/logflush", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/logflush", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -28,7 +28,7 @@ func TestDeleteLogFlush(t *testing.T) {
 
 func TestDeleteLogFlushByLogIDInterval(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/logflush/test-id/id/test-id/interval/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/logflush/test-id/id/test-id/interval/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -43,7 +43,7 @@ func TestDeleteLogFlushByLogIDInterval(t *testing.T) {
 
 func TestDeleteLogFlushByLogInterval(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/logflush/test-id/interval/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/logflush/test-id/interval/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

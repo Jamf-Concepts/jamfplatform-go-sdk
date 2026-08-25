@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceEnrollmentProfileByID(ctx context.Context, id string) (*MobileDeviceEnrollmentProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByID(ctx context.Context, id st
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceEnrollmentProfileByID(ctx context.Context, id string, request *MobileDeviceEnrollmentProfilePost) (*MobileDeviceEnrollmentProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateMobileDeviceEnrollmentProfileByID(ctx context.Context, id string, request *MobileDeviceEnrollmentProfilePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceEnrollmentProfileByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceEnrollmentProfileByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceEnrollmentProfileByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetMobileDeviceEnrollmentProfileByName(ctx context.Context, name string) (*MobileDeviceEnrollmentProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByName(ctx context.Context, nam
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceEnrollmentProfileByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceEnrollmentProfileByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByName(ctx context.Context, 
 // Parameters:
 //   - invitation: Invitation value to filter by.
 func (c *Client) GetMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string) (*MobileDeviceEnrollmentProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -128,7 +128,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByInvitation(ctx context.Contex
 //
 // Required privileges: read:pro:enrollment-profiles.
 func (c *Client) ListMobileDeviceEnrollmentProfiles(ctx context.Context) (*MobileDeviceEnrollmentProfiles, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfiles
 	endpoint := prefix + "/mobiledeviceenrollmentprofiles"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -146,7 +146,7 @@ func (c *Client) ListMobileDeviceEnrollmentProfiles(ctx context.Context) (*Mobil
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Location", "Purchasing", "Attachments".
 func (c *Client) GetMobileDeviceEnrollmentProfileByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceEnrollmentProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -162,7 +162,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByIDSubset(ctx context.Context,
 // Parameters:
 //   - invitation: Invitation value to filter by.
 func (c *Client) DeleteMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceEnrollmentProfileByInvitation(%s): %w", invitation, err)
@@ -177,7 +177,7 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByInvitation(ctx context.Con
 // Parameters:
 //   - invitation: Invitation value to filter by.
 func (c *Client) UpdateMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string, request *MobileDeviceEnrollmentProfilePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceEnrollmentProfileByInvitation(%s): %w", invitation, err)
@@ -192,7 +192,7 @@ func (c *Client) UpdateMobileDeviceEnrollmentProfileByInvitation(ctx context.Con
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceEnrollmentProfileByName(ctx context.Context, name string, request *MobileDeviceEnrollmentProfilePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceEnrollmentProfileByName(%s): %w", name, err)
@@ -209,7 +209,7 @@ func (c *Client) UpdateMobileDeviceEnrollmentProfileByName(ctx context.Context, 
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Location", "Purchasing", "Attachments".
 func (c *Client) GetMobileDeviceEnrollmentProfileByNameSubset(ctx context.Context, name string, subset string) (*MobileDeviceEnrollmentProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -227,7 +227,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByNameSubset(ctx context.Contex
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Location", "Purchasing", "Attachments".
 func (c *Client) GetMobileDeviceEnrollmentProfileByInvitationSubset(ctx context.Context, invitation string, subset string) (*MobileDeviceEnrollmentProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s/subset/%s", prefix, url.PathEscape(invitation), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -243,7 +243,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByInvitationSubset(ctx context.
 // Parameters:
 //   - invitation: ID value to filter by.
 func (c *Client) CreateMobileDeviceEnrollmentProfileByInvitation(ctx context.Context, invitation string, request *MobileDeviceEnrollmentProfilePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceEnrollmentProfileByInvitation(%s): %w", invitation, err)
@@ -258,7 +258,7 @@ func (c *Client) CreateMobileDeviceEnrollmentProfileByInvitation(ctx context.Con
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateMobileDeviceEnrollmentProfileByName(ctx context.Context, name string, request *MobileDeviceEnrollmentProfilePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceenrollmentprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceEnrollmentProfileByName(%s): %w", name, err)

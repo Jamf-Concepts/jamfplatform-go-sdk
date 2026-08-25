@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetDirectoryBindingByID(ctx context.Context, id string) (*DirectoryBinding, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DirectoryBinding
 	endpoint := fmt.Sprintf("%s/directorybindings/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetDirectoryBindingByID(ctx context.Context, id string) (*Direc
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateDirectoryBindingByID(ctx context.Context, id string, request *DirectoryBinding) (*DirectoryBinding, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DirectoryBinding
 	endpoint := fmt.Sprintf("%s/directorybindings/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateDirectoryBindingByID(ctx context.Context, id string, requ
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateDirectoryBindingByID(ctx context.Context, id string, request *DirectoryBinding) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDirectoryBindingByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateDirectoryBindingByID(ctx context.Context, id string, requ
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteDirectoryBindingByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDirectoryBindingByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteDirectoryBindingByID(ctx context.Context, id string) erro
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetDirectoryBindingByName(ctx context.Context, name string) (*DirectoryBinding, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DirectoryBinding
 	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetDirectoryBindingByName(ctx context.Context, name string) (*D
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateDirectoryBindingByName(ctx context.Context, name string, request *DirectoryBinding) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDirectoryBindingByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateDirectoryBindingByName(ctx context.Context, name string, 
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteDirectoryBindingByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDirectoryBindingByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteDirectoryBindingByName(ctx context.Context, name string) 
 //
 // Required privileges: read:pro:directory-bindings.
 func (c *Client) ListDirectoryBindings(ctx context.Context) (*DirectoryBindings, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DirectoryBindings
 	endpoint := prefix + "/directorybindings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListDirectoryBindings(ctx context.Context) (*DirectoryBindings,
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateDirectoryBindingByName(ctx context.Context, name string, request *DirectoryBinding) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/directorybindings/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateDirectoryBindingByName(%s): %w", name, err)

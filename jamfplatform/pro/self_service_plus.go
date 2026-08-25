@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetSelfServicePlusFeatureToggleEnabledV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/self-service-plus/feature-toggle/enabled"
 	if err := c.transport.DoExpect(ctx, http.MethodGet, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("GetSelfServicePlusFeatureToggleEnabledV1: %w", err)
@@ -27,7 +27,7 @@ func (c *Client) GetSelfServicePlusFeatureToggleEnabledV1(ctx context.Context) e
 //
 // Required privileges: read:pro:self-service. Legacy Jamf Pro privilege name(s): Read Self Service.
 func (c *Client) GetSelfServicePlusSettingsV1(ctx context.Context) (*SelfServicePlusSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SelfServicePlusSettings
 	endpoint := prefix + "/self-service-plus/settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -40,7 +40,7 @@ func (c *Client) GetSelfServicePlusSettingsV1(ctx context.Context) (*SelfService
 //
 // Required privileges: update:pro:self-service. Legacy Jamf Pro privilege name(s): Update Self Service.
 func (c *Client) UpdateSelfServicePlusSettingsV1(ctx context.Context, request *SelfServicePlusSettings) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/self-service-plus/settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateSelfServicePlusSettingsV1: %w", err)

@@ -30,7 +30,7 @@ import (
 //     `operatingSystemVersion`, `enrollmentType`, `lastEnrollmentTime`. Dates are specified in ISO 8601
 //     format. Example: `name=="*iPhone*" and lastInventoryUpdateTime>="2025-01-31T18:09:00.000Z"`.
 func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	return client.ListAllPages(ctx, 1000, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -64,7 +64,7 @@ func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) 
 // Parameters:
 //   - id: The ID of the device, in UUID format.
 func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	var result DeviceReadRepresentationV1
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -80,7 +80,7 @@ func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresent
 // Parameters:
 //   - id: The ID of the device, in UUID format.
 func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpdateRepresentationV1) error {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDevice(%s): %w", id, err)
@@ -95,7 +95,7 @@ func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpd
 // Parameters:
 //   - id: The ID of the device, in UUID format.
 func (c *Client) DeleteDevice(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDevice(%s): %w", id, err)
@@ -113,7 +113,7 @@ func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 //   - filter: Filter query in RSQL format. Includes all results, by default. Fields allowed in the query: `name`,
 //     `version`. Example: `name=="*Safari*" and version>="26.0.0"`.
 func (c *Client) ListDeviceApplications(ctx context.Context, id string, sort []string, filter string) ([]DeviceInstalledApplicationReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	return client.ListAllPages(ctx, 1000, func(ctx context.Context, page, pageSize int) ([]DeviceInstalledApplicationReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -142,7 +142,7 @@ func (c *Client) ListDeviceApplications(ctx context.Context, id string, sort []s
 
 // ResolveDeviceIDByName looks up a Device by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDeviceIDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	listPath := prefix + "/devices"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -153,7 +153,7 @@ func (c *Client) ResolveDeviceIDByName(ctx context.Context, name string) (string
 
 // ResolveDeviceByName looks up a Device by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveDeviceByName(ctx context.Context, name string) (*DeviceListReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	listPath := prefix + "/devices"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -168,7 +168,7 @@ func (c *Client) ResolveDeviceByName(ctx context.Context, name string) (*DeviceL
 
 // ResolveDeviceIDBySerialNumber looks up a Device by its serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDeviceIDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	listPath := prefix + "/devices"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "serialNumber", "id", name)
 	if err != nil {
@@ -179,7 +179,7 @@ func (c *Client) ResolveDeviceIDBySerialNumber(ctx context.Context, name string)
 
 // ResolveDeviceBySerialNumber looks up a Device by its serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveDeviceBySerialNumber(ctx context.Context, name string) (*DeviceListReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	listPath := prefix + "/devices"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "serialNumber", "id", name)
 	if err != nil {

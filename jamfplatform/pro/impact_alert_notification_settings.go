@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:impact-alert-notification-settings. Legacy Jamf Pro privilege name(s): Read Impact Alert Notification Settings.
 func (c *Client) GetImpactAlertNotificationSettingsV1(ctx context.Context) (*ImpactAlertNotificationSettingsV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ImpactAlertNotificationSettingsV1
 	endpoint := prefix + "/impact-alert-notification-settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetImpactAlertNotificationSettingsV1(ctx context.Context) (*Imp
 //
 // Required privileges: update:pro:impact-alert-notification-settings. Legacy Jamf Pro privilege name(s): Update Impact Alert Notification Settings.
 func (c *Client) UpdateImpactAlertNotificationSettingsV1(ctx context.Context, request *ImpactAlertNotificationSettingsV1) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/impact-alert-notification-settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateImpactAlertNotificationSettingsV1: %w", err)

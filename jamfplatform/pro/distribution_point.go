@@ -28,7 +28,7 @@ import (
 //     fileSharingConnectionType, and httpsEnabled Can be combined with paging and sorting. Default filter
 //     is an empty query and returns all results from the requested page.
 func (c *Client) ListDistributionPointsV1(ctx context.Context, sort []string, filter string) ([]DistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]DistributionPoint, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -60,7 +60,7 @@ func (c *Client) ListDistributionPointsV1(ctx context.Context, sort []string, fi
 //
 // Required privileges: create:pro:distribution-points. Legacy Jamf Pro privilege name(s): Create Distribution Points.
 func (c *Client) CreateDistributionPointV1(ctx context.Context, request *DistributionPoint) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/distribution-points"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -73,7 +73,7 @@ func (c *Client) CreateDistributionPointV1(ctx context.Context, request *Distrib
 //
 // Required privileges: delete:pro:distribution-points. Legacy Jamf Pro privilege name(s): Delete Distribution Points.
 func (c *Client) DeleteMultipleDistributionPointsV1(ctx context.Context, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/distribution-points/delete-multiple"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMultipleDistributionPointsV1: %w", err)
@@ -88,7 +88,7 @@ func (c *Client) DeleteMultipleDistributionPointsV1(ctx context.Context, request
 // Parameters:
 //   - id: instance id of distribution point.
 func (c *Client) GetDistributionPointV1(ctx context.Context, id string) (*DistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DistributionPoint
 	endpoint := fmt.Sprintf("%s/distribution-points/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -105,7 +105,7 @@ func (c *Client) GetDistributionPointV1(ctx context.Context, id string) (*Distri
 // Parameters:
 //   - id: Instance id of distribution point.
 func (c *Client) UpdateDistributionPointV1(ctx context.Context, id string, request *DistributionPoint) (*DistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DistributionPoint
 	endpoint := fmt.Sprintf("%s/distribution-points/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
@@ -121,7 +121,7 @@ func (c *Client) UpdateDistributionPointV1(ctx context.Context, id string, reque
 // Parameters:
 //   - id: Instance id of distribution point.
 func (c *Client) DeleteDistributionPointV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/distribution-points/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDistributionPointV1(%s): %w", id, err)
@@ -137,7 +137,7 @@ func (c *Client) DeleteDistributionPointV1(ctx context.Context, id string) error
 // Parameters:
 //   - id: Instance id of distribution point.
 func (c *Client) PatchDistributionPointV1(ctx context.Context, id string, request *DistributionPoint) (*DistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DistributionPoint
 	endpoint := fmt.Sprintf("%s/distribution-points/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
@@ -158,7 +158,7 @@ func (c *Client) PatchDistributionPointV1(ctx context.Context, id string, reques
 //     combined with paging and sorting. Default filter is an empty query and returns all results from the
 //     requested page.
 func (c *Client) ListDistributionPointHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -193,7 +193,7 @@ func (c *Client) ListDistributionPointHistoryV1(ctx context.Context, id string, 
 // Parameters:
 //   - id: Instance id of distribution point history.
 func (c *Client) CreateDistributionPointHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := fmt.Sprintf("%s/distribution-points/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -204,7 +204,7 @@ func (c *Client) CreateDistributionPointHistoryNoteV1(ctx context.Context, id st
 
 // ResolveDistributionPointV1IDByName looks up a DistributionPointV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDistributionPointV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/distribution-points"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -215,7 +215,7 @@ func (c *Client) ResolveDistributionPointV1IDByName(ctx context.Context, name st
 
 // ResolveDistributionPointV1ByName looks up a DistributionPointV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveDistributionPointV1ByName(ctx context.Context, name string) (*DistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/distribution-points"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {

@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - q: Will perform a "contains" search on the names of access groups.
 func (c *Client) SearchLdapGroupsPreview(ctx context.Context, q string) (*LdapGroupSearchResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "")
+	prefix := c.transport.APIPrefix("pro", "")
 	var result LdapGroupSearchResults
 	endpoint := prefix + "/ldap/groups"
 	params := url.Values{}
@@ -39,7 +39,7 @@ func (c *Client) SearchLdapGroupsPreview(ctx context.Context, q string) (*LdapGr
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) ListLdapServersPreview(ctx context.Context) ([]LdapServer, error) {
-	prefix := c.transport.TenantPrefix("pro", "")
+	prefix := c.transport.APIPrefix("pro", "")
 	var result []LdapServer
 	endpoint := prefix + "/ldap/servers"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -55,7 +55,7 @@ func (c *Client) ListLdapServersPreview(ctx context.Context) ([]LdapServer, erro
 // Parameters:
 //   - q: Will perform a "contains" search on the names of access groups.
 func (c *Client) SearchLdapGroupsV1(ctx context.Context, q string) (*LdapGroupSearchResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LdapGroupSearchResults
 	endpoint := prefix + "/ldap/groups"
 	params := url.Values{}
@@ -75,7 +75,7 @@ func (c *Client) SearchLdapGroupsV1(ctx context.Context, q string) (*LdapGroupSe
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) ListLdapLdapServersV1(ctx context.Context) ([]LdapServer, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []LdapServer
 	endpoint := prefix + "/ldap/ldap-servers"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -88,7 +88,7 @@ func (c *Client) ListLdapLdapServersV1(ctx context.Context) ([]LdapServer, error
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) ListLdapServersV1(ctx context.Context) ([]LdapServer, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []LdapServer
 	endpoint := prefix + "/ldap/servers"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

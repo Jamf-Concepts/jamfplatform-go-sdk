@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) GetSsoSettingsV3(ctx context.Context) (*SsoSettingsV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result SsoSettingsV3
 	endpoint := prefix + "/sso"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetSsoSettingsV3(ctx context.Context) (*SsoSettingsV3, error) {
 //
 // Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) UpdateSsoSettingsV3(ctx context.Context, request *SsoSettingsV3) (*SsoSettingsV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result SsoSettingsV3
 	endpoint := prefix + "/sso"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -46,7 +46,7 @@ func (c *Client) UpdateSsoSettingsV3(ctx context.Context, request *SsoSettingsV3
 //
 // Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) GetSsoDependenciesV3(ctx context.Context) (*EnrollmentCustomizationDependencies, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result EnrollmentCustomizationDependencies
 	endpoint := prefix + "/sso/dependencies"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -59,7 +59,7 @@ func (c *Client) GetSsoDependenciesV3(ctx context.Context) (*EnrollmentCustomiza
 //
 // Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) DisableSsoV3(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := prefix + "/sso/disable"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("DisableSsoV3: %w", err)
@@ -79,7 +79,7 @@ func (c *Client) DisableSsoV3(ctx context.Context) error {
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListSsoHistoryV3(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -111,7 +111,7 @@ func (c *Client) ListSsoHistoryV3(ctx context.Context, sort []string, filter str
 //
 // Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) CreateSsoHistoryNoteV3(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := prefix + "/sso/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -124,7 +124,7 @@ func (c *Client) CreateSsoHistoryNoteV3(ctx context.Context, request *ObjectHist
 //
 // Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) DownloadSsoMetadataV3(ctx context.Context) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []byte
 	endpoint := prefix + "/sso/metadata/download"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

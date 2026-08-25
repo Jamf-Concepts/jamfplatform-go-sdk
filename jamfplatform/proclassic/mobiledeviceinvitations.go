@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceInvitationByID(ctx context.Context, id string) (*MobileDeviceInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceInvitation
 	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetMobileDeviceInvitationByID(ctx context.Context, id string) (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceInvitationByID(ctx context.Context, id string, request *MobileDeviceInvitationPost) (*MobileDeviceInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceInvitation
 	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusOK, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreateMobileDeviceInvitationByID(ctx context.Context, id string
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceInvitationByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceInvitationByID(%s): %w", id, err)
@@ -63,7 +63,7 @@ func (c *Client) DeleteMobileDeviceInvitationByID(ctx context.Context, id string
 //
 // Required privileges: read:pro:mobile-device-enrollment-invitations.
 func (c *Client) ListMobileDeviceInvitations(ctx context.Context) (*MobileDeviceInvitations, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceInvitations
 	endpoint := prefix + "/mobiledeviceinvitations"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -79,7 +79,7 @@ func (c *Client) ListMobileDeviceInvitations(ctx context.Context) (*MobileDevice
 // Parameters:
 //   - invitation: Invitation value to filter by.
 func (c *Client) DeleteMobileDeviceInvitationByInvitation(ctx context.Context, invitation string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceInvitationByInvitation(%s): %w", invitation, err)
@@ -94,7 +94,7 @@ func (c *Client) DeleteMobileDeviceInvitationByInvitation(ctx context.Context, i
 // Parameters:
 //   - invitation: Invitation value to filter by.
 func (c *Client) GetMobileDeviceInvitationByInvitation(ctx context.Context, invitation string) (*MobileDeviceInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceInvitation
 	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -110,7 +110,7 @@ func (c *Client) GetMobileDeviceInvitationByInvitation(ctx context.Context, invi
 // Parameters:
 //   - invitation: Invitation value to filter by.
 func (c *Client) CreateMobileDeviceInvitationByInvitation(ctx context.Context, invitation string, request *MobileDeviceInvitationPost) (*MobileDeviceInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceInvitation
 	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -126,7 +126,7 @@ func (c *Client) CreateMobileDeviceInvitationByInvitation(ctx context.Context, i
 // Parameters:
 //   - invitation: ID value to filter by.
 func (c *Client) UpdateMobileDeviceInvitationByInvitation(ctx context.Context, invitation string, request *MobileDeviceInvitationPost) (*MobileDeviceInvitation, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceInvitation
 	endpoint := fmt.Sprintf("%s/mobiledeviceinvitations/invitation/%s", prefix, url.PathEscape(invitation))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, &result); err != nil {

@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:user-sessions. Legacy Jamf Pro privilege name(s): Read Last Login.
 func (c *Client) GetLastLoginV1(ctx context.Context) (*LastLoginResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LastLoginResponse
 	endpoint := prefix + "/last-login"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

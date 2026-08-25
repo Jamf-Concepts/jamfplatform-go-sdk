@@ -29,7 +29,7 @@ import (
 //     combined with paging and sorting. Fields allowed in the query: id, name Default filter is an empty
 //     query and returns all results from the requested page.
 func (c *Client) ListComputerExtensionAttributesV1(ctx context.Context, sort []string, filter string) ([]ComputerExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributes, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -61,7 +61,7 @@ func (c *Client) ListComputerExtensionAttributesV1(ctx context.Context, sort []s
 //
 // Required privileges: create:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Create Computer Extension Attributes.
 func (c *Client) CreateComputerExtensionAttributeV1(ctx context.Context, request *ComputerExtensionAttributes) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/computer-extension-attributes"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -74,7 +74,7 @@ func (c *Client) CreateComputerExtensionAttributeV1(ctx context.Context, request
 //
 // Required privileges: delete:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Delete Computer Extension Attributes.
 func (c *Client) DeleteMultipleComputerExtensionAttributesV1(ctx context.Context, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/computer-extension-attributes/delete-multiple"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMultipleComputerExtensionAttributesV1: %w", err)
@@ -95,7 +95,7 @@ func (c *Client) DeleteMultipleComputerExtensionAttributesV1(ctx context.Context
 //     query: templateName, templateCategoryName Default filter is an empty query and returns all results
 //     from the requested page.
 func (c *Client) ListComputerExtensionAttributeTemplatesV1(ctx context.Context, sort []string, filter string) ([]ComputerExtensionAttributeTemplates, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerExtensionAttributeTemplates, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -130,7 +130,7 @@ func (c *Client) ListComputerExtensionAttributeTemplatesV1(ctx context.Context, 
 // Parameters:
 //   - id: Unique Id of the Template.
 func (c *Client) GetComputerExtensionAttributeTemplateV1(ctx context.Context, id string) (*ComputerExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerExtensionAttributes
 	endpoint := fmt.Sprintf("%s/computer-extension-attributes/templates/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -150,7 +150,7 @@ func (c *Client) GetComputerExtensionAttributeTemplateV1(ctx context.Context, id
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadComputerExtensionAttributeV1(ctx context.Context, fileFilename string, file io.Reader) (*ComputerExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerExtensionAttributes
 	endpoint := prefix + "/computer-extension-attributes/upload"
 	parts := []client.MultipartField{
@@ -169,7 +169,7 @@ func (c *Client) UploadComputerExtensionAttributeV1(ctx context.Context, fileFil
 // Parameters:
 //   - id: Unique ID of Computer Extension Attribute.
 func (c *Client) GetComputerExtensionAttributeV1(ctx context.Context, id string) (*ComputerExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerExtensionAttributes
 	endpoint := fmt.Sprintf("%s/computer-extension-attributes/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -185,7 +185,7 @@ func (c *Client) GetComputerExtensionAttributeV1(ctx context.Context, id string)
 // Parameters:
 //   - id: Unique ID of Computer Extension Attribute.
 func (c *Client) UpdateComputerExtensionAttributeV1(ctx context.Context, id string, request *ComputerExtensionAttributes) (*ComputerExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerExtensionAttributes
 	endpoint := fmt.Sprintf("%s/computer-extension-attributes/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
@@ -201,7 +201,7 @@ func (c *Client) UpdateComputerExtensionAttributeV1(ctx context.Context, id stri
 // Parameters:
 //   - id: Unique ID of Computer Extension Attribute.
 func (c *Client) DeleteComputerExtensionAttributeV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/computer-extension-attributes/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerExtensionAttributeV1(%s): %w", id, err)
@@ -216,7 +216,7 @@ func (c *Client) DeleteComputerExtensionAttributeV1(ctx context.Context, id stri
 // Parameters:
 //   - id: Unique ID of computer extension attribute.
 func (c *Client) GetComputerExtensionAttributeDataDependencyV1(ctx context.Context, id string) (*DependencyObjectResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DependencyObjectResults
 	endpoint := fmt.Sprintf("%s/computer-extension-attributes/%s/data-dependency", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -232,7 +232,7 @@ func (c *Client) GetComputerExtensionAttributeDataDependencyV1(ctx context.Conte
 // Parameters:
 //   - id: The unique ID of the Computer Extension Attribute to be downloaded.
 func (c *Client) DownloadComputerExtensionAttributeV1(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/computer-extension-attributes/%s/download", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -253,7 +253,7 @@ func (c *Client) DownloadComputerExtensionAttributeV1(ctx context.Context, id st
 //     combined with paging and sorting. Default filter is an empty query and returns all results from the
 //     requested page.
 func (c *Client) ListComputerExtensionAttributeHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -288,7 +288,7 @@ func (c *Client) ListComputerExtensionAttributeHistoryV1(ctx context.Context, id
 // Parameters:
 //   - id: Instance ID of Computer Extension Attribute history.
 func (c *Client) CreateComputerExtensionAttributeHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := fmt.Sprintf("%s/computer-extension-attributes/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -299,7 +299,7 @@ func (c *Client) CreateComputerExtensionAttributeHistoryNoteV1(ctx context.Conte
 
 // ResolveComputerExtensionAttributeV1IDByName looks up a ComputerExtensionAttributeV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerExtensionAttributeV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/computer-extension-attributes"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -310,7 +310,7 @@ func (c *Client) ResolveComputerExtensionAttributeV1IDByName(ctx context.Context
 
 // ResolveComputerExtensionAttributeV1ByName looks up a ComputerExtensionAttributeV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerExtensionAttributeV1ByName(ctx context.Context, name string) (*ComputerExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/computer-extension-attributes"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {

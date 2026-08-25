@@ -25,7 +25,7 @@ import (
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListCloudIdpV1(ctx context.Context, sort []string) ([]CloudIDPCommonResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]CloudIDPCommonResponse, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -68,7 +68,7 @@ func (c *Client) ListCloudIdpV1(ctx context.Context, sort []string) ([]CloudIDPC
 //   - returning all results for the requested page. Fields allowed in the query: id, name. This param
 //     can be combined with paging and sorting. Example: name=="*department*".
 func (c *Client) ExportCloudIdpV1(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/cloud-idp/export"
 	params := url.Values{}
@@ -100,7 +100,7 @@ func (c *Client) ExportCloudIdpV1(ctx context.Context, request *ExportParameters
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) GetCloudIdpV1(ctx context.Context, id string) (*CloudIDPCommon, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudIDPCommon
 	endpoint := fmt.Sprintf("%s/cloud-idp/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -122,7 +122,7 @@ func (c *Client) GetCloudIdpV1(ctx context.Context, id string) (*CloudIDPCommon,
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListCloudIdpHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -157,7 +157,7 @@ func (c *Client) ListCloudIdpHistoryV1(ctx context.Context, id string, sort []st
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) CreateCloudIdpHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := fmt.Sprintf("%s/cloud-idp/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -173,7 +173,7 @@ func (c *Client) CreateCloudIdpHistoryNoteV1(ctx context.Context, id string, req
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) TestCloudIdpGroupV1(ctx context.Context, id string, request *GroupTestSearchRequest) (*GroupTestSearchResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GroupTestSearchResponse
 	endpoint := fmt.Sprintf("%s/cloud-idp/%s/test-group", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -189,7 +189,7 @@ func (c *Client) TestCloudIdpGroupV1(ctx context.Context, id string, request *Gr
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) TestCloudIdpUserV1(ctx context.Context, id string, request *UserTestSearchRequest) (*UserTestSearchResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result UserTestSearchResponse
 	endpoint := fmt.Sprintf("%s/cloud-idp/%s/test-user", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -205,7 +205,7 @@ func (c *Client) TestCloudIdpUserV1(ctx context.Context, id string, request *Use
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) TestCloudIdpUserMembershipV1(ctx context.Context, id string, request *MembershipTestSearchRequest) (*MembershipTestSearchResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result MembershipTestSearchResponse
 	endpoint := fmt.Sprintf("%s/cloud-idp/%s/test-user-membership", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -216,7 +216,7 @@ func (c *Client) TestCloudIdpUserMembershipV1(ctx context.Context, id string, re
 
 // ResolveCloudIdpV1IDByName looks up a CloudIdpV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveCloudIdpV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/cloud-idp"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -227,7 +227,7 @@ func (c *Client) ResolveCloudIdpV1IDByName(ctx context.Context, name string) (st
 
 // ResolveCloudIdpV1ByName looks up a CloudIdpV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveCloudIdpV1ByName(ctx context.Context, name string) (*CloudIDPCommonResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/cloud-idp"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {

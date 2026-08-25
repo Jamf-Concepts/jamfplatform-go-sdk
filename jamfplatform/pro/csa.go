@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetCsaTenantIdV1(ctx context.Context) (*CsaTenantIDInfo, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CsaTenantIDInfo
 	endpoint := prefix + "/csa/tenant-id"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetCsaTenantIdV1(ctx context.Context) (*CsaTenantIDInfo, error)
 //
 // Required privileges: read:pro:cloud-services-settings. Legacy Jamf Pro privilege name(s): Read Cloud Services Settings.
 func (c *Client) GetCsaTokenV1(ctx context.Context) (*CsaToken, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CsaToken
 	endpoint := prefix + "/csa/token"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -41,7 +41,7 @@ func (c *Client) GetCsaTokenV1(ctx context.Context) (*CsaToken, error) {
 //
 // Required privileges: update:pro:cloud-services-settings. Legacy Jamf Pro privilege name(s): Update Cloud Services Settings.
 func (c *Client) DeleteCsaTokenV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/csa/token"
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteCsaTokenV1: %w", err)

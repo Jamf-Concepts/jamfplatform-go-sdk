@@ -30,7 +30,7 @@ import (
 //     filter=position=="Manager";id!="1" - filter=id=in=(123,456,789).
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) ListUsersV1(ctx context.Context, sort []string, filter string, platform bool) ([]User, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]User, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -67,7 +67,7 @@ func (c *Client) ListUsersV1(ctx context.Context, sort []string, filter string, 
 // Parameters:
 //   - platform: Internal platform request indicator.
 func (c *Client) CreateUserV1(ctx context.Context, request *UserInventory, platform bool) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/users"
 	params := url.Values{}
@@ -91,7 +91,7 @@ func (c *Client) CreateUserV1(ctx context.Context, request *UserInventory, platf
 //   - id: ID of the user to retrieve.
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) GetUserV1(ctx context.Context, id string, platform bool) (*User, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result User
 	endpoint := fmt.Sprintf("%s/users/%s", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -114,7 +114,7 @@ func (c *Client) GetUserV1(ctx context.Context, id string, platform bool) (*User
 // Parameters:
 //   - id: ID of the user to update.
 func (c *Client) UpdateUserV1(ctx context.Context, id string, request *UserInventory) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/users/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateUserV1(%s): %w", id, err)
@@ -129,7 +129,7 @@ func (c *Client) UpdateUserV1(ctx context.Context, id string, request *UserInven
 // Parameters:
 //   - id: ID of the user to delete.
 func (c *Client) DeleteUserV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/users/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteUserV1(%s): %w", id, err)
@@ -139,7 +139,7 @@ func (c *Client) DeleteUserV1(ctx context.Context, id string) error {
 
 // ResolveUserV1IDByName looks up a UserV1 by its username field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveUserV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/users"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
 	if err != nil {
@@ -150,7 +150,7 @@ func (c *Client) ResolveUserV1IDByName(ctx context.Context, name string) (string
 
 // ResolveUserV1ByName looks up a UserV1 by its username field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveUserV1ByName(ctx context.Context, name string) (*User, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/users"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
 	if err != nil {

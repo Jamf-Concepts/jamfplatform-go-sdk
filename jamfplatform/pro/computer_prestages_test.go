@@ -13,7 +13,7 @@ import (
 
 func TestGetAllComputerPrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-prestages/scope", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computer-prestages/scope", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetAllComputerPrestageScopeV2(t *testing.T) {
 
 func TestGetAllComputerPrestageScopeV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-prestages/scope", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computer-prestages/scope", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetAllComputerPrestageScopeV2_NotFound(t *testing.T) {
 
 func TestGetComputerPrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computer-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestGetComputerPrestageScopeV2(t *testing.T) {
 
 func TestGetComputerPrestageScopeV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-prestages/test-id/scope", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computer-prestages/test-id/scope", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -81,7 +81,7 @@ func TestGetComputerPrestageScopeV2_NotFound(t *testing.T) {
 
 func TestReplaceComputerPrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computer-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -99,7 +99,7 @@ func TestReplaceComputerPrestageScopeV2(t *testing.T) {
 
 func TestAddToComputerPrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computer-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -117,7 +117,7 @@ func TestAddToComputerPrestageScopeV2(t *testing.T) {
 
 func TestRemoveFromComputerPrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computer-prestages/test-id/scope/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computer-prestages/test-id/scope/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -135,7 +135,7 @@ func TestRemoveFromComputerPrestageScopeV2(t *testing.T) {
 
 func TestListComputerPrestagesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -157,7 +157,7 @@ func TestListComputerPrestagesV3(t *testing.T) {
 
 func TestCreateComputerPrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -175,7 +175,7 @@ func TestCreateComputerPrestageV3(t *testing.T) {
 
 func TestGetComputerPrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -193,7 +193,7 @@ func TestGetComputerPrestageV3(t *testing.T) {
 
 func TestGetComputerPrestageV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -209,7 +209,7 @@ func TestGetComputerPrestageV3_NotFound(t *testing.T) {
 
 func TestUpdateComputerPrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -227,7 +227,7 @@ func TestUpdateComputerPrestageV3(t *testing.T) {
 
 func TestDeleteComputerPrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -242,7 +242,7 @@ func TestDeleteComputerPrestageV3(t *testing.T) {
 
 func TestResolveComputerPrestageV3IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -265,7 +265,7 @@ func TestResolveComputerPrestageV3IDByName(t *testing.T) {
 
 func TestResolveComputerPrestageV3ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -289,7 +289,7 @@ func TestResolveComputerPrestageV3ByName(t *testing.T) {
 func TestApplyComputerPrestageV3_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -321,7 +321,7 @@ func TestApplyComputerPrestageV3_Create(t *testing.T) {
 func TestApplyComputerPrestageV3_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -333,7 +333,7 @@ func TestApplyComputerPrestageV3_Update(t *testing.T) {
 		})
 	})
 	// GET (versionLock fetch) and Update share the same path — dispatch on method.
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computer-prestages/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computer-prestages/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "versionLock": 5})

@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
 func (c *Client) ListJamfRemoteAssistSessionsV1(ctx context.Context) ([]SessionHistoryItem, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []SessionHistoryItem
 	endpoint := prefix + "/jamf-remote-assist/session"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -36,7 +36,7 @@ func (c *Client) ListJamfRemoteAssistSessionsV1(ctx context.Context) ([]SessionH
 // Parameters:
 //   - id: instance id of session.
 func (c *Client) GetJamfRemoteAssistSessionV1(ctx context.Context, id string) (*SessionHistoryItemWithDetails, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SessionHistoryItemWithDetails
 	endpoint := fmt.Sprintf("%s/jamf-remote-assist/session/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -58,7 +58,7 @@ func (c *Client) GetJamfRemoteAssistSessionV1(ctx context.Context, id string) (*
 //     deviceId, sessionAdminId. This param can be combined with paging and sorting. Example:
 //     sessionAdminId=="*Andrzej*".
 func (c *Client) ListJamfRemoteAssistSessionsV2(ctx context.Context, sort []string, filter string) ([]SessionHistoryItem, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SessionHistoryItem, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -90,7 +90,7 @@ func (c *Client) ListJamfRemoteAssistSessionsV2(ctx context.Context, sort []stri
 //
 // Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
 func (c *Client) ExportJamfRemoteAssistSessionsV2(ctx context.Context, request *ExportParameters) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
 	endpoint := prefix + "/jamf-remote-assist/session/export"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -106,7 +106,7 @@ func (c *Client) ExportJamfRemoteAssistSessionsV2(ctx context.Context, request *
 // Parameters:
 //   - id: instance id of session.
 func (c *Client) GetJamfRemoteAssistSessionV2(ctx context.Context, id string) (*SessionHistoryItemWithDetails, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SessionHistoryItemWithDetails
 	endpoint := fmt.Sprintf("%s/jamf-remote-assist/session/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

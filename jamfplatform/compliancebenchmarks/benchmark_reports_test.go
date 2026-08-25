@@ -13,7 +13,7 @@ import (
 
 func TestListBenchmarkRulesStats(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/benchmarks/test-id/rules", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks/test-id/rules", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListBenchmarkRulesStats(t *testing.T) {
 
 func TestListBenchmarkRuleDevices(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/benchmarks/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -57,7 +57,7 @@ func TestListBenchmarkRuleDevices(t *testing.T) {
 
 func TestGetBenchmarkCompliancePercentage(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/benchmarks/test-id/compliance-percentage", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks/test-id/compliance-percentage", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -75,7 +75,7 @@ func TestGetBenchmarkCompliancePercentage(t *testing.T) {
 
 func TestGetBenchmarkCompliancePercentage_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/benchmarks/test-id/compliance-percentage", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/compliance-benchmarks/v1/benchmarks/test-id/compliance-percentage", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

@@ -21,7 +21,7 @@ import (
 // Parameters:
 //   - id: Patch software title id to filter by.
 func (c *Client) GetPatchReportByPatchSoftwareTitleID(ctx context.Context, id string) (*PatchReport, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchReport
 	endpoint := fmt.Sprintf("%s/patchreports/patchsoftwaretitleid/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -40,7 +40,7 @@ func (c *Client) GetPatchReportByPatchSoftwareTitleID(ctx context.Context, id st
 //   - id: Patch software title ID to filter by.
 //   - version: Version number to filter by.
 func (c *Client) GetPatchReportByTitleIDVersion(ctx context.Context, id string, version string) (*PatchReport, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchReport
 	endpoint := fmt.Sprintf("%s/patchreports/patchsoftwaretitleid/%s/version/%s", prefix, url.PathEscape(id), url.PathEscape(version))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

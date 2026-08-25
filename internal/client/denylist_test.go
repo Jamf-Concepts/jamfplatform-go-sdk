@@ -58,28 +58,102 @@ func TestDoRefusesDeniedPath(t *testing.T) {
 	_ = srv
 }
 
-func TestTransportTenantPrefix(t *testing.T) {
+func TestTransportAPIPrefix(t *testing.T) {
 	tests := []struct {
 		name      string
-		tenantID  string
 		namespace string
 		version   string
 		want      string
 	}{
-		{"devices", "e77c1408-10c8-4007-b177-abc9157fbcaa", "devices", "v1", "/api/devices/v1/tenant/e77c1408-10c8-4007-b177-abc9157fbcaa"},
-		{"device groups", "t-123", "device-groups", "v1", "/api/device-groups/v1/tenant/t-123"},
-		{"device actions", "t-123", "device-actions", "v1", "/api/device-actions/v1/tenant/t-123"},
-		{"blueprints", "t-abc", "blueprints", "v1", "/api/blueprints/v1/tenant/t-abc"},
-		{"compliance benchmarks", "t-abc", "compliance-benchmarks", "v1", "/api/compliance-benchmarks/v1/tenant/t-abc"},
-		{"version-less pro", "t-abc", "pro", "", "/api/pro/tenant/t-abc"},
-		{"proclassic has no version", "t-abc", "proclassic", "", "/api/proclassic/tenant/t-abc"},
+		{"devices", "devices", "v1", "/api/devices/v1"},
+		{"device groups", "device-groups", "v1", "/api/device-groups/v1"},
+		{"device actions", "device-actions", "v1", "/api/device-actions/v1"},
+		{"blueprints", "blueprints", "v1", "/api/blueprints/v1"},
+		{"compliance benchmarks", "compliance-benchmarks", "v1", "/api/compliance-benchmarks/v1"},
+		{"slashed namespace", "ddm/report", "v1", "/api/ddm/report/v1"},
+		{"version-less pro", "pro", "", "/api/pro"},
+		{"proclassic has no version", "proclassic", "", "/api/proclassic"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			tr := &Transport{tenantID: tc.tenantID}
-			if got := tr.TenantPrefix(tc.namespace, tc.version); got != tc.want {
-				t.Errorf("TenantPrefix() = %q, want %q", got, tc.want)
+			// The scope is not in the path, so the prefix is independent of
+			// which tenant the client is configured for. That independence is
+			// the property this asserts: a tenant ID must never reach the URL.
+			tr := &Transport{}
+			WithTenantID("t-should-not-appear")(tr)
+			got := tr.APIPrefix(tc.namespace, tc.version)
+			if got != tc.want {
+				t.Errorf("APIPrefix(%q, %q) = %q, want %q", tc.namespace, tc.version, got, tc.want)
+			}
+			if strings.Contains(got, "t-should-not-appear") {
+				t.Error("the tenant ID leaked into the URL path; it belongs in the X-Tenant-Id header")
 			}
 		})
+	}
+}
+
+// TestScopeHeader pins the header each scope kind travels in. Organization
+// scope is deliberately absent: the gateway resolves it from the access token
+// alone, so there is no header for a client to send.
+func TestScopeHeader(t *testing.T) {
+	for _, tc := range []struct {
+		kind ScopeKind
+		want string
+	}{
+		{ScopeTenant, "X-Tenant-Id"},
+		{ScopeEnvironment, "X-Environment-Id"},
+		{ScopeKind(0), ""},
+		{ScopeKind(99), ""},
+	} {
+		if got := tc.kind.ScopeHeader(); got != tc.want {
+			t.Errorf("ScopeKind(%d).ScopeHeader() = %q, want %q", tc.kind, got, tc.want)
+		}
+	}
+}
+
+// TestSetScopeHeader covers what execute() stamps on an outbound request.
+func TestSetScopeHeader(t *testing.T) {
+	tests := []struct {
+		name string
+		tr   *Transport
+		want map[string]string
+	}{
+		{"tenant scope", &Transport{scopeKind: ScopeTenant, scopeID: "t-123"}, map[string]string{"X-Tenant-Id": "t-123"}},
+		{"environment scope", &Transport{scopeKind: ScopeEnvironment, scopeID: "e-456"}, map[string]string{"X-Environment-Id": "e-456"}},
+		// No scope configured is not an error: the gateway falls back to the
+		// access token, which is how organization-scoped products work.
+		{"no scope configured", &Transport{}, nil},
+		{"kind set but ID empty", &Transport{scopeKind: ScopeTenant}, nil},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req, err := http.NewRequest(http.MethodGet, "https://example.invalid/api/pro/v1/buildings", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			tc.tr.setScopeHeader(req)
+			for _, h := range []string{"X-Tenant-Id", "X-Environment-Id"} {
+				if got := req.Header.Get(h); got != tc.want[h] {
+					t.Errorf("%s = %q, want %q", h, got, tc.want[h])
+				}
+			}
+		})
+	}
+}
+
+// TestWithTenantID checks the option records a tenant scope, and that TenantID
+// only reports a value back when the scope really is a tenant.
+func TestWithTenantID(t *testing.T) {
+	tr := &Transport{}
+	WithTenantID("t-abc")(tr)
+	if tr.scopeKind != ScopeTenant {
+		t.Errorf("scopeKind = %v, want ScopeTenant", tr.scopeKind)
+	}
+	if got := tr.TenantID(); got != "t-abc" {
+		t.Errorf("TenantID() = %q, want %q", got, "t-abc")
+	}
+	env := &Transport{scopeKind: ScopeEnvironment, scopeID: "e-1"}
+	if got := env.TenantID(); got != "" {
+		t.Errorf("TenantID() on an environment-scoped client = %q, want empty", got)
 	}
 }

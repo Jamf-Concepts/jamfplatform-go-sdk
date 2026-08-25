@@ -24,7 +24,7 @@ import (
 //   - idType: Name is supported for all but the peripherals resource.
 //     Allowed values: "id", "name".
 func (c *Client) UploadFileByResourceIDTypeID(ctx context.Context, resource string, idType string, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/fileuploads/%s/%s/%s", prefix, url.PathEscape(resource), url.PathEscape(idType), url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UploadFileByResourceIDTypeID(%s): %w", resource, err)

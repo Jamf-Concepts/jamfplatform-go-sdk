@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: instance id of smart group.
 func (c *Client) RecalculateSmartComputerGroupV1(ctx context.Context, id string) (*RecalculationResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result RecalculationResults
 	endpoint := fmt.Sprintf("%s/smart-computer-groups/%s/recalculate", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodPost, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) RecalculateSmartComputerGroupV1(ctx context.Context, id string)
 // Parameters:
 //   - id: id of computer.
 func (c *Client) RecalculateComputerSmartGroupsV1(ctx context.Context, id string) (*RecalculationResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result RecalculationResults
 	endpoint := fmt.Sprintf("%s/computers/%s/recalculate-smart-groups", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodPost, endpoint, nil, &result); err != nil {
