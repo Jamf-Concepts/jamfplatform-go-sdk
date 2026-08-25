@@ -108,6 +108,23 @@ func WithTenantID(id string) Option {
 	}
 }
 
+// WithEnvironmentID sets the platform environment this client is scoped to. It
+// is sent as the X-Environment-Id request header on every API call.
+//
+// An environment groups a customer's tenants. A credential is minted against
+// one scope or the other, and the header must match the credential: an
+// environment-scoped integration sending X-Tenant-Id — or a tenant-scoped one
+// sending X-Environment-Id — is refused with 403 OWNERSHIP_FORBIDDEN, even when
+// both IDs belong to the same customer (wire-verified against securitycloud in
+// prod, 2026-08-25). So this is not an alternative spelling of WithTenantID;
+// pick the one your integration was created for.
+func WithEnvironmentID(id string) Option {
+	return func(c *Transport) {
+		c.scopeKind = ScopeEnvironment
+		c.scopeID = id
+	}
+}
+
 // WithCookieJar overrides the default in-memory cookie jar. Typically used to
 // install a persistent jar (e.g. FileCookieJar) so sticky-session cookies
 // survive across process invocations.
@@ -201,10 +218,11 @@ const (
 	// X-Tenant-Id. This is what every API surface in this SDK uses today.
 	ScopeTenant ScopeKind = iota + 1
 	// ScopeEnvironment scopes requests to a platform environment — a grouping
-	// of tenants — sent as X-Environment-Id. Declared because the gateway
-	// accepts it on several namespaces and environment-scoped APIs exist
-	// (ai-governance, audit); no operation this SDK generates is
-	// environment-scoped yet, so no option sets it.
+	// of tenants — sent as X-Environment-Id, set by WithEnvironmentID. Every
+	// spec this SDK generates declares X-Tenant-Id, so no operation *requires*
+	// environment scope; it is offered because the gateway accepts it (several
+	// api-products declare request-context-types [tenant, environment]) and an
+	// environment-scoped credential can only use this.
 	ScopeEnvironment
 )
 

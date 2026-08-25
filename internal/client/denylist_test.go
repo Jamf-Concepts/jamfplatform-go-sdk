@@ -141,6 +141,41 @@ func TestSetScopeHeader(t *testing.T) {
 	}
 }
 
+// TestWithEnvironmentID checks the option records an environment scope, and
+// that a client carries exactly one scope — the options are alternatives, not
+// additive, because the gateway refuses a header that disagrees with the
+// credential (403 OWNERSHIP_FORBIDDEN).
+func TestWithEnvironmentID(t *testing.T) {
+	tr := &Transport{}
+	WithEnvironmentID("e-123")(tr)
+	if tr.scopeKind != ScopeEnvironment {
+		t.Errorf("scopeKind = %v, want ScopeEnvironment", tr.scopeKind)
+	}
+	if tr.scopeID != "e-123" {
+		t.Errorf("scopeID = %q, want %q", tr.scopeID, "e-123")
+	}
+	if got := tr.TenantID(); got != "" {
+		t.Errorf("TenantID() on an environment-scoped client = %q, want empty", got)
+	}
+
+	// Last option wins; the client never sends both headers.
+	WithTenantID("t-456")(tr)
+	if tr.scopeKind != ScopeTenant || tr.scopeID != "t-456" {
+		t.Errorf("after WithTenantID: kind=%v id=%q, want ScopeTenant/t-456", tr.scopeKind, tr.scopeID)
+	}
+	req, err := http.NewRequest(http.MethodGet, "https://example.invalid/api/pro/v1/buildings", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tr.setScopeHeader(req)
+	if got := req.Header.Get("X-Environment-Id"); got != "" {
+		t.Errorf("X-Environment-Id = %q after switching to tenant scope, want empty", got)
+	}
+	if got := req.Header.Get("X-Tenant-Id"); got != "t-456" {
+		t.Errorf("X-Tenant-Id = %q, want t-456", got)
+	}
+}
+
 // TestWithTenantID checks the option records a tenant scope, and that TenantID
 // only reports a value back when the scope really is a tenant.
 func TestWithTenantID(t *testing.T) {

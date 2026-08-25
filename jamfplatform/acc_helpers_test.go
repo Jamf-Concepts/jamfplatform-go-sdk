@@ -59,6 +59,54 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 	return c, nil
 })
 
+// errAccEnvCredsUnset marks an absent environment-scoped credential set, the
+// same way errAccCredsUnset marks an absent tenant one.
+var errAccEnvCredsUnset = errors.New("environment-scoped acceptance credentials not configured")
+
+// initEnvAcceptanceClient creates and validates the singleton environment-scoped
+// acceptance client.
+//
+// This needs its own credential set, not just a second ID: a credential is
+// minted against one scope, and the gateway refuses a header that disagrees with
+// it — an environment-scoped integration sending X-Tenant-Id, or a tenant-scoped
+// one sending X-Environment-Id, gets 403 OWNERSHIP_FORBIDDEN even when both IDs
+// belong to the same customer. Wire-verified against securitycloud in prod on
+// 2026-08-25, which is what TestAcceptance_EnvironmentScope pins.
+var initEnvAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
+	baseURL := os.Getenv("JAMFPLATFORM_ENV_BASE_URL")
+	if baseURL == "" {
+		baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
+	}
+	clientID := os.Getenv("JAMFPLATFORM_ENV_CLIENT_ID")
+	clientSecret := os.Getenv("JAMFPLATFORM_ENV_CLIENT_SECRET")
+	environmentID := os.Getenv("JAMFPLATFORM_ENVIRONMENT_ID")
+
+	if baseURL == "" || clientID == "" || clientSecret == "" || environmentID == "" {
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ENV_CLIENT_ID, JAMFPLATFORM_ENV_CLIENT_SECRET, JAMFPLATFORM_ENVIRONMENT_ID (and JAMFPLATFORM_ENV_BASE_URL when it differs from JAMFPLATFORM_BASE_URL)", errAccEnvCredsUnset)
+	}
+
+	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
+		jamfplatform.WithEnvironmentID(environmentID))
+	if err := c.ValidateCredentials(context.Background()); err != nil {
+		return nil, fmt.Errorf("failed to validate environment-scoped credentials: %w", err)
+	}
+	return c, nil
+})
+
+// accEnvClient returns a live environment-scoped client. Unset credentials skip;
+// supplied-but-rejected credentials fail, the same distinction accClient draws.
+func accEnvClient(t *testing.T) *jamfplatform.Client {
+	t.Helper()
+	c, err := initEnvAcceptanceClient()
+	switch {
+	case errors.Is(err, errAccEnvCredsUnset):
+		t.Skipf("Skipping environment-scope acceptance test: %v", err)
+	case err != nil:
+		t.Fatal(credentialRejectedMessage(err))
+	}
+	return c
+}
+
 // egressIP reports this host's public egress IP, resolved once per run because a
 // rejected credential fails every test in the suite and a per-test lookup would
 // add three seconds each. An empty result is itself a signal: a host that cannot

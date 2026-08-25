@@ -53,6 +53,9 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	if cfg.tenantID != "" {
 		transportOpts = append(transportOpts, client.WithTenantID(cfg.tenantID))
 	}
+	if cfg.environmentID != "" {
+		transportOpts = append(transportOpts, client.WithEnvironmentID(cfg.environmentID))
+	}
 	if cfg.minRequestIntervalSet {
 		transportOpts = append(transportOpts, client.WithMinRequestInterval(cfg.minRequestInterval))
 	}
@@ -94,13 +97,14 @@ func (c *Client) Transport() *client.Transport {
 
 // clientConfig holds configuration applied via Option functions.
 type clientConfig struct {
-	userAgent    string
-	httpClient   *http.Client
-	logger       Logger
-	tenantID     string
-	tokenCache   TokenCache
-	cacheDir     string
-	cookieJarDir string
+	userAgent     string
+	httpClient    *http.Client
+	logger        Logger
+	tenantID      string
+	environmentID string
+	tokenCache    TokenCache
+	cacheDir      string
+	cookieJarDir  string
 
 	minRequestInterval    time.Duration
 	minRequestIntervalSet bool
@@ -171,6 +175,22 @@ func WithFileCookieJar(dir string) Option {
 func WithTenantID(id string) Option {
 	return func(cfg *clientConfig) {
 		cfg.tenantID = id
+	}
+}
+
+// WithEnvironmentID configures the platform environment this client is scoped
+// to. It is sent as the X-Environment-Id request header on every API call.
+//
+// An environment groups a customer's tenants. Use this instead of WithTenantID
+// when the integration was created with environment scope: the header must
+// match the credential, and a mismatch is refused with 403
+// OWNERSHIP_FORBIDDEN even when both IDs belong to the same customer.
+//
+// Setting both options is not meaningful — the last one wins, because a client
+// carries exactly one scope.
+func WithEnvironmentID(id string) Option {
+	return func(cfg *clientConfig) {
+		cfg.environmentID = id
 	}
 }
 
